@@ -7,7 +7,7 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.string('key', 255).notNullable().primary()
       table.integer('points').notNullable().defaultTo(0)
-      table.timestamp('expire', { useTz: true }).nullable()
+      table.bigInteger('expire').nullable()
     })
   }
 

@@ -27,7 +27,9 @@ import {
   Eye,
   MoreHorizontal,
   CirclePlus,
+  Globe,
 } from 'lucide-react'
+import { useTranslation, type Locale } from '@/lib/i18n'
 
 interface TeamListItem {
   id: string
@@ -192,6 +194,26 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
           </motion.div>
         )}
       </AnimatePresence>
+    </div>
+  )
+}
+
+function LanguageSwitcher() {
+  const { locale, setLocale } = useTranslation()
+  const locales: { value: Locale; label: string; flag: string }[] = [
+    { value: 'fr', label: 'Français', flag: '🇫🇷' },
+    { value: 'en', label: 'English', flag: '🇬🇧' },
+  ]
+
+  return (
+    <div className="px-1">
+      {locales.map((l) => (
+        <DropdownItem key={l.value} onClick={() => setLocale(l.value)}>
+          <Globe className="h-4 w-4" />
+          <span>{l.flag} {l.label}</span>
+          {locale === l.value && <Check className="h-3.5 w-3.5 ml-auto text-primary" />}
+        </DropdownItem>
+      ))}
     </div>
   )
 }
@@ -374,6 +396,10 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
               <Settings className="h-4 w-4" /> Parametres
             </DropdownItem>
           </Link>
+
+          <DropdownSeparator />
+
+          <LanguageSwitcher />
 
           <DropdownSeparator />
 
