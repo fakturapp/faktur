@@ -25,6 +25,8 @@ import {
   Shield,
   UserCog,
   Eye,
+  MoreHorizontal,
+  CirclePlus,
 } from 'lucide-react'
 
 interface TeamListItem {
@@ -91,18 +93,12 @@ const mainNav: NavItem[] = [
 
 const managementNav: NavItem[] = [
   { href: '/dashboard/company', label: 'Entreprise', icon: Building2 },
-  { href: '/dashboard/team', label: 'Équipe', icon: Users },
+  { href: '/dashboard/team', label: 'Equipe', icon: Users },
   { href: '/dashboard/settings/invoices', label: 'Facturation', icon: FileText },
-  { href: '/dashboard/account', label: 'Paramètres', icon: Settings },
+  { href: '/dashboard/account', label: 'Parametres', icon: Settings },
 ]
 
-function NavLink({
-  item,
-  pathname,
-}: {
-  item: NavItem
-  pathname: string
-}) {
+function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
   const isActive = item.href === '/dashboard'
     ? pathname === '/dashboard'
     : pathname === item.href || pathname.startsWith(item.href + '/')
@@ -209,7 +205,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
 
   return (
     <aside className="flex h-screen w-64 flex-col border-r border-border bg-card/50">
-      {/* Team Dropdown */}
+      {/* Team header */}
       <div className="px-3 py-3">
         {teamsLoaded ? (
           <Dropdown
@@ -220,8 +216,8 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
                   {currentTeam?.name.charAt(0).toUpperCase() || 'T'}
                 </div>
                 <div className="flex-1 min-w-0 text-left">
-                  <p className="text-sm font-medium text-foreground leading-tight truncate">
-                    {currentTeam?.name || 'Équipe'}
+                  <p className="text-sm font-semibold text-foreground leading-tight truncate">
+                    {currentTeam?.name || 'Equipe'}
                   </p>
                   {currentTeam?.role && (
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
@@ -237,7 +233,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
           >
             <div className="px-3 py-2">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Vos équipes
+                Vos equipes
               </p>
             </div>
 
@@ -272,7 +268,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
 
             <Link href="/dashboard/team">
               <DropdownItem>
-                <Users className="h-4 w-4" /> Gérer l&apos;équipe
+                <Users className="h-4 w-4" /> Gerer l&apos;equipe
               </DropdownItem>
             </Link>
             <Link href="/dashboard/company">
@@ -285,16 +281,16 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
 
             <Link href="/dashboard/team/create">
               <DropdownItem>
-                <Plus className="h-4 w-4" /> Créer une équipe
+                <Plus className="h-4 w-4" /> Creer une equipe
               </DropdownItem>
             </Link>
           </Dropdown>
         ) : (
           <div className="flex items-center gap-2.5 px-3 py-2">
-            <div className="h-8 w-8 rounded-lg bg-muted animate-pulse" />
+            <div className="h-8 w-8 rounded-lg skeleton-shimmer" />
             <div className="flex-1 space-y-1.5">
-              <div className="h-3.5 w-24 rounded bg-muted animate-pulse" />
-              <div className="h-2.5 w-16 rounded bg-muted animate-pulse" />
+              <div className="h-3.5 w-24 rounded skeleton-shimmer" />
+              <div className="h-2.5 w-16 rounded skeleton-shimmer" />
             </div>
           </div>
         )}
@@ -302,8 +298,19 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
 
       <div className="mx-3 h-px bg-border" />
 
+      {/* Quick create */}
+      <div className="px-3 pt-3 pb-1">
+        <Link
+          href="/dashboard/invoices/new"
+          className="flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+        >
+          <CirclePlus className="h-4 w-4" />
+          <span>Creer</span>
+        </Link>
+      </div>
+
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-1">
+      <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-1">
         {mainNav.map((item) => (
           <NavLink key={item.href} item={item} pathname={pathname} />
         ))}
@@ -321,7 +328,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
 
       <div className="mx-3 h-px bg-border" />
 
-      {/* User Section — Dropdown Menu */}
+      {/* User section */}
       <div className="p-3">
         <Dropdown
           align="left"
@@ -332,6 +339,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
                 alt={user.fullName || user.email}
                 fallback={initials}
                 size="sm"
+                className="grayscale"
               />
               <div className="flex-1 min-w-0 text-left">
                 <p className="text-sm font-medium text-foreground truncate leading-tight">
@@ -341,7 +349,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
                   {user.email}
                 </p>
               </div>
-              <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+              <MoreHorizontal className="h-4 w-4 text-muted-foreground shrink-0" />
             </div>
           }
           position="above"
@@ -363,14 +371,14 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
           </Link>
           <Link href="/dashboard/account">
             <DropdownItem>
-              <Settings className="h-4 w-4" /> Paramètres
+              <Settings className="h-4 w-4" /> Parametres
             </DropdownItem>
           </Link>
 
           <DropdownSeparator />
 
           <DropdownItem destructive onClick={onLogout}>
-            <LogOut className="h-4 w-4" /> Déconnexion
+            <LogOut className="h-4 w-4" /> Deconnexion
           </DropdownItem>
         </Dropdown>
       </div>

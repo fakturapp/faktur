@@ -43,6 +43,14 @@ export const controllers = {
       Me: () => import('#controllers/auth/session/me'),
     },
   },
+  client: {
+    Create: () => import('#controllers/client/create'),
+    Delete: () => import('#controllers/client/delete'),
+    List: () => import('#controllers/client/list'),
+    SearchSiren: () => import('#controllers/client/search_siren'),
+    Show: () => import('#controllers/client/show'),
+    Update: () => import('#controllers/client/update'),
+  },
   company: {
     Bank: () => import('#controllers/company/bank'),
     Show: () => import('#controllers/company/show'),
@@ -71,13 +79,5 @@ export const controllers = {
     TransferOwnership: () => import('#controllers/team/transfer_ownership'),
     UpdateRole: () => import('#controllers/team/update_role'),
     Update: () => import('#controllers/team/update'),
-  },
-  client: {
-    List: () => import('#controllers/client/list'),
-    Show: () => import('#controllers/client/show'),
-    Create: () => import('#controllers/client/create'),
-    Update: () => import('#controllers/client/update'),
-    Delete: () => import('#controllers/client/delete'),
-    SearchSiren: () => import('#controllers/client/search_siren'),
   },
 }
