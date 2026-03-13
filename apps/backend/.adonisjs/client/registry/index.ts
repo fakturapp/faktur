@@ -1,4 +1,4 @@
- 
+/* eslint-disable prettier/prettier */
 import type { AdonisEndpoint } from '@tuyau/core/types'
 import type { Registry } from './schema.d.ts'
 import type { ApiDefinition } from './tree.d.ts'
@@ -162,11 +162,23 @@ const routes = {
     tokens: [{"old":"/onboarding/company/search","type":0,"val":"onboarding","end":""},{"old":"/onboarding/company/search","type":0,"val":"company","end":""},{"old":"/onboarding/company/search","type":0,"val":"search","end":""}],
     types: placeholder as Registry['search_company']['types'],
   },
-  'dashboard_stats': {
+  'dashboard.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/dashboard',
+    tokens: [{"old":"/dashboard","type":0,"val":"dashboard","end":""}],
+    types: placeholder as Registry['dashboard.index']['types'],
+  },
+  'dashboard.stats': {
     methods: ["GET","HEAD"],
     pattern: '/dashboard/stats',
     tokens: [{"old":"/dashboard/stats","type":0,"val":"dashboard","end":""},{"old":"/dashboard/stats","type":0,"val":"stats","end":""}],
-    types: placeholder as Registry['dashboard_stats']['types'],
+    types: placeholder as Registry['dashboard.stats']['types'],
+  },
+  'serve_icon': {
+    methods: ["GET","HEAD"],
+    pattern: '/team-icons/:filename',
+    tokens: [{"old":"/team-icons/:filename","type":0,"val":"team-icons","end":""},{"old":"/team-icons/:filename","type":1,"val":"filename","end":""}],
+    types: placeholder as Registry['serve_icon']['types'],
   },
   'team_list': {
     methods: ["GET","HEAD"],
@@ -191,6 +203,12 @@ const routes = {
     pattern: '/team',
     tokens: [{"old":"/team","type":0,"val":"team","end":""}],
     types: placeholder as Registry['team_update']['types'],
+  },
+  'upload_icon': {
+    methods: ["POST"],
+    pattern: '/team/icon',
+    tokens: [{"old":"/team/icon","type":0,"val":"team","end":""},{"old":"/team/icon","type":0,"val":"icon","end":""}],
+    types: placeholder as Registry['upload_icon']['types'],
   },
   'team_switch': {
     methods: ["POST"],
@@ -246,6 +264,12 @@ const routes = {
     tokens: [{"old":"/invite/:token","type":0,"val":"invite","end":""},{"old":"/invite/:token","type":1,"val":"token","end":""}],
     types: placeholder as Registry['invite_info']['types'],
   },
+  'serve_logo': {
+    methods: ["GET","HEAD"],
+    pattern: '/company-logos/:filename',
+    tokens: [{"old":"/company-logos/:filename","type":0,"val":"company-logos","end":""},{"old":"/company-logos/:filename","type":1,"val":"filename","end":""}],
+    types: placeholder as Registry['serve_logo']['types'],
+  },
   'company_show': {
     methods: ["GET","HEAD"],
     pattern: '/company',
@@ -263,6 +287,12 @@ const routes = {
     pattern: '/company/bank',
     tokens: [{"old":"/company/bank","type":0,"val":"company","end":""},{"old":"/company/bank","type":0,"val":"bank","end":""}],
     types: placeholder as Registry['company_bank']['types'],
+  },
+  'upload_logo': {
+    methods: ["POST"],
+    pattern: '/company/logo',
+    tokens: [{"old":"/company/logo","type":0,"val":"company","end":""},{"old":"/company/logo","type":0,"val":"logo","end":""}],
+    types: placeholder as Registry['upload_logo']['types'],
   },
   'search_siren': {
     methods: ["GET","HEAD"],
@@ -299,6 +329,30 @@ const routes = {
     pattern: '/clients/:id',
     tokens: [{"old":"/clients/:id","type":0,"val":"clients","end":""},{"old":"/clients/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['client_delete']['types'],
+  },
+  'serve_invoice_logo': {
+    methods: ["GET","HEAD"],
+    pattern: '/invoice-logos/:filename',
+    tokens: [{"old":"/invoice-logos/:filename","type":0,"val":"invoice-logos","end":""},{"old":"/invoice-logos/:filename","type":1,"val":"filename","end":""}],
+    types: placeholder as Registry['serve_invoice_logo']['types'],
+  },
+  'invoice_settings_show': {
+    methods: ["GET","HEAD"],
+    pattern: '/settings/invoices',
+    tokens: [{"old":"/settings/invoices","type":0,"val":"settings","end":""},{"old":"/settings/invoices","type":0,"val":"invoices","end":""}],
+    types: placeholder as Registry['invoice_settings_show']['types'],
+  },
+  'invoice_settings_update': {
+    methods: ["PUT"],
+    pattern: '/settings/invoices',
+    tokens: [{"old":"/settings/invoices","type":0,"val":"settings","end":""},{"old":"/settings/invoices","type":0,"val":"invoices","end":""}],
+    types: placeholder as Registry['invoice_settings_update']['types'],
+  },
+  'invoice_logo_upload': {
+    methods: ["POST"],
+    pattern: '/settings/invoices/logo',
+    tokens: [{"old":"/settings/invoices/logo","type":0,"val":"settings","end":""},{"old":"/settings/invoices/logo","type":0,"val":"invoices","end":""},{"old":"/settings/invoices/logo","type":0,"val":"logo","end":""}],
+    types: placeholder as Registry['invoice_logo_upload']['types'],
   },
 } as const satisfies Record<string, AdonisEndpoint>
 

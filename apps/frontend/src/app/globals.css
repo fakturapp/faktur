@@ -19,6 +19,13 @@
   --color-secondary-foreground: #fafafa;
   --color-accent: #27272a;
   --color-accent-foreground: #fafafa;
+  --color-sidebar: #18181b;
+  --color-sidebar-foreground: #fafafa;
+  --color-sidebar-border: rgba(255, 255, 255, 0.08);
+  --color-sidebar-accent: #27272a;
+  --color-sidebar-accent-foreground: #fafafa;
+  --sidebar-width: 16rem;
+  --header-height: 3.5rem;
   --color-chart-1: #6366f1;
   --color-chart-2: #8b5cf6;
   --color-chart-3: #a78bfa;

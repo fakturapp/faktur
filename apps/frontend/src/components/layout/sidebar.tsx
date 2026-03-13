@@ -47,6 +47,7 @@ export interface SidebarProps {
   onSwitchTeam: (teamId: string) => void
   user: { fullName: string | null; email: string; avatarUrl: string | null }
   onLogout: () => void
+  collapsed?: boolean
 }
 
 const roleIcons: Record<string, React.ReactNode> = {
@@ -116,21 +117,14 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
       <Link
         href={item.href}
         className={cn(
-          'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors relative',
+          'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-all duration-300 ease-in-out relative',
           isActive
-            ? 'text-foreground'
-            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+            ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+            : 'text-muted-foreground hover:bg-sidebar-accent/50 hover:text-foreground'
         )}
       >
-        {isActive && (
-          <motion.div
-            layoutId="sidebar-active"
-            className="absolute inset-0 rounded-lg bg-muted"
-            transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
-          />
-        )}
-        <item.icon className="relative z-10 h-4 w-4 shrink-0" />
-        <span className="relative z-10">{item.label}</span>
+        <item.icon className="h-4 w-4 shrink-0" />
+        <span>{item.label}</span>
       </Link>
     )
   }
@@ -140,23 +134,15 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
       <button
         onClick={() => setExpanded(!expanded)}
         className={cn(
-          'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors relative',
+          'flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-all duration-300 ease-in-out relative',
           isActive
-            ? 'text-foreground'
-            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+            ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+            : 'text-muted-foreground hover:bg-sidebar-accent/50 hover:text-foreground'
         )}
       >
-        {isActive && !expanded && (
-          <motion.div
-            layoutId="sidebar-active"
-            className="absolute inset-0 rounded-lg bg-muted"
-            transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
-          />
-        )}
-        <item.icon className="relative z-10 h-4 w-4 shrink-0" />
-        <span className="relative z-10 flex-1 text-left">{item.label}</span>
+        <item.icon className="h-4 w-4 shrink-0" />
+        <span className="flex-1 text-left">{item.label}</span>
         <motion.div
-          className="relative z-10"
           animate={{ rotate: expanded ? 90 : 0 }}
           transition={{ duration: 0.2 }}
         >
@@ -172,7 +158,7 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
             transition={{ duration: 0.2, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
-            <div className="ml-4 border-l border-border/50 pl-3 py-1 space-y-0.5">
+            <div className="ml-4 border-l border-sidebar-border pl-3 py-1 space-y-0.5">
               {item.children!.map((child) => {
                 const childActive = pathname === child.href
                 return (
@@ -180,10 +166,10 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
                     key={child.href}
                     href={child.href}
                     className={cn(
-                      'flex items-center rounded-md px-3 py-1.5 text-sm transition-colors',
+                      'flex items-center rounded-md px-3 py-1.5 text-sm transition-all duration-300 ease-in-out',
                       childActive
-                        ? 'text-foreground font-medium bg-muted/50'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
+                        ? 'bg-sidebar-accent/50 text-sidebar-accent-foreground font-medium'
+                        : 'text-muted-foreground hover:bg-sidebar-accent/50 hover:text-foreground'
                     )}
                   >
                     {child.label}
@@ -218,7 +204,7 @@ function LanguageSwitcher() {
   )
 }
 
-export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, onLogout }: SidebarProps) {
+export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, onLogout, collapsed }: SidebarProps) {
   const pathname = usePathname()
 
   const initials = user.fullName
@@ -226,14 +212,19 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
     : user.email.slice(0, 2).toUpperCase()
 
   return (
-    <aside className="flex h-screen w-64 flex-col border-r border-border bg-card/50">
+    <aside
+      className={cn(
+        'flex h-screen flex-col bg-sidebar text-sidebar-foreground transition-[width] duration-200 ease-linear overflow-hidden',
+        collapsed ? 'w-0' : 'w-(--sidebar-width)'
+      )}
+    >
       {/* Team header */}
       <div className="px-3 py-3">
         {teamsLoaded ? (
           <Dropdown
             align="left"
             trigger={
-              <div className="flex items-center gap-2.5 rounded-lg px-3 py-2 hover:bg-muted/50 transition-colors w-full">
+              <div className="flex items-center gap-2.5 rounded-lg px-3 py-2 hover:bg-sidebar-accent/50 transition-all duration-300 ease-in-out w-full">
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary font-semibold text-xs">
                   {currentTeam?.name.charAt(0).toUpperCase() || 'T'}
                 </div>
@@ -351,7 +342,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
         <Dropdown
           align="left"
           trigger={
-            <div className="flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-muted/50 transition-colors w-full">
+            <div className="flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-sidebar-accent/50 transition-all duration-300 ease-in-out w-full">
               <Avatar
                 src={user.avatarUrl}
                 alt={user.fullName || user.email}

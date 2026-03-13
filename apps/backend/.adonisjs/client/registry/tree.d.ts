@@ -1,4 +1,4 @@
- 
+/* eslint-disable prettier/prettier */
 import type { routes } from './index.ts'
 
 export interface ApiDefinition {
@@ -30,11 +30,16 @@ export interface ApiDefinition {
   createCompany: typeof routes['create_company']
   skipCompany: typeof routes['skip_company']
   searchCompany: typeof routes['search_company']
-  dashboardStats: typeof routes['dashboard_stats']
+  dashboard: {
+    index: typeof routes['dashboard.index']
+    stats: typeof routes['dashboard.stats']
+  }
+  serveIcon: typeof routes['serve_icon']
   teamList: typeof routes['team_list']
   teamCreate: typeof routes['team_create']
   teamShow: typeof routes['team_show']
   teamUpdate: typeof routes['team_update']
+  uploadIcon: typeof routes['upload_icon']
   teamSwitch: typeof routes['team_switch']
   teamMembers: typeof routes['team_members']
   teamInvite: typeof routes['team_invite']
@@ -44,13 +49,19 @@ export interface ApiDefinition {
   removeMember: typeof routes['remove_member']
   transferOwnership: typeof routes['transfer_ownership']
   inviteInfo: typeof routes['invite_info']
+  serveLogo: typeof routes['serve_logo']
   companyShow: typeof routes['company_show']
   companyUpdate: typeof routes['company_update']
   companyBank: typeof routes['company_bank']
+  uploadLogo: typeof routes['upload_logo']
   searchSiren: typeof routes['search_siren']
   clientList: typeof routes['client_list']
   clientShow: typeof routes['client_show']
   clientCreate: typeof routes['client_create']
   clientUpdate: typeof routes['client_update']
   clientDelete: typeof routes['client_delete']
+  serveInvoiceLogo: typeof routes['serve_invoice_logo']
+  invoiceSettingsShow: typeof routes['invoice_settings_show']
+  invoiceSettingsUpdate: typeof routes['invoice_settings_update']
+  invoiceLogoUpload: typeof routes['invoice_logo_upload']
 }

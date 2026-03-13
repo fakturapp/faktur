@@ -1,4 +1,4 @@
- 
+/* eslint-disable prettier/prettier */
 /// <reference path="../manifest.d.ts" />
 
 import type { ExtractBody, ExtractErrorResponse, ExtractQuery, ExtractQueryForGet, ExtractResponse } from '@tuyau/core/types'
@@ -319,7 +319,19 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/onboarding/search_company').default['handle']>>>
     }
   }
-  'dashboard_stats': {
+  'dashboard.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/dashboard'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/stats').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/stats').default['handle']>>>
+    }
+  }
+  'dashboard.stats': {
     methods: ["GET","HEAD"]
     pattern: '/dashboard/stats'
     types: {
@@ -329,6 +341,18 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/stats').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/stats').default['handle']>>>
+    }
+  }
+  'serve_icon': {
+    methods: ["GET","HEAD"]
+    pattern: '/team-icons/:filename'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { filename: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/team/serve_icon').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/team/serve_icon').default['handle']>>>
     }
   }
   'team_list': {
@@ -377,6 +401,18 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/team/update').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/team/update').default['handle']>>>
+    }
+  }
+  'upload_icon': {
+    methods: ["POST"]
+    pattern: '/team/icon'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/team/upload_icon').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/team/upload_icon').default['handle']>>>
     }
   }
   'team_switch': {
@@ -487,6 +523,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/team/invite_info').default['handle']>>>
     }
   }
+  'serve_logo': {
+    methods: ["GET","HEAD"]
+    pattern: '/company-logos/:filename'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { filename: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/company/serve_logo').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/company/serve_logo').default['handle']>>>
+    }
+  }
   'company_show': {
     methods: ["GET","HEAD"]
     pattern: '/company'
@@ -521,6 +569,18 @@ export interface Registry {
       query: ExtractQuery<InferInput<(typeof import('#validators/auth/onboarding_validators').updateBankValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/company/bank').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/company/bank').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'upload_logo': {
+    methods: ["POST"]
+    pattern: '/company/logo'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/company/upload_logo').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/company/upload_logo').default['handle']>>>
     }
   }
   'search_siren': {
@@ -593,6 +653,54 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/client/delete').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/client/delete').default['handle']>>>
+    }
+  }
+  'serve_invoice_logo': {
+    methods: ["GET","HEAD"]
+    pattern: '/invoice-logos/:filename'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { filename: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings/serve_invoice_logo').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings/serve_invoice_logo').default['handle']>>>
+    }
+  }
+  'invoice_settings_show': {
+    methods: ["GET","HEAD"]
+    pattern: '/settings/invoices'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings/invoice_settings_show').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings/invoice_settings_show').default['handle']>>>
+    }
+  }
+  'invoice_settings_update': {
+    methods: ["PUT"]
+    pattern: '/settings/invoices'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/invoice_settings_validator').updateInvoiceSettingsValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/invoice_settings_validator').updateInvoiceSettingsValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings/invoice_settings_update').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings/invoice_settings_update').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'invoice_logo_upload': {
+    methods: ["POST"]
+    pattern: '/settings/invoices/logo'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings/invoice_logo_upload').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings/invoice_logo_upload').default['handle']>>>
     }
   }
 }
