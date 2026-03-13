@@ -14,7 +14,7 @@ export function QuickActions() {
   return (
     <div className="px-4 lg:px-6">
       <h2 className="text-base font-medium mb-4">Actions rapides</h2>
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 @xl/main:grid-cols-3">
         {actions.map((action) => (
           <Link key={action.label} href={action.href}>
             <Card className="group cursor-pointer hover:ring-primary/30 transition-all hover:shadow-lg hover:shadow-primary/5">

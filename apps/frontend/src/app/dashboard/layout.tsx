@@ -139,7 +139,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <RouteProgressBar />
 
         <main className="flex-1 overflow-y-auto">
-          <div className="flex flex-1 flex-col gap-2">
+          <div className="@container/main flex flex-1 flex-col gap-2">
             {children}
           </div>
         </main>

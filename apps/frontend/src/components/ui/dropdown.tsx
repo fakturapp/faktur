@@ -23,8 +23,15 @@ export function Dropdown({ trigger, children, align = 'right', position = 'below
         setOpen(false)
       }
     }
+    function handleEscape(e: KeyboardEvent) {
+      if (e.key === 'Escape') setOpen(false)
+    }
     document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
+    document.addEventListener('keydown', handleEscape)
+    return () => {
+      document.removeEventListener('mousedown', handleClick)
+      document.removeEventListener('keydown', handleEscape)
+    }
   }, [])
 
   return (
@@ -35,12 +42,12 @@ export function Dropdown({ trigger, children, align = 'right', position = 'below
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: position === 'above' ? 4 : -4, scale: 0.95 }}
+            initial={{ opacity: 0, y: position === 'above' ? 6 : -6, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: position === 'above' ? 4 : -4, scale: 0.95 }}
-            transition={{ duration: 0.15 }}
+            exit={{ opacity: 0, y: position === 'above' ? 6 : -6, scale: 0.96 }}
+            transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
             className={cn(
-              'absolute z-50 min-w-[200px] rounded-xl border border-border bg-card p-1.5 shadow-xl',
+              'absolute z-50 min-w-[220px] rounded-xl border border-border/80 bg-card p-1.5 shadow-xl shadow-black/10 backdrop-blur-xl',
               position === 'above' ? 'bottom-full mb-2' : 'mt-2',
               align === 'right' ? 'right-0' : 'left-0',
               className
@@ -64,10 +71,10 @@ export const DropdownItem = React.forwardRef<HTMLButtonElement, DropdownItemProp
     <button
       ref={ref}
       className={cn(
-        'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors',
+        'flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
         destructive
           ? 'text-destructive hover:bg-destructive/10'
-          : 'text-foreground hover:bg-muted',
+          : 'text-foreground/90 hover:bg-muted hover:text-foreground',
         className
       )}
       {...props}
@@ -78,4 +85,14 @@ export const DropdownItem = React.forwardRef<HTMLButtonElement, DropdownItemProp
 )
 DropdownItem.displayName = 'DropdownItem'
 
-export const DropdownSeparator = () => <div className="my-1 h-px bg-border" />
+export function DropdownLabel({ children, className }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div className={cn('px-3 py-2', className)}>
+      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+        {children}
+      </p>
+    </div>
+  )
+}
+
+export const DropdownSeparator = () => <div className="my-1.5 h-px bg-border/60" />

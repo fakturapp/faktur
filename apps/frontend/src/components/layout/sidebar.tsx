@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Avatar } from '@/components/ui/avatar'
-import { Dropdown, DropdownItem, DropdownSeparator } from '@/components/ui/dropdown'
+import { Dropdown, DropdownItem, DropdownLabel, DropdownSeparator } from '@/components/ui/dropdown'
 import {
   LayoutDashboard,
   FileText,
@@ -116,7 +116,7 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
       <Link
         href={item.href}
         className={cn(
-          'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors relative',
+          'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors relative',
           isActive
             ? 'text-foreground'
             : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
@@ -140,7 +140,7 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
       <button
         onClick={() => setExpanded(!expanded)}
         className={cn(
-          'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors relative',
+          'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors relative',
           isActive
             ? 'text-foreground'
             : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
@@ -253,11 +253,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             }
             className="min-w-[230px]"
           >
-            <div className="px-3 py-2">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Vos equipes
-              </p>
-            </div>
+            <DropdownLabel>Vos equipes</DropdownLabel>
 
             {teams.map((team) => (
               <DropdownItem
@@ -324,7 +320,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
       <div className="px-3 pt-3 pb-1">
         <Link
           href="/dashboard/invoices/new"
-          className="flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+          className="flex items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm"
         >
           <CirclePlus className="h-4 w-4" />
           <span>Creer</span>

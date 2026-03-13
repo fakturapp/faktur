@@ -129,7 +129,7 @@ export default function InvoiceSettingsPage() {
 
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto space-y-6 px-4 lg:px-6 py-4 md:py-6">
+      <div className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
         <div className="space-y-2">
           <Skeleton className="h-8 w-64" />
           <Skeleton className="h-4 w-96" />
@@ -153,7 +153,7 @@ export default function InvoiceSettingsPage() {
     <motion.div
       initial="hidden"
       animate="visible"
-      className="max-w-4xl mx-auto space-y-6 px-4 lg:px-6 py-4 md:py-6"
+      className="space-y-6 px-4 lg:px-6 py-4 md:py-6"
     >
       {/* Header */}
       <motion.div variants={fadeUp} custom={0}>

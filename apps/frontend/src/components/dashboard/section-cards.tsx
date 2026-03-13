@@ -25,12 +25,12 @@ interface SectionCardsProps {
 
 export function SectionCards({ cards }: SectionCardsProps) {
   return (
-    <div className="grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs lg:px-6 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs dark:*:data-[slot=card]:bg-card lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
       {cards.map((stat) => (
-        <Card key={stat.label}>
+        <Card key={stat.label} className="@container/card">
           <CardHeader>
             <CardDescription>{stat.label}</CardDescription>
-            <CardTitle className="text-2xl font-semibold tabular-nums">
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
               {stat.value}
             </CardTitle>
             <CardAction>

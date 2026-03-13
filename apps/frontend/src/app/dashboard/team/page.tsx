@@ -221,7 +221,7 @@ export default function TeamPage() {
 
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto space-y-6 px-4 lg:px-6 py-4 md:py-6">
+      <div className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
         <div className="rounded-2xl border border-border/50 overflow-hidden">
           <div className="h-24 bg-gradient-to-br from-indigo-500/20 via-purple-500/10 to-transparent" />
           <div className="p-6 -mt-12 flex items-end gap-4">
@@ -260,7 +260,7 @@ export default function TeamPage() {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-4xl mx-auto space-y-6 px-4 lg:px-6 py-4 md:py-6"
+      className="space-y-6 px-4 lg:px-6 py-4 md:py-6"
     >
       {/* Team Header Card */}
       <Card className="overflow-hidden border-border/50">

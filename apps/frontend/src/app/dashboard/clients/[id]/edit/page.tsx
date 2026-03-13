@@ -139,7 +139,7 @@ export default function ClientEditPage() {
 
   if (loading) {
     return (
-      <div className="max-w-3xl mx-auto space-y-6 px-4 lg:px-6 py-4 md:py-6">
+      <div className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
         <Skeleton className="h-4 w-32" />
         <div className="flex items-center gap-3">
           <Skeleton className="h-10 w-10 rounded-lg" />
@@ -153,7 +153,7 @@ export default function ClientEditPage() {
 
   if (!client) {
     return (
-      <div className="max-w-3xl mx-auto text-center py-20 px-4 lg:px-6">
+      <div className="text-center py-20 px-4 lg:px-6">
         <p className="text-muted-foreground">Client introuvable.</p>
         <Link href="/dashboard/clients"><Button variant="outline" className="mt-4">Retour</Button></Link>
       </div>
@@ -165,7 +165,7 @@ export default function ClientEditPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 lg:px-6 py-4 md:py-6">
+    <div className="px-4 lg:px-6 py-4 md:py-6">
       <Link href="/dashboard/clients" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6">
         <ArrowLeft className="h-4 w-4" /> Retour aux clients
       </Link>

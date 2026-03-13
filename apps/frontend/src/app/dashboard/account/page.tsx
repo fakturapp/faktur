@@ -272,7 +272,7 @@ export default function AccountPage() {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-4xl mx-auto space-y-6 px-4 lg:px-6 py-4 md:py-6"
+      className="space-y-6 px-4 lg:px-6 py-4 md:py-6"
     >
       <div>
         <h1 className="text-2xl font-bold text-foreground">Mon compte</h1>

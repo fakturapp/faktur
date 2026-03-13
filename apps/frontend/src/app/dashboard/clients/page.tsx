@@ -80,7 +80,7 @@ export default function ClientsPage() {
   const individualCount = clients.filter((c) => c.type === 'individual').length
 
   return (
-    <motion.div initial="hidden" animate="visible" className="max-w-5xl mx-auto space-y-6 px-4 lg:px-6 py-4 md:py-6">
+    <motion.div initial="hidden" animate="visible" className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
       {/* Header */}
       <motion.div variants={fadeUp} custom={0} className="flex items-center justify-between">
         <div>
@@ -97,7 +97,7 @@ export default function ClientsPage() {
       </motion.div>
 
       {/* Stats */}
-      <motion.div variants={fadeUp} custom={1} className="grid grid-cols-3 gap-4">
+      <motion.div variants={fadeUp} custom={1} className="grid grid-cols-1 gap-4 @xl/main:grid-cols-3">
         <div className="rounded-xl border border-border bg-card/50 p-4">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
