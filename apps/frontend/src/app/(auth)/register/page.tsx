@@ -60,7 +60,7 @@ export default function RegisterPage() {
               <motion.div variants={fadeUp} custom={0} className="flex flex-col items-center gap-2 text-center mb-2">
                 <h1 className="text-2xl font-bold">Créer un compte</h1>
                 <p className="text-muted-foreground text-sm">
-                  Rejoignez ZenVoice gratuitement
+                  Rejoignez Faktur gratuitement
                 </p>
               </motion.div>
 

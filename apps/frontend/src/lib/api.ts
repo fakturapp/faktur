@@ -4,7 +4,7 @@ async function request<T = unknown>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<{ data?: T; error?: string }> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('zenvoice_token') : null
+  const token = typeof window !== 'undefined' ? localStorage.getItem('faktur_token') : null
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -32,7 +32,7 @@ async function uploadRequest<T = unknown>(
   endpoint: string,
   formData: FormData
 ): Promise<{ data?: T; error?: string }> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('zenvoice_token') : null
+  const token = typeof window !== 'undefined' ? localStorage.getItem('faktur_token') : null
 
   const headers: Record<string, string> = {}
   if (token) {

@@ -10,7 +10,7 @@ import '#start/routes/client'
 
 router.get('/', async () => {
   return {
-    name: 'ZenVoice API',
+    name: 'Faktur API',
     version: '1.0.0',
     status: 'healthy',
   }

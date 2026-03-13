@@ -122,7 +122,7 @@ export default function AccountPage() {
 
     setAvatarUploading(true)
     try {
-      const token = localStorage.getItem('zenvoice_token')
+      const token = localStorage.getItem('faktur_token')
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333'
       const res = await fetch(`${baseUrl}/account/avatar`, {
         method: 'POST',
