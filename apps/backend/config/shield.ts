@@ -6,19 +6,21 @@ const shieldConfig = defineConfig({
    * to learn more.
    */
   csp: {
-    /**
-     * Enable the Content-Security-Policy header.
-     */
-    enabled: false,
-
-    /**
-     * Per-resource CSP directives.
-     */
-    directives: {},
-
-    /**
-     * Report violations without blocking resources.
-     */
+    enabled: true,
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", '@nonce'],
+      styleSrc: ["'self'", '@nonce'],
+      imgSrc: ["'self'", 'data:', 'blob:'],
+      connectSrc: ["'self'"],
+      fontSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      frameSrc: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+      frameAncestors: ["'none'"],
+      upgradeInsecureRequests: [],
+    },
     reportOnly: false,
   },
 
@@ -69,15 +71,9 @@ const shieldConfig = defineConfig({
    * Force browser to always use HTTPS.
    */
   hsts: {
-    /**
-     * Enable the Strict-Transport-Security header.
-     */
     enabled: true,
-
-    /**
-     * HSTS policy duration remembered by browsers.
-     */
     maxAge: '180 days',
+    includeSubDomains: true,
   },
 
   /**

@@ -1,5 +1,12 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
+import {
+  loginLimiter,
+  registerLimiter,
+  passwordResetLimiter,
+  emailVerificationLimiter,
+  twoFactorLimiter,
+} from '#middleware/security/rate_limit_middleware'
 
 const Login = () => import('#controllers/auth/session/login')
 const Logout = () => import('#controllers/auth/session/logout')
@@ -15,15 +22,15 @@ const TwoFactorVerify = () => import('#controllers/auth/security/two_factor/veri
 
 router
   .group(() => {
-    router.post('/sign-up', [Signup, 'handle'])
-    router.post('/verify-email', [VerifyEmail, 'handle'])
-    router.post('/resend-verification', [ResendVerification, 'handle'])
+    router.post('/sign-up', [Signup, 'handle']).use(registerLimiter)
+    router.post('/verify-email', [VerifyEmail, 'handle']).use(emailVerificationLimiter)
+    router.post('/resend-verification', [ResendVerification, 'handle']).use(emailVerificationLimiter)
 
-    router.post('/login', [Login, 'handle'])
-    router.post('/login/2fa', [TwoFactorVerify, 'handle'])
+    router.post('/login', [Login, 'handle']).use(loginLimiter)
+    router.post('/login/2fa', [TwoFactorVerify, 'handle']).use(twoFactorLimiter)
 
-    router.post('/password/forgot', [PasswordResetRequest, 'handle'])
-    router.post('/password/reset', [PasswordReset, 'handle'])
+    router.post('/password/forgot', [PasswordResetRequest, 'handle']).use(passwordResetLimiter)
+    router.post('/password/reset', [PasswordReset, 'handle']).use(passwordResetLimiter)
 
     router
       .group(() => {
