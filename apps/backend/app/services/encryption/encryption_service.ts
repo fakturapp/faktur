@@ -7,7 +7,8 @@ class EncryptionService {
   private ivLength = 16
 
   private getKey(): Buffer {
-    const keyString = env.get('ENCRYPTION_KEY') || env.get('APP_KEY')
+    const rawKey = env.get('ENCRYPTION_KEY') || env.get('APP_KEY')
+    const keyString = typeof rawKey === 'string' ? rawKey : rawKey.release()
     return crypto.scryptSync(keyString, 'salt', this.keyLength)
   }
 

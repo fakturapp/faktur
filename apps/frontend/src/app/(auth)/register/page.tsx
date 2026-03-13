@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldError } from '@/components/ui/field'
+import { Spinner } from '@/components/ui/spinner'
 import { api } from '@/lib/api'
 
 const fadeUp = {
@@ -57,7 +58,7 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit}>
             <FieldGroup>
               <motion.div variants={fadeUp} custom={0} className="flex flex-col items-center gap-2 text-center mb-2">
-                <h1 className="text-2xl font-bold">Creer un compte</h1>
+                <h1 className="text-2xl font-bold">Créer un compte</h1>
                 <p className="text-muted-foreground text-sm">
                   Rejoignez ZenVoice gratuitement
                 </p>
@@ -106,7 +107,7 @@ export default function RegisterPage() {
                   <Input
                     id="password"
                     type="password"
-                    placeholder="8 caracteres minimum"
+                    placeholder="8 caractères minimum"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     minLength={8}
@@ -133,15 +134,9 @@ export default function RegisterPage() {
                 <Field>
                   <Button type="submit" className="w-full" disabled={loading}>
                     {loading ? (
-                      <span className="flex items-center gap-2">
-                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                        </svg>
-                        Creation...
-                      </span>
+                      <><Spinner /> Création...</>
                     ) : (
-                      'Creer mon compte'
+                      'Créer mon compte'
                     )}
                   </Button>
                 </Field>
@@ -149,7 +144,7 @@ export default function RegisterPage() {
 
               <motion.div variants={fadeUp} custom={6}>
                 <FieldDescription className="text-center">
-                  Deja un compte ?{' '}
+                  Déjà un compte ?{' '}
                   <Link href="/login">Se connecter</Link>
                 </FieldDescription>
               </motion.div>

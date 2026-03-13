@@ -6,6 +6,7 @@ import '#start/routes/onboarding'
 import '#start/routes/dashboard'
 import '#start/routes/team'
 import '#start/routes/company'
+import '#start/routes/client'
 
 router.get('/', async () => {
   return {

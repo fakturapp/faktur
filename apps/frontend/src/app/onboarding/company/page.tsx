@@ -10,6 +10,7 @@ import { Field, FieldGroup, FieldLabel, FieldDescription, FieldError } from '@/c
 import { Separator } from '@/components/ui/separator'
 import { useAuth } from '@/lib/auth'
 import { api } from '@/lib/api'
+import { Spinner } from '@/components/ui/spinner'
 import { Building2, Search } from 'lucide-react'
 
 const fadeUp = {
@@ -100,7 +101,7 @@ export default function OnboardingCompanyPage() {
     if (err) return setError(err)
 
     await refreshUser()
-    router.push('/')
+    router.push('/dashboard')
   }
 
   async function handleSkip() {
@@ -109,7 +110,7 @@ export default function OnboardingCompanyPage() {
     setLoading(false)
     if (err) return setError(err)
     await refreshUser()
-    router.push('/')
+    router.push('/dashboard')
   }
 
   return (
@@ -125,7 +126,7 @@ export default function OnboardingCompanyPage() {
                 <div>
                   <h1 className="text-2xl font-bold">Votre entreprise</h1>
                   <p className="mt-2 text-sm text-muted-foreground">
-                    Recherchez par SIREN/SIRET ou nom pour pre-remplir vos informations.
+                    Recherchez par SIREN/SIRET ou nom pour pré-remplir vos informations.
                   </p>
                 </div>
               </motion.div>
@@ -200,7 +201,7 @@ export default function OnboardingCompanyPage() {
 
                   <motion.div variants={fadeUp} custom={6} className="grid grid-cols-2 gap-4">
                     <Field>
-                      <FieldLabel htmlFor="vatNumber">N TVA</FieldLabel>
+                      <FieldLabel htmlFor="vatNumber">N° TVA</FieldLabel>
                       <Input id="vatNumber" value={form.vatNumber} onChange={(e) => updateForm('vatNumber', e.target.value)} />
                     </Field>
                     <Field>
@@ -249,20 +250,20 @@ export default function OnboardingCompanyPage() {
                   onClick={handleSkip}
                   disabled={loading}
                 >
-                  Passer cette etape
+                  Passer cette étape
                 </Button>
                 <Button
                   type="submit"
                   className="flex-1"
                   disabled={loading || !form.legalName.trim()}
                 >
-                  {loading ? 'Enregistrement...' : 'Terminer'}
+                  {loading ? <><Spinner /> Enregistrement...</> : 'Terminer'}
                 </Button>
               </motion.div>
 
               <motion.div variants={fadeUp} custom={10}>
                 <FieldDescription className="text-center">
-                  Vous pourrez completer ces informations plus tard.
+                  Vous pourrez compléter ces informations plus tard.
                 </FieldDescription>
               </motion.div>
             </FieldGroup>

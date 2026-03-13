@@ -5,12 +5,20 @@
 
 export const controllers = {
   account: {
+    Delete: () => import('#controllers/account/delete'),
+    Password: () => import('#controllers/account/password'),
+    RevokeSession: () => import('#controllers/account/revoke_session'),
+    SecurityVerify: () => import('#controllers/account/security_verify'),
+    ServeAvatar: () => import('#controllers/account/serve_avatar'),
+    Sessions: () => import('#controllers/account/sessions'),
     Show: () => import('#controllers/account/show'),
     twoFactor: {
       Disable: () => import('#controllers/account/two_factor/disable'),
       Enable: () => import('#controllers/account/two_factor/enable'),
       Setup: () => import('#controllers/account/two_factor/setup'),
     },
+    Update: () => import('#controllers/account/update'),
+    UploadAvatar: () => import('#controllers/account/upload_avatar'),
   },
   auth: {
     registration: {
@@ -34,5 +42,42 @@ export const controllers = {
       Logout: () => import('#controllers/auth/session/logout'),
       Me: () => import('#controllers/auth/session/me'),
     },
+  },
+  company: {
+    Bank: () => import('#controllers/company/bank'),
+    Show: () => import('#controllers/company/show'),
+    Update: () => import('#controllers/company/update'),
+  },
+  dashboard: {
+    Stats: () => import('#controllers/dashboard/stats'),
+  },
+  onboarding: {
+    CreateCompany: () => import('#controllers/onboarding/create_company'),
+    CreateTeam: () => import('#controllers/onboarding/create_team'),
+    SearchCompany: () => import('#controllers/onboarding/search_company'),
+    SkipCompany: () => import('#controllers/onboarding/skip_company'),
+  },
+  team: {
+    AcceptInvite: () => import('#controllers/team/accept_invite'),
+    Create: () => import('#controllers/team/create'),
+    InviteInfo: () => import('#controllers/team/invite_info'),
+    Invite: () => import('#controllers/team/invite'),
+    List: () => import('#controllers/team/list'),
+    Members: () => import('#controllers/team/members'),
+    RemoveMember: () => import('#controllers/team/remove_member'),
+    RevokeInvite: () => import('#controllers/team/revoke_invite'),
+    Show: () => import('#controllers/team/show'),
+    Switch: () => import('#controllers/team/switch'),
+    TransferOwnership: () => import('#controllers/team/transfer_ownership'),
+    UpdateRole: () => import('#controllers/team/update_role'),
+    Update: () => import('#controllers/team/update'),
+  },
+  client: {
+    List: () => import('#controllers/client/list'),
+    Show: () => import('#controllers/client/show'),
+    Create: () => import('#controllers/client/create'),
+    Update: () => import('#controllers/client/update'),
+    Delete: () => import('#controllers/client/delete'),
+    SearchSiren: () => import('#controllers/client/search_siren'),
   },
 }

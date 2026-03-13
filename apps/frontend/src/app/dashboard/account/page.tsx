@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -15,11 +15,12 @@ import { SecurityVerificationModal } from '@/components/security-verification-mo
 import { useAuth } from '@/lib/auth'
 import { useToast } from '@/components/ui/toast'
 import { api } from '@/lib/api'
-import { User, Shield, Monitor, Trash2, Smartphone, Key, Copy, Check } from 'lucide-react'
+import { Spinner } from '@/components/ui/spinner'
+import { User, Shield, Monitor, Trash2, Smartphone, Key, Copy, Check, Camera } from 'lucide-react'
 
 const tabs = [
   { id: 'profile', label: 'Profil', icon: <User className="h-4 w-4" /> },
-  { id: 'security', label: 'Securite', icon: <Shield className="h-4 w-4" /> },
+  { id: 'security', label: 'Sécurité', icon: <Shield className="h-4 w-4" /> },
   { id: 'sessions', label: 'Sessions', icon: <Monitor className="h-4 w-4" /> },
 ]
 
@@ -34,10 +35,12 @@ export default function AccountPage() {
   const { user, refreshUser, logout } = useAuth()
   const { toast } = useToast()
   const [activeTab, setActiveTab] = useState('profile')
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Profile
   const [fullName, setFullName] = useState(user?.fullName || '')
   const [profileLoading, setProfileLoading] = useState(false)
+  const [avatarUploading, setAvatarUploading] = useState(false)
 
   // Password
   const [currentPassword, setCurrentPassword] = useState('')
@@ -82,7 +85,6 @@ export default function AccountPage() {
     setSecurityOpen(false)
     setSecurityVerified(true)
 
-    // Execute the pending action
     if (securityAction === 'change_password') {
       executeChangePassword()
     } else if (securityAction === 'setup_2fa') {
@@ -101,7 +103,46 @@ export default function AccountPage() {
     setProfileLoading(false)
     if (error) return toast(error, 'error')
     await refreshUser()
-    toast('Profil mis a jour', 'success')
+    toast('Profil mis à jour', 'success')
+  }
+
+  async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast('Le fichier ne doit pas dépasser 2 Mo', 'error')
+      return
+    }
+
+    const formData = new FormData()
+    formData.append('avatar', file)
+
+    setAvatarUploading(true)
+    try {
+      const token = localStorage.getItem('zenvoice_token')
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333'
+      const res = await fetch(`${baseUrl}/account/avatar`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        toast(data.message || 'Erreur lors de l\'upload', 'error')
+      } else {
+        await refreshUser()
+        toast('Photo de profil mise à jour', 'success')
+      }
+    } catch {
+      toast('Erreur lors de l\'upload', 'error')
+    }
+    setAvatarUploading(false)
+
+    // Reset file input
+    if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
   async function handleChangePassword(e: React.FormEvent) {
@@ -123,7 +164,7 @@ export default function AccountPage() {
     setNewPassword('')
     setConfirmPassword('')
     setSecurityVerified(false)
-    toast('Mot de passe modifie', 'success')
+    toast('Mot de passe modifié', 'success')
   }
 
   function handleSetup2FA() {
@@ -156,7 +197,7 @@ export default function AccountPage() {
       setRecoveryCodes(data.recoveryCodes)
       setTwoFactorStep('recovery')
       await refreshUser()
-      toast('2FA activee', 'success')
+      toast('2FA activée', 'success')
     }
   }
 
@@ -173,7 +214,7 @@ export default function AccountPage() {
     setDisableOpen(false)
     setDisableCode('')
     await refreshUser()
-    toast('2FA desactivee', 'success')
+    toast('2FA désactivée', 'success')
   }
 
   function handleCopyRecoveryCodes() {
@@ -194,7 +235,7 @@ export default function AccountPage() {
     const { error } = await api.delete(`/account/sessions/${id}`)
     if (error) return toast(error, 'error')
     setSessions((prev) => prev.filter((s) => String(s.id) !== String(id)))
-    toast('Session revoquee', 'success')
+    toast('Session révoquée', 'success')
   }
 
   function handleDeleteAccount() {
@@ -210,7 +251,6 @@ export default function AccountPage() {
     logout()
   }
 
-  // Load sessions on tab switch
   if (activeTab === 'sessions' && !sessionsLoaded) {
     loadSessions()
   }
@@ -227,7 +267,7 @@ export default function AccountPage() {
     >
       <div>
         <h1 className="text-2xl font-bold text-foreground">Mon compte</h1>
-        <p className="text-muted-foreground text-sm mt-1">Gerez votre profil et vos parametres de securite.</p>
+        <p className="text-muted-foreground text-sm mt-1">Gérez votre profil et vos paramètres de sécurité.</p>
       </div>
 
       <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
@@ -239,10 +279,38 @@ export default function AccountPage() {
             <form onSubmit={handleUpdateProfile}>
               <FieldGroup>
                 <div className="flex items-center gap-4">
-                  <Avatar src={user?.avatarUrl} alt={user?.fullName || ''} fallback={initials} size="lg" />
+                  <div className="relative group">
+                    <Avatar src={user?.avatarUrl} alt={user?.fullName || ''} fallback={initials} size="lg" />
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={avatarUploading}
+                      className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                    >
+                      {avatarUploading ? (
+                        <Spinner size="sm" className="text-white" />
+                      ) : (
+                        <Camera className="h-5 w-5 text-white" />
+                      )}
+                    </button>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/gif,image/webp"
+                      className="hidden"
+                      onChange={handleAvatarUpload}
+                    />
+                  </div>
                   <div>
                     <p className="font-medium text-foreground">{user?.fullName || 'Utilisateur'}</p>
                     <p className="text-sm text-muted-foreground">{user?.email}</p>
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="text-xs text-primary hover:text-primary/80 mt-1"
+                    >
+                      Changer la photo
+                    </button>
                   </div>
                 </div>
 
@@ -260,11 +328,11 @@ export default function AccountPage() {
                 <Field>
                   <FieldLabel>Email</FieldLabel>
                   <Input value={user?.email || ''} disabled />
-                  <FieldDescription>L&apos;email ne peut pas etre modifie.</FieldDescription>
+                  <FieldDescription>L&apos;email ne peut pas être modifié.</FieldDescription>
                 </Field>
 
                 <Button type="submit" disabled={profileLoading}>
-                  {profileLoading ? 'Enregistrement...' : 'Enregistrer'}
+                  {profileLoading ? <><Spinner /> Enregistrement...</> : 'Enregistrer'}
                 </Button>
               </FieldGroup>
             </form>
@@ -316,7 +384,7 @@ export default function AccountPage() {
                   </Field>
 
                   <Button type="submit" disabled={passwordLoading}>
-                    {passwordLoading ? 'Modification...' : 'Modifier le mot de passe'}
+                    {passwordLoading ? <><Spinner /> Modification...</> : 'Modifier le mot de passe'}
                   </Button>
                 </FieldGroup>
               </form>
@@ -334,16 +402,16 @@ export default function AccountPage() {
                         <Smartphone className="h-5 w-5 text-primary" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-foreground">Authentification a deux facteurs</h3>
+                        <h3 className="font-semibold text-foreground">Authentification à deux facteurs</h3>
                         <p className="text-sm text-muted-foreground mt-0.5">
                           {user?.twoFactorEnabled
-                            ? 'La 2FA est activee sur votre compte.'
-                            : 'Ajoutez une couche de securite supplementaire.'}
+                            ? 'La 2FA est activée sur votre compte.'
+                            : 'Ajoutez une couche de sécurité supplémentaire.'}
                         </p>
                       </div>
                     </div>
                     <Badge variant={user?.twoFactorEnabled ? 'success' : 'muted'}>
-                      {user?.twoFactorEnabled ? 'Active' : 'Desactive'}
+                      {user?.twoFactorEnabled ? 'Activé' : 'Désactivé'}
                     </Badge>
                   </div>
 
@@ -352,7 +420,7 @@ export default function AccountPage() {
                   {!user?.twoFactorEnabled ? (
                     <Button onClick={handleSetup2FA} disabled={twoFactorLoading}>
                       <Shield className="h-4 w-4 mr-2" />
-                      {twoFactorLoading ? 'Chargement...' : 'Activer la 2FA'}
+                      {twoFactorLoading ? <><Spinner /> Chargement...</> : 'Activer la 2FA'}
                     </Button>
                   ) : (
                     <Button
@@ -360,7 +428,7 @@ export default function AccountPage() {
                       className="border-destructive/30 text-destructive hover:bg-destructive/10"
                       onClick={handleDisable2FA}
                     >
-                      Desactiver la 2FA
+                      Désactiver la 2FA
                     </Button>
                   )}
                 </div>
@@ -390,7 +458,7 @@ export default function AccountPage() {
 
                   <form onSubmit={handleEnable2FA}>
                     <Field>
-                      <FieldLabel htmlFor="twoFactorCode">Code de verification</FieldLabel>
+                      <FieldLabel htmlFor="twoFactorCode">Code de vérification</FieldLabel>
                       <Input
                         id="twoFactorCode"
                         type="text"
@@ -403,7 +471,7 @@ export default function AccountPage() {
                         autoFocus
                       />
                       <FieldDescription>
-                        Entrez le code a 6 chiffres affiche dans votre application.
+                        Entrez le code à 6 chiffres affiché dans votre application.
                       </FieldDescription>
                     </Field>
 
@@ -419,7 +487,7 @@ export default function AccountPage() {
                         Annuler
                       </Button>
                       <Button type="submit" disabled={twoFactorLoading || twoFactorCode.length !== 6}>
-                        {twoFactorLoading ? 'Verification...' : 'Activer'}
+                        {twoFactorLoading ? <><Spinner /> Vérification...</> : 'Activer'}
                       </Button>
                     </div>
                   </form>
@@ -428,9 +496,9 @@ export default function AccountPage() {
 
               {twoFactorStep === 'recovery' && (
                 <div>
-                  <h3 className="font-semibold text-foreground mb-1">Codes de recuperation</h3>
+                  <h3 className="font-semibold text-foreground mb-1">Codes de récupération</h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Conservez ces codes en lieu sur. Ils vous permettront d&apos;acceder a votre compte si vous perdez votre appareil d&apos;authentification.
+                    Conservez ces codes en lieu sûr. Ils vous permettront d&apos;accéder à votre compte si vous perdez votre appareil d&apos;authentification.
                   </p>
 
                   <div className="rounded-xl border border-border bg-muted/30 p-4 mb-4">
@@ -446,13 +514,13 @@ export default function AccountPage() {
                   <div className="flex gap-3">
                     <Button variant="outline" onClick={handleCopyRecoveryCodes}>
                       {copiedCodes ? (
-                        <><Check className="h-4 w-4 mr-2 text-green-500" /> Copie !</>
+                        <><Check className="h-4 w-4 mr-2 text-green-500" /> Copié !</>
                       ) : (
                         <><Copy className="h-4 w-4 mr-2" /> Copier les codes</>
                       )}
                     </Button>
                     <Button onClick={() => setTwoFactorStep('idle')}>
-                      J&apos;ai sauvegarde mes codes
+                      J&apos;ai sauvegardé mes codes
                     </Button>
                   </div>
                 </div>
@@ -465,7 +533,7 @@ export default function AccountPage() {
             <CardContent className="p-6">
               <h3 className="font-semibold text-destructive">Zone dangereuse</h3>
               <p className="text-sm text-muted-foreground mt-1 mb-4">
-                La suppression de votre compte est irreversible.
+                La suppression de votre compte est irréversible.
               </p>
               <Button
                 variant="outline"
@@ -485,7 +553,7 @@ export default function AccountPage() {
           <CardContent className="p-6">
             <FieldGroup>
               <h3 className="font-semibold text-foreground">Sessions actives</h3>
-              <p className="text-sm text-muted-foreground">Gerez vos sessions de connexion.</p>
+              <p className="text-sm text-muted-foreground">Gérez vos sessions de connexion.</p>
 
               <div className="space-y-3">
                 {sessions.map((session) => (
@@ -500,7 +568,7 @@ export default function AccountPage() {
                           Session {session.isCurrent && <Badge variant="success" className="ml-2">Active</Badge>}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          Creee le {new Date(session.createdAt).toLocaleDateString('fr-FR')}
+                          Créée le {new Date(session.createdAt).toLocaleDateString('fr-FR')}
                         </p>
                       </div>
                     </div>
@@ -510,13 +578,16 @@ export default function AccountPage() {
                         size="sm"
                         onClick={() => revokeSession(session.id)}
                       >
-                        Revoquer
+                        Révoquer
                       </Button>
                     )}
                   </div>
                 ))}
                 {sessions.length === 0 && (
-                  <p className="text-sm text-muted-foreground text-center py-4">Chargement...</p>
+                  <div className="flex items-center justify-center gap-2 py-4">
+                    <Spinner size="sm" className="text-primary" />
+                    <span className="text-sm text-muted-foreground">Chargement...</span>
+                  </div>
                 )}
               </div>
             </FieldGroup>
@@ -532,11 +603,11 @@ export default function AccountPage() {
         twoFactorEnabled={user?.twoFactorEnabled}
       />
 
-      {/* Delete account dialog (after security verification) */}
+      {/* Delete account dialog */}
       <Dialog open={deleteOpen} onClose={() => setDeleteOpen(false)}>
         <DialogTitle>Supprimer votre compte</DialogTitle>
         <DialogDescription>
-          Cette action est irreversible. Toutes vos donnees seront perdues. Entrez votre mot de passe pour confirmer.
+          Cette action est irréversible. Toutes vos données seront perdues. Entrez votre mot de passe pour confirmer.
         </DialogDescription>
         <div className="mt-4">
           <Input
@@ -556,16 +627,16 @@ export default function AccountPage() {
             onClick={executeDeleteAccount}
             disabled={deleteLoading || !deletePassword}
           >
-            {deleteLoading ? 'Suppression...' : 'Supprimer definitivement'}
+            {deleteLoading ? <><Spinner /> Suppression...</> : 'Supprimer définitivement'}
           </Button>
         </DialogFooter>
       </Dialog>
 
-      {/* Disable 2FA dialog (after security verification) */}
+      {/* Disable 2FA dialog */}
       <Dialog open={disableOpen} onClose={() => setDisableOpen(false)}>
-        <DialogTitle>Desactiver la 2FA</DialogTitle>
+        <DialogTitle>Désactiver la 2FA</DialogTitle>
         <DialogDescription>
-          Entrez un code de votre application d&apos;authentification pour confirmer la desactivation.
+          Entrez un code de votre application d&apos;authentification pour confirmer la désactivation.
         </DialogDescription>
         <form onSubmit={executeDisable2FA} className="mt-4">
           <Input
@@ -588,7 +659,7 @@ export default function AccountPage() {
               className="border-destructive/30 text-destructive hover:bg-destructive/10"
               disabled={disableLoading || disableCode.length !== 6}
             >
-              {disableLoading ? 'Desactivation...' : 'Desactiver'}
+              {disableLoading ? <><Spinner /> Désactivation...</> : 'Désactiver'}
             </Button>
           </DialogFooter>
         </form>

@@ -8,7 +8,7 @@ import { CheckCircle2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const steps = [
-  { id: 'team', label: 'Equipe', path: '/onboarding/team' },
+  { id: 'team', label: 'Équipe', path: '/onboarding/team' },
   { id: 'company', label: 'Entreprise', path: '/onboarding/company' },
 ]
 

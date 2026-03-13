@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useAuth } from '@/lib/auth'
 import { api } from '@/lib/api'
+import { Spinner } from '@/components/ui/spinner'
 import { Users, Check, X } from 'lucide-react'
 
 interface InviteInfo {
@@ -41,7 +42,7 @@ export default function InvitePage() {
       .get<{ invitation: InviteInfo }>(`/invite/${params.token}`)
       .then(({ data, error }) => {
         if (error || !data?.invitation) {
-          setError(error || 'Invitation invalide ou expiree')
+          setError(error || 'Invitation invalide ou expirée')
         } else {
           setInfo(data.invitation)
         }
@@ -51,7 +52,6 @@ export default function InvitePage() {
 
   async function handleAccept() {
     if (!user) {
-      // Redirect to login with return URL
       router.push(`/login?redirect=/invite/${params.token}`)
       return
     }
@@ -69,13 +69,13 @@ export default function InvitePage() {
     }
 
     setAccepted(true)
-    setTimeout(() => router.push('/'), 2000)
+    setTimeout(() => router.push('/dashboard'), 2000)
   }
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full" />
+        <Spinner size="md" className="text-primary" />
       </div>
     )
   }
@@ -97,7 +97,7 @@ export default function InvitePage() {
               {error}
             </p>
             <Button variant="outline" onClick={() => router.push('/login')}>
-              Retour a la connexion
+              Retour à la connexion
             </Button>
           </CardContent>
         </Card>
@@ -117,7 +117,7 @@ export default function InvitePage() {
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-500/10">
               <Check className="h-6 w-6 text-green-500" />
             </div>
-            <h2 className="text-lg font-semibold text-foreground mb-2">Bienvenue dans l&apos;equipe !</h2>
+            <h2 className="text-lg font-semibold text-foreground mb-2">Bienvenue dans l&apos;équipe !</h2>
             <p className="text-sm text-muted-foreground">
               Vous avez rejoint <strong>{info?.team.name}</strong>. Redirection en cours...
             </p>
@@ -139,16 +139,16 @@ export default function InvitePage() {
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
               <Users className="h-7 w-7 text-primary" />
             </div>
-            <h2 className="text-xl font-bold text-foreground">Invitation a rejoindre une equipe</h2>
+            <h2 className="text-xl font-bold text-foreground">Invitation à rejoindre une équipe</h2>
           </div>
 
           <div className="rounded-xl border border-border bg-muted/30 p-4 space-y-3 mb-6">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Equipe</span>
+              <span className="text-sm text-muted-foreground">Équipe</span>
               <span className="text-sm font-medium text-foreground">{info?.team.name}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Role</span>
+              <span className="text-sm text-muted-foreground">Rôle</span>
               <Badge variant="default">{roleLabels[info?.role || 'member']}</Badge>
             </div>
             {info?.email && (
@@ -174,12 +174,12 @@ export default function InvitePage() {
                 Se connecter
               </Button>
               <Button variant="outline" className="w-full" onClick={() => router.push(`/register?redirect=/invite/${params.token}`)}>
-                Creer un compte
+                Créer un compte
               </Button>
             </div>
           ) : (
             <Button className="w-full" onClick={handleAccept} disabled={accepting}>
-              {accepting ? 'Acceptation...' : 'Accepter l\'invitation'}
+              {accepting ? <><Spinner /> Acceptation...</> : 'Accepter l\'invitation'}
             </Button>
           )}
         </CardContent>

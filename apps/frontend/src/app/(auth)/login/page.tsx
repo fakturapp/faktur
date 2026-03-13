@@ -12,6 +12,7 @@ import { Avatar } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
 import { useAuth } from '@/lib/auth'
 import { api } from '@/lib/api'
+import { Spinner } from '@/components/ui/spinner'
 import { LogOut, LayoutDashboard } from 'lucide-react'
 
 const fadeUp = {
@@ -51,7 +52,7 @@ export default function LoginPage() {
         if (!data.user.onboardingCompleted) {
           router.push('/onboarding/team')
         } else {
-          router.push('/')
+          router.push('/dashboard')
         }
       }
       return
@@ -85,7 +86,7 @@ export default function LoginPage() {
       if (!data.user.onboardingCompleted) {
         router.push('/onboarding/team')
       } else {
-        router.push('/')
+        router.push('/dashboard')
       }
     }
   }
@@ -109,9 +110,9 @@ export default function LoginPage() {
                   size="lg"
                 />
                 <div>
-                  <h1 className="text-2xl font-bold">Deja connecte</h1>
+                  <h1 className="text-2xl font-bold">Déjà connecté</h1>
                   <p className="text-muted-foreground text-sm mt-1">
-                    Vous etes connecte en tant que
+                    Vous êtes connecté en tant que
                   </p>
                   <p className="font-medium text-foreground mt-0.5">
                     {user.fullName || user.email}
@@ -125,7 +126,7 @@ export default function LoginPage() {
               </motion.div>
 
               <motion.div variants={fadeUp} custom={2} className="space-y-3">
-                <Button className="w-full" onClick={() => router.push('/')}>
+                <Button className="w-full" onClick={() => router.push('/dashboard')}>
                   <LayoutDashboard className="h-4 w-4 mr-2" />
                   Aller au Dashboard
                 </Button>
@@ -137,7 +138,7 @@ export default function LoginPage() {
                   }}
                 >
                   <LogOut className="h-4 w-4 mr-2" />
-                  Se deconnecter
+                  Se déconnecter
                 </Button>
               </motion.div>
             </FieldGroup>
@@ -159,12 +160,12 @@ export default function LoginPage() {
             <FieldGroup>
               <motion.div variants={fadeUp} custom={0} className="flex flex-col items-center gap-2 text-center mb-2">
                 <h1 className="text-2xl font-bold">
-                  {requires2FA ? 'Verification 2FA' : 'Bon retour'}
+                  {requires2FA ? 'Vérification 2FA' : 'Bon retour'}
                 </h1>
                 <p className="text-muted-foreground text-sm">
                   {requires2FA
                     ? 'Entrez le code de votre application authenticator'
-                    : 'Connectez-vous a votre compte ZenVoice'}
+                    : 'Connectez-vous à votre compte ZenVoice'}
                 </p>
               </motion.div>
 
@@ -179,7 +180,7 @@ export default function LoginPage() {
               {requires2FA ? (
                 <motion.div variants={fadeUp} custom={2}>
                   <Field>
-                    <FieldLabel htmlFor="code">Code de verification</FieldLabel>
+                    <FieldLabel htmlFor="code">Code de vérification</FieldLabel>
                     <Input
                       id="code"
                       type="text"
@@ -192,7 +193,7 @@ export default function LoginPage() {
                       autoFocus
                     />
                     <FieldDescription>
-                      Entrez un code TOTP ou un code de recuperation
+                      Entrez un code TOTP ou un code de récupération
                     </FieldDescription>
                   </Field>
                 </motion.div>
@@ -221,7 +222,7 @@ export default function LoginPage() {
                           href="/forgot-password"
                           className="ml-auto text-sm text-primary underline-offset-2 hover:underline"
                         >
-                          Mot de passe oublie ?
+                          Mot de passe oublié ?
                         </Link>
                       </div>
                       <Input
@@ -240,15 +241,9 @@ export default function LoginPage() {
                 <Field>
                   <Button type="submit" className="w-full" disabled={loading}>
                     {loading ? (
-                      <span className="flex items-center gap-2">
-                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                        </svg>
-                        Connexion...
-                      </span>
+                      <><Spinner /> {requires2FA ? 'Vérification...' : 'Connexion...'}</>
                     ) : requires2FA ? (
-                      'Verifier'
+                      'Vérifier'
                     ) : (
                       'Se connecter'
                     )}
@@ -260,7 +255,7 @@ export default function LoginPage() {
                 <motion.div variants={fadeUp} custom={5}>
                   <FieldDescription className="text-center">
                     Pas encore de compte ?{' '}
-                    <Link href="/register">Creer un compte</Link>
+                    <Link href="/register">Créer un compte</Link>
                   </FieldDescription>
                 </motion.div>
               )}
@@ -277,7 +272,7 @@ export default function LoginPage() {
                       }}
                       className="text-primary underline underline-offset-4 hover:text-primary/80"
                     >
-                      Retour a la connexion
+                      Retour à la connexion
                     </button>
                   </FieldDescription>
                 </motion.div>
@@ -291,7 +286,7 @@ export default function LoginPage() {
         <FieldDescription className="px-6 text-center mt-4">
           En continuant, vous acceptez nos{' '}
           <a href="#">Conditions d&apos;utilisation</a> et notre{' '}
-          <a href="#">Politique de confidentialite</a>.
+          <a href="#">Politique de confidentialité</a>.
         </FieldDescription>
       </motion.div>
     </motion.div>

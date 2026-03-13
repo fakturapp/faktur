@@ -10,6 +10,7 @@ import { Field, FieldGroup, FieldLabel, FieldDescription } from '@/components/ui
 import { useAuth } from '@/lib/auth'
 import { useToast } from '@/components/ui/toast'
 import { api } from '@/lib/api'
+import { Spinner } from '@/components/ui/spinner'
 import { Users, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
@@ -32,8 +33,8 @@ export default function CreateTeamPage() {
     if (error) return toast(error, 'error')
 
     await refreshUser()
-    toast(`Equipe "${data?.team.name}" creee`, 'success')
-    router.push('/team')
+    toast(`Équipe "${data?.team.name}" créée`, 'success')
+    router.push('/dashboard/team')
   }
 
   return (
@@ -44,14 +45,14 @@ export default function CreateTeamPage() {
     >
       <div>
         <Link
-          href="/team"
+          href="/dashboard/team"
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
         >
           <ArrowLeft className="h-4 w-4" /> Retour
         </Link>
-        <h1 className="text-2xl font-bold text-foreground">Creer une equipe</h1>
+        <h1 className="text-2xl font-bold text-foreground">Créer une équipe</h1>
         <p className="text-muted-foreground text-sm mt-1">
-          Creez une nouvelle equipe pour collaborer avec vos collegues.
+          Créez une nouvelle équipe pour collaborer avec vos collègues.
         </p>
       </div>
 
@@ -66,23 +67,23 @@ export default function CreateTeamPage() {
               </div>
 
               <Field>
-                <FieldLabel htmlFor="teamName">Nom de l&apos;equipe</FieldLabel>
+                <FieldLabel htmlFor="teamName">Nom de l&apos;équipe</FieldLabel>
                 <Input
                   id="teamName"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Mon equipe"
+                  placeholder="Mon équipe"
                   required
                   minLength={2}
                   autoFocus
                 />
                 <FieldDescription>
-                  Choisissez un nom pour identifier cette equipe.
+                  Choisissez un nom pour identifier cette équipe.
                 </FieldDescription>
               </Field>
 
               <Button type="submit" className="w-full" disabled={loading || name.length < 2}>
-                {loading ? 'Creation...' : 'Creer l\'equipe'}
+                {loading ? <><Spinner /> Création...</> : 'Créer l\'équipe'}
               </Button>
             </FieldGroup>
           </form>

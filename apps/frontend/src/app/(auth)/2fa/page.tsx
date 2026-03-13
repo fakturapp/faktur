@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldError } from '@/components/ui/field'
+import { Spinner } from '@/components/ui/spinner'
 import { api } from '@/lib/api'
 
 const fadeUp = {
@@ -113,7 +114,7 @@ function TwoFactorContent() {
               <motion.div variants={fadeUp} custom={3}>
                 <Field>
                   <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? 'Verification...' : 'Verifier'}
+                    {loading ? <><Spinner /> Vérification...</> : 'Vérifier'}
                   </Button>
                 </Field>
               </motion.div>
@@ -148,7 +149,7 @@ function TwoFactorContent() {
 
 export default function TwoFactorPage() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Chargement...</div>}>
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Spinner size="lg" className="text-primary" /></div>}>
       <TwoFactorContent />
     </Suspense>
   )

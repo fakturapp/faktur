@@ -28,6 +28,34 @@ async function request<T = unknown>(
   }
 }
 
+async function uploadRequest<T = unknown>(
+  endpoint: string,
+  formData: FormData
+): Promise<{ data?: T; error?: string }> {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('zenvoice_token') : null
+
+  const headers: Record<string, string> = {}
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
+  }
+
+  try {
+    const res = await fetch(`${API_URL}${endpoint}`, {
+      method: 'POST',
+      headers,
+      body: formData,
+    })
+    const data = await res.json()
+
+    if (!res.ok) {
+      return { error: data.message || 'Something went wrong' }
+    }
+    return { data }
+  } catch {
+    return { error: 'Network error. Please try again.' }
+  }
+}
+
 export const api = {
   post: <T = unknown>(endpoint: string, body: unknown) =>
     request<T>(endpoint, { method: 'POST', body: JSON.stringify(body) }),
@@ -36,4 +64,6 @@ export const api = {
     request<T>(endpoint, { method: 'PUT', body: JSON.stringify(body) }),
   delete: <T = unknown>(endpoint: string, body?: unknown) =>
     request<T>(endpoint, { method: 'DELETE', body: body ? JSON.stringify(body) : undefined }),
+  upload: <T = unknown>(endpoint: string, formData: FormData) =>
+    uploadRequest<T>(endpoint, formData),
 }

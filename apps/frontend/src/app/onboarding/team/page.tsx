@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Field, FieldGroup, FieldLabel, FieldError } from '@/components/ui/field'
 import { useAuth } from '@/lib/auth'
 import { api } from '@/lib/api'
+import { Spinner } from '@/components/ui/spinner'
 import { Users } from 'lucide-react'
 
 const fadeUp = {
@@ -52,9 +53,9 @@ export default function OnboardingTeamPage() {
                   <Users className="h-8 w-8 text-primary" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold">Creez votre equipe</h1>
+                  <h1 className="text-2xl font-bold">Créez votre équipe</h1>
                   <p className="mt-2 text-sm text-muted-foreground">
-                    Donnez un nom a votre espace de travail. Vous pourrez inviter des collaborateurs plus tard.
+                    Donnez un nom à votre espace de travail. Vous pourrez inviter des collaborateurs plus tard.
                   </p>
                 </div>
               </motion.div>
@@ -69,7 +70,7 @@ export default function OnboardingTeamPage() {
 
               <motion.div variants={fadeUp} custom={2}>
                 <Field>
-                  <FieldLabel htmlFor="name">Nom de l&apos;equipe</FieldLabel>
+                  <FieldLabel htmlFor="name">Nom de l&apos;équipe</FieldLabel>
                   <Input
                     id="name"
                     type="text"
@@ -85,13 +86,7 @@ export default function OnboardingTeamPage() {
               <motion.div variants={fadeUp} custom={3}>
                 <Button type="submit" className="w-full" disabled={loading || !name.trim()}>
                   {loading ? (
-                    <span className="flex items-center gap-2">
-                      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                      </svg>
-                      Creation...
-                    </span>
+                    <><Spinner /> Création...</>
                   ) : (
                     'Continuer'
                   )}

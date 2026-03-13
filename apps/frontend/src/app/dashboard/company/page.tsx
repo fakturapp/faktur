@@ -11,7 +11,8 @@ import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/components/ui/toast'
 import { api } from '@/lib/api'
 import { Select } from '@/components/ui/select'
-import { Building2, CreditCard, Receipt, Search, Info } from 'lucide-react'
+import { Spinner } from '@/components/ui/spinner'
+import { Building2, CreditCard, Receipt, Search, Info, Banknote, Coins, PenLine, Lock } from 'lucide-react'
 
 interface Company {
   id: string
@@ -75,6 +76,8 @@ export default function CompanyPage() {
   const [paymentForm, setPaymentForm] = useState({
     paymentConditions: '',
     currency: 'EUR',
+    paymentMethods: ['bank_transfer'] as string[],
+    customPaymentMethod: '',
   })
 
   useEffect(() => {
@@ -104,6 +107,8 @@ export default function CompanyPage() {
         setPaymentForm({
           paymentConditions: data.company.paymentConditions || '',
           currency: data.company.currency || 'EUR',
+          paymentMethods: (data.company as any).paymentMethods || ['bank_transfer'],
+          customPaymentMethod: (data.company as any).customPaymentMethod || '',
         })
       } else {
         setNoCompany(true)
@@ -125,12 +130,12 @@ export default function CompanyPage() {
       if (error) return toast(error, 'error')
       setNoCompany(false)
       setCompany(data?.company || null)
-      toast('Entreprise creee', 'success')
+      toast('Entreprise créée', 'success')
     } else {
       const { error } = await api.put('/company', form)
       setSaving(false)
       if (error) return toast(error, 'error')
-      toast('Informations mises a jour', 'success')
+      toast('Informations mises à jour', 'success')
     }
   }
 
@@ -140,7 +145,16 @@ export default function CompanyPage() {
     const { error } = await api.put('/company/bank', bankForm)
     setSaving(false)
     if (error) return toast(error, 'error')
-    toast('Coordonnees bancaires mises a jour', 'success')
+    toast('Coordonnées bancaires mises à jour', 'success')
+  }
+
+  function togglePaymentMethod(method: string) {
+    setPaymentForm((p) => {
+      const methods = p.paymentMethods.includes(method)
+        ? p.paymentMethods.filter((m) => m !== method)
+        : [...p.paymentMethods, method]
+      return { ...p, paymentMethods: methods }
+    })
   }
 
   async function handleSavePayment(e: React.FormEvent) {
@@ -149,16 +163,34 @@ export default function CompanyPage() {
     const { error } = await api.put('/company', {
       paymentConditions: paymentForm.paymentConditions,
       currency: paymentForm.currency,
+      paymentMethods: paymentForm.paymentMethods,
+      customPaymentMethod: paymentForm.customPaymentMethod,
     })
     setSaving(false)
     if (error) return toast(error, 'error')
-    toast('Conditions de paiement mises a jour', 'success')
+    toast('Conditions de paiement mises à jour', 'success')
   }
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full" />
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div className="space-y-2">
+          <div className="h-7 w-40 rounded bg-muted animate-pulse" />
+          <div className="h-4 w-64 rounded bg-muted animate-pulse" />
+        </div>
+        <div className="flex gap-2">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="h-9 w-32 rounded-lg bg-muted animate-pulse" />
+          ))}
+        </div>
+        <div className="rounded-2xl border border-border/50 p-6 space-y-5">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="space-y-2">
+              <div className="h-3.5 w-24 rounded bg-muted animate-pulse" />
+              <div className="h-10 w-full rounded-lg bg-muted animate-pulse" />
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
@@ -172,7 +204,7 @@ export default function CompanyPage() {
       <div>
         <h1 className="text-2xl font-bold text-foreground">Entreprise</h1>
         <p className="text-muted-foreground text-sm mt-1">
-          Gerez les informations de votre entreprise.
+          Gérez les informations de votre entreprise.
         </p>
       </div>
 
@@ -184,7 +216,7 @@ export default function CompanyPage() {
           <CardContent className="p-6">
             <form onSubmit={handleSaveInfo}>
               <FieldGroup>
-                <h3 className="font-semibold text-foreground">Informations legales</h3>
+                <h3 className="font-semibold text-foreground">Informations légales</h3>
 
                 <Field>
                   <FieldLabel htmlFor="legalName">Raison sociale *</FieldLabel>
@@ -209,7 +241,7 @@ export default function CompanyPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <Field>
-                    <FieldLabel htmlFor="vatNumber">N TVA</FieldLabel>
+                    <FieldLabel htmlFor="vatNumber">N° TVA</FieldLabel>
                     <Input id="vatNumber" value={form.vatNumber} onChange={(e) => updateForm('vatNumber', e.target.value)} />
                   </Field>
                   <Field>
@@ -247,7 +279,7 @@ export default function CompanyPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <Field>
-                    <FieldLabel htmlFor="phone">Telephone</FieldLabel>
+                    <FieldLabel htmlFor="phone">Téléphone</FieldLabel>
                     <Input id="phone" value={form.phone} onChange={(e) => updateForm('phone', e.target.value)} />
                   </Field>
                   <Field>
@@ -262,7 +294,7 @@ export default function CompanyPage() {
                 </Field>
 
                 <Button type="submit" disabled={saving}>
-                  {saving ? 'Enregistrement...' : 'Enregistrer'}
+                  {saving ? <><Spinner className="text-primary-foreground" /> Enregistrement...</> : 'Enregistrer'}
                 </Button>
               </FieldGroup>
             </form>
@@ -278,15 +310,15 @@ export default function CompanyPage() {
               <div className="flex flex-col items-center py-8 text-center">
                 <CreditCard className="h-8 w-8 text-muted-foreground mb-3" />
                 <p className="text-sm text-muted-foreground">
-                  Creez d&apos;abord votre entreprise dans l&apos;onglet Informations.
+                  Créez d&apos;abord votre entreprise dans l&apos;onglet Informations.
                 </p>
               </div>
             ) : (
               <form onSubmit={handleSaveBank}>
                 <FieldGroup>
-                  <h3 className="font-semibold text-foreground">Coordonnees bancaires</h3>
+                  <h3 className="font-semibold text-foreground">Coordonnées bancaires</h3>
                   <FieldDescription>
-                    Ces informations apparaitront sur vos factures.
+                    Ces informations apparaîtront sur vos factures.
                   </FieldDescription>
 
                   <Field>
@@ -306,7 +338,7 @@ export default function CompanyPage() {
                   </div>
 
                   <Button type="submit" disabled={saving}>
-                    {saving ? 'Enregistrement...' : 'Enregistrer'}
+                    {saving ? <><Spinner className="text-primary-foreground" /> Enregistrement...</> : 'Enregistrer'}
                   </Button>
                 </FieldGroup>
               </form>
@@ -323,7 +355,7 @@ export default function CompanyPage() {
               <div className="flex flex-col items-center py-8 text-center">
                 <Receipt className="h-8 w-8 text-muted-foreground mb-3" />
                 <p className="text-sm text-muted-foreground">
-                  Creez d&apos;abord votre entreprise dans l&apos;onglet Informations.
+                  Créez d&apos;abord votre entreprise dans l&apos;onglet Informations.
                 </p>
               </div>
             ) : (
@@ -339,13 +371,13 @@ export default function CompanyPage() {
                       onChange={(e) => setPaymentForm((p) => ({ ...p, currency: e.target.value }))}
                     >
                       <option value="EUR">EUR - Euro</option>
-                      <option value="USD">USD - Dollar americain</option>
+                      <option value="USD">USD - Dollar américain</option>
                       <option value="GBP">GBP - Livre sterling</option>
                       <option value="CHF">CHF - Franc suisse</option>
                       <option value="CAD">CAD - Dollar canadien</option>
                     </Select>
                     <FieldDescription>
-                      La devise utilisee par defaut sur vos factures et devis.
+                      La devise utilisée par défaut sur vos factures et devis.
                     </FieldDescription>
                   </Field>
 
@@ -355,25 +387,148 @@ export default function CompanyPage() {
                       id="paymentConditions"
                       value={paymentForm.paymentConditions}
                       onChange={(e) => setPaymentForm((p) => ({ ...p, paymentConditions: e.target.value }))}
-                      placeholder="Ex: Paiement a 30 jours"
+                      placeholder="Ex: Paiement à 30 jours"
                     />
                     <FieldDescription>
-                      Ces conditions seront ajoutees par defaut a vos factures.
+                      Ces conditions seront ajoutées par défaut à vos factures.
                     </FieldDescription>
                   </Field>
 
-                  <Button type="submit" disabled={saving}>
-                    {saving ? 'Enregistrement...' : 'Enregistrer'}
-                  </Button>
+                  <Separator className="my-2" />
+
+                  <h3 className="font-semibold text-foreground">Moyens de paiement acceptés</h3>
+                  <FieldDescription>
+                    Sélectionnez les moyens de paiement que vous souhaitez afficher sur vos factures.
+                  </FieldDescription>
+
+                  <div className="space-y-3">
+                    {/* Virement bancaire */}
+                    <label className="flex items-center gap-4 rounded-xl border border-border p-4 cursor-pointer hover:bg-muted/30 transition-colors has-[:checked]:border-primary/40 has-[:checked]:bg-primary/5">
+                      <input
+                        type="checkbox"
+                        checked={paymentForm.paymentMethods.includes('bank_transfer')}
+                        onChange={() => togglePaymentMethod('bank_transfer')}
+                        className="sr-only"
+                      />
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                        <Banknote className="h-5 w-5 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-foreground">Virement bancaire</p>
+                        <p className="text-xs text-muted-foreground">Vos coordonnées bancaires seront affichées sur la facture</p>
+                      </div>
+                      <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-colors ${paymentForm.paymentMethods.includes('bank_transfer') ? 'bg-primary border-primary' : 'border-muted-foreground/30'}`}>
+                        {paymentForm.paymentMethods.includes('bank_transfer') && (
+                          <svg className="h-3 w-3 text-primary-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </div>
+                    </label>
+
+                    {/* Espèces */}
+                    <label className="flex items-center gap-4 rounded-xl border border-border p-4 cursor-pointer hover:bg-muted/30 transition-colors has-[:checked]:border-primary/40 has-[:checked]:bg-primary/5">
+                      <input
+                        type="checkbox"
+                        checked={paymentForm.paymentMethods.includes('cash')}
+                        onChange={() => togglePaymentMethod('cash')}
+                        className="sr-only"
+                      />
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-green-500/10">
+                        <Coins className="h-5 w-5 text-green-500" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-foreground">Espèces</p>
+                        <p className="text-xs text-muted-foreground">Paiement en espèces accepté</p>
+                      </div>
+                      <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-colors ${paymentForm.paymentMethods.includes('cash') ? 'bg-primary border-primary' : 'border-muted-foreground/30'}`}>
+                        {paymentForm.paymentMethods.includes('cash') && (
+                          <svg className="h-3 w-3 text-primary-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </div>
+                    </label>
+
+                    {/* Autre (custom) */}
+                    <label className="flex items-center gap-4 rounded-xl border border-border p-4 cursor-pointer hover:bg-muted/30 transition-colors has-[:checked]:border-primary/40 has-[:checked]:bg-primary/5">
+                      <input
+                        type="checkbox"
+                        checked={paymentForm.paymentMethods.includes('custom')}
+                        onChange={() => togglePaymentMethod('custom')}
+                        className="sr-only"
+                      />
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-yellow-500/10">
+                        <PenLine className="h-5 w-5 text-yellow-500" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-foreground">Autre</p>
+                        <p className="text-xs text-muted-foreground">Définissez un moyen de paiement personnalisé</p>
+                      </div>
+                      <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-colors ${paymentForm.paymentMethods.includes('custom') ? 'bg-primary border-primary' : 'border-muted-foreground/30'}`}>
+                        {paymentForm.paymentMethods.includes('custom') && (
+                          <svg className="h-3 w-3 text-primary-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </div>
+                    </label>
+
+                    {paymentForm.paymentMethods.includes('custom') && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="pl-14"
+                      >
+                        <Input
+                          placeholder="Ex: Chèque, PayPal, etc."
+                          value={paymentForm.customPaymentMethod}
+                          onChange={(e) => setPaymentForm((p) => ({ ...p, customPaymentMethod: e.target.value }))}
+                        />
+                      </motion.div>
+                    )}
+                  </div>
 
                   <Separator className="my-2" />
+
+                  <h3 className="font-semibold text-muted-foreground text-sm">Paiement en ligne</h3>
+                  <div className="space-y-3 opacity-50">
+                    {/* Stripe - disabled */}
+                    <div className="flex items-center gap-4 rounded-xl border border-border p-4 cursor-not-allowed">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
+                        <CreditCard className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-muted-foreground">Stripe</p>
+                        <p className="text-xs text-muted-foreground">Carte bancaire, Apple Pay, Google Pay</p>
+                      </div>
+                      <Lock className="h-4 w-4 text-muted-foreground shrink-0" />
+                    </div>
+
+                    {/* PayPal - disabled */}
+                    <div className="flex items-center gap-4 rounded-xl border border-border p-4 cursor-not-allowed">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
+                        <CreditCard className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-muted-foreground">PayPal</p>
+                        <p className="text-xs text-muted-foreground">Paiement via compte PayPal</p>
+                      </div>
+                      <Lock className="h-4 w-4 text-muted-foreground shrink-0" />
+                    </div>
+                  </div>
 
                   <div className="flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4">
                     <Info className="h-5 w-5 text-primary shrink-0" />
                     <p className="text-sm text-foreground">
-                      L&apos;integration de moyens de paiement en ligne arrive bientot.
+                      L&apos;intégration des paiements en ligne (Stripe, PayPal) arrive bientôt.
                     </p>
                   </div>
+
+                  <Button type="submit" disabled={saving}>
+                    {saving ? <><Spinner className="text-primary-foreground" /> Enregistrement...</> : 'Enregistrer'}
+                  </Button>
                 </FieldGroup>
               </form>
             )}

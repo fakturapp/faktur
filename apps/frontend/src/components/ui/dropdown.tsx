@@ -9,10 +9,11 @@ interface DropdownProps {
   trigger: React.ReactNode
   children: React.ReactNode
   align?: 'left' | 'right'
+  position?: 'below' | 'above'
   className?: string
 }
 
-export function Dropdown({ trigger, children, align = 'right', className }: DropdownProps) {
+export function Dropdown({ trigger, children, align = 'right', position = 'below', className }: DropdownProps) {
   const [open, setOpen] = React.useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -34,12 +35,13 @@ export function Dropdown({ trigger, children, align = 'right', className }: Drop
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: -4, scale: 0.95 }}
+            initial={{ opacity: 0, y: position === 'above' ? 4 : -4, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -4, scale: 0.95 }}
+            exit={{ opacity: 0, y: position === 'above' ? 4 : -4, scale: 0.95 }}
             transition={{ duration: 0.15 }}
             className={cn(
-              'absolute z-50 mt-2 min-w-[200px] rounded-xl border border-border bg-card p-1.5 shadow-xl',
+              'absolute z-50 min-w-[200px] rounded-xl border border-border bg-card p-1.5 shadow-xl',
+              position === 'above' ? 'bottom-full mb-2' : 'mt-2',
               align === 'right' ? 'right-0' : 'left-0',
               className
             )}
