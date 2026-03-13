@@ -28,7 +28,9 @@ export default class SearchSiren {
         address: item.siege?.adresse || '',
         postalCode: item.siege?.code_postal || '',
         city: item.siege?.libelle_commune || '',
-        vatNumber: item.siren ? `FR${(12 + 3 * (Number.parseInt(item.siren) % 97)) % 97}${item.siren}` : '',
+        vatNumber: item.siren
+          ? `FR${(12 + 3 * (Number.parseInt(item.siren) % 97)) % 97}${item.siren}`
+          : '',
       }))
 
       return response.ok({ results })

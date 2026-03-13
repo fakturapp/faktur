@@ -6,12 +6,7 @@ export default class extends BaseSchema {
   async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().defaultTo(this.db.rawQuery('gen_random_uuid()').knexQuery)
-      table
-        .uuid('user_id')
-        .nullable()
-        .references('id')
-        .inTable('users')
-        .onDelete('CASCADE')
+      table.uuid('user_id').nullable().references('id').inTable('users').onDelete('CASCADE')
 
       table.string('token_identifier', 255).nullable()
       table.string('ip_address', 45).notNullable()

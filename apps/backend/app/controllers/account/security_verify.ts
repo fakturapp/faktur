@@ -5,7 +5,6 @@ import vine from '@vinejs/vine'
 import EmailService from '#services/email/email_service'
 import TwoFactorService from '#services/auth/two_factor_service'
 
-
 const verifyCodeValidator = vine.compile(
   vine.object({
     code: vine.string().trim(),
@@ -34,9 +33,7 @@ export default class SecurityVerify {
     user.securityCodeExpiresAt = DateTime.now().plus({ minutes: 5 })
     await user.save()
 
-    EmailService.sendSecurityCodeEmail(user.email, code, user.fullName ?? undefined).catch(
-      () => {}
-    )
+    EmailService.sendSecurityCodeEmail(user.email, code, user.fullName ?? undefined).catch(() => {})
 
     return response.ok({
       message: 'Security code sent',

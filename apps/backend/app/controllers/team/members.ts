@@ -9,9 +9,7 @@ export default class Members {
       return response.notFound({ message: 'No team found' })
     }
 
-    const members = await TeamMember.query()
-      .where('teamId', user.currentTeamId)
-      .preload('user')
+    const members = await TeamMember.query().where('teamId', user.currentTeamId).preload('user')
 
     return response.ok({
       members: members.map((m) => ({

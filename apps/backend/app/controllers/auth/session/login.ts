@@ -61,9 +61,7 @@ export default class Login {
       if (code.includes('-') && user.recoveryCodesEncrypted) {
         const result = TwoFactorService.verifyRecoveryCode(code, user.recoveryCodesEncrypted)
         if (result.valid) {
-          user.recoveryCodesEncrypted = TwoFactorService.encryptRecoveryCodes(
-            result.remainingCodes
-          )
+          user.recoveryCodesEncrypted = TwoFactorService.encryptRecoveryCodes(result.remainingCodes)
           await user.save()
           await AuditLog.create({
             userId: user.id,

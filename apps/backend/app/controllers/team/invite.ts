@@ -61,7 +61,7 @@ export default class Invite {
 
     const member = await TeamMember.create({
       teamId: user.currentTeamId,
-      userId: existingUser?.id ?? null as any,
+      userId: existingUser?.id ?? (null as any),
       role: payload.role,
       status: 'pending',
       invitationToken: token,
@@ -73,11 +73,9 @@ export default class Invite {
     const inviteUrl = `${frontendUrl}/invite/${token}`
 
     // Send invitation email
-    EmailService.sendTeamInviteEmail(
-      payload.email,
-      user.fullName || user.email,
-      inviteUrl
-    ).catch(() => {})
+    EmailService.sendTeamInviteEmail(payload.email, user.fullName || user.email, inviteUrl).catch(
+      () => {}
+    )
 
     return response.created({
       message: 'Invitation sent',

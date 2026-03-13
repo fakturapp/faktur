@@ -5,7 +5,12 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.alterTable(this.tableName, (table) => {
-      table.uuid('current_team_id').nullable().references('id').inTable('teams').onDelete('SET NULL')
+      table
+        .uuid('current_team_id')
+        .nullable()
+        .references('id')
+        .inTable('teams')
+        .onDelete('SET NULL')
       table.boolean('onboarding_completed').notNullable().defaultTo(false)
     })
   }

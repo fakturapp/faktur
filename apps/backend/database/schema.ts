@@ -8,7 +8,18 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
 export class AuditLogSchema extends BaseModel {
-  static $columns = ['action', 'createdAt', 'id', 'ipAddress', 'metadata', 'resourceId', 'resourceType', 'severity', 'userAgent', 'userId'] as const
+  static $columns = [
+    'action',
+    'createdAt',
+    'id',
+    'ipAddress',
+    'metadata',
+    'resourceId',
+    'resourceType',
+    'severity',
+    'userAgent',
+    'userId',
+  ] as const
   $columns = AuditLogSchema.$columns
   @column()
   declare action: string
@@ -33,7 +44,18 @@ export class AuditLogSchema extends BaseModel {
 }
 
 export class AuthAccessTokenSchema extends BaseModel {
-  static $columns = ['abilities', 'createdAt', 'expiresAt', 'hash', 'id', 'lastUsedAt', 'name', 'tokenableId', 'type', 'updatedAt'] as const
+  static $columns = [
+    'abilities',
+    'createdAt',
+    'expiresAt',
+    'hash',
+    'id',
+    'lastUsedAt',
+    'name',
+    'tokenableId',
+    'type',
+    'updatedAt',
+  ] as const
   $columns = AuthAccessTokenSchema.$columns
   @column()
   declare abilities: string
@@ -58,7 +80,32 @@ export class AuthAccessTokenSchema extends BaseModel {
 }
 
 export class CompanySchema extends BaseModel {
-  static $columns = ['addressLine1', 'addressLine2', 'bankName', 'bic', 'city', 'country', 'createdAt', 'currency', 'email', 'iban', 'id', 'legalForm', 'legalName', 'logoUrl', 'paymentConditions', 'phone', 'postalCode', 'siren', 'siret', 'teamId', 'tradeName', 'updatedAt', 'vatNumber', 'website'] as const
+  static $columns = [
+    'addressLine1',
+    'addressLine2',
+    'bankName',
+    'bic',
+    'city',
+    'country',
+    'createdAt',
+    'currency',
+    'email',
+    'iban',
+    'id',
+    'legalForm',
+    'legalName',
+    'logoUrl',
+    'paymentConditions',
+    'phone',
+    'postalCode',
+    'siren',
+    'siret',
+    'teamId',
+    'tradeName',
+    'updatedAt',
+    'vatNumber',
+    'website',
+  ] as const
   $columns = CompanySchema.$columns
   @column()
   declare addressLine1: string | null
@@ -111,7 +158,19 @@ export class CompanySchema extends BaseModel {
 }
 
 export class LoginHistorySchema extends BaseModel {
-  static $columns = ['city', 'country', 'createdAt', 'failureReason', 'id', 'ipAddress', 'isSuspicious', 'status', 'tokenIdentifier', 'userAgent', 'userId'] as const
+  static $columns = [
+    'city',
+    'country',
+    'createdAt',
+    'failureReason',
+    'id',
+    'ipAddress',
+    'isSuspicious',
+    'status',
+    'tokenIdentifier',
+    'userAgent',
+    'userId',
+  ] as const
   $columns = LoginHistorySchema.$columns
   @column()
   declare city: string | null
@@ -138,7 +197,19 @@ export class LoginHistorySchema extends BaseModel {
 }
 
 export class TeamMemberSchema extends BaseModel {
-  static $columns = ['createdAt', 'id', 'invitationToken', 'invitedAt', 'invitedEmail', 'joinedAt', 'role', 'status', 'teamId', 'updatedAt', 'userId'] as const
+  static $columns = [
+    'createdAt',
+    'id',
+    'invitationToken',
+    'invitedAt',
+    'invitedEmail',
+    'joinedAt',
+    'role',
+    'status',
+    'teamId',
+    'updatedAt',
+    'userId',
+  ] as const
   $columns = TeamMemberSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -182,7 +253,31 @@ export class TeamSchema extends BaseModel {
 }
 
 export class UserSchema extends BaseModel {
-  static $columns = ['avatarUrl', 'createdAt', 'currentTeamId', 'email', 'emailVerificationSentAt', 'emailVerificationToken', 'emailVerified', 'failedLoginAttempts', 'fullName', 'id', 'lastLoginAt', 'lockedUntil', 'onboardingCompleted', 'password', 'passwordResetExpiresAt', 'passwordResetToken', 'recoveryCodesEncrypted', 'securityCode', 'securityCodeExpiresAt', 'status', 'twoFactorEnabled', 'twoFactorSecretEncrypted', 'updatedAt'] as const
+  static $columns = [
+    'avatarUrl',
+    'createdAt',
+    'currentTeamId',
+    'email',
+    'emailVerificationSentAt',
+    'emailVerificationToken',
+    'emailVerified',
+    'failedLoginAttempts',
+    'fullName',
+    'id',
+    'lastLoginAt',
+    'lockedUntil',
+    'onboardingCompleted',
+    'password',
+    'passwordResetExpiresAt',
+    'passwordResetToken',
+    'recoveryCodesEncrypted',
+    'securityCode',
+    'securityCodeExpiresAt',
+    'status',
+    'twoFactorEnabled',
+    'twoFactorSecretEncrypted',
+    'updatedAt',
+  ] as const
   $columns = UserSchema.$columns
   @column()
   declare avatarUrl: string | null

@@ -15,7 +15,9 @@ export default class SirenService {
   private static BASE_URL = 'https://recherche-entreprises.api.gouv.fr'
 
   static async searchByName(query: string): Promise<SirenResult[]> {
-    const res = await fetch(`${this.BASE_URL}/search?q=${encodeURIComponent(query)}&page=1&per_page=10`)
+    const res = await fetch(
+      `${this.BASE_URL}/search?q=${encodeURIComponent(query)}&page=1&per_page=10`
+    )
     if (!res.ok) return []
     const data = (await res.json()) as any
     return (data.results || []).map((r: any) => this.mapResult(r))

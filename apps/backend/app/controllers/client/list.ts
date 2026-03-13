@@ -10,9 +10,7 @@ export default class List {
       return response.badRequest({ message: 'No team selected' })
     }
 
-    const clients = await Client.query()
-      .where('team_id', teamId)
-      .orderBy('created_at', 'desc')
+    const clients = await Client.query().where('team_id', teamId).orderBy('created_at', 'desc')
 
     const clientsList = clients.map((c) => ({
       id: c.id,

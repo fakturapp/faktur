@@ -10,10 +10,7 @@ export default class Show {
       return response.badRequest({ message: 'No team selected' })
     }
 
-    const client = await Client.query()
-      .where('id', params.id)
-      .where('team_id', teamId)
-      .first()
+    const client = await Client.query().where('id', params.id).where('team_id', teamId).first()
 
     if (!client) {
       return response.notFound({ message: 'Client not found' })
