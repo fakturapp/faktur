@@ -11,6 +11,8 @@ export default class Me {
         avatarUrl: user.avatarUrl,
         emailVerified: user.emailVerified,
         twoFactorEnabled: user.twoFactorEnabled,
+        onboardingCompleted: user.onboardingCompleted,
+        currentTeamId: user.currentTeamId,
         lastLoginAt: user.lastLoginAt,
         createdAt: user.createdAt,
       },

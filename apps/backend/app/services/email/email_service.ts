@@ -12,7 +12,7 @@ interface EmailOptions {
 
 class EmailService {
   private frontendUrl = env.get('FRONTEND_URL') || 'http://localhost:3000'
-  private fromEmail = 'noreply@zenvoice.app'
+  private fromEmail = 'noreply@authguard.net'
   private fromName = 'ZenVoice'
 
   private get baseStyle() {
@@ -187,6 +187,55 @@ class EmailService {
       subject: 'Reset your password - ZenVoice',
       html: this.wrapHtml(content, 'Reset Password'),
       text: `Reset your password: ${resetUrl}`,
+    })
+  }
+
+  async sendSecurityCodeEmail(email: string, code: string, name?: string): Promise<void> {
+    const content = `
+      <h1 class="h1">Security verification code</h1>
+      <p class="text">
+        Hi${name ? ` ${name}` : ''},<br><br>
+        You requested a security verification code. Use the code below to confirm your action.
+      </p>
+      <div style="background: #27272a; border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 24px;">
+        <p style="margin: 0; font-size: 32px; font-weight: 700; color: #fff; letter-spacing: 8px; font-family: monospace;">
+          ${code}
+        </p>
+      </div>
+      <p class="text" style="font-size: 13px;">
+        This code is valid for <strong>5 minutes</strong>. If you didn't request this code, you can safely ignore this email.
+      </p>
+    `
+
+    await this.send({
+      to: email,
+      subject: 'Security verification code - ZenVoice',
+      html: this.wrapHtml(content, 'Security Code'),
+      text: `Your security verification code is: ${code}`,
+    })
+  }
+
+  async sendTeamInviteEmail(email: string, inviterName: string, inviteUrl: string): Promise<void> {
+    const content = `
+      <h1 class="h1">You've been invited to join a team</h1>
+      <p class="text">
+        <strong>${inviterName}</strong> has invited you to join their team on ZenVoice.
+      </p>
+      <a href="${inviteUrl}" class="button">Accept Invitation</a>
+      <p class="text" style="margin-top: 24px; font-size: 13px;">
+        If you don't have a ZenVoice account yet, you'll be able to create one after clicking the link.
+      </p>
+      <p class="text" style="margin-bottom: 0; font-size: 13px;">
+        Or paste this link in your browser:<br>
+        <a href="${inviteUrl}" class="link" style="word-break: break-all;">${inviteUrl}</a>
+      </p>
+    `
+
+    await this.send({
+      to: email,
+      subject: `${inviterName} invited you to ZenVoice`,
+      html: this.wrapHtml(content, 'Team Invitation'),
+      text: `You've been invited to join a team on ZenVoice: ${inviteUrl}`,
     })
   }
 

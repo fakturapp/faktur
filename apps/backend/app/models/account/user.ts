@@ -1,12 +1,13 @@
 import { DateTime } from 'luxon'
 import hash from '@adonisjs/core/services/hash'
 import { compose } from '@adonisjs/core/helpers'
-import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
-import type { HasMany } from '@adonisjs/lucid/types/relations'
+import { BaseModel, column, belongsTo, hasMany } from '@adonisjs/lucid/orm'
+import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
 import LoginHistory from '#models/account/login_history'
 import AuditLog from '#models/shared/audit_log'
+import Team from '#models/team/team'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
@@ -62,6 +63,20 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column.dateTime()
   declare lockedUntil: DateTime | null
 
+  // Security Verification
+  @column({ serializeAs: null })
+  declare securityCode: string | null
+
+  @column.dateTime()
+  declare securityCodeExpiresAt: DateTime | null
+
+  // Team & Onboarding
+  @column()
+  declare currentTeamId: string | null
+
+  @column()
+  declare onboardingCompleted: boolean
+
   // Status
   @column()
   declare status: 'active' | 'suspended' | 'deleted'
@@ -76,6 +91,9 @@ export default class User extends compose(BaseModel, AuthFinder) {
   declare updatedAt: DateTime | null
 
   // Relations
+  @belongsTo(() => Team, { foreignKey: 'currentTeamId' })
+  declare currentTeam: BelongsTo<typeof Team>
+
   @hasMany(() => LoginHistory)
   declare loginHistories: HasMany<typeof LoginHistory>
 

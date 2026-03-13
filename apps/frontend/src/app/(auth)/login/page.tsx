@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldError } from '@/components/ui/field'
+import { useAuth } from '@/lib/auth'
 import { api } from '@/lib/api'
 
 const fadeUp = {
@@ -21,6 +22,7 @@ const fadeUp = {
 
 export default function LoginPage() {
   const router = useRouter()
+  const { login } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [code, setCode] = useState('')
@@ -35,15 +37,19 @@ export default function LoginPage() {
     setLoading(true)
 
     if (requires2FA && userId) {
-      const { data, error: err } = await api.post<{ token: string }>('/auth/login/2fa', {
+      const { data, error: err } = await api.post<{ token: string; user: any }>('/auth/login/2fa', {
         userId,
         code,
       })
       setLoading(false)
       if (err) return setError(err)
       if (data?.token) {
-        localStorage.setItem('zenvoice_token', data.token)
-        router.push('/dashboard')
+        login(data.token, data.user)
+        if (!data.user.onboardingCompleted) {
+          router.push('/onboarding/team')
+        } else {
+          router.push('/')
+        }
       }
       return
     }
@@ -51,11 +57,19 @@ export default function LoginPage() {
     const { data, error: err } = await api.post<{
       token?: string
       requiresTwoFactor?: boolean
+      requiresEmailVerification?: boolean
+      email?: string
       userId?: string
+      user?: any
     }>('/auth/login', { email, password })
     setLoading(false)
 
     if (err) return setError(err)
+
+    if (data?.requiresEmailVerification) {
+      router.push(`/verify-email?email=${encodeURIComponent(data.email || email)}`)
+      return
+    }
 
     if (data?.requiresTwoFactor) {
       setRequires2FA(true)
@@ -63,9 +77,13 @@ export default function LoginPage() {
       return
     }
 
-    if (data?.token) {
-      localStorage.setItem('zenvoice_token', data.token)
-      router.push('/dashboard')
+    if (data?.token && data?.user) {
+      login(data.token, data.user)
+      if (!data.user.onboardingCompleted) {
+        router.push('/onboarding/team')
+      } else {
+        router.push('/')
+      }
     }
   }
 
