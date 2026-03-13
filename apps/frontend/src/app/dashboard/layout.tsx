@@ -1,14 +1,16 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth'
-import { Sidebar } from '@/components/ui/sidebar'
+import { Sidebar } from '@/components/layout/sidebar'
+import { SiteHeader } from '@/components/layout/site-header'
+import { RouteProgressBar } from '@/components/layout/route-progress'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Spinner } from '@/components/ui/spinner'
 import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useRouter, usePathname } from 'next/navigation'
+import { AnimatePresence, motion } from 'framer-motion'
+import { useRouter } from 'next/navigation'
 import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import { ArrowRightLeft } from 'lucide-react'
@@ -20,35 +22,6 @@ interface TeamListItem {
   role: string
   isOwner: boolean
   isCurrent: boolean
-}
-
-function RouteProgressBar() {
-  const pathname = usePathname()
-  const [show, setShow] = useState(false)
-  const prevPathname = useRef(pathname)
-
-  useEffect(() => {
-    if (pathname !== prevPathname.current) {
-      prevPathname.current = pathname
-      setShow(true)
-      const timer = setTimeout(() => setShow(false), 500)
-      return () => clearTimeout(timer)
-    }
-  }, [pathname])
-
-  return (
-    <AnimatePresence>
-      {show && (
-        <motion.div
-          className="h-0.5 bg-primary origin-left"
-          initial={{ scaleX: 0, opacity: 1 }}
-          animate={{ scaleX: 1, opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.4, ease: 'easeOut' }}
-        />
-      )}
-    </AnimatePresence>
-  )
 }
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -93,10 +66,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     setSwitching(false)
   }
 
-  if (loading || !user) {
+  if (loading) {
     return (
       <div className="flex h-screen overflow-hidden bg-background">
-        {/* Sidebar skeleton */}
         <div className="w-64 border-r border-border bg-card/50 flex flex-col">
           <div className="px-3 py-3">
             <div className="flex items-center gap-2.5 px-3 py-2">
@@ -109,43 +81,41 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
           <div className="mx-3 h-px bg-border" />
           <div className="flex-1 px-3 py-3 space-y-2">
-            {[...Array(4)].map((_, i) => (
+            {[...Array(5)].map((_, i) => (
               <Skeleton key={i} className="h-9 w-full rounded-lg" />
             ))}
             <div className="pt-4" />
-            {[...Array(3)].map((_, i) => (
+            {[...Array(4)].map((_, i) => (
               <Skeleton key={i} className="h-9 w-full rounded-lg" />
             ))}
           </div>
           <div className="mx-3 h-px bg-border" />
-          <div className="p-3 space-y-2">
+          <div className="p-3">
             <div className="flex items-center gap-3 px-2">
               <Skeleton className="h-8 w-8 rounded-full" />
-              <Skeleton className="h-3.5 w-24" />
+              <div className="flex-1 space-y-1">
+                <Skeleton className="h-3.5 w-24" />
+                <Skeleton className="h-2.5 w-32" />
+              </div>
             </div>
-            <Skeleton className="h-8 w-full rounded-lg" />
           </div>
         </div>
-        {/* Content skeleton */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex-1 m-2 ml-0 rounded-2xl bg-card/20 border border-border/50 p-8 space-y-6">
-            <Skeleton className="h-32 w-full rounded-2xl" />
+          <div className="h-12 border-b border-border shrink-0" />
+          <div className="flex-1 p-6 space-y-6">
             <div className="grid gap-4 grid-cols-4">
               {[...Array(4)].map((_, i) => (
-                <Skeleton key={i} className="h-24 rounded-xl" />
+                <Skeleton key={i} className="h-32 rounded-xl" />
               ))}
             </div>
-            <Skeleton className="h-5 w-40" />
-            <div className="grid gap-4 grid-cols-3">
-              {[...Array(3)].map((_, i) => (
-                <Skeleton key={i} className="h-16 rounded-xl" />
-              ))}
-            </div>
+            <Skeleton className="h-80 rounded-xl" />
           </div>
         </div>
       </div>
     )
   }
+
+  if (!user) return null
 
   const currentTeam = teams.find((t) => t.isCurrent) || null
 
@@ -165,30 +135,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       />
 
       <div className={cn('flex-1 flex flex-col overflow-hidden transition-all duration-300', switching && 'blur-sm pointer-events-none')}>
+        <SiteHeader />
         <RouteProgressBar />
 
-        <main className="flex-1 overflow-y-auto m-2 ml-0 rounded-2xl bg-card/20 border border-border/50">
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="p-6 lg:p-8"
-          >
+        <main className="flex-1 overflow-y-auto">
+          <div className="flex flex-1 flex-col gap-2">
             {children}
-          </motion.div>
+          </div>
         </main>
       </div>
 
-      {/* Team switch confirmation dialog */}
+      {/* Team switch confirmation */}
       <Dialog open={!!switchConfirm} onClose={() => setSwitchConfirm(null)}>
         <div className="flex items-center gap-3 mb-4">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
             <ArrowRightLeft className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <DialogTitle>Changer d&apos;équipe</DialogTitle>
+            <DialogTitle>Changer d&apos;equipe</DialogTitle>
             <DialogDescription className="mt-0">
-              Basculer vers une autre équipe
+              Basculer vers une autre equipe
             </DialogDescription>
           </div>
         </div>
@@ -202,7 +168,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <div>
                 <p className="text-sm font-medium text-foreground">{switchConfirm.name}</p>
                 <p className="text-xs text-muted-foreground">
-                  {switchConfirm.isOwner ? 'Propriétaire' : switchConfirm.role === 'admin' ? 'Administrateur' : 'Membre'}
+                  {switchConfirm.isOwner ? 'Proprietaire' : switchConfirm.role === 'admin' ? 'Administrateur' : 'Membre'}
                 </p>
               </div>
             </div>
@@ -230,7 +196,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           >
             <Spinner size="lg" className="text-primary" />
             <p className="mt-4 text-sm font-medium text-foreground">
-              Changement d&apos;équipe en cours...
+              Changement d&apos;equipe en cours...
             </p>
           </motion.div>
         )}

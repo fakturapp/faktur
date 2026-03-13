@@ -166,7 +166,7 @@ export default function ClientCreatePage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-2xl mx-auto px-4 lg:px-6 py-4 md:py-6">
       {/* Back link */}
       <Link
         href="/dashboard/clients"

@@ -11,7 +11,7 @@ import { Avatar } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
-import { SecurityVerificationModal } from '@/components/security-verification-modal'
+import { SecurityVerificationModal } from '@/components/modals/security-verification-modal'
 import { useAuth } from '@/lib/auth'
 import { useToast } from '@/components/ui/toast'
 import { api } from '@/lib/api'
@@ -51,6 +51,8 @@ export default function AccountPage() {
   // Sessions
   const [sessions, setSessions] = useState<Session[]>([])
   const [sessionsLoaded, setSessionsLoaded] = useState(false)
+  const [revokeConfirm, setRevokeConfirm] = useState<string | null>(null)
+  const [revoking, setRevoking] = useState(false)
 
   // Delete
   const [deleteOpen, setDeleteOpen] = useState(false)
@@ -231,11 +233,18 @@ export default function AccountPage() {
     }
   }
 
-  async function revokeSession(id: string) {
-    const { error } = await api.delete(`/account/sessions/${id}`)
-    if (error) return toast(error, 'error')
-    setSessions((prev) => prev.filter((s) => String(s.id) !== String(id)))
-    toast('Session révoquée', 'success')
+  async function confirmRevokeSession() {
+    if (!revokeConfirm) return
+    setRevoking(true)
+    const { error } = await api.delete(`/account/sessions/${revokeConfirm}`)
+    setRevoking(false)
+    if (error) {
+      setRevokeConfirm(null)
+      return toast(error, 'error')
+    }
+    setSessions((prev) => prev.filter((s) => String(s.id) !== String(revokeConfirm)))
+    setRevokeConfirm(null)
+    toast('Session revoquee', 'success')
   }
 
   function handleDeleteAccount() {
@@ -263,7 +272,7 @@ export default function AccountPage() {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-4xl mx-auto space-y-6"
+      className="max-w-4xl mx-auto space-y-6 px-4 lg:px-6 py-4 md:py-6"
     >
       <div>
         <h1 className="text-2xl font-bold text-foreground">Mon compte</h1>
@@ -576,9 +585,9 @@ export default function AccountPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => revokeSession(session.id)}
+                        onClick={() => setRevokeConfirm(session.id)}
                       >
-                        Révoquer
+                        Revoquer
                       </Button>
                     )}
                   </div>
@@ -602,6 +611,22 @@ export default function AccountPage() {
         onVerified={handleSecurityVerified}
         twoFactorEnabled={user?.twoFactorEnabled}
       />
+
+      {/* Revoke session confirmation */}
+      <Dialog open={!!revokeConfirm} onClose={() => setRevokeConfirm(null)}>
+        <DialogTitle>Revoquer cette session</DialogTitle>
+        <DialogDescription>
+          Cette session sera deconnectee immediatement. L&apos;appareil devra se reconnecter.
+        </DialogDescription>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setRevokeConfirm(null)} disabled={revoking}>
+            Annuler
+          </Button>
+          <Button variant="destructive" onClick={confirmRevokeSession} disabled={revoking}>
+            {revoking ? <Spinner size="sm" /> : 'Revoquer'}
+          </Button>
+        </DialogFooter>
+      </Dialog>
 
       {/* Delete account dialog */}
       <Dialog open={deleteOpen} onClose={() => setDeleteOpen(false)}>

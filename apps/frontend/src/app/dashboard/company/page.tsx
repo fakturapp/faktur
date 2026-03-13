@@ -173,7 +173,7 @@ export default function CompanyPage() {
 
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div className="max-w-4xl mx-auto space-y-6 px-4 lg:px-6 py-4 md:py-6">
         <div className="space-y-2">
           <div className="h-7 w-40 rounded bg-muted animate-pulse" />
           <div className="h-4 w-64 rounded bg-muted animate-pulse" />
@@ -199,7 +199,7 @@ export default function CompanyPage() {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-4xl mx-auto space-y-6"
+      className="max-w-4xl mx-auto space-y-6 px-4 lg:px-6 py-4 md:py-6"
     >
       <div>
         <h1 className="text-2xl font-bold text-foreground">Entreprise</h1>
