@@ -4,19 +4,35 @@
  */
 
 export const controllers = {
-  AccessToken: () => import('#controllers/access_token_controller'),
-  auth: {
-    Login: () => import('#controllers/auth/login_controller'),
-    Logout: () => import('#controllers/auth/logout_controller'),
-    Me: () => import('#controllers/auth/me_controller'),
-    PasswordReset: () => import('#controllers/auth/password_reset_controller'),
-    PasswordResetRequest: () => import('#controllers/auth/password_reset_request_controller'),
-    ResendVerification: () => import('#controllers/auth/resend_verification_controller'),
-    Signup: () => import('#controllers/auth/signup_controller'),
-    VerifyEmail: () => import('#controllers/auth/verify_email_controller'),
-    TwoFactorSetup: () => import('#controllers/auth/two_factor_setup_controller'),
-    TwoFactorVerify: () => import('#controllers/auth/two_factor_verify_controller'),
+  account: {
+    Show: () => import('#controllers/account/show'),
+    twoFactor: {
+      Disable: () => import('#controllers/account/two_factor/disable'),
+      Enable: () => import('#controllers/account/two_factor/enable'),
+      Setup: () => import('#controllers/account/two_factor/setup'),
+    },
   },
-  NewAccount: () => import('#controllers/new_account_controller'),
-  Profile: () => import('#controllers/profile_controller'),
+  auth: {
+    registration: {
+      Signup: () => import('#controllers/auth/registration/signup'),
+    },
+    security: {
+      email: {
+        Resend: () => import('#controllers/auth/security/email/resend'),
+        Verify: () => import('#controllers/auth/security/email/verify'),
+      },
+      passwordReset: {
+        Request: () => import('#controllers/auth/security/password_reset/request'),
+        Reset: () => import('#controllers/auth/security/password_reset/reset'),
+      },
+      twoFactor: {
+        Verify: () => import('#controllers/auth/security/two_factor/verify'),
+      },
+    },
+    session: {
+      Login: () => import('#controllers/auth/session/login'),
+      Logout: () => import('#controllers/auth/session/logout'),
+      Me: () => import('#controllers/auth/session/me'),
+    },
+  },
 }

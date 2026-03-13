@@ -34,7 +34,7 @@ function TwoFactorContent() {
     setLoading(true)
 
     const { data, error: err } = await api.post<{ token: string }>('/auth/login/2fa', {
-      userId: Number(userId),
+      userId,
       code,
     })
     setLoading(false)

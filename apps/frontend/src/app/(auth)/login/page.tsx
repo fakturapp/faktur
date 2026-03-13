@@ -27,7 +27,7 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [requires2FA, setRequires2FA] = useState(false)
-  const [userId, setUserId] = useState<number | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -51,7 +51,7 @@ export default function LoginPage() {
     const { data, error: err } = await api.post<{
       token?: string
       requiresTwoFactor?: boolean
-      userId?: number
+      userId?: string
     }>('/auth/login', { email, password })
     setLoading(false)
 

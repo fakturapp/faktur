@@ -22,8 +22,15 @@ export default await Env.create(new URL('../', import.meta.url), {
   APP_KEY: Env.schema.secret(),
   APP_URL: Env.schema.string({ format: 'url', tld: false }),
 
-  // Session
-  SESSION_DRIVER: Env.schema.enum(['cookie', 'memory', 'database'] as const),
+  // Session (keep for shield CSRF)
+  SESSION_DRIVER: Env.schema.enum(['cookie', 'memory'] as const),
+
+  // Database (PostgreSQL)
+  DB_HOST: Env.schema.string({ format: 'host' }),
+  DB_PORT: Env.schema.number(),
+  DB_USER: Env.schema.string(),
+  DB_PASSWORD: Env.schema.string.optional(),
+  DB_DATABASE: Env.schema.string(),
 
   // Encryption (for 2FA secrets, recovery codes)
   ENCRYPTION_KEY: Env.schema.string.optional(),

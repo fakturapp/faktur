@@ -1,0 +1,20 @@
+import type { HttpContext } from '@adonisjs/core/http'
+
+export default class Show {
+  async handle({ auth, response }: HttpContext) {
+    const user = auth.user!
+
+    return response.ok({
+      user: {
+        id: user.id,
+        fullName: user.fullName,
+        email: user.email,
+        avatarUrl: user.avatarUrl,
+        emailVerified: user.emailVerified,
+        twoFactorEnabled: user.twoFactorEnabled,
+        lastLoginAt: user.lastLoginAt,
+        createdAt: user.createdAt,
+      },
+    })
+  }
+}

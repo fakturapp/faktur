@@ -38,7 +38,7 @@ export default function RegisterPage() {
 
     setLoading(true)
 
-    const { error: err } = await api.post('/auth/signup', {
+    const { error: err } = await api.post('/auth/sign-up', {
       fullName,
       email,
       password,
