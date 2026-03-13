@@ -78,6 +78,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     if (user && isPublicPath) {
+      // Let login and verify-email pages handle their own "already logged in" state
+      if (pathname === '/login' || pathname.startsWith('/verify-email')) {
+        return
+      }
       if (!user.onboardingCompleted) {
         router.replace('/onboarding/team')
       } else {

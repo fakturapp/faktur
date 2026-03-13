@@ -8,21 +8,24 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldError } from '@/components/ui/field'
+import { Avatar } from '@/components/ui/avatar'
+import { Separator } from '@/components/ui/separator'
 import { useAuth } from '@/lib/auth'
 import { api } from '@/lib/api'
+import { LogOut, LayoutDashboard } from 'lucide-react'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.08, duration: 0.4, ease: 'easeOut' },
+    transition: { delay: i * 0.08, duration: 0.4, ease: 'easeOut' as const },
   }),
 }
 
 export default function LoginPage() {
   const router = useRouter()
-  const { login } = useAuth()
+  const { user, login, logout, loading: authLoading } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [code, setCode] = useState('')
@@ -85,6 +88,63 @@ export default function LoginPage() {
         router.push('/')
       }
     }
+  }
+
+  // Already logged in
+  if (!authLoading && user) {
+    const initials = user.fullName
+      ? user.fullName.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
+      : user.email.slice(0, 2).toUpperCase()
+
+    return (
+      <motion.div initial="hidden" animate="visible" className="w-full max-w-md">
+        <Card className="overflow-hidden p-0 border-border/50">
+          <CardContent className="p-8">
+            <FieldGroup>
+              <motion.div variants={fadeUp} custom={0} className="flex flex-col items-center gap-4 text-center">
+                <Avatar
+                  src={user.avatarUrl}
+                  alt={user.fullName || user.email}
+                  fallback={initials}
+                  size="lg"
+                />
+                <div>
+                  <h1 className="text-2xl font-bold">Deja connecte</h1>
+                  <p className="text-muted-foreground text-sm mt-1">
+                    Vous etes connecte en tant que
+                  </p>
+                  <p className="font-medium text-foreground mt-0.5">
+                    {user.fullName || user.email}
+                  </p>
+                  <p className="text-xs text-muted-foreground">{user.email}</p>
+                </div>
+              </motion.div>
+
+              <motion.div variants={fadeUp} custom={1}>
+                <Separator />
+              </motion.div>
+
+              <motion.div variants={fadeUp} custom={2} className="space-y-3">
+                <Button className="w-full" onClick={() => router.push('/')}>
+                  <LayoutDashboard className="h-4 w-4 mr-2" />
+                  Aller au Dashboard
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={async () => {
+                    await logout()
+                  }}
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Se deconnecter
+                </Button>
+              </motion.div>
+            </FieldGroup>
+          </CardContent>
+        </Card>
+      </motion.div>
+    )
   }
 
   return (
