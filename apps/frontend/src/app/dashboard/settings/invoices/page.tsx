@@ -1,18 +1,16 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useRef } from 'react'
 import { motion, type Variants } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Field, FieldGroup, FieldLabel, FieldDescription } from '@/components/ui/field'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/toast'
 import { Spinner } from '@/components/ui/spinner'
-import { api } from '@/lib/api'
+import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import {
-  FileText,
   ImagePlus,
   Palette,
   Banknote,
@@ -48,83 +46,36 @@ const accentColors = [
   { name: 'Noir', value: '#18181b' },
 ]
 
-interface InvoiceSettings {
-  billingType: 'quick' | 'detailed'
-  logoUrl: string | null
-  accentColor: string
-  paymentMethods: string[]
-  customPaymentMethod: string
-}
-
 export default function InvoiceSettingsPage() {
   const { toast } = useToast()
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
+  const { settings, loading, updateSettings, uploadLogo } = useInvoiceSettings()
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-
-  const [settings, setSettings] = useState<InvoiceSettings>({
-    billingType: 'quick',
-    logoUrl: null,
-    accentColor: '#6366f1',
-    paymentMethods: ['bank_transfer'],
-    customPaymentMethod: '',
-  })
-
-  useEffect(() => {
-    loadSettings()
-  }, [])
-
-  async function loadSettings() {
-    setLoading(true)
-    const { data } = await api.get<{ settings: InvoiceSettings }>('/settings/invoices')
-    if (data?.settings) {
-      setSettings(data.settings)
-    }
-    setLoading(false)
-  }
-
-  async function handleSave() {
-    setSaving(true)
-    const { error } = await api.put('/settings/invoices', settings)
-    setSaving(false)
-    if (error) {
-      toast(error, 'error')
-    } else {
-      toast('Paramètres enregistrés', 'success')
-    }
-  }
 
   async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
 
     setUploading(true)
-    const formData = new FormData()
-    formData.append('logo', file)
-
-    const { data, error } = await api.upload<{ logoUrl: string }>('/settings/invoices/logo', formData)
-    setUploading(false)
-
-    if (error) {
-      toast(error, 'error')
-    } else if (data?.logoUrl) {
-      setSettings((prev) => ({ ...prev, logoUrl: data.logoUrl }))
-      toast('Logo mis à jour', 'success')
+    try {
+      await uploadLogo(file)
+      toast('Logo mis a jour', 'success')
+    } catch {
+      toast('Erreur lors de l\'envoi du logo', 'error')
     }
+    setUploading(false)
   }
 
   function handleRemoveLogo() {
-    setSettings((prev) => ({ ...prev, logoUrl: null }))
+    updateSettings({ logoUrl: null })
   }
 
   function togglePaymentMethod(method: string) {
-    setSettings((prev) => ({
-      ...prev,
-      paymentMethods: prev.paymentMethods.includes(method)
-        ? prev.paymentMethods.filter((m) => m !== method)
-        : [...prev.paymentMethods, method],
-    }))
+    const current = settings.paymentMethods
+    const updated = current.includes(method)
+      ? current.filter((m) => m !== method)
+      : [...current, method]
+    updateSettings({ paymentMethods: updated })
   }
 
   if (loading) {
@@ -180,7 +131,7 @@ export default function InvoiceSettingsPage() {
 
                 <div className="grid grid-cols-2 gap-3">
                   <button
-                    onClick={() => setSettings((prev) => ({ ...prev, billingType: 'quick' }))}
+                    onClick={() => updateSettings({ billingType: 'quick' })}
                     className={`relative rounded-xl border-2 p-4 text-left transition-all ${
                       settings.billingType === 'quick'
                         ? 'border-primary bg-primary/5 shadow-sm'
@@ -202,7 +153,7 @@ export default function InvoiceSettingsPage() {
                   </button>
 
                   <button
-                    onClick={() => setSettings((prev) => ({ ...prev, billingType: 'detailed' }))}
+                    onClick={() => updateSettings({ billingType: 'detailed' })}
                     className={`relative rounded-xl border-2 p-4 text-left transition-all ${
                       settings.billingType === 'detailed'
                         ? 'border-primary bg-primary/5 shadow-sm'
@@ -311,7 +262,7 @@ export default function InvoiceSettingsPage() {
                     {accentColors.map((color) => (
                       <button
                         key={color.value}
-                        onClick={() => setSettings((prev) => ({ ...prev, accentColor: color.value }))}
+                        onClick={() => updateSettings({ accentColor: color.value })}
                         className="group relative"
                         title={color.name}
                       >
@@ -343,7 +294,7 @@ export default function InvoiceSettingsPage() {
                     />
                     <Input
                       value={settings.accentColor}
-                      onChange={(e) => setSettings((prev) => ({ ...prev, accentColor: e.target.value }))}
+                      onChange={(e) => updateSettings({ accentColor: e.target.value })}
                       placeholder="#6366f1"
                       className="font-mono text-sm max-w-[140px]"
                     />
@@ -472,7 +423,7 @@ export default function InvoiceSettingsPage() {
                         <Input
                           placeholder="Ex: Cheque, PayPal, etc."
                           value={settings.customPaymentMethod}
-                          onChange={(e) => setSettings((prev) => ({ ...prev, customPaymentMethod: e.target.value }))}
+                          onChange={(e) => updateSettings({ customPaymentMethod: e.target.value })}
                           className="text-sm"
                         />
                       </motion.div>
@@ -507,11 +458,12 @@ export default function InvoiceSettingsPage() {
             </Card>
           </motion.div>
 
-          {/* Save Button */}
+          {/* Auto-save indicator (replaces save button) */}
           <motion.div variants={fadeUp} custom={5} className="flex justify-end">
-            <Button onClick={handleSave} disabled={saving} className="min-w-[160px]">
-              {saving ? <><Spinner /> Enregistrement...</> : 'Enregistrer'}
-            </Button>
+            <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+              <Check className="h-3.5 w-3.5 text-green-500" />
+              Enregistrement automatique
+            </p>
           </motion.div>
         </div>
 

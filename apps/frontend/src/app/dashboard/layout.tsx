@@ -13,6 +13,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useRouter, usePathname } from 'next/navigation'
 import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
+import { InvoiceSettingsProvider } from '@/lib/invoice-settings-context'
 import { ArrowRightLeft } from 'lucide-react'
 
 interface TeamListItem {
@@ -122,6 +123,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const currentTeam = teams.find((t) => t.isCurrent) || null
 
   return (
+    <InvoiceSettingsProvider>
     <div className="flex h-screen overflow-hidden bg-sidebar">
       <Sidebar
         teams={teams}
@@ -221,5 +223,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         )}
       </AnimatePresence>
     </div>
+    </InvoiceSettingsProvider>
   )
 }
