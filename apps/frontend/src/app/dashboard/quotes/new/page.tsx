@@ -9,8 +9,7 @@ import { useToast } from '@/components/ui/toast'
 import { Spinner } from '@/components/ui/spinner'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { api } from '@/lib/api'
-import { A4Sheet, type QuoteLine } from '@/components/quotes/a4-sheet'
-import { ClientSelector } from '@/components/quotes/client-selector'
+import { A4Sheet, type QuoteLine, type ClientInfo } from '@/components/quotes/a4-sheet'
 import { QuoteOptionsPanel } from '@/components/quotes/quote-options'
 import { Save, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
@@ -33,24 +32,6 @@ interface CompanyInfo {
   country: string
   phone: string | null
   email: string | null
-  siren: string | null
-  vatNumber: string | null
-}
-
-interface ClientInfo {
-  id: string
-  type: 'company' | 'individual'
-  displayName: string
-  companyName: string | null
-  firstName: string | null
-  lastName: string | null
-  email: string | null
-  phone: string | null
-  address: string | null
-  addressComplement: string | null
-  postalCode: string | null
-  city: string | null
-  country: string
   siren: string | null
   vatNumber: string | null
 }
@@ -81,7 +62,16 @@ export default function NewQuotePage() {
   const [selectedClient, setSelectedClient] = useState<ClientInfo | null>(null)
 
   const [lines, setLines] = useState<QuoteLine[]>([
-    { id: generateId(), description: '', saleType: '', quantity: 1, unit: '', unitPrice: 0, vatRate: 20 },
+    {
+      id: generateId(),
+      type: 'standard',
+      description: '',
+      saleType: '',
+      quantity: 1,
+      unit: '',
+      unitPrice: 0,
+      vatRate: 20,
+    },
   ])
 
   const [options, setOptions] = useState({
@@ -103,33 +93,22 @@ export default function NewQuotePage() {
 
   const [notes, setNotes] = useState('')
 
-  // Load initial data
   useEffect(() => {
     async function init() {
       const [numberRes, companyRes] = await Promise.all([
         api.get<{ nextNumber: string }>('/quotes/next-number'),
         api.get<{ company: CompanyInfo }>('/company'),
       ])
-
-      if (numberRes.data?.nextNumber) {
-        setQuoteNumber(numberRes.data.nextNumber)
-      }
-      if (companyRes.data?.company) {
-        setCompany(companyRes.data.company)
-      }
-
+      if (numberRes.data?.nextNumber) setQuoteNumber(numberRes.data.nextNumber)
+      if (companyRes.data?.company) setCompany(companyRes.data.company)
       setLoading(false)
     }
     init()
   }, [])
 
-  // Apply invoice settings defaults when they load
   useEffect(() => {
     if (!settingsLoading) {
-      setOptions((prev) => ({
-        ...prev,
-        billingType: invoiceSettings.billingType,
-      }))
+      setOptions((prev) => ({ ...prev, billingType: invoiceSettings.billingType }))
     }
   }, [settingsLoading, invoiceSettings.billingType])
 
@@ -137,10 +116,19 @@ export default function NewQuotePage() {
     setLines((prev) => prev.map((l, i) => (i === index ? { ...l, ...partial } : l)))
   }, [])
 
-  const handleAddLine = useCallback(() => {
+  const handleAddLine = useCallback((type: 'standard' | 'section') => {
     setLines((prev) => [
       ...prev,
-      { id: generateId(), description: '', saleType: '', quantity: 1, unit: '', unitPrice: 0, vatRate: 20 },
+      {
+        id: generateId(),
+        type,
+        description: '',
+        saleType: '',
+        quantity: 1,
+        unit: '',
+        unitPrice: 0,
+        vatRate: type === 'section' ? 0 : 20,
+      },
     ])
   }, [])
 
@@ -154,7 +142,6 @@ export default function NewQuotePage() {
 
   const handleSelectClient = useCallback((client: ClientInfo) => {
     setSelectedClient(client)
-    // Auto-fill client fiscal info
     setOptions((prev) => ({
       ...prev,
       clientSiren: client.siren || prev.clientSiren,
@@ -162,11 +149,11 @@ export default function NewQuotePage() {
     }))
   }, [])
 
-  // Calculate totals
   const { subtotal, taxAmount, discountAmount, total } = useMemo(() => {
     let sub = 0
     let tax = 0
     for (const line of lines) {
+      if (line.type === 'section') continue
       const lt = options.billingType === 'quick' ? line.unitPrice : line.quantity * line.unitPrice
       const lTax = options.billingType === 'detailed' ? lt * (line.vatRate / 100) : 0
       sub += lt
@@ -189,7 +176,7 @@ export default function NewQuotePage() {
   }, [lines, options.billingType, options.globalDiscountType, options.globalDiscountValue])
 
   async function handleSave() {
-    if (!lines.some((l) => l.description.trim())) {
+    if (!lines.some((l) => l.type === 'standard' && l.description.trim())) {
       toast('Ajoutez au moins une ligne avec une description', 'error')
       return
     }
@@ -219,11 +206,11 @@ export default function NewQuotePage() {
         .filter((l) => l.description.trim())
         .map((l) => ({
           description: l.description,
-          saleType: l.saleType || undefined,
-          quantity: options.billingType === 'quick' ? 1 : l.quantity,
-          unit: l.unit || undefined,
-          unitPrice: l.unitPrice,
-          vatRate: options.billingType === 'quick' ? 0 : l.vatRate,
+          saleType: l.type === 'section' ? 'section' : l.saleType || undefined,
+          quantity: l.type === 'section' ? 1 : options.billingType === 'quick' ? 1 : l.quantity,
+          unit: l.type === 'section' ? undefined : l.unit || undefined,
+          unitPrice: l.type === 'section' ? 0 : l.unitPrice,
+          vatRate: l.type === 'section' ? 0 : options.billingType === 'quick' ? 0 : l.vatRate,
         })),
     }
 
@@ -242,12 +229,13 @@ export default function NewQuotePage() {
     return (
       <div className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
         <Skeleton className="h-8 w-64" />
-        <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-6">
-          <Skeleton className="h-[800px] rounded-xl" />
+        <div className="grid grid-cols-1 xl:grid-cols-[1fr_340px] gap-6 items-start">
+          <div className="flex justify-center">
+            <Skeleton className="w-full max-w-[680px] rounded-xl" style={{ aspectRatio: '210/297' }} />
+          </div>
           <div className="space-y-4">
-            <Skeleton className="h-40 rounded-xl" />
-            <Skeleton className="h-32 rounded-xl" />
             <Skeleton className="h-48 rounded-xl" />
+            <Skeleton className="h-32 rounded-xl" />
           </div>
         </div>
       </div>
@@ -284,19 +272,9 @@ export default function NewQuotePage() {
             validityDate={options.validityDate}
             billingType={options.billingType}
             company={company}
-            client={
-              selectedClient
-                ? {
-                    displayName: selectedClient.displayName,
-                    address: selectedClient.address,
-                    addressComplement: selectedClient.addressComplement,
-                    postalCode: selectedClient.postalCode,
-                    city: selectedClient.city,
-                    country: selectedClient.country,
-                    email: selectedClient.email,
-                  }
-                : null
-            }
+            client={selectedClient}
+            onSelectClient={handleSelectClient}
+            onClearClient={() => setSelectedClient(null)}
             lines={lines}
             onUpdateLine={handleUpdateLine}
             onAddLine={handleAddLine}
@@ -306,6 +284,7 @@ export default function NewQuotePage() {
             discountAmount={discountAmount}
             total={total}
             notes={notes}
+            onNotesChange={setNotes}
             acceptanceConditions={options.acceptanceConditions}
             signatureField={options.signatureField}
             freeField={options.freeField}
@@ -314,31 +293,8 @@ export default function NewQuotePage() {
           />
         </motion.div>
 
-        {/* Right: Sidebar */}
-        <motion.div variants={fadeUp} custom={2} className="space-y-4 xl:sticky xl:top-4">
-          {/* Client Selector */}
-          <div>
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Client</p>
-            <ClientSelector
-              selectedClient={selectedClient}
-              onSelect={handleSelectClient}
-              onClear={() => setSelectedClient(null)}
-            />
-          </div>
-
-          {/* Notes */}
-          <div>
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Notes</p>
-            <textarea
-              placeholder="Notes visibles sur le devis..."
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              rows={2}
-              className="w-full rounded-lg border border-border bg-transparent px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-none"
-            />
-          </div>
-
-          {/* Options */}
+        {/* Right: Sidebar - Options only */}
+        <motion.div variants={fadeUp} custom={2} className="xl:sticky xl:top-4">
           <QuoteOptionsPanel options={options} onChange={handleOptionsChange} />
         </motion.div>
       </div>
