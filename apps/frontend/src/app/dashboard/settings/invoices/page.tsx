@@ -134,16 +134,14 @@ export default function InvoiceSettingsPage() {
           <Skeleton className="h-8 w-64" />
           <Skeleton className="h-4 w-96" />
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          <div className="space-y-6">
             <Skeleton className="h-40 rounded-xl" />
             <Skeleton className="h-48 rounded-xl" />
             <Skeleton className="h-32 rounded-xl" />
             <Skeleton className="h-56 rounded-xl" />
           </div>
-          <div>
-            <Skeleton className="h-[500px] rounded-xl" />
-          </div>
+          <Skeleton className="h-[600px] rounded-xl" />
         </div>
       </div>
     )
@@ -163,9 +161,9 @@ export default function InvoiceSettingsPage() {
         </p>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Settings Column */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6">
           {/* Billing Type */}
           <motion.div variants={fadeUp} custom={1}>
             <Card className="overflow-hidden border-border/50">
@@ -517,128 +515,188 @@ export default function InvoiceSettingsPage() {
           </motion.div>
         </div>
 
-        {/* Preview Column */}
-        <motion.div variants={fadeUp} custom={2} className="lg:col-span-1">
+        {/* Preview Column — A4-like document */}
+        <motion.div variants={fadeUp} custom={2}>
           <div className="sticky top-6">
             <Card className="overflow-hidden border-border/50">
               <CardContent className="p-0">
                 {/* Preview header */}
-                <div className="p-4 border-b border-border">
+                <div className="px-5 py-3.5 border-b border-border flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Eye className="h-4 w-4 text-muted-foreground" />
-                    <p className="text-sm font-medium text-foreground">Apercu</p>
+                    <p className="text-sm font-medium text-foreground">Apercu du document</p>
                   </div>
+                  <p className="text-xs text-muted-foreground">
+                    {settings.billingType === 'quick' ? 'Facture rapide' : 'Facture complete'}
+                  </p>
                 </div>
 
-                {/* Mini invoice preview */}
-                <div className="p-4">
-                  <div className="rounded-lg border border-border bg-white p-4 space-y-4">
-                    {/* Header with logo and color */}
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-1">
-                        {settings.logoUrl ? (
-                          <img src={settings.logoUrl} alt="Logo" className="h-8 w-auto" />
-                        ) : (
-                          <div className="h-8 w-16 rounded bg-gray-200 flex items-center justify-center">
-                            <ImagePlus className="h-4 w-4 text-gray-400" />
+                {/* A4 Document Preview */}
+                <div className="p-5 bg-muted/30">
+                  <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden" style={{ aspectRatio: '1 / 1.2' }}>
+                    <div className="h-full flex flex-col p-6 sm:p-8">
+
+                      {/* Document header */}
+                      <div className="flex items-start justify-between mb-5">
+                        <div className="space-y-2">
+                          {settings.logoUrl ? (
+                            <img src={settings.logoUrl} alt="Logo" className="h-10 w-auto max-w-[120px] object-contain" />
+                          ) : (
+                            <div className="h-10 w-20 rounded-md bg-gray-100 border border-dashed border-gray-300 flex items-center justify-center">
+                              <ImagePlus className="h-5 w-5 text-gray-300" />
+                            </div>
+                          )}
+                          <div className="space-y-0.5">
+                            <div className="h-2 w-24 rounded-full bg-gray-200" />
+                            <div className="h-1.5 w-32 rounded-full bg-gray-100" />
+                            <div className="h-1.5 w-28 rounded-full bg-gray-100" />
                           </div>
-                        )}
-                        <p className="text-[8px] text-gray-400">Votre entreprise</p>
+                        </div>
+                        <div className="text-right space-y-1">
+                          <p className="text-sm font-bold tracking-wide" style={{ color: settings.accentColor }}>
+                            FACTURE
+                          </p>
+                          <p className="text-[10px] text-gray-400 font-medium">#F-2025-001</p>
+                          <p className="text-[10px] text-gray-400">13/03/2025</p>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <p
-                          className="text-xs font-bold"
-                          style={{ color: settings.accentColor }}
+
+                      {/* Accent divider */}
+                      <div className="h-[2px] rounded-full mb-5" style={{ backgroundColor: settings.accentColor }} />
+
+                      {/* Addresses: From / To */}
+                      <div className="grid grid-cols-2 gap-6 mb-6">
+                        <div className="space-y-1">
+                          <p className="text-[9px] font-semibold uppercase tracking-wider" style={{ color: settings.accentColor }}>
+                            Emetteur
+                          </p>
+                          <div className="space-y-0.5">
+                            <div className="h-2 w-28 rounded-full bg-gray-200" />
+                            <div className="h-1.5 w-36 rounded-full bg-gray-100" />
+                            <div className="h-1.5 w-24 rounded-full bg-gray-100" />
+                            <div className="h-1.5 w-20 rounded-full bg-gray-100" />
+                          </div>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-[9px] font-semibold uppercase tracking-wider" style={{ color: settings.accentColor }}>
+                            Client
+                          </p>
+                          <div className="space-y-0.5">
+                            <div className="h-2 w-24 rounded-full bg-gray-200" />
+                            <div className="h-1.5 w-32 rounded-full bg-gray-100" />
+                            <div className="h-1.5 w-28 rounded-full bg-gray-100" />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Items table */}
+                      <div className="flex-1 min-h-0">
+                        {/* Table header */}
+                        <div
+                          className="rounded-t-md px-3 py-2 flex items-center"
+                          style={{ backgroundColor: settings.accentColor + '12' }}
                         >
-                          FACTURE
-                        </p>
-                        <p className="text-[8px] text-gray-400">#F-2025-001</p>
-                      </div>
-                    </div>
-
-                    {/* Accent bar */}
-                    <div
-                      className="h-0.5 rounded-full"
-                      style={{ backgroundColor: settings.accentColor }}
-                    />
-
-                    {/* Skeleton content */}
-                    <div className="space-y-2">
-                      <div className="flex gap-4">
-                        <div className="flex-1 space-y-1">
-                          <div className="h-1.5 w-12 rounded-full bg-gray-200" />
-                          <div className="h-1 w-20 rounded-full bg-gray-100" />
-                          <div className="h-1 w-16 rounded-full bg-gray-100" />
-                        </div>
-                        <div className="flex-1 space-y-1">
-                          <div className="h-1.5 w-12 rounded-full bg-gray-200" />
-                          <div className="h-1 w-20 rounded-full bg-gray-100" />
-                          <div className="h-1 w-16 rounded-full bg-gray-100" />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Table skeleton */}
-                    <div className="space-y-1">
-                      <div
-                        className="h-4 rounded flex items-center px-2"
-                        style={{ backgroundColor: settings.accentColor + '15' }}
-                      >
-                        <div className="flex w-full gap-2">
-                          <div className="h-1 w-16 rounded-full" style={{ backgroundColor: settings.accentColor + '40' }} />
-                          <div className="flex-1" />
-                          <div className="h-1 w-6 rounded-full" style={{ backgroundColor: settings.accentColor + '40' }} />
-                          <div className="h-1 w-8 rounded-full" style={{ backgroundColor: settings.accentColor + '40' }} />
-                        </div>
-                      </div>
-                      {[...Array(3)].map((_, i) => (
-                        <div key={i} className="h-3 rounded flex items-center px-2">
-                          <div className="flex w-full gap-2">
-                            <div className="h-1 w-20 rounded-full bg-gray-100" />
+                          <div className="flex w-full items-center gap-2">
+                            <div className="h-1.5 w-20 rounded-full" style={{ backgroundColor: settings.accentColor + '50' }} />
                             <div className="flex-1" />
-                            <div className="h-1 w-4 rounded-full bg-gray-100" />
-                            <div className="h-1 w-8 rounded-full bg-gray-100" />
+                            {settings.billingType === 'detailed' && (
+                              <>
+                                <div className="h-1.5 w-8 rounded-full" style={{ backgroundColor: settings.accentColor + '50' }} />
+                                <div className="h-1.5 w-10 rounded-full" style={{ backgroundColor: settings.accentColor + '50' }} />
+                              </>
+                            )}
+                            <div className="h-1.5 w-8 rounded-full" style={{ backgroundColor: settings.accentColor + '50' }} />
+                            <div className="h-1.5 w-12 rounded-full" style={{ backgroundColor: settings.accentColor + '50' }} />
                           </div>
                         </div>
-                      ))}
-                    </div>
 
-                    {/* Total */}
-                    <div className="flex justify-end">
-                      <div
-                        className="rounded px-3 py-1.5 text-right"
-                        style={{ backgroundColor: settings.accentColor + '10' }}
-                      >
-                        <p className="text-[7px] text-gray-400">Total TTC</p>
-                        <p
-                          className="text-xs font-bold"
-                          style={{ color: settings.accentColor }}
-                        >
-                          1 234,00 EUR
-                        </p>
+                        {/* Table rows */}
+                        {[...Array(settings.billingType === 'detailed' ? 4 : 3)].map((_, i) => (
+                          <div key={i} className={`px-3 py-2.5 flex items-center ${i < (settings.billingType === 'detailed' ? 3 : 2) ? 'border-b border-gray-100' : ''}`}>
+                            <div className="flex w-full items-center gap-2">
+                              <div className="h-1.5 rounded-full bg-gray-200" style={{ width: `${60 + (i % 3) * 15}px` }} />
+                              <div className="flex-1" />
+                              {settings.billingType === 'detailed' && (
+                                <>
+                                  <div className="h-1.5 w-6 rounded-full bg-gray-100" />
+                                  <div className="h-1.5 w-8 rounded-full bg-gray-100" />
+                                </>
+                              )}
+                              <div className="h-1.5 w-6 rounded-full bg-gray-100" />
+                              <div className="h-1.5 w-10 rounded-full bg-gray-200" />
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    </div>
 
-                    {/* Payment methods footer */}
-                    <div className="border-t border-gray-100 pt-2">
-                      <p className="text-[7px] text-gray-400 mb-1">Moyens de paiement</p>
-                      <div className="flex flex-wrap gap-1">
-                        {settings.paymentMethods.includes('bank_transfer') && (
-                          <span className="text-[7px] bg-gray-100 text-gray-500 rounded px-1.5 py-0.5">
-                            Virement
-                          </span>
+                      {/* Totals section */}
+                      <div className="flex justify-end mt-4 mb-4">
+                        <div className="w-48 space-y-1.5">
+                          {settings.billingType === 'detailed' && (
+                            <>
+                              <div className="flex items-center justify-between">
+                                <p className="text-[9px] text-gray-400">Sous-total HT</p>
+                                <div className="h-1.5 w-14 rounded-full bg-gray-200" />
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <p className="text-[9px] text-gray-400">TVA (20%)</p>
+                                <div className="h-1.5 w-10 rounded-full bg-gray-200" />
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <p className="text-[9px] text-gray-400">Remise</p>
+                                <div className="h-1.5 w-8 rounded-full bg-gray-100" />
+                              </div>
+                              <div className="h-px bg-gray-200 my-1" />
+                            </>
+                          )}
+                          <div
+                            className="flex items-center justify-between rounded-md px-3 py-2"
+                            style={{ backgroundColor: settings.accentColor + '10' }}
+                          >
+                            <p className="text-[10px] font-semibold" style={{ color: settings.accentColor }}>
+                              Total TTC
+                            </p>
+                            <p className="text-xs font-bold" style={{ color: settings.accentColor }}>
+                              1 234,00 EUR
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Footer: payment methods + legal */}
+                      <div className="border-t border-gray-100 pt-3 mt-auto space-y-2">
+                        {settings.paymentMethods.length > 0 && (
+                          <div>
+                            <p className="text-[8px] font-semibold text-gray-400 uppercase tracking-wider mb-1">
+                              Moyens de paiement acceptes
+                            </p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {settings.paymentMethods.includes('bank_transfer') && (
+                                <span className="text-[8px] bg-gray-50 text-gray-500 rounded-md px-2 py-0.5 border border-gray-100">
+                                  Virement bancaire
+                                </span>
+                              )}
+                              {settings.paymentMethods.includes('cash') && (
+                                <span className="text-[8px] bg-gray-50 text-gray-500 rounded-md px-2 py-0.5 border border-gray-100">
+                                  Especes
+                                </span>
+                              )}
+                              {settings.paymentMethods.includes('custom') && settings.customPaymentMethod && (
+                                <span className="text-[8px] bg-gray-50 text-gray-500 rounded-md px-2 py-0.5 border border-gray-100">
+                                  {settings.customPaymentMethod}
+                                </span>
+                              )}
+                            </div>
+                          </div>
                         )}
-                        {settings.paymentMethods.includes('cash') && (
-                          <span className="text-[7px] bg-gray-100 text-gray-500 rounded px-1.5 py-0.5">
-                            Especes
-                          </span>
-                        )}
-                        {settings.paymentMethods.includes('custom') && settings.customPaymentMethod && (
-                          <span className="text-[7px] bg-gray-100 text-gray-500 rounded px-1.5 py-0.5">
-                            {settings.customPaymentMethod}
-                          </span>
+                        {settings.billingType === 'detailed' && (
+                          <div className="space-y-0.5">
+                            <div className="h-1 w-full rounded-full bg-gray-50" />
+                            <div className="h-1 w-4/5 rounded-full bg-gray-50" />
+                          </div>
                         )}
                       </div>
+
                     </div>
                   </div>
                 </div>
