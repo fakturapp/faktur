@@ -348,7 +348,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
                 alt={user.fullName || user.email}
                 fallback={initials}
                 size="sm"
-                className="grayscale"
+                className=""
               />
               <div className="flex-1 min-w-0 text-left">
                 <p className="text-sm font-medium text-foreground truncate leading-tight">

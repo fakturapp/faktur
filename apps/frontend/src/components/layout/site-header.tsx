@@ -34,18 +34,18 @@ export function SiteHeader({ onToggleSidebar }: SiteHeaderProps) {
   }, '/dashboard')
 
   return (
-    <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b border-border transition-[width,height] ease-linear">
+    <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b border-border/50 transition-[width,height] ease-linear">
       <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
         {onToggleSidebar && (
           <button
             onClick={onToggleSidebar}
-            className="-ml-1 flex h-8 w-8 items-center justify-center rounded-md hover:bg-muted transition-colors"
+            className="-ml-1 flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-all duration-200"
           >
-            <PanelLeft className="h-4 w-4 text-muted-foreground" />
+            <PanelLeft className="h-4 w-4" />
           </button>
         )}
-        <Separator orientation="vertical" className="mx-1 data-[orientation=vertical]:h-4" />
-        <h1 className="text-base font-medium">{routeTitles[title] || 'Dashboard'}</h1>
+        <Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />
+        <h1 className="text-sm font-medium text-muted-foreground">{routeTitles[title] || 'Dashboard'}</h1>
       </div>
     </header>
   )
