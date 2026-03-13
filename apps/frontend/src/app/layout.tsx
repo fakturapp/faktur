@@ -13,8 +13,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="fr" className="dark">
       <body className="min-h-screen antialiased">
         <Providers>{children}</Providers>
+        {process.env.NODE_ENV === 'development' && <Agentation />}
       </body>
-      {process.env.NODE_ENV === 'development' && <Agentation />}
     </html>
   )
 }

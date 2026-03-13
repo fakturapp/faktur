@@ -13,10 +13,46 @@ export type ScannedRoutes = {
     'password_reset': { paramsTuple?: []; params?: {} }
     'logout': { paramsTuple?: []; params?: {} }
     'me': { paramsTuple?: []; params?: {} }
+    'serve_avatar': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'profile_show': { paramsTuple?: []; params?: {} }
+    'profile_update': { paramsTuple?: []; params?: {} }
+    'password_change': { paramsTuple?: []; params?: {} }
+    'upload_avatar': { paramsTuple?: []; params?: {} }
+    'sessions_list': { paramsTuple?: []; params?: {} }
+    'session_revoke': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'account_delete': { paramsTuple?: []; params?: {} }
     'two_factor_setup': { paramsTuple?: []; params?: {} }
     'two_factor_enable': { paramsTuple?: []; params?: {} }
     'two_factor_disable': { paramsTuple?: []; params?: {} }
+    'security_verify.send_code': { paramsTuple?: []; params?: {} }
+    'security_verify.verify': { paramsTuple?: []; params?: {} }
+    'create_team': { paramsTuple?: []; params?: {} }
+    'create_company': { paramsTuple?: []; params?: {} }
+    'skip_company': { paramsTuple?: []; params?: {} }
+    'search_company': { paramsTuple?: []; params?: {} }
+    'dashboard_stats': { paramsTuple?: []; params?: {} }
+    'team_list': { paramsTuple?: []; params?: {} }
+    'team_create': { paramsTuple?: []; params?: {} }
+    'team_show': { paramsTuple?: []; params?: {} }
+    'team_update': { paramsTuple?: []; params?: {} }
+    'team_switch': { paramsTuple?: []; params?: {} }
+    'team_members': { paramsTuple?: []; params?: {} }
+    'team_invite': { paramsTuple?: []; params?: {} }
+    'accept_invite': { paramsTuple?: []; params?: {} }
+    'revoke_invite': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'update_role': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'remove_member': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'transfer_ownership': { paramsTuple?: []; params?: {} }
+    'invite_info': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'company_show': { paramsTuple?: []; params?: {} }
+    'company_update': { paramsTuple?: []; params?: {} }
+    'company_bank': { paramsTuple?: []; params?: {} }
+    'search_siren': { paramsTuple?: []; params?: {} }
+    'client_list': { paramsTuple?: []; params?: {} }
+    'client_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'client_create': { paramsTuple?: []; params?: {} }
+    'client_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'client_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   POST: {
     'signup': { paramsTuple?: []; params?: {} }
@@ -27,17 +63,69 @@ export type ScannedRoutes = {
     'password_reset_request': { paramsTuple?: []; params?: {} }
     'password_reset': { paramsTuple?: []; params?: {} }
     'logout': { paramsTuple?: []; params?: {} }
+    'upload_avatar': { paramsTuple?: []; params?: {} }
     'two_factor_setup': { paramsTuple?: []; params?: {} }
     'two_factor_enable': { paramsTuple?: []; params?: {} }
     'two_factor_disable': { paramsTuple?: []; params?: {} }
+    'security_verify.send_code': { paramsTuple?: []; params?: {} }
+    'security_verify.verify': { paramsTuple?: []; params?: {} }
+    'create_team': { paramsTuple?: []; params?: {} }
+    'create_company': { paramsTuple?: []; params?: {} }
+    'skip_company': { paramsTuple?: []; params?: {} }
+    'team_create': { paramsTuple?: []; params?: {} }
+    'team_switch': { paramsTuple?: []; params?: {} }
+    'team_invite': { paramsTuple?: []; params?: {} }
+    'accept_invite': { paramsTuple?: []; params?: {} }
+    'transfer_ownership': { paramsTuple?: []; params?: {} }
+    'client_create': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'me': { paramsTuple?: []; params?: {} }
+    'serve_avatar': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'profile_show': { paramsTuple?: []; params?: {} }
+    'sessions_list': { paramsTuple?: []; params?: {} }
+    'search_company': { paramsTuple?: []; params?: {} }
+    'dashboard_stats': { paramsTuple?: []; params?: {} }
+    'team_list': { paramsTuple?: []; params?: {} }
+    'team_show': { paramsTuple?: []; params?: {} }
+    'team_members': { paramsTuple?: []; params?: {} }
+    'invite_info': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'company_show': { paramsTuple?: []; params?: {} }
+    'search_siren': { paramsTuple?: []; params?: {} }
+    'client_list': { paramsTuple?: []; params?: {} }
+    'client_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   HEAD: {
     'me': { paramsTuple?: []; params?: {} }
+    'serve_avatar': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'profile_show': { paramsTuple?: []; params?: {} }
+    'sessions_list': { paramsTuple?: []; params?: {} }
+    'search_company': { paramsTuple?: []; params?: {} }
+    'dashboard_stats': { paramsTuple?: []; params?: {} }
+    'team_list': { paramsTuple?: []; params?: {} }
+    'team_show': { paramsTuple?: []; params?: {} }
+    'team_members': { paramsTuple?: []; params?: {} }
+    'invite_info': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'company_show': { paramsTuple?: []; params?: {} }
+    'search_siren': { paramsTuple?: []; params?: {} }
+    'client_list': { paramsTuple?: []; params?: {} }
+    'client_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+  }
+  PUT: {
+    'profile_update': { paramsTuple?: []; params?: {} }
+    'password_change': { paramsTuple?: []; params?: {} }
+    'team_update': { paramsTuple?: []; params?: {} }
+    'update_role': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'company_update': { paramsTuple?: []; params?: {} }
+    'company_bank': { paramsTuple?: []; params?: {} }
+    'client_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+  }
+  DELETE: {
+    'session_revoke': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'account_delete': { paramsTuple?: []; params?: {} }
+    'revoke_invite': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'remove_member': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'client_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

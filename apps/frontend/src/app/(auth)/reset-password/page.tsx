@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldError } from '@/components/ui/field'
+import { Spinner } from '@/components/ui/spinner'
 import { api } from '@/lib/api'
 
 const fadeUp = {
@@ -56,7 +57,7 @@ function ResetPasswordContent() {
           <CardContent className="p-8 text-center">
             <h1 className="text-2xl font-bold mb-4">Lien invalide</h1>
             <p className="text-muted-foreground mb-4">
-              Ce lien de reinitialisation est invalide ou a expire.
+              Ce lien de réinitialisation est invalide ou a expiré.
             </p>
             <Link href="/forgot-password">
               <Button>Demander un nouveau lien</Button>
@@ -79,9 +80,9 @@ function ResetPasswordContent() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h1 className="text-2xl font-bold">Mot de passe modifie</h1>
+                <h1 className="text-2xl font-bold">Mot de passe modifié</h1>
                 <p className="text-muted-foreground text-sm">
-                  Votre mot de passe a ete reinitialise avec succes.
+                  Votre mot de passe a été réinitialisé avec succès.
                 </p>
                 <Link href="/login">
                   <Button className="mt-2">Se connecter</Button>
@@ -94,7 +95,7 @@ function ResetPasswordContent() {
                 <motion.div variants={fadeUp} custom={0} className="flex flex-col items-center gap-2 text-center mb-2">
                   <h1 className="text-2xl font-bold">Nouveau mot de passe</h1>
                   <p className="text-muted-foreground text-sm">
-                    Choisissez un nouveau mot de passe securise
+                    Choisissez un nouveau mot de passe sécurisé
                   </p>
                 </motion.div>
 
@@ -112,7 +113,7 @@ function ResetPasswordContent() {
                     <Input
                       id="password"
                       type="password"
-                      placeholder="8 caracteres minimum"
+                      placeholder="8 caractères minimum"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       minLength={8}
@@ -139,14 +140,14 @@ function ResetPasswordContent() {
                 <motion.div variants={fadeUp} custom={4}>
                   <Field>
                     <Button type="submit" className="w-full" disabled={loading}>
-                      {loading ? 'Reinitialisation...' : 'Reinitialiser le mot de passe'}
+                      {loading ? <><Spinner /> Réinitialisation...</> : 'Réinitialiser le mot de passe'}
                     </Button>
                   </Field>
                 </motion.div>
 
                 <motion.div variants={fadeUp} custom={5}>
                   <FieldDescription className="text-center">
-                    <Link href="/login">Retour a la connexion</Link>
+                    <Link href="/login">Retour à la connexion</Link>
                   </FieldDescription>
                 </motion.div>
               </FieldGroup>
@@ -160,7 +161,7 @@ function ResetPasswordContent() {
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Chargement...</div>}>
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Spinner size="lg" className="text-primary" /></div>}>
       <ResetPasswordContent />
     </Suspense>
   )

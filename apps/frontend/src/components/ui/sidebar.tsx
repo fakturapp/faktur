@@ -1,10 +1,13 @@
 'use client'
 
 import * as React from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Avatar } from '@/components/ui/avatar'
+import { Dropdown, DropdownItem, DropdownSeparator } from '@/components/ui/dropdown'
 import {
   LayoutDashboard,
   FileText,
@@ -12,111 +15,365 @@ import {
   Users,
   Building2,
   Settings,
-  ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  Plus,
+  Check,
+  LogOut,
+  User,
+  Crown,
+  Shield,
+  UserCog,
+  Eye,
 } from 'lucide-react'
 
-interface SidebarProps {
-  collapsed: boolean
-  onToggle: () => void
+interface TeamListItem {
+  id: string
+  name: string
+  iconUrl: string | null
+  role: string
+  isOwner: boolean
+  isCurrent: boolean
 }
 
-const navItems = [
-  { href: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/invoices', label: 'Factures', icon: FileText },
-  { href: '/quotes', label: 'Devis', icon: Receipt },
-  { href: '/clients', label: 'Clients', icon: Users },
+export interface SidebarProps {
+  teams: TeamListItem[]
+  currentTeam: TeamListItem | null
+  teamsLoaded: boolean
+  onSwitchTeam: (teamId: string) => void
+  user: { fullName: string | null; email: string; avatarUrl: string | null }
+  onLogout: () => void
+}
+
+const roleIcons: Record<string, React.ReactNode> = {
+  super_admin: <Crown className="h-3 w-3 text-primary" />,
+  admin: <Shield className="h-3 w-3 text-yellow-500" />,
+  member: <UserCog className="h-3 w-3 text-muted-foreground" />,
+  viewer: <Eye className="h-3 w-3 text-muted-foreground" />,
+}
+
+const roleLabels: Record<string, string> = {
+  super_admin: 'Super Admin',
+  admin: 'Admin',
+  member: 'Membre',
+  viewer: 'Lecteur',
+}
+
+interface NavItem {
+  href: string
+  label: string
+  icon: React.ElementType
+  children?: { href: string; label: string }[]
+}
+
+const mainNav: NavItem[] = [
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  {
+    href: '/dashboard/invoices',
+    label: 'Factures',
+    icon: FileText,
+    children: [
+      { href: '/dashboard/invoices', label: 'Toutes les factures' },
+      { href: '/dashboard/invoices/drafts', label: 'Brouillons' },
+    ],
+  },
+  {
+    href: '/dashboard/quotes',
+    label: 'Devis',
+    icon: Receipt,
+    children: [
+      { href: '/dashboard/quotes', label: 'Tous les devis' },
+      { href: '/dashboard/quotes/drafts', label: 'Brouillons' },
+    ],
+  },
+  { href: '/dashboard/clients', label: 'Clients', icon: Users },
 ]
 
-const bottomItems = [
-  { href: '/company', label: 'Entreprise', icon: Building2 },
-  { href: '/team', label: 'Equipe', icon: Users },
-  { href: '/account', label: 'Parametres', icon: Settings },
+const managementNav: NavItem[] = [
+  { href: '/dashboard/company', label: 'Entreprise', icon: Building2 },
+  { href: '/dashboard/team', label: 'Équipe', icon: Users },
+  { href: '/dashboard/settings/invoices', label: 'Facturation', icon: FileText },
+  { href: '/dashboard/account', label: 'Paramètres', icon: Settings },
 ]
 
-export function Sidebar({ collapsed, onToggle }: SidebarProps) {
-  const pathname = usePathname()
+function NavLink({
+  item,
+  pathname,
+}: {
+  item: NavItem
+  pathname: string
+}) {
+  const isActive = item.href === '/dashboard'
+    ? pathname === '/dashboard'
+    : pathname === item.href || pathname.startsWith(item.href + '/')
+  const hasChildren = item.children && item.children.length > 0
+  const [expanded, setExpanded] = useState(isActive && hasChildren)
+
+  React.useEffect(() => {
+    if (isActive && hasChildren) setExpanded(true)
+  }, [isActive, hasChildren])
+
+  if (!hasChildren) {
+    return (
+      <Link
+        href={item.href}
+        className={cn(
+          'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors relative',
+          isActive
+            ? 'text-foreground'
+            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+        )}
+      >
+        {isActive && (
+          <motion.div
+            layoutId="sidebar-active"
+            className="absolute inset-0 rounded-lg bg-muted"
+            transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
+          />
+        )}
+        <item.icon className="relative z-10 h-4 w-4 shrink-0" />
+        <span className="relative z-10">{item.label}</span>
+      </Link>
+    )
+  }
 
   return (
-    <motion.aside
-      animate={{ width: collapsed ? 72 : 256 }}
-      transition={{ type: 'spring', bounce: 0.1, duration: 0.4 }}
-      className="relative flex h-screen flex-col border-r border-border bg-card/50"
-    >
-      {/* Logo */}
-      <div className="flex h-16 items-center gap-3 px-4 border-b border-border">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-sm">
-          Z
-        </div>
-        {!collapsed && (
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-lg font-semibold text-foreground"
+    <div>
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className={cn(
+          'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors relative',
+          isActive
+            ? 'text-foreground'
+            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+        )}
+      >
+        {isActive && !expanded && (
+          <motion.div
+            layoutId="sidebar-active"
+            className="absolute inset-0 rounded-lg bg-muted"
+            transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
+          />
+        )}
+        <item.icon className="relative z-10 h-4 w-4 shrink-0" />
+        <span className="relative z-10 flex-1 text-left">{item.label}</span>
+        <motion.div
+          className="relative z-10"
+          animate={{ rotate: expanded ? 90 : 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <ChevronRight className="h-3.5 w-3.5" />
+        </motion.div>
+      </button>
+      <AnimatePresence initial={false}>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+            className="overflow-hidden"
           >
-            ZenVoice
-          </motion.span>
+            <div className="ml-4 border-l border-border/50 pl-3 py-1 space-y-0.5">
+              {item.children!.map((child) => {
+                const childActive = pathname === child.href
+                return (
+                  <Link
+                    key={child.href}
+                    href={child.href}
+                    className={cn(
+                      'flex items-center rounded-md px-3 py-1.5 text-sm transition-colors',
+                      childActive
+                        ? 'text-foreground font-medium bg-muted/50'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
+                    )}
+                  >
+                    {child.label}
+                  </Link>
+                )
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, onLogout }: SidebarProps) {
+  const pathname = usePathname()
+
+  const initials = user.fullName
+    ? user.fullName.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
+    : user.email.slice(0, 2).toUpperCase()
+
+  return (
+    <aside className="flex h-screen w-64 flex-col border-r border-border bg-card/50">
+      {/* Team Dropdown */}
+      <div className="px-3 py-3">
+        {teamsLoaded ? (
+          <Dropdown
+            align="left"
+            trigger={
+              <div className="flex items-center gap-2.5 rounded-lg px-3 py-2 hover:bg-muted/50 transition-colors w-full">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary font-semibold text-xs">
+                  {currentTeam?.name.charAt(0).toUpperCase() || 'T'}
+                </div>
+                <div className="flex-1 min-w-0 text-left">
+                  <p className="text-sm font-medium text-foreground leading-tight truncate">
+                    {currentTeam?.name || 'Équipe'}
+                  </p>
+                  {currentTeam?.role && (
+                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                      {roleIcons[currentTeam.role]}
+                      {roleLabels[currentTeam.role]}
+                    </p>
+                  )}
+                </div>
+                <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+              </div>
+            }
+            className="min-w-[230px]"
+          >
+            <div className="px-3 py-2">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Vos équipes
+              </p>
+            </div>
+
+            {teams.map((team) => (
+              <DropdownItem
+                key={team.id}
+                onClick={() => {
+                  if (!team.isCurrent) onSwitchTeam(team.id)
+                }}
+              >
+                <div className="flex items-center justify-between w-full">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted text-xs font-semibold text-foreground">
+                      {team.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground leading-tight">{team.name}</p>
+                      <p className="text-xs text-muted-foreground flex items-center gap-1">
+                        {roleIcons[team.role]}
+                        {roleLabels[team.role]}
+                      </p>
+                    </div>
+                  </div>
+                  {team.isCurrent && (
+                    <Check className="h-4 w-4 text-primary shrink-0" />
+                  )}
+                </div>
+              </DropdownItem>
+            ))}
+
+            <DropdownSeparator />
+
+            <Link href="/dashboard/team">
+              <DropdownItem>
+                <Users className="h-4 w-4" /> Gérer l&apos;équipe
+              </DropdownItem>
+            </Link>
+            <Link href="/dashboard/company">
+              <DropdownItem>
+                <Building2 className="h-4 w-4" /> Entreprise
+              </DropdownItem>
+            </Link>
+
+            <DropdownSeparator />
+
+            <Link href="/dashboard/team/create">
+              <DropdownItem>
+                <Plus className="h-4 w-4" /> Créer une équipe
+              </DropdownItem>
+            </Link>
+          </Dropdown>
+        ) : (
+          <div className="flex items-center gap-2.5 px-3 py-2">
+            <div className="h-8 w-8 rounded-lg bg-muted animate-pulse" />
+            <div className="flex-1 space-y-1.5">
+              <div className="h-3.5 w-24 rounded bg-muted animate-pulse" />
+              <div className="h-2.5 w-16 rounded bg-muted animate-pulse" />
+            </div>
+          </div>
         )}
       </div>
 
+      <div className="mx-3 h-px bg-border" />
+
       {/* Navigation */}
-      <nav className="flex-1 space-y-1 px-3 py-4">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors relative',
-                isActive
-                  ? 'text-foreground bg-muted'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-              )}
-            >
-              {isActive && (
-                <motion.div
-                  layoutId="sidebar-active"
-                  className="absolute inset-0 rounded-lg bg-muted"
-                  transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
-                />
-              )}
-              <item.icon className="relative z-10 h-5 w-5 shrink-0" />
-              {!collapsed && <span className="relative z-10">{item.label}</span>}
-            </Link>
-          )
-        })}
+      <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-1">
+        {mainNav.map((item) => (
+          <NavLink key={item.href} item={item} pathname={pathname} />
+        ))}
+
+        <div className="pt-4 pb-1">
+          <p className="px-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            Gestion
+          </p>
+        </div>
+
+        {managementNav.map((item) => (
+          <NavLink key={item.href} item={item} pathname={pathname} />
+        ))}
       </nav>
 
-      {/* Bottom section */}
-      <div className="space-y-1 px-3 pb-4 border-t border-border pt-4">
-        {bottomItems.map((item) => {
-          const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
-                isActive
-                  ? 'text-foreground bg-muted'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-              )}
-            >
-              <item.icon className="h-5 w-5 shrink-0" />
-              {!collapsed && <span>{item.label}</span>}
-            </Link>
-          )
-        })}
-      </div>
+      <div className="mx-3 h-px bg-border" />
 
-      {/* Collapse toggle */}
-      <button
-        onClick={onToggle}
-        className="absolute -right-3 top-20 flex h-6 w-6 items-center justify-center rounded-full border border-border bg-card shadow-sm hover:bg-muted transition-colors"
-      >
-        {collapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
-      </button>
-    </motion.aside>
+      {/* User Section — Dropdown Menu */}
+      <div className="p-3">
+        <Dropdown
+          align="left"
+          trigger={
+            <div className="flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-muted/50 transition-colors w-full">
+              <Avatar
+                src={user.avatarUrl}
+                alt={user.fullName || user.email}
+                fallback={initials}
+                size="sm"
+              />
+              <div className="flex-1 min-w-0 text-left">
+                <p className="text-sm font-medium text-foreground truncate leading-tight">
+                  {user.fullName || user.email}
+                </p>
+                <p className="text-xs text-muted-foreground truncate">
+                  {user.email}
+                </p>
+              </div>
+              <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+            </div>
+          }
+          position="above"
+          className="min-w-[230px]"
+        >
+          <div className="px-3 py-2 border-b border-border mb-1">
+            <p className="text-sm font-medium text-foreground truncate">
+              {user.fullName || user.email}
+            </p>
+            <p className="text-xs text-muted-foreground truncate">
+              {user.email}
+            </p>
+          </div>
+
+          <Link href="/dashboard/account">
+            <DropdownItem>
+              <User className="h-4 w-4" /> Mon compte
+            </DropdownItem>
+          </Link>
+          <Link href="/dashboard/account">
+            <DropdownItem>
+              <Settings className="h-4 w-4" /> Paramètres
+            </DropdownItem>
+          </Link>
+
+          <DropdownSeparator />
+
+          <DropdownItem destructive onClick={onLogout}>
+            <LogOut className="h-4 w-4" /> Déconnexion
+          </DropdownItem>
+        </Dropdown>
+      </div>
+    </aside>
   )
 }

@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useEffect, useRef } from 'react'
 import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Field, FieldLabel, FieldDescription } from '@/components/ui/field'
+import { FieldDescription } from '@/components/ui/field'
 import { api } from '@/lib/api'
+import { Spinner } from '@/components/ui/spinner'
 import { Shield, Mail, Smartphone, Key } from 'lucide-react'
 
 interface SecurityVerificationModalProps {
@@ -34,7 +34,6 @@ export function SecurityVerificationModal({
   const [cooldown, setCooldown] = useState(0)
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  // Persist code state across close/reopen
   const [sentEmail, setSentEmail] = useState(false)
 
   useEffect(() => {
@@ -54,7 +53,6 @@ export function SecurityVerificationModal({
     }
   }, [cooldown])
 
-  // Auto-send code when opening with email method
   useEffect(() => {
     if (open && method === 'email' && !sentEmail) {
       handleSendCode()
@@ -105,7 +103,6 @@ export function SecurityVerificationModal({
     }
 
     if (data?.verified) {
-      // Reset state
       setCode('')
       setCodeSent(false)
       setSentEmail(false)
@@ -116,7 +113,6 @@ export function SecurityVerificationModal({
   }
 
   function handleClose() {
-    // Don't reset sent state - preserve code validity across close/reopen
     setCode('')
     setError(null)
     onClose()
@@ -137,14 +133,14 @@ export function SecurityVerificationModal({
           <Shield className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <DialogTitle>Verification de securite</DialogTitle>
+          <DialogTitle>Vérification de sécurité</DialogTitle>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Confirmez votre identite pour continuer
+            Confirmez votre identité pour continuer
           </p>
         </div>
       </div>
 
-      {/* Method selector (only if 2FA is enabled) */}
+      {/* Method selector */}
       {twoFactorEnabled && (
         <div className="flex gap-2 mb-4">
           <button
@@ -186,16 +182,16 @@ export function SecurityVerificationModal({
             {!codeSent && !sentEmail ? (
               <div className="text-center py-4">
                 <p className="text-sm text-muted-foreground mb-4">
-                  Un code de verification sera envoye a votre adresse email.
+                  Un code de vérification sera envoyé à votre adresse email.
                 </p>
                 <Button type="button" onClick={handleSendCode} disabled={sending}>
-                  {sending ? 'Envoi...' : 'Envoyer le code'}
+                  {sending ? <><Spinner /> Envoi...</> : 'Envoyer le code'}
                 </Button>
               </div>
             ) : (
               <div className="space-y-4">
                 <FieldDescription>
-                  Un code a 6 chiffres a ete envoye a votre adresse email. Il est valide pendant 5 minutes.
+                  Un code à 6 chiffres a été envoyé à votre adresse email. Il est valide pendant 5 minutes.
                 </FieldDescription>
                 <Input
                   type="text"
@@ -209,7 +205,7 @@ export function SecurityVerificationModal({
                 />
                 {isExpired && (
                   <p className="text-xs text-destructive text-center">
-                    Le code a expire.
+                    Le code a expiré.
                   </p>
                 )}
                 <div className="flex justify-center">
@@ -220,7 +216,7 @@ export function SecurityVerificationModal({
                     onClick={handleSendCode}
                     disabled={sending || cooldown > 0}
                   >
-                    {cooldown > 0 ? `Renvoyer (${cooldown}s)` : sending ? 'Envoi...' : 'Renvoyer le code'}
+                    {cooldown > 0 ? `Renvoyer (${cooldown}s)` : sending ? <><Spinner /> Envoi...</> : 'Renvoyer le code'}
                   </Button>
                 </div>
               </div>
@@ -231,7 +227,7 @@ export function SecurityVerificationModal({
         {method === 'totp' && (
           <div className="space-y-4">
             <FieldDescription>
-              Entrez le code a 6 chiffres de votre application d&apos;authentification.
+              Entrez le code à 6 chiffres de votre application d&apos;authentification.
             </FieldDescription>
             <Input
               type="text"
@@ -249,7 +245,7 @@ export function SecurityVerificationModal({
         {method === 'recovery' && (
           <div className="space-y-4">
             <FieldDescription>
-              Entrez un de vos codes de recuperation.
+              Entrez un de vos codes de récupération.
             </FieldDescription>
             <Input
               type="text"
@@ -276,7 +272,7 @@ export function SecurityVerificationModal({
             type="submit"
             disabled={verifying || !code.trim() || (method === 'email' && !codeSent && !sentEmail)}
           >
-            {verifying ? 'Verification...' : 'Verifier'}
+            {verifying ? <><Spinner /> Vérification...</> : 'Vérifier'}
           </Button>
         </DialogFooter>
       </form>

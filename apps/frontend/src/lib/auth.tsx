@@ -78,14 +78,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     if (user && isPublicPath) {
-      // Let login and verify-email pages handle their own "already logged in" state
-      if (pathname === '/login' || pathname.startsWith('/verify-email')) {
+      // Let these pages handle their own "already logged in" state
+      if (pathname === '/login' || pathname.startsWith('/verify-email') || pathname.startsWith('/invite')) {
         return
       }
       if (!user.onboardingCompleted) {
         router.replace('/onboarding/team')
       } else {
-        router.replace('/')
+        router.replace('/dashboard')
       }
       return
     }
@@ -97,7 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return
       }
       if (user.onboardingCompleted && isOnboarding) {
-        router.replace('/')
+        router.replace('/dashboard')
         return
       }
     }

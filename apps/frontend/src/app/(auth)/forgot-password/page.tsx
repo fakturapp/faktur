@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldError } from '@/components/ui/field'
+import { Spinner } from '@/components/ui/spinner'
 import { api } from '@/lib/api'
 
 const fadeUp = {
@@ -48,12 +49,12 @@ export default function ForgotPasswordPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <h1 className="text-2xl font-bold">Email envoye</h1>
+                <h1 className="text-2xl font-bold">Email envoyé</h1>
                 <p className="text-muted-foreground text-sm">
-                  Si un compte existe avec cette adresse, vous recevrez un lien de reinitialisation.
+                  Si un compte existe avec cette adresse, vous recevrez un lien de réinitialisation.
                 </p>
                 <Link href="/login">
-                  <Button variant="outline" className="mt-2">Retour a la connexion</Button>
+                  <Button variant="outline" className="mt-2">Retour à la connexion</Button>
                 </Link>
               </motion.div>
             </FieldGroup>
@@ -61,9 +62,9 @@ export default function ForgotPasswordPage() {
             <form onSubmit={handleSubmit}>
               <FieldGroup>
                 <motion.div variants={fadeUp} custom={0} className="flex flex-col items-center gap-2 text-center mb-2">
-                  <h1 className="text-2xl font-bold">Mot de passe oublie</h1>
+                  <h1 className="text-2xl font-bold">Mot de passe oublié</h1>
                   <p className="text-muted-foreground text-sm">
-                    Entrez votre email pour recevoir un lien de reinitialisation
+                    Entrez votre email pour recevoir un lien de réinitialisation
                   </p>
                 </motion.div>
 
@@ -93,14 +94,14 @@ export default function ForgotPasswordPage() {
                 <motion.div variants={fadeUp} custom={3}>
                   <Field>
                     <Button type="submit" className="w-full" disabled={loading}>
-                      {loading ? 'Envoi...' : 'Envoyer le lien'}
+                      {loading ? <><Spinner /> Envoi...</> : 'Envoyer le lien'}
                     </Button>
                   </Field>
                 </motion.div>
 
                 <motion.div variants={fadeUp} custom={4}>
                   <FieldDescription className="text-center">
-                    <Link href="/login">Retour a la connexion</Link>
+                    <Link href="/login">Retour à la connexion</Link>
                   </FieldDescription>
                 </motion.div>
               </FieldGroup>
