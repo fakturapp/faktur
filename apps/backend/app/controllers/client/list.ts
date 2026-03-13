@@ -2,7 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import Client from '#models/client/client'
 
 export default class List {
-  async handle({ auth, response }: HttpContext) {
+  async handle({ auth, request, response }: HttpContext) {
     const user = auth.user!
     const teamId = user.currentTeamId
 
@@ -10,7 +10,20 @@ export default class List {
       return response.badRequest({ message: 'No team selected' })
     }
 
-    const clients = await Client.query().where('team_id', teamId).orderBy('created_at', 'desc')
+    const search = request.input('search', '')
+
+    const query = Client.query().where('team_id', teamId).orderBy('created_at', 'desc')
+
+    if (search) {
+      query.where((q) => {
+        q.whereILike('company_name', `%${search}%`)
+          .orWhereILike('first_name', `%${search}%`)
+          .orWhereILike('last_name', `%${search}%`)
+          .orWhereILike('email', `%${search}%`)
+      })
+    }
+
+    const clients = await query
 
     const clientsList = clients.map((c) => ({
       id: c.id,

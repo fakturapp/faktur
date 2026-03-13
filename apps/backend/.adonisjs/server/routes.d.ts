@@ -62,6 +62,12 @@ export type ScannedRoutes = {
     'invoice_settings_show': { paramsTuple?: []; params?: {} }
     'invoice_settings_update': { paramsTuple?: []; params?: {} }
     'invoice_logo_upload': { paramsTuple?: []; params?: {} }
+    'quote_next_number': { paramsTuple?: []; params?: {} }
+    'quote_list': { paramsTuple?: []; params?: {} }
+    'quote_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'quote_create': { paramsTuple?: []; params?: {} }
+    'quote_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'quote_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   POST: {
     'signup': { paramsTuple?: []; params?: {} }
@@ -90,6 +96,7 @@ export type ScannedRoutes = {
     'upload_logo': { paramsTuple?: []; params?: {} }
     'client_create': { paramsTuple?: []; params?: {} }
     'invoice_logo_upload': { paramsTuple?: []; params?: {} }
+    'quote_create': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'me': { paramsTuple?: []; params?: {} }
@@ -111,6 +118,9 @@ export type ScannedRoutes = {
     'client_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'serve_invoice_logo': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'invoice_settings_show': { paramsTuple?: []; params?: {} }
+    'quote_next_number': { paramsTuple?: []; params?: {} }
+    'quote_list': { paramsTuple?: []; params?: {} }
+    'quote_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   HEAD: {
     'me': { paramsTuple?: []; params?: {} }
@@ -132,6 +142,9 @@ export type ScannedRoutes = {
     'client_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'serve_invoice_logo': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'invoice_settings_show': { paramsTuple?: []; params?: {} }
+    'quote_next_number': { paramsTuple?: []; params?: {} }
+    'quote_list': { paramsTuple?: []; params?: {} }
+    'quote_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PUT: {
     'profile_update': { paramsTuple?: []; params?: {} }
@@ -142,6 +155,7 @@ export type ScannedRoutes = {
     'company_bank': { paramsTuple?: []; params?: {} }
     'client_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_settings_update': { paramsTuple?: []; params?: {} }
+    'quote_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   DELETE: {
     'session_revoke': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -149,6 +163,7 @@ export type ScannedRoutes = {
     'revoke_invite': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'remove_member': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'client_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'quote_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

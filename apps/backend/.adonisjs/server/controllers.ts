@@ -67,6 +67,14 @@ export const controllers = {
     SearchCompany: () => import('#controllers/onboarding/search_company'),
     SkipCompany: () => import('#controllers/onboarding/skip_company'),
   },
+  quote: {
+    Create: () => import('#controllers/quote/create'),
+    Delete: () => import('#controllers/quote/delete'),
+    List: () => import('#controllers/quote/list'),
+    NextNumber: () => import('#controllers/quote/next_number'),
+    Show: () => import('#controllers/quote/show'),
+    Update: () => import('#controllers/quote/update'),
+  },
   settings: {
     InvoiceLogoUpload: () => import('#controllers/settings/invoice_logo_upload'),
     InvoiceSettingsShow: () => import('#controllers/settings/invoice_settings_show'),

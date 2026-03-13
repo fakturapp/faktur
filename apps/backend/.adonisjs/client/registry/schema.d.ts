@@ -703,4 +703,76 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings/invoice_logo_upload').default['handle']>>>
     }
   }
+  'quote_next_number': {
+    methods: ["GET","HEAD"]
+    pattern: '/quotes/next-number'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/quote/next_number').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/quote/next_number').default['handle']>>>
+    }
+  }
+  'quote_list': {
+    methods: ["GET","HEAD"]
+    pattern: '/quotes'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/quote/list').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/quote/list').default['handle']>>>
+    }
+  }
+  'quote_show': {
+    methods: ["GET","HEAD"]
+    pattern: '/quotes/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/quote/show').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/quote/show').default['handle']>>>
+    }
+  }
+  'quote_create': {
+    methods: ["POST"]
+    pattern: '/quotes'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/quote_validator').createQuoteValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/quote_validator').createQuoteValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/quote/create').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/quote/create').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'quote_update': {
+    methods: ["PUT"]
+    pattern: '/quotes/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/quote_validator').createQuoteValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/quote_validator').createQuoteValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/quote/update').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/quote/update').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'quote_delete': {
+    methods: ["DELETE"]
+    pattern: '/quotes/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/quote/delete').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/quote/delete').default['handle']>>>
+    }
+  }
 }

@@ -354,6 +354,42 @@ const routes = {
     tokens: [{"old":"/settings/invoices/logo","type":0,"val":"settings","end":""},{"old":"/settings/invoices/logo","type":0,"val":"invoices","end":""},{"old":"/settings/invoices/logo","type":0,"val":"logo","end":""}],
     types: placeholder as Registry['invoice_logo_upload']['types'],
   },
+  'quote_next_number': {
+    methods: ["GET","HEAD"],
+    pattern: '/quotes/next-number',
+    tokens: [{"old":"/quotes/next-number","type":0,"val":"quotes","end":""},{"old":"/quotes/next-number","type":0,"val":"next-number","end":""}],
+    types: placeholder as Registry['quote_next_number']['types'],
+  },
+  'quote_list': {
+    methods: ["GET","HEAD"],
+    pattern: '/quotes',
+    tokens: [{"old":"/quotes","type":0,"val":"quotes","end":""}],
+    types: placeholder as Registry['quote_list']['types'],
+  },
+  'quote_show': {
+    methods: ["GET","HEAD"],
+    pattern: '/quotes/:id',
+    tokens: [{"old":"/quotes/:id","type":0,"val":"quotes","end":""},{"old":"/quotes/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['quote_show']['types'],
+  },
+  'quote_create': {
+    methods: ["POST"],
+    pattern: '/quotes',
+    tokens: [{"old":"/quotes","type":0,"val":"quotes","end":""}],
+    types: placeholder as Registry['quote_create']['types'],
+  },
+  'quote_update': {
+    methods: ["PUT"],
+    pattern: '/quotes/:id',
+    tokens: [{"old":"/quotes/:id","type":0,"val":"quotes","end":""},{"old":"/quotes/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['quote_update']['types'],
+  },
+  'quote_delete': {
+    methods: ["DELETE"],
+    pattern: '/quotes/:id',
+    tokens: [{"old":"/quotes/:id","type":0,"val":"quotes","end":""},{"old":"/quotes/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['quote_delete']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

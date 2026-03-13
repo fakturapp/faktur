@@ -155,6 +155,29 @@ export class CompanySchema extends BaseModel {
   declare website: string | null
 }
 
+export class InvoiceSettingSchema extends BaseModel {
+  static $columns = ['accentColor', 'billingType', 'createdAt', 'customPaymentMethod', 'id', 'logoUrl', 'paymentMethods', 'teamId', 'updatedAt'] as const
+  $columns = InvoiceSettingSchema.$columns
+  @column()
+  declare accentColor: string
+  @column()
+  declare billingType: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare customPaymentMethod: string | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare logoUrl: string | null
+  @column()
+  declare paymentMethods: any
+  @column()
+  declare teamId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class LoginHistorySchema extends BaseModel {
   static $columns = ['city', 'country', 'createdAt', 'failureReason', 'id', 'ipAddress', 'isSuspicious', 'status', 'tokenIdentifier', 'userAgent', 'userId'] as const
   $columns = LoginHistorySchema.$columns
@@ -180,6 +203,94 @@ export class LoginHistorySchema extends BaseModel {
   declare userAgent: string | null
   @column()
   declare userId: string | null
+}
+
+export class QuoteLineSchema extends BaseModel {
+  static $columns = ['createdAt', 'description', 'id', 'position', 'quantity', 'quoteId', 'saleType', 'total', 'unit', 'unitPrice', 'updatedAt', 'vatRate'] as const
+  $columns = QuoteLineSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare description: string
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare position: number
+  @column()
+  declare quantity: string
+  @column()
+  declare quoteId: string
+  @column()
+  declare saleType: string | null
+  @column()
+  declare total: string
+  @column()
+  declare unit: string | null
+  @column()
+  declare unitPrice: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare vatRate: string
+}
+
+export class QuoteSchema extends BaseModel {
+  static $columns = ['accentColor', 'acceptanceConditions', 'billingType', 'clientId', 'clientSiren', 'clientVatNumber', 'createdAt', 'deliveryAddress', 'documentTitle', 'freeField', 'globalDiscountType', 'globalDiscountValue', 'id', 'issueDate', 'language', 'logoUrl', 'notes', 'quoteNumber', 'signatureField', 'status', 'subject', 'subtotal', 'taxAmount', 'teamId', 'total', 'updatedAt', 'validityDate'] as const
+  $columns = QuoteSchema.$columns
+  @column()
+  declare accentColor: string
+  @column()
+  declare acceptanceConditions: string | null
+  @column()
+  declare billingType: string
+  @column()
+  declare clientId: string | null
+  @column()
+  declare clientSiren: string | null
+  @column()
+  declare clientVatNumber: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare deliveryAddress: string | null
+  @column()
+  declare documentTitle: string | null
+  @column()
+  declare freeField: string | null
+  @column()
+  declare globalDiscountType: string
+  @column()
+  declare globalDiscountValue: string
+  @column({ isPrimary: true })
+  declare id: string
+  @column.date()
+  declare issueDate: DateTime
+  @column()
+  declare language: string
+  @column()
+  declare logoUrl: string | null
+  @column()
+  declare notes: string | null
+  @column()
+  declare quoteNumber: string
+  @column()
+  declare signatureField: boolean
+  @column()
+  declare status: string
+  @column()
+  declare subject: string | null
+  @column()
+  declare subtotal: string
+  @column()
+  declare taxAmount: string
+  @column()
+  declare teamId: string
+  @column()
+  declare total: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column.date()
+  declare validityDate: DateTime | null
 }
 
 export class RateLimitSchema extends BaseModel {

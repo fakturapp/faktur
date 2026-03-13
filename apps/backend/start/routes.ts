@@ -8,6 +8,7 @@ import '#start/routes/team'
 import '#start/routes/company'
 import '#start/routes/client'
 import '#start/routes/settings'
+import '#start/routes/quote'
 
 router.get('/', async () => {
   return {

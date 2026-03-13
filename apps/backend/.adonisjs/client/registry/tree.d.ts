@@ -64,4 +64,10 @@ export interface ApiDefinition {
   invoiceSettingsShow: typeof routes['invoice_settings_show']
   invoiceSettingsUpdate: typeof routes['invoice_settings_update']
   invoiceLogoUpload: typeof routes['invoice_logo_upload']
+  quoteNextNumber: typeof routes['quote_next_number']
+  quoteList: typeof routes['quote_list']
+  quoteShow: typeof routes['quote_show']
+  quoteCreate: typeof routes['quote_create']
+  quoteUpdate: typeof routes['quote_update']
+  quoteDelete: typeof routes['quote_delete']
 }
