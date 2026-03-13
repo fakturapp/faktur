@@ -7,6 +7,7 @@ import '#start/routes/dashboard'
 import '#start/routes/team'
 import '#start/routes/company'
 import '#start/routes/client'
+import '#start/routes/settings'
 
 router.get('/', async () => {
   return {
