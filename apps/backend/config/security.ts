@@ -8,7 +8,7 @@ const securityConfig = {
   },
 
   twoFactor: {
-    issuer: 'ZenVoice',
+    issuer: 'Faktur',
     recoveryCodesCount: 10,
     recoveryCodeLength: 10,
     window: 2,

@@ -165,7 +165,7 @@ export default function LoginPage() {
                 <p className="text-muted-foreground text-sm">
                   {requires2FA
                     ? 'Entrez le code de votre application authenticator'
-                    : 'Connectez-vous à votre compte ZenVoice'}
+                    : 'Connectez-vous à votre compte Faktur'}
                 </p>
               </motion.div>
 

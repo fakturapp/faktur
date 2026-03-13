@@ -48,7 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isPublicPath = publicPaths.some((p) => pathname.startsWith(p))
 
   const refreshUser = useCallback(async () => {
-    const token = localStorage.getItem('zenvoice_token')
+    const token = localStorage.getItem('faktur_token')
     if (!token) {
       setUser(null)
       setLoading(false)
@@ -57,7 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const { data, error } = await api.get<{ user: User }>('/auth/me')
     if (error || !data?.user) {
-      localStorage.removeItem('zenvoice_token')
+      localStorage.removeItem('faktur_token')
       setUser(null)
     } else {
       setUser(data.user)
@@ -104,13 +104,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [user, loading, pathname, isPublicPath, router])
 
   function login(token: string, userData: User) {
-    localStorage.setItem('zenvoice_token', token)
+    localStorage.setItem('faktur_token', token)
     setUser(userData)
   }
 
   async function logout() {
     await api.post('/auth/logout', {})
-    localStorage.removeItem('zenvoice_token')
+    localStorage.removeItem('faktur_token')
     setUser(null)
     router.replace('/login')
   }

@@ -1,6 +1,6 @@
-# ZenVoice Frontend
+# Faktur Frontend
 
-Next.js 15 frontend for ZenVoice invoicing application.
+Next.js 15 frontend for Faktur invoicing application.
 
 ## Setup
 

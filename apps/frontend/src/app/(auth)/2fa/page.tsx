@@ -43,7 +43,7 @@ function TwoFactorContent() {
     if (err) return setError(err)
 
     if (data?.token) {
-      localStorage.setItem('zenvoice_token', data.token)
+      localStorage.setItem('faktur_token', data.token)
       router.push('/dashboard')
     }
   }

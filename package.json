@@ -1,9 +1,9 @@
 {
-  "name": "zenvoice",
+  "name": "faktur",
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "ZenVoice - Free professional invoicing and quoting software",
+  "description": "Faktur - Free professional invoicing and quoting software",
   "license": "MIT",
   "workspaces": [
     "apps/*"

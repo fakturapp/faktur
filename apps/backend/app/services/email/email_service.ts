@@ -13,7 +13,7 @@ interface EmailOptions {
 class EmailService {
   private frontendUrl = env.get('FRONTEND_URL') || 'http://localhost:3000'
   private fromEmail = 'noreply@authguard.net'
-  private fromName = 'ZenVoice'
+  private fromName = 'Faktur'
 
   private get baseStyle() {
     return `
@@ -143,7 +143,7 @@ class EmailService {
       <h1 class="h1">Verify your email address</h1>
       <p class="text">
         Hi${name ? ` ${name}` : ''},<br><br>
-        Thanks for joining ZenVoice. To complete your account setup, please verify your email address.
+        Thanks for joining Faktur. To complete your account setup, please verify your email address.
       </p>
       <a href="${verifyUrl}" class="button">Verify Email Address</a>
       <p class="text" style="margin-top: 24px; font-size: 13px;">
@@ -157,7 +157,7 @@ class EmailService {
 
     await this.send({
       to: email,
-      subject: 'Verify your email address - ZenVoice',
+      subject: 'Verify your email address - Faktur',
       html: this.wrapHtml(content, 'Verify Email'),
       text: `Verify your email: ${verifyUrl}`,
     })
@@ -184,7 +184,7 @@ class EmailService {
 
     await this.send({
       to: email,
-      subject: 'Reset your password - ZenVoice',
+      subject: 'Reset your password - Faktur',
       html: this.wrapHtml(content, 'Reset Password'),
       text: `Reset your password: ${resetUrl}`,
     })
@@ -209,7 +209,7 @@ class EmailService {
 
     await this.send({
       to: email,
-      subject: 'Security verification code - ZenVoice',
+      subject: 'Security verification code - Faktur',
       html: this.wrapHtml(content, 'Security Code'),
       text: `Your security verification code is: ${code}`,
     })
@@ -219,11 +219,11 @@ class EmailService {
     const content = `
       <h1 class="h1">You've been invited to join a team</h1>
       <p class="text">
-        <strong>${inviterName}</strong> has invited you to join their team on ZenVoice.
+        <strong>${inviterName}</strong> has invited you to join their team on Faktur.
       </p>
       <a href="${inviteUrl}" class="button">Accept Invitation</a>
       <p class="text" style="margin-top: 24px; font-size: 13px;">
-        If you don't have a ZenVoice account yet, you'll be able to create one after clicking the link.
+        If you don't have a Faktur account yet, you'll be able to create one after clicking the link.
       </p>
       <p class="text" style="margin-bottom: 0; font-size: 13px;">
         Or paste this link in your browser:<br>
@@ -233,9 +233,9 @@ class EmailService {
 
     await this.send({
       to: email,
-      subject: `${inviterName} invited you to ZenVoice`,
+      subject: `${inviterName} invited you to Faktur`,
       html: this.wrapHtml(content, 'Team Invitation'),
-      text: `You've been invited to join a team on ZenVoice: ${inviteUrl}`,
+      text: `You've been invited to join a team on Faktur: ${inviteUrl}`,
     })
   }
 
@@ -258,7 +258,7 @@ class EmailService {
 
     await this.send({
       to: email,
-      subject: '2FA Enabled - ZenVoice',
+      subject: '2FA Enabled - Faktur',
       html: this.wrapHtml(content, '2FA Enabled'),
       text: '2FA has been enabled on your account.',
     })

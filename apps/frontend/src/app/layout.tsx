@@ -4,7 +4,7 @@ import './globals.css'
 import { Providers } from './providers'
 
 export const metadata: Metadata = {
-  title: 'ZenVoice - Free Invoicing & Quoting',
+  title: 'Faktur - Facturation gratuite',
   description: 'Professional invoicing and quoting software, 100% free.',
 }
 
