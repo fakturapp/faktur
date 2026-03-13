@@ -15,6 +15,19 @@ export default class Stats {
         .then((r) => Number(r[0].$extras.total))
     }
 
+    // Generate empty chart data for the last 90 days
+    const chartData: { date: string; factures: number; devis: number }[] = []
+    const now = new Date()
+    for (let i = 89; i >= 0; i--) {
+      const d = new Date(now)
+      d.setDate(d.getDate() - i)
+      chartData.push({
+        date: d.toISOString().split('T')[0],
+        factures: 0,
+        devis: 0,
+      })
+    }
+
     return response.ok({
       stats: {
         revenue: { value: 0, trend: 0 },
@@ -23,6 +36,7 @@ export default class Stats {
         clients: { value: clientsCount, trend: 0 },
       },
       recent: [],
+      chartData,
     })
   }
 }

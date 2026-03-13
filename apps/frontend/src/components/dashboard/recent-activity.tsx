@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardAction } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -40,16 +40,25 @@ function formatCurrency(cents: number) {
 export function RecentActivity({ items }: { items: RecentItem[] }) {
   return (
     <div className="px-4 lg:px-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-base font-medium">Activite recente</h2>
-        {items.length > 0 && (
-          <Link href="/dashboard/invoices" className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors">
-            Tout voir <ArrowUpRight className="h-3.5 w-3.5" />
-          </Link>
-        )}
-      </div>
-
       <Card>
+        <CardHeader>
+          <CardTitle>Activite recente</CardTitle>
+          <CardDescription>
+            {items.length > 0
+              ? `${items.length} document${items.length > 1 ? 's' : ''} recents`
+              : 'Aucun document recent'}
+          </CardDescription>
+          {items.length > 0 && (
+            <CardAction>
+              <Link href="/dashboard/invoices">
+                <Button variant="outline" size="sm">
+                  Tout voir <ArrowUpRight className="h-3.5 w-3.5 ml-1" />
+                </Button>
+              </Link>
+            </CardAction>
+          )}
+        </CardHeader>
+
         {items.length === 0 ? (
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted mb-4">
@@ -66,55 +75,64 @@ export function RecentActivity({ items }: { items: RecentItem[] }) {
             </Link>
           </CardContent>
         ) : (
-          <div className="divide-y divide-border">
-            <div className="grid grid-cols-12 gap-4 px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              <div className="col-span-1">Type</div>
-              <div className="col-span-2">Numero</div>
-              <div className="col-span-3">Client</div>
-              <div className="col-span-2">Montant</div>
-              <div className="col-span-2">Statut</div>
-              <div className="col-span-2 text-right">Date</div>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Type</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Numero</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Client</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Montant</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Statut</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {items.map((item) => {
+                    const status = statusMap[item.status] || { label: item.status, variant: 'muted' as const }
+                    return (
+                      <tr
+                        key={item.id}
+                        className="hover:bg-muted/30 transition-colors group cursor-pointer"
+                      >
+                        <td className="px-4 py-3.5">
+                          {item.type === 'invoice' ? (
+                            <FileText className="h-4 w-4 text-primary" />
+                          ) : (
+                            <Receipt className="h-4 w-4 text-yellow-500" />
+                          )}
+                        </td>
+                        <td className="px-4 py-3.5">
+                          <span className="text-sm font-medium text-foreground">{item.number}</span>
+                        </td>
+                        <td className="px-4 py-3.5">
+                          <span className="text-sm text-foreground truncate">{item.clientName}</span>
+                        </td>
+                        <td className="px-4 py-3.5">
+                          <span className="text-sm font-medium text-foreground tabular-nums">
+                            {formatCurrency(item.amount)}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3.5">
+                          <Badge variant={status.variant}>{status.label}</Badge>
+                        </td>
+                        <td className="px-4 py-3.5">
+                          <div className="flex items-center justify-end gap-2">
+                            <span className="text-xs text-muted-foreground flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              {new Date(item.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
+                            </span>
+                            <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors" />
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
             </div>
-
-            {items.map((item) => {
-              const status = statusMap[item.status] || { label: item.status, variant: 'muted' as const }
-              return (
-                <div
-                  key={item.id}
-                  className="grid grid-cols-12 gap-4 px-4 py-3.5 items-center hover:bg-muted/30 transition-colors cursor-pointer group"
-                >
-                  <div className="col-span-1">
-                    {item.type === 'invoice' ? (
-                      <FileText className="h-4 w-4 text-primary" />
-                    ) : (
-                      <Receipt className="h-4 w-4 text-yellow-500" />
-                    )}
-                  </div>
-                  <div className="col-span-2">
-                    <span className="text-sm font-medium text-foreground">{item.number}</span>
-                  </div>
-                  <div className="col-span-3">
-                    <span className="text-sm text-foreground truncate">{item.clientName}</span>
-                  </div>
-                  <div className="col-span-2">
-                    <span className="text-sm font-medium text-foreground tabular-nums">
-                      {formatCurrency(item.amount)}
-                    </span>
-                  </div>
-                  <div className="col-span-2">
-                    <Badge variant={status.variant}>{status.label}</Badge>
-                  </div>
-                  <div className="col-span-2 flex items-center justify-end gap-2">
-                    <span className="text-xs text-muted-foreground flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {new Date(item.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
-                    </span>
-                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors" />
-                  </div>
-                </div>
-              )
-            })}
-          </div>
+          </CardContent>
         )}
       </Card>
     </div>

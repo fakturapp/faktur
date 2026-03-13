@@ -13,7 +13,17 @@
   --color-input: #27272a;
   --color-ring: #6366f1;
   --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
   --color-success: #22c55e;
+  --color-secondary: #27272a;
+  --color-secondary-foreground: #fafafa;
+  --color-accent: #27272a;
+  --color-accent-foreground: #fafafa;
+  --color-chart-1: #6366f1;
+  --color-chart-2: #8b5cf6;
+  --color-chart-3: #a78bfa;
+  --color-chart-4: #c4b5fd;
+  --color-chart-5: #4f46e5;
   --radius: 0.75rem;
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
 }

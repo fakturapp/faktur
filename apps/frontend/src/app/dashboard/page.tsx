@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth'
 import { SectionCards } from '@/components/dashboard/section-cards'
-import { QuickActions } from '@/components/dashboard/quick-actions'
+import { ChartRevenue } from '@/components/dashboard/chart-revenue'
 import { RecentActivity } from '@/components/dashboard/recent-activity'
 import { Skeleton } from '@/components/ui/skeleton'
 import { api } from '@/lib/api'
@@ -25,6 +25,12 @@ interface RecentItem {
   date: string
 }
 
+interface RevenueDataPoint {
+  date: string
+  factures: number
+  devis: number
+}
+
 function formatCurrency(cents: number) {
   return (cents / 100).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
 }
@@ -33,6 +39,7 @@ export default function DashboardPage() {
   const { user } = useAuth()
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [recent, setRecent] = useState<RecentItem[]>([])
+  const [chartData, setChartData] = useState<RevenueDataPoint[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -40,10 +47,15 @@ export default function DashboardPage() {
   }, [])
 
   async function loadDashboard() {
-    const { data } = await api.get<{ stats: DashboardStats; recent: RecentItem[] }>('/dashboard')
+    const { data } = await api.get<{
+      stats: DashboardStats
+      recent: RecentItem[]
+      chartData?: RevenueDataPoint[]
+    }>('/dashboard')
     if (data) {
       setStats(data.stats)
       setRecent(data.recent || [])
+      setChartData(data.chartData || [])
     }
     setLoading(false)
   }
@@ -51,18 +63,13 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-        <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
           {[...Array(4)].map((_, i) => (
             <Skeleton key={i} className="h-32 rounded-xl" />
           ))}
         </div>
-        <div className="px-4 lg:px-6 space-y-4">
-          <Skeleton className="h-5 w-32" />
-          <div className="grid gap-3 sm:grid-cols-3">
-            {[...Array(3)].map((_, i) => (
-              <Skeleton key={i} className="h-20 rounded-xl" />
-            ))}
-          </div>
+        <div className="px-4 lg:px-6">
+          <Skeleton className="h-[340px] rounded-xl" />
         </div>
         <div className="px-4 lg:px-6">
           <Skeleton className="h-64 rounded-xl" />
@@ -105,7 +112,9 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
       <SectionCards cards={statCards} />
-      <QuickActions />
+      <div className="px-4 lg:px-6">
+        <ChartRevenue data={chartData} />
+      </div>
       <RecentActivity items={recent} />
     </div>
   )
