@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -33,6 +33,9 @@ import {
   X,
   Settings,
   Send,
+  ImagePlus,
+  Building2 as BuildingIcon,
+  Upload,
 } from 'lucide-react'
 
 interface TeamMember {
@@ -112,6 +115,11 @@ export default function TeamPage() {
   const [removeOpen, setRemoveOpen] = useState(false)
   const [removeTarget, setRemoveTarget] = useState<TeamMember | null>(null)
   const [removing, setRemoving] = useState(false)
+
+  // Team logo
+  const [logoOpen, setLogoOpen] = useState(false)
+  const [uploadingIcon, setUploadingIcon] = useState(false)
+  const iconInputRef = useRef<HTMLInputElement>(null)
 
   const currentMember = team?.members.find((m) => m.userId === user?.id)
   const isAdmin = currentMember && ['super_admin', 'admin'].includes(currentMember.role)
@@ -213,6 +221,30 @@ export default function TeamPage() {
     loadTeam()
   }
 
+  async function handleUseCompanyLogo() {
+    setUploadingIcon(true)
+    const { data, error } = await api.post<{ iconUrl: string }>('/team/icon', { useCompanyLogo: true })
+    setUploadingIcon(false)
+    if (error) return toast(error, 'error')
+    toast('Logo mis à jour', 'success')
+    setLogoOpen(false)
+    loadTeam()
+  }
+
+  async function handleIconUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploadingIcon(true)
+    const formData = new FormData()
+    formData.append('icon', file)
+    const { data, error } = await api.upload<{ iconUrl: string }>('/team/icon', formData)
+    setUploadingIcon(false)
+    if (error) return toast(error, 'error')
+    toast('Logo mis à jour', 'success')
+    setLogoOpen(false)
+    loadTeam()
+  }
+
   function openRoleDialog(member: TeamMember) {
     setRoleTarget(member)
     setNewRole(member.role)
@@ -269,11 +301,35 @@ export default function TeamPage() {
           <div className="h-24 bg-gradient-to-br from-indigo-500/20 via-purple-500/10 to-transparent" />
 
           <CardContent className="p-6 -mt-12">
+            <input
+              ref={iconInputRef}
+              type="file"
+              accept="image/png,image/svg+xml,image/jpeg,image/webp"
+              className="hidden"
+              onChange={handleIconUpload}
+            />
             <div className="flex items-end justify-between">
               <div className="flex items-end gap-4">
-                <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-zinc-800 border-2 border-background text-lg font-bold text-foreground shadow-lg">
-                  {teamInitials}
-                </div>
+                <button
+                  type="button"
+                  onClick={() => isAdmin && setLogoOpen(true)}
+                  className={`relative group flex h-16 w-16 items-center justify-center rounded-xl border-2 border-background shadow-lg overflow-hidden ${isAdmin ? 'cursor-pointer' : 'cursor-default'} ${team?.iconUrl ? 'bg-white' : 'bg-zinc-800'}`}
+                >
+                  {team?.iconUrl ? (
+                    <img
+                      src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333'}${team.iconUrl}`}
+                      alt={team.name}
+                      className="h-full w-full object-contain p-1"
+                    />
+                  ) : (
+                    <span className="text-lg font-bold text-foreground">{teamInitials}</span>
+                  )}
+                  {isAdmin && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl">
+                      <ImagePlus className="h-5 w-5 text-white" />
+                    </div>
+                  )}
+                </button>
                 <div className="mb-1">
                   <h1 className="text-xl font-bold text-foreground">{team?.name}</h1>
                   <p className="text-sm text-muted-foreground">
@@ -663,6 +719,60 @@ export default function TeamPage() {
             disabled={removing}
           >
             {removing ? <><Spinner /> Suppression...</> : 'Retirer'}
+          </Button>
+        </DialogFooter>
+      </Dialog>
+
+      {/* Team Logo Dialog */}
+      <Dialog open={logoOpen} onClose={() => setLogoOpen(false)}>
+        <DialogTitle>Logo de l&apos;equipe</DialogTitle>
+        <DialogDescription>
+          Choisissez comment definir le logo de votre equipe.
+        </DialogDescription>
+
+        <div className="mt-4 space-y-3">
+          <button
+            onClick={handleUseCompanyLogo}
+            disabled={uploadingIcon}
+            className="flex w-full items-center gap-4 rounded-xl border-2 border-border p-4 text-left transition-all hover:border-primary/40 hover:bg-primary/5 disabled:opacity-50"
+          >
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+              <BuildingIcon className="h-6 w-6 text-primary" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-foreground">Utiliser le logo de l&apos;entreprise</p>
+              <p className="text-xs text-muted-foreground">
+                Reprendre le logo defini dans les parametres de l&apos;entreprise
+              </p>
+            </div>
+          </button>
+
+          <button
+            onClick={() => iconInputRef.current?.click()}
+            disabled={uploadingIcon}
+            className="flex w-full items-center gap-4 rounded-xl border-2 border-border p-4 text-left transition-all hover:border-primary/40 hover:bg-primary/5 disabled:opacity-50"
+          >
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+              <Upload className="h-6 w-6 text-primary" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-foreground">Importer un logo</p>
+              <p className="text-xs text-muted-foreground">
+                Telecharger une image depuis votre ordinateur (PNG, SVG, JPG)
+              </p>
+            </div>
+          </button>
+
+          {uploadingIcon && (
+            <div className="flex items-center justify-center gap-2 py-2">
+              <Spinner /> <span className="text-sm text-muted-foreground">Mise a jour...</span>
+            </div>
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setLogoOpen(false)}>
+            Annuler
           </Button>
         </DialogFooter>
       </Dialog>

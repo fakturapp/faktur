@@ -14,6 +14,11 @@ const UpdateRole = () => import('#controllers/team/update_role')
 const TransferOwnership = () => import('#controllers/team/transfer_ownership')
 const RemoveMember = () => import('#controllers/team/remove_member')
 const InviteInfo = () => import('#controllers/team/invite_info')
+const UploadIcon = () => import('#controllers/team/upload_icon')
+const ServeIcon = () => import('#controllers/team/serve_icon')
+
+// Public route - serve team icons
+router.get('/team-icons/:filename', [ServeIcon, 'handle'])
 
 router
   .group(() => {
@@ -21,6 +26,7 @@ router
     router.post('/create', [TeamCreate, 'handle'])
     router.get('/', [TeamShow, 'handle'])
     router.put('/', [TeamUpdate, 'handle'])
+    router.post('/icon', [UploadIcon, 'handle'])
     router.post('/switch', [TeamSwitch, 'handle'])
     router.get('/members', [TeamMembers, 'handle'])
     router.post('/invite', [TeamInvite, 'handle'])
