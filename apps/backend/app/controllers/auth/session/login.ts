@@ -41,6 +41,14 @@ export default class Login {
       return response.unauthorized({ message: 'Invalid email or password' })
     }
 
+    if (!user.emailVerified) {
+      return response.ok({
+        requiresEmailVerification: true,
+        email: user.email,
+        message: 'Please verify your email address before logging in',
+      })
+    }
+
     if (user.twoFactorEnabled) {
       if (!code) {
         return response.ok({
@@ -115,6 +123,8 @@ export default class Login {
         emailVerified: user.emailVerified,
         twoFactorEnabled: user.twoFactorEnabled,
         avatarUrl: user.avatarUrl,
+        onboardingCompleted: user.onboardingCompleted,
+        currentTeamId: user.currentTeamId,
       },
       token: token.value!.release(),
     })

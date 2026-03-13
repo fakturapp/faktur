@@ -2,6 +2,10 @@ import router from '@adonisjs/core/services/router'
 
 import '#start/routes/auth'
 import '#start/routes/account'
+import '#start/routes/onboarding'
+import '#start/routes/dashboard'
+import '#start/routes/team'
+import '#start/routes/company'
 
 router.get('/', async () => {
   return {

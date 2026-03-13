@@ -83,6 +83,8 @@ export default class Verify {
         emailVerified: user.emailVerified,
         twoFactorEnabled: user.twoFactorEnabled,
         avatarUrl: user.avatarUrl,
+        onboardingCompleted: user.onboardingCompleted,
+        currentTeamId: user.currentTeamId,
       },
       token: token.value!.release(),
     })
