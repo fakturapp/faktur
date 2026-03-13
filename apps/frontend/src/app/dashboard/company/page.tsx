@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -12,7 +12,7 @@ import { useToast } from '@/components/ui/toast'
 import { api } from '@/lib/api'
 import { Select } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
-import { Building2, CreditCard, Receipt, Search, Info, Banknote, Coins, PenLine, Lock } from 'lucide-react'
+import { Building2, CreditCard, Receipt, Search, Info, Banknote, Coins, PenLine, Lock, ImagePlus, Trash2 } from 'lucide-react'
 
 interface Company {
   id: string
@@ -30,6 +30,7 @@ interface Company {
   phone: string | null
   email: string | null
   website: string | null
+  logoUrl: string | null
   iban: string | null
   bic: string | null
   bankName: string | null
@@ -49,7 +50,10 @@ export default function CompanyPage() {
   const [company, setCompany] = useState<Company | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const [noCompany, setNoCompany] = useState(false)
+  const [logoUrl, setLogoUrl] = useState<string | null>(null)
+  const logoInputRef = useRef<HTMLInputElement>(null)
 
   const [form, setForm] = useState({
     legalName: '',
@@ -84,6 +88,7 @@ export default function CompanyPage() {
     api.get<{ company: Company }>('/company').then(({ data, error }) => {
       if (data?.company) {
         setCompany(data.company)
+        setLogoUrl(data.company.logoUrl)
         setForm({
           legalName: data.company.legalName || '',
           tradeName: data.company.tradeName || '',
@@ -157,6 +162,28 @@ export default function CompanyPage() {
     })
   }
 
+  async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    const formData = new FormData()
+    formData.append('logo', file)
+    const { data, error } = await api.upload<{ logoUrl: string }>('/company/logo', formData)
+    setUploading(false)
+    if (error) return toast(error, 'error')
+    if (data?.logoUrl) {
+      setLogoUrl(data.logoUrl)
+      toast('Logo mis à jour', 'success')
+    }
+  }
+
+  async function handleRemoveLogo() {
+    const { error } = await api.put('/company', { logoUrl: null })
+    if (error) return toast(error, 'error')
+    setLogoUrl(null)
+    toast('Logo supprimé', 'success')
+  }
+
   async function handleSavePayment(e: React.FormEvent) {
     e.preventDefault()
     setSaving(true)
@@ -216,6 +243,54 @@ export default function CompanyPage() {
           <CardContent className="p-6">
             <form onSubmit={handleSaveInfo}>
               <FieldGroup>
+                {/* Company Logo */}
+                <h3 className="font-semibold text-foreground">Logo de l&apos;entreprise</h3>
+                <div className="flex items-start gap-6">
+                  <div className="relative group">
+                    <div className="h-24 w-24 rounded-xl border-2 border-dashed border-border bg-muted/30 flex items-center justify-center overflow-hidden">
+                      {logoUrl ? (
+                        <img src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333'}${logoUrl}`} alt="Logo" className="h-full w-full object-contain p-2" />
+                      ) : (
+                        <ImagePlus className="h-8 w-8 text-muted-foreground/50" />
+                      )}
+                    </div>
+                    {logoUrl && (
+                      <button
+                        type="button"
+                        onClick={handleRemoveLogo}
+                        className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
+                    )}
+                  </div>
+                  <div className="flex-1 space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      Ce logo apparaitra sur vos factures, devis et documents. Format recommande : PNG ou SVG, fond transparent.
+                    </p>
+                    <input
+                      ref={logoInputRef}
+                      type="file"
+                      accept="image/png,image/svg+xml,image/jpeg,image/webp"
+                      className="hidden"
+                      onChange={handleLogoUpload}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => logoInputRef.current?.click()}
+                      disabled={uploading || noCompany}
+                    >
+                      {uploading ? <><Spinner className="text-foreground" /> Envoi...</> : 'Telecharger un logo'}
+                    </Button>
+                    {noCompany && (
+                      <p className="text-xs text-muted-foreground">Enregistrez d&apos;abord les informations de l&apos;entreprise.</p>
+                    )}
+                  </div>
+                </div>
+
+                <Separator />
                 <h3 className="font-semibold text-foreground">Informations légales</h3>
 
                 <Field>
