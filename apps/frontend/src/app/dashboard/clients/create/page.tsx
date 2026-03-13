@@ -154,7 +154,7 @@ export default function ClientCreatePage() {
     const { error: apiError } = await api.post('/clients', payload)
     setSaving(false)
     if (apiError) { setError(apiError); return }
-    toast({ title: 'Client cree', description: 'Le client a ete ajoute avec succes.' })
+    toast('Client créé', 'success')
     router.push('/dashboard/clients')
   }
 

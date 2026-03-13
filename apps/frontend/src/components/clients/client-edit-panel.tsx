@@ -136,9 +136,9 @@ export function ClientEditPanel({ open, clientId, onClose, onUpdated, onDeleted 
     setSaving(false)
 
     if (error) {
-      toast({ title: 'Erreur', description: error, variant: 'destructive' })
+      toast(error, 'error')
     } else {
-      toast({ title: 'Client mis a jour', description: 'Les modifications ont ete enregistrees.' })
+      toast('Client mis à jour', 'success')
       onUpdated()
     }
   }
@@ -149,9 +149,9 @@ export function ClientEditPanel({ open, clientId, onClose, onUpdated, onDeleted 
     setDeleting(false)
 
     if (error) {
-      toast({ title: 'Erreur', description: error, variant: 'destructive' })
+      toast(error, 'error')
     } else {
-      toast({ title: 'Client supprime' })
+      toast('Client supprimé', 'success')
       onClose()
       onDeleted()
     }

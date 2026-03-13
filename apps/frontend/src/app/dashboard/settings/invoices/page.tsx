@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { motion } from 'framer-motion'
+import { motion, type Variants } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -31,9 +31,9 @@ const fadeUp = {
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.06, duration: 0.4, ease: 'easeOut' },
+    transition: { delay: i * 0.06, duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] },
   }),
-}
+} satisfies Variants
 
 const accentColors = [
   { name: 'Indigo', value: '#6366f1' },
@@ -89,9 +89,9 @@ export default function InvoiceSettingsPage() {
     const { error } = await api.put('/settings/invoices', settings)
     setSaving(false)
     if (error) {
-      toast({ title: 'Erreur', description: error, variant: 'destructive' })
+      toast(error, 'error')
     } else {
-      toast({ title: 'Enregistre', description: 'Vos parametres de facturation ont ete mis a jour.' })
+      toast('Paramètres enregistrés', 'success')
     }
   }
 
@@ -107,10 +107,10 @@ export default function InvoiceSettingsPage() {
     setUploading(false)
 
     if (error) {
-      toast({ title: 'Erreur', description: error, variant: 'destructive' })
+      toast(error, 'error')
     } else if (data?.logoUrl) {
       setSettings((prev) => ({ ...prev, logoUrl: data.logoUrl }))
-      toast({ title: 'Logo mis a jour', description: 'Votre logo a ete telecharge.' })
+      toast('Logo mis à jour', 'success')
     }
   }
 
@@ -325,7 +325,7 @@ export default function InvoiceSettingsPage() {
                           }`}
                           style={{
                             backgroundColor: color.value,
-                            ringColor: settings.accentColor === color.value ? color.value : undefined,
+                            ...(settings.accentColor === color.value ? { '--tw-ring-color': color.value } as React.CSSProperties : {}),
                           }}
                         />
                         {settings.accentColor === color.value && (

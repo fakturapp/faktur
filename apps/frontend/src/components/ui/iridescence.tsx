@@ -52,7 +52,7 @@ export default function Iridescence({
   amplitude = 0.1,
   mouseReact = true,
   ...rest
-}: IridescenceProps & React.HTMLAttributes<HTMLDivElement>) {
+}: IridescenceProps & Omit<React.HTMLAttributes<HTMLDivElement>, 'color'>) {
   const ctnDom = useRef<HTMLDivElement>(null)
   const mousePos = useRef({ x: 0.5, y: 0.5 })
 

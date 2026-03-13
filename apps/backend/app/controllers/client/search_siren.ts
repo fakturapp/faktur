@@ -18,7 +18,7 @@ export default class SearchSiren {
         return response.ok({ results: [] })
       }
 
-      const data = await res.json()
+      const data = (await res.json()) as { results?: any[] }
 
       const results = (data.results || []).map((item: any) => ({
         siren: item.siren || '',

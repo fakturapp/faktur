@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, type Variants } from 'framer-motion'
 
 export function RouteProgressBar() {
   const pathname = usePathname()
@@ -26,7 +26,7 @@ export function RouteProgressBar() {
           initial={{ scaleX: 0, opacity: 1 }}
           animate={{ scaleX: 1, opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.4, ease: 'easeOut' }}
+          transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
         />
       )}
     </AnimatePresence>

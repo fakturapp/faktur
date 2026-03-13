@@ -115,9 +115,9 @@ export default function ClientEditPage() {
     const { error } = await api.put(`/clients/${id}`, form)
     setSaving(false)
     if (error) {
-      toast({ title: 'Erreur', description: error, variant: 'destructive' })
+      toast(error, 'error')
     } else {
-      toast({ title: 'Client mis a jour' })
+      toast('Client mis à jour', 'success')
     }
   }
 
@@ -126,9 +126,9 @@ export default function ClientEditPage() {
     const { error } = await api.delete(`/clients/${id}`)
     setDeleting(false)
     if (error) {
-      toast({ title: 'Erreur', description: error, variant: 'destructive' })
+      toast(error, 'error')
     } else {
-      toast({ title: 'Client supprime' })
+      toast('Client supprimé', 'success')
       router.push('/dashboard/clients')
     }
   }
