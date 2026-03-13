@@ -31,6 +31,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [teamsLoaded, setTeamsLoaded] = useState(false)
   const [switchConfirm, setSwitchConfirm] = useState<TeamListItem | null>(null)
   const [switching, setSwitching] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   useEffect(() => {
     if (user) {
@@ -68,8 +69,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (loading) {
     return (
-      <div className="flex h-screen overflow-hidden bg-background">
-        <div className="w-64 border-r border-border bg-card/50 flex flex-col">
+      <div className="flex h-screen overflow-hidden bg-sidebar">
+        <div className="w-(--sidebar-width) bg-sidebar flex flex-col">
           <div className="px-3 py-3">
             <div className="flex items-center gap-2.5 px-3 py-2">
               <Skeleton className="h-8 w-8 rounded-lg" />
@@ -100,8 +101,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
           </div>
         </div>
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="h-12 border-b border-border shrink-0" />
+        <div className="flex-1 flex flex-col overflow-hidden md:m-2 md:ml-0 md:rounded-xl md:shadow-sm bg-background">
+          <div className="h-(--header-height) border-b border-border shrink-0" />
           <div className="flex-1 p-6 space-y-6">
             <div className="grid gap-4 grid-cols-4">
               {[...Array(4)].map((_, i) => (
@@ -120,7 +121,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const currentTeam = teams.find((t) => t.isCurrent) || null
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div className="flex h-screen overflow-hidden bg-sidebar">
       <Sidebar
         teams={teams}
         currentTeam={currentTeam}
@@ -132,10 +133,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           avatarUrl: user.avatarUrl,
         }}
         onLogout={logout}
+        collapsed={sidebarCollapsed}
       />
 
-      <div className={cn('flex-1 flex flex-col overflow-hidden transition-all duration-300', switching && 'blur-sm pointer-events-none')}>
-        <SiteHeader />
+      <div
+        className={cn(
+          'relative flex min-h-svh flex-1 flex-col bg-background transition-all duration-200 ease-linear',
+          'md:m-2 md:ml-0 md:rounded-xl md:shadow-sm',
+          sidebarCollapsed && 'md:ml-2',
+          switching && 'blur-sm pointer-events-none'
+        )}
+      >
+        <SiteHeader onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)} />
         <RouteProgressBar />
 
         <main className="flex-1 overflow-y-auto">

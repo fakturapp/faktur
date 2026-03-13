@@ -30,11 +30,14 @@ export type ScannedRoutes = {
     'create_company': { paramsTuple?: []; params?: {} }
     'skip_company': { paramsTuple?: []; params?: {} }
     'search_company': { paramsTuple?: []; params?: {} }
-    'dashboard_stats': { paramsTuple?: []; params?: {} }
+    'dashboard.index': { paramsTuple?: []; params?: {} }
+    'dashboard.stats': { paramsTuple?: []; params?: {} }
+    'serve_icon': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'team_list': { paramsTuple?: []; params?: {} }
     'team_create': { paramsTuple?: []; params?: {} }
     'team_show': { paramsTuple?: []; params?: {} }
     'team_update': { paramsTuple?: []; params?: {} }
+    'upload_icon': { paramsTuple?: []; params?: {} }
     'team_switch': { paramsTuple?: []; params?: {} }
     'team_members': { paramsTuple?: []; params?: {} }
     'team_invite': { paramsTuple?: []; params?: {} }
@@ -44,15 +47,21 @@ export type ScannedRoutes = {
     'remove_member': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'transfer_ownership': { paramsTuple?: []; params?: {} }
     'invite_info': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'serve_logo': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'company_show': { paramsTuple?: []; params?: {} }
     'company_update': { paramsTuple?: []; params?: {} }
     'company_bank': { paramsTuple?: []; params?: {} }
+    'upload_logo': { paramsTuple?: []; params?: {} }
     'search_siren': { paramsTuple?: []; params?: {} }
     'client_list': { paramsTuple?: []; params?: {} }
     'client_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'client_create': { paramsTuple?: []; params?: {} }
     'client_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'client_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'serve_invoice_logo': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
+    'invoice_settings_show': { paramsTuple?: []; params?: {} }
+    'invoice_settings_update': { paramsTuple?: []; params?: {} }
+    'invoice_logo_upload': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'signup': { paramsTuple?: []; params?: {} }
@@ -73,11 +82,14 @@ export type ScannedRoutes = {
     'create_company': { paramsTuple?: []; params?: {} }
     'skip_company': { paramsTuple?: []; params?: {} }
     'team_create': { paramsTuple?: []; params?: {} }
+    'upload_icon': { paramsTuple?: []; params?: {} }
     'team_switch': { paramsTuple?: []; params?: {} }
     'team_invite': { paramsTuple?: []; params?: {} }
     'accept_invite': { paramsTuple?: []; params?: {} }
     'transfer_ownership': { paramsTuple?: []; params?: {} }
+    'upload_logo': { paramsTuple?: []; params?: {} }
     'client_create': { paramsTuple?: []; params?: {} }
+    'invoice_logo_upload': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'me': { paramsTuple?: []; params?: {} }
@@ -85,15 +97,20 @@ export type ScannedRoutes = {
     'profile_show': { paramsTuple?: []; params?: {} }
     'sessions_list': { paramsTuple?: []; params?: {} }
     'search_company': { paramsTuple?: []; params?: {} }
-    'dashboard_stats': { paramsTuple?: []; params?: {} }
+    'dashboard.index': { paramsTuple?: []; params?: {} }
+    'dashboard.stats': { paramsTuple?: []; params?: {} }
+    'serve_icon': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'team_list': { paramsTuple?: []; params?: {} }
     'team_show': { paramsTuple?: []; params?: {} }
     'team_members': { paramsTuple?: []; params?: {} }
     'invite_info': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'serve_logo': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'company_show': { paramsTuple?: []; params?: {} }
     'search_siren': { paramsTuple?: []; params?: {} }
     'client_list': { paramsTuple?: []; params?: {} }
     'client_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'serve_invoice_logo': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
+    'invoice_settings_show': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'me': { paramsTuple?: []; params?: {} }
@@ -101,15 +118,20 @@ export type ScannedRoutes = {
     'profile_show': { paramsTuple?: []; params?: {} }
     'sessions_list': { paramsTuple?: []; params?: {} }
     'search_company': { paramsTuple?: []; params?: {} }
-    'dashboard_stats': { paramsTuple?: []; params?: {} }
+    'dashboard.index': { paramsTuple?: []; params?: {} }
+    'dashboard.stats': { paramsTuple?: []; params?: {} }
+    'serve_icon': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'team_list': { paramsTuple?: []; params?: {} }
     'team_show': { paramsTuple?: []; params?: {} }
     'team_members': { paramsTuple?: []; params?: {} }
     'invite_info': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'serve_logo': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'company_show': { paramsTuple?: []; params?: {} }
     'search_siren': { paramsTuple?: []; params?: {} }
     'client_list': { paramsTuple?: []; params?: {} }
     'client_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'serve_invoice_logo': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
+    'invoice_settings_show': { paramsTuple?: []; params?: {} }
   }
   PUT: {
     'profile_update': { paramsTuple?: []; params?: {} }
@@ -119,6 +141,7 @@ export type ScannedRoutes = {
     'company_update': { paramsTuple?: []; params?: {} }
     'company_bank': { paramsTuple?: []; params?: {} }
     'client_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoice_settings_update': { paramsTuple?: []; params?: {} }
   }
   DELETE: {
     'session_revoke': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

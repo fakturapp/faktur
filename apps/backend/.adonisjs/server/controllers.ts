@@ -53,8 +53,10 @@ export const controllers = {
   },
   company: {
     Bank: () => import('#controllers/company/bank'),
+    ServeLogo: () => import('#controllers/company/serve_logo'),
     Show: () => import('#controllers/company/show'),
     Update: () => import('#controllers/company/update'),
+    UploadLogo: () => import('#controllers/company/upload_logo'),
   },
   dashboard: {
     Stats: () => import('#controllers/dashboard/stats'),
@@ -65,6 +67,12 @@ export const controllers = {
     SearchCompany: () => import('#controllers/onboarding/search_company'),
     SkipCompany: () => import('#controllers/onboarding/skip_company'),
   },
+  settings: {
+    InvoiceLogoUpload: () => import('#controllers/settings/invoice_logo_upload'),
+    InvoiceSettingsShow: () => import('#controllers/settings/invoice_settings_show'),
+    InvoiceSettingsUpdate: () => import('#controllers/settings/invoice_settings_update'),
+    ServeInvoiceLogo: () => import('#controllers/settings/serve_invoice_logo'),
+  },
   team: {
     AcceptInvite: () => import('#controllers/team/accept_invite'),
     Create: () => import('#controllers/team/create'),
@@ -74,10 +82,12 @@ export const controllers = {
     Members: () => import('#controllers/team/members'),
     RemoveMember: () => import('#controllers/team/remove_member'),
     RevokeInvite: () => import('#controllers/team/revoke_invite'),
+    ServeIcon: () => import('#controllers/team/serve_icon'),
     Show: () => import('#controllers/team/show'),
     Switch: () => import('#controllers/team/switch'),
     TransferOwnership: () => import('#controllers/team/transfer_ownership'),
     UpdateRole: () => import('#controllers/team/update_role'),
     Update: () => import('#controllers/team/update'),
+    UploadIcon: () => import('#controllers/team/upload_icon'),
   },
 }
