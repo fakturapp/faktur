@@ -3,6 +3,15 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react'
 import { api } from '@/lib/api'
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333'
+
+/** Ensure a relative logo path becomes a full URL */
+function resolveLogoUrl(url: string | null): string | null {
+  if (!url) return null
+  if (url.startsWith('http://') || url.startsWith('https://')) return url
+  return `${API_URL}${url}`
+}
+
 export interface InvoiceSettings {
   billingType: 'quick' | 'detailed'
   logoUrl: string | null
@@ -55,7 +64,7 @@ export function InvoiceSettingsProvider({ children }: { children: React.ReactNod
   const loadSettings = useCallback(async () => {
     const { data } = await api.get<{ settings: InvoiceSettings }>('/settings/invoices')
     if (data?.settings) {
-      setSettings(data.settings)
+      setSettings({ ...data.settings, logoUrl: resolveLogoUrl(data.settings.logoUrl) })
     }
     setLoading(false)
   }, [])
@@ -90,7 +99,7 @@ export function InvoiceSettingsProvider({ children }: { children: React.ReactNod
     formData.append('logo', file)
     const { data } = await api.upload<{ logoUrl: string }>('/settings/invoices/logo', formData)
     if (data?.logoUrl) {
-      setSettings((prev) => ({ ...prev, logoUrl: data.logoUrl }))
+      setSettings((prev) => ({ ...prev, logoUrl: resolveLogoUrl(data.logoUrl) }))
     }
   }, [])
 
