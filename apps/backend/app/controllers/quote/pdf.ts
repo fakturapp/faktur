@@ -58,6 +58,7 @@ export default class Pdf {
       subtotal: quote.subtotal,
       taxAmount: quote.taxAmount,
       total: quote.total,
+      language: quote.language || 'fr',
     }
 
     const linesData = quote.lines.map((l) => ({

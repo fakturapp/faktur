@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
 import { getTemplate, type TemplateConfig } from '@/lib/invoice-templates'
+import { getTranslations } from '@/lib/invoice-i18n'
 
 /* ═══════════════════════════════════════════════════════════
    Types
@@ -72,13 +73,13 @@ function contrastText(hex: string) {
   return (r * 299 + g * 587 + b * 114) / 1000 > 128 ? '#000' : '#fff'
 }
 
-function fmtCurrency(n: number) {
-  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(n)
+function fmtCurrency(n: number, lang?: string) {
+  return new Intl.NumberFormat(lang === 'en' ? 'en-GB' : 'fr-FR', { style: 'currency', currency: 'EUR' }).format(n)
 }
 
-function fmtDate(d: string) {
+function fmtDate(d: string, lang?: string) {
   if (!d) return ''
-  try { return new Date(d).toLocaleDateString('fr-FR') } catch { return d }
+  try { return new Date(d).toLocaleDateString(lang === 'en' ? 'en-GB' : 'fr-FR') } catch { return d }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -87,7 +88,7 @@ function fmtDate(d: string) {
 
 function InlineEdit({
   value, onChange, preview = false, className, placeholder, multiline, accentColor = '#6366f1',
-  inputBg = '#ffffff', borderDashed = '#ddd',
+  inputBg = '#ffffff', borderDashed = '#ddd', titleText,
 }: {
   value: string
   onChange: (v: string) => void
@@ -98,6 +99,7 @@ function InlineEdit({
   accentColor?: string
   inputBg?: string
   borderDashed?: string
+  titleText?: string
 }) {
   const [editing, setEditing] = useState(false)
   const [tmp, setTmp] = useState(value)
@@ -153,7 +155,7 @@ function InlineEdit({
       style={{ borderBottomColor: borderDashed }}
       onMouseEnter={(e) => ((e.target as HTMLElement).style.borderBottomColor = accentColor)}
       onMouseLeave={(e) => ((e.target as HTMLElement).style.borderBottomColor = borderDashed)}
-      title="Cliquer pour modifier"
+      title={titleText || 'Click to edit'}
     >
       {value || <span style={{ color: borderDashed }} className="italic">{placeholder || '...'}</span>}
     </span>
@@ -166,7 +168,7 @@ function InlineEdit({
 
 function InlineNumber({
   value, onChange, preview = false, className, min = 0, step = 1, accentColor = '#6366f1',
-  inputBg = '#ffffff', borderDashed = '#ddd',
+  inputBg = '#ffffff', borderDashed = '#ddd', titleText,
 }: {
   value: number
   onChange: (v: number) => void
@@ -177,6 +179,7 @@ function InlineNumber({
   accentColor?: string
   inputBg?: string
   borderDashed?: string
+  titleText?: string
 }) {
   const [editing, setEditing] = useState(false)
   const [tmp, setTmp] = useState(String(value))
@@ -225,7 +228,7 @@ function InlineNumber({
       style={{ borderBottomColor: borderDashed }}
       onMouseEnter={(e) => ((e.target as HTMLElement).style.borderBottomColor = accentColor)}
       onMouseLeave={(e) => ((e.target as HTMLElement).style.borderBottomColor = borderDashed)}
-      title="Cliquer pour modifier"
+      title={titleText || 'Click to edit'}
     >
       {typeof value === 'number' ? value : '0'}
     </span>
@@ -352,6 +355,7 @@ interface A4SheetProps {
   subject: string
   template?: string
   darkMode?: boolean
+  language?: string
 }
 
 export function A4Sheet({
@@ -363,12 +367,14 @@ export function A4Sheet({
   notes, onNotesChange, acceptanceConditions, signatureField, freeField,
   deliveryAddress, showDeliveryAddress, clientSiren, showClientSiren,
   clientVatNumber, showClientVatNumber, paymentMethods, customPaymentMethod,
-  subject, template, darkMode,
+  subject, template, darkMode, language,
 }: A4SheetProps) {
   const isPreview = mode === 'preview'
   const ed = !isPreview // shorthand: is editable?
+  const lang = language || 'fr'
 
   const T = getTemplate(template, darkMode)
+  const t = getTranslations(lang)
 
   const gridCols = billingType === 'detailed'
     ? 'minmax(180px, 1fr) 60px 60px 90px 55px 90px 32px'
@@ -383,7 +389,8 @@ export function A4Sheet({
   /* helper to shorten InlineEdit props */
   const ie = (v: string, onChange: (s: string) => void, cls?: string, ph?: string) => (
     <InlineEdit value={v} onChange={onChange} preview={isPreview} accentColor={accentColor}
-      inputBg={T.inputBg} borderDashed={T.editBorderDashed} className={cls} placeholder={ph} />
+      inputBg={T.inputBg} borderDashed={T.editBorderDashed} className={cls} placeholder={ph}
+      titleText={t.clickToEdit} />
   )
 
   return (
@@ -421,16 +428,16 @@ export function A4Sheet({
                         <img src={logoUrl} alt="Logo" className="h-12 w-auto max-w-[100px] object-contain mb-1" />
                       ) : (
                         <div className="text-[18px] font-bold" style={{ color: contrastText(accentColor) }}>
-                          {company?.legalName || 'Societe'}
+                          {company?.legalName || t.society}
                         </div>
                       )}
                     </div>
                     <div className="text-right">
                       <div className="text-[18px] font-bold uppercase tracking-[2px]" style={{ color: contrastText(accentColor) }}>
-                        {documentTitle || 'Devis'}
+                        {documentTitle || t.quote}
                       </div>
                       <div className="text-[11px] mt-0.5" style={{ color: contrastText(accentColor), opacity: 0.8 }}>
-                        N&deg; {quoteNumber}
+                        {t.quoteNumber} {quoteNumber}
                       </div>
                     </div>
                   </div>
@@ -439,7 +446,7 @@ export function A4Sheet({
 
               {/* ── Header: Company + Devis badge (standard/lateral) ── */}
               {T.layout !== 'banner' && (
-                <div className="flex justify-between items-start mb-8">
+                <div className="flex justify-between items-start mb-5">
                   {/* Left: Logo + Company (all editable) */}
                   <div className="max-w-[55%]">
                     {logoUrl ? (
@@ -458,19 +465,19 @@ export function A4Sheet({
                     )}
                     {company && (
                       <div className="text-[12px] leading-[1.6]" style={{ color: T.textMuted }}>
-                        <div>{ie(company.legalName, (v) => onCompanyFieldChange('legalName', v), `font-semibold text-[13px]`, 'Nom de la societe')}</div>
-                        <div>{ie(company.addressLine1 || '', (v) => onCompanyFieldChange('addressLine1', v), 'text-[12px]', 'Adresse')}</div>
+                        <div>{ie(company.legalName, (v) => onCompanyFieldChange('legalName', v), `font-semibold text-[13px]`, t.society)}</div>
+                        <div>{ie(company.addressLine1 || '', (v) => onCompanyFieldChange('addressLine1', v), 'text-[12px]', t.address)}</div>
                         <div>
-                          {ie(company.postalCode || '', (v) => onCompanyFieldChange('postalCode', v), 'text-[12px]', 'CP')}{' '}
-                          {ie(company.city || '', (v) => onCompanyFieldChange('city', v), 'text-[12px]', 'Ville')}
+                          {ie(company.postalCode || '', (v) => onCompanyFieldChange('postalCode', v), 'text-[12px]', t.postalCode)}{' '}
+                          {ie(company.city || '', (v) => onCompanyFieldChange('city', v), 'text-[12px]', t.city)}
                         </div>
-                        <div>{ie(company.phone || '', (v) => onCompanyFieldChange('phone', v), 'text-[12px]', 'Telephone')}</div>
-                        <div>{ie(company.email || '', (v) => onCompanyFieldChange('email', v), 'text-[12px]', 'Email')}</div>
+                        <div>{ie(company.phone || '', (v) => onCompanyFieldChange('phone', v), 'text-[12px]', t.phone)}</div>
+                        <div>{ie(company.email || '', (v) => onCompanyFieldChange('email', v), 'text-[12px]', t.email)}</div>
                         <div className="text-[10px] mt-0.5">
                           SIREN : {ie(company.siren || '', (v) => onCompanyFieldChange('siren', v), 'text-[10px]', '000000000')}
                         </div>
                         <div className="text-[10px]">
-                          N&deg; TVA : {ie(company.vatNumber || '', (v) => onCompanyFieldChange('vatNumber', v), 'text-[10px]', 'FR00000000000')}
+                          {lang === 'en' ? 'VAT No.' : 'N\u00b0 TVA'} : {ie(company.vatNumber || '', (v) => onCompanyFieldChange('vatNumber', v), 'text-[10px]', 'FR00000000000')}
                         </div>
                       </div>
                     )}
@@ -489,16 +496,16 @@ export function A4Sheet({
                       <div className="flex items-center gap-2 justify-center">
                         <FileText className="h-5 w-5" style={{ color: accentColor }} />
                         <span className="text-[20px] font-bold uppercase tracking-[2px]" style={{ color: accentColor }}>
-                          {documentTitle || 'Devis'}
+                          {documentTitle || t.quote}
                         </span>
                       </div>
                     </div>
                     <div className="text-[12px] leading-[1.8]" style={{ color: T.textMuted }}>
                       <div>
-                        N&deg; {ie(quoteNumber, onQuoteNumberChange, `font-semibold`, 'D-0001')}
+                        {t.quoteNumber} {ie(quoteNumber, onQuoteNumberChange, `font-semibold`, 'D-0001')}
                       </div>
-                      {issueDate && <div>Date : <span className="font-medium">{fmtDate(issueDate)}</span></div>}
-                      {validityDate && <div>Validite : <span className="font-medium">{fmtDate(validityDate)}</span></div>}
+                      {issueDate && <div>{t.date} : <span className="font-medium">{fmtDate(issueDate, lang)}</span></div>}
+                      {validityDate && <div>{t.validity} : <span className="font-medium">{fmtDate(validityDate, lang)}</span></div>}
                     </div>
                   </div>
                 </div>
@@ -506,7 +513,7 @@ export function A4Sheet({
 
               {/* ── Company info under banner header ── */}
               {T.layout === 'banner' && company && (
-                <div className="flex justify-between items-start mb-6">
+                <div className="flex justify-between items-start mb-5">
                   <div className="text-[12px] leading-[1.6]" style={{ color: T.textMuted }}>
                     <div style={{ color: T.text }} className="font-semibold text-[13px]">{company.legalName}</div>
                     {company.addressLine1 && <div>{company.addressLine1}</div>}
@@ -515,10 +522,10 @@ export function A4Sheet({
                     {company.email && <div>{company.email}</div>}
                   </div>
                   <div className="text-[12px] text-right leading-[1.8]" style={{ color: T.textMuted }}>
-                    {issueDate && <div>Date : <span className="font-medium">{fmtDate(issueDate)}</span></div>}
-                    {validityDate && <div>Validite : <span className="font-medium">{fmtDate(validityDate)}</span></div>}
+                    {issueDate && <div>{t.date} : <span className="font-medium">{fmtDate(issueDate, lang)}</span></div>}
+                    {validityDate && <div>{t.validity} : <span className="font-medium">{fmtDate(validityDate, lang)}</span></div>}
                     {company.siren && <div className="text-[10px]">SIREN : {company.siren}</div>}
-                    {company.vatNumber && <div className="text-[10px]">N&deg; TVA : {company.vatNumber}</div>}
+                    {company.vatNumber && <div className="text-[10px]">{lang === 'en' ? 'VAT No.' : 'N\u00b0 TVA'} : {company.vatNumber}</div>}
                   </div>
                 </div>
               )}
@@ -526,101 +533,103 @@ export function A4Sheet({
               {/* ── Subject ── */}
               {subject && (
                 <div className="mb-4 text-[13px]" style={{ color: T.textMuted }}>
-                  <span className="font-semibold" style={{ color: T.text }}>Objet :</span> {subject}
+                  <span className="font-semibold" style={{ color: T.text }}>{t.subject} :</span> {subject}
                 </div>
               )}
 
-              {/* ── Client Block (editable) ── */}
-              <div
-                className={cn(
-                  'px-5 py-3.5 mb-6 border relative transition-all',
-                  !client && 'border-dashed cursor-pointer',
-                )}
-                style={{
-                  borderRadius: T.borderRadius,
-                  backgroundColor: client ? T.clientBlockBg : T.clientEmptyBg,
-                  borderColor: client ? T.clientBlockBorder : T.clientEmptyBorder,
-                }}
-                onClick={!client ? onClientClick : undefined}
-                onMouseEnter={!client && ed ? (e) => (e.currentTarget.style.borderColor = T.textMuted) : undefined}
-                onMouseLeave={!client && ed ? (e) => (e.currentTarget.style.borderColor = T.clientEmptyBorder) : undefined}
-              >
-                <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1.5" style={{ color: T.textMuted }}>
-                  Destinataire
-                </div>
+              {/* ── Client Block (left-aligned, below dates) ── */}
+              <div className="flex mb-5">
+                <div
+                  className={cn(
+                    'px-5 py-3.5 border relative transition-all w-full max-w-[55%]',
+                    !client && 'border-dashed cursor-pointer',
+                  )}
+                  style={{
+                    borderRadius: T.borderRadius,
+                    backgroundColor: client ? T.clientBlockBg : T.clientEmptyBg,
+                    borderColor: client ? T.clientBlockBorder : T.clientEmptyBorder,
+                  }}
+                  onClick={!client ? onClientClick : undefined}
+                  onMouseEnter={!client && ed ? (e) => (e.currentTarget.style.borderColor = T.textMuted) : undefined}
+                  onMouseLeave={!client && ed ? (e) => (e.currentTarget.style.borderColor = T.clientEmptyBorder) : undefined}
+                >
+                  <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1.5" style={{ color: T.textMuted }}>
+                    {t.recipient}
+                  </div>
 
-                {client ? (
-                  <div className="text-[12px] leading-[1.7] group">
-                    <div className="font-semibold text-[13px]" style={{ color: T.text }}>{client.displayName}</div>
-                    {client.address && <div style={{ color: T.textMuted }}>{client.address}</div>}
-                    {client.addressComplement && <div style={{ color: T.textMuted }}>{client.addressComplement}</div>}
-                    {(client.postalCode || client.city) && (
-                      <div style={{ color: T.textMuted }}>{client.postalCode} {client.city}</div>
-                    )}
-                    {client.email && <div style={{ color: T.textMuted }}>{client.email}</div>}
+                  {client ? (
+                    <div className="text-[12px] leading-[1.7] group">
+                      <div className="font-semibold text-[13px]" style={{ color: T.text }}>{client.displayName}</div>
+                      {client.address && <div style={{ color: T.textMuted }}>{client.address}</div>}
+                      {client.addressComplement && <div style={{ color: T.textMuted }}>{client.addressComplement}</div>}
+                      {(client.postalCode || client.city) && (
+                        <div style={{ color: T.textMuted }}>{client.postalCode} {client.city}</div>
+                      )}
+                      {client.email && <div style={{ color: T.textMuted }}>{client.email}</div>}
 
-                    {showClientSiren && (
-                      <div className="text-[10px] mt-0.5" style={{ color: T.textMuted }}>
-                        SIREN : {client.type === 'company' && clientSiren
-                          ? ie(clientSiren, () => {}, 'text-[10px]')
-                          : <span className="italic" style={{ color: T.inputPlaceholder }}>N/A (particulier)</span>
-                        }
-                      </div>
-                    )}
-
-                    {showClientVatNumber && (
-                      <div className="text-[10px]" style={{ color: T.textMuted }}>
-                        N&deg; TVA : {clientVatNumber
-                          ? ie(clientVatNumber, () => {}, 'text-[10px]')
-                          : <span className="italic" style={{ color: T.inputPlaceholder }}>Non renseigne</span>
-                        }
-                      </div>
-                    )}
-
-                    {/* ── Delivery address inside client block ── */}
-                    {showDeliveryAddress && deliveryAddress && (
-                      <div className="mt-2 pt-2" style={{ borderTop: `1px solid ${T.clientBlockBorder}` }}>
-                        <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-0.5" style={{ color: T.textMuted }}>
-                          Adresse de livraison
+                      {showClientSiren && (
+                        <div className="text-[10px] mt-0.5" style={{ color: T.textMuted }}>
+                          SIREN : {client.type === 'company' && clientSiren
+                            ? ie(clientSiren, () => {}, 'text-[10px]')
+                            : <span className="italic" style={{ color: T.inputPlaceholder }}>{t.na}</span>
+                          }
                         </div>
-                        <div className="text-[12px] whitespace-pre-line" style={{ color: T.textMuted }}>{deliveryAddress}</div>
-                      </div>
-                    )}
+                      )}
 
-                    {ed && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); onClearClient() }}
-                        className="absolute top-3.5 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
-                        style={{ color: T.textMuted }}
-                        onMouseEnter={(e) => (e.currentTarget.style.color = '#e53935')}
-                        onMouseLeave={(e) => (e.currentTarget.style.color = T.textMuted)}
-                      >
-                        <X className="h-3.5 w-3.5" />
-                      </button>
-                    )}
-                  </div>
-                ) : (
-                  <div className="py-3">
-                    <div className="text-[12px] leading-[1.7] space-y-0.5">
-                      <div className="rounded h-3.5 w-40" style={{ backgroundColor: T.borderLight }} />
-                      <div className="rounded h-3 w-52 mt-1.5" style={{ backgroundColor: T.borderLight }} />
-                      <div className="rounded h-3 w-32 mt-1" style={{ backgroundColor: T.borderLight }} />
-                    </div>
-                    {ed && (
-                      <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} className="mt-3">
-                        <motion.div
-                          animate={{ scale: [1, 1.05, 1] }}
-                          transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
-                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium"
-                          style={{ background: `${accentColor}12`, color: accentColor, border: `1px solid ${accentColor}30` }}
+                      {showClientVatNumber && (
+                        <div className="text-[10px]" style={{ color: T.textMuted }}>
+                          {lang === 'en' ? 'VAT No.' : 'N\u00b0 TVA'} : {clientVatNumber
+                            ? ie(clientVatNumber, () => {}, 'text-[10px]')
+                            : <span className="italic" style={{ color: T.inputPlaceholder }}>{t.notProvided}</span>
+                          }
+                        </div>
+                      )}
+
+                      {/* ── Delivery address inside client block ── */}
+                      {showDeliveryAddress && deliveryAddress && (
+                        <div className="mt-2 pt-2" style={{ borderTop: `1px solid ${T.clientBlockBorder}` }}>
+                          <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-0.5" style={{ color: T.textMuted }}>
+                            {t.deliveryAddress}
+                          </div>
+                          <div className="text-[12px] whitespace-pre-line" style={{ color: T.textMuted }}>{deliveryAddress}</div>
+                        </div>
+                      )}
+
+                      {ed && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); onClearClient() }}
+                          className="absolute top-3.5 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
+                          style={{ color: T.textMuted }}
+                          onMouseEnter={(e) => (e.currentTarget.style.color = '#e53935')}
+                          onMouseLeave={(e) => (e.currentTarget.style.color = T.textMuted)}
                         >
-                          <MousePointerClick className="h-3 w-3" />
-                          Cliquez pour selectionner un client
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="py-3">
+                      <div className="text-[12px] leading-[1.7] space-y-0.5">
+                        <div className="rounded h-3.5 w-40" style={{ backgroundColor: T.borderLight }} />
+                        <div className="rounded h-3 w-52 mt-1.5" style={{ backgroundColor: T.borderLight }} />
+                        <div className="rounded h-3 w-32 mt-1" style={{ backgroundColor: T.borderLight }} />
+                      </div>
+                      {ed && (
+                        <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} className="mt-3">
+                          <motion.div
+                            animate={{ scale: [1, 1.05, 1] }}
+                            transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
+                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium"
+                            style={{ background: `${accentColor}12`, color: accentColor, border: `1px solid ${accentColor}30` }}
+                          >
+                            <MousePointerClick className="h-3 w-3" />
+                            {t.clickToSelectClient}
+                          </motion.div>
                         </motion.div>
-                      </motion.div>
-                    )}
-                  </div>
-                )}
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* ── Lines Table ── */}
@@ -628,14 +637,14 @@ export function A4Sheet({
                 {/* Header */}
                 <div className="overflow-hidden" style={{ display: 'grid', gridTemplateColumns: cols, borderTopLeftRadius: T.borderRadius, borderTopRightRadius: T.borderRadius }}>
                   <div className="px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.5px]"
-                    style={{ backgroundColor: accentColor, color: contrastText(accentColor) }}>Designation</div>
+                    style={{ backgroundColor: accentColor, color: contrastText(accentColor) }}>{t.designation}</div>
                   {billingType === 'detailed' && (<>
-                    <div className="px-1.5 py-2 text-[10px] font-semibold text-center" style={{ backgroundColor: accentColor, color: contrastText(accentColor) }}>Qte</div>
-                    <div className="px-1.5 py-2 text-[10px] font-semibold text-center" style={{ backgroundColor: accentColor, color: contrastText(accentColor) }}>Unite</div>
-                    <div className="px-1.5 py-2 text-[10px] font-semibold text-right" style={{ backgroundColor: accentColor, color: contrastText(accentColor) }}>P.U. HT</div>
-                    <div className="px-1.5 py-2 text-[10px] font-semibold text-center" style={{ backgroundColor: accentColor, color: contrastText(accentColor) }}>TVA</div>
+                    <div className="px-1.5 py-2 text-[10px] font-semibold text-center" style={{ backgroundColor: accentColor, color: contrastText(accentColor) }}>{t.qty}</div>
+                    <div className="px-1.5 py-2 text-[10px] font-semibold text-center" style={{ backgroundColor: accentColor, color: contrastText(accentColor) }}>{t.unit}</div>
+                    <div className="px-1.5 py-2 text-[10px] font-semibold text-right" style={{ backgroundColor: accentColor, color: contrastText(accentColor) }}>{t.unitPriceHT}</div>
+                    <div className="px-1.5 py-2 text-[10px] font-semibold text-center" style={{ backgroundColor: accentColor, color: contrastText(accentColor) }}>{t.vat}</div>
                   </>)}
-                  <div className="px-3 py-2 text-[10px] font-semibold text-right" style={{ backgroundColor: accentColor, color: contrastText(accentColor) }}>Montant HT</div>
+                  <div className="px-3 py-2 text-[10px] font-semibold text-right" style={{ backgroundColor: accentColor, color: contrastText(accentColor) }}>{t.amountHT}</div>
                   {ed && <div className="py-2" style={{ backgroundColor: accentColor }} />}
                 </div>
 
@@ -659,7 +668,7 @@ export function A4Sheet({
                         ) : (
                           <input type="text" value={line.description}
                             onChange={(e) => onUpdateLine(idx, { description: e.target.value })}
-                            placeholder={isSection ? 'Titre de section...' : 'Description...'}
+                            placeholder={isSection ? t.sectionTitle : t.description}
                             className={cn('w-full bg-transparent text-[12px] focus:outline-none', isSection && 'font-bold')}
                             style={{ color: T.text, '--tw-placeholder-color': T.inputPlaceholder } as React.CSSProperties}
                           />
@@ -676,13 +685,13 @@ export function A4Sheet({
                         </div>
                         <div className="px-1.5 py-2 text-center">
                           {isPreview ? <span className="text-[11px]" style={{ color: T.textMuted }}>{line.unit || '-'}</span>
-                            : <input type="text" value={line.unit} placeholder="unite"
+                            : <input type="text" value={line.unit} placeholder={t.unit}
                                 onChange={(e) => onUpdateLine(idx, { unit: e.target.value })}
                                 className="w-full bg-transparent text-[11px] text-center focus:outline-none"
                                 style={{ color: T.textMuted }} />}
                         </div>
                         <div className="px-1.5 py-2 text-right">
-                          {isPreview ? <span className="text-[12px]">{fmtCurrency(line.unitPrice)}</span>
+                          {isPreview ? <span className="text-[12px]">{fmtCurrency(line.unitPrice, lang)}</span>
                             : <input type="number" min="0" step="0.01" value={line.unitPrice}
                                 onChange={(e) => onUpdateLine(idx, { unitPrice: parseFloat(e.target.value) || 0 })}
                                 className="w-full bg-transparent text-[12px] text-right focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
@@ -707,7 +716,7 @@ export function A4Sheet({
                               onChange={(e) => onUpdateLine(idx, { unitPrice: parseFloat(e.target.value) || 0 })}
                               className="w-full bg-transparent text-[12px] text-right font-semibold focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
                               style={{ color: T.text }} />
-                          ) : fmtCurrency(ht)}
+                          ) : fmtCurrency(ht, lang)}
                         </div>
                       ) : <div />}
 
@@ -717,7 +726,7 @@ export function A4Sheet({
                             <button onClick={() => onRemoveLine(idx)}
                               className="w-5 h-5 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
                               style={{ color: T.inputPlaceholder }}
-                              onMouseEnter={(e) => { e.currentTarget.style.color = '#e53935'; e.currentTarget.style.backgroundColor = T.id === 'sombre' ? '#3f3f46' : '#fef2f2' }}
+                              onMouseEnter={(e) => { e.currentTarget.style.color = '#e53935'; e.currentTarget.style.backgroundColor = darkMode ? '#3f3f46' : '#fef2f2' }}
                               onMouseLeave={(e) => { e.currentTarget.style.color = T.inputPlaceholder; e.currentTarget.style.backgroundColor = 'transparent' }}
                             >
                               <Trash2 className="h-3 w-3" />
@@ -738,14 +747,14 @@ export function A4Sheet({
                     style={{ border: `1px dashed ${accentColor}88`, background: `${accentColor}08`, color: accentColor }}
                     onMouseEnter={(e) => (e.currentTarget.style.background = `${accentColor}18`)}
                     onMouseLeave={(e) => (e.currentTarget.style.background = `${accentColor}08`)}>
-                    <Plus className="h-3 w-3" /> Ligne
+                    <Plus className="h-3 w-3" /> {t.addLine}
                   </button>
                   <button onClick={() => onAddLine('section')}
                     className="px-3.5 py-1.5 rounded-full border border-dashed text-[11px] font-medium cursor-pointer transition-all flex items-center gap-1.5"
                     style={{ borderColor: T.borderLight, backgroundColor: T.docBg, color: T.textMuted }}
                     onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = T.clientBlockBg)}
                     onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = T.docBg)}>
-                    <Type className="h-3 w-3" /> Section
+                    <Type className="h-3 w-3" /> {t.addSection}
                   </button>
                 </div>
               )}
@@ -762,19 +771,19 @@ export function A4Sheet({
               <div className="flex justify-end mb-5">
                 <div className="w-[260px]">
                   <div className="flex justify-between py-1.5" style={{ borderBottom: `1px solid ${T.borderLight}` }}>
-                    <span className="text-[12px]" style={{ color: T.textMuted }}>Total HT</span>
-                    <span className="text-[12px] font-semibold" style={{ color: T.text }}>{fmtCurrency(subtotal)}</span>
+                    <span className="text-[12px]" style={{ color: T.textMuted }}>{t.totalHT}</span>
+                    <span className="text-[12px] font-semibold" style={{ color: T.text }}>{fmtCurrency(subtotal, lang)}</span>
                   </div>
                   {tvaBreakdown.map((e) => (
                     <div key={e.rate} className="flex justify-between py-1" style={{ borderBottom: `1px solid ${T.borderLight}` }}>
-                      <span className="text-[10px]" style={{ color: T.textMuted }}>TVA {e.rate}% (base : {fmtCurrency(e.base)})</span>
-                      <span className="text-[10px]" style={{ color: T.textMuted }}>{fmtCurrency(e.amount)}</span>
+                      <span className="text-[10px]" style={{ color: T.textMuted }}>{t.vatRate(e.rate)} {t.vatBase(fmtCurrency(e.base, lang))}</span>
+                      <span className="text-[10px]" style={{ color: T.textMuted }}>{fmtCurrency(e.amount, lang)}</span>
                     </div>
                   ))}
                   {discountAmount > 0 && (
                     <div className="flex justify-between py-1" style={{ borderBottom: `1px solid ${T.borderLight}` }}>
-                      <span className="text-[10px]" style={{ color: T.textMuted }}>Remise</span>
-                      <span className="text-[10px] text-[#e53935]">-{fmtCurrency(discountAmount)}</span>
+                      <span className="text-[10px]" style={{ color: T.textMuted }}>{t.discount}</span>
+                      <span className="text-[10px] text-[#e53935]">-{fmtCurrency(discountAmount, lang)}</span>
                     </div>
                   )}
                   <div className="flex justify-between px-3.5 py-2.5 mt-1.5"
@@ -783,22 +792,22 @@ export function A4Sheet({
                       border: `1px solid ${accentColor}${T.totalBorder}`,
                       borderRadius: T.borderRadius,
                     }}>
-                    <span className="text-[13px] font-bold" style={{ color: T.text }}>Total {billingType === 'detailed' ? 'TTC' : ''}</span>
-                    <span className="text-[15px] font-bold" style={{ color: accentColor }}>{fmtCurrency(total)}</span>
+                    <span className="text-[13px] font-bold" style={{ color: T.text }}>{billingType === 'detailed' ? t.totalTTC : t.totalHT}</span>
+                    <span className="text-[15px] font-bold" style={{ color: accentColor }}>{fmtCurrency(total, lang)}</span>
                   </div>
                 </div>
               </div>
 
               {/* ── Notes (editable) ── */}
               <div className="pt-3" style={{ borderTop: `1px solid ${T.clientBlockBorder}` }}>
-                <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1" style={{ color: T.textMuted }}>Conditions et notes</div>
+                <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1" style={{ color: T.textMuted }}>{t.conditionsAndNotes}</div>
                 {isPreview ? (
                   <p className="text-[11px] whitespace-pre-line leading-[1.6]" style={{ color: T.textMuted }}>
-                    {notes || <span className="italic" style={{ color: T.inputPlaceholder }}>Aucune note</span>}
+                    {notes || <span className="italic" style={{ color: T.inputPlaceholder }}>{t.noNotes}</span>}
                   </p>
                 ) : (
                   <textarea value={notes} onChange={(e) => onNotesChange(e.target.value)}
-                    placeholder="Ajoutez vos conditions de paiement, notes..."
+                    placeholder={t.conditionsAndNotes}
                     className="w-full bg-transparent text-[11px] leading-[1.6] focus:outline-none resize-y min-h-[30px]"
                     style={{ color: T.textMuted }}
                     rows={2} />
@@ -807,7 +816,7 @@ export function A4Sheet({
 
               {acceptanceConditions && (
                 <div className="mt-2">
-                  <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1" style={{ color: T.textMuted }}>Conditions d&apos;acceptation</div>
+                  <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1" style={{ color: T.textMuted }}>{t.acceptanceConditions}</div>
                   <p className="text-[11px] whitespace-pre-line" style={{ color: T.textMuted }}>{acceptanceConditions}</p>
                 </div>
               )}
@@ -821,11 +830,11 @@ export function A4Sheet({
               {signatureField && (
                 <div className="mt-3 flex gap-5">
                   <div className="flex-1">
-                    <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1" style={{ color: T.textMuted }}>Signature emetteur</div>
+                    <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1" style={{ color: T.textMuted }}>{t.signatureIssuer}</div>
                     <div className="h-14 rounded-lg border-2 border-dashed" style={{ borderColor: T.signatureBorder }} />
                   </div>
                   <div className="flex-1">
-                    <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1" style={{ color: T.textMuted }}>Signature client</div>
+                    <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1" style={{ color: T.textMuted }}>{t.signatureClient}</div>
                     <div className="h-14 rounded-lg border-2 border-dashed" style={{ borderColor: T.signatureBorder }} />
                   </div>
                 </div>
@@ -833,16 +842,16 @@ export function A4Sheet({
 
               {paymentMethods.length > 0 && (
                 <div className="mt-2">
-                  <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1" style={{ color: T.textMuted }}>Moyens de paiement</div>
+                  <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1" style={{ color: T.textMuted }}>{t.paymentMethods}</div>
                   <div className="flex flex-wrap gap-1">
                     {paymentMethods.includes('bank_transfer') && (
-                      <span className="text-[9px] rounded px-1.5 py-0.5" style={{ backgroundColor: T.paymentBadgeBg, border: `1px solid ${T.paymentBadgeBorder}`, color: T.paymentBadgeText }}>Virement</span>
+                      <span className="text-[9px] rounded px-1.5 py-0.5" style={{ backgroundColor: T.paymentBadgeBg, border: `1px solid ${T.paymentBadgeBorder}`, color: T.paymentBadgeText }}>{t.bankTransfer}</span>
                     )}
                     {paymentMethods.includes('check') && (
-                      <span className="text-[9px] rounded px-1.5 py-0.5" style={{ backgroundColor: T.paymentBadgeBg, border: `1px solid ${T.paymentBadgeBorder}`, color: T.paymentBadgeText }}>Cheque</span>
+                      <span className="text-[9px] rounded px-1.5 py-0.5" style={{ backgroundColor: T.paymentBadgeBg, border: `1px solid ${T.paymentBadgeBorder}`, color: T.paymentBadgeText }}>{t.check}</span>
                     )}
                     {paymentMethods.includes('cash') && (
-                      <span className="text-[9px] rounded px-1.5 py-0.5" style={{ backgroundColor: T.paymentBadgeBg, border: `1px solid ${T.paymentBadgeBorder}`, color: T.paymentBadgeText }}>Especes</span>
+                      <span className="text-[9px] rounded px-1.5 py-0.5" style={{ backgroundColor: T.paymentBadgeBg, border: `1px solid ${T.paymentBadgeBorder}`, color: T.paymentBadgeText }}>{t.cash}</span>
                     )}
                     {paymentMethods.includes('custom') && customPaymentMethod && (
                       <span className="text-[9px] rounded px-1.5 py-0.5" style={{ backgroundColor: T.paymentBadgeBg, border: `1px solid ${T.paymentBadgeBorder}`, color: T.paymentBadgeText }}>{customPaymentMethod}</span>
@@ -855,14 +864,14 @@ export function A4Sheet({
               <div className="mt-4 pt-3 text-center" style={{ borderTop: `2px solid ${T.footerBorder}` }}>
                 <div className="text-[9px] leading-[1.6]" style={{ color: T.textFooter }}>
                   {company && (<>
-                    {ie(company.legalName, (v) => onCompanyFieldChange('legalName', v), 'font-semibold text-[9px]', 'Societe')}
+                    {ie(company.legalName, (v) => onCompanyFieldChange('legalName', v), 'font-semibold text-[9px]', t.society)}
                     {company.siren && <> &mdash; SIREN : {ie(company.siren, (v) => onCompanyFieldChange('siren', v), 'text-[9px]')}</>}
-                    {company.vatNumber && <> &mdash; N&deg; TVA : {ie(company.vatNumber, (v) => onCompanyFieldChange('vatNumber', v), 'text-[9px]')}</>}
+                    {company.vatNumber && <> &mdash; {lang === 'en' ? 'VAT No.' : 'N\u00b0 TVA'} : {ie(company.vatNumber, (v) => onCompanyFieldChange('vatNumber', v), 'text-[9px]')}</>}
                     <br />
-                    {ie(company.addressLine1 || '', (v) => onCompanyFieldChange('addressLine1', v), 'text-[9px]', 'Adresse')}
+                    {ie(company.addressLine1 || '', (v) => onCompanyFieldChange('addressLine1', v), 'text-[9px]', t.address)}
                     {', '}
-                    {ie(company.postalCode || '', (v) => onCompanyFieldChange('postalCode', v), 'text-[9px]', 'CP')}{' '}
-                    {ie(company.city || '', (v) => onCompanyFieldChange('city', v), 'text-[9px]', 'Ville')}
+                    {ie(company.postalCode || '', (v) => onCompanyFieldChange('postalCode', v), 'text-[9px]', t.postalCode)}{' '}
+                    {ie(company.city || '', (v) => onCompanyFieldChange('city', v), 'text-[9px]', t.city)}
                     {company.phone && <> &mdash; {ie(company.phone, (v) => onCompanyFieldChange('phone', v), 'text-[9px]')}</>}
                     {company.email && <> &mdash; {ie(company.email, (v) => onCompanyFieldChange('email', v), 'text-[9px]')}</>}
                   </>)}

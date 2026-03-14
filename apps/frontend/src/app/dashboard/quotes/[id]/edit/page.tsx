@@ -371,6 +371,7 @@ export default function EditQuotePage() {
             subject={options.subject}
             template={invoiceSettings.template}
             darkMode={invoiceSettings.darkMode}
+            language={options.language}
           />
         </motion.div>
 

@@ -4,8 +4,8 @@ interface QuoteData {
   quoteNumber: string
   status: string
   subject: string | null
-  issueDate: string
-  validityDate: string | null
+  issueDate: string | Date
+  validityDate: string | Date | null
   billingType: 'quick' | 'detailed'
   accentColor: string
   logoUrl: string | null
@@ -22,6 +22,7 @@ interface QuoteData {
   subtotal: number
   taxAmount: number
   total: number
+  language: string
 }
 
 interface LineData {
@@ -83,14 +84,56 @@ function esc(str: string | null | undefined): string {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
-function formatCurrency(n: number): string {
-  return n.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'
+function fmtC(n: number, lang: string): string {
+  const locale = lang === 'en' ? 'en-GB' : 'fr-FR'
+  return n.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' \u20ac'
 }
 
-function formatDate(dateStr: string): string {
+function fmtD(dateStr: string | Date, lang: string): string {
   if (!dateStr) return ''
-  const [y, m, d] = dateStr.split('-')
-  return `${d}/${m}/${y}`
+  const str = typeof dateStr === 'object' && dateStr instanceof Date
+    ? dateStr.toISOString().split('T')[0]
+    : String(dateStr)
+  const parts = str.split('-')
+  if (parts.length !== 3) return str
+  const [y, m, d] = parts
+  return lang === 'en' ? `${d}/${m}/${y}` : `${d}/${m}/${y}`
+}
+
+interface I18n {
+  quote: string; date: string; validity: string; issuer: string; recipient: string
+  deliveryAddress: string; subject: string; description: string; qty: string
+  unitPrice: string; vat: string; amount: string; subtotalHT: string; totalTTC: string
+  discount: string; notes: string; acceptanceConditions: string
+  signatureLabel: string; paymentMethods: string
+  bankTransfer: string; cash: string; vatNo: string; company: string
+  vatBreakRate: string; vatBreakBase: string; vatBreakAmount: string
+  bankLabel: string
+}
+
+function getI18n(lang: string): I18n {
+  if (lang === 'en') return {
+    quote: 'QUOTE', date: 'Date', validity: 'Valid until', issuer: 'From', recipient: 'To',
+    deliveryAddress: 'Delivery address', subject: 'Subject', description: 'Description', qty: 'Qty',
+    unitPrice: 'Unit price', vat: 'VAT', amount: 'Amount', subtotalHT: 'Subtotal', totalTTC: 'Total incl. tax',
+    discount: 'Discount', notes: 'Notes', acceptanceConditions: 'Acceptance conditions',
+    signatureLabel: 'Client signature (preceded by "Approved")',
+    paymentMethods: 'Accepted payment methods', bankTransfer: 'Bank transfer', cash: 'Cash',
+    vatNo: 'VAT No.', company: 'Company',
+    vatBreakRate: 'VAT rate', vatBreakBase: 'Base', vatBreakAmount: 'VAT amount',
+    bankLabel: 'Bank',
+  }
+  return {
+    quote: 'DEVIS', date: 'Date', validity: 'Validite', issuer: 'Emetteur', recipient: 'Destinataire',
+    deliveryAddress: 'Adresse de livraison', subject: 'Objet', description: 'Designation', qty: 'Qte',
+    unitPrice: 'P.U. HT', vat: 'TVA', amount: 'Montant HT', subtotalHT: 'Sous-total HT', totalTTC: 'Total TTC',
+    discount: 'Remise', notes: 'Notes', acceptanceConditions: "Conditions d'acceptation",
+    signatureLabel: 'Signature du client (precedee de la mention "Bon pour accord")',
+    paymentMethods: 'Moyens de paiement acceptes', bankTransfer: 'Virement bancaire', cash: 'Especes',
+    vatNo: 'N\u00b0 TVA', company: 'Societe',
+    vatBreakRate: 'Taux TVA', vatBreakBase: 'Base HT', vatBreakAmount: 'Montant TVA',
+    bankLabel: 'Banque',
+  }
 }
 
 function buildTvaBreakdown(lines: LineData[], billingType: string) {
@@ -121,7 +164,9 @@ export function renderQuoteHtml(
 ): string {
   const T = getTemplate(settings.template, settings.darkMode)
   const ac = quote.accentColor || '#6366f1'
-  const docTitle = quote.documentTitle || 'DEVIS'
+  const lang = quote.language || 'fr'
+  const i = getI18n(lang)
+  const docTitle = quote.documentTitle || i.quote
   const tva = buildTvaBreakdown(lines, quote.billingType)
   let discountAmount = 0
   if (quote.globalDiscountType === 'percentage' && quote.globalDiscountValue > 0) {
@@ -218,17 +263,17 @@ export function renderQuoteHtml(
 </head>
 <body>
 <div class="page">
-${T.layout === 'lateral' ? renderLateral(quote, lines, client, company, settings, T, ac, docTitle, tva, discountAmount) : ''}
+${T.layout === 'lateral' ? renderLateral(quote, lines, client, company, settings, T, ac, docTitle, tva, discountAmount, lang, i) : ''}
 ${T.layout !== 'lateral' ? `
 <div>
-${T.layout === 'banner' ? renderBanner(quote, ac, docTitle) : renderStandardHeader(quote, ac, docTitle)}
+${T.layout === 'banner' ? renderBanner(quote, docTitle, lang, i) : renderStandardHeader(quote, docTitle, lang, i)}
 <div class="divider"></div>
-${renderAddresses(company, client, quote, T)}
-${quote.subject ? `<div class="subject">Objet : ${esc(quote.subject)}</div>` : ''}
-${renderTable(lines, quote, T, ac)}
-${renderTotals(quote, tva, discountAmount, ac, T)}
-${quote.notes ? `<div class="notes"><div class="notes-label">Notes</div>${esc(quote.notes)}</div>` : ''}
-${renderFooter(company, settings, quote, T)}
+${renderAddresses(company, client, quote, T, lang, i)}
+${quote.subject ? `<div class="subject">${i.subject} : ${esc(quote.subject)}</div>` : ''}
+${renderTable(lines, quote, T, lang, i)}
+${renderTotals(quote, tva, discountAmount, lang, i)}
+${quote.notes ? `<div class="notes"><div class="notes-label">${i.notes}</div>${esc(quote.notes)}</div>` : ''}
+${renderFooter(company, settings, quote, T, lang, i)}
 </div>
 ` : ''}
 </div>
@@ -236,7 +281,7 @@ ${renderFooter(company, settings, quote, T)}
 </html>`
 }
 
-function renderStandardHeader(quote: QuoteData, _ac: string, docTitle: string): string {
+function renderStandardHeader(quote: QuoteData, docTitle: string, lang: string, i: I18n): string {
   return `<div class="header">
   <div class="logo">
     ${quote.logoUrl ? `<img src="${esc(quote.logoUrl)}" alt="Logo" />` : ''}
@@ -244,13 +289,13 @@ function renderStandardHeader(quote: QuoteData, _ac: string, docTitle: string): 
   <div class="doc-info">
     <div class="doc-title">${esc(docTitle)}</div>
     <div class="doc-number">${esc(quote.quoteNumber)}</div>
-    <div class="doc-date">${formatDate(quote.issueDate)}</div>
-    ${quote.validityDate ? `<div class="doc-date">Valide jusqu'au ${formatDate(quote.validityDate)}</div>` : ''}
+    <div class="doc-date">${i.date} : ${fmtD(quote.issueDate, lang)}</div>
+    ${quote.validityDate ? `<div class="doc-date">${i.validity} : ${fmtD(quote.validityDate, lang)}</div>` : ''}
   </div>
 </div>`
 }
 
-function renderBanner(quote: QuoteData, _ac: string, docTitle: string): string {
+function renderBanner(quote: QuoteData, docTitle: string, lang: string, i: I18n): string {
   return `<div class="banner">
   <div class="logo">
     ${quote.logoUrl ? `<img src="${esc(quote.logoUrl)}" alt="Logo" />` : ''}
@@ -258,12 +303,14 @@ function renderBanner(quote: QuoteData, _ac: string, docTitle: string): string {
   <div style="text-align:right">
     <div class="doc-title">${esc(docTitle)}</div>
     <div class="doc-number">${esc(quote.quoteNumber)}</div>
-    <div class="doc-date">${formatDate(quote.issueDate)}</div>
+    <div class="doc-date">${i.date} : ${fmtD(quote.issueDate, lang)}</div>
   </div>
 </div>`
 }
 
-function renderAddresses(company: CompanyData | null, client: ClientData | null, quote: QuoteData, T: TemplateConfig): string {
+function renderAddresses(company: CompanyData | null, client: ClientData | null, quote: QuoteData, T: TemplateConfig, _lang: string, i: I18n): string {
+  const vatLabel = i.vatNo
+
   const companyHtml = company ? `
     <div class="address-name">${esc(company.tradeName || company.legalName)}</div>
     ${company.legalForm ? `<div class="address-line">${esc(company.legalForm)}</div>` : ''}
@@ -271,7 +318,7 @@ function renderAddresses(company: CompanyData | null, client: ClientData | null,
     ${company.addressLine2 ? `<div class="address-line">${esc(company.addressLine2)}</div>` : ''}
     ${company.postalCode || company.city ? `<div class="address-line">${esc(company.postalCode || '')} ${esc(company.city || '')}</div>` : ''}
     ${company.siren ? `<div class="address-line">SIREN : ${esc(company.siren)}</div>` : ''}
-    ${company.vatNumber ? `<div class="address-line">TVA : ${esc(company.vatNumber)}</div>` : ''}
+    ${company.vatNumber ? `<div class="address-line">${vatLabel} : ${esc(company.vatNumber)}</div>` : ''}
   ` : ''
 
   const clientHtml = client ? `
@@ -281,80 +328,80 @@ function renderAddresses(company: CompanyData | null, client: ClientData | null,
     ${client.postalCode || client.city ? `<div class="address-line">${esc(client.postalCode || '')} ${esc(client.city || '')}</div>` : ''}
     ${client.country && client.country !== 'FR' ? `<div class="address-line">${esc(client.country)}</div>` : ''}
     ${quote.clientSiren ? `<div class="address-line">SIREN : ${esc(quote.clientSiren)}</div>` : ''}
-    ${quote.clientVatNumber ? `<div class="address-line">TVA : ${esc(quote.clientVatNumber)}</div>` : ''}
-    ${quote.deliveryAddress ? `<div style="border-top:1px solid ${T.clientBlockBorder};margin-top:6px;padding-top:6px;"><div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:${T.textMuted};margin-bottom:3px;">Adresse de livraison</div><div class="address-line">${esc(quote.deliveryAddress)}</div></div>` : ''}
-  ` : '<div class="address-line" style="opacity:0.5">Aucun client selectionne</div>'
+    ${quote.clientVatNumber ? `<div class="address-line">${vatLabel} : ${esc(quote.clientVatNumber)}</div>` : ''}
+    ${quote.deliveryAddress ? `<div style="border-top:1px solid ${T.clientBlockBorder};margin-top:6px;padding-top:6px;"><div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:${T.textMuted};margin-bottom:3px;">${i.deliveryAddress}</div><div class="address-line">${esc(quote.deliveryAddress)}</div></div>` : ''}
+  ` : ''
 
   return `<div class="addresses">
   <div class="address-block">
-    <div class="address-label">Emetteur</div>
+    <div class="address-label">${i.issuer}</div>
     <div class="address-content">${companyHtml}</div>
   </div>
   <div class="address-block">
-    <div class="address-label">Destinataire</div>
+    <div class="address-label">${i.recipient}</div>
     <div class="address-content">${clientHtml}</div>
   </div>
 </div>`
 }
 
-function renderTable(lines: LineData[], quote: QuoteData, T: TemplateConfig, _ac: string): string {
+function renderTable(lines: LineData[], quote: QuoteData, T: TemplateConfig, lang: string, i: I18n): string {
   const isDetailed = quote.billingType === 'detailed'
 
-  let headerCols = '<th>Description</th>'
-  if (isDetailed) headerCols += '<th class="right">Qte</th><th class="right">P.U. HT</th><th class="right">TVA</th>'
-  headerCols += '<th class="right">Total</th>'
+  let headerCols = `<th>${i.description}</th>`
+  if (isDetailed) headerCols += `<th class="right">${i.qty}</th><th class="right">${i.unitPrice}</th><th class="right">${i.vat}</th>`
+  headerCols += `<th class="right">${i.amount}</th>`
 
   let rows = ''
-  lines.forEach((line, i) => {
+  lines.forEach((line, idx) => {
     if (line.saleType === 'section') {
       rows += `<tr class="section-row"><td colspan="${isDetailed ? 5 : 2}">${esc(line.description)}</td></tr>`
       return
     }
-    const cls = i % 2 === 0 ? 'even' : 'odd'
+    const cls = idx % 2 === 0 ? 'even' : 'odd'
     const lineTotal = isDetailed ? line.quantity * line.unitPrice : line.unitPrice
     rows += `<tr class="${cls}"><td>${esc(line.description)}${line.unit ? ` <span style="color:${T.textMuted};font-size:9px">(${esc(line.unit)})</span>` : ''}</td>`
     if (isDetailed) {
       rows += `<td class="right">${line.quantity}</td>`
-      rows += `<td class="right">${formatCurrency(line.unitPrice)}</td>`
+      rows += `<td class="right">${fmtC(line.unitPrice, lang)}</td>`
       rows += `<td class="right">${line.vatRate}%</td>`
     }
-    rows += `<td class="right" style="font-weight:600">${formatCurrency(lineTotal)}</td></tr>`
+    rows += `<td class="right" style="font-weight:600">${fmtC(lineTotal, lang)}</td></tr>`
   })
 
   return `<table><thead><tr>${headerCols}</tr></thead><tbody>${rows}</tbody></table>`
 }
 
-function renderTotals(quote: QuoteData, tva: { rate: number; base: number; amount: number }[], discountAmount: number, _ac: string, _T: TemplateConfig): string {
+function renderTotals(quote: QuoteData, tva: { rate: number; base: number; amount: number }[], discountAmount: number, lang: string, i: I18n): string {
   const isDetailed = quote.billingType === 'detailed'
 
   let html = '<div class="totals"><div class="totals-box">'
 
   if (isDetailed) {
-    html += `<div class="total-row"><span>Sous-total HT</span><span>${formatCurrency(quote.subtotal)}</span></div>`
-    for (const t of tva) {
-      html += `<div class="total-row"><span>TVA ${t.rate}%</span><span>${formatCurrency(t.amount)}</span></div>`
+    html += `<div class="total-row"><span>${i.subtotalHT}</span><span>${fmtC(quote.subtotal, lang)}</span></div>`
+    for (const tv of tva) {
+      html += `<div class="total-row"><span>${i.vat} ${tv.rate}%</span><span>${fmtC(tv.amount, lang)}</span></div>`
     }
   }
 
   if (discountAmount > 0) {
     const label = quote.globalDiscountType === 'percentage'
-      ? `Remise (${quote.globalDiscountValue}%)`
-      : 'Remise'
-    html += `<div class="total-row discount"><span>${label}</span><span>- ${formatCurrency(discountAmount)}</span></div>`
+      ? `${i.discount} (${quote.globalDiscountValue}%)`
+      : i.discount
+    html += `<div class="total-row discount"><span>${label}</span><span>- ${fmtC(discountAmount, lang)}</span></div>`
   }
 
   if (isDetailed || discountAmount > 0) {
     html += '<div class="total-sep"></div>'
   }
 
-  html += `<div class="total-final"><span>Total TTC</span><span>${formatCurrency(quote.total)}</span></div>`
+  html += `<div class="total-final"><span>${i.totalTTC}</span><span>${fmtC(quote.total, lang)}</span></div>`
   html += '</div></div>'
 
   // TVA breakdown table
   if (isDetailed && tva.length > 0) {
-    html += '<table class="tva-table"><thead><tr><th>Taux TVA</th><th class="right">Base HT</th><th class="right">Montant TVA</th></tr></thead><tbody>'
-    for (const t of tva) {
-      html += `<tr class="even"><td>${t.rate}%</td><td class="right">${formatCurrency(t.base)}</td><td class="right">${formatCurrency(t.amount)}</td></tr>`
+    html += `<table class="tva-table"><thead><tr><th>${i.vatBreakRate}</th><th class="right">${i.vatBreakBase}</th><th class="right">${i.vatBreakAmount}</th></tr></thead><tbody>`
+    for (const tv of tva) {
+      html += `<tr class="even"><td>${tv.rate}%</td><td class="right">${fmtC(tv.base, lang)}</td><td class="right">${fmtC(tv.amount, lang)}</td></tr>`
     }
     html += '</tbody></table>'
   }
@@ -362,14 +409,14 @@ function renderTotals(quote: QuoteData, tva: { rate: number; base: number; amoun
   return html
 }
 
-function renderFooter(company: CompanyData | null, settings: SettingsData, quote: QuoteData, T: TemplateConfig): string {
+function renderFooter(company: CompanyData | null, settings: SettingsData, quote: QuoteData, T: TemplateConfig, _lang: string, i: I18n): string {
   let html = '<div class="footer">'
 
   // Payment methods
   if (settings.paymentMethods.length > 0) {
-    html += '<div class="footer-section"><div class="footer-label">Moyens de paiement acceptes</div><div class="payment-badges">'
-    if (settings.paymentMethods.includes('bank_transfer')) html += '<span class="payment-badge">Virement bancaire</span>'
-    if (settings.paymentMethods.includes('cash')) html += '<span class="payment-badge">Especes</span>'
+    html += `<div class="footer-section"><div class="footer-label">${i.paymentMethods}</div><div class="payment-badges">`
+    if (settings.paymentMethods.includes('bank_transfer')) html += `<span class="payment-badge">${i.bankTransfer}</span>`
+    if (settings.paymentMethods.includes('cash')) html += `<span class="payment-badge">${i.cash}</span>`
     if (settings.paymentMethods.includes('custom') && settings.customPaymentMethod) {
       html += `<span class="payment-badge">${esc(settings.customPaymentMethod)}</span>`
     }
@@ -380,7 +427,7 @@ function renderFooter(company: CompanyData | null, settings: SettingsData, quote
       html += '<div class="bank-info">'
       if (company.iban) html += `<div class="bank-item"><strong>IBAN :</strong> ${esc(company.iban)}</div>`
       if (company.bic) html += `<div class="bank-item"><strong>BIC :</strong> ${esc(company.bic)}</div>`
-      if (company.bankName) html += `<div class="bank-item"><strong>Banque :</strong> ${esc(company.bankName)}</div>`
+      if (company.bankName) html += `<div class="bank-item"><strong>${i.bankLabel} :</strong> ${esc(company.bankName)}</div>`
       html += '</div>'
     }
     html += '</div>'
@@ -388,12 +435,12 @@ function renderFooter(company: CompanyData | null, settings: SettingsData, quote
 
   // Acceptance conditions
   if (quote.acceptanceConditions) {
-    html += `<div class="footer-section"><div class="footer-label">Conditions d'acceptation</div><div class="conditions">${esc(quote.acceptanceConditions)}</div></div>`
+    html += `<div class="footer-section"><div class="footer-label">${i.acceptanceConditions}</div><div class="conditions">${esc(quote.acceptanceConditions)}</div></div>`
   }
 
   // Signature
   if (quote.signatureField) {
-    html += `<div class="signature-box"><div class="signature-label">Signature du client (precedee de la mention "Bon pour accord")</div><div class="signature-area"></div></div>`
+    html += `<div class="signature-box"><div class="signature-label">${i.signatureLabel}</div><div class="signature-area"></div></div>`
   }
 
   // Free field
@@ -407,7 +454,7 @@ function renderFooter(company: CompanyData | null, settings: SettingsData, quote
     html += `${esc(company.tradeName || company.legalName)}`
     if (company.legalForm) html += ` - ${esc(company.legalForm)}`
     if (company.siren) html += ` - SIREN ${esc(company.siren)}`
-    if (company.vatNumber) html += ` - TVA ${esc(company.vatNumber)}`
+    if (company.vatNumber) html += ` - ${i.vatNo} ${esc(company.vatNumber)}`
     html += '</div>'
   }
 
@@ -422,10 +469,12 @@ function renderLateral(
   company: CompanyData | null,
   settings: SettingsData,
   T: TemplateConfig,
-  ac: string,
+  _ac: string,
   docTitle: string,
   tva: { rate: number; base: number; amount: number }[],
-  discountAmount: number
+  discountAmount: number,
+  lang: string,
+  i: I18n,
 ): string {
   // Sidebar with company info
   let sidebar = '<div class="sidebar">'
@@ -434,7 +483,7 @@ function renderLateral(
   }
   if (company) {
     sidebar += '<div class="section">'
-    sidebar += `<h3>Societe</h3>`
+    sidebar += `<h3>${i.company}</h3>`
     sidebar += `<p style="font-weight:700">${esc(company.tradeName || company.legalName)}</p>`
     if (company.legalForm) sidebar += `<p>${esc(company.legalForm)}</p>`
     if (company.addressLine1) sidebar += `<p>${esc(company.addressLine1)}</p>`
@@ -444,7 +493,7 @@ function renderLateral(
       sidebar += '<div class="section">'
       sidebar += '<h3>Informations</h3>'
       if (company.siren) sidebar += `<p>SIREN: ${esc(company.siren)}</p>`
-      if (company.vatNumber) sidebar += `<p>TVA: ${esc(company.vatNumber)}</p>`
+      if (company.vatNumber) sidebar += `<p>${i.vatNo}: ${esc(company.vatNumber)}</p>`
       sidebar += '</div>'
     }
     if (company.phone || company.email) {
@@ -459,24 +508,24 @@ function renderLateral(
 
   // Main content area
   let main = '<div class="main-content">'
-  main += `<div class="header"><div></div><div class="doc-info"><div class="doc-title">${esc(docTitle)}</div><div class="doc-number">${esc(quote.quoteNumber)}</div><div class="doc-date">${formatDate(quote.issueDate)}</div></div></div>`
+  main += `<div class="header"><div></div><div class="doc-info"><div class="doc-title">${esc(docTitle)}</div><div class="doc-number">${esc(quote.quoteNumber)}</div><div class="doc-date">${i.date} : ${fmtD(quote.issueDate, lang)}</div></div></div>`
   main += `<div class="divider"></div>`
 
   // Client only (company is in sidebar)
   if (client) {
-    main += `<div style="margin-bottom:20px"><div class="address-label">Destinataire</div><div class="address-content">`
+    main += `<div style="margin-bottom:20px"><div class="address-label">${i.recipient}</div><div class="address-content">`
     main += `<div class="address-name">${esc(client.displayName)}</div>`
     if (client.address) main += `<div class="address-line">${esc(client.address)}</div>`
     if (client.postalCode || client.city) main += `<div class="address-line">${esc(client.postalCode || '')} ${esc(client.city || '')}</div>`
-    if (quote.deliveryAddress) main += `<div style="border-top:1px solid ${T.clientBlockBorder};margin-top:6px;padding-top:6px;"><div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:${T.textMuted};margin-bottom:3px;">Adresse de livraison</div><div class="address-line">${esc(quote.deliveryAddress)}</div></div>`
+    if (quote.deliveryAddress) main += `<div style="border-top:1px solid ${T.clientBlockBorder};margin-top:6px;padding-top:6px;"><div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:${T.textMuted};margin-bottom:3px;">${i.deliveryAddress}</div><div class="address-line">${esc(quote.deliveryAddress)}</div></div>`
     main += '</div></div>'
   }
 
-  if (quote.subject) main += `<div class="subject">Objet : ${esc(quote.subject)}</div>`
-  main += renderTable(lines, quote, T, ac)
-  main += renderTotals(quote, tva, discountAmount, ac, T)
-  if (quote.notes) main += `<div class="notes"><div class="notes-label">Notes</div>${esc(quote.notes)}</div>`
-  main += renderFooter(company, settings, quote, T)
+  if (quote.subject) main += `<div class="subject">${i.subject} : ${esc(quote.subject)}</div>`
+  main += renderTable(lines, quote, T, lang, i)
+  main += renderTotals(quote, tva, discountAmount, lang, i)
+  if (quote.notes) main += `<div class="notes"><div class="notes-label">${i.notes}</div>${esc(quote.notes)}</div>`
+  main += renderFooter(company, settings, quote, T, lang, i)
   main += '</div>'
 
   return sidebar + main
