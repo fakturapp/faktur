@@ -9,32 +9,18 @@ import { useToast } from '@/components/ui/toast'
 import { Spinner } from '@/components/ui/spinner'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { api } from '@/lib/api'
-import { A4Sheet, type QuoteLine, type ClientInfo } from '@/components/quotes/a4-sheet'
+import { A4Sheet, ClientModal, type QuoteLine, type ClientInfo, type CompanyInfo } from '@/components/quotes/a4-sheet'
 import { QuoteOptionsPanel } from '@/components/quotes/quote-options'
-import { Save, ArrowLeft } from 'lucide-react'
+import { Save, ArrowLeft, Eye, Pencil } from 'lucide-react'
 import Link from 'next/link'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
   visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
+    opacity: 1, y: 0,
     transition: { delay: i * 0.05, duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] },
   }),
 } satisfies Variants
-
-interface CompanyInfo {
-  legalName: string
-  addressLine1: string | null
-  addressLine2: string | null
-  postalCode: string | null
-  city: string | null
-  country: string
-  phone: string | null
-  email: string | null
-  siren: string | null
-  vatNumber: string | null
-}
 
 function generateId() {
   return Math.random().toString(36).substring(2, 9)
@@ -57,21 +43,15 @@ export default function NewQuotePage() {
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [mode, setMode] = useState<'edit' | 'preview'>('edit')
   const [quoteNumber, setQuoteNumber] = useState('')
   const [company, setCompany] = useState<CompanyInfo | null>(null)
   const [selectedClient, setSelectedClient] = useState<ClientInfo | null>(null)
+  const [clientModalOpen, setClientModalOpen] = useState(false)
+  const [accentColor, setAccentColor] = useState('#6366f1')
 
   const [lines, setLines] = useState<QuoteLine[]>([
-    {
-      id: generateId(),
-      type: 'standard',
-      description: '',
-      saleType: '',
-      quantity: 1,
-      unit: '',
-      unitPrice: 0,
-      vatRate: 20,
-    },
+    { id: generateId(), type: 'standard', description: '', saleType: '', quantity: 1, unit: '', unitPrice: 0, vatRate: 20 },
   ])
 
   const [options, setOptions] = useState({
@@ -93,6 +73,7 @@ export default function NewQuotePage() {
 
   const [notes, setNotes] = useState('')
 
+  // Initialize
   useEffect(() => {
     async function init() {
       const [numberRes, companyRes] = await Promise.all([
@@ -106,12 +87,15 @@ export default function NewQuotePage() {
     init()
   }, [])
 
+  // Sync from settings
   useEffect(() => {
     if (!settingsLoading) {
       setOptions((prev) => ({ ...prev, billingType: invoiceSettings.billingType }))
+      setAccentColor(invoiceSettings.accentColor)
     }
-  }, [settingsLoading, invoiceSettings.billingType])
+  }, [settingsLoading, invoiceSettings.billingType, invoiceSettings.accentColor])
 
+  // Handlers
   const handleUpdateLine = useCallback((index: number, partial: Partial<QuoteLine>) => {
     setLines((prev) => prev.map((l, i) => (i === index ? { ...l, ...partial } : l)))
   }, [])
@@ -119,16 +103,7 @@ export default function NewQuotePage() {
   const handleAddLine = useCallback((type: 'standard' | 'section') => {
     setLines((prev) => [
       ...prev,
-      {
-        id: generateId(),
-        type,
-        description: '',
-        saleType: '',
-        quantity: 1,
-        unit: '',
-        unitPrice: 0,
-        vatRate: type === 'section' ? 0 : 20,
-      },
+      { id: generateId(), type, description: '', saleType: '', quantity: 1, unit: '', unitPrice: 0, vatRate: type === 'section' ? 0 : 20 },
     ])
   }, [])
 
@@ -149,23 +124,25 @@ export default function NewQuotePage() {
     }))
   }, [])
 
+  const handleCompanyFieldChange = useCallback((field: keyof CompanyInfo, value: string) => {
+    setCompany((prev) => prev ? { ...prev, [field]: value } : prev)
+  }, [])
+
+  // Calculations
   const { subtotal, taxAmount, discountAmount, total, tvaBreakdown } = useMemo(() => {
-    let sub = 0
-    let tax = 0
+    let sub = 0, tax = 0
     const tvaMap: Record<number, { base: number; amount: number }> = {}
 
     for (const line of lines) {
       if (line.type === 'section') continue
       const lt = options.billingType === 'quick' ? line.unitPrice : line.quantity * line.unitPrice
       const lTax = options.billingType === 'detailed' ? lt * (line.vatRate / 100) : 0
-      sub += lt
-      tax += lTax
+      sub += lt; tax += lTax
 
       if (options.billingType === 'detailed') {
         const rate = line.vatRate
         if (!tvaMap[rate]) tvaMap[rate] = { base: 0, amount: 0 }
-        tvaMap[rate].base += lt
-        tvaMap[rate].amount += lTax
+        tvaMap[rate].base += lt; tvaMap[rate].amount += lTax
       }
     }
 
@@ -189,6 +166,7 @@ export default function NewQuotePage() {
     }
   }, [lines, options.billingType, options.globalDiscountType, options.globalDiscountValue])
 
+  // Save
   async function handleSave() {
     if (!lines.some((l) => l.type === 'standard' && l.description.trim())) {
       toast('Ajoutez au moins une ligne avec une description', 'error')
@@ -203,7 +181,7 @@ export default function NewQuotePage() {
       issueDate: options.issueDate,
       validityDate: options.validityDate || undefined,
       billingType: options.billingType,
-      accentColor: invoiceSettings.accentColor,
+      accentColor,
       logoUrl: invoiceSettings.logoUrl || undefined,
       language: options.language,
       notes: notes || undefined,
@@ -239,17 +217,18 @@ export default function NewQuotePage() {
     }
   }
 
+  // Loading skeleton
   if (loading || settingsLoading) {
     return (
       <div className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
         <Skeleton className="h-8 w-64" />
         <div className="flex flex-col xl:flex-row gap-5">
-          <div className="w-full xl:w-[280px] xl:shrink-0 order-2 xl:order-1 space-y-4">
-            <Skeleton className="h-[400px] rounded-xl" />
-            <Skeleton className="h-32 rounded-xl" />
+          <div className="flex-1 min-w-0 flex justify-center">
+            <Skeleton className="w-full max-w-[794px] rounded-xl" style={{ aspectRatio: '210/297' }} />
           </div>
-          <div className="flex-1 min-w-0 order-1 xl:order-2 flex justify-center">
-            <Skeleton className="w-full max-w-[860px] h-[600px] rounded-xl" />
+          <div className="w-full xl:w-[300px] xl:shrink-0 space-y-4">
+            <Skeleton className="h-[500px] rounded-xl" />
+            <Skeleton className="h-32 rounded-xl" />
           </div>
         </div>
       </div>
@@ -258,44 +237,53 @@ export default function NewQuotePage() {
 
   return (
     <motion.div initial="hidden" animate="visible" className="space-y-5 px-4 lg:px-6 py-4 md:py-5">
-      {/* Header */}
+      {/* ── Header ── */}
       <motion.div variants={fadeUp} custom={0} className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link href="/dashboard/quotes">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
+            <Button variant="ghost" size="icon"><ArrowLeft className="h-4 w-4" /></Button>
           </Link>
           <div>
             <h1 className="text-2xl font-bold text-foreground">Nouveau devis</h1>
             <p className="text-muted-foreground mt-0.5 text-sm">{quoteNumber}</p>
           </div>
         </div>
+
+        {/* Mode toggle */}
+        <div className="flex items-center gap-2">
+          <div className="flex rounded-lg border border-border overflow-hidden">
+            <button
+              onClick={() => setMode('edit')}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium transition-all ${
+                mode === 'edit'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Pencil className="h-3 w-3" /> Edition
+            </button>
+            <button
+              onClick={() => setMode('preview')}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium transition-all ${
+                mode === 'preview'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Eye className="h-3 w-3" /> Apercu
+            </button>
+          </div>
+        </div>
       </motion.div>
 
-      {/* Main content: sidebar + document */}
+      {/* ── Main content: A4 Sheet (center) + Sidebar (right) ── */}
       <div className="flex flex-col xl:flex-row gap-5 max-w-[1400px] mx-auto">
-        {/* Left: Sidebar */}
-        <motion.div variants={fadeUp} custom={1} className="w-full xl:w-[280px] xl:shrink-0 order-2 xl:order-1">
-          <div className="xl:sticky xl:top-4">
-            <QuoteOptionsPanel
-              options={options}
-              onChange={handleOptionsChange}
-              subtotal={subtotal}
-              taxAmount={taxAmount}
-              discountAmount={discountAmount}
-              total={total}
-              tvaBreakdown={tvaBreakdown}
-              accentColor={invoiceSettings.accentColor}
-            />
-          </div>
-        </motion.div>
-
-        {/* Right: Document */}
-        <motion.div variants={fadeUp} custom={2} className="flex-1 min-w-0 order-1 xl:order-2">
+        {/* A4 Sheet */}
+        <motion.div variants={fadeUp} custom={1} className="flex-1 min-w-0 order-1">
           <A4Sheet
+            mode={mode}
             logoUrl={invoiceSettings.logoUrl}
-            accentColor={invoiceSettings.accentColor}
+            accentColor={accentColor}
             documentTitle={options.documentTitle}
             quoteNumber={quoteNumber}
             issueDate={options.issueDate}
@@ -303,7 +291,9 @@ export default function NewQuotePage() {
             billingType={options.billingType}
             company={company}
             client={selectedClient}
-            onSelectClient={handleSelectClient}
+            onQuoteNumberChange={setQuoteNumber}
+            onCompanyFieldChange={handleCompanyFieldChange}
+            onClientClick={() => setClientModalOpen(true)}
             onClearClient={() => setSelectedClient(null)}
             lines={lines}
             onUpdateLine={handleUpdateLine}
@@ -319,13 +309,39 @@ export default function NewQuotePage() {
             acceptanceConditions={options.acceptanceConditions}
             signatureField={options.signatureField}
             freeField={options.freeField}
+            deliveryAddress={options.deliveryAddress}
+            showDeliveryAddress={!!options.deliveryAddress}
+            clientSiren={options.clientSiren}
+            showClientSiren={!!options.clientSiren}
+            clientVatNumber={options.clientVatNumber}
+            showClientVatNumber={!!options.clientVatNumber}
             paymentMethods={invoiceSettings.paymentMethods}
             customPaymentMethod={invoiceSettings.customPaymentMethod}
+            subject={options.subject}
           />
+        </motion.div>
+
+        {/* Right Sidebar */}
+        <motion.div variants={fadeUp} custom={2} className="w-full xl:w-[300px] xl:shrink-0 order-2">
+          <div className="xl:sticky xl:top-4">
+            <QuoteOptionsPanel
+              options={options}
+              onChange={handleOptionsChange}
+              accentColor={accentColor}
+              onAccentColorChange={setAccentColor}
+              selectedClient={selectedClient}
+              onOpenClientModal={() => setClientModalOpen(true)}
+              subtotal={subtotal}
+              taxAmount={taxAmount}
+              discountAmount={discountAmount}
+              total={total}
+              tvaBreakdown={tvaBreakdown}
+            />
+          </div>
         </motion.div>
       </div>
 
-      {/* Sticky save bar */}
+      {/* ── Sticky save bar ── */}
       <motion.div
         variants={fadeUp}
         custom={3}
@@ -333,24 +349,27 @@ export default function NewQuotePage() {
       >
         <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
-            Total:{' '}
+            Total :{' '}
             <span className="font-bold text-foreground">
               {total.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
             </span>
           </div>
           <Button onClick={handleSave} disabled={saving} className="min-w-[160px]">
             {saving ? (
-              <>
-                <Spinner /> Enregistrement...
-              </>
+              <><Spinner /> Enregistrement...</>
             ) : (
-              <>
-                <Save className="h-4 w-4 mr-1.5" /> Sauvegarder
-              </>
+              <><Save className="h-4 w-4 mr-1.5" /> Sauvegarder</>
             )}
           </Button>
         </div>
       </motion.div>
+
+      {/* ── Client Modal ── */}
+      <ClientModal
+        open={clientModalOpen}
+        onClose={() => setClientModalOpen(false)}
+        onSelect={handleSelectClient}
+      />
     </motion.div>
   )
 }

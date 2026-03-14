@@ -1,10 +1,20 @@
 'use client'
 
 import { useState } from 'react'
+import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
-import { Check, Zap, ClipboardList, ChevronDown } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import {
+  Check, Zap, ClipboardList, ChevronDown, Building2, UserRound,
+  Palette, Pen,
+} from 'lucide-react'
+import type { ClientInfo } from './a4-sheet'
 
-interface QuoteOptions {
+/* ═══════════════════════════════════════════════════════════
+   Types
+   ═══════════════════════════════════════════════════════════ */
+
+export interface QuoteOptions {
   billingType: 'quick' | 'detailed'
   subject: string
   issueDate: string
@@ -24,17 +34,34 @@ interface QuoteOptions {
 interface QuoteOptionsProps {
   options: QuoteOptions
   onChange: (partial: Partial<QuoteOptions>) => void
+  accentColor: string
+  onAccentColorChange: (color: string) => void
+  selectedClient: ClientInfo | null
+  onOpenClientModal: () => void
   subtotal: number
   taxAmount: number
   discountAmount: number
   total: number
   tvaBreakdown: { rate: number; base: number; amount: number }[]
-  accentColor: string
 }
 
-function formatCurrency(amount: number) {
-  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount)
+/* ═══════════════════════════════════════════════════════════
+   Helpers
+   ═══════════════════════════════════════════════════════════ */
+
+const ACCENT_COLORS = [
+  '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#ec4899',
+  '#ef4444', '#f97316', '#eab308', '#22c55e', '#14b8a6',
+  '#06b6d4', '#64748b',
+]
+
+function fmtCurrency(n: number) {
+  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(n)
 }
+
+/* ═══════════════════════════════════════════════════════════
+   OptionCheckbox — toggle with nested content
+   ═══════════════════════════════════════════════════════════ */
 
 function OptionCheckbox({
   checked, onToggle, label, children,
@@ -49,11 +76,12 @@ function OptionCheckbox({
       <label className="flex items-center gap-2.5 cursor-pointer py-1">
         <div
           onClick={(e) => { e.preventDefault(); onToggle() }}
-          className={`h-4 w-4 rounded border flex-shrink-0 flex items-center justify-center transition-colors ${
+          className={cn(
+            'h-4 w-4 rounded border flex-shrink-0 flex items-center justify-center transition-colors',
             checked
               ? 'border-primary bg-primary'
-              : 'border-muted-foreground/30 hover:border-muted-foreground/50'
-          }`}
+              : 'border-muted-foreground/30 hover:border-muted-foreground/50',
+          )}
         >
           {checked && <Check className="h-2.5 w-2.5 text-primary-foreground" />}
         </div>
@@ -64,8 +92,14 @@ function OptionCheckbox({
   )
 }
 
+/* ═══════════════════════════════════════════════════════════
+   QuoteOptionsPanel
+   ═══════════════════════════════════════════════════════════ */
+
 export function QuoteOptionsPanel({
-  options, onChange, subtotal, taxAmount, discountAmount, total, tvaBreakdown, accentColor,
+  options, onChange, accentColor, onAccentColorChange,
+  selectedClient, onOpenClientModal,
+  subtotal, taxAmount, discountAmount, total, tvaBreakdown,
 }: QuoteOptionsProps) {
   const [showDelivery, setShowDelivery] = useState(!!options.deliveryAddress)
   const [showSiren, setShowSiren] = useState(!!options.clientSiren)
@@ -77,7 +111,7 @@ export function QuoteOptionsPanel({
 
   return (
     <div className="space-y-4">
-      {/* Settings card */}
+      {/* ── Settings card ── */}
       <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
         <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-[0.5px] mb-4">
           Parametres
@@ -87,28 +121,53 @@ export function QuoteOptionsPanel({
         <div className="mb-4">
           <label className="text-xs text-muted-foreground font-medium block mb-1.5">Type de facture</label>
           <div className="flex gap-1">
-            <button
-              onClick={() => onChange({ billingType: 'quick' })}
-              className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-medium transition-all ${
-                options.billingType === 'quick'
-                  ? 'border-primary bg-primary/5 text-foreground'
-                  : 'border-border text-muted-foreground hover:border-muted-foreground/40'
-              }`}
-            >
-              <Zap className="h-3 w-3" />
-              Rapide
-            </button>
-            <button
-              onClick={() => onChange({ billingType: 'detailed' })}
-              className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-medium transition-all ${
-                options.billingType === 'detailed'
-                  ? 'border-primary bg-primary/5 text-foreground'
-                  : 'border-border text-muted-foreground hover:border-muted-foreground/40'
-              }`}
-            >
-              <ClipboardList className="h-3 w-3" />
-              Complet
-            </button>
+            {[
+              { id: 'quick' as const, label: 'Rapide', icon: Zap },
+              { id: 'detailed' as const, label: 'Complet', icon: ClipboardList },
+            ].map((t) => (
+              <button
+                key={t.id}
+                onClick={() => onChange({ billingType: t.id })}
+                className={cn(
+                  'flex-1 flex items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-medium transition-all',
+                  options.billingType === t.id
+                    ? 'border-primary bg-primary/5 text-foreground'
+                    : 'border-border text-muted-foreground hover:border-muted-foreground/40',
+                )}
+              >
+                <t.icon className="h-3 w-3" /> {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Accent Color */}
+        <div className="mb-4">
+          <label className="text-xs text-muted-foreground font-medium flex items-center gap-1.5 mb-2">
+            <Palette className="h-3 w-3" /> Couleur du bandeau
+          </label>
+          <div className="flex flex-wrap gap-1.5">
+            {ACCENT_COLORS.map((c) => (
+              <div
+                key={c}
+                onClick={() => onAccentColorChange(c)}
+                className="w-6 h-6 rounded-full cursor-pointer transition-all"
+                style={{
+                  backgroundColor: c,
+                  border: accentColor === c ? '2px solid currentColor' : '2px solid transparent',
+                  boxShadow: accentColor === c ? `0 0 0 2px var(--card), 0 0 0 4px ${c}` : 'none',
+                }}
+              />
+            ))}
+          </div>
+          <div className="flex items-center gap-2 mt-2">
+            <input
+              type="color"
+              value={accentColor}
+              onChange={(e) => onAccentColorChange(e.target.value)}
+              className="w-6 h-6 border-none p-0 cursor-pointer rounded bg-transparent"
+            />
+            <span className="text-[10px] text-muted-foreground">Personnalisee</span>
           </div>
         </div>
 
@@ -161,60 +220,112 @@ export function QuoteOptionsPanel({
           </div>
         </div>
 
-        {/* Client fiscal options */}
+        {/* Client */}
         <div className="mb-4">
           <label className="text-xs text-muted-foreground font-medium block mb-2">Client</label>
-          <div className="space-y-1">
-            <OptionCheckbox
-              checked={showDelivery}
-              onToggle={() => {
-                setShowDelivery(!showDelivery)
-                if (showDelivery) onChange({ deliveryAddress: '' })
-              }}
-              label="Adresse de livraison"
+          {selectedClient ? (
+            <div className="rounded-lg border border-border p-3 bg-card/50">
+              <div className="flex items-center gap-2 mb-1">
+                <div className={cn(
+                  'h-7 w-7 rounded-lg flex items-center justify-center shrink-0',
+                  selectedClient.type === 'company' ? 'bg-blue-500/10' : 'bg-green-500/10',
+                )}>
+                  {selectedClient.type === 'company'
+                    ? <Building2 className="h-3.5 w-3.5 text-blue-500" />
+                    : <UserRound className="h-3.5 w-3.5 text-green-500" />
+                  }
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-foreground truncate">{selectedClient.displayName}</p>
+                  <Badge variant="muted" className="text-[9px]">
+                    {selectedClient.type === 'company' ? 'Pro' : 'Part.'}
+                  </Badge>
+                </div>
+              </div>
+              <button
+                onClick={onOpenClientModal}
+                className="w-full mt-2 rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:border-muted-foreground/40 transition-colors flex items-center justify-center gap-1.5"
+              >
+                <Pen className="h-3 w-3" /> Modifier
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={onOpenClientModal}
+              className="w-full rounded-lg border border-dashed border-border px-3 py-3 text-sm text-muted-foreground hover:text-foreground hover:border-muted-foreground/40 transition-colors"
             >
-              <textarea
-                placeholder="Adresse..."
-                value={options.deliveryAddress}
-                onChange={(e) => onChange({ deliveryAddress: e.target.value })}
-                rows={2}
-                className="w-full rounded-lg border border-border bg-transparent px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-none"
-              />
-            </OptionCheckbox>
-            <OptionCheckbox
-              checked={showSiren}
-              onToggle={() => {
-                setShowSiren(!showSiren)
-                if (showSiren) onChange({ clientSiren: '' })
-              }}
-              label="SIREN"
-            >
+              + Selectionner un client
+            </button>
+          )}
+        </div>
+
+        {/* Client options */}
+        <div className="mb-4 space-y-1">
+          <OptionCheckbox
+            checked={showDelivery}
+            onToggle={() => {
+              setShowDelivery(!showDelivery)
+              if (showDelivery) onChange({ deliveryAddress: '' })
+              else if (selectedClient) {
+                const addr = [selectedClient.address, selectedClient.addressComplement, `${selectedClient.postalCode || ''} ${selectedClient.city || ''}`].filter(Boolean).join('\n')
+                onChange({ deliveryAddress: addr })
+              }
+            }}
+            label="Adresse de livraison"
+          >
+            <textarea
+              placeholder="Adresse..."
+              value={options.deliveryAddress}
+              onChange={(e) => onChange({ deliveryAddress: e.target.value })}
+              rows={2}
+              className="w-full rounded-lg border border-border bg-transparent px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-none"
+            />
+          </OptionCheckbox>
+
+          <OptionCheckbox
+            checked={showSiren}
+            onToggle={() => {
+              setShowSiren(!showSiren)
+              if (showSiren) onChange({ clientSiren: '' })
+              else if (selectedClient?.type === 'company' && selectedClient.siren) {
+                onChange({ clientSiren: selectedClient.siren })
+              }
+            }}
+            label="SIREN"
+          >
+            {selectedClient?.type === 'company' ? (
               <Input
                 placeholder="123456789"
                 value={options.clientSiren}
                 onChange={(e) => onChange({ clientSiren: e.target.value })}
                 className="h-8 text-sm"
               />
-            </OptionCheckbox>
-            <OptionCheckbox
-              checked={showVat}
-              onToggle={() => {
-                setShowVat(!showVat)
-                if (showVat) onChange({ clientVatNumber: '' })
-              }}
-              label="TVA intracommunautaire"
-            >
-              <Input
-                placeholder="FR12345678901"
-                value={options.clientVatNumber}
-                onChange={(e) => onChange({ clientVatNumber: e.target.value })}
-                className="h-8 text-sm"
-              />
-            </OptionCheckbox>
-          </div>
+            ) : (
+              <p className="text-xs text-muted-foreground italic">Non applicable (client particulier)</p>
+            )}
+          </OptionCheckbox>
+
+          <OptionCheckbox
+            checked={showVat}
+            onToggle={() => {
+              setShowVat(!showVat)
+              if (showVat) onChange({ clientVatNumber: '' })
+              else if (selectedClient?.vatNumber) {
+                onChange({ clientVatNumber: selectedClient.vatNumber })
+              }
+            }}
+            label="TVA intracommunautaire"
+          >
+            <Input
+              placeholder="FR12345678901"
+              value={options.clientVatNumber}
+              onChange={(e) => onChange({ clientVatNumber: e.target.value })}
+              className="h-8 text-sm"
+            />
+          </OptionCheckbox>
         </div>
 
-        {/* Infos complementaires */}
+        {/* Additional info */}
         <div>
           <label className="text-xs text-muted-foreground font-medium block mb-2">Infos complementaires</label>
           <div className="space-y-1">
@@ -234,11 +345,13 @@ export function QuoteOptionsPanel({
                 className="w-full rounded-lg border border-border bg-transparent px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-none"
               />
             </OptionCheckbox>
+
             <OptionCheckbox
               checked={options.signatureField}
               onToggle={() => onChange({ signatureField: !options.signatureField })}
               label="Champ signature"
             />
+
             <OptionCheckbox
               checked={showTitle}
               onToggle={() => {
@@ -254,6 +367,7 @@ export function QuoteOptionsPanel({
                 className="h-8 text-sm"
               />
             </OptionCheckbox>
+
             <OptionCheckbox
               checked={showFreeField}
               onToggle={() => {
@@ -270,6 +384,7 @@ export function QuoteOptionsPanel({
                 className="w-full rounded-lg border border-border bg-transparent px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-none"
               />
             </OptionCheckbox>
+
             <OptionCheckbox
               checked={showDiscount}
               onToggle={() => {
@@ -281,18 +396,19 @@ export function QuoteOptionsPanel({
             >
               <div className="space-y-2">
                 <div className="flex gap-1.5">
-                  {[
+                  {([
                     { id: 'percentage' as const, label: '%' },
                     { id: 'fixed' as const, label: 'EUR' },
-                  ].map((t) => (
+                  ]).map((t) => (
                     <button
                       key={t.id}
                       onClick={() => onChange({ globalDiscountType: t.id, globalDiscountValue: 0 })}
-                      className={`rounded-md border px-3 py-1 text-xs font-medium transition-all ${
+                      className={cn(
+                        'rounded-md border px-3 py-1 text-xs font-medium transition-all',
                         options.globalDiscountType === t.id
                           ? 'border-primary bg-primary/5 text-foreground'
-                          : 'border-border text-muted-foreground hover:border-muted-foreground/40'
-                      }`}
+                          : 'border-border text-muted-foreground hover:border-muted-foreground/40',
+                      )}
                     >
                       {t.label}
                     </button>
@@ -313,7 +429,7 @@ export function QuoteOptionsPanel({
         </div>
       </div>
 
-      {/* Summary card */}
+      {/* ── Summary card ── */}
       <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
         <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-[0.5px] mb-4">
           Recapitulatif
@@ -321,28 +437,26 @@ export function QuoteOptionsPanel({
 
         <div className="flex justify-between mb-2">
           <span className="text-[13px] text-muted-foreground">Total HT</span>
-          <span className="text-[13px] font-semibold text-foreground">{formatCurrency(subtotal)}</span>
+          <span className="text-[13px] font-semibold text-foreground">{fmtCurrency(subtotal)}</span>
         </div>
 
-        {tvaBreakdown.map((entry) => (
-          <div key={entry.rate} className="flex justify-between mb-1.5">
-            <span className="text-xs text-muted-foreground">TVA {entry.rate}%</span>
-            <span className="text-xs text-muted-foreground">{formatCurrency(entry.amount)}</span>
+        {tvaBreakdown.map((e) => (
+          <div key={e.rate} className="flex justify-between mb-1.5">
+            <span className="text-xs text-muted-foreground">TVA {e.rate}%</span>
+            <span className="text-xs text-muted-foreground">{fmtCurrency(e.amount)}</span>
           </div>
         ))}
 
         {discountAmount > 0 && (
           <div className="flex justify-between mb-1.5">
             <span className="text-xs text-muted-foreground">Remise</span>
-            <span className="text-xs text-red-400">-{formatCurrency(discountAmount)}</span>
+            <span className="text-xs text-red-400">-{fmtCurrency(discountAmount)}</span>
           </div>
         )}
 
-        <div
-          className="border-t-2 border-foreground/20 pt-2.5 mt-2.5 flex justify-between"
-        >
+        <div className="border-t-2 border-foreground/20 pt-2.5 mt-2.5 flex justify-between">
           <span className="text-[15px] font-bold text-foreground">Total TTC</span>
-          <span className="text-[15px] font-bold" style={{ color: accentColor }}>{formatCurrency(total)}</span>
+          <span className="text-[15px] font-bold" style={{ color: accentColor }}>{fmtCurrency(total)}</span>
         </div>
       </div>
     </div>
