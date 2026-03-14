@@ -36,6 +36,11 @@ export interface TemplateConfig {
   paymentBadgeText: string
   // Border radius
   borderRadius: string // e.g. '10px', '0px', '6px'
+  // Optional overrides
+  font?: string // Override document font for this template
+  editStyle?: 'underline' | 'box' // How editable fields appear (default: underline)
+  addButtonColor?: string // Color for add line button (default: accentColor)
+  totalsInAccent?: boolean // Whether totals labels use accent color
 }
 
 const classique: TemplateConfig = {
@@ -336,6 +341,10 @@ const tiime: TemplateConfig = {
   paymentBadgeBorder: '#bfcee1',
   paymentBadgeText: '#476388',
   borderRadius: '8px',
+  font: 'Nunito',
+  editStyle: 'box',
+  addButtonColor: '#29a557',
+  totalsInAccent: true,
 }
 
 export const TEMPLATES: TemplateConfig[] = [

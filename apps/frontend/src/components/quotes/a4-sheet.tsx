@@ -88,7 +88,7 @@ function fmtDate(d: string, lang?: string) {
 
 function InlineEdit({
   value, onChange, preview = false, className, placeholder, multiline, accentColor = '#6366f1',
-  inputBg = '#ffffff', borderDashed = '#ddd', titleText,
+  inputBg = '#ffffff', borderDashed = '#ddd', titleText, editStyle = 'underline',
 }: {
   value: string
   onChange: (v: string) => void
@@ -100,6 +100,7 @@ function InlineEdit({
   inputBg?: string
   borderDashed?: string
   titleText?: string
+  editStyle?: 'underline' | 'box'
 }) {
   const [editing, setEditing] = useState(false)
   const [tmp, setTmp] = useState(value)
@@ -145,6 +146,24 @@ function InlineEdit({
     )
   }
 
+  if (editStyle === 'box') {
+    return (
+      <span
+        onClick={start}
+        className={cn(
+          'cursor-pointer inline-block min-w-[30px] min-h-[16px] transition-colors px-1.5 py-0.5',
+          className,
+        )}
+        style={{ border: `1px dashed ${borderDashed}` }}
+        onMouseEnter={(e) => ((e.target as HTMLElement).style.borderColor = accentColor)}
+        onMouseLeave={(e) => ((e.target as HTMLElement).style.borderColor = borderDashed)}
+        title={titleText || 'Click to edit'}
+      >
+        {value || <span style={{ color: borderDashed }} className="italic">{placeholder || '...'}</span>}
+      </span>
+    )
+  }
+
   return (
     <span
       onClick={start}
@@ -168,7 +187,7 @@ function InlineEdit({
 
 function InlineNumber({
   value, onChange, preview = false, className, min = 0, step = 1, accentColor = '#6366f1',
-  inputBg = '#ffffff', borderDashed = '#ddd', titleText,
+  inputBg = '#ffffff', borderDashed = '#ddd', titleText, editStyle = 'underline',
 }: {
   value: number
   onChange: (v: number) => void
@@ -180,6 +199,7 @@ function InlineNumber({
   inputBg?: string
   borderDashed?: string
   titleText?: string
+  editStyle?: 'underline' | 'box'
 }) {
   const [editing, setEditing] = useState(false)
   const [tmp, setTmp] = useState(String(value))
@@ -215,6 +235,24 @@ function InlineNumber({
         )}
         style={{ border: `1px solid ${accentColor}`, fontSize: 'inherit', fontFamily: 'inherit', backgroundColor: inputBg }}
       />
+    )
+  }
+
+  if (editStyle === 'box') {
+    return (
+      <span
+        onClick={start}
+        className={cn(
+          'cursor-pointer inline-block min-w-[30px] transition-colors px-1.5 py-0.5',
+          className,
+        )}
+        style={{ border: `1px dashed ${borderDashed}` }}
+        onMouseEnter={(e) => ((e.target as HTMLElement).style.borderColor = accentColor)}
+        onMouseLeave={(e) => ((e.target as HTMLElement).style.borderColor = borderDashed)}
+        title={titleText || 'Click to edit'}
+      >
+        {typeof value === 'number' ? value : '0'}
+      </span>
     )
   }
 
@@ -390,20 +428,23 @@ export function A4Sheet({
   const ed = !isPreview // shorthand: is editable?
   const lang = language || 'fr'
 
+  const T = getTemplate(template, darkMode)
+  const t = getTranslations(lang)
+
+  // Template can override font
+  const effectiveFont = T.font || documentFont
+
   // Dynamically load document font from Google Fonts
   useEffect(() => {
-    if (!documentFont || documentFont === 'Lexend') return // Lexend already loaded via next/font
-    const id = `gfont-${documentFont.replace(/\s/g, '-')}`
+    if (!effectiveFont || effectiveFont === 'Lexend') return // Lexend already loaded via next/font
+    const id = `gfont-${effectiveFont.replace(/\s/g, '-')}`
     if (document.getElementById(id)) return
     const link = document.createElement('link')
     link.id = id
     link.rel = 'stylesheet'
-    link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(documentFont)}:wght@300;400;500;600;700;800&display=swap`
+    link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(effectiveFont)}:wght@300;400;500;600;700;800&display=swap`
     document.head.appendChild(link)
-  }, [documentFont])
-
-  const T = getTemplate(template, darkMode)
-  const t = getTranslations(lang)
+  }, [effectiveFont])
 
   const gridCols = billingType === 'detailed'
     ? 'minmax(180px, 1fr) 60px 60px 90px 55px 90px 32px'
@@ -419,7 +460,7 @@ export function A4Sheet({
   const ie = (v: string, onChange: (s: string) => void, cls?: string, ph?: string) => (
     <InlineEdit value={v} onChange={onChange} preview={isPreview} accentColor={accentColor}
       inputBg={T.inputBg} borderDashed={T.editBorderDashed} className={cls} placeholder={ph}
-      titleText={t.clickToEdit} />
+      titleText={t.clickToEdit} editStyle={T.editStyle} />
   )
 
   return (
@@ -437,7 +478,7 @@ export function A4Sheet({
         <div className="absolute inset-0 overflow-y-auto">
           <div
             className="flex flex-col min-h-full px-10 py-8"
-            style={{ fontFamily: `'${documentFont}', 'Segoe UI', sans-serif`, color: T.text }}
+            style={{ fontFamily: `'${effectiveFont}', 'Segoe UI', sans-serif`, color: T.text }}
           >
 
             {/* ═══════════════════════════════════════════
@@ -580,11 +621,26 @@ export function A4Sheet({
                     {/* Name — click opens client search */}
                     {ed ? (
                       <div
-                        className="font-semibold text-[13px] cursor-pointer border-b border-dashed transition-colors"
-                        style={{ color: client?.displayName ? T.text : T.inputPlaceholder, borderBottomColor: T.editBorderDashed }}
+                        className={cn(
+                          'font-semibold text-[13px] cursor-pointer transition-colors',
+                          T.editStyle === 'box' ? 'px-1.5 py-0.5' : 'border-b border-dashed'
+                        )}
+                        style={{
+                          color: client?.displayName ? T.text : T.inputPlaceholder,
+                          ...(T.editStyle === 'box'
+                            ? { border: `1px dashed ${T.editBorderDashed}` }
+                            : { borderBottomColor: T.editBorderDashed }
+                          ),
+                        }}
                         onClick={onClientClick}
-                        onMouseEnter={(e) => (e.currentTarget.style.borderBottomColor = accentColor)}
-                        onMouseLeave={(e) => (e.currentTarget.style.borderBottomColor = T.editBorderDashed)}
+                        onMouseEnter={(e) => {
+                          if (T.editStyle === 'box') e.currentTarget.style.borderColor = accentColor
+                          else e.currentTarget.style.borderBottomColor = accentColor
+                        }}
+                        onMouseLeave={(e) => {
+                          if (T.editStyle === 'box') e.currentTarget.style.borderColor = T.editBorderDashed
+                          else e.currentTarget.style.borderBottomColor = T.editBorderDashed
+                        }}
                         title={t.clickToSelectClient}
                       >
                         <div className="flex items-center gap-1.5">
@@ -784,24 +840,31 @@ export function A4Sheet({
               </div>
 
               {/* ── Add line buttons (edit mode) ── */}
-              {ed && (
-                <div className="flex gap-2 mb-4">
-                  <button onClick={() => onAddLine('standard')}
-                    className="px-3.5 py-1.5 rounded-full text-[11px] font-medium cursor-pointer transition-all flex items-center gap-1.5"
-                    style={{ border: `1px dashed ${accentColor}88`, background: `${accentColor}08`, color: accentColor }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = `${accentColor}18`)}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = `${accentColor}08`)}>
-                    <Plus className="h-3 w-3" /> {t.addLine}
-                  </button>
-                  <button onClick={() => onAddLine('section')}
-                    className="px-3.5 py-1.5 rounded-full border border-dashed text-[11px] font-medium cursor-pointer transition-all flex items-center gap-1.5"
-                    style={{ borderColor: T.borderLight, backgroundColor: T.docBg, color: T.textMuted }}
-                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = T.clientBlockBg)}
-                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = T.docBg)}>
-                    <Type className="h-3 w-3" /> {t.addSection}
-                  </button>
-                </div>
-              )}
+              {ed && (() => {
+                const btnColor = T.addButtonColor || accentColor
+                const isTiimeStyle = !!T.addButtonColor
+                return (
+                  <div className="flex gap-2 mb-4">
+                    <button onClick={() => onAddLine('standard')}
+                      className="px-3.5 py-1.5 rounded-full text-[11px] font-extrabold cursor-pointer transition-all flex items-center gap-1.5"
+                      style={isTiimeStyle
+                        ? { border: 'none', background: '#fff', color: btnColor, boxShadow: 'rgba(71,99,136,0.25) 0px 0px 6px' }
+                        : { border: `1px dashed ${btnColor}88`, background: `${btnColor}08`, color: btnColor }
+                      }
+                      onMouseEnter={(e) => (e.currentTarget.style.background = isTiimeStyle ? '#f8f9fa' : `${btnColor}18`)}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = isTiimeStyle ? '#fff' : `${btnColor}08`)}>
+                      <Plus className="h-3 w-3" /> {t.addLine}
+                    </button>
+                    <button onClick={() => onAddLine('section')}
+                      className="px-3.5 py-1.5 rounded-full border border-dashed text-[11px] font-medium cursor-pointer transition-all flex items-center gap-1.5"
+                      style={{ borderColor: T.borderLight, backgroundColor: T.docBg, color: T.textMuted }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = T.clientBlockBg)}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = T.docBg)}>
+                      <Type className="h-3 w-3" /> {t.addSection}
+                    </button>
+                  </div>
+                )
+              })()}
 
             </div>
             {/* ═══ END TOP SECTION ═══ */}
@@ -814,30 +877,30 @@ export function A4Sheet({
               {/* ── Totals ── */}
               <div className="flex justify-end mb-5">
                 <div className="w-[260px]">
-                  <div className="flex justify-between py-1.5" style={{ borderBottom: `1px solid ${T.borderLight}` }}>
-                    <span className="text-[12px]" style={{ color: T.textMuted }}>{t.totalHT}</span>
-                    <span className="text-[12px] font-semibold" style={{ color: T.text }}>{fmtCurrency(subtotal, lang)}</span>
+                  <div className="flex justify-between py-1.5" style={{ borderBottom: T.totalsInAccent ? 'none' : `1px solid ${T.borderLight}` }}>
+                    <span className="text-[12px] font-semibold" style={{ color: T.totalsInAccent ? accentColor : T.textMuted }}>{t.totalHT}</span>
+                    <span className="text-[12px] font-semibold" style={{ color: T.totalsInAccent ? accentColor : T.text }}>{fmtCurrency(subtotal, lang)}</span>
                   </div>
                   {tvaBreakdown.map((e) => (
-                    <div key={e.rate} className="flex justify-between py-1" style={{ borderBottom: `1px solid ${T.borderLight}` }}>
-                      <span className="text-[10px]" style={{ color: T.textMuted }}>{t.vatRate(e.rate)} {t.vatBase(fmtCurrency(e.base, lang))}</span>
-                      <span className="text-[10px]" style={{ color: T.textMuted }}>{fmtCurrency(e.amount, lang)}</span>
+                    <div key={e.rate} className="flex justify-between py-1" style={{ borderBottom: T.totalsInAccent ? 'none' : `1px solid ${T.borderLight}` }}>
+                      <span className="text-[10px] font-semibold" style={{ color: T.totalsInAccent ? accentColor : T.textMuted }}>{t.vatRate(e.rate)} {t.vatBase(fmtCurrency(e.base, lang))}</span>
+                      <span className="text-[10px] font-semibold" style={{ color: T.totalsInAccent ? accentColor : T.textMuted }}>{fmtCurrency(e.amount, lang)}</span>
                     </div>
                   ))}
                   {discountAmount > 0 && (
-                    <div className="flex justify-between py-1" style={{ borderBottom: `1px solid ${T.borderLight}` }}>
-                      <span className="text-[10px]" style={{ color: T.textMuted }}>{t.discount}</span>
+                    <div className="flex justify-between py-1" style={{ borderBottom: T.totalsInAccent ? 'none' : `1px solid ${T.borderLight}` }}>
+                      <span className="text-[10px] font-semibold" style={{ color: T.totalsInAccent ? accentColor : T.textMuted }}>{t.discount}</span>
                       <span className="text-[10px] text-[#e53935]">-{fmtCurrency(discountAmount, lang)}</span>
                     </div>
                   )}
-                  <div className="flex justify-between px-3.5 py-2.5 mt-1.5"
+                  <div className="flex justify-between items-center px-3.5 py-2.5 mt-1.5"
                     style={{
                       background: `${accentColor}${T.totalBg}`,
                       border: `1px solid ${accentColor}${T.totalBorder}`,
-                      borderRadius: T.borderRadius,
+                      borderRadius: T.totalsInAccent ? '100px' : T.borderRadius,
                     }}>
-                    <span className="text-[13px] font-bold" style={{ color: T.text }}>{billingType === 'detailed' ? t.totalTTC : t.totalHT}</span>
-                    <span className="text-[15px] font-bold" style={{ color: accentColor }}>{fmtCurrency(total, lang)}</span>
+                    <span className="text-[13px] font-extrabold" style={{ color: T.totalsInAccent ? accentColor : T.text }}>{billingType === 'detailed' ? t.totalTTC : t.totalHT}</span>
+                    <span className="text-[15px] font-extrabold" style={{ color: accentColor }}>{fmtCurrency(total, lang)}</span>
                   </div>
                 </div>
               </div>
