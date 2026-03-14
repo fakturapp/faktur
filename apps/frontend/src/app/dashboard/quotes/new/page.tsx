@@ -348,6 +348,8 @@ export default function NewQuotePage() {
             onFreeFieldChange={(v) => handleOptionsChange({ freeField: v })}
             onFooterTextChange={(v) => handleOptionsChange({ footerText: v })}
             onDeliveryAddressChange={(v) => handleOptionsChange({ deliveryAddress: v })}
+            onIssueDateChange={(d) => handleOptionsChange({ issueDate: d })}
+            onValidityDateChange={(d) => handleOptionsChange({ validityDate: d })}
           />
           </div>
         </motion.div>
