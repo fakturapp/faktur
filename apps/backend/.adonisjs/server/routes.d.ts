@@ -64,6 +64,7 @@ export type ScannedRoutes = {
     'invoice_logo_upload': { paramsTuple?: []; params?: {} }
     'quote_next_number': { paramsTuple?: []; params?: {} }
     'quote_list': { paramsTuple?: []; params?: {} }
+    'quote_pdf': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'quote_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'quote_create': { paramsTuple?: []; params?: {} }
     'quote_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -120,6 +121,7 @@ export type ScannedRoutes = {
     'invoice_settings_show': { paramsTuple?: []; params?: {} }
     'quote_next_number': { paramsTuple?: []; params?: {} }
     'quote_list': { paramsTuple?: []; params?: {} }
+    'quote_pdf': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'quote_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   HEAD: {
@@ -144,6 +146,7 @@ export type ScannedRoutes = {
     'invoice_settings_show': { paramsTuple?: []; params?: {} }
     'quote_next_number': { paramsTuple?: []; params?: {} }
     'quote_list': { paramsTuple?: []; params?: {} }
+    'quote_pdf': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'quote_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PUT: {
