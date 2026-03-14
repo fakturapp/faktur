@@ -156,7 +156,7 @@ export class CompanySchema extends BaseModel {
 }
 
 export class InvoiceSettingSchema extends BaseModel {
-  static $columns = ['accentColor', 'billingType', 'createdAt', 'customPaymentMethod', 'id', 'logoUrl', 'paymentMethods', 'teamId', 'updatedAt'] as const
+  static $columns = ['accentColor', 'billingType', 'createdAt', 'customPaymentMethod', 'darkMode', 'documentFont', 'id', 'logoUrl', 'paymentMethods', 'teamId', 'template', 'updatedAt'] as const
   $columns = InvoiceSettingSchema.$columns
   @column()
   declare accentColor: string
@@ -166,6 +166,10 @@ export class InvoiceSettingSchema extends BaseModel {
   declare createdAt: DateTime
   @column()
   declare customPaymentMethod: string | null
+  @column()
+  declare darkMode: boolean
+  @column()
+  declare documentFont: string | null
   @column({ isPrimary: true })
   declare id: string
   @column()
@@ -174,6 +178,8 @@ export class InvoiceSettingSchema extends BaseModel {
   declare paymentMethods: any
   @column()
   declare teamId: string
+  @column()
+  declare template: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }

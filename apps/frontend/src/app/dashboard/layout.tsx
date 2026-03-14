@@ -141,7 +141,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       <div
         className={cn(
-          'relative flex min-h-svh flex-1 flex-col bg-background transition-all duration-200 ease-linear',
+          'relative flex min-h-svh flex-1 flex-col bg-background transition-all duration-200 ease-linear overflow-hidden',
           'md:m-2 md:ml-0 md:rounded-xl md:shadow-sm',
           sidebarCollapsed && 'md:ml-2',
           switching && 'blur-sm pointer-events-none'

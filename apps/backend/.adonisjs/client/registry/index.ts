@@ -366,6 +366,12 @@ const routes = {
     tokens: [{"old":"/quotes","type":0,"val":"quotes","end":""}],
     types: placeholder as Registry['quote_list']['types'],
   },
+  'quote_pdf': {
+    methods: ["GET","HEAD"],
+    pattern: '/quotes/:id/pdf',
+    tokens: [{"old":"/quotes/:id/pdf","type":0,"val":"quotes","end":""},{"old":"/quotes/:id/pdf","type":1,"val":"id","end":""},{"old":"/quotes/:id/pdf","type":0,"val":"pdf","end":""}],
+    types: placeholder as Registry['quote_pdf']['types'],
+  },
   'quote_show': {
     methods: ["GET","HEAD"],
     pattern: '/quotes/:id',

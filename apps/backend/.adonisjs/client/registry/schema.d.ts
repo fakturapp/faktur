@@ -727,6 +727,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/quote/list').default['handle']>>>
     }
   }
+  'quote_pdf': {
+    methods: ["GET","HEAD"]
+    pattern: '/quotes/:id/pdf'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/quote/pdf').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/quote/pdf').default['handle']>>>
+    }
+  }
   'quote_show': {
     methods: ["GET","HEAD"]
     pattern: '/quotes/:id'

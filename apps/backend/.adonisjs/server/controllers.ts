@@ -72,6 +72,7 @@ export const controllers = {
     Delete: () => import('#controllers/quote/delete'),
     List: () => import('#controllers/quote/list'),
     NextNumber: () => import('#controllers/quote/next_number'),
+    Pdf: () => import('#controllers/quote/pdf'),
     Show: () => import('#controllers/quote/show'),
     Update: () => import('#controllers/quote/update'),
   },
