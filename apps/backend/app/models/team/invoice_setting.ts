@@ -31,6 +31,9 @@ export default class InvoiceSetting extends BaseModel {
   @column()
   declare customPaymentMethod: string | null
 
+  @column()
+  declare template: string
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

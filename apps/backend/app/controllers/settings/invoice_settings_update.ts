@@ -21,12 +21,14 @@ export default class InvoiceSettingsUpdate {
         accentColor: payload.accentColor,
         paymentMethods: payload.paymentMethods,
         customPaymentMethod: payload.customPaymentMethod || null,
+        template: payload.template || 'classique',
       })
     } else {
       settings.billingType = payload.billingType
       settings.accentColor = payload.accentColor
       settings.paymentMethods = payload.paymentMethods
       settings.customPaymentMethod = payload.customPaymentMethod || null
+      if (payload.template) settings.template = payload.template
       await settings.save()
     }
 
@@ -38,6 +40,7 @@ export default class InvoiceSettingsUpdate {
         logoUrl: settings.logoUrl,
         paymentMethods: settings.paymentMethods,
         customPaymentMethod: settings.customPaymentMethod || '',
+        template: settings.template || 'classique',
       },
     })
   }

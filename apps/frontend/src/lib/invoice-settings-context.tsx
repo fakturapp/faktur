@@ -9,6 +9,7 @@ export interface InvoiceSettings {
   accentColor: string
   paymentMethods: string[]
   customPaymentMethod: string
+  template: string
 }
 
 interface InvoiceSettingsContextType {
@@ -24,6 +25,7 @@ const defaultSettings: InvoiceSettings = {
   accentColor: '#6366f1',
   paymentMethods: ['bank_transfer'],
   customPaymentMethod: '',
+  template: 'classique',
 }
 
 const InvoiceSettingsContext = createContext<InvoiceSettingsContextType>({

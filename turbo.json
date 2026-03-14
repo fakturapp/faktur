@@ -1,6 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "ui": "tui",
+  "ui": "stream-with-experimental-timestamps",
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

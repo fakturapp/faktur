@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { motion, type Variants } from 'framer-motion'
+import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/toast'
 import { Spinner } from '@/components/ui/spinner'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
+import { TEMPLATES, getTemplate, type TemplateConfig } from '@/lib/invoice-templates'
 import {
   ImagePlus,
   Palette,
@@ -22,6 +23,9 @@ import {
   Eye,
   Zap,
   ClipboardList,
+  LayoutTemplate,
+  X,
+  ChevronRight,
 } from 'lucide-react'
 
 const fadeUp = {
@@ -46,11 +50,370 @@ const accentColors = [
   { name: 'Noir', value: '#18181b' },
 ]
 
+/* ═══════════════════════════════════════════════════════════
+   TemplateThumbnail — realistic mini A4 skeleton per layout
+   ═══════════════════════════════════════════════════════════ */
+
+function TemplateThumbnail({
+  tpl,
+  accentColor,
+  selected,
+  size = 'sm',
+  onClick,
+}: {
+  tpl: TemplateConfig
+  accentColor: string
+  selected: boolean
+  size?: 'sm' | 'lg'
+  onClick?: () => void
+}) {
+  const T = tpl
+  const isLg = size === 'lg'
+  const p = isLg ? 'p-3.5' : 'p-2'
+  const contrastCol = '#ffffff'
+
+  return (
+    <button onClick={onClick} className="group text-center w-full">
+      <div
+        className={`relative rounded-lg overflow-hidden transition-all ${
+          selected
+            ? 'ring-2 ring-primary ring-offset-2 ring-offset-card shadow-lg'
+            : 'border border-border/60 hover:border-border hover:shadow-md'
+        }`}
+        style={{ aspectRatio: '210 / 297' }}
+      >
+        <div className={`h-full w-full ${p} flex flex-col relative`} style={{ backgroundColor: T.docBg }}>
+
+          {/* ── CLASSIQUE: accent bar + standard layout ── */}
+          {T.id === 'classique' && (<>
+            <div className="absolute top-0 left-0 bottom-0 w-[3px]" style={{ backgroundColor: accentColor }} />
+            <div className="flex justify-between items-start mb-2 pl-1">
+              <div className="space-y-0.5">
+                <div className="h-1.5 w-6 rounded-full" style={{ backgroundColor: T.borderLight }} />
+                <div className="h-1 w-8 rounded-full" style={{ backgroundColor: T.borderLight }} />
+              </div>
+              <div className="rounded px-1.5 py-0.5" style={{ backgroundColor: `${accentColor}15` }}>
+                <div className="h-1.5 w-5 rounded-full" style={{ backgroundColor: accentColor, opacity: 0.7 }} />
+              </div>
+            </div>
+            <div className="rounded px-1 py-1 mb-2" style={{ backgroundColor: T.clientBlockBg, border: `0.5px solid ${T.clientBlockBorder}` }}>
+              <div className="h-0.5 w-4 rounded-full mb-0.5" style={{ backgroundColor: T.textMuted, opacity: 0.3 }} />
+              <div className="h-1 w-6 rounded-full mb-0.5" style={{ backgroundColor: T.text, opacity: 0.2 }} />
+              <div className="h-0.5 w-8 rounded-full" style={{ backgroundColor: T.textMuted, opacity: 0.15 }} />
+            </div>
+          </>)}
+
+          {/* ── SOMBRE: dark bg + accent bar ── */}
+          {T.id === 'sombre' && (<>
+            <div className="absolute top-0 left-0 bottom-0 w-[3px]" style={{ backgroundColor: accentColor }} />
+            <div className="flex justify-between items-start mb-2 pl-1">
+              <div className="space-y-0.5">
+                <div className="h-1.5 w-6 rounded-full" style={{ backgroundColor: '#52525b' }} />
+                <div className="h-1 w-8 rounded-full" style={{ backgroundColor: '#3f3f46' }} />
+              </div>
+              <div className="rounded px-1.5 py-0.5" style={{ backgroundColor: `${accentColor}20` }}>
+                <div className="h-1.5 w-5 rounded-full" style={{ backgroundColor: accentColor, opacity: 0.8 }} />
+              </div>
+            </div>
+            <div className="rounded px-1 py-1 mb-2" style={{ backgroundColor: '#27272a', border: '0.5px solid #3f3f46' }}>
+              <div className="h-0.5 w-4 rounded-full mb-0.5" style={{ backgroundColor: '#71717a' }} />
+              <div className="h-1 w-6 rounded-full mb-0.5" style={{ backgroundColor: '#a1a1aa', opacity: 0.3 }} />
+              <div className="h-0.5 w-8 rounded-full" style={{ backgroundColor: '#71717a', opacity: 0.5 }} />
+            </div>
+          </>)}
+
+          {/* ── MODERNE: full-width colored banner ── */}
+          {T.id === 'moderne' && (<>
+            <div className="rounded-md px-2 py-1.5 mb-2 -mx-1 -mt-1" style={{ backgroundColor: accentColor }}>
+              <div className="flex justify-between items-center">
+                <div className="h-2 w-7 rounded-full" style={{ backgroundColor: contrastCol, opacity: 0.6 }} />
+                <div className="text-right">
+                  <div className="h-1.5 w-5 rounded-full ml-auto" style={{ backgroundColor: contrastCol, opacity: 0.9 }} />
+                  <div className="h-0.5 w-4 rounded-full ml-auto mt-0.5" style={{ backgroundColor: contrastCol, opacity: 0.5 }} />
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-2 mb-2">
+              <div className="flex-1 space-y-0.5">
+                <div className="h-0.5 w-4 rounded-full" style={{ backgroundColor: T.textMuted, opacity: 0.3 }} />
+                <div className="h-1 w-5 rounded-full" style={{ backgroundColor: T.text, opacity: 0.2 }} />
+              </div>
+              <div className="flex-1 space-y-0.5">
+                <div className="h-0.5 w-4 rounded-full" style={{ backgroundColor: T.textMuted, opacity: 0.3 }} />
+                <div className="h-1 w-6 rounded-full" style={{ backgroundColor: T.text, opacity: 0.2 }} />
+              </div>
+            </div>
+          </>)}
+
+          {/* ── COMPACT: sharp corners, tight, data-dense ── */}
+          {T.id === 'compact' && (<>
+            <div className="flex justify-between items-start mb-1">
+              <div className="h-2 w-8 rounded-none bg-gray-200" />
+              <div className="text-right space-y-0.5">
+                <div className="h-1.5 w-5 rounded-none" style={{ backgroundColor: accentColor, opacity: 0.7 }} />
+                <div className="h-0.5 w-4 rounded-none bg-gray-300" />
+              </div>
+            </div>
+            <div className="border border-gray-300 px-1 py-0.5 mb-1">
+              <div className="h-1 w-5 rounded-none bg-gray-200 mb-0.5" />
+              <div className="h-0.5 w-8 rounded-none bg-gray-100" />
+            </div>
+          </>)}
+
+          {/* ── ELEGANCE: thin lines, no backgrounds ── */}
+          {T.id === 'elegance' && (<>
+            <div className="flex justify-between items-start mb-1.5">
+              <div className="space-y-0.5">
+                <div className="h-1.5 w-7 rounded-full" style={{ backgroundColor: T.text, opacity: 0.15 }} />
+                <div className="h-0.5 w-10 rounded-full" style={{ backgroundColor: T.textMuted, opacity: 0.1 }} />
+              </div>
+              <div className="h-1.5 w-6 rounded-full" style={{ backgroundColor: accentColor, opacity: 0.5 }} />
+            </div>
+            <div className="h-px mb-2" style={{ backgroundColor: accentColor, opacity: 0.3 }} />
+            <div className="mb-2 pb-1" style={{ borderBottom: `0.5px solid ${T.borderLight}` }}>
+              <div className="h-0.5 w-3 rounded-full mb-0.5" style={{ backgroundColor: accentColor, opacity: 0.4 }} />
+              <div className="h-1 w-6 rounded-full" style={{ backgroundColor: T.text, opacity: 0.15 }} />
+              <div className="h-0.5 w-8 rounded-full mt-0.5" style={{ backgroundColor: T.textMuted, opacity: 0.1 }} />
+            </div>
+          </>)}
+
+          {/* ── AUDACIEUX: large bold banner, geometric ── */}
+          {T.id === 'audacieux' && (<>
+            <div className="rounded-xl px-2 py-2.5 mb-2 -mx-1 -mt-1 relative overflow-hidden" style={{ backgroundColor: accentColor }}>
+              <div className="absolute -right-2 -top-2 w-8 h-8 rounded-full" style={{ backgroundColor: contrastCol, opacity: 0.08 }} />
+              <div className="absolute -right-1 -bottom-3 w-6 h-6 rounded-full" style={{ backgroundColor: contrastCol, opacity: 0.05 }} />
+              <div className="h-2.5 w-8 rounded-full mb-1" style={{ backgroundColor: contrastCol, opacity: 0.9 }} />
+              <div className="h-1 w-5 rounded-full" style={{ backgroundColor: contrastCol, opacity: 0.5 }} />
+            </div>
+            <div className="rounded-lg px-1 py-1 mb-1.5" style={{ backgroundColor: T.clientBlockBg, border: `0.5px solid ${T.clientBlockBorder}` }}>
+              <div className="h-1 w-5 rounded-full mb-0.5" style={{ backgroundColor: T.text, opacity: 0.2 }} />
+              <div className="h-0.5 w-7 rounded-full" style={{ backgroundColor: T.textMuted, opacity: 0.15 }} />
+            </div>
+          </>)}
+
+          {/* ── LATERAL: colored sidebar ── */}
+          {T.id === 'lateral' && (<>
+            <div className="absolute top-0 left-0 bottom-0 flex" style={{ width: '28%' }}>
+              <div className="h-full w-full flex flex-col p-1.5 pt-2" style={{ backgroundColor: accentColor }}>
+                <div className="h-2 w-5 rounded-full mb-1.5" style={{ backgroundColor: contrastCol, opacity: 0.8 }} />
+                <div className="h-0.5 w-full rounded-full mb-0.5" style={{ backgroundColor: contrastCol, opacity: 0.3 }} />
+                <div className="h-0.5 w-4/5 rounded-full mb-0.5" style={{ backgroundColor: contrastCol, opacity: 0.2 }} />
+                <div className="h-0.5 w-3/5 rounded-full mb-2" style={{ backgroundColor: contrastCol, opacity: 0.2 }} />
+                <div className="h-0.5 w-full rounded-full mb-0.5" style={{ backgroundColor: contrastCol, opacity: 0.15 }} />
+                <div className="h-0.5 w-4/5 rounded-full" style={{ backgroundColor: contrastCol, opacity: 0.15 }} />
+              </div>
+            </div>
+            <div style={{ marginLeft: '30%' }}>
+              <div className="flex justify-between items-start mb-1.5">
+                <div className="h-1 w-6 rounded-full" style={{ backgroundColor: T.text, opacity: 0.2 }} />
+                <div className="h-1.5 w-5 rounded-full" style={{ backgroundColor: accentColor, opacity: 0.6 }} />
+              </div>
+              <div className="rounded px-1 py-0.5 mb-1.5" style={{ backgroundColor: T.clientBlockBg, border: `0.5px solid ${T.clientBlockBorder}` }}>
+                <div className="h-1 w-5 rounded-full mb-0.5" style={{ backgroundColor: T.text, opacity: 0.15 }} />
+                <div className="h-0.5 w-7 rounded-full" style={{ backgroundColor: T.textMuted, opacity: 0.1 }} />
+              </div>
+            </div>
+          </>)}
+
+          {/* ── MINIMALISTE: ultra-clean ── */}
+          {T.id === 'minimaliste' && (<>
+            <div className="flex justify-between items-start mb-3">
+              <div className="h-2 w-7 rounded-full" style={{ backgroundColor: T.text, opacity: 0.1 }} />
+              <div className="h-1 w-5 rounded-full" style={{ backgroundColor: accentColor, opacity: 0.4 }} />
+            </div>
+            <div className="h-px mb-3" style={{ backgroundColor: T.borderLight }} />
+            <div className="space-y-0.5 mb-2">
+              <div className="h-0.5 w-4 rounded-full" style={{ backgroundColor: T.textMuted, opacity: 0.2 }} />
+              <div className="h-1 w-6 rounded-full" style={{ backgroundColor: T.text, opacity: 0.12 }} />
+            </div>
+          </>)}
+
+          {/* ── DUO: two-color split header ── */}
+          {T.id === 'duo' && (<>
+            <div className="flex -mx-1 -mt-1 mb-2 overflow-hidden rounded-md">
+              <div className="flex-1 px-1.5 py-1.5" style={{ backgroundColor: accentColor }}>
+                <div className="h-2 w-6 rounded-full" style={{ backgroundColor: contrastCol, opacity: 0.7 }} />
+                <div className="h-0.5 w-5 rounded-full mt-0.5" style={{ backgroundColor: contrastCol, opacity: 0.3 }} />
+              </div>
+              <div className="flex-1 px-1.5 py-1.5" style={{ backgroundColor: '#1e293b' }}>
+                <div className="h-1.5 w-5 rounded-full ml-auto" style={{ backgroundColor: contrastCol, opacity: 0.8 }} />
+                <div className="h-0.5 w-4 rounded-full ml-auto mt-0.5" style={{ backgroundColor: contrastCol, opacity: 0.4 }} />
+              </div>
+            </div>
+            <div className="flex gap-1.5 mb-2">
+              <div className="flex-1 space-y-0.5">
+                <div className="h-1 w-5 rounded-full" style={{ backgroundColor: T.text, opacity: 0.2 }} />
+                <div className="h-0.5 w-7 rounded-full" style={{ backgroundColor: T.textMuted, opacity: 0.12 }} />
+              </div>
+              <div className="flex-1 rounded px-1 py-0.5" style={{ backgroundColor: T.clientBlockBg, border: `0.5px solid ${T.clientBlockBorder}` }}>
+                <div className="h-1 w-4 rounded-full" style={{ backgroundColor: T.text, opacity: 0.15 }} />
+              </div>
+            </div>
+          </>)}
+
+          {/* ── LIGNE: accent line separators ── */}
+          {T.id === 'ligne' && (<>
+            <div className="flex justify-between items-start mb-1">
+              <div className="space-y-0.5">
+                <div className="h-1.5 w-6 rounded-full" style={{ backgroundColor: T.text, opacity: 0.15 }} />
+                <div className="h-0.5 w-9 rounded-full" style={{ backgroundColor: T.textMuted, opacity: 0.1 }} />
+              </div>
+              <div className="h-1.5 w-5 rounded-full" style={{ backgroundColor: accentColor, opacity: 0.6 }} />
+            </div>
+            <div className="h-[2px] mb-1.5 rounded-full" style={{ backgroundColor: accentColor, opacity: 0.5 }} />
+            <div className="space-y-0.5 mb-1.5 pb-1" style={{ borderBottom: `1.5px solid ${accentColor}40` }}>
+              <div className="h-1 w-5 rounded-full" style={{ backgroundColor: T.text, opacity: 0.15 }} />
+              <div className="h-0.5 w-8 rounded-full" style={{ backgroundColor: T.textMuted, opacity: 0.1 }} />
+            </div>
+          </>)}
+
+          {/* ── Common: table + totals (except lateral which offsets) ── */}
+          <div style={T.id === 'lateral' ? { marginLeft: '30%' } : undefined} className="flex-1 flex flex-col">
+            {/* Table header (shown for all) */}
+            {!['classique', 'sombre', 'moderne', 'compact', 'elegance', 'audacieux', 'lateral', 'minimaliste', 'duo', 'ligne'].includes('_skip_') && (
+              <>
+                <div className="px-0.5 py-0.5 mb-px" style={{ backgroundColor: accentColor, borderRadius: T.id === 'compact' ? '0' : '2px 2px 0 0' }}>
+                  <div className="flex gap-1">
+                    <div className="h-0.5 w-4 rounded-full" style={{ backgroundColor: contrastCol, opacity: 0.6 }} />
+                    <div className="flex-1" />
+                    <div className="h-0.5 w-2 rounded-full" style={{ backgroundColor: contrastCol, opacity: 0.6 }} />
+                  </div>
+                </div>
+
+                {/* Rows */}
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="px-0.5 py-[2px]" style={{ backgroundColor: i % 2 === 0 ? T.rowEven : T.rowOdd, borderBottom: `0.5px solid ${T.borderLight}` }}>
+                    <div className="flex gap-0.5 items-center">
+                      <div className="h-0.5 rounded-full" style={{ backgroundColor: T.text, opacity: 0.15, width: `${8 + i * 2}px` }} />
+                      <div className="flex-1" />
+                      <div className="h-0.5 w-2 rounded-full" style={{ backgroundColor: T.text, opacity: 0.1 }} />
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+
+            <div className="flex-1" />
+
+            {/* Total */}
+            <div className="flex justify-end mt-1">
+              <div className="rounded px-1 py-0.5" style={{ backgroundColor: `${accentColor}15`, borderRadius: T.id === 'compact' ? '0' : '3px' }}>
+                <div className="h-1 w-6 rounded-full" style={{ backgroundColor: accentColor, opacity: 0.5 }} />
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="mt-1 pt-0.5" style={{ borderTop: `0.5px solid ${T.footerBorder}` }}>
+              <div className="h-0.5 w-full rounded-full" style={{ backgroundColor: T.textFooter, opacity: 0.15 }} />
+            </div>
+          </div>
+        </div>
+
+        {/* Selected check */}
+        {selected && (
+          <div className="absolute top-1.5 right-1.5">
+            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary shadow">
+              <Check className="h-3 w-3 text-primary-foreground" />
+            </div>
+          </div>
+        )}
+      </div>
+      <p className={`text-[11px] mt-1.5 font-medium transition-colors ${selected ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'}`}>
+        {T.name}
+      </p>
+      {isLg && (
+        <p className="text-[10px] text-muted-foreground mt-0.5">{T.description}</p>
+      )}
+    </button>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TemplateModal — full modal for choosing templates
+   ═══════════════════════════════════════════════════════════ */
+
+function TemplateModal({
+  open,
+  onClose,
+  accentColor,
+  currentTemplate,
+  onSelect,
+}: {
+  open: boolean
+  onClose: () => void
+  accentColor: string
+  currentTemplate: string
+  onSelect: (id: string) => void
+}) {
+  return (
+    <AnimatePresence>
+      {open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={onClose}
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+            transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
+            className="relative z-10 w-full max-w-3xl rounded-2xl border border-border bg-card shadow-2xl overflow-hidden"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+              <div>
+                <h2 className="text-lg font-semibold text-foreground">Choisir un modele</h2>
+                <p className="text-sm text-muted-foreground mt-0.5">10 modeles de mise en page pour vos documents</p>
+              </div>
+              <button
+                onClick={onClose}
+                className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Template grid */}
+            <div className="p-6 max-h-[70vh] overflow-y-auto">
+              <div className="grid grid-cols-5 gap-4">
+                {TEMPLATES.map((tpl) => (
+                  <TemplateThumbnail
+                    key={tpl.id}
+                    tpl={tpl}
+                    accentColor={accentColor}
+                    selected={currentTemplate === tpl.id}
+                    size="lg"
+                    onClick={() => {
+                      onSelect(tpl.id)
+                      onClose()
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════
+   InvoiceSettingsPage — main page
+   ═══════════════════════════════════════════════════════════ */
+
 export default function InvoiceSettingsPage() {
   const { toast } = useToast()
   const { settings, loading, updateSettings, uploadLogo } = useInvoiceSettings()
   const [uploading, setUploading] = useState(false)
+  const [templateModalOpen, setTemplateModalOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const currentTemplate = getTemplate(settings.template)
 
   async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -115,8 +478,50 @@ export default function InvoiceSettingsPage() {
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Settings Column */}
         <div className="space-y-6">
-          {/* Billing Type */}
+
+          {/* Template Selector — card with current + change button */}
           <motion.div variants={fadeUp} custom={1}>
+            <Card className="overflow-hidden border-border/50">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                    <LayoutTemplate className="h-4.5 w-4.5 text-primary" />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-semibold text-foreground">Modele de document</h2>
+                    <p className="text-xs text-muted-foreground">Choisissez l&apos;apparence de vos factures et devis</p>
+                  </div>
+                </div>
+
+                {/* Current template preview + change */}
+                <button
+                  onClick={() => setTemplateModalOpen(true)}
+                  className="w-full flex items-center gap-4 rounded-xl border-2 border-border p-4 text-left transition-all hover:border-primary/40 hover:bg-primary/5 group"
+                >
+                  {/* Mini preview */}
+                  <div className="w-16 shrink-0">
+                    <TemplateThumbnail
+                      tpl={currentTemplate}
+                      accentColor={settings.accentColor}
+                      selected={false}
+                      size="sm"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground">{currentTemplate.name}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{currentTemplate.description}</p>
+                    <p className="text-xs text-primary mt-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      Changer de modele <ChevronRight className="h-3 w-3" />
+                    </p>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                </button>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Billing Type */}
+          <motion.div variants={fadeUp} custom={2}>
             <Card className="overflow-hidden border-border/50">
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-4">
@@ -179,7 +584,7 @@ export default function InvoiceSettingsPage() {
           </motion.div>
 
           {/* Logo */}
-          <motion.div variants={fadeUp} custom={2}>
+          <motion.div variants={fadeUp} custom={3}>
             <Card className="overflow-hidden border-border/50">
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-4">
@@ -193,15 +598,10 @@ export default function InvoiceSettingsPage() {
                 </div>
 
                 <div className="flex items-start gap-6">
-                  {/* Logo preview */}
                   <div className="relative group">
                     <div className="h-24 w-24 rounded-xl border-2 border-dashed border-border bg-muted/30 flex items-center justify-center overflow-hidden">
                       {settings.logoUrl ? (
-                        <img
-                          src={settings.logoUrl}
-                          alt="Logo"
-                          className="h-full w-full object-contain p-2"
-                        />
+                        <img src={settings.logoUrl} alt="Logo" className="h-full w-full object-contain p-2" />
                       ) : (
                         <ImagePlus className="h-8 w-8 text-muted-foreground/50" />
                       )}
@@ -215,25 +615,12 @@ export default function InvoiceSettingsPage() {
                       </button>
                     )}
                   </div>
-
-                  {/* Upload actions */}
                   <div className="flex-1 space-y-3">
                     <p className="text-sm text-muted-foreground">
                       Format recommande : PNG ou SVG, fond transparent, 500x500px minimum
                     </p>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/png,image/svg+xml,image/jpeg"
-                      className="hidden"
-                      onChange={handleLogoUpload}
-                    />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={uploading}
-                    >
+                    <input ref={fileInputRef} type="file" accept="image/png,image/svg+xml,image/jpeg" className="hidden" onChange={handleLogoUpload} />
+                    <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
                       {uploading ? <><Spinner /> Envoi...</> : 'Telecharger un logo'}
                     </Button>
                   </div>
@@ -243,7 +630,7 @@ export default function InvoiceSettingsPage() {
           </motion.div>
 
           {/* Accent Color */}
-          <motion.div variants={fadeUp} custom={3}>
+          <motion.div variants={fadeUp} custom={4}>
             <Card className="overflow-hidden border-border/50">
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-4">
@@ -257,7 +644,6 @@ export default function InvoiceSettingsPage() {
                 </div>
 
                 <div className="space-y-4">
-                  {/* Color grid */}
                   <div className="flex flex-wrap gap-2.5">
                     {accentColors.map((color) => (
                       <button
@@ -286,12 +672,8 @@ export default function InvoiceSettingsPage() {
                     ))}
                   </div>
 
-                  {/* Custom color input */}
                   <div className="flex items-center gap-3">
-                    <div
-                      className="h-9 w-9 rounded-lg border border-border shrink-0"
-                      style={{ backgroundColor: settings.accentColor }}
-                    />
+                    <div className="h-9 w-9 rounded-lg border border-border shrink-0" style={{ backgroundColor: settings.accentColor }} />
                     <Input
                       value={settings.accentColor}
                       onChange={(e) => updateSettings({ accentColor: e.target.value })}
@@ -306,7 +688,7 @@ export default function InvoiceSettingsPage() {
           </motion.div>
 
           {/* Payment Methods */}
-          <motion.div variants={fadeUp} custom={4}>
+          <motion.div variants={fadeUp} custom={5}>
             <Card className="overflow-hidden border-border/50">
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-4">
@@ -320,129 +702,76 @@ export default function InvoiceSettingsPage() {
                 </div>
 
                 <div className="space-y-3">
-                  {/* Bank Transfer */}
                   <button
                     onClick={() => togglePaymentMethod('bank_transfer')}
                     className={`flex w-full items-center gap-3 rounded-xl border-2 p-4 text-left transition-all ${
-                      settings.paymentMethods.includes('bank_transfer')
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border hover:border-muted-foreground/30'
+                      settings.paymentMethods.includes('bank_transfer') ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
                     }`}
                   >
-                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
-                      settings.paymentMethods.includes('bank_transfer') ? 'bg-primary/10' : 'bg-muted'
-                    }`}>
-                      <Banknote className={`h-5 w-5 ${
-                        settings.paymentMethods.includes('bank_transfer') ? 'text-primary' : 'text-muted-foreground'
-                      }`} />
+                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${settings.paymentMethods.includes('bank_transfer') ? 'bg-primary/10' : 'bg-muted'}`}>
+                      <Banknote className={`h-5 w-5 ${settings.paymentMethods.includes('bank_transfer') ? 'text-primary' : 'text-muted-foreground'}`} />
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-medium text-foreground">Virement bancaire</p>
                       <p className="text-xs text-muted-foreground">IBAN, BIC et nom de la banque</p>
                     </div>
-                    <div className={`h-5 w-5 rounded-md border-2 flex items-center justify-center transition-colors ${
-                      settings.paymentMethods.includes('bank_transfer')
-                        ? 'border-primary bg-primary'
-                        : 'border-muted-foreground/30'
-                    }`}>
-                      {settings.paymentMethods.includes('bank_transfer') && (
-                        <Check className="h-3 w-3 text-primary-foreground" />
-                      )}
+                    <div className={`h-5 w-5 rounded-md border-2 flex items-center justify-center transition-colors ${settings.paymentMethods.includes('bank_transfer') ? 'border-primary bg-primary' : 'border-muted-foreground/30'}`}>
+                      {settings.paymentMethods.includes('bank_transfer') && <Check className="h-3 w-3 text-primary-foreground" />}
                     </div>
                   </button>
 
-                  {/* Cash */}
                   <button
                     onClick={() => togglePaymentMethod('cash')}
                     className={`flex w-full items-center gap-3 rounded-xl border-2 p-4 text-left transition-all ${
-                      settings.paymentMethods.includes('cash')
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border hover:border-muted-foreground/30'
+                      settings.paymentMethods.includes('cash') ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
                     }`}
                   >
-                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
-                      settings.paymentMethods.includes('cash') ? 'bg-primary/10' : 'bg-muted'
-                    }`}>
-                      <Coins className={`h-5 w-5 ${
-                        settings.paymentMethods.includes('cash') ? 'text-primary' : 'text-muted-foreground'
-                      }`} />
+                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${settings.paymentMethods.includes('cash') ? 'bg-primary/10' : 'bg-muted'}`}>
+                      <Coins className={`h-5 w-5 ${settings.paymentMethods.includes('cash') ? 'text-primary' : 'text-muted-foreground'}`} />
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-medium text-foreground">Especes</p>
                       <p className="text-xs text-muted-foreground">Paiement en especes</p>
                     </div>
-                    <div className={`h-5 w-5 rounded-md border-2 flex items-center justify-center transition-colors ${
-                      settings.paymentMethods.includes('cash')
-                        ? 'border-primary bg-primary'
-                        : 'border-muted-foreground/30'
-                    }`}>
-                      {settings.paymentMethods.includes('cash') && (
-                        <Check className="h-3 w-3 text-primary-foreground" />
-                      )}
+                    <div className={`h-5 w-5 rounded-md border-2 flex items-center justify-center transition-colors ${settings.paymentMethods.includes('cash') ? 'border-primary bg-primary' : 'border-muted-foreground/30'}`}>
+                      {settings.paymentMethods.includes('cash') && <Check className="h-3 w-3 text-primary-foreground" />}
                     </div>
                   </button>
 
-                  {/* Custom */}
                   <div>
                     <button
                       onClick={() => togglePaymentMethod('custom')}
                       className={`flex w-full items-center gap-3 rounded-xl border-2 p-4 text-left transition-all ${
-                        settings.paymentMethods.includes('custom')
-                          ? 'border-primary bg-primary/5'
-                          : 'border-border hover:border-muted-foreground/30'
+                        settings.paymentMethods.includes('custom') ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
                       }`}
                     >
-                      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
-                        settings.paymentMethods.includes('custom') ? 'bg-primary/10' : 'bg-muted'
-                      }`}>
-                        <PenLine className={`h-5 w-5 ${
-                          settings.paymentMethods.includes('custom') ? 'text-primary' : 'text-muted-foreground'
-                        }`} />
+                      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${settings.paymentMethods.includes('custom') ? 'bg-primary/10' : 'bg-muted'}`}>
+                        <PenLine className={`h-5 w-5 ${settings.paymentMethods.includes('custom') ? 'text-primary' : 'text-muted-foreground'}`} />
                       </div>
                       <div className="flex-1">
                         <p className="text-sm font-medium text-foreground">Autre</p>
                         <p className="text-xs text-muted-foreground">Moyen de paiement personnalise</p>
                       </div>
-                      <div className={`h-5 w-5 rounded-md border-2 flex items-center justify-center transition-colors ${
-                        settings.paymentMethods.includes('custom')
-                          ? 'border-primary bg-primary'
-                          : 'border-muted-foreground/30'
-                      }`}>
-                        {settings.paymentMethods.includes('custom') && (
-                          <Check className="h-3 w-3 text-primary-foreground" />
-                        )}
+                      <div className={`h-5 w-5 rounded-md border-2 flex items-center justify-center transition-colors ${settings.paymentMethods.includes('custom') ? 'border-primary bg-primary' : 'border-muted-foreground/30'}`}>
+                        {settings.paymentMethods.includes('custom') && <Check className="h-3 w-3 text-primary-foreground" />}
                       </div>
                     </button>
                     {settings.paymentMethods.includes('custom') && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="mt-2 ml-14"
-                      >
-                        <Input
-                          placeholder="Ex: Cheque, PayPal, etc."
-                          value={settings.customPaymentMethod}
-                          onChange={(e) => updateSettings({ customPaymentMethod: e.target.value })}
-                          className="text-sm"
-                        />
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="mt-2 ml-14">
+                        <Input placeholder="Ex: Cheque, PayPal, etc." value={settings.customPaymentMethod} onChange={(e) => updateSettings({ customPaymentMethod: e.target.value })} className="text-sm" />
                       </motion.div>
                     )}
                   </div>
 
                   <Separator />
 
-                  {/* Disabled methods */}
                   <div className="space-y-2">
                     <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider px-1">Bientot disponible</p>
                     {[
                       { name: 'Stripe', desc: 'Paiement en ligne par carte bancaire' },
                       { name: 'PayPal', desc: 'Paiement via compte PayPal' },
                     ].map((method) => (
-                      <div
-                        key={method.name}
-                        className="flex items-center gap-3 rounded-xl border-2 border-border/50 p-4 opacity-50 cursor-not-allowed"
-                      >
+                      <div key={method.name} className="flex items-center gap-3 rounded-xl border-2 border-border/50 p-4 opacity-50 cursor-not-allowed">
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
                           <Lock className="h-5 w-5 text-muted-foreground" />
                         </div>
@@ -458,8 +787,8 @@ export default function InvoiceSettingsPage() {
             </Card>
           </motion.div>
 
-          {/* Auto-save indicator (replaces save button) */}
-          <motion.div variants={fadeUp} custom={5} className="flex justify-end">
+          {/* Auto-save indicator */}
+          <motion.div variants={fadeUp} custom={6} className="flex justify-end">
             <p className="text-xs text-muted-foreground flex items-center gap-1.5">
               <Check className="h-3.5 w-3.5 text-green-500" />
               Enregistrement automatique
@@ -467,7 +796,7 @@ export default function InvoiceSettingsPage() {
           </motion.div>
         </div>
 
-        {/* Preview Column — A4-like document */}
+        {/* Preview Column — A4-like document using current template */}
         <motion.div variants={fadeUp} custom={2}>
           <div className="sticky top-6">
             <Card className="overflow-hidden border-border/50">
@@ -479,172 +808,158 @@ export default function InvoiceSettingsPage() {
                     <p className="text-sm font-medium text-foreground">Apercu du document</p>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {settings.billingType === 'quick' ? 'Facture rapide' : 'Facture complete'}
+                    {currentTemplate.name} &middot; {settings.billingType === 'quick' ? 'Rapide' : 'Complet'}
                   </p>
                 </div>
 
                 {/* A4 Document Preview */}
                 <div className="p-5 bg-muted/30">
-                  <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden" style={{ aspectRatio: '1 / 1.2' }}>
-                    <div className="h-full flex flex-col p-6 sm:p-8">
+                  <div
+                    className="rounded-lg shadow-sm overflow-hidden relative"
+                    style={{
+                      aspectRatio: '1 / 1.2',
+                      backgroundColor: currentTemplate.docBg,
+                      border: currentTemplate.id === 'sombre' ? '1px solid #3f3f46' : '1px solid #e5e7eb',
+                    }}
+                  >
+                    <div className="h-full flex flex-col p-6 sm:p-8 relative">
 
-                      {/* Document header */}
-                      <div className="flex items-start justify-between mb-5">
-                        <div className="space-y-2">
-                          {settings.logoUrl ? (
-                            <img src={settings.logoUrl} alt="Logo" className="h-10 w-auto max-w-[120px] object-contain" />
-                          ) : (
-                            <div className="h-10 w-20 rounded-md bg-gray-100 border border-dashed border-gray-300 flex items-center justify-center">
-                              <ImagePlus className="h-5 w-5 text-gray-300" />
-                            </div>
-                          )}
-                          <div className="space-y-0.5">
-                            <div className="h-2 w-24 rounded-full bg-gray-200" />
-                            <div className="h-1.5 w-32 rounded-full bg-gray-100" />
-                            <div className="h-1.5 w-28 rounded-full bg-gray-100" />
+                      {/* Accent bar */}
+                      {currentTemplate.showAccentBar && (
+                        <div className="absolute top-0 left-0 bottom-0 w-[3px]" style={{ backgroundColor: settings.accentColor }} />
+                      )}
+
+                      {/* Banner header */}
+                      {currentTemplate.layout === 'banner' && (
+                        <div className="rounded-lg px-4 py-3 mb-4 -mx-2 -mt-2" style={{ backgroundColor: settings.accentColor }}>
+                          <div className="flex justify-between items-center">
+                            {settings.logoUrl ? (
+                              <img src={settings.logoUrl} alt="Logo" className="h-7 w-auto max-w-[80px] object-contain" />
+                            ) : (
+                              <div className="h-2.5 w-16 rounded-full" style={{ backgroundColor: '#fff', opacity: 0.5 }} />
+                            )}
+                            <p className="text-xs font-bold tracking-wide" style={{ color: '#fff' }}>
+                              FACTURE
+                            </p>
                           </div>
                         </div>
-                        <div className="text-right space-y-1">
-                          <p className="text-sm font-bold tracking-wide" style={{ color: settings.accentColor }}>
-                            FACTURE
-                          </p>
-                          <p className="text-[10px] text-gray-400 font-medium">#F-2025-001</p>
-                          <p className="text-[10px] text-gray-400">13/03/2025</p>
+                      )}
+
+                      {/* Standard header */}
+                      {currentTemplate.layout !== 'banner' && (
+                        <div className="flex items-start justify-between mb-5">
+                          <div className="space-y-2">
+                            {settings.logoUrl ? (
+                              <img src={settings.logoUrl} alt="Logo" className="h-10 w-auto max-w-[120px] object-contain" />
+                            ) : (
+                              <div className="h-10 w-20 border border-dashed flex items-center justify-center" style={{ borderRadius: currentTemplate.borderRadius, backgroundColor: currentTemplate.borderLight, borderColor: currentTemplate.editBorderDashed }}>
+                                <ImagePlus className="h-5 w-5" style={{ color: currentTemplate.editBorderDashed }} />
+                              </div>
+                            )}
+                            <div className="space-y-0.5">
+                              <div className="h-2 w-24 rounded-full" style={{ backgroundColor: currentTemplate.borderLight }} />
+                              <div className="h-1.5 w-32 rounded-full" style={{ backgroundColor: currentTemplate.borderLight, opacity: 0.6 }} />
+                              <div className="h-1.5 w-28 rounded-full" style={{ backgroundColor: currentTemplate.borderLight, opacity: 0.6 }} />
+                            </div>
+                          </div>
+                          <div className="text-right space-y-1">
+                            <p className="text-sm font-bold tracking-wide" style={{ color: settings.accentColor }}>FACTURE</p>
+                            <p className="text-[10px] font-medium" style={{ color: currentTemplate.textMuted }}>#F-2026-001</p>
+                            <p className="text-[10px]" style={{ color: currentTemplate.textMuted }}>14/03/2026</p>
+                          </div>
                         </div>
-                      </div>
+                      )}
 
                       {/* Accent divider */}
                       <div className="h-[2px] rounded-full mb-5" style={{ backgroundColor: settings.accentColor }} />
 
-                      {/* Addresses: From / To */}
+                      {/* Addresses */}
                       <div className="grid grid-cols-2 gap-6 mb-6">
                         <div className="space-y-1">
-                          <p className="text-[9px] font-semibold uppercase tracking-wider" style={{ color: settings.accentColor }}>
-                            Emetteur
-                          </p>
+                          <p className="text-[9px] font-semibold uppercase tracking-wider" style={{ color: settings.accentColor }}>Emetteur</p>
                           <div className="space-y-0.5">
-                            <div className="h-2 w-28 rounded-full bg-gray-200" />
-                            <div className="h-1.5 w-36 rounded-full bg-gray-100" />
-                            <div className="h-1.5 w-24 rounded-full bg-gray-100" />
-                            <div className="h-1.5 w-20 rounded-full bg-gray-100" />
+                            <div className="h-2 w-28 rounded-full" style={{ backgroundColor: currentTemplate.borderLight }} />
+                            <div className="h-1.5 w-36 rounded-full" style={{ backgroundColor: currentTemplate.borderLight, opacity: 0.6 }} />
+                            <div className="h-1.5 w-24 rounded-full" style={{ backgroundColor: currentTemplate.borderLight, opacity: 0.6 }} />
                           </div>
                         </div>
                         <div className="space-y-1">
-                          <p className="text-[9px] font-semibold uppercase tracking-wider" style={{ color: settings.accentColor }}>
-                            Client
-                          </p>
+                          <p className="text-[9px] font-semibold uppercase tracking-wider" style={{ color: settings.accentColor }}>Client</p>
                           <div className="space-y-0.5">
-                            <div className="h-2 w-24 rounded-full bg-gray-200" />
-                            <div className="h-1.5 w-32 rounded-full bg-gray-100" />
-                            <div className="h-1.5 w-28 rounded-full bg-gray-100" />
+                            <div className="h-2 w-24 rounded-full" style={{ backgroundColor: currentTemplate.borderLight }} />
+                            <div className="h-1.5 w-32 rounded-full" style={{ backgroundColor: currentTemplate.borderLight, opacity: 0.6 }} />
+                            <div className="h-1.5 w-28 rounded-full" style={{ backgroundColor: currentTemplate.borderLight, opacity: 0.6 }} />
                           </div>
                         </div>
                       </div>
 
                       {/* Items table */}
                       <div className="flex-1 min-h-0">
-                        {/* Table header */}
-                        <div
-                          className="rounded-t-md px-3 py-2 flex items-center"
-                          style={{ backgroundColor: settings.accentColor + '12' }}
-                        >
+                        <div className="px-3 py-2 flex items-center" style={{ backgroundColor: settings.accentColor + '12', borderTopLeftRadius: currentTemplate.borderRadius, borderTopRightRadius: currentTemplate.borderRadius }}>
                           <div className="flex w-full items-center gap-2">
                             <div className="h-1.5 w-20 rounded-full" style={{ backgroundColor: settings.accentColor + '50' }} />
                             <div className="flex-1" />
-                            {settings.billingType === 'detailed' && (
-                              <>
-                                <div className="h-1.5 w-8 rounded-full" style={{ backgroundColor: settings.accentColor + '50' }} />
-                                <div className="h-1.5 w-10 rounded-full" style={{ backgroundColor: settings.accentColor + '50' }} />
-                              </>
-                            )}
+                            {settings.billingType === 'detailed' && (<>
+                              <div className="h-1.5 w-8 rounded-full" style={{ backgroundColor: settings.accentColor + '50' }} />
+                              <div className="h-1.5 w-10 rounded-full" style={{ backgroundColor: settings.accentColor + '50' }} />
+                            </>)}
                             <div className="h-1.5 w-8 rounded-full" style={{ backgroundColor: settings.accentColor + '50' }} />
                             <div className="h-1.5 w-12 rounded-full" style={{ backgroundColor: settings.accentColor + '50' }} />
                           </div>
                         </div>
-
-                        {/* Table rows */}
                         {[...Array(settings.billingType === 'detailed' ? 4 : 3)].map((_, i) => (
-                          <div key={i} className={`px-3 py-2.5 flex items-center ${i < (settings.billingType === 'detailed' ? 3 : 2) ? 'border-b border-gray-100' : ''}`}>
+                          <div key={i} className="px-3 py-2.5 flex items-center" style={{ backgroundColor: i % 2 === 0 ? currentTemplate.rowEven : currentTemplate.rowOdd, borderBottom: i < (settings.billingType === 'detailed' ? 3 : 2) ? `1px solid ${currentTemplate.borderLight}` : undefined }}>
                             <div className="flex w-full items-center gap-2">
-                              <div className="h-1.5 rounded-full bg-gray-200" style={{ width: `${60 + (i % 3) * 15}px` }} />
+                              <div className="h-1.5 rounded-full" style={{ width: `${60 + (i % 3) * 15}px`, backgroundColor: currentTemplate.borderLight }} />
                               <div className="flex-1" />
-                              {settings.billingType === 'detailed' && (
-                                <>
-                                  <div className="h-1.5 w-6 rounded-full bg-gray-100" />
-                                  <div className="h-1.5 w-8 rounded-full bg-gray-100" />
-                                </>
-                              )}
-                              <div className="h-1.5 w-6 rounded-full bg-gray-100" />
-                              <div className="h-1.5 w-10 rounded-full bg-gray-200" />
+                              {settings.billingType === 'detailed' && (<>
+                                <div className="h-1.5 w-6 rounded-full" style={{ backgroundColor: currentTemplate.borderLight, opacity: 0.6 }} />
+                                <div className="h-1.5 w-8 rounded-full" style={{ backgroundColor: currentTemplate.borderLight, opacity: 0.6 }} />
+                              </>)}
+                              <div className="h-1.5 w-6 rounded-full" style={{ backgroundColor: currentTemplate.borderLight, opacity: 0.6 }} />
+                              <div className="h-1.5 w-10 rounded-full" style={{ backgroundColor: currentTemplate.borderLight }} />
                             </div>
                           </div>
                         ))}
                       </div>
 
-                      {/* Totals section */}
+                      {/* Totals */}
                       <div className="flex justify-end mt-4 mb-4">
                         <div className="w-48 space-y-1.5">
-                          {settings.billingType === 'detailed' && (
-                            <>
-                              <div className="flex items-center justify-between">
-                                <p className="text-[9px] text-gray-400">Sous-total HT</p>
-                                <div className="h-1.5 w-14 rounded-full bg-gray-200" />
-                              </div>
-                              <div className="flex items-center justify-between">
-                                <p className="text-[9px] text-gray-400">TVA (20%)</p>
-                                <div className="h-1.5 w-10 rounded-full bg-gray-200" />
-                              </div>
-                              <div className="flex items-center justify-between">
-                                <p className="text-[9px] text-gray-400">Remise</p>
-                                <div className="h-1.5 w-8 rounded-full bg-gray-100" />
-                              </div>
-                              <div className="h-px bg-gray-200 my-1" />
-                            </>
-                          )}
-                          <div
-                            className="flex items-center justify-between rounded-md px-3 py-2"
-                            style={{ backgroundColor: settings.accentColor + '10' }}
-                          >
-                            <p className="text-[10px] font-semibold" style={{ color: settings.accentColor }}>
-                              Total TTC
-                            </p>
-                            <p className="text-xs font-bold" style={{ color: settings.accentColor }}>
-                              1 234,00 EUR
-                            </p>
+                          {settings.billingType === 'detailed' && (<>
+                            <div className="flex items-center justify-between">
+                              <p className="text-[9px]" style={{ color: currentTemplate.textMuted }}>Sous-total HT</p>
+                              <div className="h-1.5 w-14 rounded-full" style={{ backgroundColor: currentTemplate.borderLight }} />
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <p className="text-[9px]" style={{ color: currentTemplate.textMuted }}>TVA (20%)</p>
+                              <div className="h-1.5 w-10 rounded-full" style={{ backgroundColor: currentTemplate.borderLight }} />
+                            </div>
+                            <div className="h-px my-1" style={{ backgroundColor: currentTemplate.borderLight }} />
+                          </>)}
+                          <div className="flex items-center justify-between px-3 py-2" style={{ backgroundColor: settings.accentColor + currentTemplate.totalBg, borderRadius: currentTemplate.borderRadius }}>
+                            <p className="text-[10px] font-semibold" style={{ color: settings.accentColor }}>Total TTC</p>
+                            <p className="text-xs font-bold" style={{ color: settings.accentColor }}>1 234,00 EUR</p>
                           </div>
                         </div>
                       </div>
 
-                      {/* Footer: payment methods + legal */}
-                      <div className="border-t border-gray-100 pt-3 mt-auto space-y-2">
+                      {/* Footer */}
+                      <div className="pt-3 mt-auto space-y-2" style={{ borderTop: `1px solid ${currentTemplate.borderLight}` }}>
                         {settings.paymentMethods.length > 0 && (
                           <div>
-                            <p className="text-[8px] font-semibold text-gray-400 uppercase tracking-wider mb-1">
-                              Moyens de paiement acceptes
-                            </p>
+                            <p className="text-[8px] font-semibold uppercase tracking-wider mb-1" style={{ color: currentTemplate.textMuted }}>Moyens de paiement</p>
                             <div className="flex flex-wrap gap-1.5">
                               {settings.paymentMethods.includes('bank_transfer') && (
-                                <span className="text-[8px] bg-gray-50 text-gray-500 rounded-md px-2 py-0.5 border border-gray-100">
-                                  Virement bancaire
-                                </span>
+                                <span className="text-[8px] rounded-md px-2 py-0.5" style={{ backgroundColor: currentTemplate.paymentBadgeBg, border: `1px solid ${currentTemplate.paymentBadgeBorder}`, color: currentTemplate.paymentBadgeText }}>Virement</span>
                               )}
                               {settings.paymentMethods.includes('cash') && (
-                                <span className="text-[8px] bg-gray-50 text-gray-500 rounded-md px-2 py-0.5 border border-gray-100">
-                                  Especes
-                                </span>
+                                <span className="text-[8px] rounded-md px-2 py-0.5" style={{ backgroundColor: currentTemplate.paymentBadgeBg, border: `1px solid ${currentTemplate.paymentBadgeBorder}`, color: currentTemplate.paymentBadgeText }}>Especes</span>
                               )}
                               {settings.paymentMethods.includes('custom') && settings.customPaymentMethod && (
-                                <span className="text-[8px] bg-gray-50 text-gray-500 rounded-md px-2 py-0.5 border border-gray-100">
-                                  {settings.customPaymentMethod}
-                                </span>
+                                <span className="text-[8px] rounded-md px-2 py-0.5" style={{ backgroundColor: currentTemplate.paymentBadgeBg, border: `1px solid ${currentTemplate.paymentBadgeBorder}`, color: currentTemplate.paymentBadgeText }}>{settings.customPaymentMethod}</span>
                               )}
                             </div>
-                          </div>
-                        )}
-                        {settings.billingType === 'detailed' && (
-                          <div className="space-y-0.5">
-                            <div className="h-1 w-full rounded-full bg-gray-50" />
-                            <div className="h-1 w-4/5 rounded-full bg-gray-50" />
                           </div>
                         )}
                       </div>
@@ -657,6 +972,15 @@ export default function InvoiceSettingsPage() {
           </div>
         </motion.div>
       </div>
+
+      {/* Template Selection Modal */}
+      <TemplateModal
+        open={templateModalOpen}
+        onClose={() => setTemplateModalOpen(false)}
+        accentColor={settings.accentColor}
+        currentTemplate={settings.template}
+        onSelect={(id) => updateSettings({ template: id })}
+      />
     </motion.div>
   )
 }

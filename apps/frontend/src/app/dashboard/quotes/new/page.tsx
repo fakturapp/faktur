@@ -318,6 +318,7 @@ export default function NewQuotePage() {
             paymentMethods={invoiceSettings.paymentMethods}
             customPaymentMethod={invoiceSettings.customPaymentMethod}
             subject={options.subject}
+            template={invoiceSettings.template}
           />
         </motion.div>
 

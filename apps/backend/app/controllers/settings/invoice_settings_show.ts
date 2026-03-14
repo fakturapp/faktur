@@ -20,6 +20,7 @@ export default class InvoiceSettingsShow {
           logoUrl: null,
           paymentMethods: ['bank_transfer'],
           customPaymentMethod: '',
+          template: 'classique',
         },
       })
     }
@@ -31,6 +32,7 @@ export default class InvoiceSettingsShow {
         logoUrl: settings.logoUrl,
         paymentMethods: settings.paymentMethods,
         customPaymentMethod: settings.customPaymentMethod || '',
+        template: settings.template || 'classique',
       },
     })
   }
