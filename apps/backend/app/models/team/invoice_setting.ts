@@ -34,6 +34,9 @@ export default class InvoiceSetting extends BaseModel {
   @column()
   declare template: string
 
+  @column()
+  declare darkMode: boolean
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

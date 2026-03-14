@@ -370,6 +370,7 @@ export default function EditQuotePage() {
             customPaymentMethod={invoiceSettings.customPaymentMethod}
             subject={options.subject}
             template={invoiceSettings.template}
+            darkMode={invoiceSettings.darkMode}
           />
         </motion.div>
 

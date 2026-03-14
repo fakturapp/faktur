@@ -73,9 +73,12 @@ function OptionCheckbox({
 }) {
   return (
     <div>
-      <label className="flex items-center gap-2.5 cursor-pointer py-1">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="flex items-center gap-2.5 cursor-pointer py-1.5 w-full text-left"
+      >
         <div
-          onClick={(e) => { e.preventDefault(); onToggle() }}
           className={cn(
             'h-4 w-4 rounded border flex-shrink-0 flex items-center justify-center transition-colors',
             checked
@@ -86,7 +89,7 @@ function OptionCheckbox({
           {checked && <Check className="h-2.5 w-2.5 text-primary-foreground" />}
         </div>
         <span className="text-sm text-foreground">{label}</span>
-      </label>
+      </button>
       {checked && children && <div className="ml-6 mt-1.5 mb-1">{children}</div>}
     </div>
   )

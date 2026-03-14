@@ -10,6 +10,7 @@ export interface InvoiceSettings {
   paymentMethods: string[]
   customPaymentMethod: string
   template: string
+  darkMode: boolean
 }
 
 interface InvoiceSettingsContextType {
@@ -26,6 +27,7 @@ const defaultSettings: InvoiceSettings = {
   paymentMethods: ['bank_transfer'],
   customPaymentMethod: '',
   template: 'classique',
+  darkMode: false,
 }
 
 const InvoiceSettingsContext = createContext<InvoiceSettingsContextType>({

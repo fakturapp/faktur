@@ -319,6 +319,7 @@ export default function NewQuotePage() {
             customPaymentMethod={invoiceSettings.customPaymentMethod}
             subject={options.subject}
             template={invoiceSettings.template}
+            darkMode={invoiceSettings.darkMode}
           />
         </motion.div>
 

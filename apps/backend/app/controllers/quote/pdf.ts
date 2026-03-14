@@ -31,6 +31,7 @@ export default class Pdf {
 
     const settingsData = {
       template: invoiceSettings?.template || 'classique',
+      darkMode: invoiceSettings?.darkMode || false,
       paymentMethods: invoiceSettings?.paymentMethods || ['bank_transfer'],
       customPaymentMethod: invoiceSettings?.customPaymentMethod || null,
     }

@@ -26,6 +26,8 @@ import {
   LayoutTemplate,
   X,
   ChevronRight,
+  Moon,
+  Sun,
 } from 'lucide-react'
 
 const fadeUp = {
@@ -86,10 +88,9 @@ function TemplateThumbnail({
       >
         <div className={`h-full w-full ${p} flex flex-col relative`} style={{ backgroundColor: T.docBg }}>
 
-          {/* ── CLASSIQUE: accent bar + standard layout ── */}
+          {/* ── CLASSIQUE: standard layout ── */}
           {T.id === 'classique' && (<>
-            <div className="absolute top-0 left-0 bottom-0 w-[3px]" style={{ backgroundColor: accentColor }} />
-            <div className="flex justify-between items-start mb-2 pl-1">
+            <div className="flex justify-between items-start mb-2">
               <div className="space-y-0.5">
                 <div className="h-1.5 w-6 rounded-full" style={{ backgroundColor: T.borderLight }} />
                 <div className="h-1 w-8 rounded-full" style={{ backgroundColor: T.borderLight }} />
@@ -102,25 +103,6 @@ function TemplateThumbnail({
               <div className="h-0.5 w-4 rounded-full mb-0.5" style={{ backgroundColor: T.textMuted, opacity: 0.3 }} />
               <div className="h-1 w-6 rounded-full mb-0.5" style={{ backgroundColor: T.text, opacity: 0.2 }} />
               <div className="h-0.5 w-8 rounded-full" style={{ backgroundColor: T.textMuted, opacity: 0.15 }} />
-            </div>
-          </>)}
-
-          {/* ── SOMBRE: dark bg + accent bar ── */}
-          {T.id === 'sombre' && (<>
-            <div className="absolute top-0 left-0 bottom-0 w-[3px]" style={{ backgroundColor: accentColor }} />
-            <div className="flex justify-between items-start mb-2 pl-1">
-              <div className="space-y-0.5">
-                <div className="h-1.5 w-6 rounded-full" style={{ backgroundColor: '#52525b' }} />
-                <div className="h-1 w-8 rounded-full" style={{ backgroundColor: '#3f3f46' }} />
-              </div>
-              <div className="rounded px-1.5 py-0.5" style={{ backgroundColor: `${accentColor}20` }}>
-                <div className="h-1.5 w-5 rounded-full" style={{ backgroundColor: accentColor, opacity: 0.8 }} />
-              </div>
-            </div>
-            <div className="rounded px-1 py-1 mb-2" style={{ backgroundColor: '#27272a', border: '0.5px solid #3f3f46' }}>
-              <div className="h-0.5 w-4 rounded-full mb-0.5" style={{ backgroundColor: '#71717a' }} />
-              <div className="h-1 w-6 rounded-full mb-0.5" style={{ backgroundColor: '#a1a1aa', opacity: 0.3 }} />
-              <div className="h-0.5 w-8 rounded-full" style={{ backgroundColor: '#71717a', opacity: 0.5 }} />
             </div>
           </>)}
 
@@ -415,7 +397,7 @@ export default function InvoiceSettingsPage() {
   const [templateModalOpen, setTemplateModalOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const currentTemplate = getTemplate(settings.template)
+  const currentTemplate = getTemplate(settings.template, settings.darkMode)
 
   async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -517,6 +499,27 @@ export default function InvoiceSettingsPage() {
                     </p>
                   </div>
                   <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                </button>
+
+                {/* Dark mode toggle */}
+                <button
+                  onClick={() => updateSettings({ darkMode: !settings.darkMode })}
+                  className={`mt-3 w-full flex items-center gap-3 rounded-xl border-2 p-3 text-left transition-all ${
+                    settings.darkMode
+                      ? 'border-primary bg-primary/5'
+                      : 'border-border hover:border-muted-foreground/30'
+                  }`}
+                >
+                  <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${settings.darkMode ? 'bg-primary/10' : 'bg-muted'}`}>
+                    {settings.darkMode ? <Moon className="h-4 w-4 text-primary" /> : <Sun className="h-4 w-4 text-muted-foreground" />}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-foreground">Mode sombre</p>
+                    <p className="text-xs text-muted-foreground">Appliquer le theme sombre au document</p>
+                  </div>
+                  <div className={`h-5 w-5 rounded-md border-2 flex items-center justify-center transition-colors ${settings.darkMode ? 'border-primary bg-primary' : 'border-muted-foreground/30'}`}>
+                    {settings.darkMode && <Check className="h-3 w-3 text-primary-foreground" />}
+                  </div>
                 </button>
               </CardContent>
             </Card>
@@ -822,15 +825,10 @@ export default function InvoiceSettingsPage() {
                       aspectRatio: '210 / 270',
                       maxHeight: '420px',
                       backgroundColor: currentTemplate.docBg,
-                      border: currentTemplate.id === 'sombre' ? '1px solid #3f3f46' : '1px solid #e5e7eb',
+                      border: settings.darkMode ? '1px solid #3f3f46' : '1px solid #e5e7eb',
                     }}
                   >
                     <div className="h-full flex flex-col p-5 relative">
-
-                      {/* Accent bar */}
-                      {currentTemplate.showAccentBar && (
-                        <div className="absolute top-0 left-0 bottom-0 w-[3px]" style={{ backgroundColor: settings.accentColor }} />
-                      )}
 
                       {/* Banner header */}
                       {currentTemplate.layout === 'banner' && (
