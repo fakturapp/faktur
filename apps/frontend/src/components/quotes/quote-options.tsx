@@ -181,28 +181,6 @@ export function QuoteOptionsPanel({
 
 
 
-        {/* Dates */}
-        <div className="grid grid-cols-2 gap-2 mb-4">
-          <div>
-            <label className="text-xs text-muted-foreground font-medium block mb-1.5">Emission</label>
-            <Input
-              type="date"
-              value={options.issueDate}
-              onChange={(e) => onChange({ issueDate: e.target.value })}
-              className="h-8 text-sm"
-            />
-          </div>
-          <div>
-            <label className="text-xs text-muted-foreground font-medium block mb-1.5">Validite</label>
-            <Input
-              type="date"
-              value={options.validityDate}
-              onChange={(e) => onChange({ validityDate: e.target.value })}
-              className="h-8 text-sm"
-            />
-          </div>
-        </div>
-
         {/* Language */}
         <div className="mb-4">
           <label className="text-xs text-muted-foreground font-medium block mb-1.5">Langue</label>

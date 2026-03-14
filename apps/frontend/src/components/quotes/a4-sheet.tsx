@@ -370,6 +370,8 @@ interface A4SheetProps {
   onFreeFieldChange?: (v: string) => void
   onFooterTextChange?: (v: string) => void
   onDeliveryAddressChange?: (v: string) => void
+  onIssueDateChange?: (d: string) => void
+  onValidityDateChange?: (d: string) => void
 }
 
 export function A4Sheet({
@@ -385,6 +387,7 @@ export function A4Sheet({
   showNotes = true, vatExempt = false, footerText, documentFont = 'Lexend',
   showSubject = true, showAcceptanceConditions = false, showFreeField = false, showFooterText = false,
   onAcceptanceConditionsChange, onFreeFieldChange, onFooterTextChange, onDeliveryAddressChange,
+  onIssueDateChange, onValidityDateChange,
 }: A4SheetProps) {
   const isPreview = mode === 'preview'
   const ed = !isPreview // shorthand: is editable?
@@ -696,15 +699,31 @@ export function A4Sheet({
               </div>
 
               {/* ── Date/Validity container (above lines table) ── */}
-              {(issueDate || validityDate) && (
+              {(issueDate || validityDate || ed) && (
                 isTiime ? (
                   <div className="flex items-end gap-3 mb-4">
                     <div className="flex-1 text-[14px] font-semibold" style={{ color: T.text, padding: '8px' }}>
                       {documentTitle || t.quote}
                     </div>
-                    {issueDate && (
-                      <div className="flex flex-col">
-                        <span className="text-[12px] mb-0.5" style={{ color: T.textMuted, letterSpacing: '0.4px' }}>{t.date}</span>
+                    <div className="flex flex-col">
+                      <span className="text-[12px] mb-0.5" style={{ color: T.textMuted, letterSpacing: '0.4px' }}>{t.date}</span>
+                      {ed ? (
+                        <input
+                          type="date"
+                          value={issueDate}
+                          onChange={(e) => onIssueDateChange?.(e.target.value)}
+                          className="text-[14px] bg-transparent outline-none cursor-pointer"
+                          style={{
+                            border: `1px solid ${T.editBorderDashed}`,
+                            borderRadius: '6px',
+                            height: '36px',
+                            minWidth: '140px',
+                            padding: '0 10px',
+                            color: T.text,
+                            fontFamily: 'inherit',
+                          }}
+                        />
+                      ) : (
                         <div
                           className="flex items-center px-2.5 text-[14px]"
                           style={{
@@ -718,37 +737,73 @@ export function A4Sheet({
                         >
                           {fmtDate(issueDate, lang)}
                         </div>
-                      </div>
-                    )}
-                    {validityDate && (
-                      <div
-                        className="flex items-center px-2 text-[14px]"
-                        style={{
-                          border: `1px dashed ${T.editBorderDashed}`,
-                          background: T.docBg,
-                          padding: '7px',
-                          color: T.text,
-                        }}
-                      >
-                        <span style={{ whiteSpace: 'nowrap' }}>{t.validity} :&nbsp;</span>
-                        <span className="font-medium">{fmtDate(validityDate, lang)}</span>
-                      </div>
-                    )}
+                      )}
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[12px] mb-0.5" style={{ color: T.textMuted, letterSpacing: '0.4px' }}>{t.validity}</span>
+                      {ed ? (
+                        <input
+                          type="date"
+                          value={validityDate}
+                          onChange={(e) => onValidityDateChange?.(e.target.value)}
+                          className="text-[14px] bg-transparent outline-none cursor-pointer"
+                          style={{
+                            border: `1px dashed ${T.editBorderDashed}`,
+                            borderRadius: '6px',
+                            height: '36px',
+                            minWidth: '140px',
+                            padding: '0 10px',
+                            color: T.text,
+                            fontFamily: 'inherit',
+                          }}
+                        />
+                      ) : (
+                        validityDate && (
+                          <div
+                            className="flex items-center px-2 text-[14px]"
+                            style={{
+                              border: `1px dashed ${T.editBorderDashed}`,
+                              background: T.docBg,
+                              padding: '7px',
+                              color: T.text,
+                            }}
+                          >
+                            <span className="font-medium">{fmtDate(validityDate, lang)}</span>
+                          </div>
+                        )
+                      )}
+                    </div>
                   </div>
                 ) : (
                   <div className="flex gap-4 mb-4 px-3 py-2.5" style={{ backgroundColor: `${accentColor}08`, border: `1px solid ${accentColor}20`, borderRadius: T.borderRadius }}>
-                    {issueDate && (
-                      <div className="text-[11px]" style={{ color: T.textMuted }}>
-                        <span className="font-semibold" style={{ color: T.text }}>{t.date} :</span>{' '}
+                    <div className="text-[11px]" style={{ color: T.textMuted }}>
+                      <span className="font-semibold" style={{ color: T.text }}>{t.date} :</span>{' '}
+                      {ed ? (
+                        <input
+                          type="date"
+                          value={issueDate}
+                          onChange={(e) => onIssueDateChange?.(e.target.value)}
+                          className="bg-transparent outline-none cursor-pointer text-[11px] font-medium"
+                          style={{ color: T.textMuted, fontFamily: 'inherit' }}
+                        />
+                      ) : (
                         <span className="font-medium">{fmtDate(issueDate, lang)}</span>
-                      </div>
-                    )}
-                    {validityDate && (
-                      <div className="text-[11px]" style={{ color: T.textMuted }}>
-                        <span className="font-semibold" style={{ color: T.text }}>{t.validity} :</span>{' '}
+                      )}
+                    </div>
+                    <div className="text-[11px]" style={{ color: T.textMuted }}>
+                      <span className="font-semibold" style={{ color: T.text }}>{t.validity} :</span>{' '}
+                      {ed ? (
+                        <input
+                          type="date"
+                          value={validityDate}
+                          onChange={(e) => onValidityDateChange?.(e.target.value)}
+                          className="bg-transparent outline-none cursor-pointer text-[11px] font-medium"
+                          style={{ color: T.textMuted, fontFamily: 'inherit' }}
+                        />
+                      ) : (
                         <span className="font-medium">{fmtDate(validityDate, lang)}</span>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 )
               )}
