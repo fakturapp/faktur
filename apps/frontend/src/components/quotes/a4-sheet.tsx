@@ -356,6 +356,10 @@ interface A4SheetProps {
   template?: string
   darkMode?: boolean
   language?: string
+  showNotes?: boolean
+  vatExempt?: boolean
+  footerText?: string
+  documentFont?: string
 }
 
 export function A4Sheet({
@@ -368,10 +372,23 @@ export function A4Sheet({
   deliveryAddress, showDeliveryAddress, clientSiren, showClientSiren,
   clientVatNumber, showClientVatNumber, paymentMethods, customPaymentMethod,
   subject, template, darkMode, language,
+  showNotes = true, vatExempt = false, footerText, documentFont = 'Lexend',
 }: A4SheetProps) {
   const isPreview = mode === 'preview'
   const ed = !isPreview // shorthand: is editable?
   const lang = language || 'fr'
+
+  // Dynamically load document font from Google Fonts
+  useEffect(() => {
+    if (!documentFont || documentFont === 'Lexend') return // Lexend already loaded via next/font
+    const id = `gfont-${documentFont.replace(/\s/g, '-')}`
+    if (document.getElementById(id)) return
+    const link = document.createElement('link')
+    link.id = id
+    link.rel = 'stylesheet'
+    link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(documentFont)}:wght@300;400;500;600;700;800&display=swap`
+    document.head.appendChild(link)
+  }, [documentFont])
 
   const T = getTemplate(template, darkMode)
   const t = getTranslations(lang)
@@ -408,7 +425,7 @@ export function A4Sheet({
         <div className="absolute inset-0 overflow-y-auto">
           <div
             className="flex flex-col min-h-full px-10 py-8"
-            style={{ fontFamily: "'Inter', 'Segoe UI', sans-serif", color: T.text }}
+            style={{ fontFamily: `'${documentFont}', 'Segoe UI', sans-serif`, color: T.text }}
           >
 
             {/* ═══════════════════════════════════════════
@@ -537,23 +554,16 @@ export function A4Sheet({
                 </div>
               )}
 
-              {/* ── Client Block (left-aligned, below dates) ── */}
-              <div className="flex mb-5">
+              {/* ── Client Block (right-aligned, no container) ── */}
+              <div className="flex justify-end mb-5">
                 <div
                   className={cn(
-                    'px-5 py-3.5 border relative transition-all w-full max-w-[55%]',
-                    !client && 'border-dashed cursor-pointer',
+                    'relative transition-all w-full max-w-[50%]',
+                    !client && 'cursor-pointer',
                   )}
-                  style={{
-                    borderRadius: T.borderRadius,
-                    backgroundColor: client ? T.clientBlockBg : T.clientEmptyBg,
-                    borderColor: client ? T.clientBlockBorder : T.clientEmptyBorder,
-                  }}
                   onClick={!client ? onClientClick : undefined}
-                  onMouseEnter={!client && ed ? (e) => (e.currentTarget.style.borderColor = T.textMuted) : undefined}
-                  onMouseLeave={!client && ed ? (e) => (e.currentTarget.style.borderColor = T.clientEmptyBorder) : undefined}
                 >
-                  <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1.5" style={{ color: T.textMuted }}>
+                  <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1.5" style={{ color: accentColor }}>
                     {t.recipient}
                   </div>
 
@@ -587,7 +597,7 @@ export function A4Sheet({
 
                       {/* ── Delivery address inside client block ── */}
                       {showDeliveryAddress && deliveryAddress && (
-                        <div className="mt-2 pt-2" style={{ borderTop: `1px solid ${T.clientBlockBorder}` }}>
+                        <div className="mt-2 pt-2" style={{ borderTop: `1px solid ${T.borderLight}` }}>
                           <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-0.5" style={{ color: T.textMuted }}>
                             {t.deliveryAddress}
                           </div>
@@ -598,7 +608,7 @@ export function A4Sheet({
                       {ed && (
                         <button
                           onClick={(e) => { e.stopPropagation(); onClearClient() }}
-                          className="absolute top-3.5 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity"
                           style={{ color: T.textMuted }}
                           onMouseEnter={(e) => (e.currentTarget.style.color = '#e53935')}
                           onMouseLeave={(e) => (e.currentTarget.style.color = T.textMuted)}
@@ -608,7 +618,7 @@ export function A4Sheet({
                       )}
                     </div>
                   ) : (
-                    <div className="py-3">
+                    <div className="py-2">
                       <div className="text-[12px] leading-[1.7] space-y-0.5">
                         <div className="rounded h-3.5 w-40" style={{ backgroundColor: T.borderLight }} />
                         <div className="rounded h-3 w-52 mt-1.5" style={{ backgroundColor: T.borderLight }} />
@@ -798,21 +808,32 @@ export function A4Sheet({
                 </div>
               </div>
 
-              {/* ── Notes (editable) ── */}
-              <div className="pt-3" style={{ borderTop: `1px solid ${T.clientBlockBorder}` }}>
-                <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1" style={{ color: T.textMuted }}>{t.conditionsAndNotes}</div>
-                {isPreview ? (
-                  <p className="text-[11px] whitespace-pre-line leading-[1.6]" style={{ color: T.textMuted }}>
-                    {notes || <span className="italic" style={{ color: T.inputPlaceholder }}>{t.noNotes}</span>}
-                  </p>
-                ) : (
-                  <textarea value={notes} onChange={(e) => onNotesChange(e.target.value)}
-                    placeholder={t.conditionsAndNotes}
-                    className="w-full bg-transparent text-[11px] leading-[1.6] focus:outline-none resize-y min-h-[30px]"
-                    style={{ color: T.textMuted }}
-                    rows={2} />
-                )}
-              </div>
+              {/* ── VAT exempt mention ── */}
+              {vatExempt && (
+                <div className="mb-3 text-[10px] italic" style={{ color: T.textMuted }}>
+                  {lang === 'en'
+                    ? 'VAT not applicable, article 293 B of the CGI'
+                    : 'TVA non applicable, article 293 B du CGI'}
+                </div>
+              )}
+
+              {/* ── Notes (editable, optional) ── */}
+              {showNotes && (
+                <div className="pt-3" style={{ borderTop: `1px solid ${T.borderLight}` }}>
+                  <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1" style={{ color: T.textMuted }}>{t.conditionsAndNotes}</div>
+                  {isPreview ? (
+                    <p className="text-[11px] whitespace-pre-line leading-[1.6]" style={{ color: T.textMuted }}>
+                      {notes || <span className="italic" style={{ color: T.inputPlaceholder }}>{t.noNotes}</span>}
+                    </p>
+                  ) : (
+                    <textarea value={notes} onChange={(e) => onNotesChange(e.target.value)}
+                      placeholder={t.conditionsAndNotes}
+                      className="w-full bg-transparent text-[11px] leading-[1.6] focus:outline-none resize-y min-h-[30px]"
+                      style={{ color: T.textMuted }}
+                      rows={2} />
+                  )}
+                </div>
+              )}
 
               {acceptanceConditions && (
                 <div className="mt-2">
@@ -860,22 +881,28 @@ export function A4Sheet({
                 </div>
               )}
 
-              {/* ── Footer (editable) ── */}
+              {/* ── Footer (editable or custom text) ── */}
               <div className="mt-4 pt-3 text-center" style={{ borderTop: `2px solid ${T.footerBorder}` }}>
-                <div className="text-[9px] leading-[1.6]" style={{ color: T.textFooter }}>
-                  {company && (<>
-                    {ie(company.legalName, (v) => onCompanyFieldChange('legalName', v), 'font-semibold text-[9px]', t.society)}
-                    {company.siren && <> &mdash; SIREN : {ie(company.siren, (v) => onCompanyFieldChange('siren', v), 'text-[9px]')}</>}
-                    {company.vatNumber && <> &mdash; {lang === 'en' ? 'VAT No.' : 'N\u00b0 TVA'} : {ie(company.vatNumber, (v) => onCompanyFieldChange('vatNumber', v), 'text-[9px]')}</>}
-                    <br />
-                    {ie(company.addressLine1 || '', (v) => onCompanyFieldChange('addressLine1', v), 'text-[9px]', t.address)}
-                    {', '}
-                    {ie(company.postalCode || '', (v) => onCompanyFieldChange('postalCode', v), 'text-[9px]', t.postalCode)}{' '}
-                    {ie(company.city || '', (v) => onCompanyFieldChange('city', v), 'text-[9px]', t.city)}
-                    {company.phone && <> &mdash; {ie(company.phone, (v) => onCompanyFieldChange('phone', v), 'text-[9px]')}</>}
-                    {company.email && <> &mdash; {ie(company.email, (v) => onCompanyFieldChange('email', v), 'text-[9px]')}</>}
-                  </>)}
-                </div>
+                {footerText ? (
+                  <div className="text-[9px] leading-[1.6] whitespace-pre-line" style={{ color: T.textFooter }}>
+                    {footerText}
+                  </div>
+                ) : (
+                  <div className="text-[9px] leading-[1.6]" style={{ color: T.textFooter }}>
+                    {company && (<>
+                      {ie(company.legalName, (v) => onCompanyFieldChange('legalName', v), 'font-semibold text-[9px]', t.society)}
+                      {company.siren && <> &mdash; SIREN : {ie(company.siren, (v) => onCompanyFieldChange('siren', v), 'text-[9px]')}</>}
+                      {company.vatNumber && <> &mdash; {lang === 'en' ? 'VAT No.' : 'N\u00b0 TVA'} : {ie(company.vatNumber, (v) => onCompanyFieldChange('vatNumber', v), 'text-[9px]')}</>}
+                      <br />
+                      {ie(company.addressLine1 || '', (v) => onCompanyFieldChange('addressLine1', v), 'text-[9px]', t.address)}
+                      {', '}
+                      {ie(company.postalCode || '', (v) => onCompanyFieldChange('postalCode', v), 'text-[9px]', t.postalCode)}{' '}
+                      {ie(company.city || '', (v) => onCompanyFieldChange('city', v), 'text-[9px]', t.city)}
+                      {company.phone && <> &mdash; {ie(company.phone, (v) => onCompanyFieldChange('phone', v), 'text-[9px]')}</>}
+                      {company.email && <> &mdash; {ie(company.email, (v) => onCompanyFieldChange('email', v), 'text-[9px]')}</>}
+                    </>)}
+                  </div>
+                )}
               </div>
 
             </div>

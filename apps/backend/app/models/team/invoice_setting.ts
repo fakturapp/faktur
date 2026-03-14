@@ -37,6 +37,9 @@ export default class InvoiceSetting extends BaseModel {
   @column()
   declare darkMode: boolean
 
+  @column()
+  declare documentFont: string
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

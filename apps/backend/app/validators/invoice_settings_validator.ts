@@ -8,5 +8,6 @@ export const updateInvoiceSettingsValidator = vine.compile(
     customPaymentMethod: vine.string().trim().maxLength(255).optional(),
     template: vine.string().trim().maxLength(30).optional(),
     darkMode: vine.boolean().optional(),
+    documentFont: vine.string().trim().maxLength(50).optional(),
   })
 )

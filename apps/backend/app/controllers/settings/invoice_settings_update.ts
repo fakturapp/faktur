@@ -23,6 +23,7 @@ export default class InvoiceSettingsUpdate {
         customPaymentMethod: payload.customPaymentMethod || null,
         template: payload.template || 'classique',
         darkMode: payload.darkMode ?? false,
+        documentFont: payload.documentFont || 'Lexend',
       })
     } else {
       settings.billingType = payload.billingType
@@ -31,6 +32,7 @@ export default class InvoiceSettingsUpdate {
       settings.customPaymentMethod = payload.customPaymentMethod || null
       if (payload.template) settings.template = payload.template
       if (payload.darkMode !== undefined) settings.darkMode = payload.darkMode
+      if (payload.documentFont) settings.documentFont = payload.documentFont
       await settings.save()
     }
 
@@ -44,6 +46,7 @@ export default class InvoiceSettingsUpdate {
         customPaymentMethod: settings.customPaymentMethod || '',
         template: settings.template || 'classique',
         darkMode: settings.darkMode || false,
+        documentFont: settings.documentFont || 'Lexend',
       },
     })
   }

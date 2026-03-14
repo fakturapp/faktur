@@ -34,6 +34,7 @@ export default class Pdf {
       darkMode: invoiceSettings?.darkMode || false,
       paymentMethods: invoiceSettings?.paymentMethods || ['bank_transfer'],
       customPaymentMethod: invoiceSettings?.customPaymentMethod || null,
+      documentFont: invoiceSettings?.documentFont || 'Lexend',
     }
 
     const quoteData = {

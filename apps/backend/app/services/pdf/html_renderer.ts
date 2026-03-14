@@ -77,6 +77,7 @@ interface SettingsData {
   darkMode: boolean
   paymentMethods: string[]
   customPaymentMethod: string | null
+  documentFont: string
 }
 
 function esc(str: string | null | undefined): string {
@@ -176,15 +177,19 @@ export function renderQuoteHtml(
   }
   discountAmount = Math.round(discountAmount * 100) / 100
 
+  const fontName = settings.documentFont || 'Lexend'
+  const fontImport = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}:wght@300;400;500;600;700;800&display=swap`
+
   return `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
+<link rel="stylesheet" href="${fontImport}">
 <style>
   @page { size: A4; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: '${fontName}', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size: 11px;
     color: ${T.text};
     background: ${T.docBg};

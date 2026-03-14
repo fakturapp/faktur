@@ -22,6 +22,7 @@ export default class InvoiceSettingsShow {
           customPaymentMethod: '',
           template: 'classique',
           darkMode: false,
+          documentFont: 'Lexend',
         },
       })
     }
@@ -35,6 +36,7 @@ export default class InvoiceSettingsShow {
         customPaymentMethod: settings.customPaymentMethod || '',
         template: settings.template || 'classique',
         darkMode: settings.darkMode || false,
+        documentFont: settings.documentFont || 'Lexend',
       },
     })
   }

@@ -327,6 +327,7 @@ export default function NewQuotePage() {
             showNotes={options.showNotes}
             vatExempt={options.vatExempt}
             footerText={options.footerText}
+            documentFont={invoiceSettings.documentFont}
           />
         </motion.div>
 

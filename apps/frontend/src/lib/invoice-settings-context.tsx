@@ -11,6 +11,7 @@ export interface InvoiceSettings {
   customPaymentMethod: string
   template: string
   darkMode: boolean
+  documentFont: string
 }
 
 interface InvoiceSettingsContextType {
@@ -28,6 +29,7 @@ const defaultSettings: InvoiceSettings = {
   customPaymentMethod: '',
   template: 'classique',
   darkMode: false,
+  documentFont: 'Lexend',
 }
 
 const InvoiceSettingsContext = createContext<InvoiceSettingsContextType>({

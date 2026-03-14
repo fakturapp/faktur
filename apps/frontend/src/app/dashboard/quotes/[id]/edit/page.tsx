@@ -381,6 +381,7 @@ export default function EditQuotePage() {
             showNotes={options.showNotes}
             vatExempt={options.vatExempt}
             footerText={options.footerText}
+            documentFont={invoiceSettings.documentFont}
           />
         </motion.div>
 
