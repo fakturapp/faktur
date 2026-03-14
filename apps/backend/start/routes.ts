@@ -9,6 +9,7 @@ import '#start/routes/company'
 import '#start/routes/client'
 import '#start/routes/settings'
 import '#start/routes/quote'
+import '#start/routes/einvoicing'
 
 router.get('/', async () => {
   return {
