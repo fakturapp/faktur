@@ -32,6 +32,11 @@ export interface QuoteOptions {
   showNotes: boolean
   vatExempt: boolean
   footerText: string
+  showSubject: boolean
+  showDeliveryAddress: boolean
+  showAcceptanceConditions: boolean
+  showFreeField: boolean
+  showFooterText: boolean
 }
 
 interface QuoteOptionsProps {
@@ -107,14 +112,10 @@ export function QuoteOptionsPanel({
   selectedClient, onOpenClientModal,
   subtotal, taxAmount, discountAmount, total, tvaBreakdown,
 }: QuoteOptionsProps) {
-  const [showDelivery, setShowDelivery] = useState(!!options.deliveryAddress)
   const [showSiren, setShowSiren] = useState(!!options.clientSiren)
   const [showVat, setShowVat] = useState(!!options.clientVatNumber)
-  const [showConditions, setShowConditions] = useState(!!options.acceptanceConditions)
   const [showTitle, setShowTitle] = useState(!!options.documentTitle)
-  const [showFreeField, setShowFreeField] = useState(!!options.freeField)
   const [showDiscount, setShowDiscount] = useState(options.globalDiscountType !== 'none')
-  const [showFooterText, setShowFooterText] = useState(!!options.footerText)
 
   return (
     <div className="space-y-4">
@@ -260,25 +261,19 @@ export function QuoteOptionsPanel({
         {/* Client options */}
         <div className="mb-4 space-y-1">
           <OptionCheckbox
-            checked={showDelivery}
+            checked={options.showDeliveryAddress}
             onToggle={() => {
-              setShowDelivery(!showDelivery)
-              if (showDelivery) onChange({ deliveryAddress: '' })
-              else if (selectedClient) {
-                const addr = [selectedClient.address, selectedClient.addressComplement, `${selectedClient.postalCode || ''} ${selectedClient.city || ''}`].filter(Boolean).join('\n')
-                onChange({ deliveryAddress: addr })
+              if (options.showDeliveryAddress) {
+                onChange({ showDeliveryAddress: false, deliveryAddress: '' })
+              } else {
+                const addr = selectedClient
+                  ? [selectedClient.address, selectedClient.addressComplement, `${selectedClient.postalCode || ''} ${selectedClient.city || ''}`].filter(Boolean).join('\n')
+                  : ''
+                onChange({ showDeliveryAddress: true, deliveryAddress: addr })
               }
             }}
             label="Adresse de livraison"
-          >
-            <textarea
-              placeholder="Adresse..."
-              value={options.deliveryAddress}
-              onChange={(e) => onChange({ deliveryAddress: e.target.value })}
-              rows={2}
-              className="w-full rounded-lg border border-border bg-transparent px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-none"
-            />
-          </OptionCheckbox>
+          />
 
           <OptionCheckbox
             checked={showSiren}
@@ -328,21 +323,21 @@ export function QuoteOptionsPanel({
           <label className="text-xs text-muted-foreground font-medium block mb-2">Infos complementaires</label>
           <div className="space-y-1">
             <OptionCheckbox
-              checked={showConditions}
+              checked={options.showSubject}
+              onToggle={() => onChange({ showSubject: !options.showSubject })}
+              label="Objet"
+            />
+
+            <OptionCheckbox
+              checked={options.showAcceptanceConditions}
               onToggle={() => {
-                setShowConditions(!showConditions)
-                if (showConditions) onChange({ acceptanceConditions: '' })
+                onChange({
+                  showAcceptanceConditions: !options.showAcceptanceConditions,
+                  ...(options.showAcceptanceConditions ? { acceptanceConditions: '' } : {}),
+                })
               }}
               label="Conditions d'acceptation"
-            >
-              <textarea
-                placeholder="Conditions..."
-                value={options.acceptanceConditions}
-                onChange={(e) => onChange({ acceptanceConditions: e.target.value })}
-                rows={2}
-                className="w-full rounded-lg border border-border bg-transparent px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-none"
-              />
-            </OptionCheckbox>
+            />
 
             <OptionCheckbox
               checked={options.signatureField}
@@ -367,21 +362,15 @@ export function QuoteOptionsPanel({
             </OptionCheckbox>
 
             <OptionCheckbox
-              checked={showFreeField}
+              checked={options.showFreeField}
               onToggle={() => {
-                setShowFreeField(!showFreeField)
-                if (showFreeField) onChange({ freeField: '' })
+                onChange({
+                  showFreeField: !options.showFreeField,
+                  ...(options.showFreeField ? { freeField: '' } : {}),
+                })
               }}
               label="Champ libre"
-            >
-              <textarea
-                placeholder="Texte supplementaire..."
-                value={options.freeField}
-                onChange={(e) => onChange({ freeField: e.target.value })}
-                rows={2}
-                className="w-full rounded-lg border border-border bg-transparent px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-none"
-              />
-            </OptionCheckbox>
+            />
 
             <OptionCheckbox
               checked={showDiscount}
@@ -437,21 +426,15 @@ export function QuoteOptionsPanel({
             />
 
             <OptionCheckbox
-              checked={showFooterText}
+              checked={options.showFooterText}
               onToggle={() => {
-                setShowFooterText(!showFooterText)
-                if (showFooterText) onChange({ footerText: '' })
+                onChange({
+                  showFooterText: !options.showFooterText,
+                  ...(options.showFooterText ? { footerText: '' } : {}),
+                })
               }}
               label="Texte de pied de page"
-            >
-              <textarea
-                placeholder="Ex: Conditions generales de vente..."
-                value={options.footerText}
-                onChange={(e) => onChange({ footerText: e.target.value })}
-                rows={3}
-                className="w-full rounded-lg border border-border bg-transparent px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-none"
-              />
-            </OptionCheckbox>
+            />
           </div>
         </div>
       </div>

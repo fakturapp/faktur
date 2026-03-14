@@ -64,6 +64,11 @@ export default function EditQuotePage() {
     showNotes: true,
     vatExempt: false,
     footerText: '',
+    showSubject: true,
+    showDeliveryAddress: false,
+    showAcceptanceConditions: false,
+    showFreeField: false,
+    showFooterText: false,
   })
 
   const [notes, setNotes] = useState('')
@@ -103,6 +108,11 @@ export default function EditQuotePage() {
           showNotes: q.showNotes !== false,
           vatExempt: q.vatExempt || false,
           footerText: q.footerText || '',
+          showSubject: true,
+          showDeliveryAddress: !!q.deliveryAddress,
+          showAcceptanceConditions: !!q.acceptanceConditions,
+          showFreeField: !!q.freeField,
+          showFooterText: !!q.footerText,
         })
 
         if (q.client) setSelectedClient(q.client)
@@ -372,7 +382,7 @@ export default function EditQuotePage() {
             signatureField={options.signatureField}
             freeField={options.freeField}
             deliveryAddress={options.deliveryAddress}
-            showDeliveryAddress={!!options.deliveryAddress}
+            showDeliveryAddress={options.showDeliveryAddress}
             clientSiren={options.clientSiren}
             showClientSiren={!!options.clientSiren}
             clientVatNumber={options.clientVatNumber}
@@ -388,6 +398,14 @@ export default function EditQuotePage() {
             vatExempt={options.vatExempt}
             footerText={options.footerText}
             documentFont={invoiceSettings.documentFont}
+            showSubject={options.showSubject}
+            showAcceptanceConditions={options.showAcceptanceConditions}
+            showFreeField={options.showFreeField}
+            showFooterText={options.showFooterText}
+            onAcceptanceConditionsChange={(v) => handleOptionsChange({ acceptanceConditions: v })}
+            onFreeFieldChange={(v) => handleOptionsChange({ freeField: v })}
+            onFooterTextChange={(v) => handleOptionsChange({ footerText: v })}
+            onDeliveryAddressChange={(v) => handleOptionsChange({ deliveryAddress: v })}
           />
         </motion.div>
 

@@ -362,6 +362,14 @@ interface A4SheetProps {
   vatExempt?: boolean
   footerText?: string
   documentFont?: string
+  showSubject?: boolean
+  showAcceptanceConditions?: boolean
+  showFreeField?: boolean
+  showFooterText?: boolean
+  onAcceptanceConditionsChange?: (v: string) => void
+  onFreeFieldChange?: (v: string) => void
+  onFooterTextChange?: (v: string) => void
+  onDeliveryAddressChange?: (v: string) => void
 }
 
 export function A4Sheet({
@@ -375,6 +383,8 @@ export function A4Sheet({
   clientVatNumber, showClientVatNumber, paymentMethods, customPaymentMethod,
   subject, onSubjectChange, template, darkMode, language,
   showNotes = true, vatExempt = false, footerText, documentFont = 'Lexend',
+  showSubject = true, showAcceptanceConditions = false, showFreeField = false, showFooterText = false,
+  onAcceptanceConditionsChange, onFreeFieldChange, onFooterTextChange, onDeliveryAddressChange,
 }: A4SheetProps) {
   const isPreview = mode === 'preview'
   const ed = !isPreview // shorthand: is editable?
@@ -556,10 +566,12 @@ export function A4Sheet({
               )}
 
               {/* ── Subject (inline editable) ── */}
-              <div className="mb-4 text-[13px]" style={{ color: T.textMuted }}>
-                <span className="font-semibold" style={{ color: T.text }}>{t.subject} : </span>
-                {ie(subject, onSubjectChange, 'text-[13px]', lang === 'en' ? 'e.g. Website development' : 'Ex: Developpement site web')}
-              </div>
+              {showSubject && (
+                <div className="mb-4 text-[13px]" style={{ color: T.textMuted }}>
+                  <span className="font-semibold" style={{ color: T.text }}>{t.subject} : </span>
+                  {ie(subject, onSubjectChange, 'text-[13px]', lang === 'en' ? 'e.g. Website development' : 'Ex: Developpement site web')}
+                </div>
+              )}
 
               {/* ── Client Block (right-aligned, inline editable fields) ── */}
               <div className="flex justify-end mb-5">
@@ -610,12 +622,23 @@ export function A4Sheet({
                     )}
 
                     {/* ── Delivery address ── */}
-                    {showDeliveryAddress && deliveryAddress && (
+                    {showDeliveryAddress && (
                       <div className="mt-2 pt-2" style={{ borderTop: `1px solid ${T.borderLight}` }}>
                         <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-0.5" style={{ color: T.textMuted }}>
                           {t.deliveryAddress}
                         </div>
-                        <div className="text-[12px] whitespace-pre-line" style={{ color: T.textMuted }}>{deliveryAddress}</div>
+                        {ed ? (
+                          <textarea
+                            value={deliveryAddress}
+                            onChange={(e) => onDeliveryAddressChange?.(e.target.value)}
+                            placeholder={lang === 'en' ? 'Delivery address...' : 'Adresse de livraison...'}
+                            className="w-full bg-transparent text-[12px] leading-[1.5] focus:outline-none resize-y min-h-[24px]"
+                            style={{ color: T.textMuted }}
+                            rows={2}
+                          />
+                        ) : (
+                          deliveryAddress && <div className="text-[12px] whitespace-pre-line" style={{ color: T.textMuted }}>{deliveryAddress}</div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -846,16 +869,39 @@ export function A4Sheet({
                 </div>
               )}
 
-              {acceptanceConditions && (
+              {showAcceptanceConditions && (
                 <div className="mt-2">
                   <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1" style={{ color: T.textMuted }}>{t.acceptanceConditions}</div>
-                  <p className="text-[11px] whitespace-pre-line" style={{ color: T.textMuted }}>{acceptanceConditions}</p>
+                  {ed ? (
+                    <textarea
+                      value={acceptanceConditions}
+                      onChange={(e) => onAcceptanceConditionsChange?.(e.target.value)}
+                      placeholder={lang === 'en' ? 'Acceptance conditions...' : "Conditions d'acceptation..."}
+                      className="w-full bg-transparent text-[11px] leading-[1.6] focus:outline-none resize-y min-h-[24px]"
+                      style={{ color: T.textMuted }}
+                      rows={2}
+                    />
+                  ) : (
+                    acceptanceConditions && <p className="text-[11px] whitespace-pre-line" style={{ color: T.textMuted }}>{acceptanceConditions}</p>
+                  )}
                 </div>
               )}
 
-              {freeField && (
+              {showFreeField && (
                 <div className="mt-2">
-                  <p className="text-[11px] whitespace-pre-line" style={{ color: T.textMuted }}>{freeField}</p>
+                  <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1" style={{ color: T.textMuted }}>{lang === 'en' ? 'Additional information' : 'Champ libre'}</div>
+                  {ed ? (
+                    <textarea
+                      value={freeField}
+                      onChange={(e) => onFreeFieldChange?.(e.target.value)}
+                      placeholder={lang === 'en' ? 'Additional text...' : 'Texte supplementaire...'}
+                      className="w-full bg-transparent text-[11px] leading-[1.6] focus:outline-none resize-y min-h-[24px]"
+                      style={{ color: T.textMuted }}
+                      rows={2}
+                    />
+                  ) : (
+                    freeField && <p className="text-[11px] whitespace-pre-line" style={{ color: T.textMuted }}>{freeField}</p>
+                  )}
                 </div>
               )}
 
@@ -894,10 +940,21 @@ export function A4Sheet({
 
               {/* ── Footer (editable or custom text) ── */}
               <div className="mt-4 pt-3 text-center" style={{ borderTop: `2px solid ${T.footerBorder}` }}>
-                {footerText ? (
-                  <div className="text-[9px] leading-[1.6] whitespace-pre-line" style={{ color: T.textFooter }}>
-                    {footerText}
-                  </div>
+                {showFooterText ? (
+                  ed ? (
+                    <textarea
+                      value={footerText || ''}
+                      onChange={(e) => onFooterTextChange?.(e.target.value)}
+                      placeholder={lang === 'en' ? 'Custom footer text...' : 'Ex: Conditions generales de vente...'}
+                      className="w-full bg-transparent text-[9px] leading-[1.6] text-center focus:outline-none resize-y min-h-[30px]"
+                      style={{ color: T.textFooter }}
+                      rows={2}
+                    />
+                  ) : (
+                    <div className="text-[9px] leading-[1.6] whitespace-pre-line" style={{ color: T.textFooter }}>
+                      {footerText || ''}
+                    </div>
+                  )
                 ) : (
                   <div className="text-[9px] leading-[1.6]" style={{ color: T.textFooter }}>
                     {company && (<>

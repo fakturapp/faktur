@@ -72,6 +72,11 @@ export default function NewQuotePage() {
     showNotes: true,
     vatExempt: false,
     footerText: '',
+    showSubject: true,
+    showDeliveryAddress: false,
+    showAcceptanceConditions: false,
+    showFreeField: false,
+    showFooterText: false,
   })
 
   const [notes, setNotes] = useState('')
@@ -318,7 +323,7 @@ export default function NewQuotePage() {
             signatureField={options.signatureField}
             freeField={options.freeField}
             deliveryAddress={options.deliveryAddress}
-            showDeliveryAddress={!!options.deliveryAddress}
+            showDeliveryAddress={options.showDeliveryAddress}
             clientSiren={options.clientSiren}
             showClientSiren={!!options.clientSiren}
             clientVatNumber={options.clientVatNumber}
@@ -334,6 +339,14 @@ export default function NewQuotePage() {
             vatExempt={options.vatExempt}
             footerText={options.footerText}
             documentFont={invoiceSettings.documentFont}
+            showSubject={options.showSubject}
+            showAcceptanceConditions={options.showAcceptanceConditions}
+            showFreeField={options.showFreeField}
+            showFooterText={options.showFooterText}
+            onAcceptanceConditionsChange={(v) => handleOptionsChange({ acceptanceConditions: v })}
+            onFreeFieldChange={(v) => handleOptionsChange({ freeField: v })}
+            onFooterTextChange={(v) => handleOptionsChange({ footerText: v })}
+            onDeliveryAddressChange={(v) => handleOptionsChange({ deliveryAddress: v })}
           />
         </motion.div>
 
