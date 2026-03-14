@@ -354,6 +354,7 @@ interface A4SheetProps {
   paymentMethods: string[]
   customPaymentMethod: string
   subject: string
+  onSubjectChange: (v: string) => void
   template?: string
   darkMode?: boolean
   language?: string
@@ -372,7 +373,7 @@ export function A4Sheet({
   notes, onNotesChange, acceptanceConditions, signatureField, freeField,
   deliveryAddress, showDeliveryAddress, clientSiren, showClientSiren,
   clientVatNumber, showClientVatNumber, paymentMethods, customPaymentMethod,
-  subject, template, darkMode, language,
+  subject, onSubjectChange, template, darkMode, language,
   showNotes = true, vatExempt = false, footerText, documentFont = 'Lexend',
 }: A4SheetProps) {
   const isPreview = mode === 'preview'
@@ -554,12 +555,11 @@ export function A4Sheet({
                 </div>
               )}
 
-              {/* ── Subject ── */}
-              {subject && (
-                <div className="mb-4 text-[13px]" style={{ color: T.textMuted }}>
-                  <span className="font-semibold" style={{ color: T.text }}>{t.subject} :</span> {subject}
-                </div>
-              )}
+              {/* ── Subject (inline editable) ── */}
+              <div className="mb-4 text-[13px]" style={{ color: T.textMuted }}>
+                <span className="font-semibold" style={{ color: T.text }}>{t.subject} : </span>
+                {ie(subject, onSubjectChange, 'text-[13px]', lang === 'en' ? 'e.g. Website development' : 'Ex: Developpement site web')}
+              </div>
 
               {/* ── Client Block (right-aligned, inline editable fields) ── */}
               <div className="flex justify-end mb-5">

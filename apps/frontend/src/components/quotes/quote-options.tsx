@@ -178,16 +178,7 @@ export function QuoteOptionsPanel({
           </div>
         </div>
 
-        {/* Subject */}
-        <div className="mb-4">
-          <label className="text-xs text-muted-foreground font-medium block mb-1.5">Objet</label>
-          <Input
-            placeholder="Ex: Developpement site web"
-            value={options.subject}
-            onChange={(e) => onChange({ subject: e.target.value })}
-            className="h-8 text-sm"
-          />
-        </div>
+
 
         {/* Dates */}
         <div className="grid grid-cols-2 gap-2 mb-4">

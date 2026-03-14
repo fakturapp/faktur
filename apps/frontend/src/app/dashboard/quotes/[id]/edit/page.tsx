@@ -380,6 +380,7 @@ export default function EditQuotePage() {
             paymentMethods={invoiceSettings.paymentMethods}
             customPaymentMethod={invoiceSettings.customPaymentMethod}
             subject={options.subject}
+            onSubjectChange={(v) => handleOptionsChange({ subject: v })}
             template={invoiceSettings.template}
             darkMode={invoiceSettings.darkMode}
             language={options.language}
