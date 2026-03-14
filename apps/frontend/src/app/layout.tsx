@@ -13,8 +13,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className="dark">
-      <body className={`${lexend.className} min-h-screen antialiased`}>
+    <html lang="fr" className="dark h-full overflow-hidden">
+      <body className={`${lexend.className} h-full antialiased`}>
         <Providers>{children}</Providers>
         {process.env.NODE_ENV === 'development' && <Agentation />}
       </body>

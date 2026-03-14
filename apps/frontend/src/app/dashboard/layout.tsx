@@ -71,7 +71,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (loading) {
     return (
-      <div className="h-screen overflow-hidden bg-sidebar p-2">
+      <div className="h-full overflow-hidden bg-sidebar p-2">
         <div className="flex h-full bg-background rounded-xl overflow-hidden">
           <div className="w-(--sidebar-width) flex flex-col border-r border-border">
             <div className="px-3 py-3">
@@ -126,7 +126,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <InvoiceSettingsProvider>
-    <div className="h-screen overflow-hidden bg-sidebar p-2">
+    <div className="h-full overflow-hidden bg-sidebar p-2">
       <div
         className={cn(
           'flex h-full bg-background rounded-xl overflow-hidden',
