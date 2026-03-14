@@ -306,7 +306,7 @@ export default function NewQuotePage() {
       <div className="flex flex-col xl:flex-row gap-5 max-w-[1400px] mx-auto">
         {/* A4 Sheet */}
         <motion.div variants={fadeUp} custom={1} className="flex-1 min-w-0 order-1">
-          <div className="bg-muted/30 rounded-xl p-6 flex justify-center relative">
+          <div className="bg-muted/30 rounded-xl p-6 relative">
           {/* Toggle options button */}
           <button
             onClick={() => setShowOptions(!showOptions)}
