@@ -312,6 +312,100 @@ export function ClientModal({
 }
 
 /* ═══════════════════════════════════════════════════════════
+   AddLineDropdown — single button with dropdown menu
+   ═══════════════════════════════════════════════════════════ */
+
+function AddLineDropdown({
+  isTiime, accentColor, T, t, onAddLine,
+}: {
+  isTiime: boolean
+  accentColor: string
+  T: any
+  t: any
+  onAddLine: (type: 'standard' | 'section') => void
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [open])
+
+  return (
+    <div className="relative mb-4" ref={ref}>
+      {isTiime ? (
+        <button
+          onClick={() => setOpen(!open)}
+          className="px-4 py-1.5 rounded-full text-[14px] font-extrabold cursor-pointer transition-all flex items-center gap-2"
+          style={{
+            border: 'none',
+            background: T.docBg,
+            color: '#29a557',
+            boxShadow: 'rgba(71,99,136,0.25) 0px 0px 6px',
+            letterSpacing: '0.5px',
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.boxShadow = 'rgba(71,99,136,0.4) 0px 0px 10px')}
+          onMouseLeave={(e) => (e.currentTarget.style.boxShadow = 'rgba(71,99,136,0.25) 0px 0px 6px')}
+        >
+          <Plus className="h-4 w-4" /> {t.addLine}
+        </button>
+      ) : (
+        <button
+          onClick={() => setOpen(!open)}
+          className="px-3.5 py-1.5 rounded-full text-[11px] font-medium cursor-pointer transition-all flex items-center gap-1.5"
+          style={{ border: `1px dashed ${accentColor}88`, background: `${accentColor}08`, color: accentColor }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = `${accentColor}18`)}
+          onMouseLeave={(e) => (e.currentTarget.style.background = `${accentColor}08`)}
+        >
+          <Plus className="h-3 w-3" /> {t.addLine}
+        </button>
+      )}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.15 }}
+            className="absolute left-0 top-full mt-1 z-10 rounded-lg overflow-hidden"
+            style={{
+              backgroundColor: T.docBg,
+              border: `1px solid ${T.borderLight}`,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+              minWidth: '150px',
+            }}
+          >
+            <button
+              onClick={() => { onAddLine('standard'); setOpen(false) }}
+              className="w-full flex items-center gap-2 px-3 py-2 text-[12px] transition-colors"
+              style={{ color: T.text }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = `${accentColor}10`)}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+            >
+              <Plus className="h-3 w-3" /> Ligne simple
+            </button>
+            <button
+              onClick={() => { onAddLine('section'); setOpen(false) }}
+              className="w-full flex items-center gap-2 px-3 py-2 text-[12px] transition-colors"
+              style={{ color: T.text }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = `${accentColor}10`)}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+            >
+              <Type className="h-3 w-3" /> Section
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════
    A4Sheet — main document component
    ═══════════════════════════════════════════════════════════ */
 
@@ -915,58 +1009,8 @@ export function A4Sheet({
                 })}
               </div>
 
-              {/* ── Add line buttons (edit mode) ── */}
-              {ed && (
-                <div className="flex gap-2 mb-4">
-                  {isTiime ? (
-                    <>
-                      <button onClick={() => onAddLine('standard')}
-                        className="px-4 py-1.5 rounded-full text-[14px] font-extrabold cursor-pointer transition-all flex items-center gap-2"
-                        style={{
-                          border: 'none',
-                          background: T.docBg,
-                          color: '#29a557',
-                          boxShadow: 'rgba(71,99,136,0.25) 0px 0px 6px',
-                          letterSpacing: '0.5px',
-                        }}
-                        onMouseEnter={(e) => (e.currentTarget.style.boxShadow = 'rgba(71,99,136,0.4) 0px 0px 10px')}
-                        onMouseLeave={(e) => (e.currentTarget.style.boxShadow = 'rgba(71,99,136,0.25) 0px 0px 6px')}>
-                        <Plus className="h-4 w-4" /> {t.addLine}
-                      </button>
-                      <button onClick={() => onAddLine('section')}
-                        className="px-4 py-1.5 rounded-full text-[14px] font-extrabold cursor-pointer transition-all flex items-center gap-2"
-                        style={{
-                          border: 'none',
-                          background: T.docBg,
-                          color: T.textMuted,
-                          boxShadow: 'rgba(71,99,136,0.15) 0px 0px 4px',
-                          letterSpacing: '0.5px',
-                        }}
-                        onMouseEnter={(e) => (e.currentTarget.style.boxShadow = 'rgba(71,99,136,0.3) 0px 0px 8px')}
-                        onMouseLeave={(e) => (e.currentTarget.style.boxShadow = 'rgba(71,99,136,0.15) 0px 0px 4px')}>
-                        <Type className="h-4 w-4" /> {t.addSection}
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button onClick={() => onAddLine('standard')}
-                        className="px-3.5 py-1.5 rounded-full text-[11px] font-medium cursor-pointer transition-all flex items-center gap-1.5"
-                        style={{ border: `1px dashed ${accentColor}88`, background: `${accentColor}08`, color: accentColor }}
-                        onMouseEnter={(e) => (e.currentTarget.style.background = `${accentColor}18`)}
-                        onMouseLeave={(e) => (e.currentTarget.style.background = `${accentColor}08`)}>
-                        <Plus className="h-3 w-3" /> {t.addLine}
-                      </button>
-                      <button onClick={() => onAddLine('section')}
-                        className="px-3.5 py-1.5 rounded-full border border-dashed text-[11px] font-medium cursor-pointer transition-all flex items-center gap-1.5"
-                        style={{ borderColor: T.borderLight, backgroundColor: T.docBg, color: T.textMuted }}
-                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = T.clientBlockBg)}
-                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = T.docBg)}>
-                        <Type className="h-3 w-3" /> {t.addSection}
-                      </button>
-                    </>
-                  )}
-                </div>
-              )}
+              {/* ── Add line dropdown (edit mode) ── */}
+              {ed && <AddLineDropdown isTiime={isTiime} accentColor={accentColor} T={T} t={t} onAddLine={onAddLine} />}
 
             </div>
             {/* ═══ END TOP SECTION ═══ */}
