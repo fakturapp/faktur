@@ -71,49 +71,47 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (loading) {
     return (
-      <div className="h-full overflow-hidden bg-sidebar p-2">
-        <div className="flex h-full bg-background rounded-xl overflow-hidden">
-          <div className="w-(--sidebar-width) flex flex-col border-r border-border">
-            <div className="px-3 py-3">
-              <div className="flex items-center gap-2.5 px-3 py-2">
-                <Skeleton className="h-8 w-8 rounded-lg" />
-                <div className="flex-1 space-y-1.5">
-                  <Skeleton className="h-3.5 w-24" />
-                  <Skeleton className="h-2.5 w-16" />
-                </div>
-              </div>
-            </div>
-            <div className="mx-3 h-px bg-border" />
-            <div className="flex-1 px-3 py-3 space-y-2">
-              {[...Array(5)].map((_, i) => (
-                <Skeleton key={i} className="h-9 w-full rounded-lg" />
-              ))}
-              <div className="pt-4" />
-              {[...Array(4)].map((_, i) => (
-                <Skeleton key={i} className="h-9 w-full rounded-lg" />
-              ))}
-            </div>
-            <div className="mx-3 h-px bg-border" />
-            <div className="p-3">
-              <div className="flex items-center gap-3 px-2">
-                <Skeleton className="h-8 w-8 rounded-full" />
-                <div className="flex-1 space-y-1">
-                  <Skeleton className="h-3.5 w-24" />
-                  <Skeleton className="h-2.5 w-32" />
-                </div>
+      <div className="flex h-screen overflow-hidden bg-sidebar">
+        <div className="w-(--sidebar-width) bg-sidebar flex flex-col">
+          <div className="px-3 py-3">
+            <div className="flex items-center gap-2.5 px-3 py-2">
+              <Skeleton className="h-8 w-8 rounded-lg" />
+              <div className="flex-1 space-y-1.5">
+                <Skeleton className="h-3.5 w-24" />
+                <Skeleton className="h-2.5 w-16" />
               </div>
             </div>
           </div>
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="h-(--header-height) border-b border-border shrink-0" />
-            <div className="flex-1 p-6 space-y-6">
-              <div className="grid gap-4 grid-cols-4">
-                {[...Array(4)].map((_, i) => (
-                  <Skeleton key={i} className="h-32 rounded-xl" />
-                ))}
+          <div className="mx-3 h-px bg-border" />
+          <div className="flex-1 px-3 py-3 space-y-2">
+            {[...Array(5)].map((_, i) => (
+              <Skeleton key={i} className="h-9 w-full rounded-lg" />
+            ))}
+            <div className="pt-4" />
+            {[...Array(4)].map((_, i) => (
+              <Skeleton key={i} className="h-9 w-full rounded-lg" />
+            ))}
+          </div>
+          <div className="mx-3 h-px bg-border" />
+          <div className="p-3">
+            <div className="flex items-center gap-3 px-2">
+              <Skeleton className="h-8 w-8 rounded-full" />
+              <div className="flex-1 space-y-1">
+                <Skeleton className="h-3.5 w-24" />
+                <Skeleton className="h-2.5 w-32" />
               </div>
-              <Skeleton className="h-80 rounded-xl" />
             </div>
+          </div>
+        </div>
+        <div className="flex-1 flex flex-col overflow-hidden md:m-2 md:ml-0 md:rounded-xl md:shadow-sm bg-background">
+          <div className="h-(--header-height) border-b border-border shrink-0" />
+          <div className="flex-1 p-6 space-y-6">
+            <div className="grid gap-4 grid-cols-4">
+              {[...Array(4)].map((_, i) => (
+                <Skeleton key={i} className="h-32 rounded-xl" />
+              ))}
+            </div>
+            <Skeleton className="h-80 rounded-xl" />
           </div>
         </div>
       </div>
@@ -126,46 +124,46 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <InvoiceSettingsProvider>
-    <div className="h-full overflow-hidden bg-sidebar p-2">
+    <div className="flex h-screen overflow-hidden bg-sidebar">
+      <Sidebar
+        teams={teams}
+        currentTeam={currentTeam}
+        teamsLoaded={teamsLoaded}
+        onSwitchTeam={handleSwitchTeam}
+        user={{
+          fullName: user.fullName,
+          email: user.email,
+          avatarUrl: user.avatarUrl,
+        }}
+        onLogout={logout}
+        collapsed={sidebarCollapsed}
+      />
+
       <div
         className={cn(
-          'flex h-full bg-background rounded-xl overflow-hidden',
+          'relative flex min-h-0 flex-1 flex-col bg-background transition-all duration-200 ease-linear overflow-hidden',
+          'md:m-2 md:ml-0 md:rounded-xl md:shadow-sm',
+          sidebarCollapsed && 'md:ml-2',
           switching && 'blur-sm pointer-events-none'
         )}
       >
-        <Sidebar
-          teams={teams}
-          currentTeam={currentTeam}
-          teamsLoaded={teamsLoaded}
-          onSwitchTeam={handleSwitchTeam}
-          user={{
-            fullName: user.fullName,
-            email: user.email,
-            avatarUrl: user.avatarUrl,
-          }}
-          onLogout={logout}
-          collapsed={sidebarCollapsed}
-        />
+        <SiteHeader onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)} />
+        <RouteProgressBar />
 
-        <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden transition-all duration-200 ease-linear">
-          <SiteHeader onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)} />
-          <RouteProgressBar />
-
-          <main className="flex-1 overflow-y-auto">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={pathname}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.25, ease: 'easeInOut' }}
-                className="@container/main flex flex-1 flex-col gap-2"
-              >
-                {children}
-              </motion.div>
-            </AnimatePresence>
-          </main>
-        </div>
+        <main className="flex-1 overflow-y-auto">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={pathname}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
+              className="@container/main flex flex-1 flex-col gap-2"
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
+        </main>
       </div>
 
       {/* Team switch confirmation */}
@@ -207,9 +205,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </Button>
         </DialogFooter>
       </Dialog>
-
-      {/* Team switch confirmation */}
-      {/* (Dialog rendered outside the rounded container) */}
 
       {/* Switching overlay */}
       <AnimatePresence>
