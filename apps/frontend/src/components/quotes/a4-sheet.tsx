@@ -500,7 +500,7 @@ export function A4Sheet({
                     )}
                   </div>
 
-                  {/* Right: DEVIS badge + meta (editable) */}
+                  {/* Right: DEVIS badge + quote number */}
                   <div className="text-right">
                     <div
                       className="inline-block px-5 py-2.5 mb-2"
@@ -521,28 +521,34 @@ export function A4Sheet({
                       <div>
                         {t.quoteNumber} {ie(quoteNumber, onQuoteNumberChange, `font-semibold`, 'D-0001')}
                       </div>
-                      {issueDate && <div>{t.date} : <span className="font-medium">{fmtDate(issueDate, lang)}</span></div>}
-                      {validityDate && <div>{t.validity} : <span className="font-medium">{fmtDate(validityDate, lang)}</span></div>}
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* ── Company info under banner header ── */}
+              {/* ── Company info under banner header (editable) ── */}
               {T.layout === 'banner' && company && (
                 <div className="flex justify-between items-start mb-5">
                   <div className="text-[12px] leading-[1.6]" style={{ color: T.textMuted }}>
-                    <div style={{ color: T.text }} className="font-semibold text-[13px]">{company.legalName}</div>
-                    {company.addressLine1 && <div>{company.addressLine1}</div>}
-                    {(company.postalCode || company.city) && <div>{company.postalCode} {company.city}</div>}
-                    {company.phone && <div>{company.phone}</div>}
-                    {company.email && <div>{company.email}</div>}
+                    <div>{ie(company.legalName, (v) => onCompanyFieldChange('legalName', v), `font-semibold text-[13px]`, t.society)}</div>
+                    <div>{ie(company.addressLine1 || '', (v) => onCompanyFieldChange('addressLine1', v), 'text-[12px]', t.address)}</div>
+                    <div>
+                      {ie(company.postalCode || '', (v) => onCompanyFieldChange('postalCode', v), 'text-[12px]', t.postalCode)}{' '}
+                      {ie(company.city || '', (v) => onCompanyFieldChange('city', v), 'text-[12px]', t.city)}
+                    </div>
+                    <div>{ie(company.phone || '', (v) => onCompanyFieldChange('phone', v), 'text-[12px]', t.phone)}</div>
+                    <div>{ie(company.email || '', (v) => onCompanyFieldChange('email', v), 'text-[12px]', t.email)}</div>
                   </div>
                   <div className="text-[12px] text-right leading-[1.8]" style={{ color: T.textMuted }}>
-                    {issueDate && <div>{t.date} : <span className="font-medium">{fmtDate(issueDate, lang)}</span></div>}
-                    {validityDate && <div>{t.validity} : <span className="font-medium">{fmtDate(validityDate, lang)}</span></div>}
-                    {company.siren && <div className="text-[10px]">SIREN : {company.siren}</div>}
-                    {company.vatNumber && <div className="text-[10px]">{lang === 'en' ? 'VAT No.' : 'N\u00b0 TVA'} : {company.vatNumber}</div>}
+                    <div>
+                      {t.quoteNumber} {ie(quoteNumber, onQuoteNumberChange, `font-semibold`, 'D-0001')}
+                    </div>
+                    <div className="text-[10px] mt-0.5">
+                      SIREN : {ie(company.siren || '', (v) => onCompanyFieldChange('siren', v), 'text-[10px]', '000000000')}
+                    </div>
+                    <div className="text-[10px]">
+                      {lang === 'en' ? 'VAT No.' : 'N\u00b0 TVA'} : {ie(company.vatNumber || '', (v) => onCompanyFieldChange('vatNumber', v), 'text-[10px]', 'FR00000000000')}
+                    </div>
                   </div>
                 </div>
               )}
@@ -554,19 +560,15 @@ export function A4Sheet({
                 </div>
               )}
 
-              {/* ── Client Block (right-aligned, no container) ── */}
+              {/* ── Client Block (right-aligned, no label) ── */}
               <div className="flex justify-end mb-5">
                 <div
                   className={cn(
-                    'relative transition-all w-full max-w-[50%]',
+                    'relative transition-all w-full max-w-[50%] text-right',
                     !client && 'cursor-pointer',
                   )}
                   onClick={!client ? onClientClick : undefined}
                 >
-                  <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1.5" style={{ color: accentColor }}>
-                    {t.recipient}
-                  </div>
-
                   {client ? (
                     <div className="text-[12px] leading-[1.7] group">
                       <div className="font-semibold text-[13px]" style={{ color: T.text }}>{client.displayName}</div>
@@ -597,7 +599,7 @@ export function A4Sheet({
 
                       {/* ── Delivery address inside client block ── */}
                       {showDeliveryAddress && deliveryAddress && (
-                        <div className="mt-2 pt-2" style={{ borderTop: `1px solid ${T.borderLight}` }}>
+                        <div className="mt-2 pt-2 text-left" style={{ borderTop: `1px solid ${T.borderLight}` }}>
                           <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-0.5" style={{ color: T.textMuted }}>
                             {t.deliveryAddress}
                           </div>
@@ -619,7 +621,7 @@ export function A4Sheet({
                     </div>
                   ) : (
                     <div className="py-2">
-                      <div className="text-[12px] leading-[1.7] space-y-0.5">
+                      <div className="text-[12px] leading-[1.7] space-y-0.5 flex flex-col items-end">
                         <div className="rounded h-3.5 w-40" style={{ backgroundColor: T.borderLight }} />
                         <div className="rounded h-3 w-52 mt-1.5" style={{ backgroundColor: T.borderLight }} />
                         <div className="rounded h-3 w-32 mt-1" style={{ backgroundColor: T.borderLight }} />
@@ -641,6 +643,24 @@ export function A4Sheet({
                   )}
                 </div>
               </div>
+
+              {/* ── Date/Validity container (above lines table) ── */}
+              {(issueDate || validityDate) && (
+                <div className="flex gap-4 mb-4 px-3 py-2.5" style={{ backgroundColor: `${accentColor}08`, border: `1px solid ${accentColor}20`, borderRadius: T.borderRadius }}>
+                  {issueDate && (
+                    <div className="text-[11px]" style={{ color: T.textMuted }}>
+                      <span className="font-semibold" style={{ color: T.text }}>{t.date} :</span>{' '}
+                      <span className="font-medium">{fmtDate(issueDate, lang)}</span>
+                    </div>
+                  )}
+                  {validityDate && (
+                    <div className="text-[11px]" style={{ color: T.textMuted }}>
+                      <span className="font-semibold" style={{ color: T.text }}>{t.validity} :</span>{' '}
+                      <span className="font-medium">{fmtDate(validityDate, lang)}</span>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* ── Lines Table ── */}
               <div className="mb-3">
