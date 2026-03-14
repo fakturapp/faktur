@@ -7,8 +7,9 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import {
   Check, Zap, ClipboardList, ChevronDown, ChevronRight, Building2, UserRound,
-  Palette, Pen,
+  Palette, Pen, Info,
 } from 'lucide-react'
+import { Tooltip } from '@/components/ui/tooltip'
 import type { ClientInfo } from './a4-sheet'
 
 /* ═══════════════════════════════════════════════════════════
@@ -351,6 +352,33 @@ export function QuoteOptionsPanel({
               className="h-7 text-sm"
             />
           </OptionCheckbox>
+        </CollapsibleSection>
+
+        {/* ── Format section ── */}
+        <CollapsibleSection title="Format">
+          <div className="flex items-center justify-between py-1">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[13px] text-foreground">Factur-X (PDF/A-3)</span>
+              <Tooltip content="Le format Factur-X est le standard de facturation electronique en France, obligatoire a partir de septembre 2026.">
+                <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+              </Tooltip>
+            </div>
+            <button
+              type="button"
+              onClick={() => onChange({ facturX: !options.facturX } as any)}
+              className={cn(
+                'relative inline-flex h-5 w-9 items-center rounded-full transition-colors',
+                (options as any).facturX ? 'bg-primary' : 'bg-muted-foreground/30',
+              )}
+            >
+              <span
+                className={cn(
+                  'inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform shadow-sm',
+                  (options as any).facturX ? 'translate-x-[18px]' : 'translate-x-[3px]',
+                )}
+              />
+            </button>
+          </div>
         </CollapsibleSection>
 
         {/* ── Options section ── */}
