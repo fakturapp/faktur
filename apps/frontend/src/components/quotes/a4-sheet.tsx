@@ -601,7 +601,7 @@ export function A4Sheet({
                       </div>
                     )}
                     {company && (
-                      <div className="text-[12px] leading-[1.6]" style={{ color: T.textMuted }}>
+                      <div className="text-[12px] leading-[1.6]" style={{ color: T.text }}>
                         <div>{ie(company.legalName, (v) => onCompanyFieldChange('legalName', v), `font-semibold text-[13px]`, t.society)}</div>
                         <div>{ie(company.addressLine1 || '', (v) => onCompanyFieldChange('addressLine1', v), 'text-[12px]', t.address)}</div>
                         <div>
@@ -627,7 +627,7 @@ export function A4Sheet({
                         <div className="text-[14px] font-semibold mb-1" style={{ color: T.text }}>
                           {documentTitle || t.quote}
                         </div>
-                        <div className="text-[12px] leading-[1.8]" style={{ color: T.textMuted }}>
+                        <div className="text-[12px] leading-[1.8]" style={{ color: T.text }}>
                           {t.quoteNumber} {ie(quoteNumber, onQuoteNumberChange, 'font-semibold', 'D-0001')}
                         </div>
                       </>
@@ -648,7 +648,7 @@ export function A4Sheet({
                             </span>
                           </div>
                         </div>
-                        <div className="text-[12px] leading-[1.8]" style={{ color: T.textMuted }}>
+                        <div className="text-[12px] leading-[1.8]" style={{ color: T.text }}>
                           <div>
                             {t.quoteNumber} {ie(quoteNumber, onQuoteNumberChange, `font-semibold`, 'D-0001')}
                           </div>
@@ -662,7 +662,7 @@ export function A4Sheet({
               {/* ── Company info under banner header (editable) ── */}
               {T.layout === 'banner' && company && (
                 <div className="flex justify-between items-start mb-5">
-                  <div className="text-[12px] leading-[1.6]" style={{ color: T.textMuted }}>
+                  <div className="text-[12px] leading-[1.6]" style={{ color: T.text }}>
                     <div>{ie(company.legalName, (v) => onCompanyFieldChange('legalName', v), `font-semibold text-[13px]`, t.society)}</div>
                     <div>{ie(company.addressLine1 || '', (v) => onCompanyFieldChange('addressLine1', v), 'text-[12px]', t.address)}</div>
                     <div>
@@ -672,7 +672,7 @@ export function A4Sheet({
                     <div>{ie(company.phone || '', (v) => onCompanyFieldChange('phone', v), 'text-[12px]', t.phone)}</div>
                     <div>{ie(company.email || '', (v) => onCompanyFieldChange('email', v), 'text-[12px]', t.email)}</div>
                   </div>
-                  <div className="text-[12px] text-right leading-[1.8]" style={{ color: T.textMuted }}>
+                  <div className="text-[12px] text-right leading-[1.8]" style={{ color: T.text }}>
                     <div>
                       {t.quoteNumber} {ie(quoteNumber, onQuoteNumberChange, `font-semibold`, 'D-0001')}
                     </div>
@@ -703,8 +703,8 @@ export function A4Sheet({
                     </div>
                   </div>
                 ) : (
-                  <div className="mb-4 text-[13px]" style={{ color: T.textMuted }}>
-                    <span className="font-semibold" style={{ color: T.text }}>{t.subject} : </span>
+                  <div className="mb-4 text-[13px]" style={{ color: T.text }}>
+                    <span className="font-semibold">{t.subject} : </span>
                     {ie(subject, onSubjectChange, 'text-[13px]', lang === 'en' ? 'e.g. Website development' : 'Ex: Developpement site web')}
                   </div>
                 )
