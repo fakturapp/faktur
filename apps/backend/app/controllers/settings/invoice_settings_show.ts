@@ -23,6 +23,10 @@ export default class InvoiceSettingsShow {
           template: 'classique',
           darkMode: false,
           documentFont: 'Lexend',
+          eInvoicingEnabled: false,
+          pdpProvider: null,
+          pdpApiKey: null,
+          pdpSandbox: true,
         },
       })
     }
@@ -37,6 +41,10 @@ export default class InvoiceSettingsShow {
         template: settings.template || 'classique',
         darkMode: settings.darkMode || false,
         documentFont: settings.documentFont || 'Lexend',
+        eInvoicingEnabled: settings.eInvoicingEnabled || false,
+        pdpProvider: settings.pdpProvider || null,
+        pdpApiKey: settings.pdpApiKey ? '••••••••' : null,
+        pdpSandbox: settings.pdpSandbox ?? true,
       },
     })
   }

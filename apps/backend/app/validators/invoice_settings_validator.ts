@@ -9,5 +9,9 @@ export const updateInvoiceSettingsValidator = vine.compile(
     template: vine.string().trim().maxLength(30).optional(),
     darkMode: vine.boolean().optional(),
     documentFont: vine.string().trim().maxLength(50).optional(),
+    eInvoicingEnabled: vine.boolean().optional(),
+    pdpProvider: vine.string().trim().maxLength(50).optional().nullable(),
+    pdpApiKey: vine.string().trim().maxLength(500).optional().nullable(),
+    pdpSandbox: vine.boolean().optional(),
   })
 )

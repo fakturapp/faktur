@@ -24,6 +24,10 @@ export default class InvoiceSettingsUpdate {
         template: payload.template || 'classique',
         darkMode: payload.darkMode ?? false,
         documentFont: payload.documentFont || 'Lexend',
+        eInvoicingEnabled: payload.eInvoicingEnabled ?? false,
+        pdpProvider: payload.pdpProvider || null,
+        pdpApiKey: payload.pdpApiKey || null,
+        pdpSandbox: payload.pdpSandbox ?? true,
       })
     } else {
       settings.billingType = payload.billingType
@@ -33,6 +37,12 @@ export default class InvoiceSettingsUpdate {
       if (payload.template) settings.template = payload.template
       if (payload.darkMode !== undefined) settings.darkMode = payload.darkMode
       if (payload.documentFont) settings.documentFont = payload.documentFont
+      if (payload.eInvoicingEnabled !== undefined) settings.eInvoicingEnabled = payload.eInvoicingEnabled
+      if (payload.pdpProvider !== undefined) settings.pdpProvider = payload.pdpProvider || null
+      if (payload.pdpApiKey !== undefined && payload.pdpApiKey !== '••••••••') {
+        settings.pdpApiKey = payload.pdpApiKey || null
+      }
+      if (payload.pdpSandbox !== undefined) settings.pdpSandbox = payload.pdpSandbox
       await settings.save()
     }
 
@@ -47,6 +57,10 @@ export default class InvoiceSettingsUpdate {
         template: settings.template || 'classique',
         darkMode: settings.darkMode || false,
         documentFont: settings.documentFont || 'Lexend',
+        eInvoicingEnabled: settings.eInvoicingEnabled || false,
+        pdpProvider: settings.pdpProvider || null,
+        pdpApiKey: settings.pdpApiKey ? '••••••••' : null,
+        pdpSandbox: settings.pdpSandbox ?? true,
       },
     })
   }
