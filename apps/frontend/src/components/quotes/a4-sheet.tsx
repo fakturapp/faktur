@@ -330,6 +330,7 @@ interface A4SheetProps {
   client: ClientInfo | null
   onClientClick: () => void
   onClearClient: () => void
+  onClientFieldChange: (field: keyof ClientInfo, value: string) => void
   lines: QuoteLine[]
   onUpdateLine: (index: number, partial: Partial<QuoteLine>) => void
   onAddLine: (type: 'standard' | 'section') => void
@@ -365,7 +366,7 @@ interface A4SheetProps {
 export function A4Sheet({
   mode, logoUrl, accentColor, documentTitle, quoteNumber, onQuoteNumberChange,
   issueDate, validityDate,
-  billingType, company, onCompanyFieldChange, client, onClientClick, onClearClient,
+  billingType, company, onCompanyFieldChange, client, onClientClick, onClearClient, onClientFieldChange,
   lines, onUpdateLine, onAddLine, onRemoveLine,
   subtotal, taxAmount, discountAmount, total, tvaBreakdown,
   notes, onNotesChange, acceptanceConditions, signatureField, freeField,
@@ -560,86 +561,76 @@ export function A4Sheet({
                 </div>
               )}
 
-              {/* ── Client Block (right-aligned, no label) ── */}
+              {/* ── Client Block (right-aligned, inline editable fields) ── */}
               <div className="flex justify-end mb-5">
-                <div
-                  className={cn(
-                    'relative transition-all w-full max-w-[50%] text-right',
-                    !client && 'cursor-pointer',
-                  )}
-                  onClick={!client ? onClientClick : undefined}
-                >
-                  {client ? (
-                    <div className="text-[12px] leading-[1.7] group">
-                      <div className="font-semibold text-[13px]" style={{ color: T.text }}>{client.displayName}</div>
-                      {client.address && <div style={{ color: T.textMuted }}>{client.address}</div>}
-                      {client.addressComplement && <div style={{ color: T.textMuted }}>{client.addressComplement}</div>}
-                      {(client.postalCode || client.city) && (
-                        <div style={{ color: T.textMuted }}>{client.postalCode} {client.city}</div>
-                      )}
-                      {client.email && <div style={{ color: T.textMuted }}>{client.email}</div>}
-
-                      {showClientSiren && (
-                        <div className="text-[10px] mt-0.5" style={{ color: T.textMuted }}>
-                          SIREN : {client.type === 'company' && clientSiren
-                            ? ie(clientSiren, () => {}, 'text-[10px]')
-                            : <span className="italic" style={{ color: T.inputPlaceholder }}>{t.na}</span>
-                          }
+                <div className="relative w-full max-w-[50%] group">
+                  <div className="text-[12px] leading-[1.5] space-y-[3px]">
+                    {/* Name — click opens client search */}
+                    {ed ? (
+                      <div
+                        className="font-semibold text-[13px] cursor-pointer border-b border-dashed transition-colors"
+                        style={{ color: client?.displayName ? T.text : T.inputPlaceholder, borderBottomColor: T.editBorderDashed }}
+                        onClick={onClientClick}
+                        onMouseEnter={(e) => (e.currentTarget.style.borderBottomColor = accentColor)}
+                        onMouseLeave={(e) => (e.currentTarget.style.borderBottomColor = T.editBorderDashed)}
+                        title={t.clickToSelectClient}
+                      >
+                        <div className="flex items-center gap-1.5">
+                          <Search className="h-3 w-3 shrink-0" style={{ color: T.inputPlaceholder }} />
+                          {client?.displayName || (lang === 'en' ? 'Client name' : 'Nom du client')}
                         </div>
-                      )}
-
-                      {showClientVatNumber && (
-                        <div className="text-[10px]" style={{ color: T.textMuted }}>
-                          {lang === 'en' ? 'VAT No.' : 'N\u00b0 TVA'} : {clientVatNumber
-                            ? ie(clientVatNumber, () => {}, 'text-[10px]')
-                            : <span className="italic" style={{ color: T.inputPlaceholder }}>{t.notProvided}</span>
-                          }
-                        </div>
-                      )}
-
-                      {/* ── Delivery address inside client block ── */}
-                      {showDeliveryAddress && deliveryAddress && (
-                        <div className="mt-2 pt-2 text-left" style={{ borderTop: `1px solid ${T.borderLight}` }}>
-                          <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-0.5" style={{ color: T.textMuted }}>
-                            {t.deliveryAddress}
-                          </div>
-                          <div className="text-[12px] whitespace-pre-line" style={{ color: T.textMuted }}>{deliveryAddress}</div>
-                        </div>
-                      )}
-
-                      {ed && (
-                        <button
-                          onClick={(e) => { e.stopPropagation(); onClearClient() }}
-                          className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                          style={{ color: T.textMuted }}
-                          onMouseEnter={(e) => (e.currentTarget.style.color = '#e53935')}
-                          onMouseLeave={(e) => (e.currentTarget.style.color = T.textMuted)}
-                        >
-                          <X className="h-3.5 w-3.5" />
-                        </button>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="py-2">
-                      <div className="text-[12px] leading-[1.7] space-y-0.5 flex flex-col items-end">
-                        <div className="rounded h-3.5 w-40" style={{ backgroundColor: T.borderLight }} />
-                        <div className="rounded h-3 w-52 mt-1.5" style={{ backgroundColor: T.borderLight }} />
-                        <div className="rounded h-3 w-32 mt-1" style={{ backgroundColor: T.borderLight }} />
                       </div>
-                      {ed && (
-                        <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} className="mt-3">
-                          <motion.div
-                            animate={{ scale: [1, 1.05, 1] }}
-                            transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
-                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium"
-                            style={{ background: `${accentColor}12`, color: accentColor, border: `1px solid ${accentColor}30` }}
-                          >
-                            <MousePointerClick className="h-3 w-3" />
-                            {t.clickToSelectClient}
-                          </motion.div>
-                        </motion.div>
-                      )}
+                    ) : (
+                      <div className="font-semibold text-[13px]" style={{ color: T.text }}>
+                        {client?.displayName || ''}
+                      </div>
+                    )}
+                    {/* Address */}
+                    <div>{ie(client?.address || '', (v) => onClientFieldChange('address', v), 'text-[12px]', lang === 'en' ? 'Address' : 'Adresse postale')}</div>
+                    {/* Address complement */}
+                    <div>{ie(client?.addressComplement || '', (v) => onClientFieldChange('addressComplement', v), 'text-[12px]', lang === 'en' ? 'Address line 2' : "Complement d'adresse")}</div>
+                    {/* Postal code + City */}
+                    <div className="flex gap-2">
+                      {ie(client?.postalCode || '', (v) => onClientFieldChange('postalCode', v), 'text-[12px]', lang === 'en' ? 'Zip' : 'Code postal')}
+                      {ie(client?.city || '', (v) => onClientFieldChange('city', v), 'text-[12px]', lang === 'en' ? 'City' : 'Ville')}
                     </div>
+                    {/* Country */}
+                    <div>{ie(client?.country || '', (v) => onClientFieldChange('country', v), 'text-[12px]', lang === 'en' ? 'Country' : 'Pays')}</div>
+
+                    {showClientSiren && (
+                      <div className="text-[10px] mt-0.5" style={{ color: T.textMuted }}>
+                        SIREN : {ie(clientSiren || '', () => {}, 'text-[10px]', '000000000')}
+                      </div>
+                    )}
+
+                    {showClientVatNumber && (
+                      <div className="text-[10px]" style={{ color: T.textMuted }}>
+                        {lang === 'en' ? 'VAT No.' : 'N\u00b0 TVA'} : {ie(clientVatNumber || '', () => {}, 'text-[10px]', 'FR00000000000')}
+                      </div>
+                    )}
+
+                    {/* ── Delivery address ── */}
+                    {showDeliveryAddress && deliveryAddress && (
+                      <div className="mt-2 pt-2" style={{ borderTop: `1px solid ${T.borderLight}` }}>
+                        <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-0.5" style={{ color: T.textMuted }}>
+                          {t.deliveryAddress}
+                        </div>
+                        <div className="text-[12px] whitespace-pre-line" style={{ color: T.textMuted }}>{deliveryAddress}</div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Clear client button */}
+                  {ed && client && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); onClearClient() }}
+                      className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                      style={{ color: T.textMuted }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = '#e53935')}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = T.textMuted)}
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
                   )}
                 </div>
               </div>

@@ -161,6 +161,10 @@ export default function EditQuotePage() {
     }))
   }, [])
 
+  const handleClientFieldChange = useCallback((field: keyof ClientInfo, value: string) => {
+    setSelectedClient((prev) => prev ? { ...prev, [field]: value } : prev)
+  }, [])
+
   const handleCompanyFieldChange = useCallback((field: keyof CompanyInfo, value: string) => {
     setCompany((prev) => prev ? { ...prev, [field]: value } : prev)
   }, [])
@@ -352,6 +356,7 @@ export default function EditQuotePage() {
             onCompanyFieldChange={handleCompanyFieldChange}
             onClientClick={() => setClientModalOpen(true)}
             onClearClient={() => setSelectedClient(null)}
+            onClientFieldChange={handleClientFieldChange}
             lines={lines}
             onUpdateLine={handleUpdateLine}
             onAddLine={handleAddLine}
