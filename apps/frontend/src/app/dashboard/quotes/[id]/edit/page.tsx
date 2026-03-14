@@ -11,7 +11,7 @@ import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { api } from '@/lib/api'
 import { A4Sheet, ClientModal, type QuoteLine, type ClientInfo, type CompanyInfo } from '@/components/quotes/a4-sheet'
 import { QuoteOptionsPanel } from '@/components/quotes/quote-options'
-import { Save, ArrowLeft, Eye, Pencil } from 'lucide-react'
+import { Save, ArrowLeft, Eye, Pencil, Download } from 'lucide-react'
 import Link from 'next/link'
 
 const fadeUp = {
@@ -35,6 +35,7 @@ export default function EditQuotePage() {
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [downloading, setDownloading] = useState(false)
   const [mode, setMode] = useState<'edit' | 'preview'>('edit')
   const [quoteNumber, setQuoteNumber] = useState('')
   const [company, setCompany] = useState<CompanyInfo | null>(null)
@@ -247,6 +248,22 @@ export default function EditQuotePage() {
     }
   }
 
+  async function handleDownloadPdf() {
+    setDownloading(true)
+    const { blob, filename, error } = await api.downloadBlob(`/quotes/${quoteId}/pdf`)
+    setDownloading(false)
+    if (error || !blob) {
+      toast(error || 'Erreur lors du telechargement', 'error')
+      return
+    }
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename || 'devis.pdf'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   // Loading skeleton
   if (loading || settingsLoading) {
     return (
@@ -279,8 +296,12 @@ export default function EditQuotePage() {
           </div>
         </div>
 
-        {/* Mode toggle */}
+        {/* Mode toggle + Download */}
         <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handleDownloadPdf} disabled={downloading}>
+            <Download className={`h-3.5 w-3.5 mr-1.5 ${downloading ? 'animate-pulse' : ''}`} />
+            {downloading ? 'PDF...' : 'PDF'}
+          </Button>
           <div className="flex rounded-lg border border-border overflow-hidden">
             <button
               onClick={() => setMode('edit')}

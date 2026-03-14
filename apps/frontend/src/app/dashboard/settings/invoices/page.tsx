@@ -72,8 +72,10 @@ function TemplateThumbnail({
   const p = isLg ? 'p-3.5' : 'p-2'
   const contrastCol = '#ffffff'
 
+  const Wrapper = onClick ? 'button' : 'div'
+
   return (
-    <button onClick={onClick} className="group text-center w-full">
+    <Wrapper onClick={onClick} className="group text-center w-full">
       <div
         className={`relative rounded-lg overflow-hidden transition-all ${
           selected
@@ -324,7 +326,7 @@ function TemplateThumbnail({
       {isLg && (
         <p className="text-[10px] text-muted-foreground mt-0.5">{T.description}</p>
       )}
-    </button>
+    </Wrapper>
   )
 }
 
@@ -813,16 +815,17 @@ export default function InvoiceSettingsPage() {
                 </div>
 
                 {/* A4 Document Preview */}
-                <div className="p-5 bg-muted/30">
+                <div className="p-4 bg-muted/30">
                   <div
-                    className="rounded-lg shadow-sm overflow-hidden relative"
+                    className="rounded-lg shadow-sm overflow-hidden relative mx-auto"
                     style={{
-                      aspectRatio: '1 / 1.2',
+                      aspectRatio: '210 / 270',
+                      maxHeight: '420px',
                       backgroundColor: currentTemplate.docBg,
                       border: currentTemplate.id === 'sombre' ? '1px solid #3f3f46' : '1px solid #e5e7eb',
                     }}
                   >
-                    <div className="h-full flex flex-col p-6 sm:p-8 relative">
+                    <div className="h-full flex flex-col p-5 relative">
 
                       {/* Accent bar */}
                       {currentTemplate.showAccentBar && (
