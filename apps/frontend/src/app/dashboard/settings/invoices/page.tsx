@@ -252,6 +252,24 @@ function TemplateThumbnail({
             </div>
           </>)}
 
+          {/* ── TIIME: dashed borders, purple accent, clean ── */}
+          {T.id === 'tiime' && (<>
+            <div className="flex justify-between items-start mb-2">
+              <div className="space-y-0.5">
+                <div className="h-2 w-8 rounded" style={{ backgroundColor: '#bfcee1', opacity: 0.4 }} />
+                <div className="h-0.5 w-10 rounded-full" style={{ backgroundColor: '#88A0BF', opacity: 0.2 }} />
+                <div className="h-0.5 w-7 rounded-full" style={{ backgroundColor: '#88A0BF', opacity: 0.15 }} />
+              </div>
+              <div className="space-y-0.5 mt-2">
+                <div className="h-1 w-6 rounded-full border border-dashed" style={{ borderColor: '#bfcee1' }} />
+                <div className="h-1 w-8 rounded-full border border-dashed" style={{ borderColor: '#bfcee1' }} />
+              </div>
+            </div>
+            <div className="mb-1.5 pb-1">
+              <div className="h-1 w-5 rounded-full" style={{ backgroundColor: accentColor, opacity: 0.6 }} />
+            </div>
+          </>)}
+
           {/* ── Common: table + totals (except lateral which offsets) ── */}
           <div style={T.id === 'lateral' ? { marginLeft: '30%' } : undefined} className="flex-1 flex flex-col">
             {/* Table header (shown for all) */}
@@ -352,7 +370,7 @@ function TemplateModal({
             <div className="flex items-center justify-between px-6 py-4 border-b border-border">
               <div>
                 <h2 className="text-lg font-semibold text-foreground">Choisir un modele</h2>
-                <p className="text-sm text-muted-foreground mt-0.5">10 modeles de mise en page pour vos documents</p>
+                <p className="text-sm text-muted-foreground mt-0.5">11 modeles de mise en page pour vos documents</p>
               </div>
               <button
                 onClick={onClose}

@@ -308,6 +308,36 @@ const ligne: TemplateConfig = {
   borderRadius: '6px',
 }
 
+const tiime: TemplateConfig = {
+  id: 'tiime',
+  name: 'Tiime',
+  description: 'Bordures pointillees, accent violet, style comptable',
+  layout: 'standard',
+  docBg: '#ffffff',
+  text: '#476388',
+  textMuted: '#88A0BF',
+  textFooter: '#88A0BF',
+  clientBlockBg: '#ffffff',
+  clientBlockBorder: '#bfcee1',
+  clientEmptyBg: '#E5ECF4',
+  clientEmptyBorder: '#88A0BF',
+  rowEven: '#ffffff',
+  rowOdd: '#fafbfd',
+  rowHover: '06',
+  borderLight: '#bfcee1',
+  totalBg: '10',
+  totalBorder: '25',
+  footerBorder: '#bfcee1',
+  inputBg: '#ffffff',
+  inputPlaceholder: '#88A0BF',
+  editBorderDashed: '#bfcee1',
+  signatureBorder: '#bfcee1',
+  paymentBadgeBg: '#f0f3f8',
+  paymentBadgeBorder: '#bfcee1',
+  paymentBadgeText: '#476388',
+  borderRadius: '8px',
+}
+
 export const TEMPLATES: TemplateConfig[] = [
   classique,
   moderne,
@@ -318,6 +348,7 @@ export const TEMPLATES: TemplateConfig[] = [
   minimaliste,
   duo,
   ligne,
+  tiime,
 ]
 
 /** Apply dark mode overlay to any template */
