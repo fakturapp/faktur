@@ -61,6 +61,9 @@ export default function EditQuotePage() {
     freeField: '',
     globalDiscountType: 'none' as 'none' | 'percentage' | 'fixed',
     globalDiscountValue: 0,
+    showNotes: true,
+    vatExempt: false,
+    footerText: '',
   })
 
   const [notes, setNotes] = useState('')
@@ -97,6 +100,9 @@ export default function EditQuotePage() {
           freeField: q.freeField || '',
           globalDiscountType: q.globalDiscountType || 'none',
           globalDiscountValue: q.globalDiscountValue || 0,
+          showNotes: q.showNotes !== false,
+          vatExempt: q.vatExempt || false,
+          footerText: q.footerText || '',
         })
 
         if (q.client) setSelectedClient(q.client)
@@ -372,6 +378,9 @@ export default function EditQuotePage() {
             template={invoiceSettings.template}
             darkMode={invoiceSettings.darkMode}
             language={options.language}
+            showNotes={options.showNotes}
+            vatExempt={options.vatExempt}
+            footerText={options.footerText}
           />
         </motion.div>
 

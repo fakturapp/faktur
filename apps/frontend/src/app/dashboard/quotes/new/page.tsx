@@ -69,6 +69,9 @@ export default function NewQuotePage() {
     freeField: '',
     globalDiscountType: 'none' as 'none' | 'percentage' | 'fixed',
     globalDiscountValue: 0,
+    showNotes: true,
+    vatExempt: false,
+    footerText: '',
   })
 
   const [notes, setNotes] = useState('')
@@ -321,6 +324,9 @@ export default function NewQuotePage() {
             template={invoiceSettings.template}
             darkMode={invoiceSettings.darkMode}
             language={options.language}
+            showNotes={options.showNotes}
+            vatExempt={options.vatExempt}
+            footerText={options.footerText}
           />
         </motion.div>
 

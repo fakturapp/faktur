@@ -29,6 +29,9 @@ export interface QuoteOptions {
   freeField: string
   globalDiscountType: 'none' | 'percentage' | 'fixed'
   globalDiscountValue: number
+  showNotes: boolean
+  vatExempt: boolean
+  footerText: string
 }
 
 interface QuoteOptionsProps {
@@ -111,6 +114,7 @@ export function QuoteOptionsPanel({
   const [showTitle, setShowTitle] = useState(!!options.documentTitle)
   const [showFreeField, setShowFreeField] = useState(!!options.freeField)
   const [showDiscount, setShowDiscount] = useState(options.globalDiscountType !== 'none')
+  const [showFooterText, setShowFooterText] = useState(!!options.footerText)
 
   return (
     <div className="space-y-4">
@@ -427,6 +431,35 @@ export function QuoteOptionsPanel({
                   className="h-8 text-sm"
                 />
               </div>
+            </OptionCheckbox>
+
+            <OptionCheckbox
+              checked={options.showNotes}
+              onToggle={() => onChange({ showNotes: !options.showNotes })}
+              label="Notes et conditions"
+            />
+
+            <OptionCheckbox
+              checked={options.vatExempt}
+              onToggle={() => onChange({ vatExempt: !options.vatExempt })}
+              label="TVA non applicable (art. 293B)"
+            />
+
+            <OptionCheckbox
+              checked={showFooterText}
+              onToggle={() => {
+                setShowFooterText(!showFooterText)
+                if (showFooterText) onChange({ footerText: '' })
+              }}
+              label="Texte de pied de page"
+            >
+              <textarea
+                placeholder="Ex: Conditions generales de vente..."
+                value={options.footerText}
+                onChange={(e) => onChange({ footerText: e.target.value })}
+                rows={3}
+                className="w-full rounded-lg border border-border bg-transparent px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring resize-none"
+              />
             </OptionCheckbox>
           </div>
         </div>
