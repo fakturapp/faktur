@@ -351,6 +351,7 @@ export default function EditQuotePage() {
       <div className="flex flex-col xl:flex-row gap-5 max-w-[1400px] mx-auto">
         {/* A4 Sheet */}
         <motion.div variants={fadeUp} custom={1} className="flex-1 min-w-0 order-1">
+          <div className="bg-muted/30 rounded-xl p-6 flex justify-center">
           <A4Sheet
             mode={mode}
             logoUrl={logoUrl}
@@ -407,6 +408,7 @@ export default function EditQuotePage() {
             onFooterTextChange={(v) => handleOptionsChange({ footerText: v })}
             onDeliveryAddressChange={(v) => handleOptionsChange({ deliveryAddress: v })}
           />
+          </div>
         </motion.div>
 
         {/* Right Sidebar */}
