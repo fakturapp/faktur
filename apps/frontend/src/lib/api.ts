@@ -56,6 +56,32 @@ async function uploadRequest<T = unknown>(
   }
 }
 
+async function blobRequest(endpoint: string): Promise<{ blob?: Blob; filename?: string; error?: string }> {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('faktur_token') : null
+
+  const headers: Record<string, string> = {}
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
+  }
+
+  try {
+    const res = await fetch(`${API_URL}${endpoint}`, { method: 'GET', headers })
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({ message: 'Download failed' }))
+      return { error: data.message || 'Download failed' }
+    }
+
+    const blob = await res.blob()
+    const disposition = res.headers.get('Content-Disposition') || ''
+    const match = disposition.match(/filename="?([^"]+)"?/)
+    const filename = match?.[1] || 'download'
+    return { blob, filename }
+  } catch {
+    return { error: 'Network error. Please try again.' }
+  }
+}
+
 export const api = {
   post: <T = unknown>(endpoint: string, body: unknown) =>
     request<T>(endpoint, { method: 'POST', body: JSON.stringify(body) }),
@@ -66,4 +92,5 @@ export const api = {
     request<T>(endpoint, { method: 'DELETE', body: body ? JSON.stringify(body) : undefined }),
   upload: <T = unknown>(endpoint: string, formData: FormData) =>
     uploadRequest<T>(endpoint, formData),
+  downloadBlob: (endpoint: string) => blobRequest(endpoint),
 }

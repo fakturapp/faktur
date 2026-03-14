@@ -7,11 +7,13 @@ const QuoteCreate = () => import('#controllers/quote/create')
 const QuoteUpdate = () => import('#controllers/quote/update')
 const QuoteDelete = () => import('#controllers/quote/delete')
 const QuoteNextNumber = () => import('#controllers/quote/next_number')
+const QuotePdf = () => import('#controllers/quote/pdf')
 
 router
   .group(() => {
     router.get('/next-number', [QuoteNextNumber, 'handle'])
     router.get('/', [QuoteList, 'handle'])
+    router.get('/:id/pdf', [QuotePdf, 'handle'])
     router.get('/:id', [QuoteShow, 'handle'])
     router.post('/', [QuoteCreate, 'handle'])
     router.put('/:id', [QuoteUpdate, 'handle'])

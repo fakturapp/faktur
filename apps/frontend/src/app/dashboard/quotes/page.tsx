@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { api } from '@/lib/api'
+import { useToast } from '@/components/ui/toast'
 import {
   Plus,
   Search,
@@ -17,6 +18,7 @@ import {
   ChevronRight,
   Send,
   XCircle,
+  Download,
 } from 'lucide-react'
 
 const fadeUp = {
@@ -52,10 +54,30 @@ const statusConfig: Record<string, { label: string; color: string; bgColor: stri
 }
 
 export default function QuotesPage() {
+  const { toast } = useToast()
   const [loading, setLoading] = useState(true)
   const [quotes, setQuotes] = useState<QuoteListItem[]>([])
   const [search, setSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState<string>('all')
+  const [downloadingId, setDownloadingId] = useState<string | null>(null)
+
+  async function handleDownloadPdf(e: React.MouseEvent, quoteId: string) {
+    e.preventDefault()
+    e.stopPropagation()
+    setDownloadingId(quoteId)
+    const { blob, filename, error } = await api.downloadBlob(`/quotes/${quoteId}/pdf`)
+    setDownloadingId(null)
+    if (error || !blob) {
+      toast(error || 'Erreur lors du telechargement', 'error')
+      return
+    }
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename || 'devis.pdf'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 
   useEffect(() => {
     loadQuotes()
@@ -251,6 +273,16 @@ export default function QuotesPage() {
                     </p>
                     <p className="text-xs text-muted-foreground">TTC</p>
                   </div>
+
+                  {/* PDF download */}
+                  <button
+                    onClick={(e) => handleDownloadPdf(e, quote.id)}
+                    disabled={downloadingId === quote.id}
+                    className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
+                    title="Telecharger le PDF"
+                  >
+                    <Download className={`h-4 w-4 ${downloadingId === quote.id ? 'animate-pulse' : ''}`} />
+                  </button>
 
                   <ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors shrink-0" />
                 </Link>
