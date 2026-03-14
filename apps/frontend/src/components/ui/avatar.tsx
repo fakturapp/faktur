@@ -26,7 +26,9 @@ const sizeClasses = {
 
 const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
   ({ className, src, alt, fallback, size = 'md', ...props }, ref) => {
+    const [imgError, setImgError] = React.useState(false)
     const initials = fallback || alt?.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase() || '?'
+    const showImg = src && !imgError
 
     return (
       <div
@@ -38,8 +40,8 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
         )}
         {...props}
       >
-        {src ? (
-          <img src={resolveUrl(src) || ''} alt={alt || ''} className="h-full w-full object-cover" />
+        {showImg ? (
+          <img src={resolveUrl(src) || ''} alt={alt || ''} className="h-full w-full object-cover" onError={() => setImgError(true)} />
         ) : (
           <span className="font-medium text-muted-foreground">{initials}</span>
         )}
