@@ -22,6 +22,7 @@ export default class InvoiceSettingsUpdate {
         paymentMethods: payload.paymentMethods,
         customPaymentMethod: payload.customPaymentMethod || null,
         template: payload.template || 'classique',
+        darkMode: payload.darkMode ?? false,
       })
     } else {
       settings.billingType = payload.billingType
@@ -29,6 +30,7 @@ export default class InvoiceSettingsUpdate {
       settings.paymentMethods = payload.paymentMethods
       settings.customPaymentMethod = payload.customPaymentMethod || null
       if (payload.template) settings.template = payload.template
+      if (payload.darkMode !== undefined) settings.darkMode = payload.darkMode
       await settings.save()
     }
 
@@ -41,6 +43,7 @@ export default class InvoiceSettingsUpdate {
         paymentMethods: settings.paymentMethods,
         customPaymentMethod: settings.customPaymentMethod || '',
         template: settings.template || 'classique',
+        darkMode: settings.darkMode || false,
       },
     })
   }

@@ -21,6 +21,7 @@ export default class InvoiceSettingsShow {
           paymentMethods: ['bank_transfer'],
           customPaymentMethod: '',
           template: 'classique',
+          darkMode: false,
         },
       })
     }
@@ -33,6 +34,7 @@ export default class InvoiceSettingsShow {
         paymentMethods: settings.paymentMethods,
         customPaymentMethod: settings.customPaymentMethod || '',
         template: settings.template || 'classique',
+        darkMode: settings.darkMode || false,
       },
     })
   }

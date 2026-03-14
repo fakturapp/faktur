@@ -34,8 +34,6 @@ export interface TemplateConfig {
   paymentBadgeBg: string
   paymentBadgeBorder: string
   paymentBadgeText: string
-  // Accent bar
-  showAccentBar: boolean
   // Border radius
   borderRadius: string // e.g. '10px', '0px', '6px'
 }
@@ -43,7 +41,7 @@ export interface TemplateConfig {
 const classique: TemplateConfig = {
   id: 'classique',
   name: 'Classique',
-  description: 'Blanc avec barre d\'accent laterale',
+  description: 'Blanc epure avec arrondis',
   layout: 'standard',
   docBg: '#ffffff',
   text: '#202124',
@@ -55,7 +53,7 @@ const classique: TemplateConfig = {
   clientEmptyBorder: '#d0d0d0',
   rowEven: '#ffffff',
   rowOdd: '#fafbfc',
-  rowHover: '06', // alpha suffix applied to accentColor
+  rowHover: '06',
   borderLight: '#f0f0f0',
   totalBg: '10',
   totalBorder: '25',
@@ -67,38 +65,6 @@ const classique: TemplateConfig = {
   paymentBadgeBg: '#f8f9fa',
   paymentBadgeBorder: '#eeeeee',
   paymentBadgeText: '#5f6368',
-  showAccentBar: true,
-  borderRadius: '10px',
-}
-
-const sombre: TemplateConfig = {
-  id: 'sombre',
-  name: 'Sombre',
-  description: 'Theme sombre professionnel',
-  layout: 'standard',
-  docBg: '#1c1c21',
-  text: '#e4e4e7',
-  textMuted: '#a1a1aa',
-  textFooter: '#71717a',
-  clientBlockBg: '#27272a',
-  clientBlockBorder: '#3f3f46',
-  clientEmptyBg: '#27272a',
-  clientEmptyBorder: '#3f3f46',
-  rowEven: '#1c1c21',
-  rowOdd: '#222226',
-  rowHover: '12',
-  borderLight: '#3f3f46',
-  totalBg: '15',
-  totalBorder: '30',
-  footerBorder: '#3f3f46',
-  inputBg: '#27272a',
-  inputPlaceholder: '#71717a',
-  editBorderDashed: '#3f3f46',
-  signatureBorder: '#3f3f46',
-  paymentBadgeBg: '#27272a',
-  paymentBadgeBorder: '#3f3f46',
-  paymentBadgeText: '#a1a1aa',
-  showAccentBar: true,
   borderRadius: '10px',
 }
 
@@ -129,7 +95,6 @@ const moderne: TemplateConfig = {
   paymentBadgeBg: '#f3f4f6',
   paymentBadgeBorder: '#e5e7eb',
   paymentBadgeText: '#6b7280',
-  showAccentBar: false,
   borderRadius: '8px',
 }
 
@@ -160,7 +125,6 @@ const compact: TemplateConfig = {
   paymentBadgeBg: '#f9fafb',
   paymentBadgeBorder: '#e5e7eb',
   paymentBadgeText: '#4b5563',
-  showAccentBar: false,
   borderRadius: '0px',
 }
 
@@ -191,7 +155,6 @@ const elegance: TemplateConfig = {
   paymentBadgeBg: 'transparent',
   paymentBadgeBorder: '#e5e7eb',
   paymentBadgeText: '#6b7280',
-  showAccentBar: false,
   borderRadius: '6px',
 }
 
@@ -222,7 +185,6 @@ const audacieux: TemplateConfig = {
   paymentBadgeBg: '#f1f5f9',
   paymentBadgeBorder: '#e2e8f0',
   paymentBadgeText: '#475569',
-  showAccentBar: false,
   borderRadius: '12px',
 }
 
@@ -253,7 +215,6 @@ const lateral: TemplateConfig = {
   paymentBadgeBg: '#f8fafc',
   paymentBadgeBorder: '#e2e8f0',
   paymentBadgeText: '#64748b',
-  showAccentBar: false,
   borderRadius: '8px',
 }
 
@@ -284,7 +245,6 @@ const minimaliste: TemplateConfig = {
   paymentBadgeBg: 'transparent',
   paymentBadgeBorder: '#e4e4e7',
   paymentBadgeText: '#71717a',
-  showAccentBar: false,
   borderRadius: '4px',
 }
 
@@ -315,7 +275,6 @@ const duo: TemplateConfig = {
   paymentBadgeBg: '#f1f5f9',
   paymentBadgeBorder: '#e2e8f0',
   paymentBadgeText: '#64748b',
-  showAccentBar: false,
   borderRadius: '10px',
 }
 
@@ -346,13 +305,11 @@ const ligne: TemplateConfig = {
   paymentBadgeBg: 'transparent',
   paymentBadgeBorder: '#e5e7eb',
   paymentBadgeText: '#6b7280',
-  showAccentBar: false,
   borderRadius: '6px',
 }
 
 export const TEMPLATES: TemplateConfig[] = [
   classique,
-  sombre,
   moderne,
   compact,
   elegance,
@@ -363,7 +320,40 @@ export const TEMPLATES: TemplateConfig[] = [
   ligne,
 ]
 
-export function getTemplate(id?: string): TemplateConfig {
-  if (!id) return classique
-  return TEMPLATES.find((t) => t.id === id) ?? classique
+/** Apply dark mode overlay to any template */
+export function applyDarkMode(tpl: TemplateConfig): TemplateConfig {
+  return {
+    ...tpl,
+    docBg: '#1c1c21',
+    text: '#e4e4e7',
+    textMuted: '#a1a1aa',
+    textFooter: '#71717a',
+    clientBlockBg: '#27272a',
+    clientBlockBorder: '#3f3f46',
+    clientEmptyBg: '#27272a',
+    clientEmptyBorder: '#3f3f46',
+    rowEven: '#1c1c21',
+    rowOdd: '#222226',
+    rowHover: '12',
+    borderLight: '#3f3f46',
+    totalBg: '15',
+    totalBorder: '30',
+    footerBorder: '#3f3f46',
+    inputBg: '#27272a',
+    inputPlaceholder: '#71717a',
+    editBorderDashed: '#3f3f46',
+    signatureBorder: '#3f3f46',
+    paymentBadgeBg: '#27272a',
+    paymentBadgeBorder: '#3f3f46',
+    paymentBadgeText: '#a1a1aa',
+  }
+}
+
+export function getTemplate(id?: string, darkMode?: boolean): TemplateConfig {
+  if (!id) {
+    const base = classique
+    return darkMode ? applyDarkMode(base) : base
+  }
+  const base = TEMPLATES.find((t) => t.id === id) ?? classique
+  return darkMode ? applyDarkMode(base) : base
 }

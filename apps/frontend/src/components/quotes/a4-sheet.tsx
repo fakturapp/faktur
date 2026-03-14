@@ -133,11 +133,11 @@ function InlineEdit({
         }}
         placeholder={placeholder}
         className={cn(
-          'rounded px-1.5 py-0.5 outline-none w-full',
-          multiline && 'resize-y min-h-[40px]',
-          className,
+          'rounded px-1.5 py-0.5 outline-none min-w-[100px]',
+          multiline && 'resize-y min-h-[40px] w-full',
+          !multiline && 'w-full',
         )}
-        style={{ border: `1px solid ${accentColor}`, fontSize: 'inherit', fontFamily: 'inherit', backgroundColor: inputBg }}
+        style={{ border: `1px solid ${accentColor}`, fontSize: 'inherit', fontFamily: 'inherit', fontWeight: 'inherit', backgroundColor: inputBg }}
         rows={multiline ? 2 : undefined}
       />
     )
@@ -351,6 +351,7 @@ interface A4SheetProps {
   customPaymentMethod: string
   subject: string
   template?: string
+  darkMode?: boolean
 }
 
 export function A4Sheet({
@@ -362,12 +363,12 @@ export function A4Sheet({
   notes, onNotesChange, acceptanceConditions, signatureField, freeField,
   deliveryAddress, showDeliveryAddress, clientSiren, showClientSiren,
   clientVatNumber, showClientVatNumber, paymentMethods, customPaymentMethod,
-  subject, template,
+  subject, template, darkMode,
 }: A4SheetProps) {
   const isPreview = mode === 'preview'
   const ed = !isPreview // shorthand: is editable?
 
-  const T = getTemplate(template)
+  const T = getTemplate(template, darkMode)
 
   const gridCols = billingType === 'detailed'
     ? 'minmax(180px, 1fr) 60px 60px 90px 55px 90px 32px'
@@ -396,11 +397,6 @@ export function A4Sheet({
           boxShadow: '0 4px 24px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.08)',
         }}
       >
-        {/* Accent left bar */}
-        {T.showAccentBar && (
-          <div className="absolute top-0 left-0 bottom-0 w-1" style={{ backgroundColor: accentColor }} />
-        )}
-
         {/* Scrollable content — flex column so bottom sticks */}
         <div className="absolute inset-0 overflow-y-auto">
           <div

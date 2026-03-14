@@ -73,6 +73,7 @@ interface CompanyData {
 
 interface SettingsData {
   template: string
+  darkMode: boolean
   paymentMethods: string[]
   customPaymentMethod: string | null
 }
@@ -118,7 +119,7 @@ export function renderQuoteHtml(
   company: CompanyData | null,
   settings: SettingsData
 ): string {
-  const T = getTemplate(settings.template)
+  const T = getTemplate(settings.template, settings.darkMode)
   const ac = quote.accentColor || '#6366f1'
   const docTitle = quote.documentTitle || 'DEVIS'
   const tva = buildTvaBreakdown(lines, quote.billingType)
@@ -153,7 +154,6 @@ export function renderQuoteHtml(
     background: ${T.docBg};
     ${T.layout === 'lateral' ? 'display: flex;' : ''}
   }
-  ${T.showAccentBar ? `.accent-bar { position: absolute; top: 0; left: 0; bottom: 0; width: 4px; background: ${ac}; }` : ''}
   ${T.layout === 'lateral' ? `
   .sidebar { width: 22%; background: ${ac}; padding: 28px 16px; color: #fff; }
   .sidebar h3 { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; margin-bottom: 6px; }
@@ -218,7 +218,6 @@ export function renderQuoteHtml(
 </head>
 <body>
 <div class="page">
-${T.showAccentBar ? '<div class="accent-bar"></div>' : ''}
 ${T.layout === 'lateral' ? renderLateral(quote, lines, client, company, settings, T, ac, docTitle, tva, discountAmount) : ''}
 ${T.layout !== 'lateral' ? `
 <div>

@@ -7,5 +7,6 @@ export const updateInvoiceSettingsValidator = vine.compile(
     paymentMethods: vine.array(vine.enum(['bank_transfer', 'cash', 'custom'])),
     customPaymentMethod: vine.string().trim().maxLength(255).optional(),
     template: vine.string().trim().maxLength(30).optional(),
+    darkMode: vine.boolean().optional(),
   })
 )
