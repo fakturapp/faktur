@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion, type Variants } from 'framer-motion'
+import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/toast'
@@ -11,7 +11,7 @@ import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { api } from '@/lib/api'
 import { A4Sheet, ClientModal, type QuoteLine, type ClientInfo, type CompanyInfo } from '@/components/quotes/a4-sheet'
 import { QuoteOptionsPanel } from '@/components/quotes/quote-options'
-import { Save, ArrowLeft, Eye, Pencil } from 'lucide-react'
+import { Save, ArrowLeft, Eye, Pencil, SlidersHorizontal } from 'lucide-react'
 import Link from 'next/link'
 
 const fadeUp = {
@@ -49,6 +49,7 @@ export default function NewQuotePage() {
   const [selectedClient, setSelectedClient] = useState<ClientInfo | null>(null)
   const [clientModalOpen, setClientModalOpen] = useState(false)
   const [accentColor, setAccentColor] = useState('#6366f1')
+  const [showOptions, setShowOptions] = useState(true)
 
   const [lines, setLines] = useState<QuoteLine[]>([
     { id: generateId(), type: 'standard', description: '', saleType: '', quantity: 1, unit: '', unitPrice: 0, vatRate: 20 },
@@ -292,7 +293,15 @@ export default function NewQuotePage() {
       <div className="flex flex-col xl:flex-row gap-5 max-w-[1400px] mx-auto">
         {/* A4 Sheet */}
         <motion.div variants={fadeUp} custom={1} className="flex-1 min-w-0 order-1">
-          <div className="bg-muted/30 rounded-xl p-6 flex justify-center">
+          <div className="bg-muted/30 rounded-xl p-6 flex justify-center relative">
+          {/* Toggle options button */}
+          <button
+            onClick={() => setShowOptions(!showOptions)}
+            className="absolute top-3 right-3 z-10 p-1.5 rounded-lg border border-border bg-card/80 backdrop-blur-sm text-muted-foreground hover:text-foreground transition-colors"
+            title={showOptions ? 'Masquer les options' : 'Afficher les options'}
+          >
+            <SlidersHorizontal className="h-4 w-4" />
+          </button>
           <A4Sheet
             mode={mode}
             logoUrl={invoiceSettings.logoUrl}
@@ -355,23 +364,33 @@ export default function NewQuotePage() {
         </motion.div>
 
         {/* Right Sidebar */}
-        <motion.div variants={fadeUp} custom={2} className="w-full xl:w-[300px] xl:shrink-0 order-2">
-          <div className="xl:sticky xl:top-4">
-            <QuoteOptionsPanel
-              options={options}
-              onChange={handleOptionsChange}
-              accentColor={accentColor}
-              onAccentColorChange={setAccentColor}
-              selectedClient={selectedClient}
-              onOpenClientModal={() => setClientModalOpen(true)}
-              subtotal={subtotal}
-              taxAmount={taxAmount}
-              discountAmount={discountAmount}
-              total={total}
-              tvaBreakdown={tvaBreakdown}
-            />
-          </div>
-        </motion.div>
+        <AnimatePresence>
+          {showOptions && (
+            <motion.div
+              initial={{ opacity: 0, x: 20, width: 0 }}
+              animate={{ opacity: 1, x: 0, width: 300 }}
+              exit={{ opacity: 0, x: 20, width: 0 }}
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
+              className="xl:shrink-0 order-2 overflow-hidden"
+            >
+              <div className="xl:sticky xl:top-4 w-[300px]">
+                <QuoteOptionsPanel
+                  options={options}
+                  onChange={handleOptionsChange}
+                  accentColor={accentColor}
+                  onAccentColorChange={setAccentColor}
+                  selectedClient={selectedClient}
+                  onOpenClientModal={() => setClientModalOpen(true)}
+                  subtotal={subtotal}
+                  taxAmount={taxAmount}
+                  discountAmount={discountAmount}
+                  total={total}
+                  tvaBreakdown={tvaBreakdown}
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* ── Sticky save bar ── */}
