@@ -536,6 +536,7 @@ export function A4Sheet({
           boxShadow: isTiime
             ? 'rgba(71,99,136,0.1) 0px 20px 40px -5px'
             : '0 4px 24px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.08)',
+          colorScheme: 'light',
         }}
       >
         {/* Scrollable content — flex column so bottom sticks */}

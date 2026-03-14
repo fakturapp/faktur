@@ -79,6 +79,7 @@ export default function NewQuotePage() {
     showAcceptanceConditions: false,
     showFreeField: false,
     showFooterText: false,
+    facturX: false,
   })
 
   const [notes, setNotes] = useState('')

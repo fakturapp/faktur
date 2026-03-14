@@ -39,6 +39,7 @@ export interface QuoteOptions {
   showAcceptanceConditions: boolean
   showFreeField: boolean
   showFooterText: boolean
+  facturX: boolean
 }
 
 interface QuoteOptionsProps {
@@ -365,16 +366,16 @@ export function QuoteOptionsPanel({
             </div>
             <button
               type="button"
-              onClick={() => onChange({ facturX: !options.facturX } as any)}
+              onClick={() => onChange({ facturX: !options.facturX })}
               className={cn(
                 'relative inline-flex h-5 w-9 items-center rounded-full transition-colors',
-                (options as any).facturX ? 'bg-primary' : 'bg-muted-foreground/30',
+                options.facturX ? 'bg-primary' : 'bg-muted-foreground/30',
               )}
             >
               <span
                 className={cn(
                   'inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform shadow-sm',
-                  (options as any).facturX ? 'translate-x-[18px]' : 'translate-x-[3px]',
+                  options.facturX ? 'translate-x-[18px]' : 'translate-x-[3px]',
                 )}
               />
             </button>

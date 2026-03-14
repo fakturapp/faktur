@@ -71,6 +71,7 @@ export default function EditQuotePage() {
     showAcceptanceConditions: false,
     showFreeField: false,
     showFooterText: false,
+    facturX: false,
   })
 
   const [notes, setNotes] = useState('')
@@ -117,6 +118,7 @@ export default function EditQuotePage() {
           showAcceptanceConditions: !!q.acceptanceConditions,
           showFreeField: !!q.freeField,
           showFooterText: !!q.footerText,
+          facturX: q.facturX || false,
         })
 
         if (q.client) setSelectedClient(q.client)
