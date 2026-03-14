@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { ImagePlus, Plus, Trash2, Search, ChevronDown, X, Building2, UserRound } from 'lucide-react'
+import { Trash2, Search, X, Building2, UserRound } from 'lucide-react'
 import { api } from '@/lib/api'
 
 export interface QuoteLine {
@@ -46,6 +46,17 @@ export interface ClientInfo {
   vatNumber: string | null
 }
 
+function contrastText(hex: string) {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  return (r * 299 + g * 587 + b * 114) / 1000 > 128 ? '#000' : '#fff'
+}
+
+function formatCurrency(amount: number) {
+  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount)
+}
+
 interface A4SheetProps {
   logoUrl: string | null
   accentColor: string
@@ -66,6 +77,7 @@ interface A4SheetProps {
   taxAmount: number
   discountAmount: number
   total: number
+  tvaBreakdown: { rate: number; base: number; amount: number }[]
   notes: string
   onNotesChange: (notes: string) => void
   acceptanceConditions: string
@@ -76,34 +88,13 @@ interface A4SheetProps {
 }
 
 export function A4Sheet({
-  logoUrl,
-  accentColor,
-  documentTitle,
-  quoteNumber,
-  issueDate,
-  validityDate,
-  billingType,
-  company,
-  client,
-  onSelectClient,
-  onClearClient,
-  lines,
-  onUpdateLine,
-  onAddLine,
-  onRemoveLine,
-  subtotal,
-  taxAmount,
-  discountAmount,
-  total,
-  notes,
-  onNotesChange,
-  acceptanceConditions,
-  signatureField,
-  freeField,
-  paymentMethods,
-  customPaymentMethod,
+  logoUrl, accentColor, documentTitle, quoteNumber, issueDate, validityDate,
+  billingType, company, client, onSelectClient, onClearClient,
+  lines, onUpdateLine, onAddLine, onRemoveLine,
+  subtotal, taxAmount, discountAmount, total, tvaBreakdown,
+  notes, onNotesChange, acceptanceConditions, signatureField, freeField,
+  paymentMethods, customPaymentMethod,
 }: A4SheetProps) {
-  // Client search
   const [clientSearch, setClientSearch] = useState('')
   const [clientResults, setClientResults] = useState<ClientInfo[]>([])
   const [clientLoading, setClientLoading] = useState(false)
@@ -111,15 +102,8 @@ export function A4Sheet({
   const clientRef = useRef<HTMLDivElement>(null)
   const clientDebounce = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Add line menu
-  const [addMenuOpen, setAddMenuOpen] = useState(false)
-  const addMenuRef = useRef<HTMLDivElement>(null)
-
   useEffect(() => {
-    if (!clientSearch.trim()) {
-      setClientResults([])
-      return
-    }
+    if (!clientSearch.trim()) { setClientResults([]); return }
     if (clientDebounce.current) clearTimeout(clientDebounce.current)
     clientDebounce.current = setTimeout(async () => {
       setClientLoading(true)
@@ -129,15 +113,12 @@ export function A4Sheet({
       if (data?.clients) setClientResults(data.clients)
       setClientLoading(false)
     }, 300)
-    return () => {
-      if (clientDebounce.current) clearTimeout(clientDebounce.current)
-    }
+    return () => { if (clientDebounce.current) clearTimeout(clientDebounce.current) }
   }, [clientSearch])
 
   useEffect(() => {
     function handle(e: MouseEvent) {
       if (clientRef.current && !clientRef.current.contains(e.target as Node)) setClientOpen(false)
-      if (addMenuRef.current && !addMenuRef.current.contains(e.target as Node)) setAddMenuOpen(false)
     }
     document.addEventListener('mousedown', handle)
     return () => document.removeEventListener('mousedown', handle)
@@ -145,513 +126,366 @@ export function A4Sheet({
 
   const formatDate = (d: string) => {
     if (!d) return ''
-    try {
-      return new Date(d).toLocaleDateString('fr-FR')
-    } catch {
-      return d
-    }
+    try { return new Date(d).toLocaleDateString('fr-FR') } catch { return d }
   }
 
-  const fmt = (n: number) =>
-    n.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  const gridCols = billingType === 'detailed'
+    ? 'minmax(200px, 1fr) 70px 70px 100px 60px 100px 36px'
+    : 'minmax(200px, 1fr) 100px 36px'
 
   return (
-    <div
-      className="bg-white rounded-xl shadow-md border border-gray-200 w-full max-w-[680px] mx-auto"
-      style={{ aspectRatio: '210 / 297' }}
-    >
-      <div className="h-full flex flex-col p-6 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-        {/* Header: Logo + Company left, Title right */}
-        <div className="flex items-start justify-between mb-3">
-          <div className="space-y-1.5">
+    <div className="bg-white rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.1)] relative overflow-hidden max-w-[860px] w-full mx-auto">
+      {/* Accent left bar */}
+      <div className="absolute top-0 left-0 bottom-0 w-1" style={{ backgroundColor: accentColor }} />
+
+      <div className="p-8 md:p-12">
+        {/* Header */}
+        <div className="flex justify-between items-start mb-9">
+          {/* Left: Logo + Company */}
+          <div>
             {logoUrl ? (
-              <img src={logoUrl} alt="Logo" className="h-8 w-auto max-w-[100px] object-contain" />
+              <img src={logoUrl} alt="Logo" className="h-16 w-auto max-w-[120px] object-contain mb-2" />
             ) : (
-              <div className="h-8 w-16 rounded bg-gray-100 border border-dashed border-gray-300 flex items-center justify-center">
-                <ImagePlus className="h-3.5 w-3.5 text-gray-300" />
+              <div
+                className="w-20 h-20 rounded-xl flex items-center justify-center mb-2 border-2 border-dashed"
+                style={{ background: `linear-gradient(135deg, ${accentColor}22, ${accentColor}44)`, borderColor: `${accentColor}88` }}
+              >
+                <span className="text-[11px] font-medium text-center" style={{ color: accentColor }}>Logo</span>
               </div>
             )}
             {company && (
-              <div className="space-y-0.5">
-                <p className="text-[11px] font-semibold text-gray-800">{company.legalName}</p>
-                {company.addressLine1 && (
-                  <p className="text-[10px] text-gray-500">{company.addressLine1}</p>
+              <div className="text-[13px] text-[#5f6368] leading-[1.6]">
+                <div className="font-semibold text-[#202124] text-sm">{company.legalName}</div>
+                {company.addressLine1 && <div>{company.addressLine1}</div>}
+                {(company.postalCode || company.city) && (
+                  <div>{company.postalCode} {company.city}</div>
                 )}
-                {company.postalCode && (
-                  <p className="text-[10px] text-gray-500">
-                    {company.postalCode} {company.city}
-                  </p>
-                )}
-                {company.phone && <p className="text-[10px] text-gray-500">{company.phone}</p>}
-                {company.email && <p className="text-[10px] text-gray-500">{company.email}</p>}
-                {company.siren && (
-                  <p className="text-[10px] text-gray-400">SIREN: {company.siren}</p>
-                )}
+                {company.siren && <div className="text-[11px]">SIREN : {company.siren}</div>}
+                {company.vatNumber && <div className="text-[11px]">N&deg; TVA : {company.vatNumber}</div>}
               </div>
             )}
           </div>
-          <div className="text-right space-y-0.5">
-            <p className="text-base font-bold tracking-wide" style={{ color: accentColor }}>
-              {documentTitle || 'DEVIS'}
-            </p>
-            <p className="text-[10px] text-gray-400 font-medium">#{quoteNumber}</p>
-            {issueDate && (
-              <p className="text-[10px] text-gray-400">{formatDate(issueDate)}</p>
-            )}
-            {validityDate && (
-              <p className="text-[10px] text-gray-400">
-                Valide jusqu&apos;au {formatDate(validityDate)}
-              </p>
-            )}
+
+          {/* Right: DEVIS badge + meta */}
+          <div className="text-right">
+            <div
+              className="inline-block rounded-[10px] px-6 py-3 mb-3"
+              style={{ background: `${accentColor}12`, border: `1px solid ${accentColor}33` }}
+            >
+              <div className="text-[22px] font-bold uppercase tracking-[2px]" style={{ color: accentColor }}>
+                {documentTitle || 'Devis'}
+              </div>
+            </div>
+            <div className="text-[13px] text-[#5f6368] leading-[1.8]">
+              <div>N&deg; <span className="font-semibold text-[#202124]">{quoteNumber}</span></div>
+              {issueDate && <div>Date : <span className="font-medium">{formatDate(issueDate)}</span></div>}
+              {validityDate && <div>Validite : <span className="font-medium">{formatDate(validityDate)}</span></div>}
+            </div>
           </div>
         </div>
 
-        {/* Accent bar */}
-        <div className="h-[2px] rounded-full mb-3" style={{ backgroundColor: accentColor }} />
-
-        {/* Addresses: Emitter / Client */}
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          {/* Emitter */}
-          <div>
-            <p
-              className="text-[8px] font-semibold uppercase tracking-wider mb-1"
-              style={{ color: accentColor }}
-            >
-              Emetteur
-            </p>
-            {company ? (
-              <div className="space-y-0.5">
-                <p className="text-[10px] font-medium text-gray-700">{company.legalName}</p>
-                {company.addressLine1 && (
-                  <p className="text-[10px] text-gray-500">{company.addressLine1}</p>
-                )}
-                {company.postalCode && (
-                  <p className="text-[10px] text-gray-500">
-                    {company.postalCode} {company.city}
-                  </p>
-                )}
-                {company.email && (
-                  <p className="text-[10px] text-gray-500">{company.email}</p>
-                )}
+        {/* Client block */}
+        <div ref={clientRef} className="bg-[#f8f9fa] rounded-[10px] px-5 py-4 mb-7 border border-[#eee] relative">
+          <div className="text-[10px] uppercase tracking-[1px] text-[#5f6368] font-semibold mb-2">Destinataire</div>
+          {client ? (
+            <div className="text-[13px] leading-[1.7] group">
+              <div className="font-semibold text-[#202124] text-sm">{client.displayName}</div>
+              {client.address && <div className="text-[#5f6368]">{client.address}</div>}
+              {(client.postalCode || client.city) && (
+                <div className="text-[#5f6368]">{client.postalCode} {client.city}</div>
+              )}
+              {client.siren && <div className="text-[11px] text-[#5f6368]">SIRET : {client.siren}</div>}
+              <button
+                onClick={() => { onClearClient(); setClientOpen(true) }}
+                className="absolute top-4 right-5 opacity-0 group-hover:opacity-100 transition-opacity text-[#999] hover:text-[#e53935]"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <div className="relative">
+              <div className="flex items-center gap-2">
+                <Search className="h-4 w-4 text-[#999] shrink-0" />
+                <input
+                  type="text"
+                  placeholder="Rechercher un client..."
+                  value={clientSearch}
+                  onChange={(e) => { setClientSearch(e.target.value); if (e.target.value.trim()) setClientOpen(true) }}
+                  onFocus={() => { if (clientSearch.trim()) setClientOpen(true) }}
+                  className="flex-1 bg-transparent text-sm text-[#202124] placeholder:text-[#999] focus:outline-none"
+                />
               </div>
-            ) : (
-              <div className="space-y-1">
-                <div className="h-2 w-24 rounded bg-gray-100" />
-                <div className="h-1.5 w-32 rounded bg-gray-50" />
-              </div>
-            )}
-          </div>
-
-          {/* Client - inline search */}
-          <div ref={clientRef}>
-            <p
-              className="text-[8px] font-semibold uppercase tracking-wider mb-1"
-              style={{ color: accentColor }}
-            >
-              Client
-            </p>
-            {client ? (
-              <div className="relative group">
-                <div className="flex items-start justify-between">
-                  <div className="space-y-0.5">
-                    <p className="text-[10px] font-medium text-gray-700">
-                      {client.displayName}
-                    </p>
-                    {client.address && (
-                      <p className="text-[10px] text-gray-500">{client.address}</p>
-                    )}
-                    {(client.postalCode || client.city) && (
-                      <p className="text-[10px] text-gray-500">
-                        {client.postalCode} {client.city}
-                      </p>
-                    )}
-                    {client.email && (
-                      <p className="text-[10px] text-gray-500">{client.email}</p>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => {
-                      onClearClient()
-                      setClientOpen(true)
-                    }}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-300 hover:text-gray-500 mt-0.5"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="relative">
-                <button
-                  onClick={() => setClientOpen(true)}
-                  className="flex items-center gap-1.5 text-[10px] text-gray-300 cursor-pointer rounded border border-dashed border-gray-200 px-2 py-1.5 hover:border-gray-300 hover:text-gray-400 transition-colors w-full"
-                >
-                  <Search className="h-3 w-3 shrink-0" />
-                  <span>Selectionner un client</span>
-                </button>
-
-                {clientOpen && (
-                  <div className="absolute top-full left-0 right-0 z-50 mt-1 rounded-lg border border-gray-200 bg-white shadow-xl min-w-[220px]">
-                    <div className="p-2">
-                      <input
-                        type="text"
-                        autoFocus
-                        placeholder="Rechercher..."
-                        value={clientSearch}
-                        onChange={(e) => setClientSearch(e.target.value)}
-                        className="w-full text-[11px] text-gray-700 px-2 py-1.5 border border-gray-200 rounded focus:outline-none focus:border-gray-400"
-                      />
-                    </div>
-                    <div className="max-h-36 overflow-y-auto">
-                      {clientLoading && (
-                        <p className="text-[10px] text-gray-400 text-center p-2 animate-pulse">
-                          Recherche...
-                        </p>
-                      )}
-                      {!clientLoading && clientResults.length === 0 && clientSearch.trim() && (
-                        <p className="text-[10px] text-gray-400 text-center p-2">Aucun resultat</p>
-                      )}
-                      {clientResults.map((c) => (
-                        <button
-                          key={c.id}
-                          className="w-full flex items-center gap-2 px-3 py-1.5 text-left hover:bg-gray-50 transition-colors"
-                          onClick={() => {
-                            onSelectClient(c)
-                            setClientOpen(false)
-                            setClientSearch('')
-                            setClientResults([])
-                          }}
-                        >
-                          <div
-                            className={`h-5 w-5 rounded flex items-center justify-center shrink-0 ${
-                              c.type === 'company' ? 'bg-blue-50' : 'bg-green-50'
-                            }`}
-                          >
-                            {c.type === 'company' ? (
-                              <Building2 className="h-2.5 w-2.5 text-blue-500" />
-                            ) : (
-                              <UserRound className="h-2.5 w-2.5 text-green-500" />
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-[10px] font-medium text-gray-700 truncate">
-                              {c.displayName}
-                            </p>
-                            {c.email && (
-                              <p className="text-[9px] text-gray-400 truncate">{c.email}</p>
-                            )}
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Lines table */}
-        <div className="flex-1 min-h-0">
-          {/* Table header */}
-          <div
-            className="rounded-t-md px-3 py-1.5 flex items-center gap-2 text-[8px] font-semibold uppercase tracking-wider"
-            style={{ backgroundColor: accentColor + '12', color: accentColor }}
-          >
-            <div className="flex-1">Designation</div>
-            {billingType === 'detailed' && (
-              <>
-                <div className="w-12 text-right">Qte</div>
-                <div className="w-12 text-right">Unite</div>
-                <div className="w-14 text-right">PU HT</div>
-                <div className="w-12 text-right">TVA</div>
-              </>
-            )}
-            {billingType === 'quick' && <div className="w-16 text-right">Montant HT</div>}
-            <div className="w-16 text-right">Total</div>
-            <div className="w-5" />
-          </div>
-
-          {/* Lines */}
-          {lines.map((line, i) => (
-            <div key={line.id}>
-              {line.type === 'section' ? (
-                <div className="px-3 py-1.5 flex items-center gap-2 group border-b border-gray-100 bg-gray-50/50">
-                  <input
-                    type="text"
-                    placeholder="Titre de section..."
-                    value={line.description}
-                    onChange={(e) => onUpdateLine(i, { description: e.target.value })}
-                    className="flex-1 bg-transparent text-[10px] font-bold text-gray-800 placeholder:text-gray-300 placeholder:font-normal focus:outline-none"
-                  />
-                  <div className="w-5">
-                    {lines.length > 1 && (
-                      <button
-                        onClick={() => onRemoveLine(i)}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-300 hover:text-red-400"
-                      >
-                        <Trash2 className="h-2.5 w-2.5" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <div
-                  className={`px-3 py-1.5 flex items-center gap-2 group ${
-                    i < lines.length - 1 ? 'border-b border-gray-100' : ''
-                  }`}
-                >
-                  <div className="flex-1">
-                    <input
-                      type="text"
-                      placeholder="Designation..."
-                      value={line.description}
-                      onChange={(e) => onUpdateLine(i, { description: e.target.value })}
-                      className="w-full bg-transparent text-[10px] text-gray-700 placeholder:text-gray-300 focus:outline-none"
-                    />
-                  </div>
-                  {billingType === 'detailed' && (
-                    <>
-                      <div className="w-12">
-                        <input
-                          type="number"
-                          min="0"
-                          step="1"
-                          value={line.quantity}
-                          onChange={(e) =>
-                            onUpdateLine(i, { quantity: parseFloat(e.target.value) || 0 })
-                          }
-                          className="w-full bg-transparent text-[10px] text-gray-700 text-right focus:outline-none"
-                        />
-                      </div>
-                      <div className="w-12">
-                        <input
-                          type="text"
-                          placeholder="u."
-                          value={line.unit}
-                          onChange={(e) => onUpdateLine(i, { unit: e.target.value })}
-                          className="w-full bg-transparent text-[10px] text-gray-700 text-right placeholder:text-gray-300 focus:outline-none"
-                        />
-                      </div>
-                      <div className="w-14">
-                        <input
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          value={line.unitPrice}
-                          onChange={(e) =>
-                            onUpdateLine(i, { unitPrice: parseFloat(e.target.value) || 0 })
-                          }
-                          className="w-full bg-transparent text-[10px] text-gray-700 text-right focus:outline-none"
-                        />
-                      </div>
-                      <div className="w-12">
-                        <input
-                          type="number"
-                          min="0"
-                          max="100"
-                          step="0.1"
-                          value={line.vatRate}
-                          onChange={(e) =>
-                            onUpdateLine(i, { vatRate: parseFloat(e.target.value) || 0 })
-                          }
-                          className="w-full bg-transparent text-[10px] text-gray-700 text-right focus:outline-none"
-                        />
-                      </div>
-                    </>
+              {clientOpen && (
+                <div className="absolute top-full left-0 right-0 z-50 mt-2 rounded-xl border border-[#e0e0e0] bg-white shadow-xl max-h-48 overflow-y-auto">
+                  {clientLoading && <p className="text-xs text-[#999] text-center p-3 animate-pulse">Recherche...</p>}
+                  {!clientLoading && clientResults.length === 0 && clientSearch.trim() && (
+                    <p className="text-xs text-[#999] text-center p-3">Aucun resultat</p>
                   )}
-                  {billingType === 'quick' && (
-                    <div className="w-16">
-                      <input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={line.unitPrice}
-                        onChange={(e) =>
-                          onUpdateLine(i, { unitPrice: parseFloat(e.target.value) || 0 })
-                        }
-                        className="w-full bg-transparent text-[10px] text-gray-700 text-right focus:outline-none"
-                      />
-                    </div>
-                  )}
-                  <div className="w-16 text-right">
-                    <p className="text-[10px] text-gray-600 font-medium">
-                      {fmt(
-                        billingType === 'quick'
-                          ? line.unitPrice
-                          : line.quantity * line.unitPrice
-                      )}{' '}
-                      &euro;
-                    </p>
-                  </div>
-                  <div className="w-5">
-                    {lines.length > 1 && (
-                      <button
-                        onClick={() => onRemoveLine(i)}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-300 hover:text-red-400"
-                      >
-                        <Trash2 className="h-2.5 w-2.5" />
-                      </button>
-                    )}
-                  </div>
+                  {clientResults.map((c) => (
+                    <button
+                      key={c.id}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-[#f8f9fa] transition-colors"
+                      onClick={() => { onSelectClient(c); setClientOpen(false); setClientSearch(''); setClientResults([]) }}
+                    >
+                      <div className={`h-7 w-7 rounded-lg flex items-center justify-center shrink-0 ${c.type === 'company' ? 'bg-blue-50' : 'bg-green-50'}`}>
+                        {c.type === 'company' ? <Building2 className="h-3.5 w-3.5 text-blue-500" /> : <UserRound className="h-3.5 w-3.5 text-green-500" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-[#202124] truncate">{c.displayName}</p>
+                        {c.email && <p className="text-xs text-[#5f6368] truncate">{c.email}</p>}
+                      </div>
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
-          ))}
+          )}
+        </div>
 
-          {/* Add line - split button */}
-          <div ref={addMenuRef} className="relative border-t border-gray-100">
-            <div className="flex">
-              <button
-                onClick={() => onAddLine('standard')}
-                className="flex-1 px-3 py-1.5 flex items-center gap-1 text-[10px] font-medium hover:bg-gray-50 transition-colors rounded-bl-md"
-                style={{ color: accentColor }}
-              >
-                <Plus className="h-3 w-3" /> Ligne simple
-              </button>
-              <button
-                onClick={() => setAddMenuOpen(!addMenuOpen)}
-                className="px-2 py-1.5 hover:bg-gray-50 transition-colors rounded-br-md border-l border-gray-100"
-                style={{ color: accentColor }}
-              >
-                <ChevronDown className="h-3 w-3" />
-              </button>
-            </div>
-            {addMenuOpen && (
-              <div className="absolute top-full left-0 z-50 mt-0.5 rounded-lg border border-gray-200 bg-white shadow-lg py-0.5 min-w-[160px]">
-                <button
-                  className="w-full px-3 py-1.5 text-left text-[10px] text-gray-700 hover:bg-gray-50"
-                  onClick={() => {
-                    onAddLine('standard')
-                    setAddMenuOpen(false)
-                  }}
-                >
-                  Ligne simple
-                </button>
-                <button
-                  className="w-full px-3 py-1.5 text-left text-[10px] text-gray-700 hover:bg-gray-50"
-                  onClick={() => {
-                    onAddLine('section')
-                    setAddMenuOpen(false)
-                  }}
-                >
-                  Ligne de designation
-                </button>
-              </div>
+        {/* Lines Table */}
+        <div className="mb-6">
+          {/* Table Header */}
+          <div className="rounded-t-[10px] overflow-hidden" style={{ display: 'grid', gridTemplateColumns: gridCols }}>
+            <div className="px-3.5 py-2.5 text-xs font-semibold uppercase tracking-[0.5px]"
+              style={{ backgroundColor: accentColor, color: contrastText(accentColor) }}>Designation</div>
+            {billingType === 'detailed' && (
+              <>
+                <div className="px-2 py-2.5 text-xs font-semibold text-center" style={{ backgroundColor: accentColor, color: contrastText(accentColor) }}>Qte</div>
+                <div className="px-2 py-2.5 text-xs font-semibold text-center" style={{ backgroundColor: accentColor, color: contrastText(accentColor) }}>Unite</div>
+                <div className="px-2 py-2.5 text-xs font-semibold text-right" style={{ backgroundColor: accentColor, color: contrastText(accentColor) }}>P.U. HT</div>
+                <div className="px-2 py-2.5 text-xs font-semibold text-center" style={{ backgroundColor: accentColor, color: contrastText(accentColor) }}>TVA</div>
+              </>
             )}
+            <div className="px-3.5 py-2.5 text-xs font-semibold text-right" style={{ backgroundColor: accentColor, color: contrastText(accentColor) }}>Montant HT</div>
+            <div className="px-1 py-2.5" style={{ backgroundColor: accentColor }} />
           </div>
+
+          {/* Rows */}
+          {lines.map((line, idx) => {
+            const isSection = line.type === 'section'
+            const montantHT = isSection ? 0 : (billingType === 'quick' ? line.unitPrice : line.quantity * line.unitPrice)
+
+            return (
+              <div
+                key={line.id}
+                className="border-b border-[#f0f0f0] items-center group"
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: gridCols,
+                  backgroundColor: idx % 2 === 0 ? '#fff' : '#fafbfc',
+                  transition: 'background-color 0.15s',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = `${accentColor}08`)}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = idx % 2 === 0 ? '#fff' : '#fafbfc')}
+              >
+                {/* Designation */}
+                <div className="px-3.5 py-2.5">
+                  <input
+                    type="text"
+                    value={line.description}
+                    onChange={(e) => onUpdateLine(idx, { description: e.target.value })}
+                    placeholder={isSection ? 'Titre de section...' : 'Description de la prestation...'}
+                    className={`w-full bg-transparent text-[13px] placeholder:text-[#aaa] focus:outline-none ${isSection ? 'font-bold text-[#202124]' : 'text-[#202124]'}`}
+                  />
+                </div>
+
+                {/* Standard line - detailed mode cells */}
+                {!isSection && billingType === 'detailed' && (
+                  <>
+                    <div className="px-2 py-2.5 text-center">
+                      <input type="number" min="0" step="1" value={line.quantity}
+                        onChange={(e) => onUpdateLine(idx, { quantity: parseFloat(e.target.value) || 0 })}
+                        className="w-full bg-transparent text-[13px] text-center text-[#202124] focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
+                    </div>
+                    <div className="px-2 py-2.5 text-center">
+                      <input type="text" value={line.unit} placeholder="unite"
+                        onChange={(e) => onUpdateLine(idx, { unit: e.target.value })}
+                        className="w-full bg-transparent text-xs text-center text-[#5f6368] placeholder:text-[#ccc] focus:outline-none" />
+                    </div>
+                    <div className="px-2 py-2.5 text-right">
+                      <input type="number" min="0" step="0.01" value={line.unitPrice}
+                        onChange={(e) => onUpdateLine(idx, { unitPrice: parseFloat(e.target.value) || 0 })}
+                        className="w-full bg-transparent text-[13px] text-right text-[#202124] focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
+                    </div>
+                    <div className="px-2 py-2.5 text-center">
+                      <select value={line.vatRate}
+                        onChange={(e) => onUpdateLine(idx, { vatRate: parseFloat(e.target.value) })}
+                        className="w-full text-xs border border-[#e0e0e0] rounded-md py-1 px-1 bg-white outline-none cursor-pointer">
+                        <option value="20">20%</option>
+                        <option value="10">10%</option>
+                        <option value="5.5">5,5%</option>
+                        <option value="0">0%</option>
+                      </select>
+                    </div>
+                  </>
+                )}
+
+                {/* Section line - empty cells for detailed mode */}
+                {isSection && billingType === 'detailed' && (
+                  <><div /><div /><div /><div /></>
+                )}
+
+                {/* Montant HT column */}
+                {!isSection ? (
+                  <div className="px-3.5 py-2.5 text-right text-[13px] font-semibold text-[#202124]">
+                    {billingType === 'quick' ? (
+                      <input type="number" min="0" step="0.01" value={line.unitPrice}
+                        onChange={(e) => onUpdateLine(idx, { unitPrice: parseFloat(e.target.value) || 0 })}
+                        className="w-full bg-transparent text-[13px] text-right text-[#202124] font-semibold focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
+                    ) : (
+                      formatCurrency(montantHT)
+                    )}
+                  </div>
+                ) : (
+                  <div />
+                )}
+
+                {/* Delete button */}
+                <div className="px-1 py-2.5 text-center">
+                  {lines.length > 1 && (
+                    <button
+                      onClick={() => onRemoveLine(idx)}
+                      className="w-6 h-6 rounded-full flex items-center justify-center text-[#999] hover:bg-red-50 hover:text-[#e53935] transition-all opacity-0 group-hover:opacity-100"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Add line buttons */}
+        <div className="flex gap-2 mb-8">
+          <button
+            onClick={() => onAddLine('standard')}
+            className="px-4 py-2 rounded-full text-xs font-medium cursor-pointer transition-all"
+            style={{ border: `1px dashed ${accentColor}88`, background: `${accentColor}08`, color: accentColor }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = `${accentColor}18`)}
+            onMouseLeave={(e) => (e.currentTarget.style.background = `${accentColor}08`)}
+          >
+            + Ligne simple
+          </button>
+          <button
+            onClick={() => onAddLine('section')}
+            className="px-4 py-2 rounded-full border border-dashed border-[#dadce0] bg-white text-[#5f6368] text-xs font-medium cursor-pointer transition-all hover:bg-[#f8f9fa]"
+          >
+            + Ligne de designation
+          </button>
         </div>
 
         {/* Totals */}
-        <div className="flex justify-end mt-3 mb-3">
-          <div className="w-44 space-y-1">
-            {billingType === 'detailed' && (
-              <>
-                <div className="flex items-center justify-between">
-                  <p className="text-[9px] text-gray-400">Sous-total HT</p>
-                  <p className="text-[10px] text-gray-600 font-medium">{fmt(subtotal)} &euro;</p>
-                </div>
-                <div className="flex items-center justify-between">
-                  <p className="text-[9px] text-gray-400">TVA</p>
-                  <p className="text-[10px] text-gray-600">{fmt(taxAmount)} &euro;</p>
-                </div>
-                {discountAmount > 0 && (
-                  <div className="flex items-center justify-between">
-                    <p className="text-[9px] text-gray-400">Remise</p>
-                    <p className="text-[10px] text-gray-600">-{fmt(discountAmount)} &euro;</p>
-                  </div>
-                )}
-                <div className="h-px bg-gray-200 my-0.5" />
-              </>
+        <div className="flex justify-end mb-8">
+          <div className="w-[300px]">
+            <div className="flex justify-between py-2 border-b border-[#f0f0f0]">
+              <span className="text-[13px] text-[#5f6368]">Total HT</span>
+              <span className="text-[13px] font-semibold text-[#202124]">{formatCurrency(subtotal)}</span>
+            </div>
+            {tvaBreakdown.map((entry) => (
+              <div key={entry.rate} className="flex justify-between py-1.5 border-b border-[#f0f0f0]">
+                <span className="text-xs text-[#5f6368]">TVA {entry.rate}% (base : {formatCurrency(entry.base)})</span>
+                <span className="text-xs text-[#5f6368]">{formatCurrency(entry.amount)}</span>
+              </div>
+            ))}
+            {discountAmount > 0 && (
+              <div className="flex justify-between py-1.5 border-b border-[#f0f0f0]">
+                <span className="text-xs text-[#5f6368]">Remise</span>
+                <span className="text-xs text-[#e53935]">-{formatCurrency(discountAmount)}</span>
+              </div>
             )}
             <div
-              className="flex items-center justify-between rounded-md px-2 py-1.5"
-              style={{ backgroundColor: accentColor + '10' }}
+              className="flex justify-between px-4 py-3 mt-2 rounded-[10px]"
+              style={{ background: `${accentColor}10`, border: `1px solid ${accentColor}25` }}
             >
-              <p className="text-[10px] font-semibold" style={{ color: accentColor }}>
+              <span className="text-[15px] font-bold text-[#202124]">
                 Total {billingType === 'detailed' ? 'TTC' : ''}
-              </p>
-              <p className="text-xs font-bold" style={{ color: accentColor }}>
-                {fmt(total)} &euro;
-              </p>
+              </span>
+              <span className="text-[17px] font-bold" style={{ color: accentColor }}>
+                {formatCurrency(total)}
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Notes - always visible, editable inline */}
-        <div className="mb-2">
+        {/* Notes */}
+        <div className="border-t border-[#eee] pt-5">
+          <div className="text-[10px] uppercase tracking-[1px] text-[#5f6368] font-semibold mb-2">Conditions et notes</div>
           <textarea
-            placeholder="Notes..."
             value={notes}
             onChange={(e) => onNotesChange(e.target.value)}
+            placeholder="Ajoutez vos conditions de paiement, notes..."
+            className="w-full bg-transparent text-xs text-[#5f6368] leading-[1.6] placeholder:text-[#aaa] focus:outline-none resize-y min-h-[40px]"
             rows={2}
-            className="w-full bg-transparent text-[10px] text-gray-500 placeholder:text-gray-300 focus:outline-none resize-none leading-relaxed"
           />
         </div>
 
-        {/* Free Field */}
-        {freeField && (
-          <div className="mb-2">
-            <p className="text-[10px] text-gray-500 whitespace-pre-line">{freeField}</p>
+        {/* Acceptance Conditions */}
+        {acceptanceConditions && (
+          <div className="mt-4">
+            <div className="text-[10px] uppercase tracking-[1px] text-[#5f6368] font-semibold mb-1">Conditions d&apos;acceptation</div>
+            <p className="text-xs text-[#5f6368] whitespace-pre-line">{acceptanceConditions}</p>
           </div>
         )}
 
-        {/* Acceptance Conditions */}
-        {acceptanceConditions && (
-          <div className="mb-2">
-            <p className="text-[8px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5">
-              Conditions d&apos;acceptation
-            </p>
-            <p className="text-[10px] text-gray-500 whitespace-pre-line">{acceptanceConditions}</p>
+        {/* Free field */}
+        {freeField && (
+          <div className="mt-4">
+            <p className="text-xs text-[#5f6368] whitespace-pre-line">{freeField}</p>
           </div>
         )}
 
         {/* Signature */}
         {signatureField && (
-          <div className="mb-2">
+          <div className="mt-4">
             <div className="flex gap-6">
               <div className="flex-1">
-                <p className="text-[8px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5">
-                  Signature emetteur
-                </p>
-                <div className="h-10 rounded border border-dashed border-gray-200" />
+                <div className="text-[10px] uppercase tracking-[1px] text-[#5f6368] font-semibold mb-1">Signature emetteur</div>
+                <div className="h-16 rounded-lg border-2 border-dashed border-[#e0e0e0]" />
               </div>
               <div className="flex-1">
-                <p className="text-[8px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5">
-                  Signature client
-                </p>
-                <div className="h-10 rounded border border-dashed border-gray-200" />
+                <div className="text-[10px] uppercase tracking-[1px] text-[#5f6368] font-semibold mb-1">Signature client</div>
+                <div className="h-16 rounded-lg border-2 border-dashed border-[#e0e0e0]" />
               </div>
             </div>
           </div>
         )}
 
-        {/* Footer: Payment methods */}
-        <div className="border-t border-gray-100 pt-2 mt-auto">
-          {paymentMethods.length > 0 && (
-            <div>
-              <p className="text-[7px] font-semibold text-gray-400 uppercase tracking-wider mb-0.5">
-                Moyens de paiement
-              </p>
-              <div className="flex flex-wrap gap-1">
-                {paymentMethods.includes('bank_transfer') && (
-                  <span className="text-[7px] bg-gray-50 text-gray-500 rounded px-1.5 py-0.5 border border-gray-100">
-                    Virement
-                  </span>
-                )}
-                {paymentMethods.includes('cash') && (
-                  <span className="text-[7px] bg-gray-50 text-gray-500 rounded px-1.5 py-0.5 border border-gray-100">
-                    Especes
-                  </span>
-                )}
-                {paymentMethods.includes('custom') && customPaymentMethod && (
-                  <span className="text-[7px] bg-gray-50 text-gray-500 rounded px-1.5 py-0.5 border border-gray-100">
-                    {customPaymentMethod}
-                  </span>
-                )}
-              </div>
+        {/* Payment methods */}
+        {paymentMethods.length > 0 && (
+          <div className="mt-4">
+            <div className="text-[10px] uppercase tracking-[1px] text-[#5f6368] font-semibold mb-1">Moyens de paiement</div>
+            <div className="flex flex-wrap gap-1.5">
+              {paymentMethods.includes('bank_transfer') && (
+                <span className="text-[10px] bg-[#f8f9fa] text-[#5f6368] rounded-md px-2 py-0.5 border border-[#eee]">Virement</span>
+              )}
+              {paymentMethods.includes('cash') && (
+                <span className="text-[10px] bg-[#f8f9fa] text-[#5f6368] rounded-md px-2 py-0.5 border border-[#eee]">Especes</span>
+              )}
+              {paymentMethods.includes('custom') && customPaymentMethod && (
+                <span className="text-[10px] bg-[#f8f9fa] text-[#5f6368] rounded-md px-2 py-0.5 border border-[#eee]">{customPaymentMethod}</span>
+              )}
             </div>
-          )}
+          </div>
+        )}
+
+        {/* Footer */}
+        <div className="mt-8 pt-4 border-t-2 border-[#f0f0f0] text-center">
+          <div className="text-[10px] text-[#999] leading-[1.6]">
+            {company && (
+              <>
+                <span className="font-semibold">{company.legalName}</span>
+                {company.siren && <> &mdash; SIREN : {company.siren}</>}
+                {company.vatNumber && <> &mdash; N&deg; TVA : {company.vatNumber}</>}
+                <br />
+                {company.addressLine1 && <>{company.addressLine1}, </>}
+                {company.postalCode && <>{company.postalCode} </>}
+                {company.city && <>{company.city}</>}
+                {company.phone && <> &mdash; {company.phone}</>}
+                {company.email && <> &mdash; {company.email}</>}
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>

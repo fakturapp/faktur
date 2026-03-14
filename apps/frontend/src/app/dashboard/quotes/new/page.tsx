@@ -149,15 +149,24 @@ export default function NewQuotePage() {
     }))
   }, [])
 
-  const { subtotal, taxAmount, discountAmount, total } = useMemo(() => {
+  const { subtotal, taxAmount, discountAmount, total, tvaBreakdown } = useMemo(() => {
     let sub = 0
     let tax = 0
+    const tvaMap: Record<number, { base: number; amount: number }> = {}
+
     for (const line of lines) {
       if (line.type === 'section') continue
       const lt = options.billingType === 'quick' ? line.unitPrice : line.quantity * line.unitPrice
       const lTax = options.billingType === 'detailed' ? lt * (line.vatRate / 100) : 0
       sub += lt
       tax += lTax
+
+      if (options.billingType === 'detailed') {
+        const rate = line.vatRate
+        if (!tvaMap[rate]) tvaMap[rate] = { base: 0, amount: 0 }
+        tvaMap[rate].base += lt
+        tvaMap[rate].amount += lTax
+      }
     }
 
     let disc = 0
@@ -172,6 +181,11 @@ export default function NewQuotePage() {
       taxAmount: Math.round(tax * 100) / 100,
       discountAmount: Math.round(disc * 100) / 100,
       total: Math.round((sub + tax - disc) * 100) / 100,
+      tvaBreakdown: Object.entries(tvaMap).map(([rate, data]) => ({
+        rate: Number(rate),
+        base: Math.round(data.base * 100) / 100,
+        amount: Math.round(data.amount * 100) / 100,
+      })),
     }
   }, [lines, options.billingType, options.globalDiscountType, options.globalDiscountValue])
 
@@ -229,13 +243,13 @@ export default function NewQuotePage() {
     return (
       <div className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
         <Skeleton className="h-8 w-64" />
-        <div className="grid grid-cols-1 xl:grid-cols-[1fr_340px] gap-6 items-start">
-          <div className="flex justify-center">
-            <Skeleton className="w-full max-w-[680px] rounded-xl" style={{ aspectRatio: '210/297' }} />
-          </div>
-          <div className="space-y-4">
-            <Skeleton className="h-48 rounded-xl" />
+        <div className="flex flex-col xl:flex-row gap-5">
+          <div className="w-full xl:w-[280px] xl:shrink-0 order-2 xl:order-1 space-y-4">
+            <Skeleton className="h-[400px] rounded-xl" />
             <Skeleton className="h-32 rounded-xl" />
+          </div>
+          <div className="flex-1 min-w-0 order-1 xl:order-2 flex justify-center">
+            <Skeleton className="w-full max-w-[860px] h-[600px] rounded-xl" />
           </div>
         </div>
       </div>
@@ -243,7 +257,7 @@ export default function NewQuotePage() {
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
+    <motion.div initial="hidden" animate="visible" className="space-y-5 px-4 lg:px-6 py-4 md:py-5">
       {/* Header */}
       <motion.div variants={fadeUp} custom={0} className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -259,10 +273,26 @@ export default function NewQuotePage() {
         </div>
       </motion.div>
 
-      {/* Main grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-[1fr_340px] gap-6 items-start">
-        {/* Left: A4 Sheet */}
-        <motion.div variants={fadeUp} custom={1} className="flex justify-center">
+      {/* Main content: sidebar + document */}
+      <div className="flex flex-col xl:flex-row gap-5 max-w-[1400px] mx-auto">
+        {/* Left: Sidebar */}
+        <motion.div variants={fadeUp} custom={1} className="w-full xl:w-[280px] xl:shrink-0 order-2 xl:order-1">
+          <div className="xl:sticky xl:top-4">
+            <QuoteOptionsPanel
+              options={options}
+              onChange={handleOptionsChange}
+              subtotal={subtotal}
+              taxAmount={taxAmount}
+              discountAmount={discountAmount}
+              total={total}
+              tvaBreakdown={tvaBreakdown}
+              accentColor={invoiceSettings.accentColor}
+            />
+          </div>
+        </motion.div>
+
+        {/* Right: Document */}
+        <motion.div variants={fadeUp} custom={2} className="flex-1 min-w-0 order-1 xl:order-2">
           <A4Sheet
             logoUrl={invoiceSettings.logoUrl}
             accentColor={invoiceSettings.accentColor}
@@ -283,6 +313,7 @@ export default function NewQuotePage() {
             taxAmount={taxAmount}
             discountAmount={discountAmount}
             total={total}
+            tvaBreakdown={tvaBreakdown}
             notes={notes}
             onNotesChange={setNotes}
             acceptanceConditions={options.acceptanceConditions}
@@ -291,11 +322,6 @@ export default function NewQuotePage() {
             paymentMethods={invoiceSettings.paymentMethods}
             customPaymentMethod={invoiceSettings.customPaymentMethod}
           />
-        </motion.div>
-
-        {/* Right: Sidebar - Options only */}
-        <motion.div variants={fadeUp} custom={2} className="xl:sticky xl:top-4">
-          <QuoteOptionsPanel options={options} onChange={handleOptionsChange} />
         </motion.div>
       </div>
 
