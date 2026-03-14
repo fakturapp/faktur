@@ -12,7 +12,8 @@ import { api } from '@/lib/api'
 import { A4Sheet, ClientModal, type QuoteLine, type ClientInfo, type CompanyInfo } from '@/components/quotes/a4-sheet'
 import { QuoteOptionsPanel } from '@/components/quotes/quote-options'
 import { Save, ArrowLeft, Eye, Pencil, Download, SlidersHorizontal } from 'lucide-react'
-import Link from 'next/link'
+import { Dialog, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -73,6 +74,8 @@ export default function EditQuotePage() {
   })
 
   const [notes, setNotes] = useState('')
+  const [isDirty, setIsDirty] = useState(false)
+  const { showModal, setShowModal, confirmNavigation, cancelNavigation } = useUnsavedChanges(isDirty)
 
   // Load quote and company
   useEffect(() => {
@@ -146,6 +149,7 @@ export default function EditQuotePage() {
   // Handlers
   const handleUpdateLine = useCallback((index: number, partial: Partial<QuoteLine>) => {
     setLines((prev) => prev.map((l, i) => (i === index ? { ...l, ...partial } : l)))
+    setIsDirty(true)
   }, [])
 
   const handleAddLine = useCallback((type: 'standard' | 'section') => {
@@ -153,14 +157,17 @@ export default function EditQuotePage() {
       ...prev,
       { id: generateId(), type, description: '', saleType: '', quantity: 1, unit: '', unitPrice: 0, vatRate: type === 'section' ? 0 : 20 },
     ])
+    setIsDirty(true)
   }, [])
 
   const handleRemoveLine = useCallback((index: number) => {
     setLines((prev) => prev.filter((_, i) => i !== index))
+    setIsDirty(true)
   }, [])
 
   const handleOptionsChange = useCallback((partial: Partial<typeof options>) => {
     setOptions((prev) => ({ ...prev, ...partial }))
+    setIsDirty(true)
   }, [])
 
   const handleSelectClient = useCallback((client: ClientInfo) => {
@@ -170,14 +177,17 @@ export default function EditQuotePage() {
       clientSiren: client.siren || prev.clientSiren,
       clientVatNumber: client.vatNumber || prev.clientVatNumber,
     }))
+    setIsDirty(true)
   }, [])
 
   const handleClientFieldChange = useCallback((field: keyof ClientInfo, value: string) => {
     setSelectedClient((prev) => prev ? { ...prev, [field]: value } : prev)
+    setIsDirty(true)
   }, [])
 
   const handleCompanyFieldChange = useCallback((field: keyof CompanyInfo, value: string) => {
     setCompany((prev) => prev ? { ...prev, [field]: value } : prev)
+    setIsDirty(true)
   }, [])
 
   // Calculations
@@ -264,6 +274,7 @@ export default function EditQuotePage() {
     if (error) {
       toast(error, 'error')
     } else {
+      setIsDirty(false)
       toast('Devis mis a jour', 'success')
       router.push('/dashboard/quotes')
     }
@@ -308,9 +319,11 @@ export default function EditQuotePage() {
       {/* ── Header ── */}
       <motion.div variants={fadeUp} custom={0} className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Link href="/dashboard/quotes">
-            <Button variant="ghost" size="icon"><ArrowLeft className="h-4 w-4" /></Button>
-          </Link>
+          <Button variant="ghost" size="icon" onClick={() => {
+            if (isDirty) { setShowModal(true) } else { router.push('/dashboard/quotes') }
+          }}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
           <div>
             <h1 className="text-2xl font-bold text-foreground">Modifier le devis</h1>
             <p className="text-muted-foreground mt-0.5 text-sm">{quoteNumber}</p>
@@ -481,6 +494,25 @@ export default function EditQuotePage() {
         onClose={() => setClientModalOpen(false)}
         onSelect={handleSelectClient}
       />
+
+      {/* ── Unsaved changes dialog ── */}
+      <Dialog open={showModal} onClose={cancelNavigation} className="max-w-sm">
+        <DialogTitle>Modifications non enregistrees</DialogTitle>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Vous avez des modifications non enregistrees. Que souhaitez-vous faire ?
+        </p>
+        <DialogFooter>
+          <Button variant="outline" size="sm" onClick={cancelNavigation}>
+            Annuler
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => { confirmNavigation(); router.push('/dashboard/quotes') }}>
+            Ignorer
+          </Button>
+          <Button size="sm" onClick={async () => { confirmNavigation(); await handleSave() }}>
+            <Save className="h-3.5 w-3.5 mr-1" /> Enregistrer
+          </Button>
+        </DialogFooter>
+      </Dialog>
     </motion.div>
   )
 }
