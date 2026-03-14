@@ -1060,25 +1060,7 @@ export function A4Sheet({
                 </div>
               )}
 
-              {paymentMethods.length > 0 && (
-                <div className="mt-2">
-                  <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1" style={{ color: T.textMuted }}>{t.paymentMethods}</div>
-                  <div className="flex flex-wrap gap-1">
-                    {paymentMethods.includes('bank_transfer') && (
-                      <span className="text-[9px] rounded px-1.5 py-0.5" style={{ backgroundColor: T.paymentBadgeBg, border: `1px solid ${T.paymentBadgeBorder}`, color: T.paymentBadgeText }}>{t.bankTransfer}</span>
-                    )}
-                    {paymentMethods.includes('check') && (
-                      <span className="text-[9px] rounded px-1.5 py-0.5" style={{ backgroundColor: T.paymentBadgeBg, border: `1px solid ${T.paymentBadgeBorder}`, color: T.paymentBadgeText }}>{t.check}</span>
-                    )}
-                    {paymentMethods.includes('cash') && (
-                      <span className="text-[9px] rounded px-1.5 py-0.5" style={{ backgroundColor: T.paymentBadgeBg, border: `1px solid ${T.paymentBadgeBorder}`, color: T.paymentBadgeText }}>{t.cash}</span>
-                    )}
-                    {paymentMethods.includes('custom') && customPaymentMethod && (
-                      <span className="text-[9px] rounded px-1.5 py-0.5" style={{ backgroundColor: T.paymentBadgeBg, border: `1px solid ${T.paymentBadgeBorder}`, color: T.paymentBadgeText }}>{customPaymentMethod}</span>
-                    )}
-                  </div>
-                </div>
-              )}
+              {/* Payment methods — hidden for quotes (devis) */}
 
               {/* ── Footer (editable or custom text) ── */}
               {isTiime ? (
