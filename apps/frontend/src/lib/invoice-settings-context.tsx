@@ -21,6 +21,10 @@ export interface InvoiceSettings {
   template: string
   darkMode: boolean
   documentFont: string
+  eInvoicingEnabled: boolean
+  pdpProvider: string | null
+  pdpApiKey: string | null
+  pdpSandbox: boolean
 }
 
 interface InvoiceSettingsContextType {
@@ -39,6 +43,10 @@ const defaultSettings: InvoiceSettings = {
   template: 'classique',
   darkMode: false,
   documentFont: 'Lexend',
+  eInvoicingEnabled: false,
+  pdpProvider: null,
+  pdpApiKey: null,
+  pdpSandbox: true,
 }
 
 const InvoiceSettingsContext = createContext<InvoiceSettingsContextType>({

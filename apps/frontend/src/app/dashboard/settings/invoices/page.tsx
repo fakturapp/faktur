@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/toast'
 import { Spinner } from '@/components/ui/spinner'
+import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { TEMPLATES, getTemplate, type TemplateConfig } from '@/lib/invoice-templates'
 import {
@@ -29,6 +30,10 @@ import {
   Moon,
   Sun,
   Type,
+  FileCheck,
+  Info,
+  Shield,
+  AlertTriangle,
 } from 'lucide-react'
 
 const fadeUp = {
@@ -414,6 +419,7 @@ export default function InvoiceSettingsPage() {
   const { settings, loading, updateSettings, uploadLogo } = useInvoiceSettings()
   const [uploading, setUploading] = useState(false)
   const [templateModalOpen, setTemplateModalOpen] = useState(false)
+  const [showEInvoicingModal, setShowEInvoicingModal] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const currentTemplate = getTemplate(settings.template, settings.darkMode)
@@ -859,8 +865,167 @@ export default function InvoiceSettingsPage() {
             </Card>
           </motion.div>
 
+          {/* E-Invoicing — Facturation electronique */}
+          <motion.div variants={fadeUp} custom={6}>
+            <Card className="overflow-hidden border-border/50">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                    <FileCheck className="h-4.5 w-4.5 text-primary" />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-semibold text-foreground">Facturation electronique</h2>
+                    <p className="text-xs text-muted-foreground">Reforme 2026 — Factur-X, PDP et e-reporting</p>
+                  </div>
+                </div>
+
+                {/* Info banner */}
+                <div className="flex items-start gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 mb-4">
+                  <Info className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-xs text-foreground leading-relaxed">
+                      A partir de septembre 2026, toutes les entreprises francaises doivent emettre des factures electroniques au format structure (Factur-X, UBL ou CII) via une Plateforme de Dematerialisation Partenaire (PDP).
+                    </p>
+                  </div>
+                </div>
+
+                {/* Toggle activation */}
+                <div className="flex items-center justify-between rounded-xl border-2 border-border p-4 mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${settings.eInvoicingEnabled ? 'bg-primary/10' : 'bg-muted'}`}>
+                      <Shield className={`h-5 w-5 ${settings.eInvoicingEnabled ? 'text-primary' : 'text-muted-foreground'}`} />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">Activer la facturation electronique</p>
+                      <p className="text-xs text-muted-foreground">Genere automatiquement le format Factur-X pour vos documents</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!settings.eInvoicingEnabled) {
+                        setShowEInvoicingModal(true)
+                      } else {
+                        updateSettings({ eInvoicingEnabled: false })
+                      }
+                    }}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 ${
+                      settings.eInvoicingEnabled ? 'bg-primary' : 'bg-muted-foreground/30'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 rounded-full bg-white transition-transform shadow-sm ${
+                        settings.eInvoicingEnabled ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {/* PDP Configuration (only when enabled) */}
+                <AnimatePresence>
+                  {settings.eInvoicingEnabled && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="space-y-4 pt-2">
+                        <Separator />
+
+                        {/* PDP Provider */}
+                        <div>
+                          <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">Plateforme PDP</label>
+                          <div className="grid grid-cols-2 gap-2">
+                            {[
+                              { id: 'chorus_pro', name: 'Chorus Pro (PPF)', desc: 'Portail public gratuit' },
+                              { id: 'b2brouter', name: 'B2Brouter', desc: 'PDP privee avec API' },
+                              { id: 'seqino', name: 'Seqino', desc: 'API marque blanche' },
+                              { id: 'other', name: 'Autre PDP', desc: 'Configuration manuelle' },
+                            ].map((pdp) => (
+                              <button
+                                key={pdp.id}
+                                onClick={() => updateSettings({ pdpProvider: pdp.id })}
+                                className={`rounded-xl border-2 p-3 text-left transition-all ${
+                                  settings.pdpProvider === pdp.id
+                                    ? 'border-primary bg-primary/5'
+                                    : 'border-border hover:border-muted-foreground/30'
+                                }`}
+                              >
+                                <p className="text-xs font-medium text-foreground">{pdp.name}</p>
+                                <p className="text-[10px] text-muted-foreground">{pdp.desc}</p>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* API Key */}
+                        {settings.pdpProvider && settings.pdpProvider !== 'chorus_pro' && (
+                          <div>
+                            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">Cle API PDP</label>
+                            <Input
+                              type="password"
+                              placeholder="Votre cle API..."
+                              value={settings.pdpApiKey === '••••••••' ? '' : (settings.pdpApiKey || '')}
+                              onChange={(e) => updateSettings({ pdpApiKey: e.target.value })}
+                              className="text-sm"
+                            />
+                            <p className="text-[10px] text-muted-foreground mt-1">
+                              Obtenez votre cle API depuis le tableau de bord de votre PDP
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Sandbox mode */}
+                        <div className="flex items-center justify-between rounded-lg border border-border p-3">
+                          <div className="flex items-center gap-2">
+                            <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                            <div>
+                              <p className="text-xs font-medium text-foreground">Mode sandbox</p>
+                              <p className="text-[10px] text-muted-foreground">Tester sans envoyer de vraies factures</p>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => updateSettings({ pdpSandbox: !settings.pdpSandbox })}
+                            className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors shrink-0 ${
+                              settings.pdpSandbox ? 'bg-yellow-500' : 'bg-muted-foreground/30'
+                            }`}
+                          >
+                            <span
+                              className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform shadow-sm ${
+                                settings.pdpSandbox ? 'translate-x-[18px]' : 'translate-x-[3px]'
+                              }`}
+                            />
+                          </button>
+                        </div>
+
+                        {/* Features list */}
+                        <div className="rounded-lg border border-border p-3 space-y-2">
+                          <p className="text-xs font-medium text-foreground mb-2">Fonctionnalites incluses</p>
+                          {[
+                            'Generation automatique Factur-X (PDF/A-3)',
+                            'Envoi via PDP vers la DGFiP',
+                            'E-reporting automatique',
+                            'Archivage certifie 10 ans',
+                            'Suivi des statuts en temps reel',
+                          ].map((feature) => (
+                            <div key={feature} className="flex items-center gap-2">
+                              <Check className="h-3.5 w-3.5 text-primary shrink-0" />
+                              <span className="text-[11px] text-muted-foreground">{feature}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </CardContent>
+            </Card>
+          </motion.div>
+
           {/* Auto-save indicator */}
-          <motion.div variants={fadeUp} custom={6} className="flex justify-end">
+          <motion.div variants={fadeUp} custom={7} className="flex justify-end">
             <p className="text-xs text-muted-foreground flex items-center gap-1.5">
               <Check className="h-3.5 w-3.5 text-green-500" />
               Enregistrement automatique
@@ -1049,6 +1214,55 @@ export default function InvoiceSettingsPage() {
         currentTemplate={settings.template}
         onSelect={(id) => updateSettings({ template: id })}
       />
+
+      {/* E-Invoicing Confirmation Modal */}
+      <Dialog open={showEInvoicingModal} onClose={() => setShowEInvoicingModal(false)}>
+        <div className="p-6 max-w-md">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+              <FileCheck className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <DialogTitle>Activer la facturation electronique</DialogTitle>
+              <DialogDescription>Reforme obligatoire a partir de septembre 2026</DialogDescription>
+            </div>
+          </div>
+
+          <div className="space-y-3 mb-6">
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              En activant cette option, vos documents seront generes au format Factur-X (PDF/A-3) conforme aux exigences de la reforme francaise.
+            </p>
+            <div className="rounded-lg border border-border p-3 space-y-2">
+              {[
+                'Vos PDF incluront les metadonnees XML structurees',
+                'Compatible avec toutes les PDP agreees',
+                'Aucun impact sur vos documents existants',
+              ].map((item) => (
+                <div key={item} className="flex items-start gap-2">
+                  <Check className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" />
+                  <span className="text-xs text-foreground">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setShowEInvoicingModal(false)}>
+              Annuler
+            </Button>
+            <Button
+              onClick={() => {
+                updateSettings({ eInvoicingEnabled: true })
+                setShowEInvoicingModal(false)
+                toast('Facturation electronique activee', 'success')
+              }}
+            >
+              <FileCheck className="h-4 w-4 mr-2" />
+              Activer
+            </Button>
+          </DialogFooter>
+        </div>
+      </Dialog>
     </motion.div>
   )
 }
