@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import {
   Trash2, Search, X, Building2, UserRound,
-  RefreshCw, MousePointerClick, FileText, Plus, Type,
+  RefreshCw, MousePointerClick, FileText, Plus, Type, ChevronDown,
 } from 'lucide-react'
 import { api } from '@/lib/api'
 import { Dialog, DialogTitle } from '@/components/ui/dialog'
@@ -352,7 +352,7 @@ function AddLineDropdown({
           onMouseEnter={(e) => (e.currentTarget.style.boxShadow = 'rgba(71,99,136,0.4) 0px 0px 10px')}
           onMouseLeave={(e) => (e.currentTarget.style.boxShadow = 'rgba(71,99,136,0.25) 0px 0px 6px')}
         >
-          <Plus className="h-4 w-4" /> {t.addLine}
+          <Plus className="h-4 w-4" /> {t.addLine} <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', open && 'rotate-180')} />
         </button>
       ) : (
         <button
@@ -362,7 +362,7 @@ function AddLineDropdown({
           onMouseEnter={(e) => (e.currentTarget.style.background = `${accentColor}18`)}
           onMouseLeave={(e) => (e.currentTarget.style.background = `${accentColor}08`)}
         >
-          <Plus className="h-3 w-3" /> {t.addLine}
+          <Plus className="h-3 w-3" /> {t.addLine} <ChevronDown className={cn('h-3 w-3 transition-transform', open && 'rotate-180')} />
         </button>
       )}
       <AnimatePresence>
@@ -531,12 +531,14 @@ export function A4Sheet({
           aspectRatio: '210 / 297',
           backgroundColor: T.docBg,
           background: isTiime
-            ? 'linear-gradient(270deg, #fafafa, #fff 23.44%, #fff 77.6%, #fafafa)'
+            ? darkMode
+              ? `linear-gradient(270deg, ${T.docBg}, #161618 23.44%, #161618 77.6%, ${T.docBg})`
+              : 'linear-gradient(270deg, #fafafa, #fff 23.44%, #fff 77.6%, #fafafa)'
             : undefined,
           boxShadow: isTiime
             ? 'rgba(71,99,136,0.1) 0px 20px 40px -5px'
             : '0 4px 24px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.08)',
-          colorScheme: 'light',
+          colorScheme: darkMode ? 'dark' : 'light',
         }}
       >
         {/* Scrollable content — flex column so bottom sticks */}
@@ -997,7 +999,7 @@ export function A4Sheet({
                             <button onClick={() => onRemoveLine(idx)}
                               className="w-5 h-5 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
                               style={{ color: T.inputPlaceholder }}
-                              onMouseEnter={(e) => { e.currentTarget.style.color = '#e53935'; e.currentTarget.style.backgroundColor = darkMode ? '#3f3f46' : '#fef2f2' }}
+                              onMouseEnter={(e) => { e.currentTarget.style.color = '#e53935'; e.currentTarget.style.backgroundColor = darkMode ? '#2a2a30' : '#fef2f2' }}
                               onMouseLeave={(e) => { e.currentTarget.style.color = T.inputPlaceholder; e.currentTarget.style.backgroundColor = 'transparent' }}
                             >
                               <Trash2 className="h-3 w-3" />
