@@ -40,6 +40,18 @@ export default class InvoiceSetting extends BaseModel {
   @column()
   declare documentFont: string
 
+  @column()
+  declare eInvoicingEnabled: boolean
+
+  @column()
+  declare pdpProvider: string | null
+
+  @column()
+  declare pdpApiKey: string | null
+
+  @column()
+  declare pdpSandbox: boolean
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
