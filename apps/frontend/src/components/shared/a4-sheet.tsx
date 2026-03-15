@@ -20,7 +20,7 @@ import { getTranslations } from '@/lib/invoice-i18n'
    Types
    ═══════════════════════════════════════════════════════════ */
 
-export interface QuoteLine {
+export interface DocumentLine {
   id: string
   type: 'standard' | 'section'
   description: string
@@ -425,8 +425,8 @@ interface A4SheetProps {
   onClientClick: () => void
   onClearClient: () => void
   onClientFieldChange: (field: keyof ClientInfo, value: string) => void
-  lines: QuoteLine[]
-  onUpdateLine: (index: number, partial: Partial<QuoteLine>) => void
+  lines: DocumentLine[]
+  onUpdateLine: (index: number, partial: Partial<DocumentLine>) => void
   onAddLine: (type: 'standard' | 'section') => void
   onRemoveLine: (index: number) => void
   subtotal: number

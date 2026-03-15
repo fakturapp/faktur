@@ -11,7 +11,7 @@ import { StatusDropdown, quoteStatusOptions } from '@/components/shared/status-d
 import { useToast } from '@/components/ui/toast'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { api } from '@/lib/api'
-import { A4Sheet, type QuoteLine, type ClientInfo, type CompanyInfo } from '@/components/quotes/a4-sheet'
+import { A4Sheet, type DocumentLine, type ClientInfo, type CompanyInfo } from '@/components/shared/a4-sheet'
 import {
   X,
   Send,
@@ -105,8 +105,8 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
     })
   }, [quoteId])
 
-  // Convert API lines to QuoteLine format for A4Sheet
-  const sheetLines: QuoteLine[] = useMemo(() => {
+  // Convert API lines to DocumentLine format for A4Sheet
+  const sheetLines: DocumentLine[] = useMemo(() => {
     if (!quote?.lines) return []
     return quote.lines.map((l) => ({
       id: l.id || Math.random().toString(36).slice(2),

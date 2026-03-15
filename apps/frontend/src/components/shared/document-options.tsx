@@ -16,7 +16,7 @@ import type { ClientInfo } from './a4-sheet'
    Types
    ═══════════════════════════════════════════════════════════ */
 
-export interface QuoteOptions {
+export interface DocumentOptions {
   billingType: 'quick' | 'detailed'
   subject: string
   issueDate: string
@@ -42,9 +42,9 @@ export interface QuoteOptions {
   facturX: boolean
 }
 
-interface QuoteOptionsProps {
-  options: QuoteOptions
-  onChange: (partial: Partial<QuoteOptions>) => void
+interface DocumentOptionsProps {
+  options: DocumentOptions
+  onChange: (partial: Partial<DocumentOptions>) => void
   accentColor: string
   onAccentColorChange: (color: string) => void
   selectedClient: ClientInfo | null
@@ -151,14 +151,14 @@ function OptionCheckbox({
 }
 
 /* ═══════════════════════════════════════════════════════════
-   QuoteOptionsPanel
+   DocumentOptionsPanel
    ═══════════════════════════════════════════════════════════ */
 
-export function QuoteOptionsPanel({
+export function DocumentOptionsPanel({
   options, onChange, accentColor, onAccentColorChange,
   selectedClient, onOpenClientModal,
   subtotal, taxAmount, discountAmount, total, tvaBreakdown,
-}: QuoteOptionsProps) {
+}: DocumentOptionsProps) {
   const [showSiren, setShowSiren] = useState(!!options.clientSiren)
   const [showVat, setShowVat] = useState(!!options.clientVatNumber)
   const [showTitle, setShowTitle] = useState(!!options.documentTitle)

@@ -9,8 +9,8 @@ import { useToast } from '@/components/ui/toast'
 import { Spinner } from '@/components/ui/spinner'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { api } from '@/lib/api'
-import { A4Sheet, ClientModal, type QuoteLine, type ClientInfo, type CompanyInfo } from '@/components/quotes/a4-sheet'
-import { QuoteOptionsPanel } from '@/components/quotes/quote-options'
+import { A4Sheet, ClientModal, type DocumentLine, type ClientInfo, type CompanyInfo } from '@/components/shared/a4-sheet'
+import { DocumentOptionsPanel } from '@/components/shared/document-options'
 import { Save, ArrowLeft, Eye, Pencil, Download, SlidersHorizontal } from 'lucide-react'
 import { Dialog, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
@@ -46,7 +46,7 @@ export default function EditQuotePage() {
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
   const [showOptions, setShowOptions] = useState(true)
 
-  const [lines, setLines] = useState<QuoteLine[]>([])
+  const [lines, setLines] = useState<DocumentLine[]>([])
 
   const [options, setOptions] = useState({
     billingType: 'quick' as 'quick' | 'detailed',
@@ -151,7 +151,7 @@ export default function EditQuotePage() {
   }, [quoteId])
 
   // Handlers
-  const handleUpdateLine = useCallback((index: number, partial: Partial<QuoteLine>) => {
+  const handleUpdateLine = useCallback((index: number, partial: Partial<DocumentLine>) => {
     setLines((prev) => prev.map((l, i) => (i === index ? { ...l, ...partial } : l)))
     setIsDirty(true)
   }, [])
@@ -522,7 +522,7 @@ export default function EditQuotePage() {
               className="xl:shrink-0 order-2 overflow-hidden"
             >
               <div className="xl:sticky xl:top-4 w-[300px]">
-                <QuoteOptionsPanel
+                <DocumentOptionsPanel
                   options={options}
                   onChange={handleOptionsChange}
                   accentColor={accentColor}

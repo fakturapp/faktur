@@ -9,8 +9,8 @@ import { useToast } from '@/components/ui/toast'
 import { Spinner } from '@/components/ui/spinner'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { api } from '@/lib/api'
-import { A4Sheet, ClientModal, type QuoteLine, type ClientInfo, type CompanyInfo } from '@/components/quotes/a4-sheet'
-import { QuoteOptionsPanel } from '@/components/quotes/quote-options'
+import { A4Sheet, ClientModal, type DocumentLine, type ClientInfo, type CompanyInfo } from '@/components/shared/a4-sheet'
+import { DocumentOptionsPanel } from '@/components/shared/document-options'
 import { Save, ArrowLeft, Eye, Pencil, SlidersHorizontal } from 'lucide-react'
 import { Dialog, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
@@ -53,7 +53,7 @@ export default function NewQuotePage() {
   const [accentColor, setAccentColor] = useState('#6366f1')
   const [showOptions, setShowOptions] = useState(true)
 
-  const [lines, setLines] = useState<QuoteLine[]>([
+  const [lines, setLines] = useState<DocumentLine[]>([
     { id: generateId(), type: 'standard', description: '', saleType: '', quantity: 1, unit: '', unitPrice: 0, vatRate: 20 },
   ])
 
@@ -128,7 +128,7 @@ export default function NewQuotePage() {
   }, [settingsLoading, invoiceSettings])
 
   // Handlers
-  const handleUpdateLine = useCallback((index: number, partial: Partial<QuoteLine>) => {
+  const handleUpdateLine = useCallback((index: number, partial: Partial<DocumentLine>) => {
     setLines((prev) => prev.map((l, i) => (i === index ? { ...l, ...partial } : l)))
     setIsDirty(true)
   }, [])
@@ -482,7 +482,7 @@ export default function NewQuotePage() {
               className="xl:shrink-0 order-2 overflow-hidden"
             >
               <div className="xl:sticky xl:top-4 w-[300px]">
-                <QuoteOptionsPanel
+                <DocumentOptionsPanel
                   options={options}
                   onChange={handleOptionsChange}
                   accentColor={accentColor}
