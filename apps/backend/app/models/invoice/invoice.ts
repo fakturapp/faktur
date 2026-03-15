@@ -90,6 +90,9 @@ export default class Invoice extends BaseModel {
   @column()
   declare paidDate: string | null
 
+  @column()
+  declare comment: string | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

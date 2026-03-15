@@ -81,6 +81,9 @@ export default class Quote extends BaseModel {
   @column()
   declare total: number
 
+  @column()
+  declare comment: string | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

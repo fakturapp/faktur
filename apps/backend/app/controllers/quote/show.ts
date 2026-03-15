@@ -46,6 +46,7 @@ export default class Show {
         subtotal: quote.subtotal,
         taxAmount: quote.taxAmount,
         total: quote.total,
+        comment: quote.comment,
         clientId: quote.clientId,
         client: quote.client
           ? {
