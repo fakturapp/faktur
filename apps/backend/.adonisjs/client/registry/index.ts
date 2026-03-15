@@ -228,6 +228,12 @@ const routes = {
     tokens: [{"old":"/team","type":0,"val":"team","end":""}],
     types: placeholder as Registry['team_update']['types'],
   },
+  'team_delete': {
+    methods: ["DELETE"],
+    pattern: '/team',
+    tokens: [{"old":"/team","type":0,"val":"team","end":""}],
+    types: placeholder as Registry['team_delete']['types'],
+  },
   'upload_icon': {
     methods: ["POST"],
     pattern: '/team/icon',
@@ -239,6 +245,12 @@ const routes = {
     pattern: '/team/switch',
     tokens: [{"old":"/team/switch","type":0,"val":"team","end":""},{"old":"/team/switch","type":0,"val":"switch","end":""}],
     types: placeholder as Registry['team_switch']['types'],
+  },
+  'team_export': {
+    methods: ["POST"],
+    pattern: '/team/export',
+    tokens: [{"old":"/team/export","type":0,"val":"team","end":""},{"old":"/team/export","type":0,"val":"export","end":""}],
+    types: placeholder as Registry['team_export']['types'],
   },
   'team_members': {
     methods: ["GET","HEAD"],
