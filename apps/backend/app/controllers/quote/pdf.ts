@@ -89,6 +89,7 @@ export default class Pdf {
       customPaymentMethod: invoiceSettings?.customPaymentMethod || null,
       documentFont: invoiceSettings?.documentFont || 'Lexend',
       documentType: 'quote' as const,
+      footerMode: (invoiceSettings?.footerMode as 'company_info' | 'vat_exempt' | 'custom') || 'vat_exempt',
     }
 
     // Resolve logo based on source preference: custom (invoice settings) or company

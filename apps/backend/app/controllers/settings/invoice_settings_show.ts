@@ -44,6 +44,7 @@ export default class InvoiceSettingsShow {
           defaultLanguage: 'fr',
           quoteFilenamePattern: 'DEV-{numero}',
           invoiceFilenamePattern: 'FAC-{numero}',
+          footerMode: 'vat_exempt',
         },
       })
     }
@@ -75,6 +76,7 @@ export default class InvoiceSettingsShow {
         defaultLanguage: settings.defaultLanguage || 'fr',
         quoteFilenamePattern: settings.quoteFilenamePattern || 'DEV-{numero}',
         invoiceFilenamePattern: settings.invoiceFilenamePattern || 'FAC-{numero}',
+        footerMode: settings.footerMode || 'vat_exempt',
       },
     })
   }

@@ -81,6 +81,7 @@ interface SettingsData {
   customPaymentMethod: string | null
   documentFont: string
   documentType?: 'quote' | 'invoice'
+  footerMode?: 'company_info' | 'vat_exempt' | 'custom'
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -614,7 +615,7 @@ function renderStandardPage(
   html += renderPaymentMethods(company, settings, T, lang, i)
 
   // Footer
-  html += renderLegalFooter(company, quote, T, lang, i, isClassique)
+  html += renderLegalFooter(company, quote, settings, T, lang, i, isClassique)
 
   html += '</div>' // end bottom-section
 
@@ -794,14 +795,23 @@ function renderPaymentMethods(
    ═══════════════════════════════════════════════════════════ */
 
 function renderLegalFooter(
-  company: CompanyData | null, quote: QuoteData, _T: TemplateConfig, _lang: string, i: I18n, isClassique: boolean,
+  company: CompanyData | null, quote: QuoteData, settings: SettingsData, _T: TemplateConfig, _lang: string, i: I18n, isClassique: boolean,
 ): string {
-  // Custom footer text
-  if (quote.footerText) {
-    return `<div class="legal-footer"><div class="legal-footer-text">${esc(quote.footerText)}</div></div>`
+  const footerMode = settings.footerMode || 'vat_exempt'
+
+  // VAT exempt mention (default)
+  if (footerMode === 'vat_exempt') {
+    return `<div class="legal-footer"><div class="legal-footer-text" style="font-style:italic">TVA non applicable, art. 293 B du CGI</div></div>`
   }
 
-  // Default: company info
+  // Custom footer text
+  if (footerMode === 'custom') {
+    const text = quote.footerText || ''
+    if (!text) return ''
+    return `<div class="legal-footer"><div class="legal-footer-text">${esc(text)}</div></div>`
+  }
+
+  // Company info
   if (!company) return ''
 
   let text = esc(company.tradeName || company.legalName)
@@ -905,7 +915,7 @@ function renderLateral(
     </div>`
   }
   main += renderPaymentMethods(company, settings, T, lang, i)
-  main += renderLegalFooter(company, quote, T, lang, i, false)
+  main += renderLegalFooter(company, quote, settings, T, lang, i, false)
   main += '</div>' // end bottom-section
   main += '</div>'
 

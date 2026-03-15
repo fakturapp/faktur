@@ -687,17 +687,43 @@ export default function InvoiceSettingsPage() {
                         />
                       </div>
 
-                      {/* Default Footer Text */}
+                      {/* Footer Mode */}
                       <div>
-                        <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">Pied de page personnalise</label>
-                        <Input
-                          placeholder="Ex: Conditions generales de vente..."
-                          value={settings.defaultFooterText || ''}
-                          onChange={(e) => updateSettings({ defaultFooterText: e.target.value?.slice(0, 50) || null })}
-                          className="text-sm"
-                          maxLength={50}
-                        />
-                        <p className="text-[10px] text-muted-foreground mt-1">50 caracteres max.</p>
+                        <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">Pied de page du document</label>
+                        <div className="space-y-2">
+                          {([
+                            { id: 'vat_exempt' as const, label: 'TVA non applicable', desc: 'Mention "TVA non applicable, art. 293 B du CGI"' },
+                            { id: 'company_info' as const, label: 'Informations entreprise', desc: 'Raison sociale, SIREN, TVA, adresse' },
+                            { id: 'custom' as const, label: 'Texte personnalise', desc: 'Saisissez votre propre texte de pied de page' },
+                          ]).map((opt) => (
+                            <button key={opt.id} onClick={() => updateSettings({ footerMode: opt.id })}
+                              className={`flex w-full items-center gap-3 rounded-xl border-2 p-3 text-left transition-all ${
+                                settings.footerMode === opt.id ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
+                              }`}>
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-foreground">{opt.label}</p>
+                                <p className="text-xs text-muted-foreground">{opt.desc}</p>
+                              </div>
+                              <div className={`h-5 w-5 rounded-md border-2 flex items-center justify-center transition-colors shrink-0 ${
+                                settings.footerMode === opt.id ? 'border-primary bg-primary' : 'border-muted-foreground/30'
+                              }`}>
+                                {settings.footerMode === opt.id && <Check className="h-3 w-3 text-primary-foreground" />}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                        {settings.footerMode === 'custom' && (
+                          <div className="mt-2">
+                            <Input
+                              placeholder="Ex: Conditions generales de vente..."
+                              value={settings.defaultFooterText || ''}
+                              onChange={(e) => updateSettings({ defaultFooterText: e.target.value?.slice(0, 50) || null })}
+                              className="text-sm"
+                              maxLength={50}
+                            />
+                            <p className="text-[10px] text-muted-foreground mt-1">50 caracteres max.</p>
+                          </div>
+                        )}
                       </div>
 
                       <Separator />
@@ -706,7 +732,6 @@ export default function InvoiceSettingsPage() {
                       {[
                         { key: 'defaultSignatureField' as const, label: 'Champ de signature', desc: 'Afficher les zones de signature emetteur/client' },
                         { key: 'defaultShowNotes' as const, label: 'Notes et conditions', desc: 'Afficher la zone de notes et conditions' },
-                        { key: 'defaultVatExempt' as const, label: 'Exoneration de TVA', desc: 'Mention "TVA non applicable, art. 293 B du CGI"' },
                         { key: 'defaultShowDeliveryAddress' as const, label: 'Adresse de livraison', desc: 'Afficher un champ adresse de livraison' },
                       ].map((opt) => (
                         <div key={opt.key} className="flex items-center justify-between rounded-xl border-2 border-border p-3">

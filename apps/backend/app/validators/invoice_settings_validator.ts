@@ -25,5 +25,6 @@ export const updateInvoiceSettingsValidator = vine.compile(
     defaultLanguage: vine.string().trim().maxLength(5).optional(),
     quoteFilenamePattern: vine.string().trim().maxLength(255).optional(),
     invoiceFilenamePattern: vine.string().trim().maxLength(255).optional(),
+    footerMode: vine.enum(['company_info', 'vat_exempt', 'custom']).optional(),
   })
 )

@@ -79,6 +79,7 @@ export default function NewQuotePage() {
     showAcceptanceConditions: false,
     showFreeField: false,
     showFooterText: false,
+    footerMode: 'vat_exempt' as 'company_info' | 'vat_exempt' | 'custom',
     facturX: false,
   })
 
@@ -119,6 +120,7 @@ export default function NewQuotePage() {
         showAcceptanceConditions: !!(invoiceSettings.defaultAcceptanceConditions) || prev.showAcceptanceConditions,
         showFreeField: !!(invoiceSettings.defaultFreeField) || prev.showFreeField,
         showFooterText: !!(invoiceSettings.defaultFooterText) || prev.showFooterText,
+        footerMode: invoiceSettings.footerMode || prev.footerMode,
       }))
       setAccentColor(invoiceSettings.accentColor)
     }
@@ -452,6 +454,7 @@ export default function NewQuotePage() {
             showAcceptanceConditions={options.showAcceptanceConditions}
             showFreeField={options.showFreeField}
             showFooterText={options.showFooterText}
+            footerMode={options.footerMode}
             onAcceptanceConditionsChange={(v) => handleOptionsChange({ acceptanceConditions: v })}
             onFreeFieldChange={(v) => handleOptionsChange({ freeField: v })}
             onFooterTextChange={(v) => handleOptionsChange({ footerText: v })}

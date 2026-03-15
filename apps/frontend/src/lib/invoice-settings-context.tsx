@@ -34,6 +34,7 @@ export interface InvoiceSettings {
   defaultLanguage: string
   quoteFilenamePattern: string
   invoiceFilenamePattern: string
+  footerMode: 'company_info' | 'vat_exempt' | 'custom'
 }
 
 interface InvoiceSettingsContextType {
@@ -69,6 +70,7 @@ const defaultSettings: InvoiceSettings = {
   defaultLanguage: 'fr',
   quoteFilenamePattern: 'DEV-{numero}',
   invoiceFilenamePattern: 'FAC-{numero}',
+  footerMode: 'vat_exempt',
 }
 
 const InvoiceSettingsContext = createContext<InvoiceSettingsContextType>({

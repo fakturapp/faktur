@@ -88,6 +88,9 @@ export default class InvoiceSetting extends BaseModel {
   @column()
   declare invoiceFilenamePattern: string
 
+  @column()
+  declare footerMode: 'company_info' | 'vat_exempt' | 'custom'
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

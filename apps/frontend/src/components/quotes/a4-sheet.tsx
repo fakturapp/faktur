@@ -460,6 +460,7 @@ interface A4SheetProps {
   showAcceptanceConditions?: boolean
   showFreeField?: boolean
   showFooterText?: boolean
+  footerMode?: 'company_info' | 'vat_exempt' | 'custom'
   onAcceptanceConditionsChange?: (v: string) => void
   onFreeFieldChange?: (v: string) => void
   onFooterTextChange?: (v: string) => void
@@ -480,6 +481,7 @@ export function A4Sheet({
   subject, onSubjectChange, template, darkMode, language,
   showNotes = true, vatExempt = false, footerText, documentFont = 'Lexend',
   showSubject = true, showAcceptanceConditions = false, showFreeField = false, showFooterText = false,
+  footerMode = 'vat_exempt',
   onAcceptanceConditionsChange, onFreeFieldChange, onFooterTextChange, onDeliveryAddressChange,
   onIssueDateChange, onValidityDateChange,
 }: A4SheetProps) {
@@ -1163,7 +1165,7 @@ export function A4Sheet({
 
               {/* Payment methods — hidden for quotes (devis) */}
 
-              {/* ── Footer (editable or custom text) ── */}
+              {/* ── Footer (company info / VAT exempt / custom text) ── */}
               {isClassique ? (
                 <div className="mt-4 pt-3 text-center">
                   <div
@@ -1173,7 +1175,7 @@ export function A4Sheet({
                       padding: '6px 7px',
                     }}
                   >
-                    {showFooterText ? (
+                    {footerMode === 'custom' ? (
                       ed ? (
                         <textarea
                           value={footerText || ''}
@@ -1189,6 +1191,10 @@ export function A4Sheet({
                           {footerText || ''}
                         </div>
                       )
+                    ) : footerMode === 'vat_exempt' ? (
+                      <div className="text-[11px] leading-[1.6] italic" style={{ color: T.textFooter }}>
+                        {lang === 'en' ? 'VAT not applicable, article 293 B of the CGI' : 'TVA non applicable, article 293 B du CGI'}
+                      </div>
                     ) : (
                       <div className="text-[11px] leading-[1.6]" style={{ color: T.textFooter }}>
                         {company && (<>
@@ -1202,7 +1208,7 @@ export function A4Sheet({
                 </div>
               ) : (
                 <div className="mt-4 pt-3 text-center" style={{ borderTop: `2px solid ${T.footerBorder}` }}>
-                  {showFooterText ? (
+                  {footerMode === 'custom' ? (
                     ed ? (
                       <textarea
                         value={footerText || ''}
@@ -1218,6 +1224,10 @@ export function A4Sheet({
                         {footerText || ''}
                       </div>
                     )
+                  ) : footerMode === 'vat_exempt' ? (
+                    <div className="text-[9px] leading-[1.6] italic" style={{ color: T.textFooter }}>
+                      {lang === 'en' ? 'VAT not applicable, article 293 B of the CGI' : 'TVA non applicable, article 293 B du CGI'}
+                    </div>
                   ) : (
                     <div className="text-[9px] leading-[1.6]" style={{ color: T.textFooter }}>
                       {company && (<>

@@ -40,6 +40,7 @@ export default class InvoiceSettingsUpdate {
         defaultLanguage: payload.defaultLanguage || 'fr',
         quoteFilenamePattern: payload.quoteFilenamePattern || 'DEV-{numero}',
         invoiceFilenamePattern: payload.invoiceFilenamePattern || 'FAC-{numero}',
+        footerMode: payload.footerMode || 'vat_exempt',
       })
     } else {
       settings.billingType = payload.billingType
@@ -67,6 +68,7 @@ export default class InvoiceSettingsUpdate {
       if (payload.defaultLanguage !== undefined) settings.defaultLanguage = payload.defaultLanguage || 'fr'
       if (payload.quoteFilenamePattern !== undefined) settings.quoteFilenamePattern = payload.quoteFilenamePattern || 'DEV-{numero}'
       if (payload.invoiceFilenamePattern !== undefined) settings.invoiceFilenamePattern = payload.invoiceFilenamePattern || 'FAC-{numero}'
+      if (payload.footerMode !== undefined) settings.footerMode = payload.footerMode || 'vat_exempt'
       await settings.save()
     }
 
@@ -97,6 +99,7 @@ export default class InvoiceSettingsUpdate {
         defaultLanguage: settings.defaultLanguage || 'fr',
         quoteFilenamePattern: settings.quoteFilenamePattern || 'DEV-{numero}',
         invoiceFilenamePattern: settings.invoiceFilenamePattern || 'FAC-{numero}',
+        footerMode: settings.footerMode || 'vat_exempt',
       },
     })
   }

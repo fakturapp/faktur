@@ -71,6 +71,7 @@ export default function EditQuotePage() {
     showAcceptanceConditions: false,
     showFreeField: false,
     showFooterText: false,
+    footerMode: 'vat_exempt' as 'company_info' | 'vat_exempt' | 'custom',
     facturX: false,
   })
 
@@ -118,6 +119,7 @@ export default function EditQuotePage() {
           showAcceptanceConditions: !!q.acceptanceConditions,
           showFreeField: !!q.freeField,
           showFooterText: !!q.footerText,
+          footerMode: invoiceSettings.footerMode || 'vat_exempt',
           facturX: q.facturX || false,
         })
 
@@ -498,6 +500,7 @@ export default function EditQuotePage() {
             showAcceptanceConditions={options.showAcceptanceConditions}
             showFreeField={options.showFreeField}
             showFooterText={options.showFooterText}
+            footerMode={options.footerMode}
             onAcceptanceConditionsChange={(v) => handleOptionsChange({ acceptanceConditions: v })}
             onFreeFieldChange={(v) => handleOptionsChange({ freeField: v })}
             onFooterTextChange={(v) => handleOptionsChange({ footerText: v })}
