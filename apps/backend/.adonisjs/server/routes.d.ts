@@ -41,8 +41,10 @@ export type ScannedRoutes = {
     'team_create': { paramsTuple?: []; params?: {} }
     'team_show': { paramsTuple?: []; params?: {} }
     'team_update': { paramsTuple?: []; params?: {} }
+    'team_delete': { paramsTuple?: []; params?: {} }
     'upload_icon': { paramsTuple?: []; params?: {} }
     'team_switch': { paramsTuple?: []; params?: {} }
+    'team_export': { paramsTuple?: []; params?: {} }
     'team_members': { paramsTuple?: []; params?: {} }
     'team_invite': { paramsTuple?: []; params?: {} }
     'accept_invite': { paramsTuple?: []; params?: {} }
@@ -120,6 +122,7 @@ export type ScannedRoutes = {
     'team_create': { paramsTuple?: []; params?: {} }
     'upload_icon': { paramsTuple?: []; params?: {} }
     'team_switch': { paramsTuple?: []; params?: {} }
+    'team_export': { paramsTuple?: []; params?: {} }
     'team_invite': { paramsTuple?: []; params?: {} }
     'accept_invite': { paramsTuple?: []; params?: {} }
     'transfer_ownership': { paramsTuple?: []; params?: {} }
@@ -218,6 +221,7 @@ export type ScannedRoutes = {
   DELETE: {
     'session_revoke': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'account_delete': { paramsTuple?: []; params?: {} }
+    'team_delete': { paramsTuple?: []; params?: {} }
     'revoke_invite': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'remove_member': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'client_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
