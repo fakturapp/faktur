@@ -52,6 +52,39 @@ export default class InvoiceSetting extends BaseModel {
   @column()
   declare pdpSandbox: boolean
 
+  @column()
+  declare defaultSubject: string | null
+
+  @column()
+  declare defaultAcceptanceConditions: string | null
+
+  @column()
+  declare defaultSignatureField: boolean
+
+  @column()
+  declare defaultFreeField: string | null
+
+  @column()
+  declare defaultShowNotes: boolean
+
+  @column()
+  declare defaultVatExempt: boolean
+
+  @column()
+  declare defaultFooterText: string | null
+
+  @column()
+  declare defaultShowDeliveryAddress: boolean
+
+  @column()
+  declare defaultLanguage: string
+
+  @column()
+  declare quoteFilenamePattern: string
+
+  @column()
+  declare invoiceFilenamePattern: string
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

@@ -28,6 +28,17 @@ export default class InvoiceSettingsUpdate {
         pdpProvider: payload.pdpProvider || null,
         pdpApiKey: payload.pdpApiKey || null,
         pdpSandbox: payload.pdpSandbox ?? true,
+        defaultSubject: payload.defaultSubject || null,
+        defaultAcceptanceConditions: payload.defaultAcceptanceConditions || null,
+        defaultSignatureField: payload.defaultSignatureField ?? false,
+        defaultFreeField: payload.defaultFreeField || null,
+        defaultShowNotes: payload.defaultShowNotes ?? true,
+        defaultVatExempt: payload.defaultVatExempt ?? false,
+        defaultFooterText: payload.defaultFooterText || null,
+        defaultShowDeliveryAddress: payload.defaultShowDeliveryAddress ?? false,
+        defaultLanguage: payload.defaultLanguage || 'fr',
+        quoteFilenamePattern: payload.quoteFilenamePattern || 'DEV-{numero}',
+        invoiceFilenamePattern: payload.invoiceFilenamePattern || 'FAC-{numero}',
       })
     } else {
       settings.billingType = payload.billingType
@@ -43,6 +54,17 @@ export default class InvoiceSettingsUpdate {
         settings.pdpApiKey = payload.pdpApiKey || null
       }
       if (payload.pdpSandbox !== undefined) settings.pdpSandbox = payload.pdpSandbox
+      if (payload.defaultSubject !== undefined) settings.defaultSubject = payload.defaultSubject || null
+      if (payload.defaultAcceptanceConditions !== undefined) settings.defaultAcceptanceConditions = payload.defaultAcceptanceConditions || null
+      if (payload.defaultSignatureField !== undefined) settings.defaultSignatureField = payload.defaultSignatureField
+      if (payload.defaultFreeField !== undefined) settings.defaultFreeField = payload.defaultFreeField || null
+      if (payload.defaultShowNotes !== undefined) settings.defaultShowNotes = payload.defaultShowNotes
+      if (payload.defaultVatExempt !== undefined) settings.defaultVatExempt = payload.defaultVatExempt
+      if (payload.defaultFooterText !== undefined) settings.defaultFooterText = payload.defaultFooterText || null
+      if (payload.defaultShowDeliveryAddress !== undefined) settings.defaultShowDeliveryAddress = payload.defaultShowDeliveryAddress
+      if (payload.defaultLanguage !== undefined) settings.defaultLanguage = payload.defaultLanguage || 'fr'
+      if (payload.quoteFilenamePattern !== undefined) settings.quoteFilenamePattern = payload.quoteFilenamePattern || 'DEV-{numero}'
+      if (payload.invoiceFilenamePattern !== undefined) settings.invoiceFilenamePattern = payload.invoiceFilenamePattern || 'FAC-{numero}'
       await settings.save()
     }
 
@@ -61,6 +83,17 @@ export default class InvoiceSettingsUpdate {
         pdpProvider: settings.pdpProvider || null,
         pdpApiKey: settings.pdpApiKey ? '••••••••' : null,
         pdpSandbox: settings.pdpSandbox ?? true,
+        defaultSubject: settings.defaultSubject || null,
+        defaultAcceptanceConditions: settings.defaultAcceptanceConditions || null,
+        defaultSignatureField: settings.defaultSignatureField || false,
+        defaultFreeField: settings.defaultFreeField || null,
+        defaultShowNotes: settings.defaultShowNotes ?? true,
+        defaultVatExempt: settings.defaultVatExempt || false,
+        defaultFooterText: settings.defaultFooterText || null,
+        defaultShowDeliveryAddress: settings.defaultShowDeliveryAddress || false,
+        defaultLanguage: settings.defaultLanguage || 'fr',
+        quoteFilenamePattern: settings.quoteFilenamePattern || 'DEV-{numero}',
+        invoiceFilenamePattern: settings.invoiceFilenamePattern || 'FAC-{numero}',
       },
     })
   }

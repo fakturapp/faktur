@@ -3,13 +3,10 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react'
 import { api } from '@/lib/api'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333'
-
-/** Ensure a relative logo path becomes a full URL */
+/** Resolve logo URL - relative paths go through Next.js rewrites */
 function resolveLogoUrl(url: string | null): string | null {
   if (!url) return null
-  if (url.startsWith('http://') || url.startsWith('https://')) return url
-  return `${API_URL}${url}`
+  return url
 }
 
 export interface InvoiceSettings {
@@ -25,6 +22,17 @@ export interface InvoiceSettings {
   pdpProvider: string | null
   pdpApiKey: string | null
   pdpSandbox: boolean
+  defaultSubject: string | null
+  defaultAcceptanceConditions: string | null
+  defaultSignatureField: boolean
+  defaultFreeField: string | null
+  defaultShowNotes: boolean
+  defaultVatExempt: boolean
+  defaultFooterText: string | null
+  defaultShowDeliveryAddress: boolean
+  defaultLanguage: string
+  quoteFilenamePattern: string
+  invoiceFilenamePattern: string
 }
 
 interface InvoiceSettingsContextType {
@@ -47,6 +55,17 @@ const defaultSettings: InvoiceSettings = {
   pdpProvider: null,
   pdpApiKey: null,
   pdpSandbox: true,
+  defaultSubject: null,
+  defaultAcceptanceConditions: null,
+  defaultSignatureField: false,
+  defaultFreeField: null,
+  defaultShowNotes: true,
+  defaultVatExempt: false,
+  defaultFooterText: null,
+  defaultShowDeliveryAddress: false,
+  defaultLanguage: 'fr',
+  quoteFilenamePattern: 'DEV-{numero}',
+  invoiceFilenamePattern: 'FAC-{numero}',
 }
 
 const InvoiceSettingsContext = createContext<InvoiceSettingsContextType>({
