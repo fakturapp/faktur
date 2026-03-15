@@ -19,7 +19,6 @@ import {
   ArrowLeft,
   Trash2,
 } from 'lucide-react'
-import { CreateInvoiceModal } from '@/components/invoices/create-invoice-modal'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -30,13 +29,13 @@ const fadeUp = {
   }),
 } satisfies Variants
 
-interface InvoiceListItem {
+interface QuoteListItem {
   id: string
-  invoiceNumber: string
-  status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled'
+  quoteNumber: string
+  status: 'draft' | 'sent' | 'accepted' | 'refused' | 'expired'
   subject: string | null
   issueDate: string
-  dueDate: string | null
+  validityDate: string | null
   subtotal: number
   taxAmount: number
   total: number
@@ -52,17 +51,16 @@ interface PaginationMeta {
   lastPage: number
 }
 
-export default function InvoiceDraftsPage() {
+export default function QuoteDraftsPage() {
   const { toast } = useToast()
   const [loading, setLoading] = useState(true)
-  const [invoices, setInvoices] = useState<InvoiceListItem[]>([])
+  const [quotes, setQuotes] = useState<QuoteListItem[]>([])
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [page, setPage] = useState(1)
   const [meta, setMeta] = useState<PaginationMeta | null>(null)
   const [downloadingId, setDownloadingId] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
-  const [showCreateModal, setShowCreateModal] = useState(false)
   const debounceRef = useRef<ReturnType<typeof setTimeout>>()
 
   const handleSearchChange = useCallback((value: string) => {
@@ -86,19 +84,19 @@ export default function InvoiceDraftsPage() {
     params.set('status', 'draft')
     if (debouncedSearch) params.set('search', debouncedSearch)
 
-    const { data } = await api.get<{ invoices: InvoiceListItem[]; meta: PaginationMeta }>(`/invoices?${params}`)
+    const { data } = await api.get<{ quotes: QuoteListItem[]; meta: PaginationMeta }>(`/quotes?${params}`)
     if (data) {
-      setInvoices(data.invoices)
+      setQuotes(data.quotes)
       setMeta(data.meta)
     }
     setLoading(false)
   }
 
-  async function handleDownloadPdf(e: React.MouseEvent, invoiceId: string) {
+  async function handleDownloadPdf(e: React.MouseEvent, quoteId: string) {
     e.preventDefault()
     e.stopPropagation()
-    setDownloadingId(invoiceId)
-    const { blob, filename, error } = await api.downloadBlob(`/invoices/${invoiceId}/pdf`)
+    setDownloadingId(quoteId)
+    const { blob, filename, error } = await api.downloadBlob(`/quotes/${quoteId}/pdf`)
     setDownloadingId(null)
     if (error || !blob) {
       toast(error || 'Erreur lors du telechargement', 'error')
@@ -107,22 +105,22 @@ export default function InvoiceDraftsPage() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = filename || 'facture.pdf'
+    a.download = filename || 'devis.pdf'
     a.click()
     URL.revokeObjectURL(url)
   }
 
-  async function handleDelete(e: React.MouseEvent, invoiceId: string) {
+  async function handleDelete(e: React.MouseEvent, quoteId: string) {
     e.preventDefault()
     e.stopPropagation()
-    setDeletingId(invoiceId)
-    const { error } = await api.delete(`/invoices/${invoiceId}`)
+    setDeletingId(quoteId)
+    const { error } = await api.delete(`/quotes/${quoteId}`)
     setDeletingId(null)
     if (error) {
       toast(error, 'error')
       return
     }
-    setInvoices((prev) => prev.filter((inv) => inv.id !== invoiceId))
+    setQuotes((prev) => prev.filter((q) => q.id !== quoteId))
     if (meta) setMeta({ ...meta, total: meta.total - 1 })
     toast('Brouillon supprime', 'success')
   }
@@ -133,7 +131,7 @@ export default function InvoiceDraftsPage() {
       <motion.div variants={fadeUp} custom={0} className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link
-            href="/dashboard/invoices"
+            href="/dashboard/quotes"
             className="flex h-9 w-9 items-center justify-center rounded-lg border border-border hover:bg-muted/50 transition-colors"
           >
             <ArrowLeft className="h-4 w-4 text-muted-foreground" />
@@ -141,13 +139,15 @@ export default function InvoiceDraftsPage() {
           <div>
             <h1 className="text-2xl font-bold text-foreground">Brouillons</h1>
             <p className="text-muted-foreground mt-1">
-              {meta?.total ?? 0} facture{(meta?.total ?? 0) > 1 ? 's' : ''} en brouillon
+              {meta?.total ?? 0} devis en brouillon
             </p>
           </div>
         </div>
-        <Button onClick={() => setShowCreateModal(true)}>
-          <Plus className="h-4 w-4 mr-1.5" /> Creer une facture
-        </Button>
+        <Link href="/dashboard/quotes/new">
+          <Button>
+            <Plus className="h-4 w-4 mr-1.5" /> Creer un devis
+          </Button>
+        </Link>
       </motion.div>
 
       {/* Search */}
@@ -183,7 +183,7 @@ export default function InvoiceDraftsPage() {
             </div>
           ))}
         </div>
-      ) : invoices.length === 0 ? (
+      ) : quotes.length === 0 ? (
         <motion.div variants={fadeUp} custom={2} className="text-center py-16">
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/50 mx-auto mb-4">
             <FileText className="h-8 w-8 text-muted-foreground/50" />
@@ -194,20 +194,22 @@ export default function InvoiceDraftsPage() {
           <p className="text-sm text-muted-foreground mt-1">
             {debouncedSearch
               ? 'Essayez avec d\'autres criteres de recherche'
-              : 'Vos factures en brouillon apparaitront ici'}
+              : 'Vos devis en brouillon apparaitront ici'}
           </p>
           {!debouncedSearch && (
-            <Button className="mt-4" onClick={() => setShowCreateModal(true)}>
-              <Plus className="h-4 w-4 mr-1.5" /> Creer une facture
-            </Button>
+            <Link href="/dashboard/quotes/new">
+              <Button className="mt-4">
+                <Plus className="h-4 w-4 mr-1.5" /> Creer un devis
+              </Button>
+            </Link>
           )}
         </motion.div>
       ) : (
         <div className="space-y-2">
-          {invoices.map((invoice, i) => (
-            <motion.div key={invoice.id} variants={fadeUp} custom={2 + i * 0.3}>
+          {quotes.map((quote, i) => (
+            <motion.div key={quote.id} variants={fadeUp} custom={2 + i * 0.3}>
               <Link
-                href={`/dashboard/invoices/${invoice.id}/edit`}
+                href={`/dashboard/quotes/${quote.id}/edit`}
                 className="w-full flex items-center gap-4 rounded-xl border border-border bg-card/50 hover:bg-card/80 p-4 transition-colors text-left group"
               >
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-400/10">
@@ -217,48 +219,48 @@ export default function InvoiceDraftsPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
                     <p className="text-sm font-semibold text-foreground truncate">
-                      {invoice.invoiceNumber}
+                      {quote.quoteNumber}
                     </p>
                     <Badge variant="muted" className="text-[10px] shrink-0 text-zinc-400 bg-zinc-400/10">
                       Brouillon
                     </Badge>
                   </div>
                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                    {invoice.clientName && (
-                      <span className="truncate">{invoice.clientName}</span>
+                    {quote.clientName && (
+                      <span className="truncate">{quote.clientName}</span>
                     )}
-                    {invoice.subject && (
-                      <span className="truncate">{invoice.subject}</span>
+                    {quote.subject && (
+                      <span className="truncate">{quote.subject}</span>
                     )}
                     <span className="shrink-0">
-                      {new Date(invoice.issueDate).toLocaleDateString('fr-FR')}
+                      {new Date(quote.issueDate).toLocaleDateString('fr-FR')}
                     </span>
                   </div>
                 </div>
 
                 <div className="text-right shrink-0">
                   <p className="text-sm font-medium text-foreground">
-                    {Number(invoice.total).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
+                    {Number(quote.total).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
                   </p>
                   <p className="text-xs text-muted-foreground">TTC</p>
                 </div>
 
                 <button
-                  onClick={(e) => handleDownloadPdf(e, invoice.id)}
-                  disabled={downloadingId === invoice.id}
+                  onClick={(e) => handleDownloadPdf(e, quote.id)}
+                  disabled={downloadingId === quote.id}
                   className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
                   title="Telecharger le PDF"
                 >
-                  <Download className={`h-4 w-4 ${downloadingId === invoice.id ? 'animate-pulse' : ''}`} />
+                  <Download className={`h-4 w-4 ${downloadingId === quote.id ? 'animate-pulse' : ''}`} />
                 </button>
 
                 <button
-                  onClick={(e) => handleDelete(e, invoice.id)}
-                  disabled={deletingId === invoice.id}
+                  onClick={(e) => handleDelete(e, quote.id)}
+                  disabled={deletingId === quote.id}
                   className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
                   title="Supprimer le brouillon"
                 >
-                  <Trash2 className={`h-4 w-4 ${deletingId === invoice.id ? 'animate-pulse' : ''}`} />
+                  <Trash2 className={`h-4 w-4 ${deletingId === quote.id ? 'animate-pulse' : ''}`} />
                 </button>
 
                 <ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors shrink-0" />
@@ -269,8 +271,6 @@ export default function InvoiceDraftsPage() {
       )}
 
       <Pagination meta={meta} onPageChange={setPage} />
-
-      <CreateInvoiceModal open={showCreateModal} onClose={() => setShowCreateModal(false)} />
     </motion.div>
   )
 }

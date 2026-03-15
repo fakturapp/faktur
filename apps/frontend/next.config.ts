@@ -10,6 +10,18 @@ const nextConfig: NextConfig = {
         source: '/avatars/:path*',
         destination: `${backendUrl}/avatars/:path*`,
       },
+      {
+        source: '/company-logos/:path*',
+        destination: `${backendUrl}/company-logos/:path*`,
+      },
+      {
+        source: '/team-icons/:path*',
+        destination: `${backendUrl}/team-icons/:path*`,
+      },
+      {
+        source: '/invoice-logos/:path*',
+        destination: `${backendUrl}/invoice-logos/:path*`,
+      },
     ]
   },
 }

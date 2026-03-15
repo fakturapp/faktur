@@ -88,6 +88,8 @@ export const api = {
   get: <T = unknown>(endpoint: string) => request<T>(endpoint, { method: 'GET' }),
   put: <T = unknown>(endpoint: string, body: unknown) =>
     request<T>(endpoint, { method: 'PUT', body: JSON.stringify(body) }),
+  patch: <T = unknown>(endpoint: string, body: unknown) =>
+    request<T>(endpoint, { method: 'PATCH', body: JSON.stringify(body) }),
   delete: <T = unknown>(endpoint: string, body?: unknown) =>
     request<T>(endpoint, { method: 'DELETE', body: body ? JSON.stringify(body) : undefined }),
   upload: <T = unknown>(endpoint: string, formData: FormData) =>

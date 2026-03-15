@@ -40,36 +40,6 @@ export interface TemplateConfig {
   font?: string
 }
 
-const classique: TemplateConfig = {
-  id: 'classique',
-  name: 'Classique',
-  description: 'Blanc epure avec arrondis',
-  layout: 'standard',
-  docBg: '#ffffff',
-  text: '#000000',
-  textMuted: '#5f6368',
-  textFooter: '#999999',
-  clientBlockBg: '#f8f9fa',
-  clientBlockBorder: '#eeeeee',
-  clientEmptyBg: '#fafafa',
-  clientEmptyBorder: '#d0d0d0',
-  rowEven: '#ffffff',
-  rowOdd: '#fafbfc',
-  rowHover: '06',
-  borderLight: '#f0f0f0',
-  totalBg: '10',
-  totalBorder: '25',
-  footerBorder: '#f0f0f0',
-  inputBg: '#ffffff',
-  inputPlaceholder: '#bbbbbb',
-  editBorderDashed: '#dddddd',
-  signatureBorder: '#e0e0e0',
-  paymentBadgeBg: '#f8f9fa',
-  paymentBadgeBorder: '#eeeeee',
-  paymentBadgeText: '#5f6368',
-  borderRadius: '10px',
-}
-
 const moderne: TemplateConfig = {
   id: 'moderne',
   name: 'Moderne',
@@ -310,10 +280,10 @@ const ligne: TemplateConfig = {
   borderRadius: '6px',
 }
 
-const tiime: TemplateConfig = {
-  id: 'tiime',
-  name: 'Tiime',
-  description: 'Bordures pointillees, accent violet, style comptable',
+const classique: TemplateConfig = {
+  id: 'classique',
+  name: 'Classique',
+  description: 'Bordures pointillees, accent bleu-gris, style comptable',
   layout: 'standard',
   docBg: '#ffffff',
   text: '#476388',
@@ -351,7 +321,6 @@ export const TEMPLATES: TemplateConfig[] = [
   minimaliste,
   duo,
   ligne,
-  tiime,
 ]
 
 /** Apply dark mode overlay to any template */

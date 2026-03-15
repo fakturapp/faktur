@@ -8,9 +8,6 @@ export default class SkipCompany {
       return response.badRequest({ message: 'You must create a team first' })
     }
 
-    user.onboardingCompleted = true
-    await user.save()
-
-    return response.ok({ message: 'Onboarding completed' })
+    return response.ok({ message: 'Company step skipped' })
   }
 }

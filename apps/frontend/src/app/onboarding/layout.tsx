@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils'
 const steps = [
   { id: 'team', label: 'Équipe', path: '/onboarding/team' },
   { id: 'company', label: 'Entreprise', path: '/onboarding/company' },
+  { id: 'personalization', label: 'Personnalisation', path: '/onboarding/personalization' },
 ]
 
 export default function OnboardingLayout({ children }: { children: React.ReactNode }) {
@@ -71,7 +72,7 @@ export default function OnboardingLayout({ children }: { children: React.ReactNo
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="w-full max-w-lg"
+        className="w-full max-w-2xl"
       >
         {children}
       </motion.div>

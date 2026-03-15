@@ -138,6 +138,18 @@ const routes = {
     tokens: [{"old":"/account/security/verify","type":0,"val":"account","end":""},{"old":"/account/security/verify","type":0,"val":"security","end":""},{"old":"/account/security/verify","type":0,"val":"verify","end":""}],
     types: placeholder as Registry['security_verify.verify']['types'],
   },
+  'email_request_change': {
+    methods: ["POST"],
+    pattern: '/account/email/request-change',
+    tokens: [{"old":"/account/email/request-change","type":0,"val":"account","end":""},{"old":"/account/email/request-change","type":0,"val":"email","end":""},{"old":"/account/email/request-change","type":0,"val":"request-change","end":""}],
+    types: placeholder as Registry['email_request_change']['types'],
+  },
+  'email_confirm_change': {
+    methods: ["POST"],
+    pattern: '/account/email/confirm-change',
+    tokens: [{"old":"/account/email/confirm-change","type":0,"val":"account","end":""},{"old":"/account/email/confirm-change","type":0,"val":"email","end":""},{"old":"/account/email/confirm-change","type":0,"val":"confirm-change","end":""}],
+    types: placeholder as Registry['email_confirm_change']['types'],
+  },
   'create_team': {
     methods: ["POST"],
     pattern: '/onboarding/team',
@@ -162,6 +174,12 @@ const routes = {
     tokens: [{"old":"/onboarding/company/search","type":0,"val":"onboarding","end":""},{"old":"/onboarding/company/search","type":0,"val":"company","end":""},{"old":"/onboarding/company/search","type":0,"val":"search","end":""}],
     types: placeholder as Registry['search_company']['types'],
   },
+  'complete_personalization': {
+    methods: ["POST"],
+    pattern: '/onboarding/personalization',
+    tokens: [{"old":"/onboarding/personalization","type":0,"val":"onboarding","end":""},{"old":"/onboarding/personalization","type":0,"val":"personalization","end":""}],
+    types: placeholder as Registry['complete_personalization']['types'],
+  },
   'dashboard.index': {
     methods: ["GET","HEAD"],
     pattern: '/dashboard',
@@ -173,6 +191,12 @@ const routes = {
     pattern: '/dashboard/stats',
     tokens: [{"old":"/dashboard/stats","type":0,"val":"dashboard","end":""},{"old":"/dashboard/stats","type":0,"val":"stats","end":""}],
     types: placeholder as Registry['dashboard.stats']['types'],
+  },
+  'dashboard.sidebarCounts': {
+    methods: ["GET","HEAD"],
+    pattern: '/dashboard/sidebar-counts',
+    tokens: [{"old":"/dashboard/sidebar-counts","type":0,"val":"dashboard","end":""},{"old":"/dashboard/sidebar-counts","type":0,"val":"sidebar-counts","end":""}],
+    types: placeholder as Registry['dashboard.sidebarCounts']['types'],
   },
   'serve_icon': {
     methods: ["GET","HEAD"],
@@ -360,6 +384,18 @@ const routes = {
     tokens: [{"old":"/quotes/next-number","type":0,"val":"quotes","end":""},{"old":"/quotes/next-number","type":0,"val":"next-number","end":""}],
     types: placeholder as Registry['quote_next_number']['types'],
   },
+  'quote_document_count': {
+    methods: ["GET","HEAD"],
+    pattern: '/quotes/document-count',
+    tokens: [{"old":"/quotes/document-count","type":0,"val":"quotes","end":""},{"old":"/quotes/document-count","type":0,"val":"document-count","end":""}],
+    types: placeholder as Registry['quote_document_count']['types'],
+  },
+  'quote_set_next_number': {
+    methods: ["POST"],
+    pattern: '/quotes/set-next-number',
+    tokens: [{"old":"/quotes/set-next-number","type":0,"val":"quotes","end":""},{"old":"/quotes/set-next-number","type":0,"val":"set-next-number","end":""}],
+    types: placeholder as Registry['quote_set_next_number']['types'],
+  },
   'quote_list': {
     methods: ["GET","HEAD"],
     pattern: '/quotes',
@@ -371,6 +407,12 @@ const routes = {
     pattern: '/quotes/:id/pdf',
     tokens: [{"old":"/quotes/:id/pdf","type":0,"val":"quotes","end":""},{"old":"/quotes/:id/pdf","type":1,"val":"id","end":""},{"old":"/quotes/:id/pdf","type":0,"val":"pdf","end":""}],
     types: placeholder as Registry['quote_pdf']['types'],
+  },
+  'quote_factur_xml': {
+    methods: ["GET","HEAD"],
+    pattern: '/quotes/:id/facturx',
+    tokens: [{"old":"/quotes/:id/facturx","type":0,"val":"quotes","end":""},{"old":"/quotes/:id/facturx","type":1,"val":"id","end":""},{"old":"/quotes/:id/facturx","type":0,"val":"facturx","end":""}],
+    types: placeholder as Registry['quote_factur_xml']['types'],
   },
   'quote_show': {
     methods: ["GET","HEAD"],
@@ -384,6 +426,24 @@ const routes = {
     tokens: [{"old":"/quotes","type":0,"val":"quotes","end":""}],
     types: placeholder as Registry['quote_create']['types'],
   },
+  'quote_update_status': {
+    methods: ["PATCH"],
+    pattern: '/quotes/:id/status',
+    tokens: [{"old":"/quotes/:id/status","type":0,"val":"quotes","end":""},{"old":"/quotes/:id/status","type":1,"val":"id","end":""},{"old":"/quotes/:id/status","type":0,"val":"status","end":""}],
+    types: placeholder as Registry['quote_update_status']['types'],
+  },
+  'quote_update_comment': {
+    methods: ["PATCH"],
+    pattern: '/quotes/:id/comment',
+    tokens: [{"old":"/quotes/:id/comment","type":0,"val":"quotes","end":""},{"old":"/quotes/:id/comment","type":1,"val":"id","end":""},{"old":"/quotes/:id/comment","type":0,"val":"comment","end":""}],
+    types: placeholder as Registry['quote_update_comment']['types'],
+  },
+  'quote_duplicate': {
+    methods: ["POST"],
+    pattern: '/quotes/:id/duplicate',
+    tokens: [{"old":"/quotes/:id/duplicate","type":0,"val":"quotes","end":""},{"old":"/quotes/:id/duplicate","type":1,"val":"id","end":""},{"old":"/quotes/:id/duplicate","type":0,"val":"duplicate","end":""}],
+    types: placeholder as Registry['quote_duplicate']['types'],
+  },
   'quote_update': {
     methods: ["PUT"],
     pattern: '/quotes/:id',
@@ -395,6 +455,102 @@ const routes = {
     pattern: '/quotes/:id',
     tokens: [{"old":"/quotes/:id","type":0,"val":"quotes","end":""},{"old":"/quotes/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['quote_delete']['types'],
+  },
+  'invoice_next_number': {
+    methods: ["GET","HEAD"],
+    pattern: '/invoices/next-number',
+    tokens: [{"old":"/invoices/next-number","type":0,"val":"invoices","end":""},{"old":"/invoices/next-number","type":0,"val":"next-number","end":""}],
+    types: placeholder as Registry['invoice_next_number']['types'],
+  },
+  'invoice_document_count': {
+    methods: ["GET","HEAD"],
+    pattern: '/invoices/document-count',
+    tokens: [{"old":"/invoices/document-count","type":0,"val":"invoices","end":""},{"old":"/invoices/document-count","type":0,"val":"document-count","end":""}],
+    types: placeholder as Registry['invoice_document_count']['types'],
+  },
+  'invoice_set_next_number': {
+    methods: ["POST"],
+    pattern: '/invoices/set-next-number',
+    tokens: [{"old":"/invoices/set-next-number","type":0,"val":"invoices","end":""},{"old":"/invoices/set-next-number","type":0,"val":"set-next-number","end":""}],
+    types: placeholder as Registry['invoice_set_next_number']['types'],
+  },
+  'invoice_list': {
+    methods: ["GET","HEAD"],
+    pattern: '/invoices',
+    tokens: [{"old":"/invoices","type":0,"val":"invoices","end":""}],
+    types: placeholder as Registry['invoice_list']['types'],
+  },
+  'invoice_pdf': {
+    methods: ["GET","HEAD"],
+    pattern: '/invoices/:id/pdf',
+    tokens: [{"old":"/invoices/:id/pdf","type":0,"val":"invoices","end":""},{"old":"/invoices/:id/pdf","type":1,"val":"id","end":""},{"old":"/invoices/:id/pdf","type":0,"val":"pdf","end":""}],
+    types: placeholder as Registry['invoice_pdf']['types'],
+  },
+  'invoice_show': {
+    methods: ["GET","HEAD"],
+    pattern: '/invoices/:id',
+    tokens: [{"old":"/invoices/:id","type":0,"val":"invoices","end":""},{"old":"/invoices/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['invoice_show']['types'],
+  },
+  'invoice_create': {
+    methods: ["POST"],
+    pattern: '/invoices',
+    tokens: [{"old":"/invoices","type":0,"val":"invoices","end":""}],
+    types: placeholder as Registry['invoice_create']['types'],
+  },
+  'invoice_convert_quote': {
+    methods: ["POST"],
+    pattern: '/invoices/convert-quote/:id',
+    tokens: [{"old":"/invoices/convert-quote/:id","type":0,"val":"invoices","end":""},{"old":"/invoices/convert-quote/:id","type":0,"val":"convert-quote","end":""},{"old":"/invoices/convert-quote/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['invoice_convert_quote']['types'],
+  },
+  'invoice_update_status': {
+    methods: ["PATCH"],
+    pattern: '/invoices/:id/status',
+    tokens: [{"old":"/invoices/:id/status","type":0,"val":"invoices","end":""},{"old":"/invoices/:id/status","type":1,"val":"id","end":""},{"old":"/invoices/:id/status","type":0,"val":"status","end":""}],
+    types: placeholder as Registry['invoice_update_status']['types'],
+  },
+  'invoice_unlink_quote': {
+    methods: ["PATCH"],
+    pattern: '/invoices/:id/unlink-quote',
+    tokens: [{"old":"/invoices/:id/unlink-quote","type":0,"val":"invoices","end":""},{"old":"/invoices/:id/unlink-quote","type":1,"val":"id","end":""},{"old":"/invoices/:id/unlink-quote","type":0,"val":"unlink-quote","end":""}],
+    types: placeholder as Registry['invoice_unlink_quote']['types'],
+  },
+  'invoice_update_comment': {
+    methods: ["PATCH"],
+    pattern: '/invoices/:id/comment',
+    tokens: [{"old":"/invoices/:id/comment","type":0,"val":"invoices","end":""},{"old":"/invoices/:id/comment","type":1,"val":"id","end":""},{"old":"/invoices/:id/comment","type":0,"val":"comment","end":""}],
+    types: placeholder as Registry['invoice_update_comment']['types'],
+  },
+  'invoice_duplicate': {
+    methods: ["POST"],
+    pattern: '/invoices/:id/duplicate',
+    tokens: [{"old":"/invoices/:id/duplicate","type":0,"val":"invoices","end":""},{"old":"/invoices/:id/duplicate","type":1,"val":"id","end":""},{"old":"/invoices/:id/duplicate","type":0,"val":"duplicate","end":""}],
+    types: placeholder as Registry['invoice_duplicate']['types'],
+  },
+  'invoice_update': {
+    methods: ["PUT"],
+    pattern: '/invoices/:id',
+    tokens: [{"old":"/invoices/:id","type":0,"val":"invoices","end":""},{"old":"/invoices/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['invoice_update']['types'],
+  },
+  'invoice_delete': {
+    methods: ["DELETE"],
+    pattern: '/invoices/:id',
+    tokens: [{"old":"/invoices/:id","type":0,"val":"invoices","end":""},{"old":"/invoices/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['invoice_delete']['types'],
+  },
+  'e_invoicing_submit': {
+    methods: ["POST"],
+    pattern: '/einvoicing/submit/:id',
+    tokens: [{"old":"/einvoicing/submit/:id","type":0,"val":"einvoicing","end":""},{"old":"/einvoicing/submit/:id","type":0,"val":"submit","end":""},{"old":"/einvoicing/submit/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['e_invoicing_submit']['types'],
+  },
+  'validate_connection': {
+    methods: ["GET","HEAD"],
+    pattern: '/einvoicing/validate-connection',
+    tokens: [{"old":"/einvoicing/validate-connection","type":0,"val":"einvoicing","end":""},{"old":"/einvoicing/validate-connection","type":0,"val":"validate-connection","end":""}],
+    types: placeholder as Registry['validate_connection']['types'],
   },
 } as const satisfies Record<string, AdonisEndpoint>
 

@@ -334,7 +334,7 @@ export default function TeamPage() {
                 >
                   {team?.iconUrl ? (
                     <img
-                      src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333'}${team.iconUrl}`}
+                      src={team.iconUrl}
                       alt={team.name}
                       className="h-full w-full object-contain p-1"
                     />

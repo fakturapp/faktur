@@ -63,6 +63,10 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column.dateTime()
   declare lockedUntil: DateTime | null
 
+  // Pending email change
+  @column({ serializeAs: null })
+  declare pendingEmail: string | null
+
   // Security Verification
   @column({ serializeAs: null })
   declare securityCode: string | null

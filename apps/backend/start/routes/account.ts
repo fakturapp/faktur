@@ -13,6 +13,8 @@ const TwoFactorEnable = () => import('#controllers/account/two_factor/enable')
 const TwoFactorDisable = () => import('#controllers/account/two_factor/disable')
 
 const SecurityVerify = () => import('#controllers/account/security_verify')
+const EmailRequestChange = () => import('#controllers/account/email_request_change')
+const EmailConfirmChange = () => import('#controllers/account/email_confirm_change')
 const UploadAvatar = () => import('#controllers/account/upload_avatar')
 const ServeAvatar = () => import('#controllers/account/serve_avatar')
 
@@ -35,6 +37,9 @@ router
 
     router.post('/security/send-code', [SecurityVerify, 'sendCode'])
     router.post('/security/verify', [SecurityVerify, 'verify'])
+
+    router.post('/email/request-change', [EmailRequestChange, 'handle'])
+    router.post('/email/confirm-change', [EmailConfirmChange, 'handle'])
   })
   .prefix('/account')
   .use(middleware.auth())

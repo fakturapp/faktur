@@ -6,6 +6,8 @@
 export const controllers = {
   account: {
     Delete: () => import('#controllers/account/delete'),
+    EmailConfirmChange: () => import('#controllers/account/email_confirm_change'),
+    EmailRequestChange: () => import('#controllers/account/email_request_change'),
     Password: () => import('#controllers/account/password'),
     RevokeSession: () => import('#controllers/account/revoke_session'),
     SecurityVerify: () => import('#controllers/account/security_verify'),
@@ -59,9 +61,31 @@ export const controllers = {
     UploadLogo: () => import('#controllers/company/upload_logo'),
   },
   dashboard: {
+    SidebarCounts: () => import('#controllers/dashboard/sidebar_counts'),
     Stats: () => import('#controllers/dashboard/stats'),
   },
+  einvoicing: {
+    Submit: () => import('#controllers/einvoicing/submit'),
+    ValidateConnection: () => import('#controllers/einvoicing/validate_connection'),
+  },
+  invoice: {
+    ConvertQuote: () => import('#controllers/invoice/convert_quote'),
+    Create: () => import('#controllers/invoice/create'),
+    Delete: () => import('#controllers/invoice/delete'),
+    DocumentCount: () => import('#controllers/invoice/document_count'),
+    Duplicate: () => import('#controllers/invoice/duplicate'),
+    List: () => import('#controllers/invoice/list'),
+    NextNumber: () => import('#controllers/invoice/next_number'),
+    Pdf: () => import('#controllers/invoice/pdf'),
+    SetNextNumber: () => import('#controllers/invoice/set_next_number'),
+    Show: () => import('#controllers/invoice/show'),
+    UnlinkQuote: () => import('#controllers/invoice/unlink_quote'),
+    UpdateComment: () => import('#controllers/invoice/update_comment'),
+    UpdateStatus: () => import('#controllers/invoice/update_status'),
+    Update: () => import('#controllers/invoice/update'),
+  },
   onboarding: {
+    CompletePersonalization: () => import('#controllers/onboarding/complete_personalization'),
     CreateCompany: () => import('#controllers/onboarding/create_company'),
     CreateTeam: () => import('#controllers/onboarding/create_team'),
     SearchCompany: () => import('#controllers/onboarding/search_company'),
@@ -70,10 +94,15 @@ export const controllers = {
   quote: {
     Create: () => import('#controllers/quote/create'),
     Delete: () => import('#controllers/quote/delete'),
+    DocumentCount: () => import('#controllers/quote/document_count'),
+    Duplicate: () => import('#controllers/quote/duplicate'),
     List: () => import('#controllers/quote/list'),
     NextNumber: () => import('#controllers/quote/next_number'),
     Pdf: () => import('#controllers/quote/pdf'),
+    SetNextNumber: () => import('#controllers/quote/set_next_number'),
     Show: () => import('#controllers/quote/show'),
+    UpdateComment: () => import('#controllers/quote/update_comment'),
+    UpdateStatus: () => import('#controllers/quote/update_status'),
     Update: () => import('#controllers/quote/update'),
   },
   settings: {

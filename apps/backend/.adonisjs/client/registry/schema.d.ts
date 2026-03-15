@@ -271,6 +271,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/security_verify').default['verify']>>>
     }
   }
+  'email_request_change': {
+    methods: ["POST"]
+    pattern: '/account/email/request-change'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/account/email_request_change').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/email_request_change').default['handle']>>>
+    }
+  }
+  'email_confirm_change': {
+    methods: ["POST"]
+    pattern: '/account/email/confirm-change'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/account/email_confirm_change').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/email_confirm_change').default['handle']>>>
+    }
+  }
   'create_team': {
     methods: ["POST"]
     pattern: '/onboarding/team'
@@ -319,6 +343,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/onboarding/search_company').default['handle']>>>
     }
   }
+  'complete_personalization': {
+    methods: ["POST"]
+    pattern: '/onboarding/personalization'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/onboarding/complete_personalization').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/onboarding/complete_personalization').default['handle']>>>
+    }
+  }
   'dashboard.index': {
     methods: ["GET","HEAD"]
     pattern: '/dashboard'
@@ -341,6 +377,18 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/stats').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/stats').default['handle']>>>
+    }
+  }
+  'dashboard.sidebarCounts': {
+    methods: ["GET","HEAD"]
+    pattern: '/dashboard/sidebar-counts'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/sidebar_counts').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/sidebar_counts').default['handle']>>>
     }
   }
   'serve_icon': {
@@ -715,6 +763,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/quote/next_number').default['handle']>>>
     }
   }
+  'quote_document_count': {
+    methods: ["GET","HEAD"]
+    pattern: '/quotes/document-count'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/quote/document_count').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/quote/document_count').default['handle']>>>
+    }
+  }
+  'quote_set_next_number': {
+    methods: ["POST"]
+    pattern: '/quotes/set-next-number'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/quote/set_next_number').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/quote/set_next_number').default['handle']>>>
+    }
+  }
   'quote_list': {
     methods: ["GET","HEAD"]
     pattern: '/quotes'
@@ -730,6 +802,18 @@ export interface Registry {
   'quote_pdf': {
     methods: ["GET","HEAD"]
     pattern: '/quotes/:id/pdf'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/quote/pdf').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/quote/pdf').default['handle']>>>
+    }
+  }
+  'quote_factur_xml': {
+    methods: ["GET","HEAD"]
+    pattern: '/quotes/:id/facturx'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -763,6 +847,42 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/quote/create').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'quote_update_status': {
+    methods: ["PATCH"]
+    pattern: '/quotes/:id/status'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/quote/update_status').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/quote/update_status').default['handle']>>>
+    }
+  }
+  'quote_update_comment': {
+    methods: ["PATCH"]
+    pattern: '/quotes/:id/comment'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/quote/update_comment').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/quote/update_comment').default['handle']>>>
+    }
+  }
+  'quote_duplicate': {
+    methods: ["POST"]
+    pattern: '/quotes/:id/duplicate'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/quote/duplicate').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/quote/duplicate').default['handle']>>>
+    }
+  }
   'quote_update': {
     methods: ["PUT"]
     pattern: '/quotes/:id'
@@ -785,6 +905,198 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/quote/delete').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/quote/delete').default['handle']>>>
+    }
+  }
+  'invoice_next_number': {
+    methods: ["GET","HEAD"]
+    pattern: '/invoices/next-number'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/next_number').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/next_number').default['handle']>>>
+    }
+  }
+  'invoice_document_count': {
+    methods: ["GET","HEAD"]
+    pattern: '/invoices/document-count'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/document_count').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/document_count').default['handle']>>>
+    }
+  }
+  'invoice_set_next_number': {
+    methods: ["POST"]
+    pattern: '/invoices/set-next-number'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/set_next_number').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/set_next_number').default['handle']>>>
+    }
+  }
+  'invoice_list': {
+    methods: ["GET","HEAD"]
+    pattern: '/invoices'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/list').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/list').default['handle']>>>
+    }
+  }
+  'invoice_pdf': {
+    methods: ["GET","HEAD"]
+    pattern: '/invoices/:id/pdf'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/pdf').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/pdf').default['handle']>>>
+    }
+  }
+  'invoice_show': {
+    methods: ["GET","HEAD"]
+    pattern: '/invoices/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/show').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/show').default['handle']>>>
+    }
+  }
+  'invoice_create': {
+    methods: ["POST"]
+    pattern: '/invoices'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/invoice_validator').createInvoiceValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/invoice_validator').createInvoiceValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/create').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/create').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'invoice_convert_quote': {
+    methods: ["POST"]
+    pattern: '/invoices/convert-quote/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/convert_quote').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/convert_quote').default['handle']>>>
+    }
+  }
+  'invoice_update_status': {
+    methods: ["PATCH"]
+    pattern: '/invoices/:id/status'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/update_status').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/update_status').default['handle']>>>
+    }
+  }
+  'invoice_unlink_quote': {
+    methods: ["PATCH"]
+    pattern: '/invoices/:id/unlink-quote'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/unlink_quote').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/unlink_quote').default['handle']>>>
+    }
+  }
+  'invoice_update_comment': {
+    methods: ["PATCH"]
+    pattern: '/invoices/:id/comment'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/update_comment').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/update_comment').default['handle']>>>
+    }
+  }
+  'invoice_duplicate': {
+    methods: ["POST"]
+    pattern: '/invoices/:id/duplicate'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/duplicate').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/duplicate').default['handle']>>>
+    }
+  }
+  'invoice_update': {
+    methods: ["PUT"]
+    pattern: '/invoices/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/invoice_validator').createInvoiceValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/invoice_validator').createInvoiceValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/update').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/update').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'invoice_delete': {
+    methods: ["DELETE"]
+    pattern: '/invoices/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/delete').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/delete').default['handle']>>>
+    }
+  }
+  'e_invoicing_submit': {
+    methods: ["POST"]
+    pattern: '/einvoicing/submit/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/einvoicing/submit').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/einvoicing/submit').default['handle']>>>
+    }
+  }
+  'validate_connection': {
+    methods: ["GET","HEAD"]
+    pattern: '/einvoicing/validate-connection'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/einvoicing/validate_connection').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/einvoicing/validate_connection').default['handle']>>>
     }
   }
 }

@@ -12,6 +12,8 @@ export default class List {
 
     const search = request.input('search', '')
     const status = request.input('status', '')
+    const page = request.input('page', 1)
+    const perPage = request.input('perPage', 20)
 
     const query = Invoice.query()
       .where('team_id', teamId)
@@ -29,9 +31,9 @@ export default class List {
       })
     }
 
-    const invoices = await query
+    const result = await query.paginate(page, perPage)
 
-    const invoicesList = invoices.map((inv) => ({
+    const invoicesList = result.all().map((inv) => ({
       id: inv.id,
       invoiceNumber: inv.invoiceNumber,
       status: inv.status,
@@ -47,6 +49,14 @@ export default class List {
       createdAt: inv.createdAt.toISO(),
     }))
 
-    return response.ok({ invoices: invoicesList })
+    return response.ok({
+      invoices: invoicesList,
+      meta: {
+        total: result.total,
+        perPage: result.perPage,
+        currentPage: result.currentPage,
+        lastPage: result.lastPage,
+      },
+    })
   }
 }

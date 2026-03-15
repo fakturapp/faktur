@@ -26,12 +26,16 @@ export type ScannedRoutes = {
     'two_factor_disable': { paramsTuple?: []; params?: {} }
     'security_verify.send_code': { paramsTuple?: []; params?: {} }
     'security_verify.verify': { paramsTuple?: []; params?: {} }
+    'email_request_change': { paramsTuple?: []; params?: {} }
+    'email_confirm_change': { paramsTuple?: []; params?: {} }
     'create_team': { paramsTuple?: []; params?: {} }
     'create_company': { paramsTuple?: []; params?: {} }
     'skip_company': { paramsTuple?: []; params?: {} }
     'search_company': { paramsTuple?: []; params?: {} }
+    'complete_personalization': { paramsTuple?: []; params?: {} }
     'dashboard.index': { paramsTuple?: []; params?: {} }
     'dashboard.stats': { paramsTuple?: []; params?: {} }
+    'dashboard.sidebarCounts': { paramsTuple?: []; params?: {} }
     'serve_icon': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'team_list': { paramsTuple?: []; params?: {} }
     'team_create': { paramsTuple?: []; params?: {} }
@@ -63,12 +67,34 @@ export type ScannedRoutes = {
     'invoice_settings_update': { paramsTuple?: []; params?: {} }
     'invoice_logo_upload': { paramsTuple?: []; params?: {} }
     'quote_next_number': { paramsTuple?: []; params?: {} }
+    'quote_document_count': { paramsTuple?: []; params?: {} }
+    'quote_set_next_number': { paramsTuple?: []; params?: {} }
     'quote_list': { paramsTuple?: []; params?: {} }
     'quote_pdf': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'quote_factur_xml': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'quote_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'quote_create': { paramsTuple?: []; params?: {} }
+    'quote_update_status': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'quote_update_comment': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'quote_duplicate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'quote_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'quote_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoice_next_number': { paramsTuple?: []; params?: {} }
+    'invoice_document_count': { paramsTuple?: []; params?: {} }
+    'invoice_set_next_number': { paramsTuple?: []; params?: {} }
+    'invoice_list': { paramsTuple?: []; params?: {} }
+    'invoice_pdf': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoice_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoice_create': { paramsTuple?: []; params?: {} }
+    'invoice_convert_quote': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoice_update_status': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoice_unlink_quote': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoice_update_comment': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoice_duplicate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoice_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoice_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'e_invoicing_submit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'validate_connection': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'signup': { paramsTuple?: []; params?: {} }
@@ -85,9 +111,12 @@ export type ScannedRoutes = {
     'two_factor_disable': { paramsTuple?: []; params?: {} }
     'security_verify.send_code': { paramsTuple?: []; params?: {} }
     'security_verify.verify': { paramsTuple?: []; params?: {} }
+    'email_request_change': { paramsTuple?: []; params?: {} }
+    'email_confirm_change': { paramsTuple?: []; params?: {} }
     'create_team': { paramsTuple?: []; params?: {} }
     'create_company': { paramsTuple?: []; params?: {} }
     'skip_company': { paramsTuple?: []; params?: {} }
+    'complete_personalization': { paramsTuple?: []; params?: {} }
     'team_create': { paramsTuple?: []; params?: {} }
     'upload_icon': { paramsTuple?: []; params?: {} }
     'team_switch': { paramsTuple?: []; params?: {} }
@@ -97,7 +126,14 @@ export type ScannedRoutes = {
     'upload_logo': { paramsTuple?: []; params?: {} }
     'client_create': { paramsTuple?: []; params?: {} }
     'invoice_logo_upload': { paramsTuple?: []; params?: {} }
+    'quote_set_next_number': { paramsTuple?: []; params?: {} }
     'quote_create': { paramsTuple?: []; params?: {} }
+    'quote_duplicate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoice_set_next_number': { paramsTuple?: []; params?: {} }
+    'invoice_create': { paramsTuple?: []; params?: {} }
+    'invoice_convert_quote': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoice_duplicate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'e_invoicing_submit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   GET: {
     'me': { paramsTuple?: []; params?: {} }
@@ -107,6 +143,7 @@ export type ScannedRoutes = {
     'search_company': { paramsTuple?: []; params?: {} }
     'dashboard.index': { paramsTuple?: []; params?: {} }
     'dashboard.stats': { paramsTuple?: []; params?: {} }
+    'dashboard.sidebarCounts': { paramsTuple?: []; params?: {} }
     'serve_icon': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'team_list': { paramsTuple?: []; params?: {} }
     'team_show': { paramsTuple?: []; params?: {} }
@@ -120,9 +157,17 @@ export type ScannedRoutes = {
     'serve_invoice_logo': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'invoice_settings_show': { paramsTuple?: []; params?: {} }
     'quote_next_number': { paramsTuple?: []; params?: {} }
+    'quote_document_count': { paramsTuple?: []; params?: {} }
     'quote_list': { paramsTuple?: []; params?: {} }
     'quote_pdf': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'quote_factur_xml': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'quote_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoice_next_number': { paramsTuple?: []; params?: {} }
+    'invoice_document_count': { paramsTuple?: []; params?: {} }
+    'invoice_list': { paramsTuple?: []; params?: {} }
+    'invoice_pdf': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoice_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'validate_connection': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'me': { paramsTuple?: []; params?: {} }
@@ -132,6 +177,7 @@ export type ScannedRoutes = {
     'search_company': { paramsTuple?: []; params?: {} }
     'dashboard.index': { paramsTuple?: []; params?: {} }
     'dashboard.stats': { paramsTuple?: []; params?: {} }
+    'dashboard.sidebarCounts': { paramsTuple?: []; params?: {} }
     'serve_icon': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'team_list': { paramsTuple?: []; params?: {} }
     'team_show': { paramsTuple?: []; params?: {} }
@@ -145,9 +191,17 @@ export type ScannedRoutes = {
     'serve_invoice_logo': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'invoice_settings_show': { paramsTuple?: []; params?: {} }
     'quote_next_number': { paramsTuple?: []; params?: {} }
+    'quote_document_count': { paramsTuple?: []; params?: {} }
     'quote_list': { paramsTuple?: []; params?: {} }
     'quote_pdf': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'quote_factur_xml': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'quote_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoice_next_number': { paramsTuple?: []; params?: {} }
+    'invoice_document_count': { paramsTuple?: []; params?: {} }
+    'invoice_list': { paramsTuple?: []; params?: {} }
+    'invoice_pdf': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoice_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'validate_connection': { paramsTuple?: []; params?: {} }
   }
   PUT: {
     'profile_update': { paramsTuple?: []; params?: {} }
@@ -159,6 +213,7 @@ export type ScannedRoutes = {
     'client_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_settings_update': { paramsTuple?: []; params?: {} }
     'quote_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoice_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   DELETE: {
     'session_revoke': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -167,6 +222,14 @@ export type ScannedRoutes = {
     'remove_member': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'client_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'quote_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoice_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+  }
+  PATCH: {
+    'quote_update_status': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'quote_update_comment': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoice_update_status': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoice_unlink_quote': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoice_update_comment': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

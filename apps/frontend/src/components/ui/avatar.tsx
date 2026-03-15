@@ -3,12 +3,10 @@
 import * as React from 'react'
 import { cn } from '@/lib/utils'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333'
-
 function resolveUrl(url: string | null | undefined): string | null {
   if (!url) return null
   if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) return url
-  return `${API_URL}${url}`
+  return url
 }
 
 interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {

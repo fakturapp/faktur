@@ -16,7 +16,7 @@ import { useAuth } from '@/lib/auth'
 import { useToast } from '@/components/ui/toast'
 import { api } from '@/lib/api'
 import { Spinner } from '@/components/ui/spinner'
-import { User, Shield, Monitor, Trash2, Smartphone, Key, Copy, Check, Camera } from 'lucide-react'
+import { User, Shield, Monitor, Trash2, Smartphone, Key, Copy, Check, Camera, Globe, MapPin } from 'lucide-react'
 
 const tabs = [
   { id: 'profile', label: 'Profil', icon: <User className="h-4 w-4" /> },
@@ -29,6 +29,9 @@ interface Session {
   isCurrent: boolean
   createdAt: string
   lastUsedAt: string | null
+  ipAddress: string | null
+  userAgent: string | null
+  location?: string | null
 }
 
 export default function AccountPage() {
@@ -41,6 +44,12 @@ export default function AccountPage() {
   const [fullName, setFullName] = useState(user?.fullName || '')
   const [profileLoading, setProfileLoading] = useState(false)
   const [avatarUploading, setAvatarUploading] = useState(false)
+
+  // Email change
+  const [newEmail, setNewEmail] = useState('')
+  const [emailCodeOpen, setEmailCodeOpen] = useState(false)
+  const [emailCode, setEmailCode] = useState('')
+  const [emailChangeLoading, setEmailChangeLoading] = useState(false)
 
   // Password
   const [currentPassword, setCurrentPassword] = useState('')
@@ -147,6 +156,30 @@ export default function AccountPage() {
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
+  async function handleRequestEmailChange(e: React.FormEvent) {
+    e.preventDefault()
+    if (!newEmail || newEmail === user?.email) return
+    setEmailChangeLoading(true)
+    const { error } = await api.post('/account/email/request-change', { newEmail })
+    setEmailChangeLoading(false)
+    if (error) return toast(error, 'error')
+    toast('Code envoyé à ' + newEmail, 'success')
+    setEmailCodeOpen(true)
+  }
+
+  async function handleConfirmEmailChange(e: React.FormEvent) {
+    e.preventDefault()
+    setEmailChangeLoading(true)
+    const { data, error } = await api.post<{ email: string }>('/account/email/confirm-change', { code: emailCode })
+    setEmailChangeLoading(false)
+    if (error) return toast(error, 'error')
+    setEmailCodeOpen(false)
+    setEmailCode('')
+    setNewEmail('')
+    await refreshUser()
+    toast('Email mis à jour', 'success')
+  }
+
   async function handleChangePassword(e: React.FormEvent) {
     e.preventDefault()
     if (newPassword !== confirmPassword) return toast('Les mots de passe ne correspondent pas', 'error')
@@ -230,6 +263,24 @@ export default function AccountPage() {
     if (data?.sessions) {
       setSessions(data.sessions)
       setSessionsLoaded(true)
+
+      // Fetch location for each unique IP
+      const ips = [...new Set(data.sessions.map((s) => s.ipAddress).filter(Boolean))] as string[]
+      for (const ip of ips) {
+        if (ip === '::1' || ip === '127.0.0.1') continue
+        try {
+          const res = await fetch(`http://ip-api.com/json/${ip}?fields=status,city,country`)
+          if (res.ok) {
+            const geo = await res.json()
+            if (geo.status === 'success') {
+              const loc = [geo.city, geo.country].filter(Boolean).join(', ')
+              setSessions((prev) =>
+                prev.map((s) => (s.ipAddress === ip ? { ...s, location: loc } : s))
+              )
+            }
+          }
+        } catch { /* ignore */ }
+      }
     }
   }
 
@@ -287,21 +338,9 @@ export default function AccountPage() {
           <CardContent className="p-6">
             <form onSubmit={handleUpdateProfile}>
               <FieldGroup>
-                <div className="flex items-center gap-4">
-                  <div className="relative group">
-                    <Avatar src={user?.avatarUrl} alt={user?.fullName || ''} fallback={initials} size="lg" />
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={avatarUploading}
-                      className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                    >
-                      {avatarUploading ? (
-                        <Spinner size="sm" className="text-white" />
-                      ) : (
-                        <Camera className="h-5 w-5 text-white" />
-                      )}
-                    </button>
+                <div className="flex items-center gap-3">
+                  <div className="relative group shrink-0">
+                    <Avatar src={user?.avatarUrl} alt={user?.fullName || ''} fallback={initials} size="md" />
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -310,17 +349,19 @@ export default function AccountPage() {
                       onChange={handleAvatarUpload}
                     />
                   </div>
-                  <div>
-                    <p className="font-medium text-foreground">{user?.fullName || 'Utilisateur'}</p>
-                    <p className="text-sm text-muted-foreground">{user?.email}</p>
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="text-xs text-primary hover:text-primary/80 mt-1"
-                    >
-                      Changer la photo
-                    </button>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{user?.fullName || 'Utilisateur'}</p>
+                    <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
                   </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={avatarUploading}
+                  >
+                    {avatarUploading ? <Spinner size="sm" /> : <><Camera className="h-3.5 w-3.5 mr-1.5" /> Photo</>}
+                  </Button>
                 </div>
 
                 <Separator />
@@ -335,9 +376,29 @@ export default function AccountPage() {
                 </Field>
 
                 <Field>
-                  <FieldLabel>Email</FieldLabel>
-                  <Input value={user?.email || ''} disabled />
-                  <FieldDescription>L&apos;email ne peut pas être modifié.</FieldDescription>
+                  <FieldLabel htmlFor="email">Email</FieldLabel>
+                  <div className="flex gap-2">
+                    <Input
+                      id="email"
+                      type="email"
+                      value={newEmail || user?.email || ''}
+                      onChange={(e) => setNewEmail(e.target.value)}
+                      placeholder={user?.email}
+                    />
+                    {newEmail && newEmail !== user?.email && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleRequestEmailChange}
+                        disabled={emailChangeLoading}
+                        className="shrink-0"
+                      >
+                        {emailChangeLoading ? <Spinner size="sm" /> : 'Verifier'}
+                      </Button>
+                    )}
+                  </div>
+                  <FieldDescription>Un code de verification sera envoyé à la nouvelle adresse.</FieldDescription>
                 </Field>
 
                 <Button type="submit" disabled={profileLoading}>
@@ -565,33 +626,59 @@ export default function AccountPage() {
               <p className="text-sm text-muted-foreground">Gérez vos sessions de connexion.</p>
 
               <div className="space-y-3">
-                {sessions.map((session) => (
-                  <div
-                    key={session.id}
-                    className="flex items-center justify-between rounded-lg border border-border p-4"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Monitor className="h-5 w-5 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm font-medium text-foreground">
-                          Session {session.isCurrent && <Badge variant="success" className="ml-2">Active</Badge>}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          Créée le {new Date(session.createdAt).toLocaleDateString('fr-FR')}
-                        </p>
+                {sessions.map((session) => {
+                  const isMobile = session.userAgent?.match(/Mobile|Android|iPhone/i)
+                  const DeviceIcon = isMobile ? Smartphone : Monitor
+                  return (
+                    <div
+                      key={session.id}
+                      className="flex items-start justify-between rounded-xl border border-border p-4 gap-4"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted/50 mt-0.5">
+                          <DeviceIcon className="h-4.5 w-4.5 text-muted-foreground" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="text-sm font-medium text-foreground">
+                              {isMobile ? 'Mobile' : 'Desktop'}
+                            </p>
+                            {session.isCurrent && <Badge variant="success">Active</Badge>}
+                          </div>
+                          <div className="space-y-0.5">
+                            {session.ipAddress && (
+                              <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                                <Globe className="h-3 w-3 shrink-0" />
+                                {session.ipAddress}
+                              </p>
+                            )}
+                            {session.location && (
+                              <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                                <MapPin className="h-3 w-3 shrink-0" />
+                                {session.location}
+                              </p>
+                            )}
+                            <p className="text-xs text-muted-foreground">
+                              {session.lastUsedAt
+                                ? `Dernière activité le ${new Date(session.lastUsedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`
+                                : `Créée le ${new Date(session.createdAt).toLocaleDateString('fr-FR')}`}
+                            </p>
+                          </div>
+                        </div>
                       </div>
+                      {!session.isCurrent && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="shrink-0 border-destructive/30 text-destructive hover:bg-destructive/10"
+                          onClick={() => setRevokeConfirm(session.id)}
+                        >
+                          <Trash2 className="h-3.5 w-3.5 mr-1.5" /> Revoquer
+                        </Button>
+                      )}
                     </div>
-                    {!session.isCurrent && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setRevokeConfirm(session.id)}
-                      >
-                        Revoquer
-                      </Button>
-                    )}
-                  </div>
-                ))}
+                  )
+                })}
                 {sessions.length === 0 && (
                   <div className="flex items-center justify-center gap-2 py-4">
                     <Spinner size="sm" className="text-primary" />
@@ -655,6 +742,34 @@ export default function AccountPage() {
             {deleteLoading ? <><Spinner /> Suppression...</> : 'Supprimer définitivement'}
           </Button>
         </DialogFooter>
+      </Dialog>
+
+      {/* Email verification code dialog */}
+      <Dialog open={emailCodeOpen} onClose={() => setEmailCodeOpen(false)}>
+        <DialogTitle>Vérification de l&apos;email</DialogTitle>
+        <DialogDescription>
+          Un code à 6 chiffres a été envoyé à <strong>{newEmail}</strong>. Entrez-le ci-dessous pour confirmer le changement.
+        </DialogDescription>
+        <form onSubmit={handleConfirmEmailChange} className="mt-4">
+          <Input
+            type="text"
+            inputMode="numeric"
+            placeholder="000000"
+            value={emailCode}
+            onChange={(e) => setEmailCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+            className="text-center text-xl tracking-[0.3em] font-mono"
+            maxLength={6}
+            autoFocus
+          />
+          <DialogFooter className="mt-4">
+            <Button type="button" variant="outline" onClick={() => setEmailCodeOpen(false)}>
+              Annuler
+            </Button>
+            <Button type="submit" disabled={emailChangeLoading || emailCode.length !== 6}>
+              {emailChangeLoading ? <><Spinner /> Vérification...</> : 'Confirmer'}
+            </Button>
+          </DialogFooter>
+        </form>
       </Dialog>
 
       {/* Disable 2FA dialog */}

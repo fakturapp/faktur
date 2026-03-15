@@ -12,6 +12,8 @@ export default class List {
 
     const search = request.input('search', '')
     const status = request.input('status', '')
+    const page = request.input('page', 1)
+    const perPage = request.input('perPage', 20)
 
     const query = Quote.query()
       .where('team_id', teamId)
@@ -29,9 +31,9 @@ export default class List {
       })
     }
 
-    const quotes = await query
+    const result = await query.paginate(page, perPage)
 
-    const quotesList = quotes.map((q) => ({
+    const quotesList = result.all().map((q) => ({
       id: q.id,
       quoteNumber: q.quoteNumber,
       status: q.status,
@@ -46,6 +48,14 @@ export default class List {
       createdAt: q.createdAt.toISO(),
     }))
 
-    return response.ok({ quotes: quotesList })
+    return response.ok({
+      quotes: quotesList,
+      meta: {
+        total: result.total,
+        perPage: result.perPage,
+        currentPage: result.currentPage,
+        lastPage: result.lastPage,
+      },
+    })
   }
 }

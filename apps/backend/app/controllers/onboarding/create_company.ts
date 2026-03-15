@@ -40,9 +40,6 @@ export default class CreateCompany {
       currency: payload.currency ?? 'EUR',
     })
 
-    user.onboardingCompleted = true
-    await user.save()
-
     return response.created({
       message: 'Company created successfully',
       company: {

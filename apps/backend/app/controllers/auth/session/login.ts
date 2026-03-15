@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
+import db from '@adonisjs/lucid/services/db'
 import User from '#models/account/user'
 import LoginHistory from '#models/account/login_history'
 import AuditLog from '#models/shared/audit_log'
@@ -99,6 +100,15 @@ export default class Login {
     const token = await User.accessTokens.create(user, ['*'], {
       expiresIn: '7 days',
     })
+
+    // Store IP and user agent on the token
+    await db
+      .from('auth_access_tokens')
+      .where('id', token.identifier)
+      .update({
+        ip_address: request.ip(),
+        user_agent: (request.header('user-agent') || '').slice(0, 512),
+      })
 
     await this.recordLoginAttempt(request, user.id, 'success', null, String(token.identifier))
 

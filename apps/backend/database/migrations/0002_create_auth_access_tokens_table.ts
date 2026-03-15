@@ -6,12 +6,18 @@ export default class extends BaseSchema {
   async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
-      table.uuid('tokenable_id').notNullable().references('id').inTable('users').onDelete('CASCADE')
-
+      table
+        .uuid('tokenable_id')
+        .notNullable()
+        .references('id')
+        .inTable('users')
+        .onDelete('CASCADE')
       table.string('type').notNullable()
       table.string('name').nullable()
       table.string('hash').notNullable()
       table.text('abilities').notNullable()
+      table.string('ip_address', 45).nullable()
+      table.string('user_agent', 512).nullable()
       table.timestamp('created_at')
       table.timestamp('updated_at')
       table.timestamp('last_used_at').nullable()

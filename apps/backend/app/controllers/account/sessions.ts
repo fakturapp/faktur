@@ -14,7 +14,7 @@ export default class Sessions {
         query.whereNull('expires_at').orWhere('expires_at', '>', new Date().toISOString())
       })
       .orderBy('last_used_at', 'desc')
-      .select('id', 'name', 'created_at', 'last_used_at', 'expires_at')
+      .select('id', 'name', 'created_at', 'last_used_at', 'expires_at', 'ip_address', 'user_agent')
 
     const sessions = tokens.map((token) => ({
       id: token.id,
@@ -23,6 +23,8 @@ export default class Sessions {
       createdAt: token.created_at,
       lastUsedAt: token.last_used_at,
       expiresAt: token.expires_at,
+      ipAddress: token.ip_address || null,
+      userAgent: token.user_agent || null,
     }))
 
     return response.ok({ sessions })
