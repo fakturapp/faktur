@@ -449,7 +449,7 @@ export default function EditQuotePage() {
           </button>
           <A4Sheet
             mode={mode}
-            logoUrl={logoUrl}
+            logoUrl={logoUrl || invoiceSettings.logoUrl}
             accentColor={accentColor}
             documentTitle={options.documentTitle}
             quoteNumber={quoteNumber}
