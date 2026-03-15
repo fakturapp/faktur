@@ -6,11 +6,10 @@ import { motion, type Variants } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
-import { useAuth } from '@/lib/auth'
 import { api } from '@/lib/api'
 import { TEMPLATES } from '@/lib/invoice-templates'
 import { TemplateThumbnail } from '@/components/shared/template-thumbnail'
-import { Paintbrush, Check, Zap, ClipboardList, ImagePlus, Trash2 } from 'lucide-react'
+import { Paintbrush, Check, ImagePlus, Trash2 } from 'lucide-react'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -36,12 +35,8 @@ const accentColors = [
 
 export default function OnboardingPersonalizationPage() {
   const router = useRouter()
-  const { refreshUser } = useAuth()
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
   const [selectedTemplate, setSelectedTemplate] = useState('classique')
   const [selectedColor, setSelectedColor] = useState('#6366f1')
-  const [billingType, setBillingType] = useState<'quick' | 'detailed'>('quick')
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -61,38 +56,18 @@ export default function OnboardingPersonalizationPage() {
     setUploading(false)
   }
 
-  async function handleSubmit() {
-    setError('')
-    setLoading(true)
-
-    const { error: err } = await api.post('/onboarding/personalization', {
+  function handleSubmit() {
+    // Save selections in sessionStorage for the billing step
+    sessionStorage.setItem('onboarding_appearance', JSON.stringify({
       template: selectedTemplate,
       accentColor: selectedColor,
-      billingType,
-    })
-
-    if (err) {
-      setLoading(false)
-      return setError(err)
-    }
-
-    await refreshUser()
-    router.push('/dashboard')
+      logoUrl,
+    }))
+    router.push('/onboarding/billing')
   }
 
-  async function handleSkip() {
-    setError('')
-    setLoading(true)
-
-    const { error: err } = await api.post('/onboarding/personalization', {})
-
-    if (err) {
-      setLoading(false)
-      return setError(err)
-    }
-
-    await refreshUser()
-    router.push('/dashboard')
+  function handleSkip() {
+    router.push('/onboarding/billing')
   }
 
   return (
@@ -110,12 +85,6 @@ export default function OnboardingPersonalizationPage() {
               </p>
             </div>
           </motion.div>
-
-          {error && (
-            <motion.div variants={fadeUp} custom={1} className="mb-4 text-center bg-destructive/10 border border-destructive/20 rounded-lg p-3 text-sm text-destructive">
-              {error}
-            </motion.div>
-          )}
 
           {/* Logo Upload */}
           <motion.div variants={fadeUp} custom={1} className="mb-6">
@@ -197,72 +166,23 @@ export default function OnboardingPersonalizationPage() {
             </div>
           </motion.div>
 
-          {/* Billing Type */}
-          <motion.div variants={fadeUp} custom={4} className="mb-6">
-            <h2 className="text-sm font-semibold text-foreground mb-3">Type de facturation</h2>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                onClick={() => setBillingType('quick')}
-                className={`relative rounded-xl border-2 p-4 text-left transition-all ${
-                  billingType === 'quick'
-                    ? 'border-primary bg-primary/5 shadow-sm'
-                    : 'border-border hover:border-muted-foreground/30 hover:bg-muted/30'
-                }`}
-              >
-                {billingType === 'quick' && (
-                  <div className="absolute top-3 right-3">
-                    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary">
-                      <Check className="h-3 w-3 text-primary-foreground" />
-                    </div>
-                  </div>
-                )}
-                <Zap className="h-5 w-5 text-primary mb-2" />
-                <p className="font-medium text-sm text-foreground">Rapide</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Facturation simplifiee avec les informations essentielles
-                </p>
-              </button>
-              <button
-                onClick={() => setBillingType('detailed')}
-                className={`relative rounded-xl border-2 p-4 text-left transition-all ${
-                  billingType === 'detailed'
-                    ? 'border-primary bg-primary/5 shadow-sm'
-                    : 'border-border hover:border-muted-foreground/30 hover:bg-muted/30'
-                }`}
-              >
-                {billingType === 'detailed' && (
-                  <div className="absolute top-3 right-3">
-                    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary">
-                      <Check className="h-3 w-3 text-primary-foreground" />
-                    </div>
-                  </div>
-                )}
-                <ClipboardList className="h-5 w-5 text-primary mb-2" />
-                <p className="font-medium text-sm text-foreground">Complet</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Factures détaillées avec TVA, remises, conditions et mentions
-                </p>
-              </button>
-            </div>
-          </motion.div>
-
           {/* Actions */}
-          <motion.div variants={fadeUp} custom={5} className="flex gap-3">
+          <motion.div variants={fadeUp} custom={4} className="flex gap-3">
             <Button
               type="button"
               variant="outline"
               className="flex-1"
               onClick={handleSkip}
-              disabled={loading}
+              disabled={uploading}
             >
               Passer cette etape
             </Button>
             <Button
               className="flex-1"
               onClick={handleSubmit}
-              disabled={loading}
+              disabled={uploading}
             >
-              {loading ? <><Spinner /> Finalisation...</> : 'Terminer'}
+              Suivant
             </Button>
           </motion.div>
 

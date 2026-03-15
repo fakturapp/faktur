@@ -7,6 +7,7 @@ const personalizeValidator = vine.compile(
     template: vine.string().trim().maxLength(30).optional(),
     accentColor: vine.string().trim().regex(/^#[0-9a-fA-F]{6}$/).optional(),
     billingType: vine.enum(['quick', 'detailed']).optional(),
+    vatExemptReason: vine.enum(['none', 'not_subject', 'france_no_vat', 'outside_france']).optional(),
   })
 )
 
@@ -35,7 +36,7 @@ export default class CompletePersonalization {
         pdpSandbox: true,
         defaultShowNotes: true,
         defaultSignatureField: false,
-        defaultVatExempt: false,
+        defaultVatExempt: payload.vatExemptReason === 'not_subject',
         defaultShowDeliveryAddress: false,
         defaultLanguage: 'fr',
       })
@@ -43,6 +44,7 @@ export default class CompletePersonalization {
       if (payload.template) settings.template = payload.template
       if (payload.accentColor) settings.accentColor = payload.accentColor
       if (payload.billingType) settings.billingType = payload.billingType
+      if (payload.vatExemptReason !== undefined) settings.defaultVatExempt = payload.vatExemptReason === 'not_subject'
       await settings.save()
     }
 

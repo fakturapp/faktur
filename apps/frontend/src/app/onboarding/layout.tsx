@@ -10,7 +10,8 @@ import { cn } from '@/lib/utils'
 const steps = [
   { id: 'team', label: 'Équipe', path: '/onboarding/team' },
   { id: 'company', label: 'Entreprise', path: '/onboarding/company' },
-  { id: 'personalization', label: 'Personnalisation', path: '/onboarding/personalization' },
+  { id: 'personalization', label: 'Apparence', path: '/onboarding/personalization' },
+  { id: 'billing', label: 'Facturation', path: '/onboarding/billing' },
 ]
 
 export default function OnboardingLayout({ children }: { children: React.ReactNode }) {
