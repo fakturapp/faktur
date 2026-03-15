@@ -11,7 +11,7 @@ import { Separator } from '@/components/ui/separator'
 import { useAuth } from '@/lib/auth'
 import { api } from '@/lib/api'
 import { Spinner } from '@/components/ui/spinner'
-import { Building2, Search } from 'lucide-react'
+import { Building2, Search, Phone, Mail } from 'lucide-react'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -54,6 +54,8 @@ export default function OnboardingCompanyPage() {
     addressLine1: '',
     city: '',
     postalCode: '',
+    phone: '',
+    email: '',
     iban: '',
     bic: '',
     bankName: '',
@@ -101,7 +103,7 @@ export default function OnboardingCompanyPage() {
     if (err) return setError(err)
 
     await refreshUser()
-    router.push('/dashboard')
+    router.push('/onboarding/personalization')
   }
 
   async function handleSkip() {
@@ -110,7 +112,7 @@ export default function OnboardingCompanyPage() {
     setLoading(false)
     if (err) return setError(err)
     await refreshUser()
-    router.push('/dashboard')
+    router.push('/onboarding/personalization')
   }
 
   return (
@@ -227,6 +229,21 @@ export default function OnboardingCompanyPage() {
                       <Input id="city" value={form.city} onChange={(e) => updateForm('city', e.target.value)} />
                     </Field>
                   </motion.div>
+
+                  <motion.div variants={fadeUp} custom={9} className="grid grid-cols-2 gap-4">
+                    <Field>
+                      <FieldLabel htmlFor="phone">
+                        <span className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5" /> Telephone</span>
+                      </FieldLabel>
+                      <Input id="phone" type="tel" placeholder="+33 1 23 45 67 89" value={form.phone} onChange={(e) => updateForm('phone', e.target.value)} />
+                    </Field>
+                    <Field>
+                      <FieldLabel htmlFor="email">
+                        <span className="flex items-center gap-1.5"><Mail className="h-3.5 w-3.5" /> Email</span>
+                      </FieldLabel>
+                      <Input id="email" type="email" placeholder="contact@entreprise.fr" value={form.email} onChange={(e) => updateForm('email', e.target.value)} />
+                    </Field>
+                  </motion.div>
                 </>
               )}
 
@@ -242,7 +259,7 @@ export default function OnboardingCompanyPage() {
                 </motion.div>
               )}
 
-              <motion.div variants={fadeUp} custom={9} className="flex gap-3">
+              <motion.div variants={fadeUp} custom={10} className="flex gap-3">
                 <Button
                   type="button"
                   variant="outline"
@@ -257,11 +274,11 @@ export default function OnboardingCompanyPage() {
                   className="flex-1"
                   disabled={loading || !form.legalName.trim()}
                 >
-                  {loading ? <><Spinner /> Enregistrement...</> : 'Terminer'}
+                  {loading ? <><Spinner /> Enregistrement...</> : 'Continuer'}
                 </Button>
               </motion.div>
 
-              <motion.div variants={fadeUp} custom={10}>
+              <motion.div variants={fadeUp} custom={11}>
                 <FieldDescription className="text-center">
                   Vous pourrez compléter ces informations plus tard.
                 </FieldDescription>
