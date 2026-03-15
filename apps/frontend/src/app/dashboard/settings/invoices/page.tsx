@@ -12,7 +12,8 @@ import { useToast } from '@/components/ui/toast'
 import { Spinner } from '@/components/ui/spinner'
 import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
-import { TEMPLATES, getTemplate, type TemplateConfig } from '@/lib/invoice-templates'
+import { TEMPLATES, getTemplate } from '@/lib/invoice-templates'
+import { TemplateThumbnail } from '@/components/shared/template-thumbnail'
 import {
   ImagePlus,
   Palette,
@@ -37,6 +38,7 @@ import {
   AlertTriangle,
   Settings2,
   Paintbrush,
+  FileText,
 } from 'lucide-react'
 
 const fadeUp = {
@@ -64,275 +66,9 @@ const accentColors = [
 const settingsTabs = [
   { id: 'apparence', label: 'Apparence', icon: <Paintbrush className="h-4 w-4" /> },
   { id: 'options', label: 'Options', icon: <Settings2 className="h-4 w-4" /> },
+  { id: 'defauts', label: 'Valeurs par defaut', icon: <ClipboardList className="h-4 w-4" /> },
   { id: 'efacturation', label: 'E-Facturation', icon: <FileCheck className="h-4 w-4" /> },
 ]
-
-/* ═══════════════════════════════════════════════════════════
-   TemplateThumbnail — realistic mini A4 skeleton per layout
-   ═══════════════════════════════════════════════════════════ */
-
-function TemplateThumbnail({
-  tpl,
-  accentColor,
-  selected,
-  size = 'sm',
-  onClick,
-}: {
-  tpl: TemplateConfig
-  accentColor: string
-  selected: boolean
-  size?: 'sm' | 'lg'
-  onClick?: () => void
-}) {
-  const T = tpl
-  const isLg = size === 'lg'
-  const p = isLg ? 'p-3.5' : 'p-2'
-  const contrastCol = '#ffffff'
-
-  const Wrapper = onClick ? 'button' : 'div'
-
-  return (
-    <Wrapper onClick={onClick} className="group text-center w-full">
-      <div
-        className={`relative rounded-lg overflow-hidden transition-all ${
-          selected
-            ? 'ring-2 ring-primary ring-offset-2 ring-offset-card shadow-lg'
-            : 'border border-border/60 hover:border-border hover:shadow-md'
-        }`}
-        style={{ aspectRatio: '210 / 297' }}
-      >
-        <div className={`h-full w-full ${p} flex flex-col relative`} style={{ backgroundColor: T.docBg }}>
-
-          {/* ── CLASSIQUE: standard layout ── */}
-          {T.id === 'classique' && (<>
-            <div className="flex justify-between items-start mb-2">
-              <div className="space-y-0.5">
-                <div className="h-1.5 w-6 rounded-full" style={{ backgroundColor: T.borderLight }} />
-                <div className="h-1 w-8 rounded-full" style={{ backgroundColor: T.borderLight }} />
-              </div>
-              <div className="rounded px-1.5 py-0.5" style={{ backgroundColor: `${accentColor}15` }}>
-                <div className="h-1.5 w-5 rounded-full" style={{ backgroundColor: accentColor, opacity: 0.7 }} />
-              </div>
-            </div>
-            <div className="rounded px-1 py-1 mb-2" style={{ backgroundColor: T.clientBlockBg, border: `0.5px solid ${T.clientBlockBorder}` }}>
-              <div className="h-0.5 w-4 rounded-full mb-0.5" style={{ backgroundColor: T.textMuted, opacity: 0.3 }} />
-              <div className="h-1 w-6 rounded-full mb-0.5" style={{ backgroundColor: T.text, opacity: 0.2 }} />
-              <div className="h-0.5 w-8 rounded-full" style={{ backgroundColor: T.textMuted, opacity: 0.15 }} />
-            </div>
-          </>)}
-
-          {/* ── MODERNE: full-width colored banner ── */}
-          {T.id === 'moderne' && (<>
-            <div className="rounded-md px-2 py-1.5 mb-2 -mx-1 -mt-1" style={{ backgroundColor: accentColor }}>
-              <div className="flex justify-between items-center">
-                <div className="h-2 w-7 rounded-full" style={{ backgroundColor: contrastCol, opacity: 0.6 }} />
-                <div className="text-right">
-                  <div className="h-1.5 w-5 rounded-full ml-auto" style={{ backgroundColor: contrastCol, opacity: 0.9 }} />
-                  <div className="h-0.5 w-4 rounded-full ml-auto mt-0.5" style={{ backgroundColor: contrastCol, opacity: 0.5 }} />
-                </div>
-              </div>
-            </div>
-            <div className="flex gap-2 mb-2">
-              <div className="flex-1 space-y-0.5">
-                <div className="h-0.5 w-4 rounded-full" style={{ backgroundColor: T.textMuted, opacity: 0.3 }} />
-                <div className="h-1 w-5 rounded-full" style={{ backgroundColor: T.text, opacity: 0.2 }} />
-              </div>
-              <div className="flex-1 space-y-0.5">
-                <div className="h-0.5 w-4 rounded-full" style={{ backgroundColor: T.textMuted, opacity: 0.3 }} />
-                <div className="h-1 w-6 rounded-full" style={{ backgroundColor: T.text, opacity: 0.2 }} />
-              </div>
-            </div>
-          </>)}
-
-          {/* ── COMPACT ── */}
-          {T.id === 'compact' && (<>
-            <div className="flex justify-between items-start mb-1">
-              <div className="h-2 w-8 rounded-none bg-gray-200" />
-              <div className="text-right space-y-0.5">
-                <div className="h-1.5 w-5 rounded-none" style={{ backgroundColor: accentColor, opacity: 0.7 }} />
-                <div className="h-0.5 w-4 rounded-none bg-gray-300" />
-              </div>
-            </div>
-            <div className="border border-gray-300 px-1 py-0.5 mb-1">
-              <div className="h-1 w-5 rounded-none bg-gray-200 mb-0.5" />
-              <div className="h-0.5 w-8 rounded-none bg-gray-100" />
-            </div>
-          </>)}
-
-          {/* ── ELEGANCE ── */}
-          {T.id === 'elegance' && (<>
-            <div className="flex justify-between items-start mb-1.5">
-              <div className="space-y-0.5">
-                <div className="h-1.5 w-7 rounded-full" style={{ backgroundColor: T.text, opacity: 0.15 }} />
-                <div className="h-0.5 w-10 rounded-full" style={{ backgroundColor: T.textMuted, opacity: 0.1 }} />
-              </div>
-              <div className="h-1.5 w-6 rounded-full" style={{ backgroundColor: accentColor, opacity: 0.5 }} />
-            </div>
-            <div className="h-px mb-2" style={{ backgroundColor: accentColor, opacity: 0.3 }} />
-            <div className="mb-2 pb-1" style={{ borderBottom: `0.5px solid ${T.borderLight}` }}>
-              <div className="h-0.5 w-3 rounded-full mb-0.5" style={{ backgroundColor: accentColor, opacity: 0.4 }} />
-              <div className="h-1 w-6 rounded-full" style={{ backgroundColor: T.text, opacity: 0.15 }} />
-              <div className="h-0.5 w-8 rounded-full mt-0.5" style={{ backgroundColor: T.textMuted, opacity: 0.1 }} />
-            </div>
-          </>)}
-
-          {/* ── AUDACIEUX ── */}
-          {T.id === 'audacieux' && (<>
-            <div className="rounded-xl px-2 py-2.5 mb-2 -mx-1 -mt-1 relative overflow-hidden" style={{ backgroundColor: accentColor }}>
-              <div className="absolute -right-2 -top-2 w-8 h-8 rounded-full" style={{ backgroundColor: contrastCol, opacity: 0.08 }} />
-              <div className="absolute -right-1 -bottom-3 w-6 h-6 rounded-full" style={{ backgroundColor: contrastCol, opacity: 0.05 }} />
-              <div className="h-2.5 w-8 rounded-full mb-1" style={{ backgroundColor: contrastCol, opacity: 0.9 }} />
-              <div className="h-1 w-5 rounded-full" style={{ backgroundColor: contrastCol, opacity: 0.5 }} />
-            </div>
-            <div className="rounded-lg px-1 py-1 mb-1.5" style={{ backgroundColor: T.clientBlockBg, border: `0.5px solid ${T.clientBlockBorder}` }}>
-              <div className="h-1 w-5 rounded-full mb-0.5" style={{ backgroundColor: T.text, opacity: 0.2 }} />
-              <div className="h-0.5 w-7 rounded-full" style={{ backgroundColor: T.textMuted, opacity: 0.15 }} />
-            </div>
-          </>)}
-
-          {/* ── LATERAL ── */}
-          {T.id === 'lateral' && (<>
-            <div className="absolute top-0 left-0 bottom-0 flex" style={{ width: '28%' }}>
-              <div className="h-full w-full flex flex-col p-1.5 pt-2" style={{ backgroundColor: accentColor }}>
-                <div className="h-2 w-5 rounded-full mb-1.5" style={{ backgroundColor: contrastCol, opacity: 0.8 }} />
-                <div className="h-0.5 w-full rounded-full mb-0.5" style={{ backgroundColor: contrastCol, opacity: 0.3 }} />
-                <div className="h-0.5 w-4/5 rounded-full mb-0.5" style={{ backgroundColor: contrastCol, opacity: 0.2 }} />
-                <div className="h-0.5 w-3/5 rounded-full mb-2" style={{ backgroundColor: contrastCol, opacity: 0.2 }} />
-                <div className="h-0.5 w-full rounded-full mb-0.5" style={{ backgroundColor: contrastCol, opacity: 0.15 }} />
-                <div className="h-0.5 w-4/5 rounded-full" style={{ backgroundColor: contrastCol, opacity: 0.15 }} />
-              </div>
-            </div>
-            <div style={{ marginLeft: '30%' }}>
-              <div className="flex justify-between items-start mb-1.5">
-                <div className="h-1 w-6 rounded-full" style={{ backgroundColor: T.text, opacity: 0.2 }} />
-                <div className="h-1.5 w-5 rounded-full" style={{ backgroundColor: accentColor, opacity: 0.6 }} />
-              </div>
-              <div className="rounded px-1 py-0.5 mb-1.5" style={{ backgroundColor: T.clientBlockBg, border: `0.5px solid ${T.clientBlockBorder}` }}>
-                <div className="h-1 w-5 rounded-full mb-0.5" style={{ backgroundColor: T.text, opacity: 0.15 }} />
-                <div className="h-0.5 w-7 rounded-full" style={{ backgroundColor: T.textMuted, opacity: 0.1 }} />
-              </div>
-            </div>
-          </>)}
-
-          {/* ── MINIMALISTE ── */}
-          {T.id === 'minimaliste' && (<>
-            <div className="flex justify-between items-start mb-3">
-              <div className="h-2 w-7 rounded-full" style={{ backgroundColor: T.text, opacity: 0.1 }} />
-              <div className="h-1 w-5 rounded-full" style={{ backgroundColor: accentColor, opacity: 0.4 }} />
-            </div>
-            <div className="h-px mb-3" style={{ backgroundColor: T.borderLight }} />
-            <div className="space-y-0.5 mb-2">
-              <div className="h-0.5 w-4 rounded-full" style={{ backgroundColor: T.textMuted, opacity: 0.2 }} />
-              <div className="h-1 w-6 rounded-full" style={{ backgroundColor: T.text, opacity: 0.12 }} />
-            </div>
-          </>)}
-
-          {/* ── DUO ── */}
-          {T.id === 'duo' && (<>
-            <div className="flex -mx-1 -mt-1 mb-2 overflow-hidden rounded-md">
-              <div className="flex-1 px-1.5 py-1.5" style={{ backgroundColor: accentColor }}>
-                <div className="h-2 w-6 rounded-full" style={{ backgroundColor: contrastCol, opacity: 0.7 }} />
-                <div className="h-0.5 w-5 rounded-full mt-0.5" style={{ backgroundColor: contrastCol, opacity: 0.3 }} />
-              </div>
-              <div className="flex-1 px-1.5 py-1.5" style={{ backgroundColor: '#1e293b' }}>
-                <div className="h-1.5 w-5 rounded-full ml-auto" style={{ backgroundColor: contrastCol, opacity: 0.8 }} />
-                <div className="h-0.5 w-4 rounded-full ml-auto mt-0.5" style={{ backgroundColor: contrastCol, opacity: 0.4 }} />
-              </div>
-            </div>
-            <div className="flex gap-1.5 mb-2">
-              <div className="flex-1 space-y-0.5">
-                <div className="h-1 w-5 rounded-full" style={{ backgroundColor: T.text, opacity: 0.2 }} />
-                <div className="h-0.5 w-7 rounded-full" style={{ backgroundColor: T.textMuted, opacity: 0.12 }} />
-              </div>
-              <div className="flex-1 rounded px-1 py-0.5" style={{ backgroundColor: T.clientBlockBg, border: `0.5px solid ${T.clientBlockBorder}` }}>
-                <div className="h-1 w-4 rounded-full" style={{ backgroundColor: T.text, opacity: 0.15 }} />
-              </div>
-            </div>
-          </>)}
-
-          {/* ── LIGNE ── */}
-          {T.id === 'ligne' && (<>
-            <div className="flex justify-between items-start mb-1">
-              <div className="space-y-0.5">
-                <div className="h-1.5 w-6 rounded-full" style={{ backgroundColor: T.text, opacity: 0.15 }} />
-                <div className="h-0.5 w-9 rounded-full" style={{ backgroundColor: T.textMuted, opacity: 0.1 }} />
-              </div>
-              <div className="h-1.5 w-5 rounded-full" style={{ backgroundColor: accentColor, opacity: 0.6 }} />
-            </div>
-            <div className="h-[2px] mb-1.5 rounded-full" style={{ backgroundColor: accentColor, opacity: 0.5 }} />
-            <div className="space-y-0.5 mb-1.5 pb-1" style={{ borderBottom: `1.5px solid ${accentColor}40` }}>
-              <div className="h-1 w-5 rounded-full" style={{ backgroundColor: T.text, opacity: 0.15 }} />
-              <div className="h-0.5 w-8 rounded-full" style={{ backgroundColor: T.textMuted, opacity: 0.1 }} />
-            </div>
-          </>)}
-
-          {/* ── TIIME ── */}
-          {T.id === 'tiime' && (<>
-            <div className="flex justify-between items-start mb-2">
-              <div className="space-y-0.5">
-                <div className="h-2 w-8 rounded" style={{ backgroundColor: '#bfcee1', opacity: 0.4 }} />
-                <div className="h-0.5 w-10 rounded-full" style={{ backgroundColor: '#88A0BF', opacity: 0.2 }} />
-                <div className="h-0.5 w-7 rounded-full" style={{ backgroundColor: '#88A0BF', opacity: 0.15 }} />
-              </div>
-              <div className="space-y-0.5 mt-2">
-                <div className="h-1 w-6 rounded-full border border-dashed" style={{ borderColor: '#bfcee1' }} />
-                <div className="h-1 w-8 rounded-full border border-dashed" style={{ borderColor: '#bfcee1' }} />
-              </div>
-            </div>
-            <div className="mb-1.5 pb-1">
-              <div className="h-1 w-5 rounded-full" style={{ backgroundColor: accentColor, opacity: 0.6 }} />
-            </div>
-          </>)}
-
-          {/* ── Common: table + totals ── */}
-          <div style={T.id === 'lateral' ? { marginLeft: '30%' } : undefined} className="flex-1 flex flex-col">
-            <>
-              <div className="px-0.5 py-0.5 mb-px" style={{ backgroundColor: accentColor, borderRadius: T.id === 'compact' ? '0' : '2px 2px 0 0' }}>
-                <div className="flex gap-1">
-                  <div className="h-0.5 w-4 rounded-full" style={{ backgroundColor: contrastCol, opacity: 0.6 }} />
-                  <div className="flex-1" />
-                  <div className="h-0.5 w-2 rounded-full" style={{ backgroundColor: contrastCol, opacity: 0.6 }} />
-                </div>
-              </div>
-              {[0, 1, 2].map((i) => (
-                <div key={i} className="px-0.5 py-[2px]" style={{ backgroundColor: i % 2 === 0 ? T.rowEven : T.rowOdd, borderBottom: `0.5px solid ${T.borderLight}` }}>
-                  <div className="flex gap-0.5 items-center">
-                    <div className="h-0.5 rounded-full" style={{ backgroundColor: T.text, opacity: 0.15, width: `${8 + i * 2}px` }} />
-                    <div className="flex-1" />
-                    <div className="h-0.5 w-2 rounded-full" style={{ backgroundColor: T.text, opacity: 0.1 }} />
-                  </div>
-                </div>
-              ))}
-            </>
-            <div className="flex-1" />
-            <div className="flex justify-end mt-1">
-              <div className="rounded px-1 py-0.5" style={{ backgroundColor: `${accentColor}15`, borderRadius: T.id === 'compact' ? '0' : '3px' }}>
-                <div className="h-1 w-6 rounded-full" style={{ backgroundColor: accentColor, opacity: 0.5 }} />
-              </div>
-            </div>
-            <div className="mt-1 pt-0.5" style={{ borderTop: `0.5px solid ${T.footerBorder}` }}>
-              <div className="h-0.5 w-full rounded-full" style={{ backgroundColor: T.textFooter, opacity: 0.15 }} />
-            </div>
-          </div>
-        </div>
-
-        {selected && (
-          <div className="absolute top-1.5 right-1.5">
-            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary shadow">
-              <Check className="h-3 w-3 text-primary-foreground" />
-            </div>
-          </div>
-        )}
-      </div>
-      <p className={`text-[11px] mt-1.5 font-medium transition-colors ${selected ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'}`}>
-        {T.name}
-      </p>
-      {isLg && (
-        <p className="text-[10px] text-muted-foreground mt-0.5">{T.description}</p>
-      )}
-    </Wrapper>
-  )
-}
 
 /* ═══════════════════════════════════════════════════════════
    TemplateModal
@@ -365,7 +101,7 @@ function TemplateModal({
             <div className="flex items-center justify-between px-6 py-4 border-b border-border">
               <div>
                 <h2 className="text-lg font-semibold text-foreground">Choisir un modele</h2>
-                <p className="text-sm text-muted-foreground mt-0.5">11 modeles de mise en page pour vos documents</p>
+                <p className="text-sm text-muted-foreground mt-0.5">9 modeles de mise en page pour vos documents</p>
               </div>
               <button onClick={onClose} className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
                 <X className="h-4 w-4" />
@@ -436,7 +172,7 @@ export default function InvoiceSettingsPage() {
         </div>
         {/* Tabs */}
         <div className="flex gap-2">
-          {[...Array(3)].map((_, i) => (
+          {[...Array(4)].map((_, i) => (
             <Skeleton key={i} className="h-9 w-28 rounded-lg" />
           ))}
         </div>
@@ -831,6 +567,175 @@ export default function InvoiceSettingsPage() {
                               <p className="text-sm font-medium text-foreground">{method.name}</p>
                               <p className="text-xs text-muted-foreground">{method.desc}</p>
                             </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </>)}
+
+              {/* ═══════════════════════════════════════
+                   TAB: VALEURS PAR DEFAUT
+                   ═══════════════════════════════════════ */}
+              {activeTab === 'defauts' && (<>
+                <Card className="overflow-hidden border-border/50">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                        <ClipboardList className="h-4.5 w-4.5 text-primary" />
+                      </div>
+                      <div>
+                        <h2 className="text-base font-semibold text-foreground">Valeurs par defaut des devis</h2>
+                        <p className="text-xs text-muted-foreground">Pre-remplissage automatique lors de la creation d&apos;un devis</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      {/* Default Subject */}
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">Objet par defaut</label>
+                        <Input
+                          placeholder="Ex: Developpement site web"
+                          value={settings.defaultSubject || ''}
+                          onChange={(e) => updateSettings({ defaultSubject: e.target.value || null })}
+                          className="text-sm"
+                        />
+                      </div>
+
+                      {/* Default Acceptance Conditions */}
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">Conditions d&apos;acceptation</label>
+                        <textarea
+                          placeholder="Conditions d'acceptation par defaut..."
+                          value={settings.defaultAcceptanceConditions || ''}
+                          onChange={(e) => updateSettings({ defaultAcceptanceConditions: e.target.value || null })}
+                          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-y min-h-[60px]"
+                          rows={2}
+                        />
+                      </div>
+
+                      {/* Default Free Field */}
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">Champ libre</label>
+                        <textarea
+                          placeholder="Texte supplementaire par defaut..."
+                          value={settings.defaultFreeField || ''}
+                          onChange={(e) => updateSettings({ defaultFreeField: e.target.value || null })}
+                          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-y min-h-[60px]"
+                          rows={2}
+                        />
+                      </div>
+
+                      {/* Default Footer Text */}
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">Pied de page personnalise</label>
+                        <Input
+                          placeholder="Ex: Conditions generales de vente..."
+                          value={settings.defaultFooterText || ''}
+                          onChange={(e) => updateSettings({ defaultFooterText: e.target.value?.slice(0, 50) || null })}
+                          className="text-sm"
+                          maxLength={50}
+                        />
+                        <p className="text-[10px] text-muted-foreground mt-1">50 caracteres max.</p>
+                      </div>
+
+                      <Separator />
+
+                      {/* Toggle options */}
+                      {[
+                        { key: 'defaultSignatureField' as const, label: 'Champ de signature', desc: 'Afficher les zones de signature emetteur/client' },
+                        { key: 'defaultShowNotes' as const, label: 'Notes et conditions', desc: 'Afficher la zone de notes et conditions' },
+                        { key: 'defaultVatExempt' as const, label: 'Exoneration de TVA', desc: 'Mention "TVA non applicable, art. 293 B du CGI"' },
+                        { key: 'defaultShowDeliveryAddress' as const, label: 'Adresse de livraison', desc: 'Afficher un champ adresse de livraison' },
+                      ].map((opt) => (
+                        <div key={opt.key} className="flex items-center justify-between rounded-xl border-2 border-border p-3">
+                          <div>
+                            <p className="text-sm font-medium text-foreground">{opt.label}</p>
+                            <p className="text-xs text-muted-foreground">{opt.desc}</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => updateSettings({ [opt.key]: !settings[opt.key] })}
+                            className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors shrink-0 ${
+                              settings[opt.key] ? 'bg-primary' : 'bg-muted-foreground/30'
+                            }`}
+                          >
+                            <span className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform shadow-sm ${
+                              settings[opt.key] ? 'translate-x-[18px]' : 'translate-x-[3px]'
+                            }`} />
+                          </button>
+                        </div>
+                      ))}
+
+                      <Separator />
+
+                      {/* Default Language */}
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">Langue par defaut</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {[
+                            { id: 'fr', label: 'Francais' },
+                            { id: 'en', label: 'English' },
+                          ].map((lang) => (
+                            <button key={lang.id} onClick={() => updateSettings({ defaultLanguage: lang.id })}
+                              className={`rounded-xl border-2 p-3 text-left transition-all ${
+                                settings.defaultLanguage === lang.id ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
+                              }`}>
+                              <p className="text-sm font-medium text-foreground">{lang.label}</p>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Filename Patterns */}
+                <Card className="overflow-hidden border-border/50">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                        <FileText className="h-4.5 w-4.5 text-primary" />
+                      </div>
+                      <div>
+                        <h2 className="text-base font-semibold text-foreground">Nommage des fichiers</h2>
+                        <p className="text-xs text-muted-foreground">Format du nom de fichier lors de l&apos;export PDF</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">Nom de fichier des devis</label>
+                        <Input
+                          placeholder="DEV-{numero}"
+                          value={settings.quoteFilenamePattern}
+                          onChange={(e) => updateSettings({ quoteFilenamePattern: e.target.value })}
+                          className="text-sm font-mono"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">Nom de fichier des factures</label>
+                        <Input
+                          placeholder="FAC-{numero}"
+                          value={settings.invoiceFilenamePattern}
+                          onChange={(e) => updateSettings({ invoiceFilenamePattern: e.target.value })}
+                          className="text-sm font-mono"
+                        />
+                      </div>
+
+                      <div className="rounded-lg border border-border p-3 space-y-2">
+                        <p className="text-xs font-medium text-foreground mb-2">Variables disponibles</p>
+                        {[
+                          { var: '{numero}', desc: 'Numero du document (ex: DEV-001)' },
+                          { var: '{date}', desc: 'Date d\'emission (ex: 2026-03-15)' },
+                          { var: '{client}', desc: 'Nom du client' },
+                          { var: '{entreprise}', desc: 'Nom de votre entreprise' },
+                        ].map((v) => (
+                          <div key={v.var} className="flex items-center gap-2">
+                            <code className="text-[11px] font-mono bg-muted px-1.5 py-0.5 rounded text-primary">{v.var}</code>
+                            <span className="text-[11px] text-muted-foreground">{v.desc}</span>
                           </div>
                         ))}
                       </div>

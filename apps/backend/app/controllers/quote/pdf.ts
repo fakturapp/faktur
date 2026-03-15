@@ -41,6 +41,23 @@ function resolveLogoToBase64(logoUrl: string | null): string | null {
   return `data:${mime};base64,${base64}`
 }
 
+/**
+ * Resolve a filename pattern like "DEV-{numero}" into an actual filename.
+ * Supported variables: {numero}, {date}, {client}, {entreprise}
+ */
+function resolveFilenamePattern(
+  pattern: string,
+  vars: { numero: string; date: string; client: string; entreprise: string }
+): string {
+  return pattern
+    .replace(/\{numero\}/gi, vars.numero)
+    .replace(/\{date\}/gi, vars.date)
+    .replace(/\{client\}/gi, vars.client)
+    .replace(/\{entreprise\}/gi, vars.entreprise)
+    .replace(/[^a-zA-Z0-9àâäéèêëïîôùûüçÀÂÄÉÈÊËÏÎÔÙÛÜÇ\-_.\s]/g, '')
+    .replace(/\s+/g, '_')
+}
+
 export default class Pdf {
   async handle({ auth, params, response }: HttpContext) {
     const user = auth.user!
@@ -159,7 +176,14 @@ export default class Pdf {
     const html = renderQuoteHtml(quoteData, linesData, clientData, companyData, settingsData)
     const pdfBuffer = await generatePdf(html)
 
-    const filename = `${quote.quoteNumber.replace(/[^a-zA-Z0-9-_]/g, '_')}.pdf`
+    const filenamePattern = invoiceSettings?.quoteFilenamePattern || 'DEV-{numero}'
+    const resolvedName = resolveFilenamePattern(filenamePattern, {
+      numero: quote.quoteNumber,
+      date: quote.issueDate ? new Date(quote.issueDate.toString()).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10),
+      client: quote.client?.displayName || quote.client?.companyName || 'client',
+      entreprise: company?.legalName || company?.tradeName || 'entreprise',
+    })
+    const filename = `${resolvedName}.pdf`
 
     // If e-invoicing is enabled, generate Factur-X XML and include metadata
     if (invoiceSettings?.eInvoicingEnabled) {
