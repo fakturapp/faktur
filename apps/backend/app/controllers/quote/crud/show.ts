@@ -1,4 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import { DateTime } from 'luxon'
 import Quote from '#models/quote/quote'
 
 export default class Show {
@@ -19,6 +20,15 @@ export default class Show {
 
     if (!quote) {
       return response.notFound({ message: 'Quote not found' })
+    }
+
+    // Auto-transition sent → expired when validity date has passed
+    if (quote.status === 'sent' && quote.validityDate) {
+      const today = DateTime.now().toSQLDate()!
+      if (quote.validityDate < today) {
+        quote.status = 'expired'
+        await quote.save()
+      }
     }
 
     return response.ok({

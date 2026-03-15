@@ -1,4 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import { DateTime } from 'luxon'
 import Quote from '#models/quote/quote'
 
 export default class List {
@@ -9,6 +10,14 @@ export default class List {
     if (!teamId) {
       return response.badRequest({ message: 'No team selected' })
     }
+
+    // Auto-transition sent → expired when validity date has passed
+    await Quote.query()
+      .where('teamId', teamId)
+      .where('status', 'sent')
+      .whereNotNull('validityDate')
+      .where('validityDate', '<', DateTime.now().toSQLDate()!)
+      .update({ status: 'expired' })
 
     const search = request.input('search', '')
     const status = request.input('status', '')

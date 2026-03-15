@@ -1,4 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import { DateTime } from 'luxon'
 import Invoice from '#models/invoice/invoice'
 
 export default class List {
@@ -9,6 +10,14 @@ export default class List {
     if (!teamId) {
       return response.badRequest({ message: 'No team selected' })
     }
+
+    // Auto-transition sent → overdue when due date has passed
+    await Invoice.query()
+      .where('teamId', teamId)
+      .where('status', 'sent')
+      .whereNotNull('dueDate')
+      .where('dueDate', '<', DateTime.now().toSQLDate()!)
+      .update({ status: 'overdue' })
 
     const search = request.input('search', '')
     const status = request.input('status', '')
