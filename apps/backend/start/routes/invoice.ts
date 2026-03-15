@@ -13,6 +13,8 @@ const InvoiceDocumentCount = () => import('#controllers/invoice/document_count')
 const InvoiceSetNextNumber = () => import('#controllers/invoice/set_next_number')
 const InvoiceUpdateStatus = () => import('#controllers/invoice/update_status')
 const InvoiceUnlinkQuote = () => import('#controllers/invoice/unlink_quote')
+const InvoiceDuplicate = () => import('#controllers/invoice/duplicate')
+const InvoiceUpdateComment = () => import('#controllers/invoice/update_comment')
 
 router
   .group(() => {
@@ -26,6 +28,8 @@ router
     router.post('/convert-quote/:id', [InvoiceConvertQuote, 'handle'])
     router.patch('/:id/status', [InvoiceUpdateStatus, 'handle'])
     router.patch('/:id/unlink-quote', [InvoiceUnlinkQuote, 'handle'])
+    router.patch('/:id/comment', [InvoiceUpdateComment, 'handle'])
+    router.post('/:id/duplicate', [InvoiceDuplicate, 'handle'])
     router.put('/:id', [InvoiceUpdate, 'handle'])
     router.delete('/:id', [InvoiceDelete, 'handle'])
   })

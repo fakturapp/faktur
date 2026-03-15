@@ -11,6 +11,9 @@ const QuotePdf = () => import('#controllers/quote/pdf')
 const QuoteFacturXml = () => import('#controllers/quote/pdf').then((m) => ({ default: m.FacturXml }))
 const QuoteDocumentCount = () => import('#controllers/quote/document_count')
 const QuoteSetNextNumber = () => import('#controllers/quote/set_next_number')
+const QuoteUpdateStatus = () => import('#controllers/quote/update_status')
+const QuoteDuplicate = () => import('#controllers/quote/duplicate')
+const QuoteUpdateComment = () => import('#controllers/quote/update_comment')
 
 router
   .group(() => {
@@ -22,6 +25,9 @@ router
     router.get('/:id/facturx', [QuoteFacturXml, 'handle'])
     router.get('/:id', [QuoteShow, 'handle'])
     router.post('/', [QuoteCreate, 'handle'])
+    router.patch('/:id/status', [QuoteUpdateStatus, 'handle'])
+    router.patch('/:id/comment', [QuoteUpdateComment, 'handle'])
+    router.post('/:id/duplicate', [QuoteDuplicate, 'handle'])
     router.put('/:id', [QuoteUpdate, 'handle'])
     router.delete('/:id', [QuoteDelete, 'handle'])
   })

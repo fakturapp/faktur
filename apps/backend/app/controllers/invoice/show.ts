@@ -57,6 +57,7 @@ export default class Show {
         total: invoice.total,
         sourceQuoteId: invoice.sourceQuoteId,
         sourceQuote,
+        comment: invoice.comment,
         paymentTerms: invoice.paymentTerms,
         paidDate: invoice.paidDate,
         clientId: invoice.clientId,
