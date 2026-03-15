@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
+import Link from 'next/link'
 import { useRouter, useParams } from 'next/navigation'
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import { Button } from '@/components/ui/button'
@@ -11,7 +12,7 @@ import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { api } from '@/lib/api'
 import { A4Sheet, ClientModal, type QuoteLine, type ClientInfo, type CompanyInfo } from '@/components/quotes/a4-sheet'
 import { QuoteOptionsPanel } from '@/components/quotes/quote-options'
-import { Save, ArrowLeft, Eye, Pencil, SlidersHorizontal, Download } from 'lucide-react'
+import { Save, ArrowLeft, Eye, Pencil, SlidersHorizontal, Download, Link2, Unlink, Landmark } from 'lucide-react'
 import { Dialog, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
 
@@ -45,6 +46,9 @@ export default function EditInvoicePage() {
   const [accentColor, setAccentColor] = useState('#6366f1')
   const [showOptions, setShowOptions] = useState(true)
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
+  const [sourceQuote, setSourceQuote] = useState<{ id: string; quoteNumber: string } | null>(null)
+  const [unlinking, setUnlinking] = useState(false)
+  const [bankInfo, setBankInfo] = useState<{ iban: string | null; bic: string | null; bankName: string | null } | null>(null)
 
   const [lines, setLines] = useState<QuoteLine[]>([
     { id: generateId(), type: 'standard', description: '', saleType: '', quantity: 1, unit: '', unitPrice: 0, vatRate: 20 },
@@ -89,7 +93,13 @@ export default function EditInvoicePage() {
         api.get<{ company: CompanyInfo }>('/company'),
       ])
 
-      if (companyRes.data?.company) setCompany(companyRes.data.company)
+      if (companyRes.data?.company) {
+        setCompany(companyRes.data.company)
+        const c = companyRes.data.company as any
+        if (c.iban || c.bic || c.bankName) {
+          setBankInfo({ iban: c.iban, bic: c.bic, bankName: c.bankName })
+        }
+      }
 
       if (invoiceRes.data?.invoice) {
         const inv = invoiceRes.data.invoice
@@ -125,6 +135,7 @@ export default function EditInvoicePage() {
           facturX: inv.facturX || false,
         })
 
+        if (inv.sourceQuote) setSourceQuote(inv.sourceQuote)
         if (inv.client) setSelectedClient(inv.client)
 
         if (inv.lines && inv.lines.length > 0) {
@@ -302,6 +313,29 @@ export default function EditInvoicePage() {
     URL.revokeObjectURL(url)
   }
 
+  async function handleUnlinkQuote() {
+    setUnlinking(true)
+    const { error } = await api.patch(`/invoices/${invoiceId}/unlink-quote`, {})
+    setUnlinking(false)
+    if (error) {
+      toast(error, 'error')
+      return
+    }
+    setSourceQuote(null)
+    toast('Devis delie', 'success')
+  }
+
+  function maskIban(iban: string) {
+    const clean = iban.replace(/\s/g, '')
+    if (clean.length <= 8) return '••••  ••••'
+    return clean.slice(0, 4) + ' •••• •••• ' + clean.slice(-4)
+  }
+
+  function maskBic(bic: string) {
+    if (bic.length <= 4) return '••••••••'
+    return bic.slice(0, 4) + '••••'
+  }
+
   // Loading skeleton
   if (loading || settingsLoading) {
     return (
@@ -390,6 +424,46 @@ export default function EditInvoicePage() {
           </div>
         </div>
       </motion.div>
+
+      {/* Linked quote + Bank info */}
+      {(sourceQuote || bankInfo) && (
+        <motion.div variants={fadeUp} custom={0.5} className="flex flex-wrap gap-3">
+          {sourceQuote && (
+            <div className="flex items-center gap-2.5 rounded-xl border border-border bg-card/50 px-4 py-2.5">
+              <Link2 className="h-4 w-4 text-primary shrink-0" />
+              <span className="text-sm text-muted-foreground">Lie au devis</span>
+              <Link
+                href={`/dashboard/quotes/${sourceQuote.id}/edit`}
+                className="text-sm font-medium text-primary hover:underline"
+              >
+                {sourceQuote.quoteNumber}
+              </Link>
+              <button
+                onClick={handleUnlinkQuote}
+                disabled={unlinking}
+                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors ml-1"
+                title="Delier le devis"
+              >
+                <Unlink className={`h-3.5 w-3.5 ${unlinking ? 'animate-pulse' : ''}`} />
+              </button>
+            </div>
+          )}
+          {bankInfo && (bankInfo.iban || bankInfo.bic || bankInfo.bankName) && (
+            <div className="flex items-center gap-3 rounded-xl border border-border bg-card/50 px-4 py-2.5">
+              <Landmark className="h-4 w-4 text-muted-foreground shrink-0" />
+              {bankInfo.bankName && (
+                <span className="text-sm text-foreground font-medium">{bankInfo.bankName}</span>
+              )}
+              {bankInfo.iban && (
+                <span className="text-xs text-muted-foreground font-mono">{maskIban(bankInfo.iban)}</span>
+              )}
+              {bankInfo.bic && (
+                <span className="text-xs text-muted-foreground font-mono">{maskBic(bankInfo.bic)}</span>
+              )}
+            </div>
+          )}
+        </motion.div>
+      )}
 
       {/* Main content */}
       <div className="flex flex-col xl:flex-row gap-5 max-w-[1400px] mx-auto">

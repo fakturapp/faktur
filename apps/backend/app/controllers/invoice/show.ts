@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Invoice from '#models/invoice/invoice'
+import Quote from '#models/quote/quote'
 
 export default class Show {
   async handle({ auth, params, response }: HttpContext) {
@@ -19,6 +20,14 @@ export default class Show {
 
     if (!invoice) {
       return response.notFound({ message: 'Invoice not found' })
+    }
+
+    let sourceQuote: { id: string; quoteNumber: string } | null = null
+    if (invoice.sourceQuoteId) {
+      const quote = await Quote.find(invoice.sourceQuoteId)
+      if (quote) {
+        sourceQuote = { id: quote.id, quoteNumber: quote.quoteNumber }
+      }
     }
 
     return response.ok({
@@ -47,6 +56,7 @@ export default class Show {
         taxAmount: invoice.taxAmount,
         total: invoice.total,
         sourceQuoteId: invoice.sourceQuoteId,
+        sourceQuote,
         paymentTerms: invoice.paymentTerms,
         paidDate: invoice.paidDate,
         clientId: invoice.clientId,

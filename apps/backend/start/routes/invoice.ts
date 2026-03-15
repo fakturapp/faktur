@@ -11,6 +11,8 @@ const InvoicePdf = () => import('#controllers/invoice/pdf')
 const InvoiceConvertQuote = () => import('#controllers/invoice/convert_quote')
 const InvoiceDocumentCount = () => import('#controllers/invoice/document_count')
 const InvoiceSetNextNumber = () => import('#controllers/invoice/set_next_number')
+const InvoiceUpdateStatus = () => import('#controllers/invoice/update_status')
+const InvoiceUnlinkQuote = () => import('#controllers/invoice/unlink_quote')
 
 router
   .group(() => {
@@ -22,6 +24,8 @@ router
     router.get('/:id', [InvoiceShow, 'handle'])
     router.post('/', [InvoiceCreate, 'handle'])
     router.post('/convert-quote/:id', [InvoiceConvertQuote, 'handle'])
+    router.patch('/:id/status', [InvoiceUpdateStatus, 'handle'])
+    router.patch('/:id/unlink-quote', [InvoiceUnlinkQuote, 'handle'])
     router.put('/:id', [InvoiceUpdate, 'handle'])
     router.delete('/:id', [InvoiceDelete, 'handle'])
   })
