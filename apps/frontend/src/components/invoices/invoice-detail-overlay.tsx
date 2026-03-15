@@ -1,13 +1,15 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Spinner } from '@/components/ui/spinner'
 import { Dropdown, DropdownItem, DropdownSeparator } from '@/components/ui/dropdown'
 import { StatusDropdown, invoiceStatusOptions } from '@/components/shared/status-dropdown'
 import { useToast } from '@/components/ui/toast'
+import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { api } from '@/lib/api'
+import { A4Sheet, type QuoteLine, type ClientInfo, type CompanyInfo } from '@/components/quotes/a4-sheet'
 import {
   X,
   Send,
@@ -28,6 +30,9 @@ interface InvoiceDetail {
   issueDate: string
   dueDate: string | null
   billingType: 'quick' | 'detailed'
+  accentColor: string | null
+  logoUrl: string | null
+  language: string | null
   subtotal: number
   taxAmount: number
   total: number
@@ -36,18 +41,19 @@ interface InvoiceDetail {
   sourceQuoteId: string | null
   sourceQuote: { id: string; quoteNumber: string } | null
   paymentTerms: string | null
-  client: {
-    id: string
-    displayName: string
-    companyName: string | null
-    email: string | null
-    phone: string | null
-    address: string | null
-    postalCode: string | null
-    city: string | null
-    country: string | null
-  } | null
+  documentTitle: string | null
+  acceptanceConditions: string | null
+  signatureField: boolean
+  freeField: string | null
+  globalDiscountType: string | null
+  globalDiscountValue: number | null
+  deliveryAddress: string | null
+  clientSiren: string | null
+  clientVatNumber: string | null
+  clientId: string | null
+  client: ClientInfo | null
   lines: {
+    id: string
     description: string
     saleType: string | null
     quantity: number
@@ -58,21 +64,6 @@ interface InvoiceDetail {
   }[]
 }
 
-interface CompanyInfo {
-  legalName: string
-  addressLine1: string | null
-  city: string | null
-  postalCode: string | null
-  country: string
-  phone: string | null
-  email: string | null
-  siren: string | null
-  vatNumber: string | null
-  iban: string | null
-  bic: string | null
-  bankName: string | null
-}
-
 interface InvoiceDetailOverlayProps {
   invoiceId: string | null
   onClose: () => void
@@ -80,9 +71,12 @@ interface InvoiceDetailOverlayProps {
   onDelete: (id: string) => void
 }
 
+const noop = () => {}
+
 export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDelete }: InvoiceDetailOverlayProps) {
   const router = useRouter()
   const { toast } = useToast()
+  const { settings: invoiceSettings, companyLogoUrl } = useInvoiceSettings()
   const [loading, setLoading] = useState(true)
   const [invoice, setInvoice] = useState<InvoiceDetail | null>(null)
   const [company, setCompany] = useState<CompanyInfo | null>(null)
@@ -110,6 +104,58 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
       setLoading(false)
     })
   }, [invoiceId])
+
+  // Convert API lines to QuoteLine format for A4Sheet
+  const sheetLines: QuoteLine[] = useMemo(() => {
+    if (!invoice?.lines) return []
+    return invoice.lines.map((l) => ({
+      id: l.id || Math.random().toString(36).slice(2),
+      type: (l.saleType === 'section' ? 'section' : 'standard') as 'standard' | 'section',
+      description: l.description || '',
+      saleType: l.saleType === 'section' ? '' : l.saleType || '',
+      quantity: l.quantity || 1,
+      unit: l.unit || '',
+      unitPrice: l.unitPrice || 0,
+      vatRate: l.vatRate || 0,
+    }))
+  }, [invoice?.lines])
+
+  // Calculate tvaBreakdown for A4Sheet
+  const { subtotal, taxAmount, discountAmount, total, tvaBreakdown } = useMemo(() => {
+    if (!invoice) return { subtotal: 0, taxAmount: 0, discountAmount: 0, total: 0, tvaBreakdown: [] }
+    const billingType = invoice.billingType
+    let sub = 0, tax = 0
+    const tvaMap: Record<number, { base: number; amount: number }> = {}
+
+    for (const line of sheetLines) {
+      if (line.type === 'section') continue
+      const lt = billingType === 'quick' ? line.unitPrice : line.quantity * line.unitPrice
+      const lTax = billingType === 'detailed' ? lt * (line.vatRate / 100) : 0
+      sub += lt; tax += lTax
+      if (billingType === 'detailed') {
+        if (!tvaMap[line.vatRate]) tvaMap[line.vatRate] = { base: 0, amount: 0 }
+        tvaMap[line.vatRate].base += lt; tvaMap[line.vatRate].amount += lTax
+      }
+    }
+
+    let disc = 0
+    const discType = invoice.globalDiscountType || 'none'
+    const discVal = invoice.globalDiscountValue || 0
+    if (discType === 'percentage' && discVal > 0) disc = sub * (discVal / 100)
+    else if (discType === 'fixed' && discVal > 0) disc = discVal
+
+    return {
+      subtotal: Math.round(sub * 100) / 100,
+      taxAmount: Math.round(tax * 100) / 100,
+      discountAmount: Math.round(disc * 100) / 100,
+      total: Math.round((sub + tax - disc) * 100) / 100,
+      tvaBreakdown: Object.entries(tvaMap).map(([rate, data]) => ({
+        rate: Number(rate),
+        base: Math.round(data.base * 100) / 100,
+        amount: Math.round(data.amount * 100) / 100,
+      })),
+    }
+  }, [invoice, sheetLines])
 
   const handleCommentChange = useCallback((value: string) => {
     setComment(value)
@@ -186,13 +232,9 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
     URL.revokeObjectURL(url)
   }
 
-  function maskIban(iban: string) {
-    const clean = iban.replace(/\s/g, '')
-    if (clean.length <= 8) return '****  ****'
-    return clean.slice(0, 4) + ' **** **** ' + clean.slice(-4)
-  }
-
   if (!invoiceId) return null
+
+  const effectiveLogoUrl = invoice?.logoUrl || (invoiceSettings.logoSource === 'company' ? companyLogoUrl : invoiceSettings.logoUrl)
 
   return (
     <AnimatePresence>
@@ -207,123 +249,79 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
         <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" onClick={onClose} />
 
         {/* Content */}
-        <div className="relative z-10 flex h-full items-stretch justify-center p-6">
-          {/* Preview area */}
-          <div className="flex-1 flex items-start justify-end pr-4 pt-4 overflow-auto">
+        <div className="relative z-10 flex h-full items-stretch">
+          {/* Preview area — centered */}
+          <div className="flex-1 flex items-center justify-center overflow-auto py-6 px-4">
             {loading ? (
-              <div className="w-[600px] bg-white rounded-lg shadow-xl p-8 flex items-center justify-center" style={{ minHeight: 800 }}>
+              <div className="w-[600px] aspect-[210/297] bg-white rounded-xl shadow-xl flex items-center justify-center">
                 <Spinner size="lg" />
               </div>
             ) : invoice ? (
-              <div
-                className="w-[600px] bg-white text-[#334155] rounded-lg shadow-xl origin-top-right"
-                style={{ transform: 'scale(0.82)', minHeight: 800, padding: '40px' }}
-              >
-                {/* Company + Client */}
-                <div className="flex justify-between mb-8">
-                  <div className="max-w-[260px]">
-                    <p className="font-bold text-sm">{company?.legalName || 'Votre entreprise'}</p>
-                    {company?.addressLine1 && <p className="text-xs text-[#64748b]">{company.addressLine1}</p>}
-                    {company?.postalCode && company?.city && <p className="text-xs text-[#64748b]">{company.postalCode} {company.city}</p>}
-                    {company?.phone && <p className="text-xs text-[#64748b]">{company.phone}</p>}
-                    {company?.email && <p className="text-xs text-[#64748b]">{company.email}</p>}
-                    {company?.siren && <p className="text-xs text-[#64748b]">SIREN : {company.siren}</p>}
-                  </div>
-                  <div className="max-w-[220px] pt-12">
-                    {invoice.client && (
-                      <>
-                        <p className="font-bold text-sm">{invoice.client.displayName}</p>
-                        {invoice.client.address && <p className="text-xs text-[#64748b]">{invoice.client.address}</p>}
-                        {invoice.client.postalCode && invoice.client.city && (
-                          <p className="text-xs text-[#64748b]">{invoice.client.postalCode} {invoice.client.city}</p>
-                        )}
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                {/* Metadata */}
-                <div className="flex justify-between mb-6">
-                  <p className="font-bold text-sm">{invoice.invoiceNumber}</p>
-                  <div className="text-right text-xs text-[#64748b]">
-                    <p>Emission : {new Date(invoice.issueDate).toLocaleDateString('fr-FR')}</p>
-                    {invoice.dueDate && <p>Echeance : {new Date(invoice.dueDate).toLocaleDateString('fr-FR')}</p>}
-                    {invoice.paymentTerms && <p>Reglement : {invoice.paymentTerms}</p>}
-                  </div>
-                </div>
-
-                {invoice.subject && <p className="text-xs text-[#64748b] mb-4">Objet : {invoice.subject}</p>}
-
-                {/* Lines table */}
-                <div className="mb-6">
-                  <div className="flex bg-indigo-500 text-white text-[10px] font-bold rounded-t">
-                    <div className="flex-1 px-2 py-1.5">Designation</div>
-                    {invoice.billingType === 'detailed' && (
-                      <>
-                        <div className="w-12 px-2 py-1.5 text-center">Qte</div>
-                        <div className="w-16 px-2 py-1.5 text-right">P.U.</div>
-                        <div className="w-12 px-2 py-1.5 text-center">TVA</div>
-                      </>
-                    )}
-                    <div className="w-20 px-2 py-1.5 text-right">Montant</div>
-                  </div>
-                  {invoice.lines.filter(l => l.saleType !== 'section').map((line, i) => (
-                    <div key={i} className="flex text-[11px] border-b border-[#e2e8f0]">
-                      <div className="flex-1 px-2 py-1.5 truncate">{line.description}</div>
-                      {invoice.billingType === 'detailed' && (
-                        <>
-                          <div className="w-12 px-2 py-1.5 text-center">{line.quantity}</div>
-                          <div className="w-16 px-2 py-1.5 text-right">{Number(line.unitPrice).toLocaleString('fr-FR', { minimumFractionDigits: 2 })}</div>
-                          <div className="w-12 px-2 py-1.5 text-center">{line.vatRate}%</div>
-                        </>
-                      )}
-                      <div className="w-20 px-2 py-1.5 text-right">{Number(line.total).toLocaleString('fr-FR', { minimumFractionDigits: 2 })}</div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Totals */}
-                <div className="flex justify-end mb-8">
-                  <div className="w-56">
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-[#64748b]">Total HT</span>
-                      <span className="font-semibold">{Number(invoice.subtotal).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</span>
-                    </div>
-                    {invoice.taxAmount > 0 && (
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-[#64748b]">TVA</span>
-                        <span>{Number(invoice.taxAmount).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</span>
-                      </div>
-                    )}
-                    <div className="flex justify-between text-sm font-bold mt-2 pt-2 border-t border-[#e2e8f0]">
-                      <span>Total TTC</span>
-                      <span className="bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full text-xs font-bold">
-                        {Number(invoice.total).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Footer */}
-                <div className="text-[10px] text-[#94a3b8] mt-auto pt-4 border-t border-[#e2e8f0]">
-                  {company?.iban && <p>IBAN : {maskIban(company.iban)}</p>}
-                  {company?.bic && <p>BIC : {company.bic}</p>}
-                  {company?.bankName && <p>Banque : {company.bankName}</p>}
-                  {company?.vatNumber && <p className="mt-1">N. TVA : {company.vatNumber}</p>}
+              <div className="w-full max-w-[620px] shrink-0">
+                <A4Sheet
+                  mode="preview"
+                  logoUrl={effectiveLogoUrl}
+                  accentColor={invoice.accentColor || '#6366f1'}
+                  documentTitle={invoice.documentTitle || 'Facture'}
+                  documentType="invoice"
+                  quoteNumber={invoice.invoiceNumber}
+                  onQuoteNumberChange={noop}
+                  issueDate={invoice.issueDate || ''}
+                  validityDate={invoice.dueDate || ''}
+                  billingType={invoice.billingType}
+                  company={company}
+                  onCompanyFieldChange={noop}
+                  client={invoice.client}
+                  onClientClick={noop}
+                  onClearClient={noop}
+                  onClientFieldChange={noop}
+                  lines={sheetLines}
+                  onUpdateLine={noop}
+                  onAddLine={noop}
+                  onRemoveLine={noop}
+                  subtotal={subtotal}
+                  taxAmount={taxAmount}
+                  discountAmount={discountAmount}
+                  total={total}
+                  tvaBreakdown={tvaBreakdown}
+                  notes={invoice.notes || ''}
+                  onNotesChange={noop}
+                  acceptanceConditions={invoice.acceptanceConditions || ''}
+                  signatureField={invoice.signatureField}
+                  freeField={invoice.freeField || ''}
+                  deliveryAddress={invoice.deliveryAddress || ''}
+                  showDeliveryAddress={!!invoice.deliveryAddress}
+                  clientSiren={invoice.clientSiren || ''}
+                  showClientSiren={!!invoice.clientSiren}
+                  clientVatNumber={invoice.clientVatNumber || ''}
+                  showClientVatNumber={!!invoice.clientVatNumber}
+                  paymentMethods={invoiceSettings.paymentMethods}
+                  customPaymentMethod={invoiceSettings.customPaymentMethod}
+                  subject={invoice.subject || ''}
+                  onSubjectChange={noop}
+                  template={invoiceSettings.template}
+                  darkMode={invoiceSettings.darkMode}
+                  language={invoice.language || 'fr'}
+                  showNotes={!!invoice.notes}
+                  showSubject={!!invoice.subject}
+                  showAcceptanceConditions={!!invoice.acceptanceConditions}
+                  showFreeField={!!invoice.freeField}
+                  footerMode={invoiceSettings.footerMode}
+                  documentFont={invoiceSettings.documentFont}
+                />
+                {/* Download button */}
+                <div className="flex justify-center mt-3">
+                  <button
+                    onClick={handleDownloadPdf}
+                    disabled={downloading}
+                    className="h-9 px-4 rounded-full bg-card shadow-lg flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors border border-border"
+                  >
+                    <Download className={`h-4 w-4 ${downloading ? 'animate-pulse' : ''}`} />
+                    Telecharger PDF
+                  </button>
                 </div>
               </div>
             ) : null}
-
-            {/* Download button */}
-            {!loading && (
-              <button
-                onClick={handleDownloadPdf}
-                disabled={downloading}
-                className="ml-3 mt-2 h-9 w-9 rounded-full bg-card shadow-lg flex items-center justify-center text-muted-foreground hover:text-primary transition-colors shrink-0 border border-border"
-              >
-                <Download className={`h-4 w-4 ${downloading ? 'animate-pulse' : ''}`} />
-              </button>
-            )}
           </div>
 
           {/* Side panel */}
