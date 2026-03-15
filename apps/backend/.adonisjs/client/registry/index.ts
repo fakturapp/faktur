@@ -252,6 +252,12 @@ const routes = {
     tokens: [{"old":"/team/export","type":0,"val":"team","end":""},{"old":"/team/export","type":0,"val":"export","end":""}],
     types: placeholder as Registry['team_export']['types'],
   },
+  'team_import': {
+    methods: ["POST"],
+    pattern: '/team/import',
+    tokens: [{"old":"/team/import","type":0,"val":"team","end":""},{"old":"/team/import","type":0,"val":"import","end":""}],
+    types: placeholder as Registry['team_import']['types'],
+  },
   'team_members': {
     methods: ["GET","HEAD"],
     pattern: '/team/members',

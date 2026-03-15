@@ -47,6 +47,7 @@ export interface ApiDefinition {
   uploadIcon: typeof routes['upload_icon']
   teamSwitch: typeof routes['team_switch']
   teamExport: typeof routes['team_export']
+  teamImport: typeof routes['team_import']
   teamMembers: typeof routes['team_members']
   teamInvite: typeof routes['team_invite']
   acceptInvite: typeof routes['accept_invite']

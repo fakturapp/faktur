@@ -114,6 +114,7 @@ export const controllers = {
       Switch: () => import('#controllers/team/core/switch'),
       Delete: () => import('#controllers/team/core/delete'),
       Export: () => import('#controllers/team/core/export'),
+      Import: () => import('#controllers/team/core/import'),
     },
     members: {
       Members: () => import('#controllers/team/members/members'),

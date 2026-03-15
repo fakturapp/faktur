@@ -45,6 +45,7 @@ export type ScannedRoutes = {
     'upload_icon': { paramsTuple?: []; params?: {} }
     'team_switch': { paramsTuple?: []; params?: {} }
     'team_export': { paramsTuple?: []; params?: {} }
+    'team_import': { paramsTuple?: []; params?: {} }
     'team_members': { paramsTuple?: []; params?: {} }
     'team_invite': { paramsTuple?: []; params?: {} }
     'accept_invite': { paramsTuple?: []; params?: {} }
@@ -123,6 +124,7 @@ export type ScannedRoutes = {
     'upload_icon': { paramsTuple?: []; params?: {} }
     'team_switch': { paramsTuple?: []; params?: {} }
     'team_export': { paramsTuple?: []; params?: {} }
+    'team_import': { paramsTuple?: []; params?: {} }
     'team_invite': { paramsTuple?: []; params?: {} }
     'accept_invite': { paramsTuple?: []; params?: {} }
     'transfer_ownership': { paramsTuple?: []; params?: {} }

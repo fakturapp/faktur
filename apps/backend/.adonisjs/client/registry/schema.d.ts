@@ -499,6 +499,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/team/core/export').default['handle']>>>
     }
   }
+  'team_import': {
+    methods: ["POST"]
+    pattern: '/team/import'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/team/core/import').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/team/core/import').default['handle']>>>
+    }
+  }
   'team_members': {
     methods: ["GET","HEAD"]
     pattern: '/team/members'
