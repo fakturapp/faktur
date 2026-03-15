@@ -653,7 +653,7 @@ function renderClientBlock(client: ClientData | null, quote: QuoteData, T: Templ
    ═══════════════════════════════════════════════════════════ */
 
 function renderDateBar(
-  quote: QuoteData, docTitle: string, T: TemplateConfig, _ac: string,
+  quote: QuoteData, docTitle: string, _T: TemplateConfig, _ac: string,
   lang: string, i: I18n, isClassique: boolean,
 ): string {
   if (isClassique) {
@@ -791,7 +791,7 @@ function renderPaymentMethods(
    ═══════════════════════════════════════════════════════════ */
 
 function renderLegalFooter(
-  company: CompanyData | null, quote: QuoteData, T: TemplateConfig, lang: string, i: I18n, isClassique: boolean,
+  company: CompanyData | null, quote: QuoteData, _T: TemplateConfig, _lang: string, i: I18n, isClassique: boolean,
 ): string {
   // Custom footer text
   if (quote.footerText) {
