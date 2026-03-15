@@ -10,8 +10,8 @@ export async function generatePdf(html: string): Promise<Buffer> {
     const page = await browser.newPage()
     await page.setContent(html, { waitUntil: 'networkidle0' })
 
-    // Wait for Google Fonts to be fully loaded
-    await page.evaluate(() => document.fonts.ready)
+    // Wait for Google Fonts to be fully loaded (runs in browser context)
+    await page.evaluate('document.fonts.ready')
 
     const pdf = await page.pdf({
       format: 'A4',
