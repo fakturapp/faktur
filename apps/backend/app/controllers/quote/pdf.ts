@@ -100,6 +100,8 @@ export default class Pdf {
       taxAmount: quote.taxAmount,
       total: quote.total,
       language: quote.language || 'fr',
+      vatExempt: invoiceSettings?.defaultVatExempt || false,
+      footerText: invoiceSettings?.defaultFooterText || null,
     }
 
     const linesData = quote.lines.map((l) => ({
