@@ -245,15 +245,84 @@ export default function NewQuotePage() {
   // Loading skeleton
   if (loading || settingsLoading) {
     return (
-      <div className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
-        <Skeleton className="h-8 w-64" />
-        <div className="flex flex-col xl:flex-row gap-5">
-          <div className="flex-1 min-w-0 flex justify-center">
-            <Skeleton className="w-full max-w-[794px] rounded-xl" style={{ aspectRatio: '210/297' }} />
+      <div className="space-y-5 px-4 lg:px-6 py-4 md:py-5">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-8 w-8 rounded-lg" />
+            <Skeleton className="h-6 w-40" />
           </div>
-          <div className="w-full xl:w-[300px] xl:shrink-0 space-y-4">
-            <Skeleton className="h-[500px] rounded-xl" />
-            <Skeleton className="h-32 rounded-xl" />
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-9 w-9 rounded-lg" />
+            <Skeleton className="h-9 w-28 rounded-lg" />
+          </div>
+        </div>
+        {/* Content */}
+        <div className="flex flex-col xl:flex-row gap-5">
+          {/* A4 sheet area */}
+          <div className="flex-1 min-w-0 flex justify-center">
+            <div className="w-full max-w-[794px] bg-muted/30 rounded-xl p-6">
+              <div className="bg-card rounded-lg border border-border p-8 space-y-6" style={{ aspectRatio: '210/297' }}>
+                {/* Doc header */}
+                <div className="flex justify-between">
+                  <div className="space-y-2">
+                    <Skeleton className="h-10 w-20 rounded" />
+                    <Skeleton className="h-3 w-32" />
+                    <Skeleton className="h-3 w-28" />
+                  </div>
+                  <div className="text-right space-y-2">
+                    <Skeleton className="h-4 w-16 ml-auto" />
+                    <Skeleton className="h-3 w-24 ml-auto" />
+                    <Skeleton className="h-3 w-20 ml-auto" />
+                  </div>
+                </div>
+                <Skeleton className="h-0.5 w-full" />
+                {/* Addresses */}
+                <div className="grid grid-cols-2 gap-8">
+                  <div className="space-y-1.5">
+                    <Skeleton className="h-3 w-16" />
+                    <Skeleton className="h-3.5 w-32" />
+                    <Skeleton className="h-3 w-40" />
+                    <Skeleton className="h-3 w-28" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Skeleton className="h-3 w-12" />
+                    <Skeleton className="h-3.5 w-28" />
+                    <Skeleton className="h-3 w-36" />
+                    <Skeleton className="h-3 w-24" />
+                  </div>
+                </div>
+                {/* Table */}
+                <div>
+                  <Skeleton className="h-8 w-full rounded-t" />
+                  {[...Array(3)].map((_, i) => (
+                    <Skeleton key={i} className="h-10 w-full rounded-none" style={{ opacity: 1 - i * 0.15 }} />
+                  ))}
+                </div>
+                {/* Totals */}
+                <div className="flex justify-end">
+                  <div className="w-48 space-y-2">
+                    <div className="flex justify-between"><Skeleton className="h-3 w-20" /><Skeleton className="h-3 w-16" /></div>
+                    <div className="flex justify-between"><Skeleton className="h-3 w-16" /><Skeleton className="h-3 w-12" /></div>
+                    <Skeleton className="h-8 w-full rounded" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* Options sidebar */}
+          <div className="w-full xl:w-[300px] xl:shrink-0 space-y-3">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="rounded-xl border border-border bg-card/50 p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-4 w-4 rounded" />
+                    <Skeleton className="h-4 w-20" />
+                  </div>
+                  <Skeleton className="h-4 w-4 rounded" />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

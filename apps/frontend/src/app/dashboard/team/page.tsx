@@ -16,6 +16,7 @@ import { useAuth } from '@/lib/auth'
 import { useToast } from '@/components/ui/toast'
 import { api } from '@/lib/api'
 import { Spinner } from '@/components/ui/spinner'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   Users,
   UserPlus,
@@ -254,27 +255,43 @@ export default function TeamPage() {
   if (loading) {
     return (
       <div className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
+        {/* Team header card */}
         <div className="rounded-2xl border border-border/50 overflow-hidden">
           <div className="h-24 bg-gradient-to-br from-indigo-500/20 via-purple-500/10 to-transparent" />
-          <div className="p-6 -mt-12 flex items-end gap-4">
-            <div className="h-16 w-16 rounded-xl bg-muted animate-pulse" />
-            <div className="space-y-2 mb-1">
-              <div className="h-5 w-40 rounded bg-muted animate-pulse" />
-              <div className="h-3 w-24 rounded bg-muted animate-pulse" />
+          <div className="p-6 -mt-12 flex items-end justify-between">
+            <div className="flex items-end gap-4">
+              <Skeleton className="h-16 w-16 rounded-xl" />
+              <div className="space-y-2 mb-1">
+                <Skeleton className="h-5 w-40" />
+                <Skeleton className="h-3.5 w-28" />
+              </div>
+            </div>
+            <div className="flex items-center gap-2 mb-1">
+              <Skeleton className="h-8 w-28 rounded-lg" />
+              <Skeleton className="h-8 w-20 rounded-lg" />
             </div>
           </div>
         </div>
-        <div className="rounded-2xl border border-border/50">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="flex items-center gap-3.5 px-5 py-4 border-b border-border/50 last:border-b-0">
-              <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
-              <div className="space-y-1.5 flex-1">
-                <div className="h-3.5 w-32 rounded bg-muted animate-pulse" />
-                <div className="h-2.5 w-48 rounded bg-muted animate-pulse" />
+        {/* Members section */}
+        <div>
+          <div className="flex items-center gap-2 mb-3 px-1">
+            <Skeleton className="h-4 w-4 rounded" />
+            <Skeleton className="h-3.5 w-16" />
+          </div>
+          <div className="rounded-2xl border border-border/50">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="flex items-center justify-between px-5 py-4 border-b border-border/50 last:border-b-0">
+                <div className="flex items-center gap-3.5">
+                  <Skeleton className="h-9 w-9 rounded-full" />
+                  <div className="space-y-1.5">
+                    <Skeleton className="h-3.5 w-32" />
+                    <Skeleton className="h-3 w-44" />
+                  </div>
+                </div>
+                <Skeleton className="h-6 w-24 rounded-full" />
               </div>
-              <div className="h-6 w-20 rounded-full bg-muted animate-pulse" />
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     )

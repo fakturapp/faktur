@@ -167,9 +167,26 @@ export default function ClientsPage() {
 
       {/* Client list */}
       {loading ? (
-        <div className="space-y-3">
+        <div className="space-y-2">
           {[...Array(5)].map((_, i) => (
-            <Skeleton key={i} className="h-20 w-full rounded-xl" />
+            <div key={i} className="flex items-center gap-4 rounded-xl border border-border bg-card/50 p-4">
+              <Skeleton className="h-10 w-10 rounded-lg shrink-0" />
+              <div className="flex-1 min-w-0 space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-4 w-10 rounded-full" />
+                </div>
+                <div className="flex items-center gap-4">
+                  <Skeleton className="h-3 w-36" />
+                  <Skeleton className="h-3 w-20" />
+                </div>
+              </div>
+              <div className="text-right space-y-1.5 shrink-0">
+                <Skeleton className="h-4 w-20 ml-auto" />
+                <Skeleton className="h-3 w-16 ml-auto" />
+              </div>
+              <Skeleton className="h-4 w-4 shrink-0" />
+            </div>
           ))}
         </div>
       ) : filtered.length === 0 ? (

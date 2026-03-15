@@ -63,16 +63,63 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+        {/* Stat cards */}
         <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
           {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-32 rounded-xl" />
+            <div key={i} className="rounded-xl border border-border bg-card/50 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <Skeleton className="h-3.5 w-28" />
+                <Skeleton className="h-5 w-5 rounded" />
+              </div>
+              <Skeleton className="h-7 w-24 mb-1.5" />
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-3 w-12" />
+                <Skeleton className="h-3 w-32" />
+              </div>
+            </div>
           ))}
         </div>
+        {/* Chart */}
         <div className="px-4 lg:px-6">
-          <Skeleton className="h-[340px] rounded-xl" />
+          <div className="rounded-xl border border-border bg-card/50 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="space-y-1.5">
+                <Skeleton className="h-5 w-36" />
+                <Skeleton className="h-3.5 w-48" />
+              </div>
+              <Skeleton className="h-8 w-28 rounded-lg" />
+            </div>
+            <div className="flex items-end gap-3 h-[240px] pt-4">
+              {[40, 65, 45, 80, 55, 70, 50, 85, 60, 75, 45, 90].map((h, i) => (
+                <div key={i} className="flex-1 flex flex-col justify-end gap-1">
+                  <Skeleton className="w-full rounded-t" style={{ height: `${h}%` }} />
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-between mt-3">
+              {['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aou', 'Sep', 'Oct', 'Nov', 'Dec'].map((_, i) => (
+                <Skeleton key={i} className="h-3 w-6" />
+              ))}
+            </div>
+          </div>
         </div>
+        {/* Recent activity */}
         <div className="px-4 lg:px-6">
-          <Skeleton className="h-64 rounded-xl" />
+          <div className="rounded-xl border border-border bg-card/50 p-6">
+            <Skeleton className="h-5 w-32 mb-4" />
+            <div className="space-y-4">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <Skeleton className="h-9 w-9 rounded-lg shrink-0" />
+                  <div className="flex-1 space-y-1.5">
+                    <Skeleton className="h-3.5 w-40" />
+                    <Skeleton className="h-3 w-24" />
+                  </div>
+                  <Skeleton className="h-4 w-20" />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     )
