@@ -1,10 +1,45 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import app from '@adonisjs/core/services/app'
+import { existsSync, readFileSync } from 'node:fs'
+import { join, extname } from 'node:path'
 import Quote from '#models/quote/quote'
 import Company from '#models/team/company'
 import InvoiceSetting from '#models/team/invoice_setting'
 import { renderQuoteHtml } from '#services/pdf/html_renderer'
 import { generatePdf } from '#services/pdf/pdf_generator'
 import { buildFacturXFromQuote, generateFacturXXml } from '#services/pdf/facturx_generator'
+
+/**
+ * Convert a relative logo URL (e.g. /invoice-logos/xxx.png) to a base64 data URL
+ * so that Puppeteer can render it without needing a live HTTP server.
+ */
+function resolveLogoToBase64(logoUrl: string | null): string | null {
+  if (!logoUrl) return null
+
+  // Already a data URL or absolute URL
+  if (logoUrl.startsWith('data:') || logoUrl.startsWith('http://') || logoUrl.startsWith('https://')) {
+    return logoUrl
+  }
+
+  // Extract filename from /invoice-logos/{filename}
+  const match = logoUrl.match(/^\/invoice-logos\/(.+)$/)
+  if (!match) return null
+
+  const filePath = join(app.tmpPath(), 'uploads', 'invoice-logos', match[1])
+  if (!existsSync(filePath)) return null
+
+  const ext = extname(filePath).toLowerCase().replace('.', '')
+  const mimeMap: Record<string, string> = {
+    png: 'image/png',
+    jpg: 'image/jpeg',
+    jpeg: 'image/jpeg',
+    svg: 'image/svg+xml',
+    webp: 'image/webp',
+  }
+  const mime = mimeMap[ext] || 'image/png'
+  const base64 = readFileSync(filePath).toString('base64')
+  return `data:${mime};base64,${base64}`
+}
 
 export default class Pdf {
   async handle({ auth, params, response }: HttpContext) {
@@ -38,6 +73,10 @@ export default class Pdf {
       documentFont: invoiceSettings?.documentFont || 'Lexend',
     }
 
+    // Resolve logo to base64 for Puppeteer (try quote logo, then settings logo)
+    const rawLogoUrl = quote.logoUrl || invoiceSettings?.logoUrl || null
+    const resolvedLogoUrl = resolveLogoToBase64(rawLogoUrl)
+
     const quoteData = {
       quoteNumber: quote.quoteNumber,
       status: quote.status,
@@ -46,7 +85,7 @@ export default class Pdf {
       validityDate: quote.validityDate,
       billingType: quote.billingType,
       accentColor: quote.accentColor,
-      logoUrl: quote.logoUrl,
+      logoUrl: resolvedLogoUrl,
       notes: quote.notes,
       acceptanceConditions: quote.acceptanceConditions,
       signatureField: quote.signatureField,
