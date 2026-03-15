@@ -84,7 +84,7 @@ export default function EditInvoicePage() {
 
   const [notes, setNotes] = useState('')
   const [isDirty, setIsDirty] = useState(false)
-  const { showModal, setShowModal, confirmNavigation, cancelNavigation } = useUnsavedChanges(isDirty)
+  const { showModal, confirmNavigation, cancelNavigation, requestNavigation } = useUnsavedChanges(isDirty)
 
   // Load invoice and company
   useEffect(() => {
@@ -401,7 +401,7 @@ export default function EditInvoicePage() {
       <motion.div variants={fadeUp} custom={0} className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => {
-            if (isDirty) { setShowModal(true) } else { router.push('/dashboard/invoices') }
+            if (!requestNavigation('/dashboard/invoices')) router.push('/dashboard/invoices')
           }}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
@@ -578,8 +578,8 @@ export default function EditInvoicePage() {
         <p className="mt-2 text-sm text-muted-foreground">Vous avez des modifications non enregistrées. Que souhaitez-vous faire ?</p>
         <DialogFooter>
           <Button variant="outline" size="sm" onClick={cancelNavigation}>Annuler</Button>
-          <Button variant="ghost" size="sm" onClick={() => { setIsDirty(false); confirmNavigation(); router.push('/dashboard/invoices') }}>Ignorer</Button>
-          <Button size="sm" onClick={async () => { confirmNavigation(); await handleSave() }}><Save className="h-3.5 w-3.5 mr-1" /> Enregistrer</Button>
+          <Button variant="ghost" size="sm" onClick={() => confirmNavigation('/dashboard/invoices')}>Ignorer</Button>
+          <Button size="sm" onClick={async () => { cancelNavigation(); await handleSave() }}><Save className="h-3.5 w-3.5 mr-1" /> Enregistrer</Button>
         </DialogFooter>
       </Dialog>
 
