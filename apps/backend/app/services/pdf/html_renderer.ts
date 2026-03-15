@@ -80,6 +80,7 @@ interface SettingsData {
   paymentMethods: string[]
   customPaymentMethod: string | null
   documentFont: string
+  documentType?: 'quote' | 'invoice'
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -763,6 +764,8 @@ function renderTotals(
 function renderPaymentMethods(
   company: CompanyData | null, settings: SettingsData, _T: TemplateConfig, _lang: string, i: I18n,
 ): string {
+  // Payment methods are only shown on invoices, not on quotes
+  if (settings.documentType === 'quote') return ''
   if (!settings.paymentMethods || settings.paymentMethods.length === 0) return ''
 
   let html = '<div class="payment-section"><div class="section-label">' + i.paymentMethods + '</div><div class="payment-badges">'

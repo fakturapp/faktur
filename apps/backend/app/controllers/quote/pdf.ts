@@ -71,6 +71,7 @@ export default class Pdf {
       paymentMethods: invoiceSettings?.paymentMethods || ['bank_transfer'],
       customPaymentMethod: invoiceSettings?.customPaymentMethod || null,
       documentFont: invoiceSettings?.documentFont || 'Lexend',
+      documentType: 'quote' as const,
     }
 
     // Resolve logo to base64 for Puppeteer (try quote logo, then settings logo)
