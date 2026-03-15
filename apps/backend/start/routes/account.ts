@@ -1,22 +1,23 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
 
-const ProfileShow = () => import('#controllers/account/show')
-const ProfileUpdate = () => import('#controllers/account/update')
-const PasswordChange = () => import('#controllers/account/password')
-const SessionsList = () => import('#controllers/account/sessions')
-const SessionRevoke = () => import('#controllers/account/revoke_session')
-const AccountDelete = () => import('#controllers/account/delete')
+const ProfileShow = () => import('#controllers/account/profile/show')
+const ProfileUpdate = () => import('#controllers/account/profile/update')
+const AccountDelete = () => import('#controllers/account/profile/delete')
+const UploadAvatar = () => import('#controllers/account/profile/upload_avatar')
+const ServeAvatar = () => import('#controllers/account/profile/serve_avatar')
+
+const PasswordChange = () => import('#controllers/account/security/password')
+const SecurityVerify = () => import('#controllers/account/security/security_verify')
+const SessionRevoke = () => import('#controllers/account/security/revoke_session')
+const SessionsList = () => import('#controllers/account/security/sessions')
 
 const TwoFactorSetup = () => import('#controllers/account/two_factor/setup')
 const TwoFactorEnable = () => import('#controllers/account/two_factor/enable')
 const TwoFactorDisable = () => import('#controllers/account/two_factor/disable')
 
-const SecurityVerify = () => import('#controllers/account/security_verify')
-const EmailRequestChange = () => import('#controllers/account/email_request_change')
-const EmailConfirmChange = () => import('#controllers/account/email_confirm_change')
-const UploadAvatar = () => import('#controllers/account/upload_avatar')
-const ServeAvatar = () => import('#controllers/account/serve_avatar')
+const EmailRequestChange = () => import('#controllers/account/email/email_request_change')
+const EmailConfirmChange = () => import('#controllers/account/email/email_confirm_change')
 
 // Public route - serve avatars
 router.get('/avatars/:filename', [ServeAvatar, 'handle'])
