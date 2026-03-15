@@ -17,7 +17,7 @@ import { useAuth } from '@/lib/auth'
 import { useToast } from '@/components/ui/toast'
 import { api } from '@/lib/api'
 import { Spinner } from '@/components/ui/spinner'
-import { User, Shield, Monitor, Trash2, Smartphone, Copy, Check, Camera, Globe, MapPin, Download } from 'lucide-react'
+import { User, Shield, Monitor, Trash2, Smartphone, Copy, Check, Camera, Globe, MapPin, Download, Lock, AlertTriangle, Calendar } from 'lucide-react'
 
 const tabs = [
   { id: 'profile', label: 'Profil', icon: <User className="h-4 w-4" /> },
@@ -326,61 +326,127 @@ export default function AccountPage() {
     ? user.fullName.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
     : user?.email.slice(0, 2).toUpperCase() || '??'
 
+  function parseUserAgent(ua: string | null): { browser: string; os: string } {
+    if (!ua) return { browser: 'Inconnu', os: 'Inconnu' }
+    let browser = 'Navigateur'
+    if (ua.includes('Firefox')) browser = 'Firefox'
+    else if (ua.includes('Edg/')) browser = 'Edge'
+    else if (ua.includes('OPR') || ua.includes('Opera')) browser = 'Opera'
+    else if (ua.includes('Chrome')) browser = 'Chrome'
+    else if (ua.includes('Safari')) browser = 'Safari'
+
+    let os = 'Autre'
+    if (ua.includes('Windows')) os = 'Windows'
+    else if (ua.includes('Mac OS')) os = 'macOS'
+    else if (ua.includes('Linux')) os = 'Linux'
+    else if (ua.includes('Android')) os = 'Android'
+    else if (ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS'
+
+    return { browser, os }
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6 px-4 lg:px-6 py-4 md:py-6"
     >
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Mon compte</h1>
-        <p className="text-muted-foreground text-sm mt-1">Gérez votre profil et vos paramètres de sécurité.</p>
-      </div>
+      {/* Page header with user info */}
+      <Card className="overflow-hidden">
+        <div className="h-20 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent" />
+        <CardContent className="px-6 pb-6 -mt-10">
+          <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4">
+            <div className="relative group">
+              <Avatar
+                src={user?.avatarUrl}
+                alt={user?.fullName || ''}
+                fallback={initials}
+                size="lg"
+                className="h-20 w-20 text-lg ring-4 ring-card"
+              />
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/gif,image/webp"
+                className="hidden"
+                onChange={handleAvatarUpload}
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={avatarUploading}
+                className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+              >
+                {avatarUploading ? (
+                  <Spinner size="sm" className="text-white" />
+                ) : (
+                  <Camera className="h-5 w-5 text-white" />
+                )}
+              </button>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-xl font-bold text-foreground">{user?.fullName || 'Utilisateur'}</h1>
+                {user?.twoFactorEnabled && (
+                  <Badge variant="success" className="text-xs">
+                    <Shield className="h-3 w-3 mr-1" /> 2FA
+                  </Badge>
+                )}
+              </div>
+              <p className="text-sm text-muted-foreground">{user?.email}</p>
+              {user?.createdAt && (
+                <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
+                  <Calendar className="h-3 w-3" />
+                  Membre depuis {new Date(user.createdAt).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
+                </p>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 
       {/* Profile tab */}
       {activeTab === 'profile' && (
-        <Card>
-          <CardContent className="p-6">
-            <form onSubmit={handleUpdateProfile}>
-              <FieldGroup>
-                <div className="flex items-center gap-3">
-                  <div className="relative group shrink-0">
-                    <Avatar src={user?.avatarUrl} alt={user?.fullName || ''} fallback={initials} size="md" />
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/jpeg,image/png,image/gif,image/webp"
-                      className="hidden"
-                      onChange={handleAvatarUpload}
+        <div className="space-y-6">
+          <Card>
+            <CardContent className="p-6">
+              <form onSubmit={handleUpdateProfile}>
+                <FieldGroup>
+                  <div className="flex items-center gap-3 mb-1">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                      <User className="h-4.5 w-4.5 text-primary" />
+                    </div>
+                    <h3 className="font-semibold text-foreground">Informations personnelles</h3>
+                  </div>
+
+                  <Field>
+                    <FieldLabel htmlFor="fullName">Nom complet</FieldLabel>
+                    <Input
+                      id="fullName"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
                     />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{user?.fullName || 'Utilisateur'}</p>
-                    <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
-                  </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={avatarUploading}
-                  >
-                    {avatarUploading ? <Spinner size="sm" /> : <><Camera className="h-3.5 w-3.5 mr-1.5" /> Photo</>}
+                  </Field>
+
+                  <Button type="submit" disabled={profileLoading}>
+                    {profileLoading ? <><Spinner /> Enregistrement...</> : 'Enregistrer'}
                   </Button>
+                </FieldGroup>
+              </form>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <FieldGroup>
+                <div className="flex items-center gap-3 mb-1">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                    <Globe className="h-4.5 w-4.5 text-primary" />
+                  </div>
+                  <h3 className="font-semibold text-foreground">Adresse email</h3>
                 </div>
-
-                <Separator />
-
-                <Field>
-                  <FieldLabel htmlFor="fullName">Nom complet</FieldLabel>
-                  <Input
-                    id="fullName"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                  />
-                </Field>
 
                 <Field>
                   <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -405,16 +471,12 @@ export default function AccountPage() {
                       </Button>
                     )}
                   </div>
-                  <FieldDescription>Un code de vérification sera envoyé à la nouvelle adresse.</FieldDescription>
+                  <FieldDescription>Un code de verification sera envoye a la nouvelle adresse.</FieldDescription>
                 </Field>
-
-                <Button type="submit" disabled={profileLoading}>
-                  {profileLoading ? <><Spinner /> Enregistrement...</> : 'Enregistrer'}
-                </Button>
               </FieldGroup>
-            </form>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
       {/* Security tab */}
@@ -425,7 +487,15 @@ export default function AccountPage() {
             <CardContent className="p-6">
               <form onSubmit={handleChangePassword}>
                 <FieldGroup>
-                  <h3 className="font-semibold text-foreground">Changer le mot de passe</h3>
+                  <div className="flex items-center gap-3 mb-1">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                      <Lock className="h-4.5 w-4.5 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-foreground">Mot de passe</h3>
+                      <p className="text-xs text-muted-foreground">Modifiez votre mot de passe de connexion.</p>
+                    </div>
+                  </div>
 
                   <Field>
                     <FieldLabel htmlFor="currentPassword">Mot de passe actuel</FieldLabel>
@@ -479,16 +549,16 @@ export default function AccountPage() {
                         <Smartphone className="h-5 w-5 text-primary" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-foreground">Authentification à deux facteurs</h3>
+                        <h3 className="font-semibold text-foreground">Authentification a deux facteurs</h3>
                         <p className="text-sm text-muted-foreground mt-0.5">
                           {user?.twoFactorEnabled
-                            ? 'La 2FA est activée sur votre compte.'
-                            : 'Ajoutez une couche de sécurité supplémentaire.'}
+                            ? 'La 2FA est activee sur votre compte.'
+                            : 'Ajoutez une couche de securite supplementaire.'}
                         </p>
                       </div>
                     </div>
                     <Badge variant={user?.twoFactorEnabled ? 'success' : 'muted'}>
-                      {user?.twoFactorEnabled ? 'Activé' : 'Désactivé'}
+                      {user?.twoFactorEnabled ? 'Active' : 'Desactive'}
                     </Badge>
                   </div>
 
@@ -505,7 +575,7 @@ export default function AccountPage() {
                       className="border-destructive/30 text-destructive hover:bg-destructive/10"
                       onClick={handleDisable2FA}
                     >
-                      Désactiver la 2FA
+                      Desactiver la 2FA
                     </Button>
                   )}
                 </div>
@@ -535,7 +605,7 @@ export default function AccountPage() {
 
                   <form onSubmit={handleEnable2FA}>
                     <Field>
-                      <FieldLabel htmlFor="twoFactorCode">Code de vérification</FieldLabel>
+                      <FieldLabel htmlFor="twoFactorCode">Code de verification</FieldLabel>
                       <Input
                         id="twoFactorCode"
                         type="text"
@@ -548,7 +618,7 @@ export default function AccountPage() {
                         autoFocus
                       />
                       <FieldDescription>
-                        Entrez le code à 6 chiffres affiché dans votre application.
+                        Entrez le code a 6 chiffres affiche dans votre application.
                       </FieldDescription>
                     </Field>
 
@@ -564,7 +634,7 @@ export default function AccountPage() {
                         Annuler
                       </Button>
                       <Button type="submit" disabled={twoFactorLoading || twoFactorCode.length !== 6}>
-                        {twoFactorLoading ? <><Spinner /> Vérification...</> : 'Activer'}
+                        {twoFactorLoading ? <><Spinner /> Verification...</> : 'Activer'}
                       </Button>
                     </div>
                   </form>
@@ -573,9 +643,9 @@ export default function AccountPage() {
 
               {twoFactorStep === 'recovery' && (
                 <div>
-                  <h3 className="font-semibold text-foreground mb-1">Codes de récupération</h3>
+                  <h3 className="font-semibold text-foreground mb-1">Codes de recuperation</h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Conservez ces codes en lieu sûr. Ils vous permettront d&apos;accéder à votre compte si vous perdez votre appareil d&apos;authentification.
+                    Conservez ces codes en lieu sur. Ils vous permettront d&apos;acceder a votre compte si vous perdez votre appareil d&apos;authentification.
                   </p>
 
                   <div className="rounded-xl border border-border bg-muted/30 p-4 mb-4">
@@ -591,13 +661,13 @@ export default function AccountPage() {
                   <div className="flex gap-3">
                     <Button variant="outline" onClick={handleCopyRecoveryCodes}>
                       {copiedCodes ? (
-                        <><Check className="h-4 w-4 mr-2 text-green-500" /> Copié !</>
+                        <><Check className="h-4 w-4 mr-2 text-green-500" /> Copie !</>
                       ) : (
                         <><Copy className="h-4 w-4 mr-2" /> Copier les codes</>
                       )}
                     </Button>
                     <Button onClick={() => setTwoFactorStep('idle')}>
-                      J&apos;ai sauvegardé mes codes
+                      J&apos;ai sauvegarde mes codes
                     </Button>
                   </div>
                 </div>
@@ -606,11 +676,19 @@ export default function AccountPage() {
           </Card>
 
           {/* Danger zone */}
-          <Card className="border-destructive/20">
+          <Card className="border-destructive/30">
             <CardContent className="p-6">
-              <h3 className="font-semibold text-destructive">Zone dangereuse</h3>
-              <p className="text-sm text-muted-foreground mt-1 mb-4">
-                La suppression de votre compte est irréversible.
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-destructive/10">
+                  <AlertTriangle className="h-4.5 w-4.5 text-destructive" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-destructive">Zone dangereuse</h3>
+                  <p className="text-xs text-muted-foreground">Actions irreversibles sur votre compte.</p>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                La suppression de votre compte entrainera la perte definitive de toutes vos donnees.
               </p>
               <Button
                 variant="outline"
@@ -626,49 +704,66 @@ export default function AccountPage() {
 
       {/* Sessions tab */}
       {activeTab === 'sessions' && (
-        <Card>
-          <CardContent className="p-6">
-            <FieldGroup>
-              <h3 className="font-semibold text-foreground">Sessions actives</h3>
-              <p className="text-sm text-muted-foreground">Gérez vos sessions de connexion.</p>
+        <div className="space-y-4">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                  <Monitor className="h-4.5 w-4.5 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground">Sessions actives</h3>
+                  <p className="text-xs text-muted-foreground">Gerez vos sessions de connexion.</p>
+                </div>
+              </div>
 
               <div className="space-y-3">
                 {sessions.map((session) => {
-                  const isMobile = session.userAgent?.match(/Mobile|Android|iPhone/i)
+                  const isMobile = !!session.userAgent?.match(/Mobile|Android|iPhone/i)
+                  const { browser, os } = parseUserAgent(session.userAgent)
                   const DeviceIcon = isMobile ? Smartphone : Monitor
+
                   return (
                     <div
                       key={session.id}
-                      className="flex items-start justify-between rounded-xl border border-border p-4 gap-4"
+                      className={`flex items-start justify-between rounded-xl border p-4 gap-4 transition-colors ${
+                        session.isCurrent
+                          ? 'border-primary/30 bg-primary/5'
+                          : 'border-border'
+                      }`}
                     >
                       <div className="flex items-start gap-3">
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted/50 mt-0.5">
-                          <DeviceIcon className="h-4.5 w-4.5 text-muted-foreground" />
+                        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl mt-0.5 ${
+                          session.isCurrent ? 'bg-primary/10' : 'bg-muted/50'
+                        }`}>
+                          <DeviceIcon className={`h-5 w-5 ${session.isCurrent ? 'text-primary' : 'text-muted-foreground'}`} />
                         </div>
                         <div className="min-w-0">
                           <div className="flex items-center gap-2 mb-1">
                             <p className="text-sm font-medium text-foreground">
-                              {isMobile ? 'Mobile' : 'Desktop'}
+                              {browser} sur {os}
                             </p>
-                            {session.isCurrent && <Badge variant="success">Active</Badge>}
+                            {session.isCurrent && (
+                              <Badge variant="success" className="text-xs">Session actuelle</Badge>
+                            )}
                           </div>
                           <div className="space-y-0.5">
                             {session.ipAddress && (
                               <p className="text-xs text-muted-foreground flex items-center gap-1.5">
                                 <Globe className="h-3 w-3 shrink-0" />
                                 {session.ipAddress}
-                              </p>
-                            )}
-                            {session.location && (
-                              <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-                                <MapPin className="h-3 w-3 shrink-0" />
-                                {session.location}
+                                {session.location && (
+                                  <span className="flex items-center gap-1">
+                                    <MapPin className="h-3 w-3 shrink-0" />
+                                    {session.location}
+                                  </span>
+                                )}
                               </p>
                             )}
                             <p className="text-xs text-muted-foreground">
                               {session.lastUsedAt
-                                ? `Dernière activité le ${new Date(session.lastUsedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`
-                                : `Créée le ${new Date(session.createdAt).toLocaleDateString('fr-FR')}`}
+                                ? `Derniere activite le ${new Date(session.lastUsedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`
+                                : `Creee le ${new Date(session.createdAt).toLocaleDateString('fr-FR')}`}
                             </p>
                           </div>
                         </div>
@@ -687,33 +782,33 @@ export default function AccountPage() {
                   )
                 })}
                 {sessions.length === 0 && (
-                  <div className="flex items-center justify-center gap-2 py-4">
+                  <div className="flex items-center justify-center gap-2 py-8">
                     <Spinner size="sm" className="text-primary" />
-                    <span className="text-sm text-muted-foreground">Chargement...</span>
+                    <span className="text-sm text-muted-foreground">Chargement des sessions...</span>
                   </div>
                 )}
               </div>
-            </FieldGroup>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
       {/* Export tab */}
       {activeTab === 'export' && (
         <Card>
           <CardContent className="p-6">
-            <div className="flex flex-col items-center text-center gap-4 py-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
-                <Download className="h-7 w-7 text-primary" />
+            <div className="flex flex-col items-center text-center gap-4 py-6">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
+                <Download className="h-8 w-8 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold text-foreground">Exporter les donnees</h3>
-                <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-                  Telechargez toutes les donnees d&apos;une equipe (factures, devis, clients, parametres, logos) dans un fichier archive.
+                <h3 className="font-semibold text-foreground text-lg">Exporter les donnees</h3>
+                <p className="text-sm text-muted-foreground mt-1 max-w-md">
+                  Telechargez toutes les donnees d&apos;une equipe (factures, devis, clients, parametres, logos) dans un fichier archive. Vous pouvez optionnellement chiffrer l&apos;export.
                 </p>
               </div>
-              <Button onClick={() => setExportModalOpen(true)}>
-                <Download className="h-4 w-4 mr-2" /> Exporter les donnees
+              <Button onClick={() => setExportModalOpen(true)} size="lg">
+                <Download className="h-4 w-4 mr-2" /> Lancer l&apos;export
               </Button>
             </div>
           </CardContent>
