@@ -39,6 +39,7 @@ import {
   Settings2,
   Paintbrush,
   FileText,
+  Building2,
 } from 'lucide-react'
 
 const fadeUp = {
@@ -128,7 +129,7 @@ function TemplateModal({
 
 export default function InvoiceSettingsPage() {
   const { toast } = useToast()
-  const { settings, loading, updateSettings, uploadLogo } = useInvoiceSettings()
+  const { settings, companyLogoUrl, loading, updateSettings, uploadLogo } = useInvoiceSettings()
   const [uploading, setUploading] = useState(false)
   const [templateModalOpen, setTemplateModalOpen] = useState(false)
   const [showEInvoicingModal, setShowEInvoicingModal] = useState(false)
@@ -136,6 +137,7 @@ export default function InvoiceSettingsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const currentTemplate = getTemplate(settings.template, settings.darkMode)
+  const effectiveLogoUrl = settings.logoSource === 'company' ? companyLogoUrl : settings.logoUrl
 
   async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -334,30 +336,88 @@ export default function InvoiceSettingsPage() {
                         <p className="text-xs text-muted-foreground">Apparait sur vos factures et devis</p>
                       </div>
                     </div>
-                    <div className="flex items-start gap-6">
-                      <div className="relative group">
-                        <div className="h-24 w-24 rounded-xl border-2 border-dashed border-border bg-muted/30 flex items-center justify-center overflow-hidden">
-                          {settings.logoUrl ? (
-                            <img src={settings.logoUrl} alt="Logo" className="h-full w-full object-contain p-2" />
-                          ) : (
-                            <ImagePlus className="h-8 w-8 text-muted-foreground/50" />
+
+                    {/* Logo source selector */}
+                    <div className="grid grid-cols-2 gap-2 mb-4">
+                      <button onClick={() => updateSettings({ logoSource: 'custom' })}
+                        className={`flex items-center gap-2.5 rounded-xl border-2 p-3 text-left transition-all ${
+                          settings.logoSource === 'custom' ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
+                        }`}>
+                        <div className={`flex h-8 w-8 items-center justify-center rounded-lg shrink-0 ${settings.logoSource === 'custom' ? 'bg-primary/10' : 'bg-muted'}`}>
+                          <ImagePlus className={`h-4 w-4 ${settings.logoSource === 'custom' ? 'text-primary' : 'text-muted-foreground'}`} />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-medium text-foreground">Logo personnalise</p>
+                          <p className="text-[10px] text-muted-foreground">Importer votre propre logo</p>
+                        </div>
+                        {settings.logoSource === 'custom' && (
+                          <div className="h-4 w-4 rounded-md border-2 border-primary bg-primary flex items-center justify-center shrink-0 ml-auto">
+                            <Check className="h-2.5 w-2.5 text-primary-foreground" />
+                          </div>
+                        )}
+                      </button>
+                      <button onClick={() => updateSettings({ logoSource: 'company' })}
+                        className={`flex items-center gap-2.5 rounded-xl border-2 p-3 text-left transition-all ${
+                          settings.logoSource === 'company' ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
+                        }`}>
+                        <div className={`flex h-8 w-8 items-center justify-center rounded-lg shrink-0 ${settings.logoSource === 'company' ? 'bg-primary/10' : 'bg-muted'}`}>
+                          <Building2 className={`h-4 w-4 ${settings.logoSource === 'company' ? 'text-primary' : 'text-muted-foreground'}`} />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-medium text-foreground">Logo entreprise</p>
+                          <p className="text-[10px] text-muted-foreground">Utiliser celui de l&apos;entreprise</p>
+                        </div>
+                        {settings.logoSource === 'company' && (
+                          <div className="h-4 w-4 rounded-md border-2 border-primary bg-primary flex items-center justify-center shrink-0 ml-auto">
+                            <Check className="h-2.5 w-2.5 text-primary-foreground" />
+                          </div>
+                        )}
+                      </button>
+                    </div>
+
+                    {settings.logoSource === 'custom' ? (
+                      <div className="flex items-start gap-6">
+                        <div className="relative group">
+                          <div className="h-24 w-24 rounded-xl border-2 border-dashed border-border bg-muted/30 flex items-center justify-center overflow-hidden">
+                            {settings.logoUrl ? (
+                              <img src={settings.logoUrl} alt="Logo" className="h-full w-full object-contain p-2" />
+                            ) : (
+                              <ImagePlus className="h-8 w-8 text-muted-foreground/50" />
+                            )}
+                          </div>
+                          {settings.logoUrl && (
+                            <button onClick={handleRemoveLogo}
+                              className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm">
+                              <Trash2 className="h-3 w-3" />
+                            </button>
                           )}
                         </div>
-                        {settings.logoUrl && (
-                          <button onClick={handleRemoveLogo}
-                            className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm">
-                            <Trash2 className="h-3 w-3" />
-                          </button>
-                        )}
+                        <div className="flex-1 space-y-3">
+                          <p className="text-sm text-muted-foreground">Format recommande : PNG ou SVG, fond transparent, 500x500px minimum</p>
+                          <input ref={fileInputRef} type="file" accept="image/png,image/svg+xml,image/jpeg" className="hidden" onChange={handleLogoUpload} />
+                          <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
+                            {uploading ? <><Spinner /> Envoi...</> : 'Telecharger un logo'}
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex-1 space-y-3">
-                        <p className="text-sm text-muted-foreground">Format recommande : PNG ou SVG, fond transparent, 500x500px minimum</p>
-                        <input ref={fileInputRef} type="file" accept="image/png,image/svg+xml,image/jpeg" className="hidden" onChange={handleLogoUpload} />
-                        <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
-                          {uploading ? <><Spinner /> Envoi...</> : 'Telecharger un logo'}
-                        </Button>
+                    ) : (
+                      <div className="flex items-center gap-4 rounded-xl border border-border p-4">
+                        <div className="h-16 w-16 rounded-xl bg-muted/30 flex items-center justify-center overflow-hidden shrink-0">
+                          {companyLogoUrl ? (
+                            <img src={companyLogoUrl} alt="Logo entreprise" className="h-full w-full object-contain p-2" />
+                          ) : (
+                            <Building2 className="h-6 w-6 text-muted-foreground/50" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          {companyLogoUrl ? (
+                            <p className="text-sm text-muted-foreground">Le logo de votre entreprise sera utilise sur vos documents.</p>
+                          ) : (
+                            <p className="text-sm text-muted-foreground">Aucun logo d&apos;entreprise configure. Ajoutez-en un dans la page <a href="/dashboard/company" className="text-primary underline underline-offset-2">Entreprise</a>.</p>
+                          )}
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </CardContent>
                 </Card>
 
@@ -907,8 +967,8 @@ export default function InvoiceSettingsPage() {
                       {currentTemplate.layout === 'banner' && (
                         <div className="rounded-lg px-4 py-3 mb-4 -mx-2 -mt-2" style={{ backgroundColor: settings.accentColor }}>
                           <div className="flex justify-between items-center">
-                            {settings.logoUrl ? (
-                              <img src={settings.logoUrl} alt="Logo" className="h-7 w-auto max-w-[80px] object-contain" />
+                            {effectiveLogoUrl ? (
+                              <img src={effectiveLogoUrl} alt="Logo" className="h-7 w-auto max-w-[80px] object-contain" />
                             ) : (
                               <div className="h-2.5 w-16 rounded-full" style={{ backgroundColor: '#fff', opacity: 0.5 }} />
                             )}
@@ -920,8 +980,8 @@ export default function InvoiceSettingsPage() {
                       {currentTemplate.layout !== 'banner' && (
                         <div className="flex items-start justify-between mb-5">
                           <div className="space-y-2">
-                            {settings.logoUrl ? (
-                              <img src={settings.logoUrl} alt="Logo" className="h-10 w-auto max-w-[120px] object-contain" />
+                            {effectiveLogoUrl ? (
+                              <img src={effectiveLogoUrl} alt="Logo" className="h-10 w-auto max-w-[120px] object-contain" />
                             ) : (
                               <div className="h-10 w-20 border border-dashed flex items-center justify-center" style={{ borderRadius: currentTemplate.borderRadius, backgroundColor: currentTemplate.borderLight, borderColor: currentTemplate.editBorderDashed }}>
                                 <ImagePlus className="h-5 w-5" style={{ color: currentTemplate.editBorderDashed }} />

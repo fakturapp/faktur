@@ -32,7 +32,7 @@ export default function EditQuotePage() {
   const params = useParams()
   const quoteId = params.id as string
   const { toast } = useToast()
-  const { settings: invoiceSettings, loading: settingsLoading } = useInvoiceSettings()
+  const { settings: invoiceSettings, companyLogoUrl, loading: settingsLoading } = useInvoiceSettings()
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -449,7 +449,7 @@ export default function EditQuotePage() {
           </button>
           <A4Sheet
             mode={mode}
-            logoUrl={logoUrl || invoiceSettings.logoUrl}
+            logoUrl={logoUrl || (invoiceSettings.logoSource === 'company' ? companyLogoUrl : invoiceSettings.logoUrl)}
             accentColor={accentColor}
             documentTitle={options.documentTitle}
             quoteNumber={quoteNumber}

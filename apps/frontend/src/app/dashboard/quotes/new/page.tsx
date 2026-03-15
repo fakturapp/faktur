@@ -40,7 +40,7 @@ function getDefaultValidity() {
 export default function NewQuotePage() {
   const router = useRouter()
   const { toast } = useToast()
-  const { settings: invoiceSettings, loading: settingsLoading } = useInvoiceSettings()
+  const { settings: invoiceSettings, companyLogoUrl, loading: settingsLoading } = useInvoiceSettings()
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -100,13 +100,29 @@ export default function NewQuotePage() {
     init()
   }, [])
 
-  // Sync from settings
+  // Sync from settings (including defaults)
   useEffect(() => {
     if (!settingsLoading) {
-      setOptions((prev) => ({ ...prev, billingType: invoiceSettings.billingType }))
+      setOptions((prev) => ({
+        ...prev,
+        billingType: invoiceSettings.billingType,
+        subject: invoiceSettings.defaultSubject || prev.subject,
+        acceptanceConditions: invoiceSettings.defaultAcceptanceConditions || prev.acceptanceConditions,
+        signatureField: invoiceSettings.defaultSignatureField || prev.signatureField,
+        freeField: invoiceSettings.defaultFreeField || prev.freeField,
+        showNotes: invoiceSettings.defaultShowNotes ?? prev.showNotes,
+        vatExempt: invoiceSettings.defaultVatExempt || prev.vatExempt,
+        footerText: invoiceSettings.defaultFooterText || prev.footerText,
+        showDeliveryAddress: invoiceSettings.defaultShowDeliveryAddress || prev.showDeliveryAddress,
+        language: invoiceSettings.defaultLanguage || prev.language,
+        showSubject: !!(invoiceSettings.defaultSubject) || prev.showSubject,
+        showAcceptanceConditions: !!(invoiceSettings.defaultAcceptanceConditions) || prev.showAcceptanceConditions,
+        showFreeField: !!(invoiceSettings.defaultFreeField) || prev.showFreeField,
+        showFooterText: !!(invoiceSettings.defaultFooterText) || prev.showFooterText,
+      }))
       setAccentColor(invoiceSettings.accentColor)
     }
-  }, [settingsLoading, invoiceSettings.billingType, invoiceSettings.accentColor])
+  }, [settingsLoading, invoiceSettings])
 
   // Handlers
   const handleUpdateLine = useCallback((index: number, partial: Partial<QuoteLine>) => {
@@ -206,7 +222,7 @@ export default function NewQuotePage() {
       validityDate: options.validityDate || undefined,
       billingType: options.billingType,
       accentColor,
-      logoUrl: invoiceSettings.logoUrl || undefined,
+      logoUrl: (invoiceSettings.logoSource === 'company' ? companyLogoUrl : invoiceSettings.logoUrl) || undefined,
       language: options.language,
       notes: notes || undefined,
       acceptanceConditions: options.acceptanceConditions || undefined,
@@ -387,7 +403,7 @@ export default function NewQuotePage() {
           </button>
           <A4Sheet
             mode={mode}
-            logoUrl={invoiceSettings.logoUrl}
+            logoUrl={invoiceSettings.logoSource === 'company' ? companyLogoUrl : invoiceSettings.logoUrl}
             accentColor={accentColor}
             documentTitle={options.documentTitle}
             quoteNumber={quoteNumber}

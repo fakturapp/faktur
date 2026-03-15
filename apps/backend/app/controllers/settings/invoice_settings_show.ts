@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import InvoiceSetting from '#models/team/invoice_setting'
+import Company from '#models/team/company'
 
 export default class InvoiceSettingsShow {
   async handle({ auth, response }: HttpContext) {
@@ -9,15 +10,20 @@ export default class InvoiceSettingsShow {
       return response.notFound({ message: 'No team found' })
     }
 
+    const company = await Company.findBy('teamId', user.currentTeamId)
+    const companyLogoUrl = company?.logoUrl || null
+
     let settings = await InvoiceSetting.findBy('teamId', user.currentTeamId)
 
     if (!settings) {
       // Return defaults if no settings exist yet
       return response.ok({
+        companyLogoUrl,
         settings: {
           billingType: 'quick',
           accentColor: '#6366f1',
           logoUrl: null,
+          logoSource: 'custom',
           paymentMethods: ['bank_transfer'],
           customPaymentMethod: '',
           template: 'classique',
@@ -43,10 +49,12 @@ export default class InvoiceSettingsShow {
     }
 
     return response.ok({
+      companyLogoUrl,
       settings: {
         billingType: settings.billingType,
         accentColor: settings.accentColor,
         logoUrl: settings.logoUrl,
+        logoSource: settings.logoSource || 'custom',
         paymentMethods: settings.paymentMethods,
         customPaymentMethod: settings.customPaymentMethod || '',
         template: settings.template || 'classique',

@@ -20,6 +20,7 @@ export default class InvoiceSettingsUpdate {
         billingType: payload.billingType,
         accentColor: payload.accentColor,
         paymentMethods: payload.paymentMethods,
+        logoSource: payload.logoSource || 'custom',
         customPaymentMethod: payload.customPaymentMethod || null,
         template: payload.template || 'classique',
         darkMode: payload.darkMode ?? false,
@@ -45,6 +46,7 @@ export default class InvoiceSettingsUpdate {
       settings.accentColor = payload.accentColor
       settings.paymentMethods = payload.paymentMethods
       settings.customPaymentMethod = payload.customPaymentMethod || null
+      if (payload.logoSource !== undefined) settings.logoSource = payload.logoSource || 'custom'
       if (payload.template) settings.template = payload.template
       if (payload.darkMode !== undefined) settings.darkMode = payload.darkMode
       if (payload.documentFont) settings.documentFont = payload.documentFont
@@ -74,6 +76,7 @@ export default class InvoiceSettingsUpdate {
         billingType: settings.billingType,
         accentColor: settings.accentColor,
         logoUrl: settings.logoUrl,
+        logoSource: settings.logoSource || 'custom',
         paymentMethods: settings.paymentMethods,
         customPaymentMethod: settings.customPaymentMethod || '',
         template: settings.template || 'classique',
