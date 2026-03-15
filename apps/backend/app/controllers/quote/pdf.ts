@@ -91,8 +91,10 @@ export default class Pdf {
       documentType: 'quote' as const,
     }
 
-    // Resolve logo to base64 for Puppeteer (try quote logo, then settings logo)
-    const rawLogoUrl = quote.logoUrl || invoiceSettings?.logoUrl || null
+    // Resolve logo based on source preference: custom (invoice settings) or company
+    const logoSource = invoiceSettings?.logoSource || 'custom'
+    const settingsLogoUrl = logoSource === 'company' ? (company?.logoUrl || null) : (invoiceSettings?.logoUrl || null)
+    const rawLogoUrl = quote.logoUrl || settingsLogoUrl
     const resolvedLogoUrl = resolveLogoToBase64(rawLogoUrl)
 
     const quoteData = {

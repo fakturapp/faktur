@@ -12,6 +12,7 @@ function resolveLogoUrl(url: string | null): string | null {
 export interface InvoiceSettings {
   billingType: 'quick' | 'detailed'
   logoUrl: string | null
+  logoSource: 'custom' | 'company'
   accentColor: string
   paymentMethods: string[]
   customPaymentMethod: string
@@ -37,6 +38,7 @@ export interface InvoiceSettings {
 
 interface InvoiceSettingsContextType {
   settings: InvoiceSettings
+  companyLogoUrl: string | null
   loading: boolean
   updateSettings: (partial: Partial<InvoiceSettings>) => void
   uploadLogo: (file: File) => Promise<void>
@@ -45,6 +47,7 @@ interface InvoiceSettingsContextType {
 const defaultSettings: InvoiceSettings = {
   billingType: 'quick',
   logoUrl: null,
+  logoSource: 'custom',
   accentColor: '#6366f1',
   paymentMethods: ['bank_transfer'],
   customPaymentMethod: '',
@@ -70,6 +73,7 @@ const defaultSettings: InvoiceSettings = {
 
 const InvoiceSettingsContext = createContext<InvoiceSettingsContextType>({
   settings: defaultSettings,
+  companyLogoUrl: null,
   loading: true,
   updateSettings: () => {},
   uploadLogo: async () => {},
@@ -81,6 +85,7 @@ export function useInvoiceSettings() {
 
 export function InvoiceSettingsProvider({ children }: { children: React.ReactNode }) {
   const [settings, setSettings] = useState<InvoiceSettings>(defaultSettings)
+  const [companyLogoUrl, setCompanyLogoUrl] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const settingsRef = useRef(settings)
@@ -89,9 +94,12 @@ export function InvoiceSettingsProvider({ children }: { children: React.ReactNod
   settingsRef.current = settings
 
   const loadSettings = useCallback(async () => {
-    const { data } = await api.get<{ settings: InvoiceSettings }>('/settings/invoices')
+    const { data } = await api.get<{ settings: InvoiceSettings; companyLogoUrl: string | null }>('/settings/invoices')
     if (data?.settings) {
       setSettings({ ...data.settings, logoUrl: resolveLogoUrl(data.settings.logoUrl) })
+    }
+    if (data?.companyLogoUrl) {
+      setCompanyLogoUrl(resolveLogoUrl(data.companyLogoUrl))
     }
     setLoading(false)
   }, [])
@@ -142,7 +150,7 @@ export function InvoiceSettingsProvider({ children }: { children: React.ReactNod
   }, [saveSettings])
 
   return (
-    <InvoiceSettingsContext.Provider value={{ settings, loading, updateSettings, uploadLogo }}>
+    <InvoiceSettingsContext.Provider value={{ settings, companyLogoUrl, loading, updateSettings, uploadLogo }}>
       {children}
     </InvoiceSettingsContext.Provider>
   )

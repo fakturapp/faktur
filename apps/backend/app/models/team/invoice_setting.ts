@@ -21,6 +21,9 @@ export default class InvoiceSetting extends BaseModel {
   @column()
   declare logoUrl: string | null
 
+  @column()
+  declare logoSource: 'custom' | 'company'
+
   @column({
     prepare: (value: string[]) => JSON.stringify(value),
     consume: (value: string | string[]) =>
