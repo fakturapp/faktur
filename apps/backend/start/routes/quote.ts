@@ -1,19 +1,19 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
 
-const QuoteList = () => import('#controllers/quote/list')
-const QuoteShow = () => import('#controllers/quote/show')
-const QuoteCreate = () => import('#controllers/quote/create')
-const QuoteUpdate = () => import('#controllers/quote/update')
-const QuoteDelete = () => import('#controllers/quote/delete')
-const QuoteNextNumber = () => import('#controllers/quote/next_number')
-const QuotePdf = () => import('#controllers/quote/pdf')
-const QuoteFacturXml = () => import('#controllers/quote/pdf').then((m) => ({ default: m.FacturXml }))
-const QuoteDocumentCount = () => import('#controllers/quote/document_count')
-const QuoteSetNextNumber = () => import('#controllers/quote/set_next_number')
-const QuoteUpdateStatus = () => import('#controllers/quote/update_status')
-const QuoteDuplicate = () => import('#controllers/quote/duplicate')
-const QuoteUpdateComment = () => import('#controllers/quote/update_comment')
+const QuoteList = () => import('#controllers/quote/crud/list')
+const QuoteShow = () => import('#controllers/quote/crud/show')
+const QuoteCreate = () => import('#controllers/quote/crud/create')
+const QuoteUpdate = () => import('#controllers/quote/crud/update')
+const QuoteDelete = () => import('#controllers/quote/crud/delete')
+const QuoteNextNumber = () => import('#controllers/quote/number/next_number')
+const QuoteDocumentCount = () => import('#controllers/quote/number/document_count')
+const QuoteSetNextNumber = () => import('#controllers/quote/number/set_next_number')
+const QuotePdf = () => import('#controllers/quote/export/pdf')
+const QuoteFacturXml = () => import('#controllers/quote/export/pdf').then((m) => ({ default: m.FacturXml }))
+const QuoteUpdateStatus = () => import('#controllers/quote/operations/update_status')
+const QuoteDuplicate = () => import('#controllers/quote/operations/duplicate')
+const QuoteUpdateComment = () => import('#controllers/quote/operations/update_comment')
 
 router
   .group(() => {

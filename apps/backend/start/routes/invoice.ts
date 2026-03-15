@@ -1,20 +1,20 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
 
-const InvoiceList = () => import('#controllers/invoice/list')
-const InvoiceShow = () => import('#controllers/invoice/show')
-const InvoiceCreate = () => import('#controllers/invoice/create')
-const InvoiceUpdate = () => import('#controllers/invoice/update')
-const InvoiceDelete = () => import('#controllers/invoice/delete')
-const InvoiceNextNumber = () => import('#controllers/invoice/next_number')
-const InvoicePdf = () => import('#controllers/invoice/pdf')
-const InvoiceConvertQuote = () => import('#controllers/invoice/convert_quote')
-const InvoiceDocumentCount = () => import('#controllers/invoice/document_count')
-const InvoiceSetNextNumber = () => import('#controllers/invoice/set_next_number')
-const InvoiceUpdateStatus = () => import('#controllers/invoice/update_status')
-const InvoiceUnlinkQuote = () => import('#controllers/invoice/unlink_quote')
-const InvoiceDuplicate = () => import('#controllers/invoice/duplicate')
-const InvoiceUpdateComment = () => import('#controllers/invoice/update_comment')
+const InvoiceList = () => import('#controllers/invoice/crud/list')
+const InvoiceShow = () => import('#controllers/invoice/crud/show')
+const InvoiceCreate = () => import('#controllers/invoice/crud/create')
+const InvoiceUpdate = () => import('#controllers/invoice/crud/update')
+const InvoiceDelete = () => import('#controllers/invoice/crud/delete')
+const InvoiceNextNumber = () => import('#controllers/invoice/number/next_number')
+const InvoiceDocumentCount = () => import('#controllers/invoice/number/document_count')
+const InvoiceSetNextNumber = () => import('#controllers/invoice/number/set_next_number')
+const InvoicePdf = () => import('#controllers/invoice/export/pdf')
+const InvoiceConvertQuote = () => import('#controllers/invoice/operations/convert_quote')
+const InvoiceUpdateStatus = () => import('#controllers/invoice/operations/update_status')
+const InvoiceUnlinkQuote = () => import('#controllers/invoice/operations/unlink_quote')
+const InvoiceDuplicate = () => import('#controllers/invoice/operations/duplicate')
+const InvoiceUpdateComment = () => import('#controllers/invoice/operations/update_comment')
 
 router
   .group(() => {

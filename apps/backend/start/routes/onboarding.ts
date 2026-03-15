@@ -1,11 +1,11 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
 
-const CreateTeam = () => import('#controllers/onboarding/create_team')
-const CreateCompany = () => import('#controllers/onboarding/create_company')
-const SkipCompany = () => import('#controllers/onboarding/skip_company')
-const SearchCompany = () => import('#controllers/onboarding/search_company')
-const CompletePersonalization = () => import('#controllers/onboarding/complete_personalization')
+const CreateTeam = () => import('#controllers/onboarding/team/create_team')
+const CreateCompany = () => import('#controllers/onboarding/company/create_company')
+const SkipCompany = () => import('#controllers/onboarding/company/skip_company')
+const SearchCompany = () => import('#controllers/onboarding/company/search_company')
+const CompletePersonalization = () => import('#controllers/onboarding/personalization/complete_personalization')
 
 router
   .group(() => {
