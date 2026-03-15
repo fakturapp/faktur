@@ -1,0 +1,92 @@
+'use client'
+
+import { useState } from 'react'
+import { Badge } from '@/components/ui/badge'
+import { Dropdown, DropdownItem } from '@/components/ui/dropdown'
+import { api } from '@/lib/api'
+import { useToast } from '@/components/ui/toast'
+
+interface StatusOption {
+  value: string
+  label: string
+  color: string
+  bgColor: string
+}
+
+interface StatusDropdownProps {
+  id: string
+  currentStatus: string
+  options: StatusOption[]
+  endpoint: 'quotes' | 'invoices'
+  onStatusChange: (id: string, newStatus: string) => void
+  fullWidth?: boolean
+}
+
+export function StatusDropdown({ id, currentStatus, options, endpoint, onStatusChange, fullWidth }: StatusDropdownProps) {
+  const { toast } = useToast()
+  const [loading, setLoading] = useState(false)
+  const current = options.find((o) => o.value === currentStatus) || options[0]
+
+  async function handleChange(newStatus: string) {
+    if (newStatus === currentStatus || loading) return
+    setLoading(true)
+    const { error } = await api.patch(`/${endpoint}/${id}/status`, { status: newStatus })
+    setLoading(false)
+    if (error) {
+      toast(error, 'error')
+      return
+    }
+    onStatusChange(id, newStatus)
+  }
+
+  return (
+    <div onClick={(e) => { e.preventDefault(); e.stopPropagation() }}>
+      <Dropdown
+        align="left"
+        trigger={
+          fullWidth ? (
+            <div className={`flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg border text-sm font-semibold cursor-pointer transition-all shadow-sm hover:shadow ${current.color} ${current.bgColor} border-current/20 ${loading ? 'animate-pulse' : ''}`}>
+              <span className={`h-2 w-2 rounded-full ${current.color.replace('text-', 'bg-')}`} />
+              {current.label}
+            </div>
+          ) : (
+            <Badge
+              variant="muted"
+              className={`text-[10px] shrink-0 cursor-pointer hover:opacity-80 transition-opacity ${current.color} ${current.bgColor} ${loading ? 'animate-pulse' : ''}`}
+            >
+              {current.label}
+            </Badge>
+          )
+        }
+        className="min-w-[160px]"
+      >
+        {options.map((opt) => (
+          <DropdownItem
+            key={opt.value}
+            onClick={() => handleChange(opt.value)}
+            className={opt.value === currentStatus ? 'opacity-50' : ''}
+          >
+            <span className={`inline-block h-2 w-2 rounded-full ${opt.bgColor.replace('/10', '')} ${opt.color.replace('text-', 'bg-')}`} />
+            <span>{opt.label}</span>
+          </DropdownItem>
+        ))}
+      </Dropdown>
+    </div>
+  )
+}
+
+export const quoteStatusOptions: StatusOption[] = [
+  { value: 'draft', label: 'Brouillon', color: 'text-zinc-400', bgColor: 'bg-zinc-400/10' },
+  { value: 'sent', label: 'Envoye', color: 'text-blue-400', bgColor: 'bg-blue-400/10' },
+  { value: 'accepted', label: 'Accepte', color: 'text-green-400', bgColor: 'bg-green-400/10' },
+  { value: 'refused', label: 'Refuse', color: 'text-red-400', bgColor: 'bg-red-400/10' },
+  { value: 'expired', label: 'Expire', color: 'text-amber-400', bgColor: 'bg-amber-400/10' },
+]
+
+export const invoiceStatusOptions: StatusOption[] = [
+  { value: 'draft', label: 'Brouillon', color: 'text-zinc-400', bgColor: 'bg-zinc-400/10' },
+  { value: 'sent', label: 'Envoyee', color: 'text-blue-400', bgColor: 'bg-blue-400/10' },
+  { value: 'paid', label: 'Payee', color: 'text-green-400', bgColor: 'bg-green-400/10' },
+  { value: 'overdue', label: 'En retard', color: 'text-red-400', bgColor: 'bg-red-400/10' },
+  { value: 'cancelled', label: 'Annulee', color: 'text-orange-400', bgColor: 'bg-orange-400/10' },
+]

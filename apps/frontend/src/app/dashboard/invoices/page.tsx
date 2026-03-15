@@ -1,14 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, type Variants } from 'framer-motion'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Pagination } from '@/components/ui/pagination'
 import { api } from '@/lib/api'
 import { useToast } from '@/components/ui/toast'
+import { StatusDropdown, invoiceStatusOptions } from '@/components/shared/status-dropdown'
 import {
   Plus,
   Search,
@@ -17,11 +17,11 @@ import {
   CheckCircle2,
   ChevronRight,
   Send,
-  XCircle,
   Download,
   Ban,
 } from 'lucide-react'
 import { CreateInvoiceModal } from '@/components/invoices/create-invoice-modal'
+import { InvoiceDetailOverlay } from '@/components/invoices/invoice-detail-overlay'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -48,12 +48,11 @@ interface InvoiceListItem {
   createdAt: string
 }
 
-const statusConfig: Record<string, { label: string; color: string; bgColor: string }> = {
-  draft: { label: 'Brouillon', color: 'text-zinc-400', bgColor: 'bg-zinc-400/10' },
-  sent: { label: 'Envoyee', color: 'text-blue-400', bgColor: 'bg-blue-400/10' },
-  paid: { label: 'Payee', color: 'text-green-400', bgColor: 'bg-green-400/10' },
-  overdue: { label: 'En retard', color: 'text-red-400', bgColor: 'bg-red-400/10' },
-  cancelled: { label: 'Annulee', color: 'text-orange-400', bgColor: 'bg-orange-400/10' },
+interface PaginationMeta {
+  total: number
+  perPage: number
+  currentPage: number
+  lastPage: number
 }
 
 export default function InvoicesPage() {
@@ -61,9 +60,23 @@ export default function InvoicesPage() {
   const [loading, setLoading] = useState(true)
   const [invoices, setInvoices] = useState<InvoiceListItem[]>([])
   const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState<string>('all')
+  const [page, setPage] = useState(1)
+  const [meta, setMeta] = useState<PaginationMeta | null>(null)
   const [downloadingId, setDownloadingId] = useState<string | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null)
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>()
+
+  const handleSearchChange = useCallback((value: string) => {
+    setSearch(value)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      setDebouncedSearch(value)
+      setPage(1)
+    }, 300)
+  }, [])
 
   async function handleDownloadPdf(e: React.MouseEvent, invoiceId: string) {
     e.preventDefault()
@@ -85,30 +98,37 @@ export default function InvoicesPage() {
 
   useEffect(() => {
     loadInvoices()
-  }, [])
+  }, [page, debouncedSearch, filterStatus])
 
   async function loadInvoices() {
     setLoading(true)
-    const { data } = await api.get<{ invoices: InvoiceListItem[] }>('/invoices')
-    if (data?.invoices) {
+    const params = new URLSearchParams()
+    params.set('page', String(page))
+    params.set('perPage', '20')
+    if (debouncedSearch) params.set('search', debouncedSearch)
+    if (filterStatus !== 'all') params.set('status', filterStatus)
+
+    const { data } = await api.get<{ invoices: InvoiceListItem[]; meta: PaginationMeta }>(`/invoices?${params}`)
+    if (data) {
       setInvoices(data.invoices)
+      setMeta(data.meta)
     }
     setLoading(false)
   }
 
-  const filtered = invoices.filter((inv) => {
-    const matchesSearch =
-      !search ||
-      inv.invoiceNumber.toLowerCase().includes(search.toLowerCase()) ||
-      inv.subject?.toLowerCase().includes(search.toLowerCase()) ||
-      inv.clientName?.toLowerCase().includes(search.toLowerCase())
-    const matchesStatus = filterStatus === 'all' || inv.status === filterStatus
-    return matchesSearch && matchesStatus
-  })
+  function handleStatusChange(id: string, newStatus: string) {
+    setInvoices((prev) => prev.map((inv) => (inv.id === id ? { ...inv, status: newStatus as InvoiceListItem['status'] } : inv)))
+  }
 
-  const totalAmount = invoices.reduce((sum, inv) => sum + Number(inv.total), 0)
-  const pendingCount = invoices.filter((inv) => inv.status === 'sent').length
-  const paidCount = invoices.filter((inv) => inv.status === 'paid').length
+  function handleFilterChange(status: string) {
+    setFilterStatus(status)
+    setPage(1)
+  }
+
+  function handleDeleteFromOverlay(id: string) {
+    setInvoices((prev) => prev.filter((inv) => inv.id !== id))
+    if (meta) setMeta({ ...meta, total: meta.total - 1 })
+  }
 
   return (
     <motion.div initial="hidden" animate="visible" className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
@@ -117,7 +137,7 @@ export default function InvoicesPage() {
         <div>
           <h1 className="text-2xl font-bold text-foreground">Factures</h1>
           <p className="text-muted-foreground mt-1">
-            {invoices.length} facture{invoices.length > 1 ? 's' : ''} au total
+            {meta?.total ?? 0} facture{(meta?.total ?? 0) > 1 ? 's' : ''} au total
           </p>
         </div>
         <Button onClick={() => setShowCreateModal(true)}>
@@ -125,53 +145,14 @@ export default function InvoicesPage() {
         </Button>
       </motion.div>
 
-      {/* Stats */}
-      <motion.div variants={fadeUp} custom={1} className="grid grid-cols-1 gap-4 @xl/main:grid-cols-3">
-        <div className="rounded-xl border border-border bg-card/50 p-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-              <FileText className="h-4.5 w-4.5 text-primary" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">
-                {totalAmount.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
-              </p>
-              <p className="text-xs text-muted-foreground">Montant total</p>
-            </div>
-          </div>
-        </div>
-        <div className="rounded-xl border border-border bg-card/50 p-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-500/10">
-              <Clock className="h-4.5 w-4.5 text-blue-500" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{pendingCount}</p>
-              <p className="text-xs text-muted-foreground">En attente</p>
-            </div>
-          </div>
-        </div>
-        <div className="rounded-xl border border-border bg-card/50 p-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-500/10">
-              <CheckCircle2 className="h-4.5 w-4.5 text-green-500" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{paidCount}</p>
-              <p className="text-xs text-muted-foreground">Payees</p>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-
       {/* Search + filter */}
-      <motion.div variants={fadeUp} custom={2} className="flex items-center gap-3">
+      <motion.div variants={fadeUp} custom={1} className="flex items-center gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Rechercher une facture..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             className="pl-10"
           />
         </div>
@@ -185,7 +166,7 @@ export default function InvoicesPage() {
           ].map((f) => (
             <button
               key={f.id}
-              onClick={() => setFilterStatus(f.id)}
+              onClick={() => handleFilterChange(f.id)}
               className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
                 filterStatus === f.id
                   ? 'bg-card text-foreground shadow-sm'
@@ -224,20 +205,20 @@ export default function InvoicesPage() {
             </div>
           ))}
         </div>
-      ) : filtered.length === 0 ? (
-        <motion.div variants={fadeUp} custom={3} className="text-center py-16">
+      ) : invoices.length === 0 ? (
+        <motion.div variants={fadeUp} custom={2} className="text-center py-16">
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/50 mx-auto mb-4">
             <FileText className="h-8 w-8 text-muted-foreground/50" />
           </div>
           <p className="text-lg font-medium text-foreground">
-            {search || filterStatus !== 'all' ? 'Aucun resultat' : 'Aucune facture'}
+            {debouncedSearch || filterStatus !== 'all' ? 'Aucun resultat' : 'Aucune facture'}
           </p>
           <p className="text-sm text-muted-foreground mt-1">
-            {search || filterStatus !== 'all'
+            {debouncedSearch || filterStatus !== 'all'
               ? 'Essayez avec d\'autres criteres de recherche'
               : 'Commencez par creer votre premiere facture'}
           </p>
-          {!search && filterStatus === 'all' && (
+          {!debouncedSearch && filterStatus === 'all' && (
             <Button className="mt-4" onClick={() => setShowCreateModal(true)}>
               <Plus className="h-4 w-4 mr-1.5" /> Creer une facture
             </Button>
@@ -245,13 +226,12 @@ export default function InvoicesPage() {
         </motion.div>
       ) : (
         <div className="space-y-2">
-          {filtered.map((invoice, i) => {
-            const cfg = statusConfig[invoice.status]
+          {invoices.map((invoice, i) => {
             return (
-              <motion.div key={invoice.id} variants={fadeUp} custom={3 + i * 0.3}>
-                <Link
-                  href={`/dashboard/invoices/${invoice.id}/edit`}
-                  className="w-full flex items-center gap-4 rounded-xl border border-border bg-card/50 hover:bg-card/80 p-4 transition-colors text-left group"
+              <motion.div key={invoice.id} variants={fadeUp} custom={2 + i * 0.3}>
+                <div
+                  onClick={() => setSelectedInvoiceId(invoice.id)}
+                  className="w-full flex items-center gap-4 rounded-xl border border-border bg-card/50 hover:bg-card/80 p-4 transition-colors text-left group cursor-pointer"
                 >
                   {/* Icon */}
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
@@ -268,9 +248,13 @@ export default function InvoicesPage() {
                       <p className="text-sm font-semibold text-foreground truncate">
                         {invoice.invoiceNumber}
                       </p>
-                      <Badge variant="muted" className={`text-[10px] shrink-0 ${cfg.color} ${cfg.bgColor}`}>
-                        {cfg.label}
-                      </Badge>
+                      <StatusDropdown
+                        id={invoice.id}
+                        currentStatus={invoice.status}
+                        options={invoiceStatusOptions}
+                        endpoint="invoices"
+                        onStatusChange={handleStatusChange}
+                      />
                     </div>
                     <div className="flex items-center gap-4 text-xs text-muted-foreground">
                       {invoice.clientName && (
@@ -304,14 +288,23 @@ export default function InvoicesPage() {
                   </button>
 
                   <ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors shrink-0" />
-                </Link>
+                </div>
               </motion.div>
             )
           })}
         </div>
       )}
 
+      <Pagination meta={meta} onPageChange={setPage} />
+
       <CreateInvoiceModal open={showCreateModal} onClose={() => setShowCreateModal(false)} />
+
+      <InvoiceDetailOverlay
+        invoiceId={selectedInvoiceId}
+        onClose={() => setSelectedInvoiceId(null)}
+        onStatusChange={handleStatusChange}
+        onDelete={handleDeleteFromOverlay}
+      />
     </motion.div>
   )
 }
