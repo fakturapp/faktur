@@ -1,9 +1,9 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import db from '@adonisjs/lucid/services/db'
-import Quote from '#models/quote/quote'
-import QuoteLine from '#models/quote/quote_line'
+import Invoice from '#models/invoice/invoice'
+import InvoiceLine from '#models/invoice/invoice_line'
 import InvoiceSetting from '#models/team/invoice_setting'
-import { createQuoteValidator } from '#validators/quote_validator'
+import { createInvoiceValidator } from '#validators/invoice_validator'
 
 export default class Create {
   async handle({ auth, request, response }: HttpContext) {
@@ -14,30 +14,30 @@ export default class Create {
       return response.badRequest({ message: 'No team selected' })
     }
 
-    const payload = await request.validateUsing(createQuoteValidator)
+    const payload = await request.validateUsing(createInvoiceValidator)
 
     // Check for custom starting number
     const settings = await InvoiceSetting.query().where('team_id', teamId).first()
-    let quoteNumber: string
+    let invoiceNumber: string
 
-    if (settings?.nextQuoteNumber) {
-      quoteNumber = settings.nextQuoteNumber
+    if (settings?.nextInvoiceNumber) {
+      invoiceNumber = settings.nextInvoiceNumber
       // Clear the custom starting number after first use
-      settings.nextQuoteNumber = null
+      settings.nextInvoiceNumber = null
       await settings.save()
     } else {
-      // Generate next quote number
-      const lastQuote = await Quote.query()
+      // Generate next invoice number
+      const lastInvoice = await Invoice.query()
         .where('team_id', teamId)
         .orderBy('created_at', 'desc')
         .first()
 
-      quoteNumber = 'DEV-001'
-      if (lastQuote) {
-        const match = lastQuote.quoteNumber.match(/^DEV-(\d+)$/)
+      invoiceNumber = 'FAC-001'
+      if (lastInvoice) {
+        const match = lastInvoice.invoiceNumber.match(/^FAC-(\d+)$/)
         if (match) {
           const num = parseInt(match[1], 10) + 1
-          quoteNumber = `DEV-${num.toString().padStart(3, '0')}`
+          invoiceNumber = `FAC-${num.toString().padStart(3, '0')}`
         }
       }
     }
@@ -74,16 +74,16 @@ export default class Create {
 
     const total = subtotal + taxAmount - discountAmount
 
-    const quote = await db.transaction(async (trx) => {
-      const q = await Quote.create(
+    const invoice = await db.transaction(async (trx) => {
+      const inv = await Invoice.create(
         {
           teamId,
           clientId: payload.clientId || null,
-          quoteNumber,
+          invoiceNumber,
           status: 'draft',
           subject: payload.subject || null,
           issueDate: payload.issueDate,
-          validityDate: payload.validityDate || null,
+          dueDate: payload.dueDate || null,
           billingType: payload.billingType,
           accentColor: payload.accentColor,
           logoUrl: payload.logoUrl || null,
@@ -101,14 +101,16 @@ export default class Create {
           subtotal: Math.round(subtotal * 100) / 100,
           taxAmount: Math.round(taxAmount * 100) / 100,
           total: Math.round(total * 100) / 100,
+          sourceQuoteId: payload.sourceQuoteId || null,
+          paymentTerms: payload.paymentTerms || null,
         },
         { client: trx }
       )
 
       for (const lineData of linesData) {
-        await QuoteLine.create(
+        await InvoiceLine.create(
           {
-            quoteId: q.id,
+            invoiceId: inv.id,
             ...lineData,
             total: Math.round(lineData.total * 100) / 100,
           },
@@ -116,16 +118,16 @@ export default class Create {
         )
       }
 
-      return q
+      return inv
     })
 
     return response.created({
-      message: 'Quote created',
-      quote: {
-        id: quote.id,
-        quoteNumber: quote.quoteNumber,
-        status: quote.status,
-        total: quote.total,
+      message: 'Invoice created',
+      invoice: {
+        id: invoice.id,
+        invoiceNumber: invoice.invoiceNumber,
+        status: invoice.status,
+        total: invoice.total,
       },
     })
   }

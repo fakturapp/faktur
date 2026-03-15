@@ -9,10 +9,14 @@ const QuoteDelete = () => import('#controllers/quote/delete')
 const QuoteNextNumber = () => import('#controllers/quote/next_number')
 const QuotePdf = () => import('#controllers/quote/pdf')
 const QuoteFacturXml = () => import('#controllers/quote/pdf').then((m) => ({ default: m.FacturXml }))
+const QuoteDocumentCount = () => import('#controllers/quote/document_count')
+const QuoteSetNextNumber = () => import('#controllers/quote/set_next_number')
 
 router
   .group(() => {
     router.get('/next-number', [QuoteNextNumber, 'handle'])
+    router.get('/document-count', [QuoteDocumentCount, 'handle'])
+    router.post('/set-next-number', [QuoteSetNextNumber, 'handle'])
     router.get('/', [QuoteList, 'handle'])
     router.get('/:id/pdf', [QuotePdf, 'handle'])
     router.get('/:id/facturx', [QuoteFacturXml, 'handle'])

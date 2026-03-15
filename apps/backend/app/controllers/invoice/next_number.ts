@@ -1,5 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import Quote from '#models/quote/quote'
+import Invoice from '#models/invoice/invoice'
 import InvoiceSetting from '#models/team/invoice_setting'
 
 export default class NextNumber {
@@ -13,22 +13,22 @@ export default class NextNumber {
 
     // Check if there's a custom starting number set
     const settings = await InvoiceSetting.query().where('team_id', teamId).first()
-    if (settings?.nextQuoteNumber) {
-      return response.ok({ nextNumber: settings.nextQuoteNumber })
+    if (settings?.nextInvoiceNumber) {
+      return response.ok({ nextNumber: settings.nextInvoiceNumber })
     }
 
-    const lastQuote = await Quote.query()
+    const lastInvoice = await Invoice.query()
       .where('team_id', teamId)
       .orderBy('created_at', 'desc')
       .first()
 
-    let nextNumber = 'DEV-001'
+    let nextNumber = 'FAC-001'
 
-    if (lastQuote) {
-      const match = lastQuote.quoteNumber.match(/^DEV-(\d+)$/)
+    if (lastInvoice) {
+      const match = lastInvoice.invoiceNumber.match(/^FAC-(\d+)$/)
       if (match) {
         const num = parseInt(match[1], 10) + 1
-        nextNumber = `DEV-${num.toString().padStart(3, '0')}`
+        nextNumber = `FAC-${num.toString().padStart(3, '0')}`
       }
     }
 
