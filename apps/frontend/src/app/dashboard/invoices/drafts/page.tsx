@@ -63,7 +63,7 @@ export default function InvoiceDraftsPage() {
   const [downloadingId, setDownloadingId] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>()
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   const handleSearchChange = useCallback((value: string) => {
     setSearch(value)
