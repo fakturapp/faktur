@@ -28,6 +28,12 @@ function generateId() {
   return Math.random().toString(36).substring(2, 9)
 }
 
+function addDays(dateStr: string | null | undefined, days: number) {
+  const base = dateStr ? new Date(dateStr) : new Date()
+  base.setDate(base.getDate() + days)
+  return base.toISOString().split('T')[0]
+}
+
 export default function EditInvoicePage() {
   const params = useParams()
   const invoiceId = params.id as string
@@ -113,7 +119,7 @@ export default function EditInvoicePage() {
           billingType: inv.billingType,
           subject: inv.subject || '',
           issueDate: inv.issueDate || '',
-          validityDate: inv.dueDate || '',
+          validityDate: inv.dueDate || addDays(inv.issueDate, 30),
           deliveryAddress: inv.deliveryAddress || '',
           clientSiren: inv.clientSiren || '',
           clientVatNumber: inv.clientVatNumber || '',

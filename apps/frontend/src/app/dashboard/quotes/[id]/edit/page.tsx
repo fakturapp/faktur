@@ -27,6 +27,12 @@ function generateId() {
   return Math.random().toString(36).substring(2, 9)
 }
 
+function addDays(dateStr: string | null | undefined, days: number) {
+  const base = dateStr ? new Date(dateStr) : new Date()
+  base.setDate(base.getDate() + days)
+  return base.toISOString().split('T')[0]
+}
+
 export default function EditQuotePage() {
   const router = useRouter()
   const params = useParams()
@@ -100,7 +106,7 @@ export default function EditQuotePage() {
           billingType: q.billingType,
           subject: q.subject || '',
           issueDate: q.issueDate || '',
-          validityDate: q.validityDate || '',
+          validityDate: q.validityDate || addDays(q.issueDate, 30),
           deliveryAddress: q.deliveryAddress || '',
           clientSiren: q.clientSiren || '',
           clientVatNumber: q.clientVatNumber || '',
