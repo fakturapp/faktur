@@ -13,7 +13,7 @@ import { api } from '@/lib/api'
 import { A4Sheet, ClientModal, type QuoteLine, type ClientInfo, type CompanyInfo } from '@/components/quotes/a4-sheet'
 import { QuoteOptionsPanel } from '@/components/quotes/quote-options'
 import { Save, ArrowLeft, Eye, Pencil, SlidersHorizontal, Download, Link2, Unlink, Landmark } from 'lucide-react'
-import { Dialog, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
 
 const fadeUp = {
@@ -48,6 +48,7 @@ export default function EditInvoicePage() {
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
   const [sourceQuote, setSourceQuote] = useState<{ id: string; quoteNumber: string } | null>(null)
   const [unlinking, setUnlinking] = useState(false)
+  const [showUnlinkConfirm, setShowUnlinkConfirm] = useState(false)
   const [bankInfo, setBankInfo] = useState<{ iban: string | null; bic: string | null; bankName: string | null } | null>(null)
 
   const [lines, setLines] = useState<QuoteLine[]>([
@@ -439,7 +440,7 @@ export default function EditInvoicePage() {
                 {sourceQuote.quoteNumber}
               </Link>
               <button
-                onClick={handleUnlinkQuote}
+                onClick={() => setShowUnlinkConfirm(true)}
                 disabled={unlinking}
                 className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors ml-1"
                 title="Delier le devis"
@@ -579,6 +580,20 @@ export default function EditInvoicePage() {
           <Button variant="outline" size="sm" onClick={cancelNavigation}>Annuler</Button>
           <Button variant="ghost" size="sm" onClick={() => { confirmNavigation(); router.push('/dashboard/invoices') }}>Ignorer</Button>
           <Button size="sm" onClick={async () => { confirmNavigation(); await handleSave() }}><Save className="h-3.5 w-3.5 mr-1" /> Enregistrer</Button>
+        </DialogFooter>
+      </Dialog>
+
+      <Dialog open={showUnlinkConfirm} onClose={() => setShowUnlinkConfirm(false)} className="max-w-sm">
+        <DialogTitle>Delier le devis</DialogTitle>
+        <DialogDescription>
+          Etes-vous sur de vouloir delier le devis {sourceQuote?.quoteNumber} de cette facture ? Cette action est reversible.
+        </DialogDescription>
+        <DialogFooter>
+          <Button variant="outline" size="sm" onClick={() => setShowUnlinkConfirm(false)}>Annuler</Button>
+          <Button variant="destructive" size="sm" disabled={unlinking} onClick={async () => { await handleUnlinkQuote(); setShowUnlinkConfirm(false) }}>
+            {unlinking ? <Spinner className="h-3.5 w-3.5" /> : <Unlink className="h-3.5 w-3.5 mr-1" />}
+            Delier
+          </Button>
         </DialogFooter>
       </Dialog>
     </motion.div>

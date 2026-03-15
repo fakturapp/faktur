@@ -65,7 +65,7 @@ export function CreateInvoiceModal({ open, onClose }: CreateInvoiceModalProps) {
   const [statusFilter, setStatusFilter] = useState<string[]>(['sent', 'accepted'])
   const [quotePage, setQuotePage] = useState(1)
   const [quoteMeta, setQuoteMeta] = useState<PaginationMeta | null>(null)
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>()
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   const handleSearchChange = useCallback((value: string) => {
     setSearch(value)
@@ -124,7 +124,8 @@ export function CreateInvoiceModal({ open, onClose }: CreateInvoiceModalProps) {
   async function handleConvertQuote(quoteId: string) {
     setConvertingId(quoteId)
     const { data, error } = await api.post<{ invoice: { id: string; invoiceNumber: string } }>(
-      `/invoices/convert-quote/${quoteId}`
+      `/invoices/convert-quote/${quoteId}`,
+      {}
     )
     setConvertingId(null)
 

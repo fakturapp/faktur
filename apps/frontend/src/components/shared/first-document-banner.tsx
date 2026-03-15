@@ -15,6 +15,28 @@ interface FirstDocumentBannerProps {
   onNumberChange: (n: string) => void
 }
 
+const DISMISSED_KEY = 'faktur_first_doc_dismissed'
+
+function isDismissed(type: string): boolean {
+  try {
+    const raw = localStorage.getItem(DISMISSED_KEY)
+    if (!raw) return false
+    const map = JSON.parse(raw)
+    return !!map[type]
+  } catch {
+    return false
+  }
+}
+
+function setDismissed(type: string) {
+  try {
+    const raw = localStorage.getItem(DISMISSED_KEY)
+    const map = raw ? JSON.parse(raw) : {}
+    map[type] = true
+    localStorage.setItem(DISMISSED_KEY, JSON.stringify(map))
+  } catch {}
+}
+
 export function FirstDocumentBanner({ documentType, currentNumber, onNumberChange }: FirstDocumentBannerProps) {
   const { toast } = useToast()
   const [visible, setVisible] = useState(false)
@@ -27,13 +49,20 @@ export function FirstDocumentBanner({ documentType, currentNumber, onNumberChang
   const label = isQuote ? 'devis' : 'facture'
 
   useEffect(() => {
+    if (isDismissed(documentType)) {
+      setLoading(false)
+      return
+    }
+
     api.get<{ count: number }>(`${endpoint}/document-count`).then(({ data }) => {
       if (data && data.count === 0) {
         setVisible(true)
       }
       setLoading(false)
+    }).catch(() => {
+      setLoading(false)
     })
-  }, [endpoint])
+  }, [endpoint, documentType])
 
   useEffect(() => {
     setEditValue(currentNumber)
@@ -50,6 +79,12 @@ export function FirstDocumentBanner({ documentType, currentNumber, onNumberChang
     }
     onNumberChange(editValue.trim())
     toast(`Numero de ${label} mis a jour`, 'success')
+    setDismissed(documentType)
+    setVisible(false)
+  }
+
+  function handleDismiss() {
+    setDismissed(documentType)
     setVisible(false)
   }
 
@@ -84,6 +119,12 @@ export function FirstDocumentBanner({ documentType, currentNumber, onNumberChang
               {saving ? <Spinner className="h-3.5 w-3.5" /> : <Check className="h-3.5 w-3.5 mr-1" />}
               Valider
             </Button>
+            <button
+              onClick={handleDismiss}
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors ml-1"
+            >
+              Ignorer
+            </button>
           </div>
         </div>
       </div>

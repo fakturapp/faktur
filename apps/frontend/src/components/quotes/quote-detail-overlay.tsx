@@ -4,7 +4,9 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Spinner } from '@/components/ui/spinner'
+import { Button } from '@/components/ui/button'
 import { Dropdown, DropdownItem, DropdownSeparator } from '@/components/ui/dropdown'
+import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { StatusDropdown, quoteStatusOptions } from '@/components/shared/status-dropdown'
 import { useToast } from '@/components/ui/toast'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
@@ -82,7 +84,8 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
   const [duplicating, setDuplicating] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [downloading, setDownloading] = useState(false)
-  const commentTimeout = useRef<ReturnType<typeof setTimeout>>()
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const commentTimeout = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   useEffect(() => {
     if (!quoteId) return
@@ -195,7 +198,7 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
 
   async function handleDuplicate() {
     setDuplicating(true)
-    const { data, error } = await api.post<{ quote: { id: string; quoteNumber: string } }>(`/quotes/${quoteId}/duplicate`)
+    const { data, error } = await api.post<{ quote: { id: string; quoteNumber: string } }>(`/quotes/${quoteId}/duplicate`, {})
     setDuplicating(false)
     if (error) { toast(error, 'error'); return }
     if (data?.quote) {
@@ -212,6 +215,7 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
     setDeleting(false)
     if (error) { toast(error, 'error'); return }
     toast('Devis supprime', 'success')
+    setShowDeleteConfirm(false)
     onDelete(quoteId)
     onClose()
   }
@@ -313,8 +317,8 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
                     disabled={downloading}
                     className="h-9 px-4 rounded-full bg-card shadow-lg flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors border border-border"
                   >
-                    <Download className={`h-4 w-4 ${downloading ? 'animate-pulse' : ''}`} />
-                    Telecharger PDF
+                    {downloading ? <Spinner className="h-4 w-4" /> : <Download className="h-4 w-4" />}
+                    {downloading ? 'Telechargement...' : 'Telecharger PDF'}
                   </button>
                 </div>
               </div>
@@ -347,8 +351,19 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
                 </div>
 
                 <div className="flex-1 overflow-auto">
+                  {/* Prominent Edit button */}
+                  <div className="px-5 pt-4 pb-2">
+                    <Button
+                      className="w-full h-11 text-sm font-semibold gap-2"
+                      onClick={() => { onClose(); router.push(`/dashboard/quotes/${quote.id}/edit`) }}
+                    >
+                      <Pencil className="h-4 w-4" />
+                      Modifier le devis
+                    </Button>
+                  </div>
+
                   {/* Status */}
-                  <div className="px-5 py-4 border-b border-border">
+                  <div className="px-5 py-3 border-b border-border">
                     <StatusDropdown
                       id={quote.id}
                       currentStatus={quote.status}
@@ -407,12 +422,6 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
                     >
                       <Send className="h-4 w-4" /> Relancer le client
                     </button>
-                    <button
-                      onClick={() => { onClose(); router.push(`/dashboard/quotes/${quote.id}/edit`) }}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted/50 transition-colors"
-                    >
-                      <Pencil className="h-4 w-4" /> Modifier
-                    </button>
 
                     {/* Plus d'actions */}
                     <Dropdown
@@ -428,8 +437,8 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
                         {duplicating ? <Spinner /> : <Copy className="h-4 w-4" />} Dupliquer
                       </DropdownItem>
                       <DropdownSeparator />
-                      <DropdownItem destructive onClick={handleDelete}>
-                        {deleting ? <Spinner /> : <Trash2 className="h-4 w-4" />} Supprimer
+                      <DropdownItem destructive onClick={() => setShowDeleteConfirm(true)}>
+                        <Trash2 className="h-4 w-4" /> Supprimer
                       </DropdownItem>
                     </Dropdown>
                   </div>
@@ -454,6 +463,21 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
             ) : null}
           </motion.div>
         </div>
+
+        {/* Delete confirmation dialog */}
+        <Dialog open={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)} className="max-w-sm">
+          <DialogTitle>Supprimer le devis</DialogTitle>
+          <DialogDescription>
+            Etes-vous sur de vouloir supprimer le devis {quote?.quoteNumber} ? Cette action est irreversible.
+          </DialogDescription>
+          <DialogFooter>
+            <Button variant="outline" size="sm" onClick={() => setShowDeleteConfirm(false)}>Annuler</Button>
+            <Button variant="destructive" size="sm" disabled={deleting} onClick={handleDelete}>
+              {deleting ? <Spinner className="h-3.5 w-3.5" /> : <Trash2 className="h-3.5 w-3.5 mr-1" />}
+              Supprimer
+            </Button>
+          </DialogFooter>
+        </Dialog>
       </motion.div>
     </AnimatePresence>
   )
