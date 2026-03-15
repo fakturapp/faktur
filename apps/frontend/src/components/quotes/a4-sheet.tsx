@@ -461,6 +461,7 @@ interface A4SheetProps {
   showFreeField?: boolean
   showFooterText?: boolean
   footerMode?: 'company_info' | 'vat_exempt' | 'custom'
+  documentType?: 'quote' | 'invoice'
   onAcceptanceConditionsChange?: (v: string) => void
   onFreeFieldChange?: (v: string) => void
   onFooterTextChange?: (v: string) => void
@@ -482,6 +483,7 @@ export function A4Sheet({
   showNotes = true, vatExempt = false, footerText, documentFont = 'Lexend',
   showSubject = true, showAcceptanceConditions = false, showFreeField = false, showFooterText = false,
   footerMode = 'vat_exempt',
+  documentType = 'quote',
   onAcceptanceConditionsChange, onFreeFieldChange, onFooterTextChange, onDeliveryAddressChange,
   onIssueDateChange, onValidityDateChange,
 }: A4SheetProps) {
@@ -492,6 +494,9 @@ export function A4Sheet({
   const T = getTemplate(template, darkMode)
   const t = getTranslations(lang)
   const isClassique = T.id === 'classique'
+  const isInvoice = documentType === 'invoice'
+  const defaultTitle = isInvoice ? t.invoice : t.quote
+  const validityLabel = isInvoice ? t.dueDate : t.validity
   // Template font override takes precedence
   const effectiveFont = T.font || documentFont
 
@@ -572,7 +577,7 @@ export function A4Sheet({
                     </div>
                     <div className="text-right">
                       <div className="text-[18px] font-bold uppercase tracking-[2px]" style={{ color: contrastText(accentColor) }}>
-                        {documentTitle || t.quote}
+                        {documentTitle || defaultTitle}
                       </div>
                       <div className="text-[11px] mt-0.5" style={{ color: contrastText(accentColor), opacity: 0.8 }}>
                         {t.quoteNumber} {quoteNumber}
@@ -626,7 +631,7 @@ export function A4Sheet({
                     {isClassique ? (
                       <>
                         <div className="text-[14px] font-semibold mb-1" style={{ color: T.text }}>
-                          {documentTitle || t.quote}
+                          {documentTitle || defaultTitle}
                         </div>
                         <div className="text-[12px] leading-[1.8]" style={{ color: T.text }}>
                           {t.quoteNumber} {ie(quoteNumber, onQuoteNumberChange, 'font-semibold', 'D-0001')}
@@ -645,7 +650,7 @@ export function A4Sheet({
                           <div className="flex items-center gap-2 justify-center">
                             <FileText className="h-5 w-5" style={{ color: accentColor }} />
                             <span className="text-[20px] font-bold uppercase tracking-[2px]" style={{ color: accentColor }}>
-                              {documentTitle || t.quote}
+                              {documentTitle || defaultTitle}
                             </span>
                           </div>
                         </div>
@@ -801,7 +806,7 @@ export function A4Sheet({
                 isClassique ? (
                   <div className="flex items-end gap-3 mb-4">
                     <div className="flex-1 text-[14px] font-semibold" style={{ color: T.text, padding: '8px' }}>
-                      {documentTitle || t.quote}
+                      {documentTitle || defaultTitle}
                     </div>
                     <div className="flex flex-col">
                       <span className="text-[12px] mb-0.5" style={{ color: T.textMuted, letterSpacing: '0.4px' }}>{t.date}</span>
@@ -838,7 +843,7 @@ export function A4Sheet({
                       )}
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[12px] mb-0.5" style={{ color: T.textMuted, letterSpacing: '0.4px' }}>{t.validity}</span>
+                      <span className="text-[12px] mb-0.5" style={{ color: T.textMuted, letterSpacing: '0.4px' }}>{validityLabel}</span>
                       {ed ? (
                         <input
                           type="date"
@@ -889,7 +894,7 @@ export function A4Sheet({
                       )}
                     </div>
                     <div className="text-[11px]" style={{ color: T.textMuted }}>
-                      <span className="font-semibold" style={{ color: T.text }}>{t.validity} :</span>{' '}
+                      <span className="font-semibold" style={{ color: T.text }}>{validityLabel} :</span>{' '}
                       {ed ? (
                         <input
                           type="date"

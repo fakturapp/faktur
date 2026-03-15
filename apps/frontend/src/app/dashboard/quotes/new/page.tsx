@@ -14,6 +14,7 @@ import { QuoteOptionsPanel } from '@/components/quotes/quote-options'
 import { Save, ArrowLeft, Eye, Pencil, SlidersHorizontal } from 'lucide-react'
 import { Dialog, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
+import { FirstDocumentBanner } from '@/components/shared/first-document-banner'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -403,6 +404,11 @@ export default function NewQuotePage() {
           >
             <SlidersHorizontal className="h-4 w-4" />
           </button>
+          <FirstDocumentBanner
+            documentType="quote"
+            currentNumber={quoteNumber}
+            onNumberChange={setQuoteNumber}
+          />
           <A4Sheet
             mode={mode}
             logoUrl={invoiceSettings.logoSource === 'company' ? companyLogoUrl : invoiceSettings.logoUrl}
