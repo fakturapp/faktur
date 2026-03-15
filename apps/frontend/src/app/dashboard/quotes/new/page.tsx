@@ -541,7 +541,7 @@ export default function NewQuotePage() {
           <Button variant="outline" size="sm" onClick={cancelNavigation}>
             Annuler
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => { confirmNavigation(); router.push('/dashboard/quotes') }}>
+          <Button variant="ghost" size="sm" onClick={() => { setIsDirty(false); confirmNavigation(); router.push('/dashboard/quotes') }}>
             Ignorer
           </Button>
           <Button size="sm" onClick={async () => { confirmNavigation(); await handleSave() }}>

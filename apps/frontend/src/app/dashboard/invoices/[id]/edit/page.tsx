@@ -578,7 +578,7 @@ export default function EditInvoicePage() {
         <p className="mt-2 text-sm text-muted-foreground">Vous avez des modifications non enregistrées. Que souhaitez-vous faire ?</p>
         <DialogFooter>
           <Button variant="outline" size="sm" onClick={cancelNavigation}>Annuler</Button>
-          <Button variant="ghost" size="sm" onClick={() => { confirmNavigation(); router.push('/dashboard/invoices') }}>Ignorer</Button>
+          <Button variant="ghost" size="sm" onClick={() => { setIsDirty(false); confirmNavigation(); router.push('/dashboard/invoices') }}>Ignorer</Button>
           <Button size="sm" onClick={async () => { confirmNavigation(); await handleSave() }}><Save className="h-3.5 w-3.5 mr-1" /> Enregistrer</Button>
         </DialogFooter>
       </Dialog>
