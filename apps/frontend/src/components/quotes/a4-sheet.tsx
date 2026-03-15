@@ -287,7 +287,7 @@ export function ClientModal({
         {loading ? (
           <div className="flex items-center justify-center py-10"><Spinner /></div>
         ) : results.length === 0 ? (
-          <p className="text-center text-sm text-muted-foreground py-10">{search ? 'Aucun client trouve' : 'Aucun client'}</p>
+          <p className="text-center text-sm text-muted-foreground py-10">{search ? 'Aucun client trouvé' : 'Aucun client'}</p>
         ) : (
           results.map((c) => (
             <button key={c.id} onClick={() => { onSelect(c); onClose() }}
@@ -1185,7 +1185,7 @@ export function A4Sheet({
                         <textarea
                           value={footerText || ''}
                           onChange={(e) => onFooterTextChange?.(e.target.value.slice(0, 50))}
-                          placeholder={lang === 'en' ? 'Legal information' : 'Informations legales de ma societe'}
+                          placeholder={lang === 'en' ? 'Legal information' : 'Informations légales de ma société'}
                           className="w-full bg-transparent text-[11px] leading-[1.6] text-center focus:outline-none resize-y min-h-[20px]"
                           style={{ color: T.textFooter }}
                           rows={1}
@@ -1218,7 +1218,7 @@ export function A4Sheet({
                       <textarea
                         value={footerText || ''}
                         onChange={(e) => onFooterTextChange?.(e.target.value.slice(0, 50))}
-                        placeholder={lang === 'en' ? 'Custom footer text...' : 'Ex: Conditions generales de vente...'}
+                        placeholder={lang === 'en' ? 'Custom footer text...' : 'Ex: Conditions générales de vente...'}
                         className="w-full bg-transparent text-[9px] leading-[1.6] text-center focus:outline-none resize-y min-h-[30px]"
                         style={{ color: T.textFooter }}
                         rows={2}

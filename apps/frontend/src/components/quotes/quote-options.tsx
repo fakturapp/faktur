@@ -246,7 +246,7 @@ export function QuoteOptionsPanel({
               setShowTitle(!showTitle)
               if (showTitle) onChange({ documentTitle: '' })
             }}
-            label="Titre personnalise"
+            label="Titre personnalisé"
           >
             <Input
               placeholder="DEVIS"
@@ -360,7 +360,7 @@ export function QuoteOptionsPanel({
           <div className="flex items-center justify-between py-1">
             <div className="flex items-center gap-1.5">
               <span className="text-[13px] text-foreground">Factur-X (PDF/A-3)</span>
-              <Tooltip content="Le format Factur-X est le standard de facturation electronique en France, obligatoire a partir de septembre 2026.">
+              <Tooltip content="Le format Factur-X est le standard de facturation électronique en France, obligatoire à partir de septembre 2026.">
                 <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
               </Tooltip>
             </div>

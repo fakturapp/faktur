@@ -68,8 +68,8 @@ const defaultSettings: InvoiceSettings = {
   defaultFooterText: null,
   defaultShowDeliveryAddress: false,
   defaultLanguage: 'fr',
-  quoteFilenamePattern: 'DEV-{numero}',
-  invoiceFilenamePattern: 'FAC-{numero}',
+  quoteFilenamePattern: 'DEV-{numéro}',
+  invoiceFilenamePattern: 'FAC-{numéro}',
   footerMode: 'vat_exempt',
 }
 

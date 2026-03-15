@@ -79,7 +79,7 @@ function TwoFactorContent() {
                 <h1 className="text-2xl font-bold">Verification 2FA</h1>
                 <p className="text-muted-foreground text-sm">
                   {useRecovery
-                    ? 'Entrez un de vos codes de recuperation'
+                    ? 'Entrez un de vos codes de récupération'
                     : 'Entrez le code a 6 chiffres de votre application authenticator'}
                 </p>
               </motion.div>
@@ -95,7 +95,7 @@ function TwoFactorContent() {
               <motion.div variants={fadeUp} custom={2}>
                 <Field>
                   <FieldLabel htmlFor="code">
-                    {useRecovery ? 'Code de recuperation' : 'Code de verification'}
+                    {useRecovery ? 'Code de récupération' : 'Code de vérification'}
                   </FieldLabel>
                   <Input
                     id="code"
@@ -132,7 +132,7 @@ function TwoFactorContent() {
                   >
                     {useRecovery
                       ? 'Utiliser le code authenticator'
-                      : 'Utiliser un code de recuperation'}
+                      : 'Utiliser un code de récupération'}
                   </button>
                   <Link href="/login" className="text-muted-foreground hover:text-foreground block">
                     Retour a la connexion

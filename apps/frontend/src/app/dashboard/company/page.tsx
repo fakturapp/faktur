@@ -320,7 +320,7 @@ export default function CompanyPage() {
                       onClick={() => logoInputRef.current?.click()}
                       disabled={uploading || noCompany}
                     >
-                      {uploading ? <><Spinner className="text-foreground" /> Envoi...</> : 'Telecharger un logo'}
+                      {uploading ? <><Spinner className="text-foreground" /> Envoi...</> : 'Télécharger un logo'}
                     </Button>
                     {noCompany && (
                       <p className="text-xs text-muted-foreground">Enregistrez d&apos;abord les informations de l&apos;entreprise.</p>

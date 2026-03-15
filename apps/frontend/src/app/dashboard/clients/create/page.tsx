@@ -126,7 +126,7 @@ export default function ClientCreatePage() {
         city: r.city || prev.city,
       }))
     } else {
-      setError('Aucune entreprise trouvee pour ce numero.')
+      setError('Aucune entreprise trouvée pour ce numéro.')
     }
   }
 
@@ -326,7 +326,7 @@ export default function ClientCreatePage() {
                       </div>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-foreground mb-1.5 block">Telephone</label>
+                      <label className="text-sm font-medium text-foreground mb-1.5 block">Téléphone</label>
                       <div className="relative">
                         <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input type="tel" placeholder="06 12 34 56 78" value={form.phone} onChange={(e) => update('phone', e.target.value)} className="pl-10" />
@@ -431,7 +431,7 @@ export default function ClientCreatePage() {
           </Button>
         ) : (
           <Button onClick={handleSubmit} disabled={saving || !canGoNext()}>
-            {saving ? <><Spinner /> Creation...</> : <><Check className="h-4 w-4 mr-1" /> Creer le client</>}
+            {saving ? <><Spinner /> Création...</> : <><Check className="h-4 w-4 mr-1" /> Créer le client</>}
           </Button>
         )}
       </div>

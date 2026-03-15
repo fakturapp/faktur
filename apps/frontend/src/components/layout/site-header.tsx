@@ -14,7 +14,7 @@ const routeTitles: Record<string, string> = {
   '/dashboard/clients/create': 'Nouveau client',
   '/dashboard/company': 'Entreprise',
   '/dashboard/team': 'Equipe',
-  '/dashboard/team/create': 'Creer une equipe',
+  '/dashboard/team/create': 'Créer une équipe',
   '/dashboard/account': 'Mon compte',
   '/dashboard/settings/invoices': 'Facturation',
 }

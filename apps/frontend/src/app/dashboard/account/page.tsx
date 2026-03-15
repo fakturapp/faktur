@@ -295,7 +295,7 @@ export default function AccountPage() {
     }
     setSessions((prev) => prev.filter((s) => String(s.id) !== String(revokeConfirm)))
     setRevokeConfirm(null)
-    toast('Session revoquee', 'success')
+    toast('Session révoquée', 'success')
   }
 
   function handleDeleteAccount() {
@@ -398,7 +398,7 @@ export default function AccountPage() {
                       </Button>
                     )}
                   </div>
-                  <FieldDescription>Un code de verification sera envoyé à la nouvelle adresse.</FieldDescription>
+                  <FieldDescription>Un code de vérification sera envoyé à la nouvelle adresse.</FieldDescription>
                 </Field>
 
                 <Button type="submit" disabled={profileLoading}>

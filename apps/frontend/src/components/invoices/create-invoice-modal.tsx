@@ -40,10 +40,10 @@ interface CreateInvoiceModalProps {
 
 const statusLabels: Record<string, string> = {
   draft: 'Brouillon',
-  sent: 'Envoye',
-  accepted: 'Accepte',
-  refused: 'Refuse',
-  expired: 'Expire',
+  sent: 'Envoyé',
+  accepted: 'Accepté',
+  refused: 'Refusé',
+  expired: 'Expiré',
 }
 
 interface PaginationMeta {
@@ -135,7 +135,7 @@ export function CreateInvoiceModal({ open, onClose }: CreateInvoiceModalProps) {
     }
 
     if (data?.invoice) {
-      toast(`Facture ${data.invoice.invoiceNumber} creee`, 'success')
+      toast(`Facture ${data.invoice.invoiceNumber} créée`, 'success')
       onClose()
       router.push(`/dashboard/invoices/${data.invoice.id}/edit`)
     }
@@ -159,7 +159,7 @@ export function CreateInvoiceModal({ open, onClose }: CreateInvoiceModalProps) {
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.2 }}
           >
-            <DialogTitle>Creer une facture</DialogTitle>
+            <DialogTitle>Créer une facture</DialogTitle>
             <p className="text-sm text-muted-foreground mt-1 mb-5">
               Choisissez comment creer votre facture
             </p>
@@ -187,7 +187,7 @@ export function CreateInvoiceModal({ open, onClose }: CreateInvoiceModalProps) {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-foreground">Facture vierge</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Creer de zero</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Créer de zéro</p>
                 </div>
               </button>
             </div>
@@ -280,7 +280,7 @@ export function CreateInvoiceModal({ open, onClose }: CreateInvoiceModalProps) {
                 <div className="text-center py-8">
                   <FileText className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
                   <p className="text-sm text-muted-foreground">
-                    {search ? 'Aucun devis trouve' : 'Aucun devis disponible'}
+                    {search ? 'Aucun devis trouvé' : 'Aucun devis disponible'}
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     Modifiez les filtres pour voir plus de devis

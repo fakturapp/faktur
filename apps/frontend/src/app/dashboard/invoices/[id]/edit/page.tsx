@@ -293,7 +293,7 @@ export default function EditInvoicePage() {
       toast(error, 'error')
     } else {
       setIsDirty(false)
-      toast('Facture mise a jour', 'success')
+      toast('Facture mise à jour', 'success')
       router.push('/dashboard/invoices')
     }
   }
@@ -303,7 +303,7 @@ export default function EditInvoicePage() {
     const { blob, filename, error } = await api.downloadBlob(`/invoices/${invoiceId}/pdf`)
     setDownloading(false)
     if (error || !blob) {
-      toast(error || 'Erreur lors du telechargement', 'error')
+      toast(error || 'Erreur lors du téléchargement', 'error')
       return
     }
     const url = URL.createObjectURL(blob)
@@ -323,7 +323,7 @@ export default function EditInvoicePage() {
       return
     }
     setSourceQuote(null)
-    toast('Devis delie', 'success')
+    toast('Devis délié', 'success')
   }
 
   function maskIban(iban: string) {
@@ -432,7 +432,7 @@ export default function EditInvoicePage() {
           {sourceQuote && (
             <div className="flex items-center gap-2.5 rounded-xl border border-border bg-card/50 px-4 py-2.5">
               <Link2 className="h-4 w-4 text-primary shrink-0" />
-              <span className="text-sm text-muted-foreground">Lie au devis</span>
+              <span className="text-sm text-muted-foreground">Lié au devis</span>
               <Link
                 href={`/dashboard/quotes/${sourceQuote.id}/edit`}
                 className="text-sm font-medium text-primary hover:underline"
@@ -443,7 +443,7 @@ export default function EditInvoicePage() {
                 onClick={() => setShowUnlinkConfirm(true)}
                 disabled={unlinking}
                 className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors ml-1"
-                title="Delier le devis"
+                title="Délier le devis"
               >
                 <Unlink className={`h-3.5 w-3.5 ${unlinking ? 'animate-pulse' : ''}`} />
               </button>
@@ -574,8 +574,8 @@ export default function EditInvoicePage() {
       <ClientModal open={clientModalOpen} onClose={() => setClientModalOpen(false)} onSelect={handleSelectClient} />
 
       <Dialog open={showModal} onClose={cancelNavigation} className="max-w-sm">
-        <DialogTitle>Modifications non enregistrees</DialogTitle>
-        <p className="mt-2 text-sm text-muted-foreground">Vous avez des modifications non enregistrees. Que souhaitez-vous faire ?</p>
+        <DialogTitle>Modifications non enregistrées</DialogTitle>
+        <p className="mt-2 text-sm text-muted-foreground">Vous avez des modifications non enregistrées. Que souhaitez-vous faire ?</p>
         <DialogFooter>
           <Button variant="outline" size="sm" onClick={cancelNavigation}>Annuler</Button>
           <Button variant="ghost" size="sm" onClick={() => { confirmNavigation(); router.push('/dashboard/invoices') }}>Ignorer</Button>
@@ -584,15 +584,15 @@ export default function EditInvoicePage() {
       </Dialog>
 
       <Dialog open={showUnlinkConfirm} onClose={() => setShowUnlinkConfirm(false)} className="max-w-sm">
-        <DialogTitle>Delier le devis</DialogTitle>
+        <DialogTitle>Délier le devis</DialogTitle>
         <DialogDescription>
-          Etes-vous sur de vouloir delier le devis {sourceQuote?.quoteNumber} de cette facture ? Cette action est reversible.
+          Êtes-vous sûr de vouloir délier le devis {sourceQuote?.quoteNumber} de cette facture ? Cette action est réversible.
         </DialogDescription>
         <DialogFooter>
           <Button variant="outline" size="sm" onClick={() => setShowUnlinkConfirm(false)}>Annuler</Button>
           <Button variant="destructive" size="sm" disabled={unlinking} onClick={async () => { await handleUnlinkQuote(); setShowUnlinkConfirm(false) }}>
             {unlinking ? <Spinner className="h-3.5 w-3.5" /> : <Unlink className="h-3.5 w-3.5 mr-1" />}
-            Delier
+            Délier
           </Button>
         </DialogFooter>
       </Dialog>

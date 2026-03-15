@@ -92,16 +92,16 @@ export function StatusDropdown({ id, currentStatus, options, endpoint, onStatusC
 
 export const quoteStatusOptions: StatusOption[] = [
   { value: 'draft', label: 'Brouillon', color: 'text-zinc-400', bgColor: 'bg-zinc-400/10', icon: <FileEdit className="h-3.5 w-3.5" /> },
-  { value: 'sent', label: 'Envoye', color: 'text-blue-400', bgColor: 'bg-blue-400/10', icon: <Send className="h-3.5 w-3.5" /> },
-  { value: 'accepted', label: 'Accepte', color: 'text-green-400', bgColor: 'bg-green-400/10', icon: <CheckCircle className="h-3.5 w-3.5" /> },
-  { value: 'refused', label: 'Refuse', color: 'text-red-400', bgColor: 'bg-red-400/10', icon: <XCircle className="h-3.5 w-3.5" /> },
-  { value: 'expired', label: 'Expire', color: 'text-amber-400', bgColor: 'bg-amber-400/10', icon: <Clock className="h-3.5 w-3.5" /> },
+  { value: 'sent', label: 'Envoyé', color: 'text-blue-400', bgColor: 'bg-blue-400/10', icon: <Send className="h-3.5 w-3.5" /> },
+  { value: 'accepted', label: 'Accepté', color: 'text-green-400', bgColor: 'bg-green-400/10', icon: <CheckCircle className="h-3.5 w-3.5" /> },
+  { value: 'refused', label: 'Refusé', color: 'text-red-400', bgColor: 'bg-red-400/10', icon: <XCircle className="h-3.5 w-3.5" /> },
+  { value: 'expired', label: 'Expiré', color: 'text-amber-400', bgColor: 'bg-amber-400/10', icon: <Clock className="h-3.5 w-3.5" /> },
 ]
 
 export const invoiceStatusOptions: StatusOption[] = [
   { value: 'draft', label: 'Brouillon', color: 'text-zinc-400', bgColor: 'bg-zinc-400/10', icon: <FileEdit className="h-3.5 w-3.5" /> },
-  { value: 'sent', label: 'Envoyee', color: 'text-blue-400', bgColor: 'bg-blue-400/10', icon: <Send className="h-3.5 w-3.5" /> },
-  { value: 'paid', label: 'Payee', color: 'text-green-400', bgColor: 'bg-green-400/10', icon: <CreditCard className="h-3.5 w-3.5" /> },
+  { value: 'sent', label: 'Envoyée', color: 'text-blue-400', bgColor: 'bg-blue-400/10', icon: <Send className="h-3.5 w-3.5" /> },
+  { value: 'paid', label: 'Payée', color: 'text-green-400', bgColor: 'bg-green-400/10', icon: <CreditCard className="h-3.5 w-3.5" /> },
   { value: 'overdue', label: 'En retard', color: 'text-red-400', bgColor: 'bg-red-400/10', icon: <AlertTriangle className="h-3.5 w-3.5" /> },
-  { value: 'cancelled', label: 'Annulee', color: 'text-orange-400', bgColor: 'bg-orange-400/10', icon: <Ban className="h-3.5 w-3.5" /> },
+  { value: 'cancelled', label: 'Annulée', color: 'text-orange-400', bgColor: 'bg-orange-400/10', icon: <Ban className="h-3.5 w-3.5" /> },
 ]

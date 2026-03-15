@@ -174,7 +174,7 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
 
   function handleSendEmail() {
     if (!quote?.client?.email) {
-      toast('Aucun email client renseigne', 'error')
+      toast('Aucun email client renseigné', 'error')
       return
     }
     const subject = encodeURIComponent(`Devis ${quote.quoteNumber}`)
@@ -186,7 +186,7 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
 
   function handleReminder() {
     if (!quote?.client?.email) {
-      toast('Aucun email client renseigne', 'error')
+      toast('Aucun email client renseigné', 'error')
       return
     }
     const subject = encodeURIComponent(`Relance - Devis ${quote.quoteNumber}`)
@@ -202,7 +202,7 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
     setDuplicating(false)
     if (error) { toast(error, 'error'); return }
     if (data?.quote) {
-      toast(`Devis ${data.quote.quoteNumber} cree`, 'success')
+      toast(`Devis ${data.quote.quoteNumber} créé`, 'success')
       onClose()
       router.push(`/dashboard/quotes/${data.quote.id}/edit`)
     }
@@ -214,7 +214,7 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
     const { error } = await api.delete(`/quotes/${quoteId}`)
     setDeleting(false)
     if (error) { toast(error, 'error'); return }
-    toast('Devis supprime', 'success')
+    toast('Devis supprimé', 'success')
     setShowDeleteConfirm(false)
     onDelete(quoteId)
     onClose()
@@ -318,7 +318,7 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
                     className="h-9 px-4 rounded-full bg-card shadow-lg flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors border border-border"
                   >
                     {downloading ? <Spinner className="h-4 w-4" /> : <Download className="h-4 w-4" />}
-                    {downloading ? 'Telechargement...' : 'Telecharger PDF'}
+                    {downloading ? 'Téléchargement...' : 'Télécharger PDF'}
                   </button>
                 </div>
               </div>
@@ -380,10 +380,10 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
                       <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-3">
                         <div className="flex items-center gap-2 mb-1">
                           <Clock className="h-4 w-4 text-amber-500" />
-                          <span className="text-sm font-bold text-amber-500">Expire</span>
+                          <span className="text-sm font-bold text-amber-500">Expiré</span>
                         </div>
                         <p className="text-xs text-muted-foreground leading-relaxed">
-                          Ce devis a depasse sa date de validite. Vous pouvez le dupliquer pour en creer un nouveau.
+                          Ce devis a dépassé sa date de validité. Vous pouvez le dupliquer pour en créer un nouveau.
                         </p>
                       </div>
                     </div>
@@ -468,7 +468,7 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
         <Dialog open={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)} className="max-w-sm">
           <DialogTitle>Supprimer le devis</DialogTitle>
           <DialogDescription>
-            Etes-vous sur de vouloir supprimer le devis {quote?.quoteNumber} ? Cette action est irreversible.
+            Êtes-vous sûr de vouloir supprimer le devis {quote?.quoteNumber} ? Cette action est irréversible.
           </DialogDescription>
           <DialogFooter>
             <Button variant="outline" size="sm" onClick={() => setShowDeleteConfirm(false)}>Annuler</Button>

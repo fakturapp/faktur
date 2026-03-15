@@ -233,7 +233,7 @@ export default function OnboardingCompanyPage() {
                   <motion.div variants={fadeUp} custom={9} className="grid grid-cols-2 gap-4">
                     <Field>
                       <FieldLabel htmlFor="phone">
-                        <span className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5" /> Telephone</span>
+                        <span className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5" /> Téléphone</span>
                       </FieldLabel>
                       <Input id="phone" type="tel" placeholder="+33 1 23 45 67 89" value={form.phone} onChange={(e) => updateForm('phone', e.target.value)} />
                     </Field>
