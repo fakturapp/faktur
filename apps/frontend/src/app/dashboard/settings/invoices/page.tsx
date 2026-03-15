@@ -429,18 +429,84 @@ export default function InvoiceSettingsPage() {
   if (loading) {
     return (
       <div className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
+        {/* Header */}
         <div className="space-y-2">
-          <Skeleton className="h-8 w-64" />
-          <Skeleton className="h-4 w-96" />
+          <Skeleton className="h-7 w-32" />
+          <Skeleton className="h-4 w-64" />
         </div>
-        <Skeleton className="h-10 w-80 rounded-xl" />
+        {/* Tabs */}
+        <div className="flex gap-2">
+          {[...Array(3)].map((_, i) => (
+            <Skeleton key={i} className="h-9 w-28 rounded-lg" />
+          ))}
+        </div>
+        {/* Two-column layout */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <Skeleton className="h-40 rounded-xl" />
-            <Skeleton className="h-48 rounded-xl" />
-            <Skeleton className="h-32 rounded-xl" />
+          <div className="space-y-6">
+            {/* Template card */}
+            <div className="rounded-xl border border-border/50 p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <Skeleton className="h-9 w-9 rounded-lg" />
+                <div className="space-y-1.5">
+                  <Skeleton className="h-4 w-36" />
+                  <Skeleton className="h-3 w-56" />
+                </div>
+              </div>
+              <div className="flex items-center gap-4 rounded-xl border border-border p-4">
+                <Skeleton className="w-16 rounded" style={{ aspectRatio: '210/297' }} />
+                <div className="flex-1 space-y-1.5">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-3 w-40" />
+                </div>
+                <Skeleton className="h-5 w-5 rounded" />
+              </div>
+            </div>
+            {/* Logo card */}
+            <div className="rounded-xl border border-border/50 p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <Skeleton className="h-9 w-9 rounded-lg" />
+                <div className="space-y-1.5">
+                  <Skeleton className="h-4 w-12" />
+                  <Skeleton className="h-3 w-44" />
+                </div>
+              </div>
+              <div className="flex items-start gap-6">
+                <Skeleton className="h-24 w-24 rounded-xl shrink-0" />
+                <div className="flex-1 space-y-3">
+                  <Skeleton className="h-3.5 w-full max-w-xs" />
+                  <Skeleton className="h-8 w-32 rounded-lg" />
+                </div>
+              </div>
+            </div>
+            {/* Color card */}
+            <div className="rounded-xl border border-border/50 p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <Skeleton className="h-9 w-9 rounded-lg" />
+                <div className="space-y-1.5">
+                  <Skeleton className="h-4 w-44" />
+                  <Skeleton className="h-3 w-52" />
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2.5">
+                {[...Array(10)].map((_, i) => (
+                  <Skeleton key={i} className="h-9 w-9 rounded-lg" />
+                ))}
+              </div>
+            </div>
           </div>
-          <Skeleton className="h-[500px] rounded-xl" />
+          {/* Preview */}
+          <div className="rounded-xl border border-border/50 overflow-hidden">
+            <div className="px-5 py-3.5 border-b border-border flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-4 w-4 rounded" />
+                <Skeleton className="h-4 w-32" />
+              </div>
+              <Skeleton className="h-3 w-28" />
+            </div>
+            <div className="p-4 bg-muted/30">
+              <Skeleton className="w-full rounded-lg" style={{ aspectRatio: '210/270' }} />
+            </div>
+          </div>
         </div>
       </div>
     )

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -201,22 +202,46 @@ export default function CompanyPage() {
   if (loading) {
     return (
       <div className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
+        {/* Header */}
         <div className="space-y-2">
-          <div className="h-7 w-40 rounded bg-muted animate-pulse" />
-          <div className="h-4 w-64 rounded bg-muted animate-pulse" />
+          <Skeleton className="h-7 w-40" />
+          <Skeleton className="h-4 w-64" />
         </div>
+        {/* Tabs */}
         <div className="flex gap-2">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-9 w-32 rounded-lg bg-muted animate-pulse" />
+            <Skeleton key={i} className="h-9 w-32 rounded-lg" />
           ))}
         </div>
+        {/* Card with form fields */}
         <div className="rounded-2xl border border-border/50 p-6 space-y-5">
-          {[...Array(5)].map((_, i) => (
+          {/* Logo section */}
+          <div className="flex items-start gap-6">
+            <Skeleton className="h-24 w-24 rounded-xl shrink-0" />
+            <div className="flex-1 space-y-3">
+              <Skeleton className="h-3.5 w-full max-w-xs" />
+              <Skeleton className="h-8 w-32 rounded-lg" />
+            </div>
+          </div>
+          <Skeleton className="h-px w-full" />
+          {/* Form fields */}
+          {[...Array(4)].map((_, i) => (
             <div key={i} className="space-y-2">
-              <div className="h-3.5 w-24 rounded bg-muted animate-pulse" />
-              <div className="h-10 w-full rounded-lg bg-muted animate-pulse" />
+              <Skeleton className="h-3.5 w-24" />
+              <Skeleton className="h-10 w-full rounded-lg" />
             </div>
           ))}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Skeleton className="h-3.5 w-16" />
+              <Skeleton className="h-10 w-full rounded-lg" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-3.5 w-16" />
+              <Skeleton className="h-10 w-full rounded-lg" />
+            </div>
+          </div>
+          <Skeleton className="h-10 w-28 rounded-lg" />
         </div>
       </div>
     )
