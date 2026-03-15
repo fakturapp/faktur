@@ -56,7 +56,10 @@ export function FirstDocumentBanner({ documentType, currentNumber, onNumberChang
 
     api.get<{ count: number }>(`${endpoint}/document-count`).then(({ data }) => {
       if (data && data.count === 0) {
-        setVisible(true)
+        const numericPart = parseInt(currentNumber.replace(/\D/g, ''), 10)
+        if (isNaN(numericPart) || numericPart <= 1) {
+          setVisible(true)
+        }
       }
       setLoading(false)
     }).catch(() => {
