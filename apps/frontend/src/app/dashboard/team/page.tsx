@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -37,6 +38,7 @@ import {
   ImagePlus,
   Building2 as BuildingIcon,
   Upload,
+  AlertTriangle,
 } from 'lucide-react'
 
 interface TeamMember {
@@ -85,7 +87,8 @@ const roleColors: Record<string, string> = {
 }
 
 export default function TeamPage() {
-  const { user } = useAuth()
+  const router = useRouter()
+  const { user, refreshUser } = useAuth()
   const { toast } = useToast()
   const [team, setTeam] = useState<Team | null>(null)
   const [name, setName] = useState('')
@@ -121,6 +124,12 @@ export default function TeamPage() {
   const [logoOpen, setLogoOpen] = useState(false)
   const [uploadingIcon, setUploadingIcon] = useState(false)
   const iconInputRef = useRef<HTMLInputElement>(null)
+
+  // Delete team
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [deleteTeamName, setDeleteTeamName] = useState('')
+  const [deletePassword, setDeletePassword] = useState('')
+  const [deleting, setDeleting] = useState(false)
 
   const currentMember = team?.members.find((m) => m.userId === user?.id)
   const isAdmin = currentMember && ['super_admin', 'admin'].includes(currentMember.role)
@@ -244,6 +253,24 @@ export default function TeamPage() {
     toast('Logo mis à jour', 'success')
     setLogoOpen(false)
     loadTeam()
+  }
+
+  async function handleDeleteTeam() {
+    setDeleting(true)
+    const { data, error } = await api.delete<{ switchedToTeamId: string | null }>('/team', {
+      teamName: deleteTeamName,
+      password: deletePassword,
+    })
+    setDeleting(false)
+    if (error) return toast(error, 'error')
+    toast('Équipe supprimée', 'success')
+    setDeleteOpen(false)
+    await refreshUser()
+    if (data?.switchedToTeamId) {
+      router.push('/dashboard')
+    } else {
+      router.push('/onboarding/team')
+    }
   }
 
   function openRoleDialog(member: TeamMember) {
@@ -587,6 +614,35 @@ export default function TeamPage() {
         </div>
       )}
 
+      {/* Danger Zone */}
+      {isSuperAdmin && (
+        <div>
+          <div className="flex items-center gap-2 mb-3 px-1">
+            <AlertTriangle className="h-4 w-4 text-destructive" />
+            <h2 className="text-sm font-medium text-destructive uppercase tracking-wider">
+              Zone de danger
+            </h2>
+          </div>
+
+          <Card className="border-destructive/20">
+            <CardContent className="p-6">
+              <h3 className="font-semibold text-destructive">Supprimer l&apos;équipe</h3>
+              <p className="text-sm text-muted-foreground mt-1 mb-4">
+                Toutes les factures, devis, clients et données de l&apos;équipe seront supprimés définitivement.
+                Cette action est irréversible.
+              </p>
+              <Button
+                variant="outline"
+                className="border-destructive/30 text-destructive hover:bg-destructive/10"
+                onClick={() => setDeleteOpen(true)}
+              >
+                <Trash2 className="h-4 w-4 mr-2" /> Supprimer l&apos;équipe
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* Invite Dialog */}
       <Dialog open={inviteOpen} onClose={resetInviteDialog}>
         {!inviteResult ? (
@@ -736,6 +792,54 @@ export default function TeamPage() {
             disabled={removing}
           >
             {removing ? <><Spinner /> Suppression...</> : 'Retirer'}
+          </Button>
+        </DialogFooter>
+      </Dialog>
+
+      {/* Delete Team Dialog */}
+      <Dialog open={deleteOpen} onClose={() => { setDeleteOpen(false); setDeleteTeamName(''); setDeletePassword('') }}>
+        <DialogTitle>Supprimer l&apos;équipe</DialogTitle>
+        <DialogDescription>
+          Cette action est <strong className="text-destructive">irréversible</strong>. Toutes les factures, devis,
+          clients et données de l&apos;équipe <strong>{team?.name}</strong> seront supprimés définitivement.
+        </DialogDescription>
+
+        <div className="mt-4 space-y-4">
+          <Field>
+            <FieldLabel htmlFor="deleteTeamName">
+              Tapez <strong>{team?.name}</strong> pour confirmer
+            </FieldLabel>
+            <Input
+              id="deleteTeamName"
+              value={deleteTeamName}
+              onChange={(e) => setDeleteTeamName(e.target.value)}
+              placeholder={team?.name || ''}
+            />
+          </Field>
+
+          <Field>
+            <FieldLabel htmlFor="deletePassword">Mot de passe du compte</FieldLabel>
+            <Input
+              id="deletePassword"
+              type="password"
+              value={deletePassword}
+              onChange={(e) => setDeletePassword(e.target.value)}
+              placeholder="Votre mot de passe"
+            />
+          </Field>
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => { setDeleteOpen(false); setDeleteTeamName(''); setDeletePassword('') }}>
+            Annuler
+          </Button>
+          <Button
+            variant="outline"
+            className="border-destructive/30 text-destructive hover:bg-destructive/10"
+            onClick={handleDeleteTeam}
+            disabled={deleting || deleteTeamName !== team?.name || !deletePassword}
+          >
+            {deleting ? <><Spinner /> Suppression...</> : <><Trash2 className="h-4 w-4 mr-2" /> Supprimer définitivement</>}
           </Button>
         </DialogFooter>
       </Dialog>
