@@ -1178,11 +1178,12 @@ export function A4Sheet({
                       ed ? (
                         <textarea
                           value={footerText || ''}
-                          onChange={(e) => onFooterTextChange?.(e.target.value)}
+                          onChange={(e) => onFooterTextChange?.(e.target.value.slice(0, 50))}
                           placeholder={lang === 'en' ? 'Legal information' : 'Informations legales de ma societe'}
                           className="w-full bg-transparent text-[11px] leading-[1.6] text-center focus:outline-none resize-y min-h-[20px]"
                           style={{ color: T.textFooter }}
                           rows={1}
+                          maxLength={50}
                         />
                       ) : (
                         <div className="text-[11px] leading-[1.6] whitespace-pre-line" style={{ color: T.textFooter }}>
@@ -1206,11 +1207,12 @@ export function A4Sheet({
                     ed ? (
                       <textarea
                         value={footerText || ''}
-                        onChange={(e) => onFooterTextChange?.(e.target.value)}
+                        onChange={(e) => onFooterTextChange?.(e.target.value.slice(0, 50))}
                         placeholder={lang === 'en' ? 'Custom footer text...' : 'Ex: Conditions generales de vente...'}
                         className="w-full bg-transparent text-[9px] leading-[1.6] text-center focus:outline-none resize-y min-h-[30px]"
                         style={{ color: T.textFooter }}
                         rows={2}
+                        maxLength={50}
                       />
                     ) : (
                       <div className="text-[9px] leading-[1.6] whitespace-pre-line" style={{ color: T.textFooter }}>
