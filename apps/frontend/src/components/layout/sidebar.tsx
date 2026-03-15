@@ -8,12 +8,13 @@ import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Avatar } from '@/components/ui/avatar'
 import { Dropdown, DropdownItem, DropdownLabel, DropdownSeparator } from '@/components/ui/dropdown'
+import { Switch } from '@/components/ui/switch'
+import { useTheme } from '@/lib/theme'
 import {
   LayoutDashboard,
   FileText,
   Receipt,
   Users,
-  Building2,
   Settings,
   ChevronRight,
   ChevronDown,
@@ -27,9 +28,9 @@ import {
   Eye,
   MoreHorizontal,
   CirclePlus,
-  Globe,
+  Sun,
+  Moon,
 } from 'lucide-react'
-import { useTranslation, type Locale } from '@/lib/i18n'
 
 interface TeamListItem {
   id: string
@@ -48,6 +49,7 @@ export interface SidebarProps {
   user: { fullName: string | null; email: string; avatarUrl: string | null }
   onLogout: () => void
   collapsed?: boolean
+  badges?: Record<string, number>
 }
 
 const roleIcons: Record<string, React.ReactNode> = {
@@ -94,14 +96,19 @@ const mainNav: NavItem[] = [
   { href: '/dashboard/clients', label: 'Clients', icon: Users },
 ]
 
-const managementNav: NavItem[] = [
-  { href: '/dashboard/company', label: 'Entreprise', icon: Building2 },
-  { href: '/dashboard/team', label: 'Equipe', icon: Users },
-  { href: '/dashboard/settings/invoices', label: 'Facturation', icon: FileText },
-  { href: '/dashboard/account', label: 'Parametres', icon: Settings },
-]
+const settingsNav: NavItem = {
+  href: '/dashboard/account',
+  label: 'Parametres',
+  icon: Settings,
+  children: [
+    { href: '/dashboard/account', label: 'Mon compte' },
+    { href: '/dashboard/company', label: 'Entreprise' },
+    { href: '/dashboard/team', label: 'Equipe' },
+    { href: '/dashboard/settings/invoices', label: 'Facturation' },
+  ],
+}
 
-function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
+function NavLink({ item, pathname, badges }: { item: NavItem; pathname: string; badges?: Record<string, number> }) {
   const isActive = item.href === '/dashboard'
     ? pathname === '/dashboard'
     : pathname === item.href || pathname.startsWith(item.href + '/')
@@ -161,18 +168,24 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
             <div className="ml-4 border-l border-sidebar-border pl-3 py-1 space-y-0.5">
               {item.children!.map((child) => {
                 const childActive = pathname === child.href
+                const badgeCount = badges?.[child.href]
                 return (
                   <Link
                     key={child.href}
                     href={child.href}
                     className={cn(
-                      'flex items-center rounded-md px-3 py-1.5 text-sm transition-all duration-300 ease-in-out',
+                      'flex items-center justify-between rounded-md px-3 py-1.5 text-sm transition-all duration-300 ease-in-out',
                       childActive
                         ? 'bg-sidebar-accent/50 text-sidebar-accent-foreground font-medium'
                         : 'text-muted-foreground hover:bg-sidebar-accent/50 hover:text-foreground'
                     )}
                   >
-                    {child.label}
+                    <span>{child.label}</span>
+                    {badgeCount != null && badgeCount > 0 && (
+                      <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary/10 px-1.5 text-[10px] font-semibold text-primary">
+                        {badgeCount}
+                      </span>
+                    )}
                   </Link>
                 )
               })}
@@ -184,28 +197,9 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
   )
 }
 
-function LanguageSwitcher() {
-  const { locale, setLocale } = useTranslation()
-  const locales: { value: Locale; label: string; flag: string }[] = [
-    { value: 'fr', label: 'Français', flag: '🇫🇷' },
-    { value: 'en', label: 'English', flag: '🇬🇧' },
-  ]
-
-  return (
-    <div className="px-1">
-      {locales.map((l) => (
-        <DropdownItem key={l.value} onClick={() => setLocale(l.value)}>
-          <Globe className="h-4 w-4" />
-          <span>{l.flag} {l.label}</span>
-          {locale === l.value && <Check className="h-3.5 w-3.5 ml-auto text-primary" />}
-        </DropdownItem>
-      ))}
-    </div>
-  )
-}
-
-export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, onLogout, collapsed }: SidebarProps) {
+export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, onLogout, collapsed, badges }: SidebarProps) {
   const pathname = usePathname()
+  const { resolvedTheme, setTheme } = useTheme()
 
   const initials = user.fullName
     ? user.fullName.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
@@ -219,14 +213,18 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
       )}
     >
       {/* Team header */}
-      <div className="px-3 py-3">
+      <div className="px-3 pt-3 pb-3">
         {teamsLoaded ? (
           <Dropdown
             align="left"
             trigger={
               <div className="flex items-center gap-2.5 rounded-lg px-3 py-2 hover:bg-sidebar-accent/50 transition-all duration-300 ease-in-out w-full">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary font-semibold text-xs">
-                  {currentTeam?.name.charAt(0).toUpperCase() || 'T'}
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary font-semibold text-xs overflow-hidden">
+                  {currentTeam?.iconUrl ? (
+                    <img src={currentTeam.iconUrl} alt={currentTeam.name} className="h-full w-full object-cover" />
+                  ) : (
+                    currentTeam?.name.charAt(0).toUpperCase() || 'T'
+                  )}
                 </div>
                 <div className="flex-1 min-w-0 text-left">
                   <p className="text-sm font-semibold text-foreground leading-tight truncate">
@@ -255,8 +253,12 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
               >
                 <div className="flex items-center justify-between w-full">
                   <div className="flex items-center gap-2.5">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted text-xs font-semibold text-foreground">
-                      {team.name.charAt(0).toUpperCase()}
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted text-xs font-semibold text-foreground overflow-hidden">
+                      {team.iconUrl ? (
+                        <img src={team.iconUrl} alt={team.name} className="h-full w-full object-cover" />
+                      ) : (
+                        team.name.charAt(0).toUpperCase()
+                      )}
                     </div>
                     <div>
                       <p className="text-sm font-medium text-foreground leading-tight">{team.name}</p>
@@ -272,19 +274,6 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
                 </div>
               </DropdownItem>
             ))}
-
-            <DropdownSeparator />
-
-            <Link href="/dashboard/team">
-              <DropdownItem>
-                <Users className="h-4 w-4" /> Gerer l&apos;equipe
-              </DropdownItem>
-            </Link>
-            <Link href="/dashboard/company">
-              <DropdownItem>
-                <Building2 className="h-4 w-4" /> Entreprise
-              </DropdownItem>
-            </Link>
 
             <DropdownSeparator />
 
@@ -321,19 +310,14 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-1">
         {mainNav.map((item) => (
-          <NavLink key={item.href} item={item} pathname={pathname} />
-        ))}
-
-        <div className="pt-4 pb-1">
-          <p className="px-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-            Gestion
-          </p>
-        </div>
-
-        {managementNav.map((item) => (
-          <NavLink key={item.href} item={item} pathname={pathname} />
+          <NavLink key={item.href} item={item} pathname={pathname} badges={badges} />
         ))}
       </nav>
+
+      {/* Pinned settings */}
+      <div className="px-3 pb-2">
+        <NavLink item={settingsNav} pathname={pathname} badges={badges} />
+      </div>
 
       <div className="mx-3 h-px bg-border" />
 
@@ -378,15 +362,21 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
               <User className="h-4 w-4" /> Mon compte
             </DropdownItem>
           </Link>
-          <Link href="/dashboard/account">
-            <DropdownItem>
-              <Settings className="h-4 w-4" /> Parametres
-            </DropdownItem>
-          </Link>
 
-          <DropdownSeparator />
-
-          <LanguageSwitcher />
+          <div
+            className="flex items-center justify-between gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground/90 hover:bg-muted transition-colors cursor-pointer"
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
+            }}
+          >
+            <div className="flex items-center gap-2.5">
+              {resolvedTheme === 'dark' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+              <span>Mode sombre</span>
+            </div>
+            <Switch checked={resolvedTheme === 'dark'} onChange={() => {}} />
+          </div>
 
           <DropdownSeparator />
 
