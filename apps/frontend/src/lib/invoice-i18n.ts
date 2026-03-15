@@ -1,8 +1,10 @@
 export interface InvoiceTranslations {
   quote: string
+  invoice: string
   quoteNumber: string
   date: string
   validity: string
+  dueDate: string
   issuer: string
   recipient: string
   deliveryAddress: string
@@ -46,9 +48,11 @@ export interface InvoiceTranslations {
 
 const fr: InvoiceTranslations = {
   quote: 'Devis',
+  invoice: 'Facture',
   quoteNumber: 'N\u00b0',
   date: 'Date',
   validity: 'Validite',
+  dueDate: 'Echeance',
   issuer: 'Emetteur',
   recipient: 'Destinataire',
   deliveryAddress: 'Adresse de livraison',
@@ -92,9 +96,11 @@ const fr: InvoiceTranslations = {
 
 const en: InvoiceTranslations = {
   quote: 'Quote',
+  invoice: 'Invoice',
   quoteNumber: 'No.',
   date: 'Date',
   validity: 'Valid until',
+  dueDate: 'Due date',
   issuer: 'From',
   recipient: 'To',
   deliveryAddress: 'Delivery address',

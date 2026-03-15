@@ -34,6 +34,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [switchConfirm, setSwitchConfirm] = useState<TeamListItem | null>(null)
   const [switching, setSwitching] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [sidebarBadges, setSidebarBadges] = useState<Record<string, number>>({})
 
   useEffect(() => {
     if (user) {
@@ -41,6 +42,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         if (data?.teams) {
           setTeams(data.teams)
           setTeamsLoaded(true)
+        }
+      })
+      api.get<{ quoteDrafts: number; invoiceDrafts: number }>('/dashboard/sidebar-counts').then(({ data }) => {
+        if (data) {
+          setSidebarBadges({
+            '/dashboard/quotes/drafts': data.quoteDrafts,
+            '/dashboard/invoices/drafts': data.invoiceDrafts,
+          })
         }
       })
     }
@@ -137,6 +146,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         }}
         onLogout={logout}
         collapsed={sidebarCollapsed}
+        badges={sidebarBadges}
       />
 
       <div
