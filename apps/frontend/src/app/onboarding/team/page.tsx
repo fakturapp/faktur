@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, type Variants } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
@@ -23,10 +23,17 @@ const fadeUp = {
 
 export default function OnboardingTeamPage() {
   const router = useRouter()
-  const { refreshUser } = useAuth()
+  const { user, refreshUser } = useAuth()
   const [name, setName] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  // If user already has a team (coming from dashboard create), skip to company
+  useEffect(() => {
+    if (user?.currentTeamId) {
+      router.replace('/onboarding/company')
+    }
+  }, [user, router])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()

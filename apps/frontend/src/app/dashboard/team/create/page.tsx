@@ -46,9 +46,9 @@ export default function CreateTeamPage() {
 
     if (error) return toast(error, 'error')
 
-    await refreshUser()
     toast(`Équipe "${data?.team.name}" créée`, 'success')
-    router.push('/dashboard/team')
+    await refreshUser()
+    // Auth guard will detect onboardingCompleted=false and redirect to onboarding
   }
 
   const handleFileSelect = useCallback((file: File) => {
