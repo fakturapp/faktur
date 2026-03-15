@@ -316,9 +316,9 @@ export function ClientModal({
    ═══════════════════════════════════════════════════════════ */
 
 function AddLineDropdown({
-  isTiime, accentColor, T, t, onAddLine,
+  isClassique, accentColor, T, t, onAddLine,
 }: {
-  isTiime: boolean
+  isClassique: boolean
   accentColor: string
   T: any
   t: any
@@ -338,7 +338,7 @@ function AddLineDropdown({
 
   return (
     <div className="relative mb-4" ref={ref}>
-      {isTiime ? (
+      {isClassique ? (
         <button
           onClick={() => setOpen(!open)}
           className="px-4 py-1.5 rounded-full text-[14px] font-extrabold cursor-pointer transition-all flex items-center gap-2"
@@ -489,7 +489,7 @@ export function A4Sheet({
 
   const T = getTemplate(template, darkMode)
   const t = getTranslations(lang)
-  const isTiime = T.id === 'tiime'
+  const isClassique = T.id === 'classique'
   // Template font override takes precedence
   const effectiveFont = T.font || documentFont
 
@@ -529,13 +529,12 @@ export function A4Sheet({
         className="w-full max-w-[794px] rounded-xl relative overflow-hidden"
         style={{
           aspectRatio: '210 / 297',
-          backgroundColor: T.docBg,
-          background: isTiime
+          background: isClassique
             ? darkMode
               ? `linear-gradient(270deg, ${T.docBg}, #161618 23.44%, #161618 77.6%, ${T.docBg})`
               : 'linear-gradient(270deg, #fafafa, #fff 23.44%, #fff 77.6%, #fafafa)'
-            : undefined,
-          boxShadow: isTiime
+            : T.docBg,
+          boxShadow: isClassique
             ? 'rgba(71,99,136,0.1) 0px 20px 40px -5px'
             : '0 4px 24px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.08)',
           colorScheme: darkMode ? 'dark' : 'light',
@@ -545,7 +544,7 @@ export function A4Sheet({
         <div className="absolute inset-0 overflow-y-auto">
           <div
             className="flex flex-col min-h-full px-10 py-8"
-            style={{ fontFamily: `'${effectiveFont}', 'Segoe UI', sans-serif`, color: T.text, letterSpacing: isTiime ? '0.5px' : undefined }}
+            style={{ fontFamily: `'${effectiveFont}', 'Segoe UI', sans-serif`, color: T.text, letterSpacing: isClassique ? '0.5px' : undefined }}
           >
 
             {/* ═══════════════════════════════════════════
@@ -622,7 +621,7 @@ export function A4Sheet({
 
                   {/* Right: DEVIS badge + quote number */}
                   <div className="text-right">
-                    {isTiime ? (
+                    {isClassique ? (
                       <>
                         <div className="text-[14px] font-semibold mb-1" style={{ color: T.text }}>
                           {documentTitle || t.quote}
@@ -688,7 +687,7 @@ export function A4Sheet({
 
               {/* ── Subject (inline editable) ── */}
               {showSubject && (
-                isTiime ? (
+                isClassique ? (
                   <div className="mb-4">
                     <div
                       style={{
@@ -797,7 +796,7 @@ export function A4Sheet({
 
               {/* ── Date/Validity container (above lines table) ── */}
               {(issueDate || validityDate || ed) && (
-                isTiime ? (
+                isClassique ? (
                   <div className="flex items-end gap-3 mb-4">
                     <div className="flex-1 text-[14px] font-semibold" style={{ color: T.text, padding: '8px' }}>
                       {documentTitle || t.quote}
@@ -1013,7 +1012,7 @@ export function A4Sheet({
               </div>
 
               {/* ── Add line dropdown (edit mode) ── */}
-              {ed && <AddLineDropdown isTiime={isTiime} accentColor={accentColor} T={T} t={t} onAddLine={onAddLine} />}
+              {ed && <AddLineDropdown isClassique={isClassique} accentColor={accentColor} T={T} t={t} onAddLine={onAddLine} />}
 
             </div>
             {/* ═══ END TOP SECTION ═══ */}
@@ -1025,7 +1024,7 @@ export function A4Sheet({
 
               {/* ── Totals ── */}
               <div className="flex justify-end mb-5">
-                {isTiime ? (
+                {isClassique ? (
                   <div className="w-[280px] flex flex-col gap-5" style={{ color: accentColor }}>
                     <div className="px-2 flex flex-col gap-3">
                       <div className="flex justify-between items-center">
@@ -1165,7 +1164,7 @@ export function A4Sheet({
               {/* Payment methods — hidden for quotes (devis) */}
 
               {/* ── Footer (editable or custom text) ── */}
-              {isTiime ? (
+              {isClassique ? (
                 <div className="mt-4 pt-3 text-center">
                   <div
                     style={{
