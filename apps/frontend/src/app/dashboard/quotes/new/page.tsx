@@ -73,14 +73,14 @@ export default function NewQuotePage() {
     globalDiscountType: 'none' as 'none' | 'percentage' | 'fixed',
     globalDiscountValue: 0,
     showNotes: true,
-    vatExempt: false,
+    vatExemptReason: 'none' as 'none' | 'not_subject' | 'france_no_vat' | 'outside_france',
     footerText: '',
     showSubject: true,
     showDeliveryAddress: false,
     showAcceptanceConditions: false,
     showFreeField: false,
     showFooterText: false,
-    footerMode: 'vat_exempt' as 'company_info' | 'vat_exempt' | 'custom',
+    footerMode: 'company_info' as 'company_info' | 'custom',
     facturX: false,
   })
 
@@ -113,7 +113,7 @@ export default function NewQuotePage() {
         signatureField: invoiceSettings.defaultSignatureField || prev.signatureField,
         freeField: invoiceSettings.defaultFreeField || prev.freeField,
         showNotes: invoiceSettings.defaultShowNotes ?? prev.showNotes,
-        vatExempt: invoiceSettings.defaultVatExempt || prev.vatExempt,
+        vatExemptReason: invoiceSettings.defaultVatExempt ? 'not_subject' : prev.vatExemptReason,
         footerText: invoiceSettings.defaultFooterText || prev.footerText,
         showDeliveryAddress: invoiceSettings.defaultShowDeliveryAddress || prev.showDeliveryAddress,
         language: invoiceSettings.defaultLanguage || prev.language,
@@ -453,7 +453,7 @@ export default function NewQuotePage() {
             darkMode={invoiceSettings.darkMode}
             language={options.language}
             showNotes={options.showNotes}
-            vatExempt={options.vatExempt}
+            vatExemptReason={options.vatExemptReason}
             footerText={options.footerText}
             documentFont={invoiceSettings.documentFont}
             showSubject={options.showSubject}
