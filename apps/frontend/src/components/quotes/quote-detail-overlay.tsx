@@ -331,7 +331,7 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
             animate={{ x: 0 }}
             exit={{ x: 320 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="w-[320px] shrink-0 bg-card border-l border-border flex flex-col overflow-hidden"
+            className="w-[320px] shrink-0 bg-card border-l border-border flex flex-col overflow-hidden rounded-l-2xl"
           >
             {loading ? (
               <div className="flex-1 flex items-center justify-center">
