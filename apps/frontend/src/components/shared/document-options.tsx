@@ -466,23 +466,6 @@ export function DocumentOptionsPanel({
               label="Notes et conditions"
             />
 
-            <div className="py-1">
-              <label className="text-[13px] text-foreground block mb-1">Exonération TVA</label>
-              <div className="relative">
-                <select
-                  value={options.vatExemptReason}
-                  onChange={(e) => onChange({ vatExemptReason: e.target.value as DocumentOptions['vatExemptReason'] })}
-                  className="w-full appearance-none rounded-lg border border-border bg-transparent px-3 py-1.5 pr-8 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer"
-                >
-                  <option value="none">Aucun motif</option>
-                  <option value="not_subject">Non soumis à la TVA (art. 293B)</option>
-                  <option value="france_no_vat">Exonération TVA (art. 261)</option>
-                  <option value="outside_france">Prestation hors France (art. 259-1)</option>
-                </select>
-                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
-              </div>
-            </div>
-
             <OptionCheckbox
               checked={options.showFooterText}
               onToggle={() => {
@@ -493,6 +476,26 @@ export function DocumentOptionsPanel({
               }}
               label="Texte de pied de page"
             />
+          </div>
+        </CollapsibleSection>
+
+        {/* ── TVA section ── */}
+        <CollapsibleSection title="TVA" defaultOpen>
+          <div>
+            <label className="text-xs text-muted-foreground font-medium block mb-1">Exonération</label>
+            <div className="relative">
+              <select
+                value={options.vatExemptReason}
+                onChange={(e) => onChange({ vatExemptReason: e.target.value as DocumentOptions['vatExemptReason'] })}
+                className="w-full appearance-none rounded-lg border border-border bg-transparent px-3 py-1.5 pr-8 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer"
+              >
+                <option value="none">Aucun motif</option>
+                <option value="not_subject">Non soumis à la TVA (art. 293B)</option>
+                <option value="france_no_vat">Exonération TVA (art. 261)</option>
+                <option value="outside_france">Prestation hors France (art. 259-1)</option>
+              </select>
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+            </div>
           </div>
         </CollapsibleSection>
       </div>

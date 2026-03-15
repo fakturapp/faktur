@@ -73,7 +73,7 @@ export default function NewQuotePage() {
     globalDiscountType: 'none' as 'none' | 'percentage' | 'fixed',
     globalDiscountValue: 0,
     showNotes: true,
-    vatExemptReason: 'none' as 'none' | 'not_subject' | 'france_no_vat' | 'outside_france',
+    vatExemptReason: 'not_subject' as 'none' | 'not_subject' | 'france_no_vat' | 'outside_france',
     footerText: '',
     showSubject: true,
     showDeliveryAddress: false,
