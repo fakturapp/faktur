@@ -12,11 +12,12 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { SecurityVerificationModal } from '@/components/modals/security-verification-modal'
+import { ExportModal } from '@/components/modals/export-modal'
 import { useAuth } from '@/lib/auth'
 import { useToast } from '@/components/ui/toast'
 import { api } from '@/lib/api'
 import { Spinner } from '@/components/ui/spinner'
-import { User, Shield, Monitor, Trash2, Smartphone, Key, Copy, Check, Camera, Globe, MapPin, Download, Lock } from 'lucide-react'
+import { User, Shield, Monitor, Trash2, Smartphone, Copy, Check, Camera, Globe, MapPin, Download } from 'lucide-react'
 
 const tabs = [
   { id: 'profile', label: 'Profil', icon: <User className="h-4 w-4" /> },
@@ -24,15 +25,6 @@ const tabs = [
   { id: 'sessions', label: 'Sessions', icon: <Monitor className="h-4 w-4" /> },
   { id: 'export', label: 'Exportation', icon: <Download className="h-4 w-4" /> },
 ]
-
-interface TeamInfo {
-  id: string
-  name: string
-  iconUrl: string | null
-  role: string
-  isOwner: boolean
-  isCurrent: boolean
-}
 
 interface Session {
   id: string
@@ -78,16 +70,8 @@ export default function AccountPage() {
   const [deletePassword, setDeletePassword] = useState('')
   const [deleteLoading, setDeleteLoading] = useState(false)
 
-  // Export
-  const [exportTeams, setExportTeams] = useState<TeamInfo[]>([])
-  const [exportTeamsLoaded, setExportTeamsLoaded] = useState(false)
-  const [selectedExportTeam, setSelectedExportTeam] = useState<string>('')
-  const [exportEncrypt, setExportEncrypt] = useState(false)
-  const [exportEncryptionPassword, setExportEncryptionPassword] = useState('')
-  const [exportEncryptionConfirm, setExportEncryptionConfirm] = useState('')
-  const [exportPasswordModalOpen, setExportPasswordModalOpen] = useState(false)
-  const [exportAccountPassword, setExportAccountPassword] = useState('')
-  const [exporting, setExporting] = useState(false)
+  // Export modal
+  const [exportModalOpen, setExportModalOpen] = useState(false)
 
   // Security verification
   const [securityOpen, setSecurityOpen] = useState(false)
@@ -332,48 +316,11 @@ export default function AccountPage() {
     logout()
   }
 
-  async function loadExportTeams() {
-    setExportTeamsLoaded(true)
-    const { data } = await api.get<{ teams: TeamInfo[] }>('/team/all')
-    if (data?.teams) {
-      setExportTeams(data.teams)
-      const current = data.teams.find((t) => t.isCurrent)
-      if (current) setSelectedExportTeam(current.id)
-    }
-  }
-
-  async function handleExport() {
-    setExporting(true)
-    const body: Record<string, string> = { password: exportAccountPassword }
-    if (exportEncrypt && exportEncryptionPassword) {
-      body.encryptionPassword = exportEncryptionPassword
-    }
-
-    const { blob, filename, error } = await api.postBlob('/team/export', body)
-    setExporting(false)
-    setExportPasswordModalOpen(false)
-    setExportAccountPassword('')
-
-    if (error || !blob) {
-      return toast(error || 'Erreur lors de l\'export', 'error')
-    }
-
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = filename || 'export.zip'
-    a.click()
-    URL.revokeObjectURL(url)
-    toast('Export téléchargé', 'success')
-  }
 
   if (activeTab === 'sessions' && !sessionsLoaded) {
     loadSessions()
   }
 
-  if (activeTab === 'export' && !exportTeamsLoaded) {
-    loadExportTeams()
-  }
 
   const initials = user?.fullName
     ? user.fullName.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
@@ -755,159 +702,26 @@ export default function AccountPage() {
       {activeTab === 'export' && (
         <Card>
           <CardContent className="p-6">
-            <FieldGroup>
-              <h3 className="font-semibold text-foreground">Exporter les données d&apos;une équipe</h3>
-              <p className="text-sm text-muted-foreground">
-                Téléchargez toutes les données d&apos;une équipe (factures, devis, clients, paramètres) dans un fichier archive.
-              </p>
-
-              {exportTeams.length === 0 ? (
-                <div className="flex items-center justify-center gap-2 py-4">
-                  <Spinner size="sm" className="text-primary" />
-                  <span className="text-sm text-muted-foreground">Chargement...</span>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {/* Team selection */}
-                  <div className="space-y-2">
-                    {exportTeams.map((t) => {
-                      const canExport = ['admin', 'super_admin'].includes(t.role)
-                      return (
-                        <label
-                          key={t.id}
-                          className={`flex items-center gap-3 rounded-xl border p-4 transition-all cursor-pointer ${
-                            selectedExportTeam === t.id
-                              ? 'border-primary bg-primary/5'
-                              : canExport
-                                ? 'border-border hover:border-primary/40'
-                                : 'border-border/50 opacity-50 cursor-not-allowed'
-                          }`}
-                        >
-                          <input
-                            type="radio"
-                            name="exportTeam"
-                            value={t.id}
-                            checked={selectedExportTeam === t.id}
-                            onChange={() => canExport && setSelectedExportTeam(t.id)}
-                            disabled={!canExport}
-                            className="accent-primary"
-                          />
-                          <div className="flex items-center gap-3 flex-1">
-                            {t.iconUrl ? (
-                              <img src={t.iconUrl} alt={t.name} className="h-8 w-8 rounded-lg object-contain bg-white p-0.5" />
-                            ) : (
-                              <div className="h-8 w-8 rounded-lg bg-zinc-800 flex items-center justify-center text-xs font-bold text-foreground">
-                                {t.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()}
-                              </div>
-                            )}
-                            <div className="flex-1">
-                              <p className="text-sm font-medium text-foreground">{t.name}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {t.isOwner ? 'Propriétaire' : t.role === 'admin' ? 'Administrateur' : t.role === 'member' ? 'Membre' : 'Lecteur'}
-                                {!canExport && ' — Permissions insuffisantes'}
-                              </p>
-                            </div>
-                          </div>
-                        </label>
-                      )
-                    })}
-                  </div>
-
-                  <Separator />
-
-                  {/* Encryption option */}
-                  <label className="flex items-start gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={exportEncrypt}
-                      onChange={(e) => {
-                        setExportEncrypt(e.target.checked)
-                        if (!e.target.checked) {
-                          setExportEncryptionPassword('')
-                          setExportEncryptionConfirm('')
-                        }
-                      }}
-                      className="accent-primary mt-1"
-                    />
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <Lock className="h-4 w-4 text-muted-foreground" />
-                        <p className="text-sm font-medium text-foreground">Chiffrer l&apos;export</p>
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        Protéger le fichier avec un mot de passe (AES-256-GCM). Format .fpdata.
-                      </p>
-                    </div>
-                  </label>
-
-                  {exportEncrypt && (
-                    <div className="space-y-3 pl-6">
-                      <Field>
-                        <FieldLabel htmlFor="exportEncPass">Mot de passe de chiffrement</FieldLabel>
-                        <Input
-                          id="exportEncPass"
-                          type="password"
-                          value={exportEncryptionPassword}
-                          onChange={(e) => setExportEncryptionPassword(e.target.value)}
-                          placeholder="Mot de passe pour chiffrer"
-                        />
-                      </Field>
-                      <Field>
-                        <FieldLabel htmlFor="exportEncConfirm">Confirmer le mot de passe</FieldLabel>
-                        <Input
-                          id="exportEncConfirm"
-                          type="password"
-                          value={exportEncryptionConfirm}
-                          onChange={(e) => setExportEncryptionConfirm(e.target.value)}
-                          placeholder="Confirmer le mot de passe"
-                        />
-                        {exportEncryptionPassword && exportEncryptionConfirm && exportEncryptionPassword !== exportEncryptionConfirm && (
-                          <p className="text-xs text-destructive mt-1">Les mots de passe ne correspondent pas</p>
-                        )}
-                      </Field>
-                    </div>
-                  )}
-
-                  <Button
-                    onClick={() => setExportPasswordModalOpen(true)}
-                    disabled={
-                      !selectedExportTeam ||
-                      (exportEncrypt && (!exportEncryptionPassword || exportEncryptionPassword !== exportEncryptionConfirm))
-                    }
-                  >
-                    <Download className="h-4 w-4 mr-2" /> Exporter les données
-                  </Button>
-                </div>
-              )}
-            </FieldGroup>
+            <div className="flex flex-col items-center text-center gap-4 py-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
+                <Download className="h-7 w-7 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground">Exporter les donnees</h3>
+                <p className="text-sm text-muted-foreground mt-1 max-w-sm">
+                  Telechargez toutes les donnees d&apos;une equipe (factures, devis, clients, parametres, logos) dans un fichier archive.
+                </p>
+              </div>
+              <Button onClick={() => setExportModalOpen(true)}>
+                <Download className="h-4 w-4 mr-2" /> Exporter les donnees
+              </Button>
+            </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Export password confirmation dialog */}
-      <Dialog open={exportPasswordModalOpen} onClose={() => { setExportPasswordModalOpen(false); setExportAccountPassword('') }}>
-        <DialogTitle>Confirmer l&apos;export</DialogTitle>
-        <DialogDescription>
-          Entrez votre mot de passe de compte pour confirmer l&apos;export des données.
-        </DialogDescription>
-        <div className="mt-4">
-          <Input
-            type="password"
-            placeholder="Mot de passe du compte"
-            value={exportAccountPassword}
-            onChange={(e) => setExportAccountPassword(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter' && exportAccountPassword) handleExport() }}
-          />
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => { setExportPasswordModalOpen(false); setExportAccountPassword('') }}>
-            Annuler
-          </Button>
-          <Button onClick={handleExport} disabled={exporting || !exportAccountPassword}>
-            {exporting ? <><Spinner /> Export en cours...</> : <><Download className="h-4 w-4 mr-2" /> Exporter</>}
-          </Button>
-        </DialogFooter>
-      </Dialog>
+      {/* Export modal */}
+      <ExportModal open={exportModalOpen} onClose={() => setExportModalOpen(false)} />
 
       {/* Security Verification Modal */}
       <SecurityVerificationModal
