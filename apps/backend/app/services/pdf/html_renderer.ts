@@ -282,7 +282,7 @@ export function renderQuoteHtml(
   }
   .banner .banner-title { font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: ${contrastText(ac)}; }
   .banner .banner-number { font-size: 11px; margin-top: 2px; color: ${contrastText(ac)}; opacity: 0.8; }
-  .banner .logo img { filter: brightness(0) invert(1); max-height: 48px; }
+  .banner .logo img { max-height: 48px; }
   .banner-company { font-size: 18px; font-weight: 700; color: ${contrastText(ac)}; }
 
   /* ── Subject ── */
@@ -830,7 +830,7 @@ function renderLateral(
   // Sidebar with company info
   let sidebar = '<div class="sidebar">'
   if (quote.logoUrl) {
-    sidebar += `<div class="section"><img src="${esc(quote.logoUrl)}" alt="Logo" style="max-width:80px;max-height:40px;filter:brightness(0) invert(1)" /></div>`
+    sidebar += `<div class="section"><img src="${esc(quote.logoUrl)}" alt="Logo" style="max-width:80px;max-height:40px" /></div>`
   }
   if (company) {
     sidebar += '<div class="section">'
