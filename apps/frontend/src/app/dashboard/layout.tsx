@@ -183,9 +183,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <ArrowRightLeft className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <DialogTitle>Changer d&apos;equipe</DialogTitle>
+            <DialogTitle>Changer d&apos;équipe</DialogTitle>
             <DialogDescription className="mt-0">
-              Basculer vers une autre equipe
+              Basculer vers une autre équipe
             </DialogDescription>
           </div>
         </div>
@@ -227,7 +227,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           >
             <Spinner size="lg" className="text-primary" />
             <p className="mt-4 text-sm font-medium text-foreground">
-              Changement d&apos;equipe en cours...
+              Changement d&apos;équipe en cours...
             </p>
           </motion.div>
         )}

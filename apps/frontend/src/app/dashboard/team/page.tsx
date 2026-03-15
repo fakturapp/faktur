@@ -742,9 +742,9 @@ export default function TeamPage() {
 
       {/* Team Logo Dialog */}
       <Dialog open={logoOpen} onClose={() => setLogoOpen(false)}>
-        <DialogTitle>Logo de l&apos;equipe</DialogTitle>
+        <DialogTitle>Logo de l&apos;équipe</DialogTitle>
         <DialogDescription>
-          Choisissez comment definir le logo de votre equipe.
+          Choisissez comment définir le logo de votre équipe.
         </DialogDescription>
 
         <div className="mt-4 space-y-3">
@@ -759,7 +759,7 @@ export default function TeamPage() {
             <div className="flex-1">
               <p className="text-sm font-medium text-foreground">Utiliser le logo de l&apos;entreprise</p>
               <p className="text-xs text-muted-foreground">
-                Reprendre le logo defini dans les parametres de l&apos;entreprise
+                Reprendre le logo défini dans les paramètres de l&apos;entreprise
               </p>
             </div>
           </button>
@@ -775,7 +775,7 @@ export default function TeamPage() {
             <div className="flex-1">
               <p className="text-sm font-medium text-foreground">Importer un logo</p>
               <p className="text-xs text-muted-foreground">
-                Telecharger une image depuis votre ordinateur (PNG, SVG, JPG)
+                Télécharger une image depuis votre ordinateur (PNG, SVG, JPG)
               </p>
             </div>
           </button>

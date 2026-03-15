@@ -441,7 +441,7 @@ export function ClientEditPanel({ open, clientId, onClose, onUpdated, onDeleted 
                         </div>
 
                         <div>
-                          <label className="text-sm font-medium text-foreground mb-1.5 block">Telephone</label>
+                          <label className="text-sm font-medium text-foreground mb-1.5 block">Téléphone</label>
                           <div className="relative">
                             <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input
@@ -485,7 +485,7 @@ export function ClientEditPanel({ open, clientId, onClose, onUpdated, onDeleted 
                         />
 
                         <p className="text-xs text-muted-foreground">
-                          Ces notes sont visibles uniquement par votre equipe et ne sont pas incluses dans les documents.
+                          Ces notes sont visibles uniquement par votre équipe et ne sont pas incluses dans les documents.
                         </p>
                       </div>
                     )}

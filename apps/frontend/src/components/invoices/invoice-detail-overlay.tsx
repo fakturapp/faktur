@@ -177,7 +177,7 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
 
   function handleSendEmail() {
     if (!invoice?.client?.email) {
-      toast('Aucun email client renseigne', 'error')
+      toast('Aucun email client renseigné', 'error')
       return
     }
     const subject = encodeURIComponent(`Facture ${invoice.invoiceNumber}`)
@@ -189,12 +189,12 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
 
   function handleReminder() {
     if (!invoice?.client?.email) {
-      toast('Aucun email client renseigne', 'error')
+      toast('Aucun email client renseigné', 'error')
       return
     }
     const subject = encodeURIComponent(`Relance - Facture ${invoice.invoiceNumber}`)
     const body = encodeURIComponent(
-      `Bonjour,\n\nNous vous rappelons que la facture ${invoice.invoiceNumber} d'un montant de ${Number(invoice.total).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })} reste en attente de reglement.\n\nCordialement`
+      `Bonjour,\n\nNous vous rappelons que la facture ${invoice.invoiceNumber} d'un montant de ${Number(invoice.total).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })} reste en attente de règlement.\n\nCordialement`
     )
     window.open(`mailto:${invoice.client.email}?subject=${subject}&body=${body}`, '_blank')
   }
@@ -205,7 +205,7 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
     setDuplicating(false)
     if (error) { toast(error, 'error'); return }
     if (data?.invoice) {
-      toast(`Facture ${data.invoice.invoiceNumber} creee`, 'success')
+      toast(`Facture ${data.invoice.invoiceNumber} créée`, 'success')
       onClose()
       router.push(`/dashboard/invoices/${data.invoice.id}/edit`)
     }
@@ -217,7 +217,7 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
     const { error } = await api.delete(`/invoices/${invoiceId}`)
     setDeleting(false)
     if (error) { toast(error, 'error'); return }
-    toast('Facture supprimee', 'success')
+    toast('Facture supprimée', 'success')
     setShowDeleteConfirm(false)
     onDelete(invoiceId)
     onClose()
@@ -321,7 +321,7 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                     className="h-9 px-4 rounded-full bg-card shadow-lg flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors border border-border"
                   >
                     {downloading ? <Spinner className="h-4 w-4" /> : <Download className="h-4 w-4" />}
-                    {downloading ? 'Telechargement...' : 'Telecharger PDF'}
+                    {downloading ? 'Téléchargement...' : 'Télécharger PDF'}
                   </button>
                 </div>
               </div>
@@ -383,7 +383,7 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                       <div className="rounded-lg bg-red-500/10 border border-red-500/20 p-3">
                         <div className="flex items-center gap-2 mb-1">
                           <AlertTriangle className="h-4 w-4 text-red-500" />
-                          <span className="text-sm font-bold text-red-500">Impayee</span>
+                          <span className="text-sm font-bold text-red-500">Impayée</span>
                         </div>
                         <p className="text-xs text-muted-foreground leading-relaxed">
                           Cette facture est en retard de paiement. Envoyez une relance au client.
@@ -477,7 +477,7 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
         <Dialog open={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)} className="max-w-sm">
           <DialogTitle>Supprimer la facture</DialogTitle>
           <DialogDescription>
-            Etes-vous sur de vouloir supprimer la facture {invoice?.invoiceNumber} ? Cette action est irreversible.
+            Êtes-vous sûr de vouloir supprimer la facture {invoice?.invoiceNumber} ? Cette action est irréversible.
           </DialogDescription>
           <DialogFooter>
             <Button variant="outline" size="sm" onClick={() => setShowDeleteConfirm(false)}>Annuler</Button>

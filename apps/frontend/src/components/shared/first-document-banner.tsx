@@ -78,7 +78,7 @@ export function FirstDocumentBanner({ documentType, currentNumber, onNumberChang
       return
     }
     onNumberChange(editValue.trim())
-    toast(`Numero de ${label} mis a jour`, 'success')
+    toast(`Numéro de ${label} mis à jour`, 'success')
     setDismissed(documentType)
     setVisible(false)
   }
@@ -103,10 +103,10 @@ export function FirstDocumentBanner({ documentType, currentNumber, onNumberChang
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-foreground">
-            Ceci est {isQuote ? 'votre premier devis' : 'votre premiere facture'}
+            Ceci est {isQuote ? 'votre premier devis' : 'votre première facture'}
           </p>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Vous pouvez personnaliser le numero de depart avant de commencer.
+            Vous pouvez personnaliser le numéro de départ avant de commencer.
           </p>
           <div className="flex items-center gap-2 mt-3">
             <Input

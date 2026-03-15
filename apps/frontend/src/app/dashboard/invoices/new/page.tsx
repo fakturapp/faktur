@@ -256,7 +256,7 @@ export default function NewInvoicePage() {
       toast(error, 'error')
     } else {
       setIsDirty(false)
-      toast('Facture creee', 'success')
+      toast('Facture créée', 'success')
       router.push('/dashboard/invoices')
     }
   }
@@ -459,8 +459,8 @@ export default function NewInvoicePage() {
       <ClientModal open={clientModalOpen} onClose={() => setClientModalOpen(false)} onSelect={handleSelectClient} />
 
       <Dialog open={showModal} onClose={cancelNavigation} className="max-w-sm">
-        <DialogTitle>Modifications non enregistrees</DialogTitle>
-        <p className="mt-2 text-sm text-muted-foreground">Vous avez des modifications non enregistrees. Que souhaitez-vous faire ?</p>
+        <DialogTitle>Modifications non enregistrées</DialogTitle>
+        <p className="mt-2 text-sm text-muted-foreground">Vous avez des modifications non enregistrées. Que souhaitez-vous faire ?</p>
         <DialogFooter>
           <Button variant="outline" size="sm" onClick={cancelNavigation}>Annuler</Button>
           <Button variant="ghost" size="sm" onClick={() => { confirmNavigation(); router.push('/dashboard/invoices') }}>Ignorer</Button>

@@ -83,7 +83,7 @@ export default function QuotesPage() {
     const { blob, filename, error } = await api.downloadBlob(`/quotes/${quoteId}/pdf`)
     setDownloadingId(null)
     if (error || !blob) {
-      toast(error || 'Erreur lors du telechargement', 'error')
+      toast(error || 'Erreur lors du téléchargement', 'error')
       return
     }
     const url = URL.createObjectURL(blob)
@@ -140,7 +140,7 @@ export default function QuotesPage() {
         </div>
         <Link href="/dashboard/quotes/new">
           <Button>
-            <Plus className="h-4 w-4 mr-1.5" /> Creer un devis
+            <Plus className="h-4 w-4 mr-1.5" /> Créer un devis
           </Button>
         </Link>
       </motion.div>
@@ -160,9 +160,9 @@ export default function QuotesPage() {
           {[
             { id: 'all', label: 'Tous' },
             { id: 'draft', label: 'Brouillon' },
-            { id: 'sent', label: 'Envoye' },
-            { id: 'accepted', label: 'Accepte' },
-            { id: 'refused', label: 'Refuse' },
+            { id: 'sent', label: 'Envoyé' },
+            { id: 'accepted', label: 'Accepté' },
+            { id: 'refused', label: 'Refusé' },
           ].map((f) => (
             <button
               key={f.id}
@@ -216,12 +216,12 @@ export default function QuotesPage() {
           <p className="text-sm text-muted-foreground mt-1">
             {debouncedSearch || filterStatus !== 'all'
               ? 'Essayez avec d\'autres criteres de recherche'
-              : 'Commencez par creer votre premier devis'}
+              : 'Commencez par créer votre premier devis'}
           </p>
           {!debouncedSearch && filterStatus === 'all' && (
             <Link href="/dashboard/quotes/new">
               <Button className="mt-4">
-                <Plus className="h-4 w-4 mr-1.5" /> Creer un devis
+                <Plus className="h-4 w-4 mr-1.5" /> Créer un devis
               </Button>
             </Link>
           )}
@@ -284,7 +284,7 @@ export default function QuotesPage() {
                     onClick={(e) => handleDownloadPdf(e, quote.id)}
                     disabled={downloadingId === quote.id}
                     className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
-                    title="Telecharger le PDF"
+                    title="Télécharger le PDF"
                   >
                     <Download className={`h-4 w-4 ${downloadingId === quote.id ? 'animate-pulse' : ''}`} />
                   </button>

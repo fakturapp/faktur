@@ -43,7 +43,7 @@ export interface TemplateConfig {
 const moderne: TemplateConfig = {
   id: 'moderne',
   name: 'Moderne',
-  description: 'Bandeau colore en-tete, corps blanc',
+  description: 'Bandeau coloré en-tête, corps blanc',
   layout: 'banner',
   docBg: '#ffffff',
   text: '#000000',
@@ -102,8 +102,8 @@ const compact: TemplateConfig = {
 
 const elegance: TemplateConfig = {
   id: 'elegance',
-  name: 'Elegance',
-  description: 'Lignes fines, sans fonds, raffine',
+  name: 'Élégance',
+  description: 'Lignes fines, sans fonds, raffiné',
   layout: 'standard',
   docBg: '#ffffff',
   text: '#000000',
@@ -133,7 +133,7 @@ const elegance: TemplateConfig = {
 const audacieux: TemplateConfig = {
   id: 'audacieux',
   name: 'Audacieux',
-  description: 'En-tete large avec accent geometrique',
+  description: 'En-tête large avec accent géométrique',
   layout: 'banner',
   docBg: '#ffffff',
   text: '#000000',
@@ -162,8 +162,8 @@ const audacieux: TemplateConfig = {
 
 const lateral: TemplateConfig = {
   id: 'lateral',
-  name: 'Lateral',
-  description: 'Barre laterale coloree avec infos societe',
+  name: 'Latéral',
+  description: 'Barre latérale colorée avec infos société',
   layout: 'lateral',
   docBg: '#ffffff',
   text: '#000000',
@@ -193,7 +193,7 @@ const lateral: TemplateConfig = {
 const minimaliste: TemplateConfig = {
   id: 'minimaliste',
   name: 'Minimaliste',
-  description: 'Ultra-epure, traits fins, espace genereux',
+  description: 'Ultra-épuré, traits fins, espace généreux',
   layout: 'standard',
   docBg: '#ffffff',
   text: '#000000',
@@ -223,7 +223,7 @@ const minimaliste: TemplateConfig = {
 const duo: TemplateConfig = {
   id: 'duo',
   name: 'Duo',
-  description: 'En-tete bicolore accent + sombre',
+  description: 'En-tête bicolore accent + sombre',
   layout: 'banner',
   docBg: '#ffffff',
   text: '#000000',
@@ -253,7 +253,7 @@ const duo: TemplateConfig = {
 const ligne: TemplateConfig = {
   id: 'ligne',
   name: 'Ligne',
-  description: 'Separateurs horizontaux colores',
+  description: 'Séparateurs horizontaux colorés',
   layout: 'standard',
   docBg: '#ffffff',
   text: '#000000',
@@ -283,7 +283,7 @@ const ligne: TemplateConfig = {
 const classique: TemplateConfig = {
   id: 'classique',
   name: 'Classique',
-  description: 'Bordures pointillees, accent bleu-gris, style comptable',
+  description: 'Bordures pointillées, accent bleu-gris, style comptable',
   layout: 'standard',
   docBg: '#ffffff',
   text: '#476388',

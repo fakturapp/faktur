@@ -240,7 +240,7 @@ export default function OnboardingPersonalizationPage() {
                 <ClipboardList className="h-5 w-5 text-primary mb-2" />
                 <p className="font-medium text-sm text-foreground">Complet</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Factures detaillees avec TVA, remises, conditions et mentions
+                  Factures détaillées avec TVA, remises, conditions et mentions
                 </p>
               </button>
             </div>
@@ -268,7 +268,7 @@ export default function OnboardingPersonalizationPage() {
 
           <motion.div variants={fadeUp} custom={6} className="mt-4">
             <p className="text-xs text-muted-foreground text-center">
-              Vous pourrez modifier ces parametres a tout moment dans les reglages.
+              Vous pourrez modifier ces paramètres à tout moment dans les réglages.
             </p>
           </motion.div>
         </CardContent>

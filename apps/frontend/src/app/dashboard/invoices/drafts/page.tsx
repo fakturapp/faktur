@@ -101,7 +101,7 @@ export default function InvoiceDraftsPage() {
     const { blob, filename, error } = await api.downloadBlob(`/invoices/${invoiceId}/pdf`)
     setDownloadingId(null)
     if (error || !blob) {
-      toast(error || 'Erreur lors du telechargement', 'error')
+      toast(error || 'Erreur lors du téléchargement', 'error')
       return
     }
     const url = URL.createObjectURL(blob)
@@ -124,7 +124,7 @@ export default function InvoiceDraftsPage() {
     }
     setInvoices((prev) => prev.filter((inv) => inv.id !== invoiceId))
     if (meta) setMeta({ ...meta, total: meta.total - 1 })
-    toast('Brouillon supprime', 'success')
+    toast('Brouillon supprimé', 'success')
   }
 
   return (
@@ -146,7 +146,7 @@ export default function InvoiceDraftsPage() {
           </div>
         </div>
         <Button onClick={() => setShowCreateModal(true)}>
-          <Plus className="h-4 w-4 mr-1.5" /> Creer une facture
+          <Plus className="h-4 w-4 mr-1.5" /> Créer une facture
         </Button>
       </motion.div>
 
@@ -198,7 +198,7 @@ export default function InvoiceDraftsPage() {
           </p>
           {!debouncedSearch && (
             <Button className="mt-4" onClick={() => setShowCreateModal(true)}>
-              <Plus className="h-4 w-4 mr-1.5" /> Creer une facture
+              <Plus className="h-4 w-4 mr-1.5" /> Créer une facture
             </Button>
           )}
         </motion.div>
@@ -247,7 +247,7 @@ export default function InvoiceDraftsPage() {
                   onClick={(e) => handleDownloadPdf(e, invoice.id)}
                   disabled={downloadingId === invoice.id}
                   className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
-                  title="Telecharger le PDF"
+                  title="Télécharger le PDF"
                 >
                   <Download className={`h-4 w-4 ${downloadingId === invoice.id ? 'animate-pulse' : ''}`} />
                 </button>

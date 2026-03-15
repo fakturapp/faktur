@@ -101,8 +101,8 @@ function TemplateModal({
           >
             <div className="flex items-center justify-between px-6 py-4 border-b border-border">
               <div>
-                <h2 className="text-lg font-semibold text-foreground">Choisir un modele</h2>
-                <p className="text-sm text-muted-foreground mt-0.5">9 modeles de mise en page pour vos documents</p>
+                <h2 className="text-lg font-semibold text-foreground">Choisir un modèle</h2>
+                <p className="text-sm text-muted-foreground mt-0.5">9 modèles de mise en page pour vos documents</p>
               </div>
               <button onClick={onClose} className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
                 <X className="h-4 w-4" />
@@ -145,7 +145,7 @@ export default function InvoiceSettingsPage() {
     setUploading(true)
     try {
       await uploadLogo(file)
-      toast('Logo mis a jour', 'success')
+      toast('Logo mis à jour', 'success')
     } catch {
       toast('Erreur lors de l\'envoi du logo', 'error')
     }
@@ -301,7 +301,7 @@ export default function InvoiceSettingsPage() {
                         <p className="text-sm font-semibold text-foreground">{currentTemplate.name}</p>
                         <p className="text-xs text-muted-foreground mt-0.5">{currentTemplate.description}</p>
                         <p className="text-xs text-primary mt-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          Changer de modele <ChevronRight className="h-3 w-3" />
+                          Changer de modèle <ChevronRight className="h-3 w-3" />
                         </p>
                       </div>
                       <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
@@ -315,7 +315,7 @@ export default function InvoiceSettingsPage() {
                       </div>
                       <div className="flex-1">
                         <p className="text-sm font-medium text-foreground">Mode sombre</p>
-                        <p className="text-xs text-muted-foreground">Appliquer le theme sombre au document</p>
+                        <p className="text-xs text-muted-foreground">Appliquer le thème sombre au document</p>
                       </div>
                       <div className={`h-5 w-5 rounded-md border-2 flex items-center justify-center transition-colors ${settings.darkMode ? 'border-primary bg-primary' : 'border-muted-foreground/30'}`}>
                         {settings.darkMode && <Check className="h-3 w-3 text-primary-foreground" />}
@@ -347,7 +347,7 @@ export default function InvoiceSettingsPage() {
                           <ImagePlus className={`h-4 w-4 ${settings.logoSource === 'custom' ? 'text-primary' : 'text-muted-foreground'}`} />
                         </div>
                         <div className="min-w-0">
-                          <p className="text-xs font-medium text-foreground">Logo personnalise</p>
+                          <p className="text-xs font-medium text-foreground">Logo personnalisé</p>
                           <p className="text-[10px] text-muted-foreground">Importer votre propre logo</p>
                         </div>
                         {settings.logoSource === 'custom' && (
@@ -537,7 +537,7 @@ export default function InvoiceSettingsPage() {
                         )}
                         <ClipboardList className="h-5 w-5 text-primary mb-2" />
                         <p className="font-medium text-sm text-foreground">Complet</p>
-                        <p className="text-xs text-muted-foreground mt-1">Factures detaillees avec TVA, remises, conditions et mentions</p>
+                        <p className="text-xs text-muted-foreground mt-1">Factures détaillées avec TVA, remises, conditions et mentions</p>
                       </button>
                     </div>
                   </CardContent>
@@ -580,7 +580,7 @@ export default function InvoiceSettingsPage() {
                           <Coins className={`h-5 w-5 ${settings.paymentMethods.includes('cash') ? 'text-primary' : 'text-muted-foreground'}`} />
                         </div>
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-foreground">Especes</p>
+                          <p className="text-sm font-medium text-foreground">Espèces</p>
                           <p className="text-xs text-muted-foreground">Paiement en especes</p>
                         </div>
                         <div className={`h-5 w-5 rounded-md border-2 flex items-center justify-center transition-colors ${settings.paymentMethods.includes('cash') ? 'border-primary bg-primary' : 'border-muted-foreground/30'}`}>
@@ -598,7 +598,7 @@ export default function InvoiceSettingsPage() {
                           </div>
                           <div className="flex-1">
                             <p className="text-sm font-medium text-foreground">Autre</p>
-                            <p className="text-xs text-muted-foreground">Moyen de paiement personnalise</p>
+                            <p className="text-xs text-muted-foreground">Moyen de paiement personnalisé</p>
                           </div>
                           <div className={`h-5 w-5 rounded-md border-2 flex items-center justify-center transition-colors ${settings.paymentMethods.includes('custom') ? 'border-primary bg-primary' : 'border-muted-foreground/30'}`}>
                             {settings.paymentMethods.includes('custom') && <Check className="h-3 w-3 text-primary-foreground" />}
@@ -606,7 +606,7 @@ export default function InvoiceSettingsPage() {
                         </button>
                         {settings.paymentMethods.includes('custom') && (
                           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="mt-2 ml-14">
-                            <Input placeholder="Ex: Cheque, PayPal, etc." value={settings.customPaymentMethod} onChange={(e) => updateSettings({ customPaymentMethod: e.target.value })} className="text-sm" />
+                            <Input placeholder="Ex: Chèque, PayPal, etc." value={settings.customPaymentMethod} onChange={(e) => updateSettings({ customPaymentMethod: e.target.value })} className="text-sm" />
                           </motion.div>
                         )}
                       </div>
@@ -694,7 +694,7 @@ export default function InvoiceSettingsPage() {
                           {([
                             { id: 'vat_exempt' as const, label: 'TVA non applicable', desc: 'Mention "TVA non applicable, art. 293 B du CGI"' },
                             { id: 'company_info' as const, label: 'Informations entreprise', desc: 'Raison sociale, SIREN, TVA, adresse' },
-                            { id: 'custom' as const, label: 'Texte personnalise', desc: 'Saisissez votre propre texte de pied de page' },
+                            { id: 'custom' as const, label: 'Texte personnalisé', desc: 'Saisissez votre propre texte de pied de page' },
                           ]).map((opt) => (
                             <button key={opt.id} onClick={() => updateSettings({ footerMode: opt.id })}
                               className={`flex w-full items-center gap-3 rounded-xl border-2 p-3 text-left transition-all ${
@@ -715,7 +715,7 @@ export default function InvoiceSettingsPage() {
                         {settings.footerMode === 'custom' && (
                           <div className="mt-2">
                             <Input
-                              placeholder="Ex: Conditions generales de vente..."
+                              placeholder="Ex: Conditions générales de vente..."
                               value={settings.defaultFooterText || ''}
                               onChange={(e) => updateSettings({ defaultFooterText: e.target.value?.slice(0, 50) || null })}
                               className="text-sm"
@@ -730,7 +730,7 @@ export default function InvoiceSettingsPage() {
 
                       {/* Toggle options */}
                       {[
-                        { key: 'defaultSignatureField' as const, label: 'Champ de signature', desc: 'Afficher les zones de signature emetteur/client' },
+                        { key: 'defaultSignatureField' as const, label: 'Champ de signature', desc: 'Afficher les zones de signature émetteur/client' },
                         { key: 'defaultShowNotes' as const, label: 'Notes et conditions', desc: 'Afficher la zone de notes et conditions' },
                         { key: 'defaultShowDeliveryAddress' as const, label: 'Adresse de livraison', desc: 'Afficher un champ adresse de livraison' },
                       ].map((opt) => (
@@ -793,7 +793,7 @@ export default function InvoiceSettingsPage() {
                       <div>
                         <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">Nom de fichier des devis</label>
                         <Input
-                          placeholder="DEV-{numero}"
+                          placeholder="DEV-{numéro}"
                           value={settings.quoteFilenamePattern}
                           onChange={(e) => updateSettings({ quoteFilenamePattern: e.target.value })}
                           className="text-sm font-mono"
@@ -803,7 +803,7 @@ export default function InvoiceSettingsPage() {
                       <div>
                         <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">Nom de fichier des factures</label>
                         <Input
-                          placeholder="FAC-{numero}"
+                          placeholder="FAC-{numéro}"
                           value={settings.invoiceFilenamePattern}
                           onChange={(e) => updateSettings({ invoiceFilenamePattern: e.target.value })}
                           className="text-sm font-mono"
@@ -813,8 +813,8 @@ export default function InvoiceSettingsPage() {
                       <div className="rounded-lg border border-border p-3 space-y-2">
                         <p className="text-xs font-medium text-foreground mb-2">Variables disponibles</p>
                         {[
-                          { var: '{numero}', desc: 'Numero du document (ex: DEV-001)' },
-                          { var: '{date}', desc: 'Date d\'emission (ex: 2026-03-15)' },
+                          { var: '{numero}', desc: 'Numéro du document (ex: DEV-001)' },
+                          { var: '{date}', desc: 'Date d\'émission (ex: 2026-03-15)' },
                           { var: '{client}', desc: 'Nom du client' },
                           { var: '{entreprise}', desc: 'Nom de votre entreprise' },
                         ].map((v) => (
@@ -840,8 +840,8 @@ export default function InvoiceSettingsPage() {
                         <FileCheck className="h-4.5 w-4.5 text-primary" />
                       </div>
                       <div>
-                        <h2 className="text-base font-semibold text-foreground">Facturation electronique</h2>
-                        <p className="text-xs text-muted-foreground">Reforme 2026 — Factur-X, PDP et e-reporting</p>
+                        <h2 className="text-base font-semibold text-foreground">Facturation électronique</h2>
+                        <p className="text-xs text-muted-foreground">Réforme 2026 — Factur-X, PDP et e-reporting</p>
                       </div>
                     </div>
 
@@ -849,7 +849,7 @@ export default function InvoiceSettingsPage() {
                     <div className="flex items-start gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 mb-4">
                       <Info className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                       <p className="text-xs text-foreground leading-relaxed">
-                        A partir de septembre 2026, toutes les entreprises francaises doivent emettre des factures electroniques au format structure (Factur-X, UBL ou CII) via une Plateforme de Dematerialisation Partenaire (PDP).
+                        A partir de septembre 2026, toutes les entreprises françaises doivent émettre des factures électroniques au format structuré (Factur-X, UBL ou CII) via une Plateforme de Dématérialisation Partenaire (PDP).
                       </p>
                     </div>
 
@@ -860,7 +860,7 @@ export default function InvoiceSettingsPage() {
                           <Shield className={`h-5 w-5 ${settings.eInvoicingEnabled ? 'text-primary' : 'text-muted-foreground'}`} />
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-foreground">Activer la facturation electronique</p>
+                          <p className="text-sm font-medium text-foreground">Activer la facturation électronique</p>
                           <p className="text-xs text-muted-foreground">Genere automatiquement le format Factur-X pour vos documents</p>
                         </div>
                       </div>
@@ -1029,7 +1029,7 @@ export default function InvoiceSettingsPage() {
                       {/* Addresses */}
                       <div className="grid grid-cols-2 gap-6 mb-6">
                         <div className="space-y-1">
-                          <p className="text-[9px] font-semibold uppercase tracking-wider" style={{ color: settings.accentColor }}>Emetteur</p>
+                          <p className="text-[9px] font-semibold uppercase tracking-wider" style={{ color: settings.accentColor }}>Émetteur</p>
                           <div className="space-y-0.5">
                             <div className="h-2 w-28 rounded-full" style={{ backgroundColor: currentTemplate.borderLight }} />
                             <div className="h-1.5 w-36 rounded-full" style={{ backgroundColor: currentTemplate.borderLight, opacity: 0.6 }} />
@@ -1104,7 +1104,7 @@ export default function InvoiceSettingsPage() {
                                 <span className="text-[8px] rounded-md px-2 py-0.5" style={{ backgroundColor: currentTemplate.paymentBadgeBg, border: `1px solid ${currentTemplate.paymentBadgeBorder}`, color: currentTemplate.paymentBadgeText }}>Virement</span>
                               )}
                               {settings.paymentMethods.includes('cash') && (
-                                <span className="text-[8px] rounded-md px-2 py-0.5" style={{ backgroundColor: currentTemplate.paymentBadgeBg, border: `1px solid ${currentTemplate.paymentBadgeBorder}`, color: currentTemplate.paymentBadgeText }}>Especes</span>
+                                <span className="text-[8px] rounded-md px-2 py-0.5" style={{ backgroundColor: currentTemplate.paymentBadgeBg, border: `1px solid ${currentTemplate.paymentBadgeBorder}`, color: currentTemplate.paymentBadgeText }}>Espèces</span>
                               )}
                               {settings.paymentMethods.includes('custom') && settings.customPaymentMethod && (
                                 <span className="text-[8px] rounded-md px-2 py-0.5" style={{ backgroundColor: currentTemplate.paymentBadgeBg, border: `1px solid ${currentTemplate.paymentBadgeBorder}`, color: currentTemplate.paymentBadgeText }}>{settings.customPaymentMethod}</span>
@@ -1135,17 +1135,17 @@ export default function InvoiceSettingsPage() {
               <FileCheck className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <DialogTitle>Activer la facturation electronique</DialogTitle>
-              <DialogDescription>Reforme obligatoire a partir de septembre 2026</DialogDescription>
+              <DialogTitle>Activer la facturation électronique</DialogTitle>
+              <DialogDescription>Réforme obligatoire à partir de septembre 2026</DialogDescription>
             </div>
           </div>
           <div className="space-y-3 mb-6">
             <p className="text-sm text-muted-foreground leading-relaxed">
-              En activant cette option, vos documents seront generes au format Factur-X (PDF/A-3) conforme aux exigences de la reforme francaise.
+              En activant cette option, vos documents seront générés au format Factur-X (PDF/A-3) conforme aux exigences de la réforme française.
             </p>
             <div className="rounded-lg border border-border p-3 space-y-2">
               {[
-                'Vos PDF incluront les metadonnees XML structurees',
+                'Vos PDF incluront les métadonnées XML structurées',
                 'Compatible avec toutes les PDP agreees',
                 'Aucun impact sur vos documents existants',
               ].map((item) => (
@@ -1158,7 +1158,7 @@ export default function InvoiceSettingsPage() {
           </div>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setShowEInvoicingModal(false)}>Annuler</Button>
-            <Button onClick={() => { updateSettings({ eInvoicingEnabled: true }); setShowEInvoicingModal(false); toast('Facturation electronique activee', 'success') }}>
+            <Button onClick={() => { updateSettings({ eInvoicingEnabled: true }); setShowEInvoicingModal(false); toast('Facturation électronique activée', 'success') }}>
               <FileCheck className="h-4 w-4 mr-2" /> Activer
             </Button>
           </DialogFooter>

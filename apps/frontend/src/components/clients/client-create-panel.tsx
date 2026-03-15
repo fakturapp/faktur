@@ -477,7 +477,7 @@ export function ClientCreatePanel({ open, onClose, onCreated }: ClientCreatePane
                           </div>
                         </div>
                         <div>
-                          <label className="text-sm font-medium text-foreground mb-1.5 block">Telephone</label>
+                          <label className="text-sm font-medium text-foreground mb-1.5 block">Téléphone</label>
                           <div className="relative">
                             <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input
@@ -660,8 +660,8 @@ export function ClientCreatePanel({ open, onClose, onCreated }: ClientCreatePane
                 </Button>
               ) : (
                 <Button onClick={handleSubmit} disabled={saving || !canGoNext()}>
-                  {saving ? <><Spinner /> Creation...</> : (
-                    <><Check className="h-4 w-4 mr-1" /> Creer le client</>
+                  {saving ? <><Spinner /> Création...</> : (
+                    <><Check className="h-4 w-4 mr-1" /> Créer le client</>
                   )}
                 </Button>
               )}

@@ -85,7 +85,7 @@ export default function InvoicesPage() {
     const { blob, filename, error } = await api.downloadBlob(`/invoices/${invoiceId}/pdf`)
     setDownloadingId(null)
     if (error || !blob) {
-      toast(error || 'Erreur lors du telechargement', 'error')
+      toast(error || 'Erreur lors du téléchargement', 'error')
       return
     }
     const url = URL.createObjectURL(blob)
@@ -141,7 +141,7 @@ export default function InvoicesPage() {
           </p>
         </div>
         <Button onClick={() => setShowCreateModal(true)}>
-          <Plus className="h-4 w-4 mr-1.5" /> Creer une facture
+          <Plus className="h-4 w-4 mr-1.5" /> Créer une facture
         </Button>
       </motion.div>
 
@@ -160,8 +160,8 @@ export default function InvoicesPage() {
           {[
             { id: 'all', label: 'Tous' },
             { id: 'draft', label: 'Brouillon' },
-            { id: 'sent', label: 'Envoyee' },
-            { id: 'paid', label: 'Payee' },
+            { id: 'sent', label: 'Envoyée' },
+            { id: 'paid', label: 'Payée' },
             { id: 'overdue', label: 'En retard' },
           ].map((f) => (
             <button
@@ -216,11 +216,11 @@ export default function InvoicesPage() {
           <p className="text-sm text-muted-foreground mt-1">
             {debouncedSearch || filterStatus !== 'all'
               ? 'Essayez avec d\'autres criteres de recherche'
-              : 'Commencez par creer votre premiere facture'}
+              : 'Commencez par créer votre première facture'}
           </p>
           {!debouncedSearch && filterStatus === 'all' && (
             <Button className="mt-4" onClick={() => setShowCreateModal(true)}>
-              <Plus className="h-4 w-4 mr-1.5" /> Creer une facture
+              <Plus className="h-4 w-4 mr-1.5" /> Créer une facture
             </Button>
           )}
         </motion.div>
@@ -282,7 +282,7 @@ export default function InvoicesPage() {
                     onClick={(e) => handleDownloadPdf(e, invoice.id)}
                     disabled={downloadingId === invoice.id}
                     className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
-                    title="Telecharger le PDF"
+                    title="Télécharger le PDF"
                   >
                     <Download className={`h-4 w-4 ${downloadingId === invoice.id ? 'animate-pulse' : ''}`} />
                   </button>

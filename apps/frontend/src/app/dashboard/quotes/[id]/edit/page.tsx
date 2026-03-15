@@ -279,7 +279,7 @@ export default function EditQuotePage() {
       toast(error, 'error')
     } else {
       setIsDirty(false)
-      toast('Devis mis a jour', 'success')
+      toast('Devis mis à jour', 'success')
       router.push('/dashboard/quotes')
     }
   }
@@ -289,7 +289,7 @@ export default function EditQuotePage() {
     const { blob, filename, error } = await api.downloadBlob(`/quotes/${quoteId}/pdf`)
     setDownloading(false)
     if (error || !blob) {
-      toast(error || 'Erreur lors du telechargement', 'error')
+      toast(error || 'Erreur lors du téléchargement', 'error')
       return
     }
     const url = URL.createObjectURL(blob)
@@ -573,9 +573,9 @@ export default function EditQuotePage() {
 
       {/* ── Unsaved changes dialog ── */}
       <Dialog open={showModal} onClose={cancelNavigation} className="max-w-sm">
-        <DialogTitle>Modifications non enregistrees</DialogTitle>
+        <DialogTitle>Modifications non enregistrées</DialogTitle>
         <p className="mt-2 text-sm text-muted-foreground">
-          Vous avez des modifications non enregistrees. Que souhaitez-vous faire ?
+          Vous avez des modifications non enregistrées. Que souhaitez-vous faire ?
         </p>
         <DialogFooter>
           <Button variant="outline" size="sm" onClick={cancelNavigation}>

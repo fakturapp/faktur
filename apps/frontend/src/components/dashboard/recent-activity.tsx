@@ -25,11 +25,11 @@ interface RecentItem {
 
 const statusMap: Record<string, { label: string; variant: 'default' | 'success' | 'warning' | 'destructive' | 'muted' }> = {
   draft: { label: 'Brouillon', variant: 'muted' },
-  sent: { label: 'Envoyee', variant: 'default' },
-  paid: { label: 'Payee', variant: 'success' },
+  sent: { label: 'Envoyée', variant: 'default' },
+  paid: { label: 'Payée', variant: 'success' },
   overdue: { label: 'En retard', variant: 'destructive' },
-  accepted: { label: 'Accepte', variant: 'success' },
-  rejected: { label: 'Refuse', variant: 'destructive' },
+  accepted: { label: 'Accepté', variant: 'success' },
+  rejected: { label: 'Refusé', variant: 'destructive' },
   pending: { label: 'En attente', variant: 'warning' },
 }
 
@@ -66,11 +66,11 @@ export function RecentActivity({ items }: { items: RecentItem[] }) {
             </div>
             <p className="text-sm font-medium text-foreground">Aucune activite recente</p>
             <p className="text-xs text-muted-foreground mt-1 max-w-xs">
-              Creez votre premiere facture ou devis pour commencer.
+              Créez votre première facture ou devis pour commencer.
             </p>
             <Link href="/dashboard/invoices/new">
               <Button className="mt-4" size="sm">
-                <Plus className="h-4 w-4 mr-1" /> Creer une facture
+                <Plus className="h-4 w-4 mr-1" /> Créer une facture
               </Button>
             </Link>
           </CardContent>
@@ -81,7 +81,7 @@ export function RecentActivity({ items }: { items: RecentItem[] }) {
                 <thead>
                   <tr className="border-b border-border">
                     <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Type</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Numero</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Numéro</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Client</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Montant</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Statut</th>

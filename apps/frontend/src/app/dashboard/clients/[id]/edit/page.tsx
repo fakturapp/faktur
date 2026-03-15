@@ -296,7 +296,7 @@ export default function ClientEditPage() {
               {activeTab === 'contacts' && (
                 <div className="space-y-5">
                   <div><label className="text-sm font-medium text-foreground mb-1.5 block">Email</label><div className="relative"><Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input type="email" value={form.email} onChange={(e) => update('email', e.target.value)} placeholder="client@exemple.fr" className="pl-10" /></div></div>
-                  <div><label className="text-sm font-medium text-foreground mb-1.5 block">Telephone</label><div className="relative"><Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input type="tel" value={form.phone} onChange={(e) => update('phone', e.target.value)} placeholder="06 12 34 56 78" className="pl-10" /></div></div>
+                  <div><label className="text-sm font-medium text-foreground mb-1.5 block">Téléphone</label><div className="relative"><Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input type="tel" value={form.phone} onChange={(e) => update('phone', e.target.value)} placeholder="06 12 34 56 78" className="pl-10" /></div></div>
                   <div className="flex items-center justify-between rounded-xl border border-border p-4">
                     <div><p className="text-sm font-medium text-foreground">Inclure dans les envois email</p><p className="text-xs text-muted-foreground mt-0.5">Utiliser cette adresse par defaut</p></div>
                     <Switch checked={form.includeInEmails} onChange={(v) => update('includeInEmails', v)} />
@@ -306,7 +306,7 @@ export default function ClientEditPage() {
               {activeTab === 'notes' && (
                 <div className="space-y-4">
                   <Textarea placeholder="Notes internes sur le client..." value={form.notes} onChange={(e) => update('notes', e.target.value)} rows={8} />
-                  <p className="text-xs text-muted-foreground">Ces notes sont visibles uniquement par votre equipe.</p>
+                  <p className="text-xs text-muted-foreground">Ces notes sont visibles uniquement par votre équipe.</p>
                 </div>
               )}
             </motion.div>

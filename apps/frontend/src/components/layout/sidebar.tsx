@@ -242,7 +242,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             }
             className="min-w-[230px]"
           >
-            <DropdownLabel>Vos equipes</DropdownLabel>
+            <DropdownLabel>Vos équipes</DropdownLabel>
 
             {teams.map((team) => (
               <DropdownItem
@@ -279,7 +279,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
 
             <Link href="/dashboard/team/create">
               <DropdownItem>
-                <Plus className="h-4 w-4" /> Creer une equipe
+                <Plus className="h-4 w-4" /> Créer une équipe
               </DropdownItem>
             </Link>
           </Dropdown>
@@ -303,7 +303,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
           className="flex items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm"
         >
           <CirclePlus className="h-4 w-4" />
-          <span>Creer</span>
+          <span>Créer</span>
         </Link>
       </div>
 
