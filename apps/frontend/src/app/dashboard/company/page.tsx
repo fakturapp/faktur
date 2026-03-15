@@ -13,7 +13,7 @@ import { useToast } from '@/components/ui/toast'
 import { api } from '@/lib/api'
 import { Select } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
-import { Building2, CreditCard, Receipt, Search, Info, Banknote, Coins, PenLine, Lock, ImagePlus, Trash2 } from 'lucide-react'
+import { Building2, CreditCard, Receipt, Search, Info, Banknote, Coins, PenLine, Lock, ImagePlus, Trash2, Eye, EyeOff } from 'lucide-react'
 
 interface Company {
   id: string
@@ -77,6 +77,19 @@ export default function CompanyPage() {
     bic: '',
     bankName: '',
   })
+  const [showIban, setShowIban] = useState(false)
+  const [showBic, setShowBic] = useState(false)
+
+  const maskIban = (iban: string) => {
+    const clean = iban.replace(/\s/g, '')
+    if (clean.length <= 8) return '••••  ••••'
+    return clean.slice(0, 4) + ' •••• •••• •••• •••• ' + clean.slice(-4)
+  }
+
+  const maskBic = (bic: string) => {
+    if (bic.length <= 4) return '••••••••'
+    return bic.slice(0, 4) + '••••'
+  }
 
   const [paymentForm, setPaymentForm] = useState({
     paymentConditions: '',
@@ -274,7 +287,7 @@ export default function CompanyPage() {
                   <div className="relative group">
                     <div className="h-24 w-24 rounded-xl border-2 border-dashed border-border bg-muted/30 flex items-center justify-center overflow-hidden">
                       {logoUrl ? (
-                        <img src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333'}${logoUrl}`} alt="Logo" className="h-full w-full object-contain p-2" />
+                        <img src={logoUrl} alt="Logo" className="h-full w-full object-contain p-2" />
                       ) : (
                         <ImagePlus className="h-8 w-8 text-muted-foreground/50" />
                       )}
@@ -423,13 +436,46 @@ export default function CompanyPage() {
 
                   <Field>
                     <FieldLabel htmlFor="iban">IBAN</FieldLabel>
-                    <Input id="iban" value={bankForm.iban} onChange={(e) => setBankForm((p) => ({ ...p, iban: e.target.value }))} placeholder="FR76 XXXX XXXX XXXX XXXX XXXX XXX" />
+                    <div className="relative">
+                      <Input
+                        id="iban"
+                        value={showIban ? bankForm.iban : (bankForm.iban ? maskIban(bankForm.iban) : '')}
+                        onChange={(e) => { if (showIban) setBankForm((p) => ({ ...p, iban: e.target.value })) }}
+                        onFocus={() => setShowIban(true)}
+                        placeholder="FR76 XXXX XXXX XXXX XXXX XXXX XXX"
+                        className="pr-10"
+                        readOnly={!showIban}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowIban((v) => !v)}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {showIban ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
                   </Field>
 
                   <div className="grid grid-cols-2 gap-4">
                     <Field>
                       <FieldLabel htmlFor="bic">BIC / SWIFT</FieldLabel>
-                      <Input id="bic" value={bankForm.bic} onChange={(e) => setBankForm((p) => ({ ...p, bic: e.target.value }))} />
+                      <div className="relative">
+                        <Input
+                          id="bic"
+                          value={showBic ? bankForm.bic : (bankForm.bic ? maskBic(bankForm.bic) : '')}
+                          onChange={(e) => { if (showBic) setBankForm((p) => ({ ...p, bic: e.target.value })) }}
+                          onFocus={() => setShowBic(true)}
+                          className="pr-10"
+                          readOnly={!showBic}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowBic((v) => !v)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          {showBic ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
                     </Field>
                     <Field>
                       <FieldLabel htmlFor="bankName">Nom de la banque</FieldLabel>
