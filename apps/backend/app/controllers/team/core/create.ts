@@ -23,8 +23,9 @@ export default class Create {
       joinedAt: DateTime.now(),
     })
 
-    // Switch to the new team
+    // Switch to the new team and trigger onboarding flow
     user.currentTeamId = team.id
+    user.onboardingCompleted = false
     await user.save()
 
     return response.created({
