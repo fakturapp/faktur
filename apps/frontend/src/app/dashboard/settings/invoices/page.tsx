@@ -692,7 +692,6 @@ export default function InvoiceSettingsPage() {
                         <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">Pied de page du document</label>
                         <div className="space-y-2">
                           {([
-                            { id: 'vat_exempt' as const, label: 'TVA non applicable', desc: 'Mention "TVA non applicable, art. 293 B du CGI"' },
                             { id: 'company_info' as const, label: 'Informations entreprise', desc: 'Raison sociale, SIREN, TVA, adresse' },
                             { id: 'custom' as const, label: 'Texte personnalisé', desc: 'Saisissez votre propre texte de pied de page' },
                           ]).map((opt) => (

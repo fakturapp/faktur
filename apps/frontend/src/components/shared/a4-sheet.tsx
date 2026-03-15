@@ -453,14 +453,14 @@ interface A4SheetProps {
   darkMode?: boolean
   language?: string
   showNotes?: boolean
-  vatExempt?: boolean
+  vatExemptReason?: 'none' | 'not_subject' | 'france_no_vat' | 'outside_france'
   footerText?: string
   documentFont?: string
   showSubject?: boolean
   showAcceptanceConditions?: boolean
   showFreeField?: boolean
   showFooterText?: boolean
-  footerMode?: 'company_info' | 'vat_exempt' | 'custom'
+  footerMode?: 'company_info' | 'custom'
   documentType?: 'quote' | 'invoice'
   onAcceptanceConditionsChange?: (v: string) => void
   onFreeFieldChange?: (v: string) => void
@@ -480,9 +480,9 @@ export function A4Sheet({
   deliveryAddress, showDeliveryAddress, clientSiren, showClientSiren,
   clientVatNumber, showClientVatNumber, paymentMethods, customPaymentMethod,
   subject, onSubjectChange, template, darkMode, language,
-  showNotes = true, vatExempt = false, footerText, documentFont = 'Lexend',
+  showNotes = true, vatExemptReason = 'none', footerText, documentFont = 'Lexend',
   showSubject = true, showAcceptanceConditions = false, showFreeField = false, showFooterText = false,
-  footerMode = 'vat_exempt',
+  footerMode = 'company_info',
   documentType = 'quote',
   onAcceptanceConditionsChange, onFreeFieldChange, onFooterTextChange, onDeliveryAddressChange,
   onIssueDateChange, onValidityDateChange,
@@ -1093,11 +1093,13 @@ export function A4Sheet({
               </div>
 
               {/* ── VAT exempt mention ── */}
-              {vatExempt && (
+              {vatExemptReason !== 'none' && (
                 <div className="mb-3 text-[10px] italic" style={{ color: T.textMuted }}>
-                  {lang === 'en'
-                    ? 'VAT not applicable, article 293 B of the CGI'
-                    : 'TVA non applicable, article 293 B du CGI'}
+                  {vatExemptReason === 'not_subject'
+                    ? (lang === 'en' ? 'VAT not applicable, article 293 B of the CGI' : 'TVA non applicable, article 293 B du CGI')
+                    : vatExemptReason === 'france_no_vat'
+                      ? (lang === 'en' ? 'VAT exemption, article 261 of the CGI' : 'Exonération de TVA, article 261 du CGI')
+                      : (lang === 'en' ? 'VAT not applicable — service performed outside France, article 259-1 of the CGI' : 'TVA non applicable — prestation de services réalisée hors de France, article 259-1 du CGI')}
                 </div>
               )}
 
@@ -1196,10 +1198,6 @@ export function A4Sheet({
                           {footerText || ''}
                         </div>
                       )
-                    ) : footerMode === 'vat_exempt' ? (
-                      <div className="text-[11px] leading-[1.6] italic" style={{ color: T.textFooter }}>
-                        {lang === 'en' ? 'VAT not applicable, article 293 B of the CGI' : 'TVA non applicable, article 293 B du CGI'}
-                      </div>
                     ) : (
                       <div className="text-[11px] leading-[1.6]" style={{ color: T.textFooter }}>
                         {company && (<>
@@ -1229,10 +1227,6 @@ export function A4Sheet({
                         {footerText || ''}
                       </div>
                     )
-                  ) : footerMode === 'vat_exempt' ? (
-                    <div className="text-[9px] leading-[1.6] italic" style={{ color: T.textFooter }}>
-                      {lang === 'en' ? 'VAT not applicable, article 293 B of the CGI' : 'TVA non applicable, article 293 B du CGI'}
-                    </div>
                   ) : (
                     <div className="text-[9px] leading-[1.6]" style={{ color: T.textFooter }}>
                       {company && (<>

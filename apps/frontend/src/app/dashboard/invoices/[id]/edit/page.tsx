@@ -71,14 +71,14 @@ export default function EditInvoicePage() {
     globalDiscountType: 'none' as 'none' | 'percentage' | 'fixed',
     globalDiscountValue: 0,
     showNotes: true,
-    vatExempt: false,
+    vatExemptReason: 'none' as 'none' | 'not_subject' | 'france_no_vat' | 'outside_france',
     footerText: '',
     showSubject: true,
     showDeliveryAddress: false,
     showAcceptanceConditions: false,
     showFreeField: false,
     showFooterText: false,
-    footerMode: 'vat_exempt' as 'company_info' | 'vat_exempt' | 'custom',
+    footerMode: 'company_info' as 'company_info' | 'custom',
     facturX: false,
   })
 
@@ -125,14 +125,14 @@ export default function EditInvoicePage() {
           globalDiscountType: inv.globalDiscountType || 'none',
           globalDiscountValue: inv.globalDiscountValue || 0,
           showNotes: inv.showNotes !== false,
-          vatExempt: inv.vatExempt || false,
+          vatExemptReason: inv.vatExemptReason || 'none',
           footerText: inv.footerText || '',
           showSubject: true,
           showDeliveryAddress: !!inv.deliveryAddress,
           showAcceptanceConditions: !!inv.acceptanceConditions,
           showFreeField: !!inv.freeField,
           showFooterText: !!inv.footerText,
-          footerMode: invoiceSettings.footerMode || 'vat_exempt',
+          footerMode: ((invoiceSettings.footerMode as string) === 'vat_exempt' ? 'company_info' : invoiceSettings.footerMode) || 'company_info',
           facturX: inv.facturX || false,
         })
 
@@ -518,7 +518,7 @@ export default function EditInvoicePage() {
               darkMode={invoiceSettings.darkMode}
               language={options.language}
               showNotes={options.showNotes}
-              vatExempt={options.vatExempt}
+              vatExemptReason={options.vatExemptReason}
               footerText={options.footerText}
               documentFont={invoiceSettings.documentFont}
               showSubject={options.showSubject}
