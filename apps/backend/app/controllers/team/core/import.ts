@@ -1,6 +1,8 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { randomUUID } from 'node:crypto'
-import { readFileSync } from 'node:fs'
+import { readFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs'
+import { join, extname } from 'node:path'
+import app from '@adonisjs/core/services/app'
 import AdmZip from 'adm-zip'
 import db from '@adonisjs/lucid/services/db'
 import Team from '#models/team/team'
@@ -176,6 +178,36 @@ export default class Import {
 
       return newTeam
     })
+
+    // Restore logo assets from ZIP
+    const uploadsBase = join(app.tmpPath(), 'uploads')
+    const assetDirs = ['team-icons', 'company-logos', 'invoice-logos'] as const
+
+    for (const dir of assetDirs) {
+      const prefix = `export/assets/${dir}/`
+      const assetEntries = zip.getEntries().filter((e) => e.entryName.startsWith(prefix) && !e.isDirectory)
+
+      for (const entry of assetEntries) {
+        const ext = extname(entry.entryName) || '.png'
+        const newFileName = `${team.id}-${randomUUID()}${ext}`
+        const destDir = join(uploadsBase, dir)
+        if (!existsSync(destDir)) {
+          mkdirSync(destDir, { recursive: true })
+        }
+        writeFileSync(join(destDir, newFileName), entry.getData())
+
+        const newUrl = `/${dir}/${newFileName}`
+
+        // Update the corresponding model's URL
+        if (dir === 'team-icons') {
+          await Team.query().where('id', team.id).update({ iconUrl: newUrl })
+        } else if (dir === 'company-logos') {
+          await Company.query().where('teamId', team.id).update({ logoUrl: newUrl })
+        } else if (dir === 'invoice-logos') {
+          await InvoiceSetting.query().where('teamId', team.id).update({ logoUrl: newUrl })
+        }
+      }
+    }
 
     // Switch user to the new team
     user.currentTeamId = team.id

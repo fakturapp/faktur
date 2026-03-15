@@ -1,4 +1,7 @@
 import { randomBytes, scryptSync, createCipheriv, createDecipheriv } from 'node:crypto'
+import { existsSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
+import app from '@adonisjs/core/services/app'
 import archiver from 'archiver'
 import Team from '#models/team/team'
 import Company from '#models/team/company'
@@ -200,7 +203,38 @@ export async function collectTeamData(teamId: string): Promise<ExportData> {
   }
 }
 
-export async function createZipBuffer(data: ExportData): Promise<Buffer> {
+interface LogoFile {
+  zipPath: string
+  buffer: Buffer
+}
+
+export function collectLogoFiles(data: ExportData): LogoFile[] {
+  const files: LogoFile[] = []
+  const uploadsBase = join(app.tmpPath(), 'uploads')
+
+  function tryAdd(urlField: string | null | undefined) {
+    if (!urlField) return
+    // URL is like /team-icons/filename.png
+    const match = urlField.match(/^\/(team-icons|company-logos|invoice-logos)\/(.+)$/)
+    if (!match) return
+    const [, dir, filename] = match
+    const diskPath = join(uploadsBase, dir, filename)
+    if (existsSync(diskPath)) {
+      files.push({
+        zipPath: `export/assets/${dir}/${filename}`,
+        buffer: readFileSync(diskPath),
+      })
+    }
+  }
+
+  tryAdd(data.team.iconUrl as string)
+  tryAdd(data.company?.logoUrl as string)
+  tryAdd(data.settings?.logoUrl as string)
+
+  return files
+}
+
+export async function createZipBuffer(data: ExportData, logoFiles?: LogoFile[]): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const archive = archiver('zip', { zlib: { level: 9 } })
     const chunks: Buffer[] = []
@@ -216,6 +250,12 @@ export async function createZipBuffer(data: ExportData): Promise<Buffer> {
     archive.append(JSON.stringify(data.invoices, null, 2), { name: 'export/invoices.json' })
     archive.append(JSON.stringify(data.quotes, null, 2), { name: 'export/quotes.json' })
     archive.append(JSON.stringify(data.settings, null, 2), { name: 'export/settings.json' })
+
+    if (logoFiles) {
+      for (const file of logoFiles) {
+        archive.append(file.buffer, { name: file.zipPath })
+      }
+    }
 
     archive.finalize()
   })

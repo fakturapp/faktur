@@ -2,7 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import vine from '@vinejs/vine'
 import hash from '@adonisjs/core/services/hash'
 import TeamMember from '#models/team/team_member'
-import { collectTeamData, createZipBuffer, encryptBuffer } from '#services/team/export_service'
+import { collectTeamData, collectLogoFiles, createZipBuffer, encryptBuffer } from '#services/team/export_service'
 
 const exportValidator = vine.compile(
   vine.object({
@@ -41,7 +41,8 @@ export default class Export {
 
     // Collect and export data
     const data = await collectTeamData(teamId)
-    const zipBuffer = await createZipBuffer(data)
+    const logoFiles = collectLogoFiles(data)
+    const zipBuffer = await createZipBuffer(data, logoFiles)
 
     if (payload.encryptionPassword) {
       const encrypted = encryptBuffer(zipBuffer, payload.encryptionPassword)
