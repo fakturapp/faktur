@@ -424,7 +424,7 @@ export default function EditQuotePage() {
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={handleDownloadPdf} disabled={downloading}>
             {downloading ? <Spinner className="h-3.5 w-3.5 mr-1.5" /> : <Download className="h-3.5 w-3.5 mr-1.5" />}
-            Telecharger
+            {downloading ? 'Téléchargement...' : 'Télécharger'}
           </Button>
           <div className="flex rounded-lg border border-border overflow-hidden">
             <button
