@@ -8,6 +8,7 @@ interface Tab {
   id: string
   label: string
   icon?: React.ReactNode
+  badge?: string
 }
 
 interface TabsProps {
@@ -39,6 +40,11 @@ export function Tabs({ tabs, activeTab, onChange, className }: TabsProps) {
           <span className="relative z-10 flex items-center gap-2">
             {tab.icon}
             {tab.label}
+            {tab.badge && (
+              <span className="px-1.5 py-0.5 rounded-full bg-primary/10 text-primary text-[9px] font-semibold uppercase tracking-wide leading-none">
+                {tab.badge}
+              </span>
+            )}
           </span>
         </button>
       ))}

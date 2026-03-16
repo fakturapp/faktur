@@ -14,6 +14,7 @@ import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/componen
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { TEMPLATES, getTemplate } from '@/lib/invoice-templates'
 import { TemplateThumbnail } from '@/components/shared/template-thumbnail'
+import { Badge } from '@/components/ui/badge'
 import {
   ImagePlus,
   Palette,
@@ -40,6 +41,7 @@ import {
   Paintbrush,
   FileText,
   Building2,
+  FlaskConical,
 } from 'lucide-react'
 
 const fadeUp = {
@@ -68,7 +70,7 @@ const settingsTabs = [
   { id: 'apparence', label: 'Apparence', icon: <Paintbrush className="h-4 w-4" /> },
   { id: 'options', label: 'Options', icon: <Settings2 className="h-4 w-4" /> },
   { id: 'defauts', label: 'Valeurs par defaut', icon: <ClipboardList className="h-4 w-4" /> },
-  { id: 'efacturation', label: 'E-Facturation', icon: <FileCheck className="h-4 w-4" /> },
+  { id: 'efacturation', label: 'E-Facturation', icon: <FileCheck className="h-4 w-4" />, badge: 'Bêta' },
 ]
 
 /* ═══════════════════════════════════════════════════════════
@@ -133,6 +135,7 @@ export default function InvoiceSettingsPage() {
   const [uploading, setUploading] = useState(false)
   const [templateModalOpen, setTemplateModalOpen] = useState(false)
   const [showEInvoicingModal, setShowEInvoicingModal] = useState(false)
+  const [showBetaWarningModal, setShowBetaWarningModal] = useState(false)
   const [activeTab, setActiveTab] = useState('apparence')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -1157,8 +1160,56 @@ export default function InvoiceSettingsPage() {
           </div>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setShowEInvoicingModal(false)}>Annuler</Button>
-            <Button onClick={() => { updateSettings({ eInvoicingEnabled: true }); setShowEInvoicingModal(false); toast('Facturation électronique activée', 'success') }}>
+            <Button onClick={() => { updateSettings({ eInvoicingEnabled: true }); setShowEInvoicingModal(false); setShowBetaWarningModal(true) }}>
               <FileCheck className="h-4 w-4 mr-2" /> Activer
+            </Button>
+          </DialogFooter>
+        </div>
+      </Dialog>
+
+      {/* Beta Warning Modal */}
+      <Dialog open={showBetaWarningModal} onClose={() => setShowBetaWarningModal(false)}>
+        <div className="p-6 max-w-md">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-yellow-500/10">
+              <FlaskConical className="h-6 w-6 text-yellow-500" />
+            </div>
+            <div>
+              <DialogTitle className="flex items-center gap-2">
+                Fonctionnalité en bêta
+                <span className="px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-500 text-[10px] font-semibold uppercase tracking-wide">Bêta</span>
+              </DialogTitle>
+              <DialogDescription>Aperçu anticipé de la facturation électronique</DialogDescription>
+            </div>
+          </div>
+          <div className="space-y-3 mb-6">
+            <div className="rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-4 space-y-2">
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="h-4 w-4 text-yellow-500 shrink-0 mt-0.5" />
+                <p className="text-sm text-foreground leading-relaxed">
+                  Cette fonctionnalité est actuellement en <strong>version bêta</strong>. Elle peut présenter des dysfonctionnements ou ne pas fonctionner correctement dans certains cas.
+                </p>
+              </div>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Nous travaillons activement sur cette fonctionnalité. Elle sera <strong className="text-foreground">pleinement opérationnelle avant septembre 2026</strong>, bien avant l&apos;entrée en vigueur de la réforme.
+            </p>
+            <div className="rounded-lg border border-border p-3 space-y-2">
+              {[
+                'Les formats générés peuvent évoluer',
+                'Certaines PDP ne sont pas encore connectées',
+                'Vos données existantes ne seront pas affectées',
+              ].map((item) => (
+                <div key={item} className="flex items-start gap-2">
+                  <Info className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
+                  <span className="text-xs text-muted-foreground">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => { setShowBetaWarningModal(false); toast('Facturation électronique activée', 'success') }}>
+              J&apos;ai compris
             </Button>
           </DialogFooter>
         </div>
