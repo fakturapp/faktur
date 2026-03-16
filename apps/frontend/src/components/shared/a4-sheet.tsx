@@ -465,6 +465,7 @@ interface A4SheetProps {
   bankAccountInfo?: { bankName: string | null; iban: string | null; bic: string | null } | null
   paymentMethod?: string | null
   logoBorderRadius?: number
+  validationErrors?: string[]
   onAcceptanceConditionsChange?: (v: string) => void
   onFreeFieldChange?: (v: string) => void
   onFooterTextChange?: (v: string) => void
@@ -488,6 +489,7 @@ export function A4Sheet({
   footerMode = 'company_info',
   documentType = 'quote',
   bankAccountInfo, paymentMethod, logoBorderRadius = 0,
+  validationErrors = [],
   onAcceptanceConditionsChange, onFreeFieldChange, onFooterTextChange, onDeliveryAddressChange,
   onIssueDateChange, onValidityDateChange,
 }: A4SheetProps) {
@@ -515,6 +517,10 @@ export function A4Sheet({
     link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(effectiveFont)}:wght@300;400;500;600;700;800&display=swap`
     document.head.appendChild(link)
   }, [effectiveFont])
+
+  // Validation error helpers
+  const hasError = (field: string) => validationErrors.includes(field)
+  const errorBorder = '#ef4444'
 
   const gridCols = billingType === 'detailed'
     ? 'minmax(180px, 1fr) 60px 60px 90px 55px 90px 32px'
@@ -702,7 +708,7 @@ export function A4Sheet({
                   <div className="mb-4">
                     <div
                       style={{
-                        border: `1px dashed ${T.editBorderDashed}`,
+                        border: `1px dashed ${hasError('Objet') ? errorBorder : T.editBorderDashed}`,
                         background: T.docBg,
                         padding: '7px',
                       }}
@@ -713,7 +719,7 @@ export function A4Sheet({
                     </div>
                   </div>
                 ) : (
-                  <div className="mb-4 text-[13px]" style={{ color: T.text }}>
+                  <div className="mb-4 text-[13px]" style={{ color: hasError('Objet') ? errorBorder : T.text }}>
                     <span className="font-semibold">{t.subject} : </span>
                     {ie(subject, onSubjectChange, 'text-[13px]', lang === 'en' ? 'e.g. Website development' : 'Ex: Developpement site web')}
                   </div>
@@ -728,10 +734,10 @@ export function A4Sheet({
                     {ed ? (
                       <div
                         className="font-semibold text-[13px] cursor-pointer border-b border-dashed transition-colors"
-                        style={{ color: client?.displayName ? T.text : T.inputPlaceholder, borderBottomColor: T.editBorderDashed }}
+                        style={{ color: hasError('Client') ? errorBorder : (client?.displayName ? T.text : T.inputPlaceholder), borderBottomColor: hasError('Client') ? errorBorder : T.editBorderDashed }}
                         onClick={onClientClick}
-                        onMouseEnter={(e) => (e.currentTarget.style.borderBottomColor = accentColor)}
-                        onMouseLeave={(e) => (e.currentTarget.style.borderBottomColor = T.editBorderDashed)}
+                        onMouseEnter={(e) => (e.currentTarget.style.borderBottomColor = hasError('Client') ? errorBorder : accentColor)}
+                        onMouseLeave={(e) => (e.currentTarget.style.borderBottomColor = hasError('Client') ? errorBorder : T.editBorderDashed)}
                         title={t.clickToSelectClient}
                       >
                         <div className="flex items-center gap-1.5">
@@ -770,8 +776,8 @@ export function A4Sheet({
 
                     {/* ── Delivery address ── */}
                     {showDeliveryAddress && (
-                      <div className="mt-2 pt-2" style={{ borderTop: `1px solid ${T.borderLight}` }}>
-                        <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-0.5" style={{ color: T.textMuted }}>
+                      <div className="mt-2 pt-2" style={{ borderTop: `1px solid ${hasError('Adresse de livraison') ? errorBorder : T.borderLight}` }}>
+                        <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-0.5" style={{ color: hasError('Adresse de livraison') ? errorBorder : T.textMuted }}>
                           {t.deliveryAddress}
                         </div>
                         {ed ? (
@@ -916,7 +922,7 @@ export function A4Sheet({
               )}
 
               {/* ── Lines Table ── */}
-              <div className="mb-3">
+              <div className="mb-3" style={(hasError('Désignation') || hasError('Prix')) ? { outline: `2px solid ${errorBorder}`, outlineOffset: '-1px', borderRadius: T.borderRadius } : undefined}>
                 {/* Header */}
                 <div className="overflow-hidden" style={{ display: 'grid', gridTemplateColumns: cols, borderTopLeftRadius: T.borderRadius, borderTopRightRadius: T.borderRadius }}>
                   <div className="px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.5px]"
@@ -1127,7 +1133,7 @@ export function A4Sheet({
 
               {showAcceptanceConditions && (
                 <div className="mt-2">
-                  <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1" style={{ color: T.textMuted }}>{t.acceptanceConditions}</div>
+                  <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1" style={{ color: hasError("Conditions d'acceptation") ? errorBorder : T.textMuted }}>{t.acceptanceConditions}</div>
                   {ed ? (
                     <textarea
                       value={acceptanceConditions}
@@ -1145,7 +1151,7 @@ export function A4Sheet({
 
               {showFreeField && (
                 <div className="mt-2">
-                  <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1" style={{ color: T.textMuted }}>{lang === 'en' ? 'Additional information' : 'Champ libre'}</div>
+                  <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1" style={{ color: hasError('Champ libre') ? errorBorder : T.textMuted }}>{lang === 'en' ? 'Additional information' : 'Champ libre'}</div>
                   {ed ? (
                     <textarea
                       value={freeField}
