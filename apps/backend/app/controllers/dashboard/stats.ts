@@ -15,6 +15,8 @@ export default class Stats {
           totalInvoiced: { value: 0, trend: 0, previousValue: 0 },
           outstanding: { value: 0, trend: 0 },
           totalCollected: { value: 0, trend: 0, previousValue: 0 },
+          totalQuoted: { value: 0, trend: 0 },
+          totalAccepted: { value: 0 },
         },
         recent: [],
         chartData: [],
@@ -27,8 +29,10 @@ export default class Stats {
     const endOfPrevMonth = now.startOf('month').minus({ days: 1 }).toISODate()!
 
     // --- Stats ---
-    const [totalInvoicedCurrent, totalInvoicedPrev, outstandingResult, totalCollectedCurrent, totalCollectedPrev] =
-      await Promise.all([
+    const [
+      totalInvoicedCurrent, totalInvoicedPrev, outstandingResult, totalCollectedCurrent, totalCollectedPrev,
+      totalQuotedCurrent, totalQuotedPrev, totalAcceptedCurrent,
+    ] = await Promise.all([
         // Total invoiced this month
         Invoice.query()
           .where('team_id', teamId)
@@ -84,6 +88,31 @@ export default class Stats {
                 .where('issue_date', '<=', endOfPrevMonth)
             })
           })
+          .sum('total as total')
+          .then((r) => Number(r[0].$extras.total) || 0),
+
+        // Total quoted this month (non-draft)
+        Quote.query()
+          .where('team_id', teamId)
+          .whereNot('status', 'draft')
+          .where('issue_date', '>=', startOfMonth)
+          .sum('total as total')
+          .then((r) => Number(r[0].$extras.total) || 0),
+
+        // Total quoted previous month
+        Quote.query()
+          .where('team_id', teamId)
+          .whereNot('status', 'draft')
+          .where('issue_date', '>=', startOfPrevMonth)
+          .where('issue_date', '<=', endOfPrevMonth)
+          .sum('total as total')
+          .then((r) => Number(r[0].$extras.total) || 0),
+
+        // Total accepted this month
+        Quote.query()
+          .where('team_id', teamId)
+          .where('status', 'accepted')
+          .where('issue_date', '>=', startOfMonth)
           .sum('total as total')
           .then((r) => Number(r[0].$extras.total) || 0),
       ])
@@ -195,6 +224,13 @@ export default class Stats {
           value: totalCollectedCurrent,
           trend: calcTrend(totalCollectedCurrent, totalCollectedPrev),
           previousValue: totalCollectedPrev,
+        },
+        totalQuoted: {
+          value: totalQuotedCurrent,
+          trend: calcTrend(totalQuotedCurrent, totalQuotedPrev),
+        },
+        totalAccepted: {
+          value: totalAcceptedCurrent,
         },
       },
       recent,

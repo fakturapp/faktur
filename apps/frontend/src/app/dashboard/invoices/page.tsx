@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { motion, type Variants } from 'framer-motion'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -19,6 +19,8 @@ import {
   Send,
   Download,
   Ban,
+  TrendingUp,
+  CalendarDays,
 } from 'lucide-react'
 import { CreateInvoiceModal } from '@/components/invoices/create-invoice-modal'
 import { InvoiceDetailOverlay } from '@/components/invoices/invoice-detail-overlay'
@@ -67,6 +69,7 @@ export default function InvoicesPage() {
   const [downloadingId, setDownloadingId] = useState<string | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null)
+  const [monthlyStats, setMonthlyStats] = useState<{ totalInvoiced: number; totalCollected: number; trend: number } | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   const handleSearchChange = useCallback((value: string) => {
@@ -97,6 +100,18 @@ export default function InvoicesPage() {
   }
 
   useEffect(() => {
+    api.get<{ stats: { totalInvoiced: { value: number; trend: number }; totalCollected: { value: number } } }>('/dashboard/stats').then(({ data }) => {
+      if (data?.stats) {
+        setMonthlyStats({
+          totalInvoiced: data.stats.totalInvoiced.value,
+          totalCollected: data.stats.totalCollected.value,
+          trend: data.stats.totalInvoiced.trend,
+        })
+      }
+    })
+  }, [])
+
+  useEffect(() => {
     loadInvoices()
   }, [page, debouncedSearch, filterStatus])
 
@@ -115,6 +130,21 @@ export default function InvoicesPage() {
     }
     setLoading(false)
   }
+
+  const currentMonth = useMemo(() => {
+    const now = new Date()
+    return now.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }).replace(/^\w/, (c) => c.toUpperCase())
+  }, [])
+
+  const monthInvoiceCount = useMemo(() => {
+    const now = new Date()
+    const y = now.getFullYear()
+    const m = now.getMonth()
+    return invoices.filter((inv) => {
+      const d = new Date(inv.issueDate)
+      return d.getFullYear() === y && d.getMonth() === m
+    }).length
+  }, [invoices])
 
   function handleStatusChange(id: string, newStatus: string) {
     setInvoices((prev) => prev.map((inv) => (inv.id === id ? { ...inv, status: newStatus as InvoiceListItem['status'] } : inv)))
@@ -144,6 +174,36 @@ export default function InvoicesPage() {
           <Plus className="h-4 w-4 mr-1.5" /> Créer une facture
         </Button>
       </motion.div>
+
+      {/* Monthly summary */}
+      {monthlyStats && (
+        <motion.div variants={fadeUp} custom={0.5} className="rounded-2xl border border-border bg-card/50 p-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <CalendarDays className="h-4 w-4 text-primary" />
+                <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{currentMonth}</span>
+              </div>
+              <p className="text-3xl font-bold text-foreground">
+                {monthlyStats.totalInvoiced.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">facturé ce mois</p>
+            </div>
+            <div className="text-right space-y-2">
+              <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-green-500/10 text-green-500 text-xs font-semibold">
+                <TrendingUp className="h-3 w-3" />
+                {monthlyStats.trend > 0 ? '+' : ''}{monthlyStats.trend}%
+              </div>
+              <div>
+                <p className="text-lg font-bold text-green-500">
+                  {monthlyStats.totalCollected.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
+                </p>
+                <p className="text-xs text-muted-foreground">encaissé</p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       {/* Search + filter */}
       <motion.div variants={fadeUp} custom={1} className="flex items-center gap-3">

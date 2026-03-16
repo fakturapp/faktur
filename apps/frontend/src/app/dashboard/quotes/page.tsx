@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import Link from 'next/link'
 import { motion, type Variants } from 'framer-motion'
 import { Input } from '@/components/ui/input'
@@ -20,6 +20,8 @@ import {
   Send,
   XCircle,
   Download,
+  CalendarDays,
+  TrendingUp,
 } from 'lucide-react'
 import { QuoteDetailOverlay } from '@/components/quotes/quote-detail-overlay'
 
@@ -65,6 +67,7 @@ export default function QuotesPage() {
   const [meta, setMeta] = useState<PaginationMeta | null>(null)
   const [downloadingId, setDownloadingId] = useState<string | null>(null)
   const [selectedQuoteId, setSelectedQuoteId] = useState<string | null>(null)
+  const [monthlyStats, setMonthlyStats] = useState<{ totalQuoted: number; totalAccepted: number; trend: number } | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   const handleSearchChange = useCallback((value: string) => {
@@ -95,6 +98,18 @@ export default function QuotesPage() {
   }
 
   useEffect(() => {
+    api.get<{ stats: { totalQuoted: { value: number; trend: number }; totalAccepted: { value: number } } }>('/dashboard/stats').then(({ data }) => {
+      if (data?.stats) {
+        setMonthlyStats({
+          totalQuoted: data.stats.totalQuoted.value,
+          totalAccepted: data.stats.totalAccepted.value,
+          trend: data.stats.totalQuoted.trend,
+        })
+      }
+    })
+  }, [])
+
+  useEffect(() => {
     loadQuotes()
   }, [page, debouncedSearch, filterStatus])
 
@@ -113,6 +128,11 @@ export default function QuotesPage() {
     }
     setLoading(false)
   }
+
+  const currentMonth = useMemo(() => {
+    const now = new Date()
+    return now.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }).replace(/^\w/, (c) => c.toUpperCase())
+  }, [])
 
   function handleStatusChange(id: string, newStatus: string) {
     setQuotes((prev) => prev.map((q) => (q.id === id ? { ...q, status: newStatus as QuoteListItem['status'] } : q)))
@@ -144,6 +164,36 @@ export default function QuotesPage() {
           </Button>
         </Link>
       </motion.div>
+
+      {/* Monthly summary */}
+      {monthlyStats && (
+        <motion.div variants={fadeUp} custom={0.5} className="rounded-2xl border border-border bg-card/50 p-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <CalendarDays className="h-4 w-4 text-primary" />
+                <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{currentMonth}</span>
+              </div>
+              <p className="text-3xl font-bold text-foreground">
+                {monthlyStats.totalQuoted.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">devisé ce mois</p>
+            </div>
+            <div className="text-right space-y-2">
+              <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-green-500/10 text-green-500 text-xs font-semibold">
+                <TrendingUp className="h-3 w-3" />
+                {monthlyStats.trend > 0 ? '+' : ''}{monthlyStats.trend}%
+              </div>
+              <div>
+                <p className="text-lg font-bold text-green-500">
+                  {monthlyStats.totalAccepted.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
+                </p>
+                <p className="text-xs text-muted-foreground">accepté</p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       {/* Search + filter */}
       <motion.div variants={fadeUp} custom={1} className="flex items-center gap-3">

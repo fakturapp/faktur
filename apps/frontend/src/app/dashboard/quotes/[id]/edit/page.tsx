@@ -348,7 +348,7 @@ export default function EditQuotePage() {
         <div className="flex flex-col xl:flex-row gap-5">
           {/* A4 sheet area */}
           <div className="flex-1 min-w-0 flex justify-center">
-            <div className="w-full max-w-[960px] rounded-xl p-1.5">
+            <div className="w-full max-w-[960px] rounded-xl">
               <div className="bg-card rounded-lg border border-border p-8 space-y-6" style={{ aspectRatio: '210/297' }}>
                 {/* Doc header */}
                 <div className="flex justify-between">
@@ -488,7 +488,7 @@ export default function EditQuotePage() {
       <div className="flex flex-col xl:flex-row gap-5">
         {/* A4 Sheet */}
         <motion.div variants={fadeUp} custom={1} className="flex-1 min-w-0 order-1">
-          <div className="rounded-xl p-1.5 relative">
+          <div className="rounded-xl relative">
           {/* Toggle options button */}
           <button
             onClick={() => setShowOptions(!showOptions)}
