@@ -77,6 +77,7 @@ export const controllers = {
     },
   },
   dashboard: {
+    Charts: () => import('#controllers/dashboard/charts'),
     SidebarCounts: () => import('#controllers/dashboard/sidebar_counts'),
     Stats: () => import('#controllers/dashboard/stats'),
   },

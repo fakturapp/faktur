@@ -36,6 +36,10 @@ export type ScannedRoutes = {
     'dashboard.index': { paramsTuple?: []; params?: {} }
     'dashboard.stats': { paramsTuple?: []; params?: {} }
     'dashboard.sidebarCounts': { paramsTuple?: []; params?: {} }
+    'dashboard.charts': { paramsTuple?: []; params?: {} }
+    'dashboard.charts.revenue': { paramsTuple?: []; params?: {} }
+    'dashboard.charts.collected': { paramsTuple?: []; params?: {} }
+    'dashboard.charts.micro': { paramsTuple?: []; params?: {} }
     'serve_icon': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'team_list': { paramsTuple?: []; params?: {} }
     'team_create': { paramsTuple?: []; params?: {} }
@@ -149,6 +153,10 @@ export type ScannedRoutes = {
     'dashboard.index': { paramsTuple?: []; params?: {} }
     'dashboard.stats': { paramsTuple?: []; params?: {} }
     'dashboard.sidebarCounts': { paramsTuple?: []; params?: {} }
+    'dashboard.charts': { paramsTuple?: []; params?: {} }
+    'dashboard.charts.revenue': { paramsTuple?: []; params?: {} }
+    'dashboard.charts.collected': { paramsTuple?: []; params?: {} }
+    'dashboard.charts.micro': { paramsTuple?: []; params?: {} }
     'serve_icon': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'team_list': { paramsTuple?: []; params?: {} }
     'team_show': { paramsTuple?: []; params?: {} }
@@ -183,6 +191,10 @@ export type ScannedRoutes = {
     'dashboard.index': { paramsTuple?: []; params?: {} }
     'dashboard.stats': { paramsTuple?: []; params?: {} }
     'dashboard.sidebarCounts': { paramsTuple?: []; params?: {} }
+    'dashboard.charts': { paramsTuple?: []; params?: {} }
+    'dashboard.charts.revenue': { paramsTuple?: []; params?: {} }
+    'dashboard.charts.collected': { paramsTuple?: []; params?: {} }
+    'dashboard.charts.micro': { paramsTuple?: []; params?: {} }
     'serve_icon': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'team_list': { paramsTuple?: []; params?: {} }
     'team_show': { paramsTuple?: []; params?: {} }

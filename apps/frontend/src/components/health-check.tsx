@@ -83,8 +83,8 @@ export function HealthCheckProvider({ children }: { children: React.ReactNode })
               transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
               className="relative z-10 w-full max-w-lg mx-4 overflow-hidden rounded-2xl border border-red-500/20 bg-card shadow-2xl"
             >
-              {/* Header gradient */}
-              <div className="relative bg-gradient-to-br from-red-500/10 via-orange-500/5 to-transparent px-6 pt-8 pb-6">
+              {/* Header */}
+              <div className="relative from-red-500/10 via-orange-500/5 to-transparent px-6 pt-8 pb-6">
                 {/* Animated pulse ring */}
                 <div className="mx-auto mb-5 relative w-16 h-16">
                   <motion.div

@@ -30,6 +30,9 @@ import {
   CirclePlus,
   Sun,
   Moon,
+  Building2,
+  UsersRound,
+  CreditCard,
 } from 'lucide-react'
 
 interface TeamListItem {
@@ -70,7 +73,7 @@ interface NavItem {
   href: string
   label: string
   icon: React.ElementType
-  children?: { href: string; label: string }[]
+  children?: { href: string; label: string; icon?: React.ElementType }[]
 }
 
 const mainNav: NavItem[] = [
@@ -97,14 +100,13 @@ const mainNav: NavItem[] = [
 ]
 
 const settingsNav: NavItem = {
-  href: '/dashboard/account',
+  href: '/dashboard/company',
   label: 'Parametres',
   icon: Settings,
   children: [
-    { href: '/dashboard/account', label: 'Mon compte' },
-    { href: '/dashboard/company', label: 'Entreprise' },
-    { href: '/dashboard/team', label: 'Equipe' },
-    { href: '/dashboard/settings/invoices', label: 'Facturation' },
+    { href: '/dashboard/company', label: 'Entreprise', icon: Building2 },
+    { href: '/dashboard/team', label: 'Equipe', icon: UsersRound },
+    { href: '/dashboard/settings/invoices', label: 'Facturation', icon: CreditCard },
   ],
 }
 
@@ -126,11 +128,11 @@ function NavLink({ item, pathname, badges }: { item: NavItem; pathname: string; 
         className={cn(
           'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-all duration-300 ease-in-out relative',
           isActive
-            ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+            ? 'bg-gradient-to-r from-primary/10 to-transparent text-sidebar-accent-foreground border-l-2 border-primary'
             : 'text-muted-foreground hover:bg-sidebar-accent/50 hover:text-foreground'
         )}
       >
-        <item.icon className="h-4 w-4 shrink-0" />
+        <item.icon className={cn('h-4 w-4 shrink-0', isActive && 'text-primary')} />
         <span>{item.label}</span>
       </Link>
     )
@@ -143,11 +145,11 @@ function NavLink({ item, pathname, badges }: { item: NavItem; pathname: string; 
         className={cn(
           'flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-all duration-300 ease-in-out relative',
           isActive
-            ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+            ? 'bg-gradient-to-r from-primary/10 to-transparent text-sidebar-accent-foreground border-l-2 border-primary'
             : 'text-muted-foreground hover:bg-sidebar-accent/50 hover:text-foreground'
         )}
       >
-        <item.icon className="h-4 w-4 shrink-0" />
+        <item.icon className={cn('h-4 w-4 shrink-0', isActive && 'text-primary')} />
         <span className="flex-1 text-left">{item.label}</span>
         <motion.div
           animate={{ rotate: expanded ? 90 : 0 }}
@@ -169,6 +171,7 @@ function NavLink({ item, pathname, badges }: { item: NavItem; pathname: string; 
               {item.children!.map((child) => {
                 const childActive = pathname === child.href
                 const badgeCount = badges?.[child.href]
+                const ChildIcon = child.icon
                 return (
                   <Link
                     key={child.href}
@@ -180,7 +183,10 @@ function NavLink({ item, pathname, badges }: { item: NavItem; pathname: string; 
                         : 'text-muted-foreground hover:bg-sidebar-accent/50 hover:text-foreground'
                     )}
                   >
-                    <span>{child.label}</span>
+                    <span className="flex items-center gap-2">
+                      {ChildIcon && <ChildIcon className={cn('h-3.5 w-3.5 shrink-0', childActive && 'text-primary')} />}
+                      {child.label}
+                    </span>
                     {badgeCount != null && badgeCount > 0 && (
                       <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary/10 px-1.5 text-[10px] font-semibold text-primary">
                         {badgeCount}
@@ -213,7 +219,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
       )}
     >
       {/* Team header */}
-      <div className="px-3 pt-3 pb-3">
+      <div className="px-3 pt-3 pb-3 bg-gradient-to-br from-primary/5 to-transparent">
         {teamsLoaded ? (
           <Dropdown
             align="left"
@@ -294,16 +300,16 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
         )}
       </div>
 
-      <div className="mx-3 h-px bg-border" />
+      <div className="mx-3 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
 
       {/* Quick create */}
       <div className="px-3 pt-3 pb-1">
         <Link
           href="/dashboard/invoices/new"
-          className="flex items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm"
+          className="flex items-center justify-center gap-2 rounded-xl border border-primary/20 bg-primary/5 px-3 py-2.5 text-sm font-semibold hover:bg-primary/10 transition-all group"
         >
-          <CirclePlus className="h-4 w-4" />
-          <span>Créer</span>
+          <CirclePlus className="h-4 w-4 text-primary" />
+          <span className="text-primary">Créer</span>
         </Link>
       </div>
 
@@ -312,17 +318,14 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
         {mainNav.map((item) => (
           <NavLink key={item.href} item={item} pathname={pathname} badges={badges} />
         ))}
+        <div className="mx-1 my-2 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+        <NavLink item={settingsNav} pathname={pathname} badges={badges} />
       </nav>
 
-      {/* Pinned settings */}
-      <div className="px-3 pb-2">
-        <NavLink item={settingsNav} pathname={pathname} badges={badges} />
-      </div>
-
-      <div className="mx-3 h-px bg-border" />
+      <div className="mx-3 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
 
       {/* User section */}
-      <div className="p-3">
+      <div className="p-3 mx-2 mb-2 rounded-xl bg-gradient-to-br from-primary/5 to-transparent">
         <Dropdown
           align="left"
           trigger={

@@ -9,7 +9,7 @@ export type ParamValue = string | number | bigint | boolean
 export interface Registry {
   'signup': {
     methods: ["POST"]
-    pattern: '/auth/sign-up'
+    pattern: '/api/v1/auth/sign-up'
     types: {
       body: ExtractBody<InferInput<(typeof import('#validators/auth/auth_validators').registerValidator)>>
       paramsTuple: []
@@ -21,7 +21,7 @@ export interface Registry {
   }
   'verify_email': {
     methods: ["POST"]
-    pattern: '/auth/verify-email'
+    pattern: '/api/v1/auth/verify-email'
     types: {
       body: {}
       paramsTuple: []
@@ -33,7 +33,7 @@ export interface Registry {
   }
   'resend_verification': {
     methods: ["POST"]
-    pattern: '/auth/resend-verification'
+    pattern: '/api/v1/auth/resend-verification'
     types: {
       body: {}
       paramsTuple: []
@@ -45,7 +45,7 @@ export interface Registry {
   }
   'login': {
     methods: ["POST"]
-    pattern: '/auth/login'
+    pattern: '/api/v1/auth/login'
     types: {
       body: ExtractBody<InferInput<(typeof import('#validators/auth/auth_validators').loginValidator)>>
       paramsTuple: []
@@ -57,7 +57,7 @@ export interface Registry {
   }
   'two_factor_verify': {
     methods: ["POST"]
-    pattern: '/auth/login/2fa'
+    pattern: '/api/v1/auth/login/2fa'
     types: {
       body: ExtractBody<InferInput<(typeof import('#validators/auth/auth_validators').twoFactorVerifyValidator)>>
       paramsTuple: []
@@ -69,7 +69,7 @@ export interface Registry {
   }
   'password_reset_request': {
     methods: ["POST"]
-    pattern: '/auth/password/forgot'
+    pattern: '/api/v1/auth/password/forgot'
     types: {
       body: ExtractBody<InferInput<(typeof import('#validators/auth/auth_validators').passwordResetRequestValidator)>>
       paramsTuple: []
@@ -81,7 +81,7 @@ export interface Registry {
   }
   'password_reset': {
     methods: ["POST"]
-    pattern: '/auth/password/reset'
+    pattern: '/api/v1/auth/password/reset'
     types: {
       body: ExtractBody<InferInput<(typeof import('#validators/auth/auth_validators').passwordResetValidator)>>
       paramsTuple: []
@@ -93,7 +93,7 @@ export interface Registry {
   }
   'logout': {
     methods: ["POST"]
-    pattern: '/auth/logout'
+    pattern: '/api/v1/auth/logout'
     types: {
       body: {}
       paramsTuple: []
@@ -105,7 +105,7 @@ export interface Registry {
   }
   'me': {
     methods: ["GET","HEAD"]
-    pattern: '/auth/me'
+    pattern: '/api/v1/auth/me'
     types: {
       body: {}
       paramsTuple: []
@@ -117,7 +117,7 @@ export interface Registry {
   }
   'serve_avatar': {
     methods: ["GET","HEAD"]
-    pattern: '/avatars/:filename'
+    pattern: '/api/v1/avatars/:filename'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -129,7 +129,7 @@ export interface Registry {
   }
   'profile_show': {
     methods: ["GET","HEAD"]
-    pattern: '/account/profile'
+    pattern: '/api/v1/account/profile'
     types: {
       body: {}
       paramsTuple: []
@@ -141,7 +141,7 @@ export interface Registry {
   }
   'profile_update': {
     methods: ["PUT"]
-    pattern: '/account/profile'
+    pattern: '/api/v1/account/profile'
     types: {
       body: {}
       paramsTuple: []
@@ -153,7 +153,7 @@ export interface Registry {
   }
   'password_change': {
     methods: ["PUT"]
-    pattern: '/account/password'
+    pattern: '/api/v1/account/password'
     types: {
       body: {}
       paramsTuple: []
@@ -165,7 +165,7 @@ export interface Registry {
   }
   'upload_avatar': {
     methods: ["POST"]
-    pattern: '/account/avatar'
+    pattern: '/api/v1/account/avatar'
     types: {
       body: {}
       paramsTuple: []
@@ -177,7 +177,7 @@ export interface Registry {
   }
   'sessions_list': {
     methods: ["GET","HEAD"]
-    pattern: '/account/sessions'
+    pattern: '/api/v1/account/sessions'
     types: {
       body: {}
       paramsTuple: []
@@ -189,7 +189,7 @@ export interface Registry {
   }
   'session_revoke': {
     methods: ["DELETE"]
-    pattern: '/account/sessions/:id'
+    pattern: '/api/v1/account/sessions/:id'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -201,7 +201,7 @@ export interface Registry {
   }
   'account_delete': {
     methods: ["DELETE"]
-    pattern: '/account'
+    pattern: '/api/v1/account'
     types: {
       body: {}
       paramsTuple: []
@@ -213,7 +213,7 @@ export interface Registry {
   }
   'two_factor_setup': {
     methods: ["POST"]
-    pattern: '/account/2fa/setup'
+    pattern: '/api/v1/account/2fa/setup'
     types: {
       body: {}
       paramsTuple: []
@@ -225,7 +225,7 @@ export interface Registry {
   }
   'two_factor_enable': {
     methods: ["POST"]
-    pattern: '/account/2fa/enable'
+    pattern: '/api/v1/account/2fa/enable'
     types: {
       body: ExtractBody<InferInput<(typeof import('#validators/auth/auth_validators').twoFactorSetupValidator)>>
       paramsTuple: []
@@ -237,7 +237,7 @@ export interface Registry {
   }
   'two_factor_disable': {
     methods: ["POST"]
-    pattern: '/account/2fa/disable'
+    pattern: '/api/v1/account/2fa/disable'
     types: {
       body: {}
       paramsTuple: []
@@ -249,7 +249,7 @@ export interface Registry {
   }
   'security_verify.send_code': {
     methods: ["POST"]
-    pattern: '/account/security/send-code'
+    pattern: '/api/v1/account/security/send-code'
     types: {
       body: {}
       paramsTuple: []
@@ -261,7 +261,7 @@ export interface Registry {
   }
   'security_verify.verify': {
     methods: ["POST"]
-    pattern: '/account/security/verify'
+    pattern: '/api/v1/account/security/verify'
     types: {
       body: {}
       paramsTuple: []
@@ -273,7 +273,7 @@ export interface Registry {
   }
   'email_request_change': {
     methods: ["POST"]
-    pattern: '/account/email/request-change'
+    pattern: '/api/v1/account/email/request-change'
     types: {
       body: {}
       paramsTuple: []
@@ -285,7 +285,7 @@ export interface Registry {
   }
   'email_confirm_change': {
     methods: ["POST"]
-    pattern: '/account/email/confirm-change'
+    pattern: '/api/v1/account/email/confirm-change'
     types: {
       body: {}
       paramsTuple: []
@@ -297,7 +297,7 @@ export interface Registry {
   }
   'create_team': {
     methods: ["POST"]
-    pattern: '/onboarding/team'
+    pattern: '/api/v1/onboarding/team'
     types: {
       body: ExtractBody<InferInput<(typeof import('#validators/auth/onboarding_validators').createTeamValidator)>>
       paramsTuple: []
@@ -309,7 +309,7 @@ export interface Registry {
   }
   'create_company': {
     methods: ["POST"]
-    pattern: '/onboarding/company'
+    pattern: '/api/v1/onboarding/company'
     types: {
       body: ExtractBody<InferInput<(typeof import('#validators/auth/onboarding_validators').createCompanyValidator)>>
       paramsTuple: []
@@ -321,7 +321,7 @@ export interface Registry {
   }
   'skip_company': {
     methods: ["POST"]
-    pattern: '/onboarding/skip'
+    pattern: '/api/v1/onboarding/skip'
     types: {
       body: {}
       paramsTuple: []
@@ -333,7 +333,7 @@ export interface Registry {
   }
   'search_company': {
     methods: ["GET","HEAD"]
-    pattern: '/onboarding/company/search'
+    pattern: '/api/v1/onboarding/company/search'
     types: {
       body: {}
       paramsTuple: []
@@ -345,7 +345,7 @@ export interface Registry {
   }
   'complete_personalization': {
     methods: ["POST"]
-    pattern: '/onboarding/personalization'
+    pattern: '/api/v1/onboarding/personalization'
     types: {
       body: {}
       paramsTuple: []
@@ -357,7 +357,7 @@ export interface Registry {
   }
   'dashboard.index': {
     methods: ["GET","HEAD"]
-    pattern: '/dashboard'
+    pattern: '/api/v1/dashboard'
     types: {
       body: {}
       paramsTuple: []
@@ -369,7 +369,7 @@ export interface Registry {
   }
   'dashboard.stats': {
     methods: ["GET","HEAD"]
-    pattern: '/dashboard/stats'
+    pattern: '/api/v1/dashboard/stats'
     types: {
       body: {}
       paramsTuple: []
@@ -381,7 +381,7 @@ export interface Registry {
   }
   'dashboard.sidebarCounts': {
     methods: ["GET","HEAD"]
-    pattern: '/dashboard/sidebar-counts'
+    pattern: '/api/v1/dashboard/sidebar-counts'
     types: {
       body: {}
       paramsTuple: []
@@ -391,9 +391,57 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/sidebar_counts').default['handle']>>>
     }
   }
+  'dashboard.charts': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/dashboard/charts'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/charts').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/charts').default['handle']>>>
+    }
+  }
+  'dashboard.charts.revenue': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/dashboard/charts/revenue'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/charts').default['revenue']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/charts').default['revenue']>>>
+    }
+  }
+  'dashboard.charts.collected': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/dashboard/charts/collected'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/charts').default['collected']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/charts').default['collected']>>>
+    }
+  }
+  'dashboard.charts.micro': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/dashboard/charts/micro-thresholds'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/charts').default['micro']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/charts').default['micro']>>>
+    }
+  }
   'serve_icon': {
     methods: ["GET","HEAD"]
-    pattern: '/team-icons/:filename'
+    pattern: '/api/v1/team-icons/:filename'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -405,7 +453,7 @@ export interface Registry {
   }
   'team_list': {
     methods: ["GET","HEAD"]
-    pattern: '/team/all'
+    pattern: '/api/v1/team/all'
     types: {
       body: {}
       paramsTuple: []
@@ -417,7 +465,7 @@ export interface Registry {
   }
   'team_create': {
     methods: ["POST"]
-    pattern: '/team/create'
+    pattern: '/api/v1/team/create'
     types: {
       body: ExtractBody<InferInput<(typeof import('#validators/auth/onboarding_validators').createTeamValidator)>>
       paramsTuple: []
@@ -429,7 +477,7 @@ export interface Registry {
   }
   'team_show': {
     methods: ["GET","HEAD"]
-    pattern: '/team'
+    pattern: '/api/v1/team'
     types: {
       body: {}
       paramsTuple: []
@@ -441,7 +489,7 @@ export interface Registry {
   }
   'team_update': {
     methods: ["PUT"]
-    pattern: '/team'
+    pattern: '/api/v1/team'
     types: {
       body: {}
       paramsTuple: []
@@ -453,7 +501,7 @@ export interface Registry {
   }
   'team_delete': {
     methods: ["DELETE"]
-    pattern: '/team'
+    pattern: '/api/v1/team'
     types: {
       body: {}
       paramsTuple: []
@@ -465,7 +513,7 @@ export interface Registry {
   }
   'upload_icon': {
     methods: ["POST"]
-    pattern: '/team/icon'
+    pattern: '/api/v1/team/icon'
     types: {
       body: {}
       paramsTuple: []
@@ -477,7 +525,7 @@ export interface Registry {
   }
   'team_switch': {
     methods: ["POST"]
-    pattern: '/team/switch'
+    pattern: '/api/v1/team/switch'
     types: {
       body: {}
       paramsTuple: []
@@ -489,7 +537,7 @@ export interface Registry {
   }
   'team_export': {
     methods: ["POST"]
-    pattern: '/team/export'
+    pattern: '/api/v1/team/export'
     types: {
       body: {}
       paramsTuple: []
@@ -501,7 +549,7 @@ export interface Registry {
   }
   'team_import': {
     methods: ["POST"]
-    pattern: '/team/import'
+    pattern: '/api/v1/team/import'
     types: {
       body: {}
       paramsTuple: []
@@ -513,7 +561,7 @@ export interface Registry {
   }
   'team_members': {
     methods: ["GET","HEAD"]
-    pattern: '/team/members'
+    pattern: '/api/v1/team/members'
     types: {
       body: {}
       paramsTuple: []
@@ -525,7 +573,7 @@ export interface Registry {
   }
   'team_invite': {
     methods: ["POST"]
-    pattern: '/team/invite'
+    pattern: '/api/v1/team/invite'
     types: {
       body: {}
       paramsTuple: []
@@ -537,7 +585,7 @@ export interface Registry {
   }
   'accept_invite': {
     methods: ["POST"]
-    pattern: '/team/invite/accept'
+    pattern: '/api/v1/team/invite/accept'
     types: {
       body: {}
       paramsTuple: []
@@ -549,7 +597,7 @@ export interface Registry {
   }
   'revoke_invite': {
     methods: ["DELETE"]
-    pattern: '/team/invite/:id'
+    pattern: '/api/v1/team/invite/:id'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -561,7 +609,7 @@ export interface Registry {
   }
   'update_role': {
     methods: ["PUT"]
-    pattern: '/team/members/:id/role'
+    pattern: '/api/v1/team/members/:id/role'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -573,7 +621,7 @@ export interface Registry {
   }
   'remove_member': {
     methods: ["DELETE"]
-    pattern: '/team/members/:id'
+    pattern: '/api/v1/team/members/:id'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -585,7 +633,7 @@ export interface Registry {
   }
   'transfer_ownership': {
     methods: ["POST"]
-    pattern: '/team/transfer-ownership'
+    pattern: '/api/v1/team/transfer-ownership'
     types: {
       body: {}
       paramsTuple: []
@@ -597,7 +645,7 @@ export interface Registry {
   }
   'invite_info': {
     methods: ["GET","HEAD"]
-    pattern: '/invite/:token'
+    pattern: '/api/v1/invite/:token'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -609,7 +657,7 @@ export interface Registry {
   }
   'serve_logo': {
     methods: ["GET","HEAD"]
-    pattern: '/company-logos/:filename'
+    pattern: '/api/v1/company-logos/:filename'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -621,7 +669,7 @@ export interface Registry {
   }
   'company_show': {
     methods: ["GET","HEAD"]
-    pattern: '/company'
+    pattern: '/api/v1/company'
     types: {
       body: {}
       paramsTuple: []
@@ -633,7 +681,7 @@ export interface Registry {
   }
   'company_update': {
     methods: ["PUT"]
-    pattern: '/company'
+    pattern: '/api/v1/company'
     types: {
       body: ExtractBody<InferInput<(typeof import('#validators/auth/onboarding_validators').updateCompanyValidator)>>
       paramsTuple: []
@@ -645,7 +693,7 @@ export interface Registry {
   }
   'company_bank': {
     methods: ["PUT"]
-    pattern: '/company/bank'
+    pattern: '/api/v1/company/bank'
     types: {
       body: ExtractBody<InferInput<(typeof import('#validators/auth/onboarding_validators').updateBankValidator)>>
       paramsTuple: []
@@ -657,7 +705,7 @@ export interface Registry {
   }
   'upload_logo': {
     methods: ["POST"]
-    pattern: '/company/logo'
+    pattern: '/api/v1/company/logo'
     types: {
       body: {}
       paramsTuple: []
@@ -669,7 +717,7 @@ export interface Registry {
   }
   'search_siren': {
     methods: ["GET","HEAD"]
-    pattern: '/clients/search-siren'
+    pattern: '/api/v1/clients/search-siren'
     types: {
       body: {}
       paramsTuple: []
@@ -681,7 +729,7 @@ export interface Registry {
   }
   'client_list': {
     methods: ["GET","HEAD"]
-    pattern: '/clients'
+    pattern: '/api/v1/clients'
     types: {
       body: {}
       paramsTuple: []
@@ -693,7 +741,7 @@ export interface Registry {
   }
   'client_show': {
     methods: ["GET","HEAD"]
-    pattern: '/clients/:id'
+    pattern: '/api/v1/clients/:id'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -705,7 +753,7 @@ export interface Registry {
   }
   'client_create': {
     methods: ["POST"]
-    pattern: '/clients'
+    pattern: '/api/v1/clients'
     types: {
       body: {}
       paramsTuple: []
@@ -717,7 +765,7 @@ export interface Registry {
   }
   'client_update': {
     methods: ["PUT"]
-    pattern: '/clients/:id'
+    pattern: '/api/v1/clients/:id'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -729,7 +777,7 @@ export interface Registry {
   }
   'client_delete': {
     methods: ["DELETE"]
-    pattern: '/clients/:id'
+    pattern: '/api/v1/clients/:id'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -741,7 +789,7 @@ export interface Registry {
   }
   'serve_invoice_logo': {
     methods: ["GET","HEAD"]
-    pattern: '/invoice-logos/:filename'
+    pattern: '/api/v1/invoice-logos/:filename'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -753,7 +801,7 @@ export interface Registry {
   }
   'invoice_settings_show': {
     methods: ["GET","HEAD"]
-    pattern: '/settings/invoices'
+    pattern: '/api/v1/settings/invoices'
     types: {
       body: {}
       paramsTuple: []
@@ -765,7 +813,7 @@ export interface Registry {
   }
   'invoice_settings_update': {
     methods: ["PUT"]
-    pattern: '/settings/invoices'
+    pattern: '/api/v1/settings/invoices'
     types: {
       body: ExtractBody<InferInput<(typeof import('#validators/invoice_settings_validator').updateInvoiceSettingsValidator)>>
       paramsTuple: []
@@ -777,7 +825,7 @@ export interface Registry {
   }
   'invoice_logo_upload': {
     methods: ["POST"]
-    pattern: '/settings/invoices/logo'
+    pattern: '/api/v1/settings/invoices/logo'
     types: {
       body: {}
       paramsTuple: []
@@ -789,7 +837,7 @@ export interface Registry {
   }
   'quote_next_number': {
     methods: ["GET","HEAD"]
-    pattern: '/quotes/next-number'
+    pattern: '/api/v1/quotes/next-number'
     types: {
       body: {}
       paramsTuple: []
@@ -801,7 +849,7 @@ export interface Registry {
   }
   'quote_document_count': {
     methods: ["GET","HEAD"]
-    pattern: '/quotes/document-count'
+    pattern: '/api/v1/quotes/document-count'
     types: {
       body: {}
       paramsTuple: []
@@ -813,7 +861,7 @@ export interface Registry {
   }
   'quote_set_next_number': {
     methods: ["POST"]
-    pattern: '/quotes/set-next-number'
+    pattern: '/api/v1/quotes/set-next-number'
     types: {
       body: {}
       paramsTuple: []
@@ -825,7 +873,7 @@ export interface Registry {
   }
   'quote_list': {
     methods: ["GET","HEAD"]
-    pattern: '/quotes'
+    pattern: '/api/v1/quotes'
     types: {
       body: {}
       paramsTuple: []
@@ -837,7 +885,7 @@ export interface Registry {
   }
   'quote_pdf': {
     methods: ["GET","HEAD"]
-    pattern: '/quotes/:id/pdf'
+    pattern: '/api/v1/quotes/:id/pdf'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -849,7 +897,7 @@ export interface Registry {
   }
   'quote_factur_xml': {
     methods: ["GET","HEAD"]
-    pattern: '/quotes/:id/facturx'
+    pattern: '/api/v1/quotes/:id/facturx'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -861,7 +909,7 @@ export interface Registry {
   }
   'quote_show': {
     methods: ["GET","HEAD"]
-    pattern: '/quotes/:id'
+    pattern: '/api/v1/quotes/:id'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -873,7 +921,7 @@ export interface Registry {
   }
   'quote_create': {
     methods: ["POST"]
-    pattern: '/quotes'
+    pattern: '/api/v1/quotes'
     types: {
       body: ExtractBody<InferInput<(typeof import('#validators/quote_validator').createQuoteValidator)>>
       paramsTuple: []
@@ -885,7 +933,7 @@ export interface Registry {
   }
   'quote_update_status': {
     methods: ["PATCH"]
-    pattern: '/quotes/:id/status'
+    pattern: '/api/v1/quotes/:id/status'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -897,7 +945,7 @@ export interface Registry {
   }
   'quote_update_comment': {
     methods: ["PATCH"]
-    pattern: '/quotes/:id/comment'
+    pattern: '/api/v1/quotes/:id/comment'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -909,7 +957,7 @@ export interface Registry {
   }
   'quote_duplicate': {
     methods: ["POST"]
-    pattern: '/quotes/:id/duplicate'
+    pattern: '/api/v1/quotes/:id/duplicate'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -921,7 +969,7 @@ export interface Registry {
   }
   'quote_update': {
     methods: ["PUT"]
-    pattern: '/quotes/:id'
+    pattern: '/api/v1/quotes/:id'
     types: {
       body: ExtractBody<InferInput<(typeof import('#validators/quote_validator').createQuoteValidator)>>
       paramsTuple: [ParamValue]
@@ -933,7 +981,7 @@ export interface Registry {
   }
   'quote_delete': {
     methods: ["DELETE"]
-    pattern: '/quotes/:id'
+    pattern: '/api/v1/quotes/:id'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -945,7 +993,7 @@ export interface Registry {
   }
   'invoice_next_number': {
     methods: ["GET","HEAD"]
-    pattern: '/invoices/next-number'
+    pattern: '/api/v1/invoices/next-number'
     types: {
       body: {}
       paramsTuple: []
@@ -957,7 +1005,7 @@ export interface Registry {
   }
   'invoice_document_count': {
     methods: ["GET","HEAD"]
-    pattern: '/invoices/document-count'
+    pattern: '/api/v1/invoices/document-count'
     types: {
       body: {}
       paramsTuple: []
@@ -969,7 +1017,7 @@ export interface Registry {
   }
   'invoice_set_next_number': {
     methods: ["POST"]
-    pattern: '/invoices/set-next-number'
+    pattern: '/api/v1/invoices/set-next-number'
     types: {
       body: {}
       paramsTuple: []
@@ -981,7 +1029,7 @@ export interface Registry {
   }
   'invoice_list': {
     methods: ["GET","HEAD"]
-    pattern: '/invoices'
+    pattern: '/api/v1/invoices'
     types: {
       body: {}
       paramsTuple: []
@@ -993,7 +1041,7 @@ export interface Registry {
   }
   'invoice_pdf': {
     methods: ["GET","HEAD"]
-    pattern: '/invoices/:id/pdf'
+    pattern: '/api/v1/invoices/:id/pdf'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -1005,7 +1053,7 @@ export interface Registry {
   }
   'invoice_show': {
     methods: ["GET","HEAD"]
-    pattern: '/invoices/:id'
+    pattern: '/api/v1/invoices/:id'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -1017,7 +1065,7 @@ export interface Registry {
   }
   'invoice_create': {
     methods: ["POST"]
-    pattern: '/invoices'
+    pattern: '/api/v1/invoices'
     types: {
       body: ExtractBody<InferInput<(typeof import('#validators/invoice_validator').createInvoiceValidator)>>
       paramsTuple: []
@@ -1029,7 +1077,7 @@ export interface Registry {
   }
   'invoice_convert_quote': {
     methods: ["POST"]
-    pattern: '/invoices/convert-quote/:id'
+    pattern: '/api/v1/invoices/convert-quote/:id'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -1041,7 +1089,7 @@ export interface Registry {
   }
   'invoice_update_status': {
     methods: ["PATCH"]
-    pattern: '/invoices/:id/status'
+    pattern: '/api/v1/invoices/:id/status'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -1053,7 +1101,7 @@ export interface Registry {
   }
   'invoice_unlink_quote': {
     methods: ["PATCH"]
-    pattern: '/invoices/:id/unlink-quote'
+    pattern: '/api/v1/invoices/:id/unlink-quote'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -1065,7 +1113,7 @@ export interface Registry {
   }
   'invoice_update_comment': {
     methods: ["PATCH"]
-    pattern: '/invoices/:id/comment'
+    pattern: '/api/v1/invoices/:id/comment'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -1077,7 +1125,7 @@ export interface Registry {
   }
   'invoice_duplicate': {
     methods: ["POST"]
-    pattern: '/invoices/:id/duplicate'
+    pattern: '/api/v1/invoices/:id/duplicate'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -1089,7 +1137,7 @@ export interface Registry {
   }
   'invoice_update': {
     methods: ["PUT"]
-    pattern: '/invoices/:id'
+    pattern: '/api/v1/invoices/:id'
     types: {
       body: ExtractBody<InferInput<(typeof import('#validators/invoice_validator').createInvoiceValidator)>>
       paramsTuple: [ParamValue]
@@ -1101,7 +1149,7 @@ export interface Registry {
   }
   'invoice_delete': {
     methods: ["DELETE"]
-    pattern: '/invoices/:id'
+    pattern: '/api/v1/invoices/:id'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -1113,7 +1161,7 @@ export interface Registry {
   }
   'e_invoicing_submit': {
     methods: ["POST"]
-    pattern: '/einvoicing/submit/:id'
+    pattern: '/api/v1/einvoicing/submit/:id'
     types: {
       body: {}
       paramsTuple: [ParamValue]
@@ -1125,7 +1173,7 @@ export interface Registry {
   }
   'validate_connection': {
     methods: ["GET","HEAD"]
-    pattern: '/einvoicing/validate-connection'
+    pattern: '/api/v1/einvoicing/validate-connection'
     types: {
       body: {}
       paramsTuple: []

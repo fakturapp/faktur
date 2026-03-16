@@ -236,26 +236,39 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
     URL.revokeObjectURL(url)
   }
 
-  if (!invoiceId) return null
-
   const effectiveLogoUrl = invoice?.logoUrl || (invoiceSettings.logoSource === 'company' ? companyLogoUrl : invoiceSettings.logoUrl)
 
   return (
     <AnimatePresence>
+      {invoiceId && (
       <motion.div
+        key="overlay"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.2 }}
+        transition={{ duration: 0.25 }}
         className="fixed inset-0 z-50"
       >
         {/* Backdrop */}
-        <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" onClick={onClose} />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="absolute inset-0 bg-background/60 backdrop-blur-sm"
+          onClick={onClose}
+        />
 
         {/* Content */}
         <div className="relative z-10 flex h-full items-stretch">
           {/* Preview area — centered */}
-          <div className="flex-1 flex items-center justify-center overflow-auto py-6 px-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
+            className="flex-1 flex items-center justify-center overflow-auto py-6 px-4"
+          >
             {loading ? (
               <div className="w-[600px] aspect-[210/297] bg-white rounded-xl shadow-xl flex items-center justify-center">
                 <Spinner size="lg" />
@@ -318,22 +331,26 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                   <button
                     onClick={handleDownloadPdf}
                     disabled={downloading}
-                    className={`h-9 px-4 rounded-full bg-card shadow-lg flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors border border-border ${downloading ? 'download-shimmer' : ''}`}
+                    className={`h-9 px-4 rounded-full bg-card shadow-lg flex items-center gap-2 text-sm font-medium transition-colors border border-border ${downloading ? 'download-shimmer text-muted-foreground' : ''}`}
                   >
-                    {downloading ? <Spinner className="h-4 w-4" /> : <Download className="h-4 w-4" />}
-                    {downloading ? 'Téléchargement...' : 'Télécharger PDF'}
+                    {downloading ? <Spinner className="h-4 w-4" /> : <Download className="h-4 w-4 text-muted-foreground" />}
+                    {downloading ? (
+                      <span className="text-muted-foreground">Téléchargement...</span>
+                    ) : (
+                      <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent font-semibold">{invoice.invoiceNumber}</span>
+                    )}
                   </button>
                 </div>
               </div>
             ) : null}
-          </div>
+          </motion.div>
 
           {/* Side panel */}
           <motion.div
-            initial={{ x: 320 }}
-            animate={{ x: 0 }}
-            exit={{ x: 320 }}
-            transition={{ duration: 0.25, ease: 'easeOut' }}
+            initial={{ x: 320, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: 320, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
             className="w-[320px] shrink-0 bg-card border-l border-border flex flex-col overflow-hidden rounded-l-2xl"
           >
             {loading ? (
@@ -488,6 +505,7 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
           </DialogFooter>
         </Dialog>
       </motion.div>
+      )}
     </AnimatePresence>
   )
 }
