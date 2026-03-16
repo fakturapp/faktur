@@ -39,7 +39,7 @@ export default function EditQuotePage() {
   const searchParams = useSearchParams()
   const quoteId = params.id as string
   const { toast } = useToast()
-  const { settings: invoiceSettings, companyLogoUrl, loading: settingsLoading } = useInvoiceSettings()
+  const { settings: invoiceSettings, companyLogoUrl, loading: settingsLoading, refreshSettings } = useInvoiceSettings()
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -92,6 +92,7 @@ export default function EditQuotePage() {
       const [quoteRes, companyRes] = await Promise.all([
         api.get<{ quote: any }>(`/quotes/${quoteId}`),
         api.get<{ company: CompanyInfo }>('/company'),
+        refreshSettings(),
       ])
 
       if (companyRes.data?.company) setCompany(companyRes.data.company)

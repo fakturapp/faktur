@@ -40,7 +40,7 @@ export default function EditInvoicePage() {
   const invoiceId = params.id as string
   const router = useRouter()
   const { toast } = useToast()
-  const { settings: invoiceSettings, companyLogoUrl, loading: settingsLoading } = useInvoiceSettings()
+  const { settings: invoiceSettings, companyLogoUrl, loading: settingsLoading, refreshSettings } = useInvoiceSettings()
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -104,6 +104,7 @@ export default function EditInvoicePage() {
         api.get<{ invoice: any }>(`/invoices/${invoiceId}`),
         api.get<{ company: CompanyInfo }>('/company'),
         api.get<{ bankAccounts: any[] }>('/company/bank-accounts'),
+        refreshSettings(),
       ])
 
       if (bankRes.data?.bankAccounts) {

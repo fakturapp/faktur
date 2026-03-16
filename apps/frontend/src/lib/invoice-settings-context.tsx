@@ -45,6 +45,7 @@ interface InvoiceSettingsContextType {
   updateSettings: (partial: Partial<InvoiceSettings>) => void
   uploadLogo: (file: File) => Promise<void>
   refreshCompanyLogo: () => Promise<void>
+  refreshSettings: () => Promise<void>
 }
 
 const defaultSettings: InvoiceSettings = {
@@ -83,6 +84,7 @@ const InvoiceSettingsContext = createContext<InvoiceSettingsContextType>({
   updateSettings: () => {},
   uploadLogo: async () => {},
   refreshCompanyLogo: async () => {},
+  refreshSettings: async () => {},
 })
 
 export function useInvoiceSettings() {
@@ -163,7 +165,7 @@ export function InvoiceSettingsProvider({ children }: { children: React.ReactNod
   }, [saveSettings])
 
   return (
-    <InvoiceSettingsContext.Provider value={{ settings, companyLogoUrl, loading, updateSettings, uploadLogo, refreshCompanyLogo }}>
+    <InvoiceSettingsContext.Provider value={{ settings, companyLogoUrl, loading, updateSettings, uploadLogo, refreshCompanyLogo, refreshSettings: loadSettings }}>
       {children}
     </InvoiceSettingsContext.Provider>
   )

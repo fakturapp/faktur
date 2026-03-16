@@ -41,7 +41,7 @@ function getDefaultValidity() {
 export default function NewQuotePage() {
   const router = useRouter()
   const { toast } = useToast()
-  const { settings: invoiceSettings, companyLogoUrl, loading: settingsLoading } = useInvoiceSettings()
+  const { settings: invoiceSettings, companyLogoUrl, loading: settingsLoading, refreshSettings } = useInvoiceSettings()
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -94,6 +94,7 @@ export default function NewQuotePage() {
       const [numberRes, companyRes] = await Promise.all([
         api.get<{ nextNumber: string }>('/quotes/next-number'),
         api.get<{ company: CompanyInfo }>('/company'),
+        refreshSettings(),
       ])
       if (numberRes.data?.nextNumber) setQuoteNumber(numberRes.data.nextNumber)
       if (companyRes.data?.company) setCompany(companyRes.data.company)
