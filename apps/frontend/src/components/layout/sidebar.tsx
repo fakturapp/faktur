@@ -3,13 +3,14 @@
 import * as React from 'react'
 import { useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Avatar } from '@/components/ui/avatar'
 import { Dropdown, DropdownItem, DropdownLabel, DropdownSeparator } from '@/components/ui/dropdown'
 import { Switch } from '@/components/ui/switch'
 import { useTheme } from '@/lib/theme'
+import { CreateInvoiceModal } from '@/components/invoices/create-invoice-modal'
 import {
   LayoutDashboard,
   FileText,
@@ -205,7 +206,9 @@ function NavLink({ item, pathname, badges }: { item: NavItem; pathname: string; 
 
 export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, onLogout, collapsed, badges }: SidebarProps) {
   const pathname = usePathname()
+  const router = useRouter()
   const { resolvedTheme, setTheme } = useTheme()
+  const [invoiceModalOpen, setInvoiceModalOpen] = useState(false)
 
   const initials = user.fullName
     ? user.fullName.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
@@ -304,14 +307,28 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
 
       {/* Quick create */}
       <div className="px-3 pt-3 pb-1">
-        <Link
-          href="/dashboard/invoices/new"
-          className="flex items-center justify-center gap-2 rounded-xl border border-primary/20 bg-primary/5 px-3 py-2.5 text-sm font-semibold hover:bg-primary/10 transition-all group"
+        <Dropdown
+          align="left"
+          trigger={
+            <div className="flex items-center justify-center gap-2 rounded-xl border border-primary/20 bg-primary/5 px-3 py-2.5 text-sm font-semibold hover:bg-primary/10 transition-all group cursor-pointer">
+              <CirclePlus className="h-4 w-4 text-primary" />
+              <span className="text-primary">Créer</span>
+            </div>
+          }
+          className="min-w-[200px]"
         >
-          <CirclePlus className="h-4 w-4 text-primary" />
-          <span className="text-primary">Créer</span>
-        </Link>
+          <DropdownItem onClick={() => setInvoiceModalOpen(true)}>
+            <FileText className="h-4 w-4 text-primary" />
+            <span>Facture</span>
+          </DropdownItem>
+          <DropdownItem onClick={() => router.push('/dashboard/quotes/new')}>
+            <Receipt className="h-4 w-4 text-orange-500" />
+            <span>Devis</span>
+          </DropdownItem>
+        </Dropdown>
       </div>
+
+      <CreateInvoiceModal open={invoiceModalOpen} onClose={() => setInvoiceModalOpen(false)} />
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-1">
