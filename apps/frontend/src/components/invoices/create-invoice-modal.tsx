@@ -161,7 +161,7 @@ export function CreateInvoiceModal({ open, onClose }: CreateInvoiceModalProps) {
           >
             <DialogTitle>Créer une facture</DialogTitle>
             <p className="text-sm text-muted-foreground mt-1 mb-5">
-              Choisissez comment creer votre facture
+              Choisissez comment créer votre facture
             </p>
 
             <div className="grid grid-cols-2 gap-3">
@@ -174,7 +174,7 @@ export function CreateInvoiceModal({ open, onClose }: CreateInvoiceModalProps) {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-foreground">Convertir un devis</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">A partir d'un devis existant</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">À partir d&apos;un devis existant</p>
                 </div>
               </button>
 
@@ -207,7 +207,7 @@ export function CreateInvoiceModal({ open, onClose }: CreateInvoiceModalProps) {
               >
                 <ArrowLeft className="h-4 w-4 text-muted-foreground" />
               </button>
-              <DialogTitle className="!mb-0 flex-1">Selectionner un devis</DialogTitle>
+              <DialogTitle className="!mb-0 flex-1">Sélectionner un devis</DialogTitle>
               <Dropdown
                 align="right"
                 trigger={
