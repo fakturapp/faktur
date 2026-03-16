@@ -60,6 +60,7 @@ export default function EditInvoicePage() {
   const [bankAccountId, setBankAccountId] = useState<string>('')
   const [bankAccounts, setBankAccounts] = useState<{ id: string; label: string; bankName: string | null; isDefault: boolean }[]>([])
   const [bankAccountInfo, setBankAccountInfo] = useState<{ bankName: string | null; iban: string | null; bic: string | null } | null>(null)
+  const [loadingBankAccount, setLoadingBankAccount] = useState(false)
 
   const [lines, setLines] = useState<DocumentLine[]>([
     { id: generateId(), type: 'standard', description: '', saleType: '', quantity: 1, unit: '', unitPrice: 0, vatRate: 20 },
@@ -83,7 +84,7 @@ export default function EditInvoicePage() {
     showNotes: true,
     vatExemptReason: 'not_subject' as 'none' | 'not_subject' | 'france_no_vat' | 'outside_france',
     footerText: '',
-    showSubject: true,
+    showSubject: false,
     showDeliveryAddress: false,
     showAcceptanceConditions: false,
     showFreeField: false,
@@ -142,7 +143,7 @@ export default function EditInvoicePage() {
           showNotes: inv.showNotes !== false,
           vatExemptReason: inv.vatExemptReason || 'not_subject',
           footerText: inv.footerText || '',
-          showSubject: true,
+          showSubject: !!inv.subject,
           showDeliveryAddress: !!inv.deliveryAddress,
           showAcceptanceConditions: !!inv.acceptanceConditions,
           showFreeField: !!inv.freeField,
@@ -251,6 +252,7 @@ export default function EditInvoicePage() {
     setBankAccountId(id)
     setIsDirty(true)
     if (id) {
+      setLoadingBankAccount(true)
       api.get<{ bankAccount: any }>(`/company/bank-accounts/${id}`).then(({ data }) => {
         if (data?.bankAccount) {
           setBankAccountInfo({
@@ -259,6 +261,7 @@ export default function EditInvoicePage() {
             bic: data.bankAccount.bic,
           })
         }
+        setLoadingBankAccount(false)
       })
     } else {
       setBankAccountInfo(null)
@@ -604,6 +607,7 @@ export default function EditInvoicePage() {
                   bankAccounts={bankAccounts}
                   bankAccountId={bankAccountId}
                   onBankAccountChange={handleBankAccountChange}
+                  loadingBankAccount={loadingBankAccount}
                 />
               </div>
             </motion.div>
@@ -638,7 +642,7 @@ export default function EditInvoicePage() {
           <div className="text-sm text-muted-foreground">
             Total : <span className="font-bold text-foreground">{total.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</span>
           </div>
-          <Button onClick={handleSave} disabled={saving} size="sm" className="min-w-[140px] rounded-xl">
+          <Button onClick={handleSave} disabled={saving || loadingBankAccount} size="sm" className="min-w-[140px] rounded-xl">
             {saving ? (<><Spinner /> Enregistrement...</>) : (<><Save className="h-4 w-4 mr-1.5" /> Sauvegarder</>)}
           </Button>
         </motion.div>

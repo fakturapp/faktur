@@ -75,7 +75,7 @@ export default function NewQuotePage() {
     showNotes: true,
     vatExemptReason: 'not_subject' as 'none' | 'not_subject' | 'france_no_vat' | 'outside_france',
     footerText: '',
-    showSubject: true,
+    showSubject: false,
     showDeliveryAddress: false,
     showAcceptanceConditions: false,
     showFreeField: false,

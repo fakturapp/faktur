@@ -60,6 +60,7 @@ interface DocumentOptionsProps {
   bankAccounts?: { id: string; label: string; bankName: string | null; isDefault: boolean }[]
   bankAccountId?: string
   onBankAccountChange?: (id: string) => void
+  loadingBankAccount?: boolean
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -166,7 +167,7 @@ export function DocumentOptionsPanel({
   subtotal, taxAmount, discountAmount, total, tvaBreakdown,
   documentType = 'invoice',
   paymentMethod = '', onPaymentMethodChange,
-  bankAccounts = [], bankAccountId = '', onBankAccountChange,
+  bankAccounts = [], bankAccountId = '', onBankAccountChange, loadingBankAccount = false,
 }: DocumentOptionsProps) {
   const [showSiren, setShowSiren] = useState(!!options.clientSiren)
   const [showVat, setShowVat] = useState(!!options.clientVatNumber)
@@ -399,14 +400,21 @@ export function DocumentOptionsPanel({
                     <select
                       value={bankAccountId}
                       onChange={(e) => onBankAccountChange(e.target.value)}
-                      className="w-full appearance-none rounded-lg border border-border bg-transparent px-3 py-1.5 pr-8 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer"
+                      disabled={loadingBankAccount}
+                      className="w-full appearance-none rounded-lg border border-border bg-transparent px-3 py-1.5 pr-8 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer disabled:opacity-50"
                     >
                       <option value="">Sélectionner un compte</option>
                       {bankAccounts.map((a) => (
                         <option key={a.id} value={a.id}>{a.label}{a.isDefault ? ' (défaut)' : ''}</option>
                       ))}
                     </select>
-                    <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+                    {loadingBankAccount ? (
+                      <svg viewBox="25 25 50 50" className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none animate-spinner-rotate">
+                        <circle r={20} cy={50} cx={50} className="animate-spinner-dash fill-none stroke-current stroke-2" strokeLinecap="round" />
+                      </svg>
+                    ) : (
+                      <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+                    )}
                   </div>
                 </div>
               )}

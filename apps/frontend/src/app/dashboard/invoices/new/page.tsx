@@ -75,7 +75,7 @@ export default function NewInvoicePage() {
     showNotes: true,
     vatExemptReason: 'not_subject' as 'none' | 'not_subject' | 'france_no_vat' | 'outside_france',
     footerText: '',
-    showSubject: true,
+    showSubject: false,
     showDeliveryAddress: false,
     showAcceptanceConditions: false,
     showFreeField: false,
@@ -91,12 +91,14 @@ export default function NewInvoicePage() {
   const [bankAccountId, setBankAccountId] = useState<string>('')
   const [bankAccounts, setBankAccounts] = useState<{ id: string; label: string; bankName: string | null; isDefault: boolean }[]>([])
   const [bankAccountInfo, setBankAccountInfo] = useState<{ bankName: string | null; iban: string | null; bic: string | null } | null>(null)
+  const [loadingBankAccount, setLoadingBankAccount] = useState(false)
   const { showModal, confirmNavigation, cancelNavigation, requestNavigation } = useUnsavedChanges(isDirty)
 
   const handleBankAccountChange = useCallback((id: string) => {
     setBankAccountId(id)
     setIsDirty(true)
     if (id) {
+      setLoadingBankAccount(true)
       api.get<{ bankAccount: any }>(`/company/bank-accounts/${id}`).then(({ data }) => {
         if (data?.bankAccount) {
           setBankAccountInfo({
@@ -105,6 +107,7 @@ export default function NewInvoicePage() {
             bic: data.bankAccount.bic,
           })
         }
+        setLoadingBankAccount(false)
       })
     } else {
       setBankAccountInfo(null)
@@ -488,6 +491,7 @@ export default function NewInvoicePage() {
                   bankAccounts={bankAccounts}
                   bankAccountId={bankAccountId}
                   onBankAccountChange={handleBankAccountChange}
+                  loadingBankAccount={loadingBankAccount}
                 />
               </div>
             </motion.div>
@@ -522,7 +526,7 @@ export default function NewInvoicePage() {
           <div className="text-sm text-muted-foreground">
             Total : <span className="font-bold text-foreground">{total.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</span>
           </div>
-          <Button onClick={handleSave} disabled={saving} size="sm" className="min-w-[140px] rounded-xl">
+          <Button onClick={handleSave} disabled={saving || loadingBankAccount} size="sm" className="min-w-[140px] rounded-xl">
             {saving ? (<><Spinner /> Enregistrement...</>) : (<><Save className="h-4 w-4 mr-1.5" /> Sauvegarder</>)}
           </Button>
         </motion.div>
