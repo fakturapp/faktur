@@ -537,7 +537,7 @@ export function A4Sheet({
     <div className="flex justify-center">
       {/* ── A4 Container (strict ratio 210×297mm) ── */}
       <div
-        className="w-full max-w-[794px] rounded-xl relative overflow-hidden"
+        className="w-full max-w-[960px] rounded-xl relative overflow-hidden"
         style={{
           aspectRatio: '210 / 297',
           background: isClassique

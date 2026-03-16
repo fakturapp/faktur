@@ -281,7 +281,7 @@ export default function NewQuotePage() {
         <div className="flex flex-col xl:flex-row gap-5">
           {/* A4 sheet area */}
           <div className="flex-1 min-w-0 flex justify-center">
-            <div className="w-full max-w-[794px] bg-muted/30 rounded-xl p-6">
+            <div className="w-full max-w-[960px] bg-muted/30 rounded-xl p-6">
               <div className="bg-card rounded-lg border border-border p-8 space-y-6" style={{ aspectRatio: '210/297' }}>
                 {/* Doc header */}
                 <div className="flex justify-between">
@@ -393,7 +393,7 @@ export default function NewQuotePage() {
       </motion.div>
 
       {/* ── Main content: A4 Sheet (center) + Sidebar (right) ── */}
-      <div className="flex flex-col xl:flex-row gap-5 max-w-[1400px] mx-auto">
+      <div className="flex flex-col xl:flex-row gap-5">
         {/* A4 Sheet */}
         <motion.div variants={fadeUp} custom={1} className="flex-1 min-w-0 order-1">
           <div className="bg-muted/30 rounded-xl p-6 relative">

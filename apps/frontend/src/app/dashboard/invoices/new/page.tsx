@@ -278,7 +278,7 @@ export default function NewInvoicePage() {
         </div>
         <div className="flex flex-col xl:flex-row gap-5">
           <div className="flex-1 min-w-0 flex justify-center">
-            <div className="w-full max-w-[794px] bg-muted/30 rounded-xl p-6">
+            <div className="w-full max-w-[960px] bg-muted/30 rounded-xl p-6">
               <div className="bg-card rounded-lg border border-border p-8 space-y-6" style={{ aspectRatio: '210/297' }}>
                 <div className="flex justify-between">
                   <div className="space-y-2"><Skeleton className="h-10 w-20 rounded" /><Skeleton className="h-3 w-32" /><Skeleton className="h-3 w-28" /></div>
@@ -353,7 +353,7 @@ export default function NewInvoicePage() {
       />
 
       {/* Main content */}
-      <div className="flex flex-col xl:flex-row gap-5 max-w-[1400px] mx-auto">
+      <div className="flex flex-col xl:flex-row gap-5">
         <motion.div variants={fadeUp} custom={1} className="flex-1 min-w-0 order-1">
           <div className="bg-muted/30 rounded-xl p-6 relative">
             <button onClick={() => setShowOptions(!showOptions)} className="absolute top-3 right-3 z-10 p-1.5 rounded-lg border border-border bg-card/80 backdrop-blur-sm text-muted-foreground hover:text-foreground transition-colors" title={showOptions ? 'Masquer les options' : 'Afficher les options'}>
