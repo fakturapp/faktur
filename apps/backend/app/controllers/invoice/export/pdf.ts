@@ -15,9 +15,10 @@ function resolveLogoToBase64(logoUrl: string | null): string | null {
   if (logoUrl.startsWith('data:') || logoUrl.startsWith('http://') || logoUrl.startsWith('https://')) {
     return logoUrl
   }
-  const match = logoUrl.match(/^\/invoice-logos\/(.+)$/)
+  // Support both /invoice-logos/... and /company-logos/... paths
+  const match = logoUrl.match(/^\/(invoice-logos|company-logos)\/(.+)$/)
   if (!match) return null
-  const filePath = join(app.tmpPath(), 'uploads', 'invoice-logos', match[1])
+  const filePath = join(app.tmpPath(), 'uploads', match[1], match[2])
   if (!existsSync(filePath)) return null
   const ext = extname(filePath).toLowerCase().replace('.', '')
   const mimeMap: Record<string, string> = {
