@@ -72,7 +72,7 @@ export function AddChartSidebar({ open, onClose, onAddChart, activeCharts }: Add
               <div className="rounded-xl border border-border bg-muted/30 p-4 space-y-3">
                 <div className="flex items-center gap-2">
                   <h4 className="text-sm font-semibold text-foreground">Graphique personnalise</h4>
-                  <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-semibold uppercase tracking-wide">Bientot</span>
+                  <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-semibold uppercase tracking-wide">Bientôt</span>
                 </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   Creez un graphique sur mesure en choisissant les donnees et le type de visualisation.
@@ -121,7 +121,7 @@ export function AddChartSidebar({ open, onClose, onAddChart, activeCharts }: Add
                           <div className="flex items-center gap-2">
                             <p className="text-sm font-medium text-foreground">{chart.label}</p>
                             {isUnavailable && (
-                              <span className="px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground text-[9px] font-semibold uppercase tracking-wide">Bientot</span>
+                              <span className="px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground text-[9px] font-semibold uppercase tracking-wide">Bientôt</span>
                             )}
                           </div>
                           <p className="text-xs text-muted-foreground truncate">{chart.description}</p>

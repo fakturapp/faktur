@@ -614,7 +614,7 @@ export default function InvoiceSettingsPage() {
                       <Separator />
 
                       <div className="space-y-2">
-                        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider px-1">Bientot disponible</p>
+                        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider px-1">Bientôt disponible</p>
                         {[
                           { name: 'Stripe', desc: 'Paiement en ligne par carte bancaire' },
                           { name: 'PayPal', desc: 'Paiement via compte PayPal' },
