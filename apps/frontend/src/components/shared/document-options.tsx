@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import {
   Check, Zap, ClipboardList, ChevronDown, ChevronRight, Building2, UserRound,
-  Palette, Pen, Info,
+  Palette, Pen, Info, Landmark, Banknote,
 } from 'lucide-react'
 import { Tooltip } from '@/components/ui/tooltip'
 import type { ClientInfo } from './a4-sheet'
@@ -54,6 +54,12 @@ interface DocumentOptionsProps {
   discountAmount: number
   total: number
   tvaBreakdown: { rate: number; base: number; amount: number }[]
+  documentType?: 'invoice' | 'quote'
+  paymentMethod?: string
+  onPaymentMethodChange?: (value: string) => void
+  bankAccounts?: { id: string; label: string; bankName: string | null; isDefault: boolean }[]
+  bankAccountId?: string
+  onBankAccountChange?: (id: string) => void
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -158,6 +164,9 @@ export function DocumentOptionsPanel({
   options, onChange, accentColor, onAccentColorChange,
   selectedClient, onOpenClientModal,
   subtotal, taxAmount, discountAmount, total, tvaBreakdown,
+  documentType = 'invoice',
+  paymentMethod = '', onPaymentMethodChange,
+  bankAccounts = [], bankAccountId = '', onBankAccountChange,
 }: DocumentOptionsProps) {
   const [showSiren, setShowSiren] = useState(!!options.clientSiren)
   const [showVat, setShowVat] = useState(!!options.clientVatNumber)
@@ -355,32 +364,59 @@ export function DocumentOptionsPanel({
           </OptionCheckbox>
         </CollapsibleSection>
 
-        {/* ── Format section ── */}
-        <CollapsibleSection title="Format">
-          <div className="flex items-center justify-between py-1">
-            <div className="flex items-center gap-1.5">
-              <span className="text-[13px] text-foreground">Factur-X (PDF/A-3)</span>
-              <Tooltip content="Le format Factur-X est le standard de facturation électronique en France, obligatoire à partir de septembre 2026.">
-                <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
-              </Tooltip>
-            </div>
-            <button
-              type="button"
-              onClick={() => onChange({ facturX: !options.facturX })}
-              className={cn(
-                'relative inline-flex h-5 w-9 items-center rounded-full transition-colors',
-                options.facturX ? 'bg-primary' : 'bg-muted-foreground/30',
+        {/* ── Moyen de paiement section (invoices only) ── */}
+        {documentType === 'invoice' && onPaymentMethodChange && (
+          <CollapsibleSection title="Paiement">
+            <div className="space-y-2">
+              <label className="text-xs text-muted-foreground font-medium block mb-1">Moyen de paiement</label>
+              <div className="flex gap-1">
+                {[
+                  { id: 'bank_transfer', label: 'Virement', icon: Landmark },
+                  { id: 'cash', label: 'Espèces', icon: Banknote },
+                ].map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => {
+                      onPaymentMethodChange(paymentMethod === t.id ? '' : t.id)
+                      if (paymentMethod === t.id && onBankAccountChange) onBankAccountChange('')
+                    }}
+                    className={cn(
+                      'flex-1 flex items-center justify-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all',
+                      paymentMethod === t.id
+                        ? 'border-primary bg-primary/5 text-foreground'
+                        : 'border-border text-muted-foreground hover:border-muted-foreground/40',
+                    )}
+                  >
+                    <t.icon className="h-3 w-3" /> {t.label}
+                  </button>
+                ))}
+              </div>
+              {paymentMethod === 'bank_transfer' && bankAccounts.length > 0 && onBankAccountChange && (
+                <div>
+                  <label className="text-xs text-muted-foreground font-medium block mb-1">Compte bancaire</label>
+                  <div className="relative">
+                    <select
+                      value={bankAccountId}
+                      onChange={(e) => onBankAccountChange(e.target.value)}
+                      className="w-full appearance-none rounded-lg border border-border bg-transparent px-3 py-1.5 pr-8 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer"
+                    >
+                      <option value="">Sélectionner un compte</option>
+                      {bankAccounts.map((a) => (
+                        <option key={a.id} value={a.id}>{a.label}{a.isDefault ? ' (défaut)' : ''}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+                  </div>
+                </div>
               )}
-            >
-              <span
-                className={cn(
-                  'inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform shadow-sm',
-                  options.facturX ? 'translate-x-[18px]' : 'translate-x-[3px]',
-                )}
-              />
-            </button>
-          </div>
-        </CollapsibleSection>
+              {paymentMethod === 'bank_transfer' && bankAccounts.length === 0 && (
+                <p className="text-[11px] text-muted-foreground italic">
+                  Aucun compte bancaire configuré. Ajoutez-en un dans les paramètres de votre entreprise.
+                </p>
+              )}
+            </div>
+          </CollapsibleSection>
+        )}
 
         {/* ── Options section ── */}
         <CollapsibleSection title="Options">

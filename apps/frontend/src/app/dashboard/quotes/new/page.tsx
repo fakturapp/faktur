@@ -507,6 +507,7 @@ export default function NewQuotePage() {
                   discountAmount={discountAmount}
                   total={total}
                   tvaBreakdown={tvaBreakdown}
+                  documentType="quote"
                 />
               </div>
             </motion.div>

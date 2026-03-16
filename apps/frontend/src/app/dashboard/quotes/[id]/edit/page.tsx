@@ -563,6 +563,7 @@ export default function EditQuotePage() {
                   discountAmount={discountAmount}
                   total={total}
                   tvaBreakdown={tvaBreakdown}
+                  documentType="quote"
                 />
               </div>
             </motion.div>

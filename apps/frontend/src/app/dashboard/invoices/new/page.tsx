@@ -87,18 +87,46 @@ export default function NewInvoicePage() {
   const [notes, setNotes] = useState('')
   const [isDirty, setIsDirty] = useState(false)
   const [validationErrors, setValidationErrors] = useState<string[]>([])
+  const [paymentMethod, setPaymentMethod] = useState<string>('')
+  const [bankAccountId, setBankAccountId] = useState<string>('')
+  const [bankAccounts, setBankAccounts] = useState<{ id: string; label: string; bankName: string | null; isDefault: boolean }[]>([])
+  const [bankAccountInfo, setBankAccountInfo] = useState<{ bankName: string | null; iban: string | null; bic: string | null } | null>(null)
   const { showModal, confirmNavigation, cancelNavigation, requestNavigation } = useUnsavedChanges(isDirty)
+
+  const handleBankAccountChange = useCallback((id: string) => {
+    setBankAccountId(id)
+    setIsDirty(true)
+    if (id) {
+      api.get<{ bankAccount: any }>(`/company/bank-accounts/${id}`).then(({ data }) => {
+        if (data?.bankAccount) {
+          setBankAccountInfo({
+            bankName: data.bankAccount.bankName,
+            iban: data.bankAccount.iban,
+            bic: data.bankAccount.bic,
+          })
+        }
+      })
+    } else {
+      setBankAccountInfo(null)
+    }
+  }, [])
 
   // Initialize
   useEffect(() => {
     async function init() {
-      const [numberRes, companyRes] = await Promise.all([
+      const [numberRes, companyRes, bankRes] = await Promise.all([
         api.get<{ nextNumber: string }>('/invoices/next-number'),
         api.get<{ company: CompanyInfo }>('/company'),
+        api.get<{ bankAccounts: any[] }>('/company/bank-accounts'),
         refreshSettings(),
       ])
       if (numberRes.data?.nextNumber) setInvoiceNumber(numberRes.data.nextNumber)
       if (companyRes.data?.company) setCompany(companyRes.data.company)
+      if (bankRes.data?.bankAccounts) {
+        setBankAccounts(bankRes.data.bankAccounts.map((a: any) => ({
+          id: a.id, label: a.label, bankName: a.bankName, isDefault: a.isDefault,
+        })))
+      }
       setLoading(false)
     }
     init()
@@ -249,6 +277,8 @@ export default function NewInvoicePage() {
       deliveryAddress: options.deliveryAddress || undefined,
       clientSiren: options.clientSiren || undefined,
       clientVatNumber: options.clientVatNumber || undefined,
+      paymentMethod: paymentMethod || undefined,
+      bankAccountId: bankAccountId || undefined,
       lines: lines
         .filter((l) => l.description.trim())
         .map((l) => ({
@@ -409,6 +439,8 @@ export default function NewInvoicePage() {
               showClientVatNumber={!!options.clientVatNumber}
               paymentMethods={invoiceSettings.paymentMethods}
               customPaymentMethod={invoiceSettings.customPaymentMethod}
+              bankAccountInfo={bankAccountInfo}
+              paymentMethod={paymentMethod}
               subject={options.subject}
               onSubjectChange={(v) => handleOptionsChange({ subject: v })}
               template={invoiceSettings.template}
@@ -450,6 +482,12 @@ export default function NewInvoicePage() {
                   discountAmount={discountAmount}
                   total={total}
                   tvaBreakdown={tvaBreakdown}
+                  documentType="invoice"
+                  paymentMethod={paymentMethod}
+                  onPaymentMethodChange={(v) => { setPaymentMethod(v); setIsDirty(true) }}
+                  bankAccounts={bankAccounts}
+                  bankAccountId={bankAccountId}
+                  onBankAccountChange={handleBankAccountChange}
                 />
               </div>
             </motion.div>

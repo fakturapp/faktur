@@ -12,7 +12,7 @@ import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { api } from '@/lib/api'
 import { A4Sheet, ClientModal, type DocumentLine, type ClientInfo, type CompanyInfo } from '@/components/shared/a4-sheet'
 import { DocumentOptionsPanel } from '@/components/shared/document-options'
-import { Save, ArrowLeft, Eye, Pencil, SlidersHorizontal, Download, Link2, Unlink, Landmark } from 'lucide-react'
+import { Save, ArrowLeft, Eye, Pencil, SlidersHorizontal, Download, Link2, Unlink } from 'lucide-react'
 import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
 
@@ -56,7 +56,6 @@ export default function EditInvoicePage() {
   const [sourceQuote, setSourceQuote] = useState<{ id: string; quoteNumber: string } | null>(null)
   const [unlinking, setUnlinking] = useState(false)
   const [showUnlinkConfirm, setShowUnlinkConfirm] = useState(false)
-  const [bankInfo, setBankInfo] = useState<{ iban: string | null; bic: string | null; bankName: string | null } | null>(null)
   const [paymentMethod, setPaymentMethod] = useState<string>('')
   const [bankAccountId, setBankAccountId] = useState<string>('')
   const [bankAccounts, setBankAccounts] = useState<{ id: string; label: string; bankName: string | null; isDefault: boolean }[]>([])
@@ -116,10 +115,6 @@ export default function EditInvoicePage() {
 
       if (companyRes.data?.company) {
         setCompany(companyRes.data.company)
-        const c = companyRes.data.company as any
-        if (c.iban || c.bic || c.bankName) {
-          setBankInfo({ iban: c.iban, bic: c.bic, bankName: c.bankName })
-        }
       }
 
       if (invoiceRes.data?.invoice) {
@@ -488,54 +483,26 @@ export default function EditInvoicePage() {
         </div>
       </motion.div>
 
-      {/* Linked quote + Bank info */}
-      {(sourceQuote || bankInfo) && (
+      {/* Linked quote */}
+      {sourceQuote && (
         <motion.div variants={fadeUp} custom={0.5} className="flex flex-wrap gap-3">
-          {sourceQuote && (
-            <div className="flex items-center gap-2.5 rounded-xl border border-border bg-card/50 px-4 py-2.5">
-              <Link2 className="h-4 w-4 text-primary shrink-0" />
-              <span className="text-sm text-muted-foreground">Lié au devis</span>
-              <Link
-                href={`/dashboard/quotes/${sourceQuote.id}/edit`}
-                className="text-sm font-medium text-primary hover:underline"
-              >
-                {sourceQuote.quoteNumber}
-              </Link>
-              <button
-                onClick={() => setShowUnlinkConfirm(true)}
-                disabled={unlinking}
-                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors ml-1"
-                title="Délier le devis"
-              >
-                <Unlink className={`h-3.5 w-3.5 ${unlinking ? 'animate-pulse' : ''}`} />
-              </button>
-            </div>
-          )}
-          {/* Payment method + bank account selector */}
-          <div className="flex items-center gap-3 rounded-xl border border-border bg-card/50 px-4 py-2.5">
-            <Landmark className="h-4 w-4 text-muted-foreground shrink-0" />
-            <select
-              value={paymentMethod}
-              onChange={(e) => { setPaymentMethod(e.target.value); setIsDirty(true) }}
-              className="text-sm bg-transparent border-none outline-none text-foreground cursor-pointer"
+          <div className="flex items-center gap-2.5 rounded-xl border border-border bg-card/50 px-4 py-2.5">
+            <Link2 className="h-4 w-4 text-primary shrink-0" />
+            <span className="text-sm text-muted-foreground">Lié au devis</span>
+            <Link
+              href={`/dashboard/quotes/${sourceQuote.id}/edit`}
+              className="text-sm font-medium text-primary hover:underline"
             >
-              <option value="">Mode de paiement</option>
-              <option value="bank_transfer">Virement</option>
-              <option value="cash">Especes</option>
-              <option value="other">Autre</option>
-            </select>
-            {paymentMethod === 'bank_transfer' && bankAccounts.length > 0 && (
-              <select
-                value={bankAccountId}
-                onChange={(e) => handleBankAccountChange(e.target.value)}
-                className="text-sm bg-transparent border-none outline-none text-foreground cursor-pointer"
-              >
-                <option value="">Compte bancaire</option>
-                {bankAccounts.map((a) => (
-                  <option key={a.id} value={a.id}>{a.label}{a.isDefault ? ' (defaut)' : ''}</option>
-                ))}
-              </select>
-            )}
+              {sourceQuote.quoteNumber}
+            </Link>
+            <button
+              onClick={() => setShowUnlinkConfirm(true)}
+              disabled={unlinking}
+              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors ml-1"
+              title="Délier le devis"
+            >
+              <Unlink className={`h-3.5 w-3.5 ${unlinking ? 'animate-pulse' : ''}`} />
+            </button>
           </div>
         </motion.div>
       )}
@@ -630,6 +597,12 @@ export default function EditInvoicePage() {
                   discountAmount={discountAmount}
                   total={total}
                   tvaBreakdown={tvaBreakdown}
+                  documentType="invoice"
+                  paymentMethod={paymentMethod}
+                  onPaymentMethodChange={(v) => { setPaymentMethod(v); setIsDirty(true) }}
+                  bankAccounts={bankAccounts}
+                  bankAccountId={bankAccountId}
+                  onBankAccountChange={handleBankAccountChange}
                 />
               </div>
             </motion.div>
