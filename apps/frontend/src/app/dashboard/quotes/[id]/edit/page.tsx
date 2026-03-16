@@ -348,7 +348,7 @@ export default function EditQuotePage() {
         <div className="flex flex-col xl:flex-row gap-5">
           {/* A4 sheet area */}
           <div className="flex-1 min-w-0 flex justify-center">
-            <div className="w-full max-w-[960px] bg-muted/30 rounded-xl p-3">
+            <div className="w-full max-w-[960px] bg-muted/30 rounded-xl p-1.5">
               <div className="bg-card rounded-lg border border-border p-8 space-y-6" style={{ aspectRatio: '210/297' }}>
                 {/* Doc header */}
                 <div className="flex justify-between">
@@ -467,7 +467,7 @@ export default function EditQuotePage() {
       <div className="flex flex-col xl:flex-row gap-5">
         {/* A4 Sheet */}
         <motion.div variants={fadeUp} custom={1} className="flex-1 min-w-0 order-1">
-          <div className="bg-muted/30 rounded-xl p-3 relative">
+          <div className="bg-muted/30 rounded-xl p-1.5 relative">
           {/* Toggle options button */}
           <button
             onClick={() => setShowOptions(!showOptions)}
@@ -581,6 +581,12 @@ export default function EditQuotePage() {
           <div className="text-sm text-muted-foreground">
             Total : <span className="font-bold text-foreground">{total.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</span>
           </div>
+          {validationErrors.length > 0 && (
+            <div className="flex items-center gap-1.5 text-xs text-destructive font-medium">
+              <span className="h-1.5 w-1.5 rounded-full bg-destructive animate-pulse" />
+              Champs manquants
+            </div>
+          )}
           <Button onClick={handleSave} disabled={saving} size="sm" className="min-w-[140px] rounded-xl">
             {saving ? (<><Spinner /> Enregistrement...</>) : (<><Save className="h-4 w-4 mr-1.5" /> Sauvegarder</>)}
           </Button>
