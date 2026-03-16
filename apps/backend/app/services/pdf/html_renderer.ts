@@ -25,6 +25,7 @@ interface QuoteData {
   language: string
   vatExempt?: boolean
   footerText?: string | null
+  logoBorderRadius?: number
 }
 
 interface LineData {
@@ -503,7 +504,7 @@ function renderStandardPage(
     html += `<div class="banner">
       <div class="logo">
         ${quote.logoUrl
-          ? `<img src="${esc(quote.logoUrl)}" alt="Logo" />`
+          ? `<img src="${esc(quote.logoUrl)}" alt="Logo" style="border-radius:${quote.logoBorderRadius || 0}px" />`
           : `<div class="banner-company">${esc(company?.tradeName || company?.legalName || '')}</div>`
         }
       </div>
@@ -520,7 +521,7 @@ function renderStandardPage(
     // Left: logo + company
     html += '<div style="max-width:55%">'
     if (quote.logoUrl) {
-      html += `<div class="logo"><img src="${esc(quote.logoUrl)}" alt="Logo" /></div>`
+      html += `<div class="logo"><img src="${esc(quote.logoUrl)}" alt="Logo" style="border-radius:${quote.logoBorderRadius || 0}px" /></div>`
     }
     if (company) {
       html += `<div style="font-size:12px;line-height:1.6;margin-top:${quote.logoUrl ? '8px' : '0'}">`
@@ -860,7 +861,7 @@ function renderLateral(
   // Sidebar with company info
   let sidebar = '<div class="sidebar">'
   if (quote.logoUrl) {
-    sidebar += `<div class="section"><img src="${esc(quote.logoUrl)}" alt="Logo" style="max-width:80px;max-height:40px" /></div>`
+    sidebar += `<div class="section"><img src="${esc(quote.logoUrl)}" alt="Logo" style="max-width:80px;max-height:40px;border-radius:${quote.logoBorderRadius || 0}px" /></div>`
   }
   if (company) {
     sidebar += '<div class="section">'

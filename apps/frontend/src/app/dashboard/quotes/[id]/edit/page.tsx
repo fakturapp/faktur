@@ -413,9 +413,9 @@ export default function EditQuotePage() {
 
         {/* Mode toggle + Download */}
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={handleDownloadPdf} disabled={downloading} className={downloading ? 'download-shimmer' : ''}>
+          <Button variant="outline" size="sm" onClick={handleDownloadPdf} disabled={downloading}>
             {downloading ? <Spinner className="h-3.5 w-3.5 mr-1.5" /> : <Download className="h-3.5 w-3.5 mr-1.5" />}
-            {downloading ? 'Génération en cours...' : quoteNumber}
+            Telecharger
           </Button>
           <div className="flex rounded-lg border border-border overflow-hidden">
             <button
@@ -507,6 +507,7 @@ export default function EditQuotePage() {
             showFreeField={options.showFreeField}
             showFooterText={options.showFooterText}
             footerMode={options.footerMode}
+            logoBorderRadius={invoiceSettings.logoBorderRadius}
             onAcceptanceConditionsChange={(v) => handleOptionsChange({ acceptanceConditions: v })}
             onFreeFieldChange={(v) => handleOptionsChange({ freeField: v })}
             onFooterTextChange={(v) => handleOptionsChange({ footerText: v })}

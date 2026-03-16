@@ -56,6 +56,10 @@ export default function EditInvoicePage() {
   const [unlinking, setUnlinking] = useState(false)
   const [showUnlinkConfirm, setShowUnlinkConfirm] = useState(false)
   const [bankInfo, setBankInfo] = useState<{ iban: string | null; bic: string | null; bankName: string | null } | null>(null)
+  const [paymentMethod, setPaymentMethod] = useState<string>('')
+  const [bankAccountId, setBankAccountId] = useState<string>('')
+  const [bankAccounts, setBankAccounts] = useState<{ id: string; label: string; bankName: string | null; isDefault: boolean }[]>([])
+  const [bankAccountInfo, setBankAccountInfo] = useState<{ bankName: string | null; iban: string | null; bic: string | null } | null>(null)
 
   const [lines, setLines] = useState<DocumentLine[]>([
     { id: generateId(), type: 'standard', description: '', saleType: '', quantity: 1, unit: '', unitPrice: 0, vatRate: 20 },
@@ -95,10 +99,17 @@ export default function EditInvoicePage() {
   // Load invoice and company
   useEffect(() => {
     async function init() {
-      const [invoiceRes, companyRes] = await Promise.all([
+      const [invoiceRes, companyRes, bankRes] = await Promise.all([
         api.get<{ invoice: any }>(`/invoices/${invoiceId}`),
         api.get<{ company: CompanyInfo }>('/company'),
+        api.get<{ bankAccounts: any[] }>('/company/bank-accounts'),
       ])
+
+      if (bankRes.data?.bankAccounts) {
+        setBankAccounts(bankRes.data.bankAccounts.map((a: any) => ({
+          id: a.id, label: a.label, bankName: a.bankName, isDefault: a.isDefault,
+        })))
+      }
 
       if (companyRes.data?.company) {
         setCompany(companyRes.data.company)
@@ -142,6 +153,20 @@ export default function EditInvoicePage() {
           facturX: inv.facturX || false,
         })
 
+        if (inv.paymentMethod) setPaymentMethod(inv.paymentMethod)
+        if (inv.bankAccountId) {
+          setBankAccountId(inv.bankAccountId)
+          // Load full bank account info for A4Sheet preview
+          api.get<{ bankAccount: any }>(`/company/bank-accounts/${inv.bankAccountId}`).then(({ data }) => {
+            if (data?.bankAccount) {
+              setBankAccountInfo({
+                bankName: data.bankAccount.bankName,
+                iban: data.bankAccount.iban,
+                bic: data.bankAccount.bic,
+              })
+            }
+          })
+        }
         if (inv.sourceQuote) setSourceQuote(inv.sourceQuote)
         if (inv.client) setSelectedClient(inv.client)
 
@@ -214,6 +239,24 @@ export default function EditInvoicePage() {
     setIsDirty(true)
   }, [])
 
+  const handleBankAccountChange = useCallback((id: string) => {
+    setBankAccountId(id)
+    setIsDirty(true)
+    if (id) {
+      api.get<{ bankAccount: any }>(`/company/bank-accounts/${id}`).then(({ data }) => {
+        if (data?.bankAccount) {
+          setBankAccountInfo({
+            bankName: data.bankAccount.bankName,
+            iban: data.bankAccount.iban,
+            bic: data.bankAccount.bic,
+          })
+        }
+      })
+    } else {
+      setBankAccountInfo(null)
+    }
+  }, [])
+
   // Calculations
   const { subtotal, taxAmount, discountAmount, total, tvaBreakdown } = useMemo(() => {
     let sub = 0, tax = 0
@@ -280,6 +323,8 @@ export default function EditInvoicePage() {
       deliveryAddress: options.deliveryAddress || undefined,
       clientSiren: options.clientSiren || undefined,
       clientVatNumber: options.clientVatNumber || undefined,
+      paymentMethod: paymentMethod || undefined,
+      bankAccountId: bankAccountId || undefined,
       lines: lines
         .filter((l) => l.description.trim())
         .map((l) => ({
@@ -330,17 +375,6 @@ export default function EditInvoicePage() {
     }
     setSourceQuote(null)
     toast('Devis délié', 'success')
-  }
-
-  function maskIban(iban: string) {
-    const clean = iban.replace(/\s/g, '')
-    if (clean.length <= 8) return '••••  ••••'
-    return clean.slice(0, 4) + ' •••• •••• ' + clean.slice(-4)
-  }
-
-  function maskBic(bic: string) {
-    if (bic.length <= 4) return '••••••••'
-    return bic.slice(0, 4) + '••••'
   }
 
   // Loading skeleton
@@ -418,13 +452,8 @@ export default function EditInvoicePage() {
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={handleDownloadPdf} disabled={downloading}>
-            <Download className="h-3.5 w-3.5 mr-1.5" />
-            Télécharger
-            {downloading ? (
-              <span className="download-shimmer rounded px-1.5 py-0.5 ml-1 text-xs font-semibold text-muted-foreground">{invoiceNumber}</span>
-            ) : (
-              <span className="ml-1 font-semibold">{invoiceNumber}</span>
-            )}
+            {downloading ? <Spinner className="h-3.5 w-3.5 mr-1.5" /> : <Download className="h-3.5 w-3.5 mr-1.5" />}
+            Telecharger
           </Button>
           <div className="flex rounded-lg border border-border overflow-hidden">
             <button onClick={() => setMode('edit')} className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium transition-all ${mode === 'edit' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}>
@@ -460,20 +489,32 @@ export default function EditInvoicePage() {
               </button>
             </div>
           )}
-          {bankInfo && (bankInfo.iban || bankInfo.bic || bankInfo.bankName) && (
-            <div className="flex items-center gap-3 rounded-xl border border-border bg-card/50 px-4 py-2.5">
-              <Landmark className="h-4 w-4 text-muted-foreground shrink-0" />
-              {bankInfo.bankName && (
-                <span className="text-sm text-foreground font-medium">{bankInfo.bankName}</span>
-              )}
-              {bankInfo.iban && (
-                <span className="text-xs text-muted-foreground font-mono">{maskIban(bankInfo.iban)}</span>
-              )}
-              {bankInfo.bic && (
-                <span className="text-xs text-muted-foreground font-mono">{maskBic(bankInfo.bic)}</span>
-              )}
-            </div>
-          )}
+          {/* Payment method + bank account selector */}
+          <div className="flex items-center gap-3 rounded-xl border border-border bg-card/50 px-4 py-2.5">
+            <Landmark className="h-4 w-4 text-muted-foreground shrink-0" />
+            <select
+              value={paymentMethod}
+              onChange={(e) => { setPaymentMethod(e.target.value); setIsDirty(true) }}
+              className="text-sm bg-transparent border-none outline-none text-foreground cursor-pointer"
+            >
+              <option value="">Mode de paiement</option>
+              <option value="bank_transfer">Virement</option>
+              <option value="cash">Especes</option>
+              <option value="other">Autre</option>
+            </select>
+            {paymentMethod === 'bank_transfer' && bankAccounts.length > 0 && (
+              <select
+                value={bankAccountId}
+                onChange={(e) => handleBankAccountChange(e.target.value)}
+                className="text-sm bg-transparent border-none outline-none text-foreground cursor-pointer"
+              >
+                <option value="">Compte bancaire</option>
+                {bankAccounts.map((a) => (
+                  <option key={a.id} value={a.id}>{a.label}{a.isDefault ? ' (defaut)' : ''}</option>
+                ))}
+              </select>
+            )}
+          </div>
         </motion.div>
       )}
 
@@ -523,6 +564,8 @@ export default function EditInvoicePage() {
               showClientVatNumber={!!options.clientVatNumber}
               paymentMethods={invoiceSettings.paymentMethods}
               customPaymentMethod={invoiceSettings.customPaymentMethod}
+              bankAccountInfo={bankAccountInfo}
+              paymentMethod={paymentMethod}
               subject={options.subject}
               onSubjectChange={(v) => handleOptionsChange({ subject: v })}
               template={invoiceSettings.template}
@@ -537,6 +580,7 @@ export default function EditInvoicePage() {
               showFreeField={options.showFreeField}
               showFooterText={options.showFooterText}
               footerMode={options.footerMode}
+              logoBorderRadius={invoiceSettings.logoBorderRadius}
               onAcceptanceConditionsChange={(v) => handleOptionsChange({ acceptanceConditions: v })}
               onFreeFieldChange={(v) => handleOptionsChange({ freeField: v })}
               onFooterTextChange={(v) => handleOptionsChange({ footerText: v })}

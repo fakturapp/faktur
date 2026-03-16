@@ -35,6 +35,7 @@ export interface InvoiceSettings {
   quoteFilenamePattern: string
   invoiceFilenamePattern: string
   footerMode: 'company_info' | 'custom'
+  logoBorderRadius: number
 }
 
 interface InvoiceSettingsContextType {
@@ -43,6 +44,7 @@ interface InvoiceSettingsContextType {
   loading: boolean
   updateSettings: (partial: Partial<InvoiceSettings>) => void
   uploadLogo: (file: File) => Promise<void>
+  refreshCompanyLogo: () => Promise<void>
 }
 
 const defaultSettings: InvoiceSettings = {
@@ -71,6 +73,7 @@ const defaultSettings: InvoiceSettings = {
   quoteFilenamePattern: 'DEV-{numéro}',
   invoiceFilenamePattern: 'FAC-{numéro}',
   footerMode: 'company_info',
+  logoBorderRadius: 0,
 }
 
 const InvoiceSettingsContext = createContext<InvoiceSettingsContextType>({
@@ -79,6 +82,7 @@ const InvoiceSettingsContext = createContext<InvoiceSettingsContextType>({
   loading: true,
   updateSettings: () => {},
   uploadLogo: async () => {},
+  refreshCompanyLogo: async () => {},
 })
 
 export function useInvoiceSettings() {
@@ -140,6 +144,13 @@ export function InvoiceSettingsProvider({ children }: { children: React.ReactNod
     }
   }, [])
 
+  const refreshCompanyLogo = useCallback(async () => {
+    const { data } = await api.get<{ settings: InvoiceSettings; companyLogoUrl: string | null }>('/settings/invoices')
+    if (data?.companyLogoUrl) {
+      setCompanyLogoUrl(resolveLogoUrl(data.companyLogoUrl))
+    }
+  }, [])
+
   // Cleanup debounce on unmount
   useEffect(() => {
     return () => {
@@ -152,7 +163,7 @@ export function InvoiceSettingsProvider({ children }: { children: React.ReactNod
   }, [saveSettings])
 
   return (
-    <InvoiceSettingsContext.Provider value={{ settings, companyLogoUrl, loading, updateSettings, uploadLogo }}>
+    <InvoiceSettingsContext.Provider value={{ settings, companyLogoUrl, loading, updateSettings, uploadLogo, refreshCompanyLogo }}>
       {children}
     </InvoiceSettingsContext.Provider>
   )

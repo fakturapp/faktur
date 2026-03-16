@@ -41,6 +41,7 @@ export default class InvoiceSettingsUpdate {
         quoteFilenamePattern: payload.quoteFilenamePattern || 'DEV-{numero}',
         invoiceFilenamePattern: payload.invoiceFilenamePattern || 'FAC-{numero}',
         footerMode: payload.footerMode || 'vat_exempt',
+        logoBorderRadius: payload.logoBorderRadius ?? 0,
       })
     } else {
       settings.billingType = payload.billingType
@@ -69,6 +70,7 @@ export default class InvoiceSettingsUpdate {
       if (payload.quoteFilenamePattern !== undefined) settings.quoteFilenamePattern = payload.quoteFilenamePattern || 'DEV-{numero}'
       if (payload.invoiceFilenamePattern !== undefined) settings.invoiceFilenamePattern = payload.invoiceFilenamePattern || 'FAC-{numero}'
       if (payload.footerMode !== undefined) settings.footerMode = payload.footerMode || 'vat_exempt'
+      if (payload.logoBorderRadius !== undefined) settings.logoBorderRadius = payload.logoBorderRadius
       await settings.save()
     }
 
@@ -100,6 +102,7 @@ export default class InvoiceSettingsUpdate {
         quoteFilenamePattern: settings.quoteFilenamePattern || 'DEV-{numero}',
         invoiceFilenamePattern: settings.invoiceFilenamePattern || 'FAC-{numero}',
         footerMode: settings.footerMode || 'vat_exempt',
+        logoBorderRadius: settings.logoBorderRadius ?? 0,
       },
     })
   }

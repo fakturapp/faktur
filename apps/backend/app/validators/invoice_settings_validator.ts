@@ -26,5 +26,6 @@ export const updateInvoiceSettingsValidator = vine.compile(
     quoteFilenamePattern: vine.string().trim().maxLength(255).optional(),
     invoiceFilenamePattern: vine.string().trim().maxLength(255).optional(),
     footerMode: vine.enum(['company_info', 'vat_exempt', 'custom']).optional(),
+    logoBorderRadius: vine.number().min(0).max(50).optional(),
   })
 )

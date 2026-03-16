@@ -5,6 +5,8 @@ import { join, extname } from 'node:path'
 import Invoice from '#models/invoice/invoice'
 import Company from '#models/team/company'
 import InvoiceSetting from '#models/team/invoice_setting'
+import BankAccount from '#models/team/bank_account'
+import EncryptionService from '#services/encryption/encryption_service'
 import { renderQuoteHtml } from '#services/pdf/html_renderer'
 import { generatePdf } from '#services/pdf/pdf_generator'
 
@@ -102,6 +104,7 @@ export default class Pdf {
       language: invoice.language || 'fr',
       vatExempt: invoiceSettings?.defaultVatExempt || false,
       footerText: invoiceSettings?.defaultFooterText || null,
+      logoBorderRadius: invoiceSettings?.logoBorderRadius ?? 0,
     }
 
     const linesData = invoice.lines.map((l) => ({
@@ -154,6 +157,26 @@ export default class Pdf {
           bankName: company.bankName,
         }
       : null
+
+    // Override bank info from linked bank account
+    if (invoice.bankAccountId && companyData) {
+      const bankAccount = await BankAccount.find(invoice.bankAccountId)
+      if (bankAccount) {
+        let iban = bankAccount.iban
+        let bic = bankAccount.bic
+        if (bankAccount.isEncrypted) {
+          if (iban) {
+            try { iban = EncryptionService.decrypt(iban) } catch { iban = null }
+          }
+          if (bic) {
+            try { bic = EncryptionService.decrypt(bic) } catch { bic = null }
+          }
+        }
+        companyData.iban = iban
+        companyData.bic = bic
+        companyData.bankName = bankAccount.bankName
+      }
+    }
 
     const html = renderQuoteHtml(quoteData, linesData, clientData, companyData, settingsData)
     const pdfBuffer = await generatePdf(html)

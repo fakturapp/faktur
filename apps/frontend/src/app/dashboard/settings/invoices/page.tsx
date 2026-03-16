@@ -131,7 +131,7 @@ function TemplateModal({
 
 export default function InvoiceSettingsPage() {
   const { toast } = useToast()
-  const { settings, companyLogoUrl, loading, updateSettings, uploadLogo } = useInvoiceSettings()
+  const { settings, companyLogoUrl, loading, updateSettings, uploadLogo, refreshCompanyLogo } = useInvoiceSettings()
   const [uploading, setUploading] = useState(false)
   const [templateModalOpen, setTemplateModalOpen] = useState(false)
   const [showEInvoicingModal, setShowEInvoicingModal] = useState(false)
@@ -359,7 +359,7 @@ export default function InvoiceSettingsPage() {
                           </div>
                         )}
                       </button>
-                      <button onClick={() => updateSettings({ logoSource: 'company' })}
+                      <button onClick={() => { updateSettings({ logoSource: 'company' }); refreshCompanyLogo() }}
                         className={`flex items-center gap-2.5 rounded-xl border-2 p-3 text-left transition-all ${
                           settings.logoSource === 'company' ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
                         }`}>
@@ -381,9 +381,9 @@ export default function InvoiceSettingsPage() {
                     {settings.logoSource === 'custom' ? (
                       <div className="flex items-start gap-6">
                         <div className="relative group">
-                          <div className="h-24 w-24 rounded-xl border-2 border-dashed border-border bg-muted/30 flex items-center justify-center overflow-hidden">
+                          <div className="h-24 w-24 border-2 border-dashed border-border bg-muted/30 flex items-center justify-center overflow-hidden" style={{ borderRadius: `${settings.logoBorderRadius}px` }}>
                             {settings.logoUrl ? (
-                              <img src={settings.logoUrl} alt="Logo" className="h-full w-full object-contain p-2" />
+                              <img src={settings.logoUrl} alt="Logo" className="h-full w-full object-contain p-2" style={{ borderRadius: `${settings.logoBorderRadius}px` }} />
                             ) : (
                               <ImagePlus className="h-8 w-8 text-muted-foreground/50" />
                             )}
@@ -396,28 +396,50 @@ export default function InvoiceSettingsPage() {
                           )}
                         </div>
                         <div className="flex-1 space-y-3">
-                          <p className="text-sm text-muted-foreground">Format recommande : PNG ou SVG, fond transparent, 500x500px minimum</p>
+                          <p className="text-sm text-muted-foreground">Format recommandé : PNG ou SVG, fond transparent, 500x500px minimum</p>
                           <input ref={fileInputRef} type="file" accept="image/png,image/svg+xml,image/jpeg" className="hidden" onChange={handleLogoUpload} />
                           <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
-                            {uploading ? <><Spinner /> Envoi...</> : 'Telecharger un logo'}
+                            {uploading ? <><Spinner /> Envoi...</> : 'Télécharger un logo'}
                           </Button>
                         </div>
                       </div>
                     ) : (
                       <div className="flex items-center gap-4 rounded-xl border border-border p-4">
-                        <div className="h-16 w-16 rounded-xl bg-muted/30 flex items-center justify-center overflow-hidden shrink-0">
+                        <div className="h-16 w-16 bg-muted/30 flex items-center justify-center overflow-hidden shrink-0" style={{ borderRadius: `${settings.logoBorderRadius}px` }}>
                           {companyLogoUrl ? (
-                            <img src={companyLogoUrl} alt="Logo entreprise" className="h-full w-full object-contain p-2" />
+                            <img src={companyLogoUrl} alt="Logo entreprise" className="h-full w-full object-contain p-2" style={{ borderRadius: `${settings.logoBorderRadius}px` }} />
                           ) : (
                             <Building2 className="h-6 w-6 text-muted-foreground/50" />
                           )}
                         </div>
                         <div className="flex-1">
                           {companyLogoUrl ? (
-                            <p className="text-sm text-muted-foreground">Le logo de votre entreprise sera utilise sur vos documents.</p>
+                            <p className="text-sm text-muted-foreground">Le logo de votre entreprise sera utilisé sur vos documents.</p>
                           ) : (
-                            <p className="text-sm text-muted-foreground">Aucun logo d&apos;entreprise configure. Ajoutez-en un dans la page <a href="/dashboard/company" className="text-primary underline underline-offset-2">Entreprise</a>.</p>
+                            <p className="text-sm text-muted-foreground">Aucun logo d&apos;entreprise configuré. Ajoutez-en un dans la page <a href="/dashboard/company" className="text-primary underline underline-offset-2">Entreprise</a>.</p>
                           )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Border Radius Slider */}
+                    {effectiveLogoUrl && (
+                      <div className="mt-4 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs font-medium text-muted-foreground">Arrondi du logo</label>
+                          <span className="text-xs text-muted-foreground tabular-nums">{settings.logoBorderRadius}px</span>
+                        </div>
+                        <input
+                          type="range"
+                          min={0}
+                          max={50}
+                          value={settings.logoBorderRadius}
+                          onChange={(e) => updateSettings({ logoBorderRadius: Number(e.target.value) })}
+                          className="w-full h-1.5 bg-muted rounded-full appearance-none cursor-pointer accent-primary"
+                        />
+                        <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+                          <span>Carré</span>
+                          <span>Arrondi</span>
                         </div>
                       </div>
                     )}
@@ -995,7 +1017,7 @@ export default function InvoiceSettingsPage() {
                         <div className="rounded-lg px-4 py-3 mb-4 -mx-2 -mt-2" style={{ backgroundColor: settings.accentColor }}>
                           <div className="flex justify-between items-center">
                             {effectiveLogoUrl ? (
-                              <img src={effectiveLogoUrl} alt="Logo" className="h-7 w-auto max-w-[80px] object-contain" />
+                              <img src={effectiveLogoUrl} alt="Logo" className="h-7 w-auto max-w-[80px] object-contain" style={{ borderRadius: `${settings.logoBorderRadius}px` }} />
                             ) : (
                               <div className="h-2.5 w-16 rounded-full" style={{ backgroundColor: '#fff', opacity: 0.5 }} />
                             )}
@@ -1008,7 +1030,7 @@ export default function InvoiceSettingsPage() {
                         <div className="flex items-start justify-between mb-5">
                           <div className="space-y-2">
                             {effectiveLogoUrl ? (
-                              <img src={effectiveLogoUrl} alt="Logo" className="h-10 w-auto max-w-[120px] object-contain" />
+                              <img src={effectiveLogoUrl} alt="Logo" className="h-10 w-auto max-w-[120px] object-contain" style={{ borderRadius: `${settings.logoBorderRadius}px` }} />
                             ) : (
                               <div className="h-10 w-20 border border-dashed flex items-center justify-center" style={{ borderRadius: currentTemplate.borderRadius, backgroundColor: currentTemplate.borderLight, borderColor: currentTemplate.editBorderDashed }}>
                                 <ImagePlus className="h-5 w-5" style={{ color: currentTemplate.editBorderDashed }} />

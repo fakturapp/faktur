@@ -123,6 +123,7 @@ export default class Pdf {
       language: quote.language || 'fr',
       vatExempt: invoiceSettings?.defaultVatExempt || false,
       footerText: invoiceSettings?.defaultFooterText || null,
+      logoBorderRadius: invoiceSettings?.logoBorderRadius ?? 0,
     }
 
     const linesData = quote.lines.map((l) => ({

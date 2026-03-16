@@ -462,6 +462,9 @@ interface A4SheetProps {
   showFooterText?: boolean
   footerMode?: 'company_info' | 'custom'
   documentType?: 'quote' | 'invoice'
+  bankAccountInfo?: { bankName: string | null; iban: string | null; bic: string | null } | null
+  paymentMethod?: string | null
+  logoBorderRadius?: number
   onAcceptanceConditionsChange?: (v: string) => void
   onFreeFieldChange?: (v: string) => void
   onFooterTextChange?: (v: string) => void
@@ -484,6 +487,7 @@ export function A4Sheet({
   showSubject = true, showAcceptanceConditions = false, showFreeField = false, showFooterText = false,
   footerMode = 'company_info',
   documentType = 'quote',
+  bankAccountInfo, paymentMethod, logoBorderRadius = 0,
   onAcceptanceConditionsChange, onFreeFieldChange, onFooterTextChange, onDeliveryAddressChange,
   onIssueDateChange, onValidityDateChange,
 }: A4SheetProps) {
@@ -568,7 +572,7 @@ export function A4Sheet({
                   <div className="flex justify-between items-center">
                     <div>
                       {logoUrl ? (
-                        <img src={logoUrl} alt="Logo" className="h-12 w-auto max-w-[100px] object-contain mb-1" />
+                        <img src={logoUrl} alt="Logo" className="h-12 w-auto max-w-[100px] object-contain mb-1" style={{ borderRadius: `${logoBorderRadius}px` }} />
                       ) : (
                         <div className="text-[18px] font-bold" style={{ color: contrastText(accentColor) }}>
                           {company?.legalName || t.society}
@@ -593,7 +597,7 @@ export function A4Sheet({
                   {/* Left: Logo + Company (all editable) */}
                   <div className="max-w-[55%]">
                     {logoUrl ? (
-                      <img src={logoUrl} alt="Logo" className="h-14 w-auto max-w-[110px] object-contain mb-2" />
+                      <img src={logoUrl} alt="Logo" className="h-14 w-auto max-w-[110px] object-contain mb-2" style={{ borderRadius: `${logoBorderRadius}px` }} />
                     ) : (
                       <div
                         className="w-16 h-16 flex items-center justify-center mb-2 border-2 border-dashed"
@@ -1170,7 +1174,25 @@ export function A4Sheet({
                 </div>
               )}
 
-              {/* Payment methods — hidden for quotes (devis) */}
+              {/* Payment method + bank account info — invoices only */}
+              {isInvoice && paymentMethod === 'bank_transfer' && bankAccountInfo && (bankAccountInfo.iban || bankAccountInfo.bic || bankAccountInfo.bankName) && (
+                <div className="mt-3 pt-3" style={{ borderTop: `1px solid ${T.borderLight}` }}>
+                  <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1.5" style={{ color: T.textMuted }}>
+                    {lang === 'en' ? 'Bank details' : 'Coordonnees bancaires'}
+                  </div>
+                  <div className="text-[11px] leading-[1.7]" style={{ color: T.text }}>
+                    {bankAccountInfo.bankName && (
+                      <div><span className="font-semibold">{lang === 'en' ? 'Bank' : 'Banque'} :</span> {bankAccountInfo.bankName}</div>
+                    )}
+                    {bankAccountInfo.iban && (
+                      <div><span className="font-semibold">IBAN :</span> <span className="font-mono">{bankAccountInfo.iban}</span></div>
+                    )}
+                    {bankAccountInfo.bic && (
+                      <div><span className="font-semibold">BIC :</span> <span className="font-mono">{bankAccountInfo.bic}</span></div>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* ── Footer (company info / VAT exempt / custom text) ── */}
               {isClassique ? (

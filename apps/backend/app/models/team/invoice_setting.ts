@@ -92,6 +92,9 @@ export default class InvoiceSetting extends BaseModel {
   declare footerMode: 'company_info' | 'vat_exempt' | 'custom'
 
   @column()
+  declare logoBorderRadius: number
+
+  @column()
   declare nextInvoiceNumber: string | null
 
   @column()
