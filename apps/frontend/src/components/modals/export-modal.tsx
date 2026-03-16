@@ -19,6 +19,7 @@ import {
   Shield,
   CheckCircle2,
   FileArchive,
+  Landmark,
 } from 'lucide-react'
 
 interface TeamInfo {
@@ -64,6 +65,7 @@ export function ExportModal({ open, onClose }: ExportModalProps) {
   const [selectedTeam, setSelectedTeam] = useState<string>('')
   const [fileName, setFileName] = useState('')
   const [encrypt, setEncrypt] = useState(false)
+  const [includeBankAccounts, setIncludeBankAccounts] = useState(false)
   const [encryptionPassword, setEncryptionPassword] = useState('')
   const [encryptionConfirm, setEncryptionConfirm] = useState('')
   const [accountPassword, setAccountPassword] = useState('')
@@ -103,6 +105,7 @@ export function ExportModal({ open, onClose }: ExportModalProps) {
     setSelectedTeam('')
     setFileName('')
     setEncrypt(false)
+    setIncludeBankAccounts(false)
     setEncryptionPassword('')
     setEncryptionConfirm('')
     setAccountPassword('')
@@ -142,9 +145,12 @@ export function ExportModal({ open, onClose }: ExportModalProps) {
 
     setExportStatus('exporting')
 
-    const body: Record<string, string> = { password: accountPassword }
+    const body: Record<string, string | boolean> = { password: accountPassword }
     if (encrypt && encryptionPassword) {
       body.encryptionPassword = encryptionPassword
+    }
+    if (includeBankAccounts) {
+      body.includeBankAccounts = true
     }
 
     const { blob, filename: serverFilename, error } = await api.postBlob('/team/export', body)
@@ -346,6 +352,24 @@ export function ExportModal({ open, onClose }: ExportModalProps) {
                     }}
                   />
                 </div>
+
+                <Separator />
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                      <Landmark className="h-4.5 w-4.5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">Inclure les comptes bancaires</p>
+                      <p className="text-xs text-muted-foreground">IBAN, BIC déchiffrés si nécessaire</p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={includeBankAccounts}
+                    onChange={setIncludeBankAccounts}
+                  />
+                </div>
               </div>
 
               <DialogFooter className="mt-auto">
@@ -462,6 +486,18 @@ export function ExportModal({ open, onClose }: ExportModalProps) {
                           {encrypt ? (
                             <span className="flex items-center gap-1 text-primary">
                               <Shield className="h-3.5 w-3.5" /> AES-256-GCM
+                            </span>
+                          ) : (
+                            'Non'
+                          )}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Comptes bancaires</span>
+                        <span className="font-medium text-foreground">
+                          {includeBankAccounts ? (
+                            <span className="flex items-center gap-1 text-primary">
+                              <Landmark className="h-3.5 w-3.5" /> Inclus
                             </span>
                           ) : (
                             'Non'

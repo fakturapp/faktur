@@ -9,6 +9,8 @@ import Client from '#models/client/client'
 import Invoice from '#models/invoice/invoice'
 import Quote from '#models/quote/quote'
 import InvoiceSetting from '#models/team/invoice_setting'
+import BankAccount from '#models/team/bank_account'
+import EncryptionService from '#services/encryption/encryption_service'
 
 const MAGIC = Buffer.from('FPDATA1')
 const FLAG_ENCRYPTED = 0x01
@@ -25,9 +27,10 @@ interface ExportData {
   invoices: Record<string, unknown>[]
   quotes: Record<string, unknown>[]
   settings: Record<string, unknown> | null
+  bankAccounts?: Record<string, unknown>[]
 }
 
-export async function collectTeamData(teamId: string): Promise<ExportData> {
+export async function collectTeamData(teamId: string, options?: { includeBankAccounts?: boolean }): Promise<ExportData> {
   const team = await Team.find(teamId)
   if (!team) throw new Error('Team not found')
 
@@ -44,6 +47,31 @@ export async function collectTeamData(teamId: string): Promise<ExportData> {
     .preload('lines', (q) => q.orderBy('position', 'asc'))
 
   const settings = await InvoiceSetting.query().where('teamId', teamId).first()
+
+  // Collect bank accounts if requested, decrypting encrypted fields
+  let bankAccountsData: Record<string, unknown>[] | undefined
+  if (options?.includeBankAccounts) {
+    const bankAccounts = await BankAccount.query().where('teamId', teamId)
+    bankAccountsData = bankAccounts.map((ba) => {
+      let iban = ba.iban
+      let bic = ba.bic
+      if (ba.isEncrypted) {
+        if (iban) {
+          try { iban = EncryptionService.decrypt(iban) } catch { iban = null }
+        }
+        if (bic) {
+          try { bic = EncryptionService.decrypt(bic) } catch { bic = null }
+        }
+      }
+      return {
+        label: ba.label,
+        bankName: ba.bankName,
+        iban,
+        bic,
+        isDefault: ba.isDefault,
+      }
+    })
+  }
 
   return {
     metadata: {
@@ -200,6 +228,7 @@ export async function collectTeamData(teamId: string): Promise<ExportData> {
           nextQuoteNumber: settings.nextQuoteNumber,
         }
       : null,
+    ...(bankAccountsData ? { bankAccounts: bankAccountsData } : {}),
   }
 }
 
@@ -250,6 +279,10 @@ export async function createZipBuffer(data: ExportData, logoFiles?: LogoFile[]):
     archive.append(JSON.stringify(data.invoices, null, 2), { name: 'export/invoices.json' })
     archive.append(JSON.stringify(data.quotes, null, 2), { name: 'export/quotes.json' })
     archive.append(JSON.stringify(data.settings, null, 2), { name: 'export/settings.json' })
+
+    if (data.bankAccounts) {
+      archive.append(JSON.stringify(data.bankAccounts, null, 2), { name: 'export/bank_accounts.json' })
+    }
 
     if (logoFiles) {
       for (const file of logoFiles) {

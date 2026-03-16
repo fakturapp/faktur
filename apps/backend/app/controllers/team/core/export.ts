@@ -8,6 +8,7 @@ const exportValidator = vine.compile(
   vine.object({
     password: vine.string(),
     encryptionPassword: vine.string().optional(),
+    includeBankAccounts: vine.boolean().optional(),
   })
 )
 
@@ -40,7 +41,7 @@ export default class Export {
     }
 
     // Collect and export data
-    const data = await collectTeamData(teamId)
+    const data = await collectTeamData(teamId, { includeBankAccounts: payload.includeBankAccounts ?? false })
     const logoFiles = collectLogoFiles(data)
     const zipBuffer = await createZipBuffer(data, logoFiles)
 
