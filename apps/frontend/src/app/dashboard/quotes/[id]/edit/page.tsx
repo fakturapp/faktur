@@ -11,7 +11,7 @@ import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { api } from '@/lib/api'
 import { A4Sheet, ClientModal, type DocumentLine, type ClientInfo, type CompanyInfo } from '@/components/shared/a4-sheet'
 import { DocumentOptionsPanel } from '@/components/shared/document-options'
-import { Save, ArrowLeft, Eye, Pencil, Download, SlidersHorizontal } from 'lucide-react'
+import { Save, ArrowLeft, Eye, Pencil, Download, SlidersHorizontal, AlertCircle } from 'lucide-react'
 import { Dialog, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
 
@@ -84,6 +84,7 @@ export default function EditQuotePage() {
 
   const [notes, setNotes] = useState('')
   const [isDirty, setIsDirty] = useState(false)
+  const [validationErrors, setValidationErrors] = useState<string[]>([])
   const { showModal, confirmNavigation, cancelNavigation, requestNavigation } = useUnsavedChanges(isDirty)
 
   // Load quote and company
@@ -169,7 +170,7 @@ export default function EditQuotePage() {
   // Handlers
   const handleUpdateLine = useCallback((index: number, partial: Partial<DocumentLine>) => {
     setLines((prev) => prev.map((l, i) => (i === index ? { ...l, ...partial } : l)))
-    setIsDirty(true)
+    setIsDirty(true); setValidationErrors([])
   }, [])
 
   const handleAddLine = useCallback((type: 'standard' | 'section') => {
@@ -177,21 +178,22 @@ export default function EditQuotePage() {
       ...prev,
       { id: generateId(), type, description: '', saleType: '', quantity: 1, unit: '', unitPrice: 0, vatRate: type === 'section' ? 0 : 20 },
     ])
-    setIsDirty(true)
+    setIsDirty(true); setValidationErrors([])
   }, [])
 
   const handleRemoveLine = useCallback((index: number) => {
     setLines((prev) => prev.filter((_, i) => i !== index))
-    setIsDirty(true)
+    setIsDirty(true); setValidationErrors([])
   }, [])
 
   const handleOptionsChange = useCallback((partial: Partial<typeof options>) => {
     setOptions((prev) => ({ ...prev, ...partial }))
-    setIsDirty(true)
+    setIsDirty(true); setValidationErrors([])
   }, [])
 
   const handleSelectClient = useCallback((client: ClientInfo) => {
     setSelectedClient(client)
+    setValidationErrors([])
     setOptions((prev) => ({
       ...prev,
       clientSiren: client.siren || prev.clientSiren,
@@ -250,11 +252,20 @@ export default function EditQuotePage() {
 
   // Save
   async function handleSave() {
-    if (!lines.some((l) => l.type === 'standard' && l.description.trim())) {
-      toast('Ajoutez au moins une ligne avec une description', 'error')
+    const errors: string[] = []
+    if (!selectedClient) errors.push('Client')
+    if (!lines.some((l) => l.type === 'standard' && l.description.trim())) errors.push('Désignation')
+    if (!lines.some((l) => l.type === 'standard' && l.unitPrice > 0)) errors.push('Prix')
+    if (options.showSubject && !options.subject?.trim()) errors.push('Objet')
+    if (options.showDeliveryAddress && !options.deliveryAddress?.trim()) errors.push('Adresse de livraison')
+    if (options.showAcceptanceConditions && !options.acceptanceConditions?.trim()) errors.push("Conditions d'acceptation")
+    if (options.showFreeField && !options.freeField?.trim()) errors.push('Champ libre')
+    if (options.showFooterText && options.footerMode === 'custom' && !options.footerText?.trim()) errors.push('Pied de page')
+    if (errors.length > 0) {
+      setValidationErrors(errors)
       return
     }
-
+    setValidationErrors([])
     setSaving(true)
 
     const payload = {
@@ -564,6 +575,20 @@ export default function EditQuotePage() {
         custom={3}
         className="sticky bottom-0 -mx-4 lg:-mx-6 px-4 lg:px-6 py-4 bg-background/80 backdrop-blur-md border-t border-border"
       >
+        <AnimatePresence>
+          {validationErrors.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="flex items-center justify-center gap-2 mb-3 px-4 py-2.5 rounded-lg bg-red-500/10 border border-red-500/20"
+            >
+              <AlertCircle className="h-4 w-4 text-red-500 shrink-0" />
+              <span className="text-sm text-red-500 font-medium">Des champs sont manquants :</span>
+              <span className="text-sm text-red-400">{validationErrors.join(', ')}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
         <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
             Total :{' '}
