@@ -417,9 +417,14 @@ export default function EditInvoicePage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={handleDownloadPdf} disabled={downloading} className={downloading ? 'download-shimmer' : ''}>
-            {downloading ? <Spinner className="h-3.5 w-3.5 mr-1.5" /> : <Download className="h-3.5 w-3.5 mr-1.5" />}
-            {downloading ? 'Génération en cours...' : 'Télécharger le PDF'}
+          <Button variant="outline" size="sm" onClick={handleDownloadPdf} disabled={downloading}>
+            <Download className="h-3.5 w-3.5 mr-1.5" />
+            Télécharger
+            {downloading ? (
+              <span className="download-shimmer rounded px-1.5 py-0.5 ml-1 text-xs font-semibold text-muted-foreground">{invoiceNumber}</span>
+            ) : (
+              <span className="ml-1 font-semibold">{invoiceNumber}</span>
+            )}
           </Button>
           <div className="flex rounded-lg border border-border overflow-hidden">
             <button onClick={() => setMode('edit')} className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium transition-all ${mode === 'edit' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}>

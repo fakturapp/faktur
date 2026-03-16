@@ -48,12 +48,14 @@ export default function AccountPage() {
   const [avatarUploading, setAvatarUploading] = useState(false)
 
   // Email change
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false)
   const [newEmail, setNewEmail] = useState('')
   const [emailCodeOpen, setEmailCodeOpen] = useState(false)
   const [emailCode, setEmailCode] = useState('')
   const [emailChangeLoading, setEmailChangeLoading] = useState(false)
 
   // Password
+  const [passwordDialogOpen, setPasswordDialogOpen] = useState(false)
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -439,40 +441,20 @@ export default function AccountPage() {
 
           <Card>
             <CardContent className="p-6">
-              <FieldGroup>
-                <div className="flex items-center gap-3 mb-1">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
                   <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
                     <Globe className="h-4.5 w-4.5 text-primary" />
                   </div>
-                  <h3 className="font-semibold text-foreground">Adresse email</h3>
-                </div>
-
-                <Field>
-                  <FieldLabel htmlFor="email">Email</FieldLabel>
-                  <div className="flex gap-2">
-                    <Input
-                      id="email"
-                      type="email"
-                      value={newEmail || user?.email || ''}
-                      onChange={(e) => setNewEmail(e.target.value)}
-                      placeholder={user?.email}
-                    />
-                    {newEmail && newEmail !== user?.email && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={handleRequestEmailChange}
-                        disabled={emailChangeLoading}
-                        className="shrink-0"
-                      >
-                        {emailChangeLoading ? <Spinner size="sm" /> : 'Verifier'}
-                      </Button>
-                    )}
+                  <div>
+                    <h3 className="font-semibold text-foreground">Adresse email</h3>
+                    <p className="text-sm text-muted-foreground">{user?.email}</p>
                   </div>
-                  <FieldDescription>Un code de verification sera envoye a la nouvelle adresse.</FieldDescription>
-                </Field>
-              </FieldGroup>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => setEmailDialogOpen(true)}>
+                  Modifier
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -481,105 +463,64 @@ export default function AccountPage() {
       {/* Security tab */}
       {activeTab === 'security' && (
         <div className="space-y-6">
-          {/* Change password */}
+          {/* Password + 2FA combined */}
           <Card>
-            <CardContent className="p-6">
-              <form onSubmit={handleChangePassword}>
-                <FieldGroup>
-                  <div className="flex items-center gap-3 mb-1">
+            <CardContent className="p-6 space-y-0">
+              {/* Password row */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                    <Lock className="h-4.5 w-4.5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-foreground">Mot de passe</h3>
+                    <p className="text-xs text-muted-foreground">Modifiez votre mot de passe de connexion.</p>
+                  </div>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => setPasswordDialogOpen(true)}>
+                  Modifier
+                </Button>
+              </div>
+
+              <Separator className="my-4" />
+
+              {/* 2FA row */}
+              {twoFactorStep === 'idle' && (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
                     <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                      <Lock className="h-4.5 w-4.5 text-primary" />
+                      <Smartphone className="h-4.5 w-4.5 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-foreground">Mot de passe</h3>
-                      <p className="text-xs text-muted-foreground">Modifiez votre mot de passe de connexion.</p>
+                      <h3 className="font-semibold text-foreground">Authentification a deux facteurs</h3>
+                      <p className="text-xs text-muted-foreground">
+                        {user?.twoFactorEnabled
+                          ? 'La 2FA est activee sur votre compte.'
+                          : 'Ajoutez une couche de securite supplementaire.'}
+                      </p>
                     </div>
                   </div>
-
-                  <Field>
-                    <FieldLabel htmlFor="currentPassword">Mot de passe actuel</FieldLabel>
-                    <Input
-                      id="currentPassword"
-                      type="password"
-                      value={currentPassword}
-                      onChange={(e) => setCurrentPassword(e.target.value)}
-                      required
-                    />
-                  </Field>
-
-                  <Field>
-                    <FieldLabel htmlFor="newPassword">Nouveau mot de passe</FieldLabel>
-                    <Input
-                      id="newPassword"
-                      type="password"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      required
-                    />
-                  </Field>
-
-                  <Field>
-                    <FieldLabel htmlFor="confirmPassword">Confirmer le mot de passe</FieldLabel>
-                    <Input
-                      id="confirmPassword"
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      required
-                    />
-                  </Field>
-
-                  <Button type="submit" disabled={passwordLoading}>
-                    {passwordLoading ? <><Spinner /> Modification...</> : 'Modifier le mot de passe'}
-                  </Button>
-                </FieldGroup>
-              </form>
-            </CardContent>
-          </Card>
-
-          {/* 2FA Section */}
-          <Card>
-            <CardContent className="p-6">
-              {twoFactorStep === 'idle' && (
-                <div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-                        <Smartphone className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-foreground">Authentification a deux facteurs</h3>
-                        <p className="text-sm text-muted-foreground mt-0.5">
-                          {user?.twoFactorEnabled
-                            ? 'La 2FA est activee sur votre compte.'
-                            : 'Ajoutez une couche de securite supplementaire.'}
-                        </p>
-                      </div>
-                    </div>
+                  <div className="flex items-center gap-2">
                     <Badge variant={user?.twoFactorEnabled ? 'success' : 'muted'}>
                       {user?.twoFactorEnabled ? 'Active' : 'Desactive'}
                     </Badge>
+                    {!user?.twoFactorEnabled ? (
+                      <Button size="sm" onClick={handleSetup2FA} disabled={twoFactorLoading}>
+                        {twoFactorLoading ? <Spinner /> : 'Activer'}
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-destructive/30 text-destructive hover:bg-destructive/10"
+                        onClick={handleDisable2FA}
+                      >
+                        Desactiver
+                      </Button>
+                    )}
                   </div>
-
-                  <Separator className="my-4" />
-
-                  {!user?.twoFactorEnabled ? (
-                    <Button onClick={handleSetup2FA} disabled={twoFactorLoading}>
-                      <Shield className="h-4 w-4 mr-2" />
-                      {twoFactorLoading ? <><Spinner /> Chargement...</> : 'Activer la 2FA'}
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="outline"
-                      className="border-destructive/30 text-destructive hover:bg-destructive/10"
-                      onClick={handleDisable2FA}
-                    >
-                      Desactiver la 2FA
-                    </Button>
-                  )}
                 </div>
               )}
-
               {twoFactorStep === 'setup' && (
                 <div>
                   <h3 className="font-semibold text-foreground mb-1">Configurer la 2FA</h3>
@@ -926,6 +867,54 @@ export default function AccountPage() {
               disabled={disableLoading || disableCode.length !== 6}
             >
               {disableLoading ? <><Spinner /> Désactivation...</> : 'Désactiver'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </Dialog>
+
+      {/* Password change dialog */}
+      <Dialog open={passwordDialogOpen} onClose={() => { setPasswordDialogOpen(false); setCurrentPassword(''); setNewPassword(''); setConfirmPassword('') }}>
+        <DialogTitle>Modifier le mot de passe</DialogTitle>
+        <DialogDescription>Entrez votre mot de passe actuel puis choisissez un nouveau mot de passe.</DialogDescription>
+        <form onSubmit={handleChangePassword} className="mt-4 space-y-4">
+          <Field>
+            <FieldLabel htmlFor="currentPassword">Mot de passe actuel</FieldLabel>
+            <Input id="currentPassword" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} required autoFocus />
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="newPassword">Nouveau mot de passe</FieldLabel>
+            <Input id="newPassword" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="confirmPassword">Confirmer le mot de passe</FieldLabel>
+            <Input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+          </Field>
+          <DialogFooter>
+            <Button variant="outline" type="button" onClick={() => { setPasswordDialogOpen(false); setCurrentPassword(''); setNewPassword(''); setConfirmPassword('') }}>
+              Annuler
+            </Button>
+            <Button type="submit" disabled={passwordLoading || !currentPassword || !newPassword || !confirmPassword}>
+              {passwordLoading ? <><Spinner /> Modification...</> : 'Modifier'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </Dialog>
+
+      {/* Email change dialog */}
+      <Dialog open={emailDialogOpen} onClose={() => { setEmailDialogOpen(false); setNewEmail('') }}>
+        <DialogTitle>Modifier l&apos;adresse email</DialogTitle>
+        <DialogDescription>Un code de verification sera envoye a la nouvelle adresse.</DialogDescription>
+        <form onSubmit={handleRequestEmailChange} className="mt-4 space-y-4">
+          <Field>
+            <FieldLabel htmlFor="newEmail">Nouvelle adresse email</FieldLabel>
+            <Input id="newEmail" type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="nouvelle@email.com" required autoFocus />
+          </Field>
+          <DialogFooter>
+            <Button variant="outline" type="button" onClick={() => { setEmailDialogOpen(false); setNewEmail('') }}>
+              Annuler
+            </Button>
+            <Button type="submit" disabled={emailChangeLoading || !newEmail || newEmail === user?.email}>
+              {emailChangeLoading ? <><Spinner /> Envoi...</> : 'Envoyer le code'}
             </Button>
           </DialogFooter>
         </form>

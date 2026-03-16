@@ -196,7 +196,7 @@ export function ExportModal({ open, onClose }: ExportModalProps) {
         })}
       </div>
 
-      <div className="min-h-[280px] relative overflow-hidden">
+      <div className="min-h-[280px] relative overflow-hidden flex flex-col">
         <AnimatePresence mode="wait" custom={direction}>
           {/* Step 1: Team selection */}
           {step === 1 && (
@@ -208,13 +208,14 @@ export function ExportModal({ open, onClose }: ExportModalProps) {
               animate="center"
               exit="exit"
               transition={{ duration: 0.25, ease: 'easeInOut' }}
+              className="flex flex-col flex-1 min-h-[280px]"
             >
               <DialogTitle>Choisir l&apos;equipe</DialogTitle>
               <DialogDescription>
                 Selectionnez l&apos;equipe dont vous souhaitez exporter les donnees.
               </DialogDescription>
 
-              <div className="mt-4 space-y-2 max-h-[200px] overflow-y-auto pr-1">
+              <div className="mt-4 space-y-2 max-h-[200px] overflow-y-auto pr-1 flex-1">
                 {teamsLoading ? (
                   <div className="flex items-center justify-center gap-2 py-8">
                     <Spinner size="sm" className="text-primary" />
@@ -282,7 +283,7 @@ export function ExportModal({ open, onClose }: ExportModalProps) {
                 )}
               </div>
 
-              <DialogFooter>
+              <DialogFooter className="mt-auto">
                 <Button variant="outline" onClick={handleClose}>
                   Annuler
                 </Button>
@@ -303,6 +304,7 @@ export function ExportModal({ open, onClose }: ExportModalProps) {
               animate="center"
               exit="exit"
               transition={{ duration: 0.25, ease: 'easeInOut' }}
+              className="flex flex-col flex-1 min-h-[280px]"
             >
               <DialogTitle>Options d&apos;export</DialogTitle>
               <DialogDescription>Configurez les parametres de l&apos;export.</DialogDescription>
@@ -346,7 +348,7 @@ export function ExportModal({ open, onClose }: ExportModalProps) {
                 </div>
               </div>
 
-              <DialogFooter>
+              <DialogFooter className="mt-auto">
                 <Button variant="outline" onClick={goBack}>
                   <ChevronLeft className="h-4 w-4 mr-1" /> Retour
                 </Button>
@@ -367,6 +369,7 @@ export function ExportModal({ open, onClose }: ExportModalProps) {
               animate="center"
               exit="exit"
               transition={{ duration: 0.25, ease: 'easeInOut' }}
+              className="flex flex-col flex-1 min-h-[280px]"
             >
               <DialogTitle>Mot de passe de chiffrement</DialogTitle>
               <DialogDescription>
@@ -407,7 +410,7 @@ export function ExportModal({ open, onClose }: ExportModalProps) {
                 </FieldGroup>
               </div>
 
-              <DialogFooter>
+              <DialogFooter className="mt-auto">
                 <Button variant="outline" onClick={goBack}>
                   <ChevronLeft className="h-4 w-4 mr-1" /> Retour
                 </Button>
@@ -428,6 +431,7 @@ export function ExportModal({ open, onClose }: ExportModalProps) {
               animate="center"
               exit="exit"
               transition={{ duration: 0.25, ease: 'easeInOut' }}
+              className="flex flex-col flex-1 min-h-[280px]"
             >
               {exportStatus === 'idle' ? (
                 <>
@@ -482,7 +486,7 @@ export function ExportModal({ open, onClose }: ExportModalProps) {
                     </Field>
                   </div>
 
-                  <DialogFooter>
+                  <DialogFooter className="mt-auto">
                     <Button variant="outline" onClick={goBack}>
                       <ChevronLeft className="h-4 w-4 mr-1" /> Retour
                     </Button>
