@@ -13,7 +13,9 @@ import { useToast } from '@/components/ui/toast'
 import { api } from '@/lib/api'
 import { Select } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
-import { Building2, CreditCard, Receipt, Search, Info, Banknote, Coins, PenLine, Lock, ImagePlus, Trash2, Eye, EyeOff } from 'lucide-react'
+import { Dialog, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Badge } from '@/components/ui/badge'
+import { Building2, CreditCard, Receipt, Info, Banknote, Coins, PenLine, Lock, ImagePlus, Trash2, Plus, Shield, Star, Pencil } from 'lucide-react'
 
 interface Company {
   id: string
@@ -37,6 +39,25 @@ interface Company {
   bankName: string | null
   paymentConditions: string | null
   currency: string
+}
+
+interface BankAccountItem {
+  id: string
+  label: string
+  bankName: string | null
+  ibanMasked: string | null
+  bicMasked: string | null
+  isEncrypted: boolean
+  isDefault: boolean
+}
+
+interface BankAccountForm {
+  label: string
+  bankName: string
+  iban: string
+  bic: string
+  isEncrypted: boolean
+  isDefault: boolean
 }
 
 const tabs = [
@@ -72,24 +93,16 @@ export default function CompanyPage() {
     website: '',
   })
 
-  const [bankForm, setBankForm] = useState({
-    iban: '',
-    bic: '',
-    bankName: '',
+  // Bank accounts state
+  const [bankAccounts, setBankAccounts] = useState<BankAccountItem[]>([])
+  const [bankLoading, setBankLoading] = useState(false)
+  const [bankDialogOpen, setBankDialogOpen] = useState(false)
+  const [bankEditId, setBankEditId] = useState<string | null>(null)
+  const [bankSaving, setBankSaving] = useState(false)
+  const [bankDeleting, setBankDeleting] = useState<string | null>(null)
+  const [bankForm, setBankForm] = useState<BankAccountForm>({
+    label: '', bankName: '', iban: '', bic: '', isEncrypted: false, isDefault: false,
   })
-  const [showIban, setShowIban] = useState(false)
-  const [showBic, setShowBic] = useState(false)
-
-  const maskIban = (iban: string) => {
-    const clean = iban.replace(/\s/g, '')
-    if (clean.length <= 8) return '••••  ••••'
-    return clean.slice(0, 4) + ' •••• •••• •••• •••• ' + clean.slice(-4)
-  }
-
-  const maskBic = (bic: string) => {
-    if (bic.length <= 4) return '••••••••'
-    return bic.slice(0, 4) + '••••'
-  }
 
   const [paymentForm, setPaymentForm] = useState({
     paymentConditions: '',
@@ -103,6 +116,7 @@ export default function CompanyPage() {
       if (data?.company) {
         setCompany(data.company)
         setLogoUrl(data.company.logoUrl)
+        loadBankAccounts()
         setForm({
           legalName: data.company.legalName || '',
           tradeName: data.company.tradeName || '',
@@ -117,11 +131,6 @@ export default function CompanyPage() {
           phone: data.company.phone || '',
           email: data.company.email || '',
           website: data.company.website || '',
-        })
-        setBankForm({
-          iban: data.company.iban || '',
-          bic: data.company.bic || '',
-          bankName: data.company.bankName || '',
         })
         setPaymentForm({
           paymentConditions: data.company.paymentConditions || '',
@@ -158,13 +167,67 @@ export default function CompanyPage() {
     }
   }
 
-  async function handleSaveBank(e: React.FormEvent) {
-    e.preventDefault()
-    setSaving(true)
-    const { error } = await api.put('/company/bank', bankForm)
-    setSaving(false)
+  async function loadBankAccounts() {
+    setBankLoading(true)
+    const { data } = await api.get<{ bankAccounts: BankAccountItem[] }>('/company/bank-accounts')
+    if (data?.bankAccounts) setBankAccounts(data.bankAccounts)
+    setBankLoading(false)
+  }
+
+  function openBankDialog(account?: BankAccountItem) {
+    if (account) {
+      setBankEditId(account.id)
+      // Load full data for editing
+      api.get<{ bankAccount: any }>(`/company/bank-accounts/${account.id}`).then(({ data }) => {
+        if (data?.bankAccount) {
+          setBankForm({
+            label: data.bankAccount.label,
+            bankName: data.bankAccount.bankName || '',
+            iban: data.bankAccount.iban || '',
+            bic: data.bankAccount.bic || '',
+            isEncrypted: data.bankAccount.isEncrypted,
+            isDefault: data.bankAccount.isDefault,
+          })
+        }
+      })
+    } else {
+      setBankEditId(null)
+      setBankForm({ label: '', bankName: '', iban: '', bic: '', isEncrypted: false, isDefault: false })
+    }
+    setBankDialogOpen(true)
+  }
+
+  async function handleSaveBankAccount() {
+    if (!bankForm.label.trim()) {
+      toast('Le libellé est requis', 'error')
+      return
+    }
+    setBankSaving(true)
+    const payload = {
+      label: bankForm.label,
+      bankName: bankForm.bankName || undefined,
+      iban: bankForm.iban || undefined,
+      bic: bankForm.bic || undefined,
+      isEncrypted: bankForm.isEncrypted,
+      isDefault: bankForm.isDefault,
+    }
+    const { error } = bankEditId
+      ? await api.put(`/company/bank-accounts/${bankEditId}`, payload)
+      : await api.post('/company/bank-accounts', payload)
+    setBankSaving(false)
     if (error) return toast(error, 'error')
-    toast('Coordonnées bancaires mises à jour', 'success')
+    toast(bankEditId ? 'Compte bancaire mis à jour' : 'Compte bancaire ajouté', 'success')
+    setBankDialogOpen(false)
+    loadBankAccounts()
+  }
+
+  async function handleDeleteBank(id: string) {
+    setBankDeleting(id)
+    const { error } = await api.delete(`/company/bank-accounts/${id}`)
+    setBankDeleting(null)
+    if (error) return toast(error, 'error')
+    toast('Compte bancaire supprimé', 'success')
+    loadBankAccounts()
   }
 
   function togglePaymentMethod(method: string) {
@@ -427,71 +490,149 @@ export default function CompanyPage() {
                 </p>
               </div>
             ) : (
-              <form onSubmit={handleSaveBank}>
-                <FieldGroup>
-                  <h3 className="font-semibold text-foreground">Coordonnées bancaires</h3>
-                  <FieldDescription>
-                    Ces informations apparaîtront sur vos factures.
-                  </FieldDescription>
-
-                  <Field>
-                    <FieldLabel htmlFor="iban">IBAN</FieldLabel>
-                    <div className="relative">
-                      <Input
-                        id="iban"
-                        value={showIban ? bankForm.iban : (bankForm.iban ? maskIban(bankForm.iban) : '')}
-                        onChange={(e) => { if (showIban) setBankForm((p) => ({ ...p, iban: e.target.value })) }}
-                        onFocus={() => setShowIban(true)}
-                        placeholder="FR76 XXXX XXXX XXXX XXXX XXXX XXX"
-                        className="pr-10"
-                        readOnly={!showIban}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowIban((v) => !v)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        {showIban ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                    </div>
-                  </Field>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <Field>
-                      <FieldLabel htmlFor="bic">BIC / SWIFT</FieldLabel>
-                      <div className="relative">
-                        <Input
-                          id="bic"
-                          value={showBic ? bankForm.bic : (bankForm.bic ? maskBic(bankForm.bic) : '')}
-                          onChange={(e) => { if (showBic) setBankForm((p) => ({ ...p, bic: e.target.value })) }}
-                          onFocus={() => setShowBic(true)}
-                          className="pr-10"
-                          readOnly={!showBic}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowBic((v) => !v)}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-colors"
-                        >
-                          {showBic ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </button>
-                      </div>
-                    </Field>
-                    <Field>
-                      <FieldLabel htmlFor="bankName">Nom de la banque</FieldLabel>
-                      <Input id="bankName" value={bankForm.bankName} onChange={(e) => setBankForm((p) => ({ ...p, bankName: e.target.value }))} />
-                    </Field>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-semibold text-foreground">Coordonnees bancaires</h3>
+                    <p className="text-sm text-muted-foreground mt-0.5">
+                      Gerez vos comptes bancaires pour les factures.
+                    </p>
                   </div>
-
-                  <Button type="submit" disabled={saving}>
-                    {saving ? <><Spinner className="text-primary-foreground" /> Enregistrement...</> : 'Enregistrer'}
+                  <Button size="sm" onClick={() => openBankDialog()}>
+                    <Plus className="h-3.5 w-3.5 mr-1.5" /> Ajouter
                   </Button>
-                </FieldGroup>
-              </form>
+                </div>
+
+                {bankLoading ? (
+                  <div className="flex justify-center py-8"><Spinner /></div>
+                ) : bankAccounts.length === 0 ? (
+                  <div className="flex flex-col items-center py-10 text-center">
+                    <CreditCard className="h-8 w-8 text-muted-foreground mb-3" />
+                    <p className="text-sm text-muted-foreground">Aucun compte bancaire enregistre.</p>
+                    <p className="text-xs text-muted-foreground mt-1">Ajoutez un compte pour l&apos;afficher sur vos factures.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {bankAccounts.map((account) => (
+                      <div key={account.id} className="flex items-center gap-4 rounded-xl border border-border p-4 hover:bg-muted/30 transition-colors">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                          <Banknote className="h-5 w-5 text-primary" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium text-foreground truncate">{account.label}</p>
+                            {account.isDefault && <Badge variant="default" className="text-[10px] shrink-0">Par defaut</Badge>}
+                            {account.isEncrypted && <Badge variant="muted" className="text-[10px] shrink-0"><Shield className="h-2.5 w-2.5 mr-0.5" /> Chiffre</Badge>}
+                          </div>
+                          <div className="flex items-center gap-3 mt-0.5">
+                            {account.bankName && <span className="text-xs text-muted-foreground">{account.bankName}</span>}
+                            {account.ibanMasked && <span className="text-xs text-muted-foreground font-mono">{account.ibanMasked}</span>}
+                            {account.bicMasked && <span className="text-xs text-muted-foreground font-mono">{account.bicMasked}</span>}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            onClick={() => openBankDialog(account)}
+                            className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteBank(account.id)}
+                            disabled={bankDeleting === account.id}
+                            className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                          >
+                            {bankDeleting === account.id ? <Spinner className="h-3.5 w-3.5" /> : <Trash2 className="h-3.5 w-3.5" />}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             )}
           </CardContent>
         </Card>
       )}
+
+      {/* Bank account add/edit dialog */}
+      <Dialog open={bankDialogOpen} onClose={() => setBankDialogOpen(false)} className="max-w-md">
+        <DialogTitle>{bankEditId ? 'Modifier le compte bancaire' : 'Ajouter un compte bancaire'}</DialogTitle>
+        <div className="space-y-4 mt-4">
+          <Field>
+            <FieldLabel htmlFor="bankLabel">Libelle *</FieldLabel>
+            <Input
+              id="bankLabel"
+              value={bankForm.label}
+              onChange={(e) => setBankForm((p) => ({ ...p, label: e.target.value }))}
+              placeholder="Ex: Ma banque principale"
+            />
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="bankNameField">Nom de la banque</FieldLabel>
+            <Input
+              id="bankNameField"
+              value={bankForm.bankName}
+              onChange={(e) => setBankForm((p) => ({ ...p, bankName: e.target.value }))}
+              placeholder="Ex: BNP Paribas"
+            />
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="bankIban">IBAN</FieldLabel>
+            <Input
+              id="bankIban"
+              value={bankForm.iban}
+              onChange={(e) => setBankForm((p) => ({ ...p, iban: e.target.value }))}
+              placeholder="FR76 XXXX XXXX XXXX XXXX XXXX XXX"
+            />
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="bankBic">BIC / SWIFT</FieldLabel>
+            <Input
+              id="bankBic"
+              value={bankForm.bic}
+              onChange={(e) => setBankForm((p) => ({ ...p, bic: e.target.value }))}
+              placeholder="BNPAFRPP"
+            />
+          </Field>
+          <div className="space-y-3">
+            <label className="flex items-center gap-3 cursor-pointer">
+              <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-colors ${bankForm.isEncrypted ? 'bg-primary border-primary' : 'border-muted-foreground/30'}`}>
+                {bankForm.isEncrypted && (
+                  <svg className="h-3 w-3 text-primary-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+              </div>
+              <div>
+                <span className="text-sm font-medium text-foreground flex items-center gap-1.5"><Shield className="h-3.5 w-3.5" /> Chiffrement AES-256</span>
+                <span className="text-xs text-muted-foreground block">L&apos;IBAN et le BIC seront chiffres en base de donnees.</span>
+              </div>
+              <input type="checkbox" checked={bankForm.isEncrypted} onChange={(e) => setBankForm((p) => ({ ...p, isEncrypted: e.target.checked }))} className="sr-only" />
+            </label>
+            <label className="flex items-center gap-3 cursor-pointer">
+              <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-colors ${bankForm.isDefault ? 'bg-primary border-primary' : 'border-muted-foreground/30'}`}>
+                {bankForm.isDefault && (
+                  <svg className="h-3 w-3 text-primary-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+              </div>
+              <div>
+                <span className="text-sm font-medium text-foreground flex items-center gap-1.5"><Star className="h-3.5 w-3.5" /> Compte par defaut</span>
+                <span className="text-xs text-muted-foreground block">Ce compte sera selectionne par defaut sur les nouvelles factures.</span>
+              </div>
+              <input type="checkbox" checked={bankForm.isDefault} onChange={(e) => setBankForm((p) => ({ ...p, isDefault: e.target.checked }))} className="sr-only" />
+            </label>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" size="sm" onClick={() => setBankDialogOpen(false)}>Annuler</Button>
+          <Button size="sm" onClick={handleSaveBankAccount} disabled={bankSaving}>
+            {bankSaving ? <><Spinner className="h-3.5 w-3.5" /> Enregistrement...</> : bankEditId ? 'Mettre à jour' : 'Ajouter'}
+          </Button>
+        </DialogFooter>
+      </Dialog>
 
       {/* Payment tab */}
       {activeTab === 'payment' && (

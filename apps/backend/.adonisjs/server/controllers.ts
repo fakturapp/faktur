@@ -70,6 +70,7 @@ export const controllers = {
     },
     finance: {
       Bank: () => import('#controllers/company/finance/bank'),
+      BankAccounts: () => import('#controllers/company/finance/bank_accounts'),
     },
     media: {
       ServeLogo: () => import('#controllers/company/media/serve_logo'),
@@ -77,9 +78,9 @@ export const controllers = {
     },
   },
   dashboard: {
-    Charts: () => import('#controllers/dashboard/charts'),
     SidebarCounts: () => import('#controllers/dashboard/sidebar_counts'),
     Stats: () => import('#controllers/dashboard/stats'),
+    Charts: () => import('#controllers/dashboard/charts'),
   },
   einvoicing: {
     Submit: () => import('#controllers/einvoicing/submit'),

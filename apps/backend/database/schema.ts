@@ -61,6 +61,31 @@ export class AuthAccessTokenSchema extends BaseModel {
   declare userAgent: string | null
 }
 
+export class BankAccountSchema extends BaseModel {
+  static $columns = ['bankName', 'bic', 'createdAt', 'iban', 'id', 'isDefault', 'isEncrypted', 'label', 'teamId', 'updatedAt'] as const
+  $columns = BankAccountSchema.$columns
+  @column()
+  declare bankName: string | null
+  @column()
+  declare bic: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare iban: string | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare isDefault: boolean
+  @column()
+  declare isEncrypted: boolean
+  @column()
+  declare label: string
+  @column()
+  declare teamId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class ClientSchema extends BaseModel {
   static $columns = ['address', 'addressComplement', 'city', 'companyName', 'country', 'createdAt', 'email', 'firstName', 'id', 'includeInEmails', 'lastName', 'notes', 'phone', 'postalCode', 'siren', 'siret', 'teamId', 'type', 'updatedAt', 'vatNumber'] as const
   $columns = ClientSchema.$columns
@@ -256,12 +281,14 @@ export class InvoiceSettingSchema extends BaseModel {
 }
 
 export class InvoiceSchema extends BaseModel {
-  static $columns = ['accentColor', 'acceptanceConditions', 'billingType', 'clientId', 'clientSiren', 'clientVatNumber', 'comment', 'createdAt', 'deliveryAddress', 'documentTitle', 'dueDate', 'freeField', 'globalDiscountType', 'globalDiscountValue', 'id', 'invoiceNumber', 'issueDate', 'language', 'logoUrl', 'notes', 'paidDate', 'paymentTerms', 'signatureField', 'sourceQuoteId', 'status', 'subject', 'subtotal', 'taxAmount', 'teamId', 'total', 'updatedAt'] as const
+  static $columns = ['accentColor', 'acceptanceConditions', 'bankAccountId', 'billingType', 'clientId', 'clientSiren', 'clientVatNumber', 'comment', 'createdAt', 'deliveryAddress', 'documentTitle', 'dueDate', 'freeField', 'globalDiscountType', 'globalDiscountValue', 'id', 'invoiceNumber', 'issueDate', 'language', 'logoUrl', 'notes', 'paidDate', 'paymentMethod', 'paymentTerms', 'signatureField', 'sourceQuoteId', 'status', 'subject', 'subtotal', 'taxAmount', 'teamId', 'total', 'updatedAt'] as const
   $columns = InvoiceSchema.$columns
   @column()
   declare accentColor: string
   @column()
   declare acceptanceConditions: string | null
+  @column()
+  declare bankAccountId: string | null
   @column()
   declare billingType: string
   @column()
@@ -300,6 +327,8 @@ export class InvoiceSchema extends BaseModel {
   declare notes: string | null
   @column.date()
   declare paidDate: DateTime | null
+  @column()
+  declare paymentMethod: string | null
   @column()
   declare paymentTerms: string | null
   @column()

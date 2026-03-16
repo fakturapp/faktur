@@ -79,6 +79,8 @@ export default class Update {
         taxAmount: Math.round(taxAmount * 100) / 100,
         total: Math.round(total * 100) / 100,
         paymentTerms: payload.paymentTerms || null,
+        paymentMethod: payload.paymentMethod || null,
+        bankAccountId: payload.bankAccountId || null,
       })
       await invoice.save()
 

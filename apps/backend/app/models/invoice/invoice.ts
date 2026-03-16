@@ -4,6 +4,7 @@ import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import Team from '#models/team/team'
 import Client from '#models/client/client'
 import InvoiceLine from '#models/invoice/invoice_line'
+import BankAccount from '#models/team/bank_account'
 
 export default class Invoice extends BaseModel {
   @column({ isPrimary: true })
@@ -93,6 +94,12 @@ export default class Invoice extends BaseModel {
   @column()
   declare comment: string | null
 
+  @column()
+  declare paymentMethod: string | null
+
+  @column()
+  declare bankAccountId: string | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
@@ -107,4 +114,7 @@ export default class Invoice extends BaseModel {
 
   @hasMany(() => InvoiceLine)
   declare lines: HasMany<typeof InvoiceLine>
+
+  @belongsTo(() => BankAccount)
+  declare bankAccount: BelongsTo<typeof BankAccount>
 }

@@ -4,6 +4,7 @@ import type { BelongsTo, HasMany, HasOne } from '@adonisjs/lucid/types/relations
 import User from '#models/account/user'
 import TeamMember from '#models/team/team_member'
 import Company from '#models/team/company'
+import BankAccount from '#models/team/bank_account'
 
 export default class Team extends BaseModel {
   @column({ isPrimary: true })
@@ -32,4 +33,7 @@ export default class Team extends BaseModel {
 
   @hasOne(() => Company)
   declare company: HasOne<typeof Company>
+
+  @hasMany(() => BankAccount)
+  declare bankAccounts: HasMany<typeof BankAccount>
 }

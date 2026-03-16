@@ -66,6 +66,13 @@ export interface ApiDefinition {
   companyUpdate: typeof routes['company_update']
   companyBank: typeof routes['company_bank']
   uploadLogo: typeof routes['upload_logo']
+  bankAccounts: {
+    index: typeof routes['bank_accounts.index']
+    show: typeof routes['bank_accounts.show']
+    store: typeof routes['bank_accounts.store']
+    update: typeof routes['bank_accounts.update']
+    destroy: typeof routes['bank_accounts.destroy']
+  }
   searchSiren: typeof routes['search_siren']
   clientList: typeof routes['client_list']
   clientShow: typeof routes['client_show']

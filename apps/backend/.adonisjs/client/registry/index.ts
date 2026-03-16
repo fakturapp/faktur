@@ -360,6 +360,36 @@ const routes = {
     tokens: [{"old":"/api/v1/company/logo","type":0,"val":"api","end":""},{"old":"/api/v1/company/logo","type":0,"val":"v1","end":""},{"old":"/api/v1/company/logo","type":0,"val":"company","end":""},{"old":"/api/v1/company/logo","type":0,"val":"logo","end":""}],
     types: placeholder as Registry['upload_logo']['types'],
   },
+  'bank_accounts.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/company/bank-accounts',
+    tokens: [{"old":"/api/v1/company/bank-accounts","type":0,"val":"api","end":""},{"old":"/api/v1/company/bank-accounts","type":0,"val":"v1","end":""},{"old":"/api/v1/company/bank-accounts","type":0,"val":"company","end":""},{"old":"/api/v1/company/bank-accounts","type":0,"val":"bank-accounts","end":""}],
+    types: placeholder as Registry['bank_accounts.index']['types'],
+  },
+  'bank_accounts.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/company/bank-accounts/:id',
+    tokens: [{"old":"/api/v1/company/bank-accounts/:id","type":0,"val":"api","end":""},{"old":"/api/v1/company/bank-accounts/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/company/bank-accounts/:id","type":0,"val":"company","end":""},{"old":"/api/v1/company/bank-accounts/:id","type":0,"val":"bank-accounts","end":""},{"old":"/api/v1/company/bank-accounts/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['bank_accounts.show']['types'],
+  },
+  'bank_accounts.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/company/bank-accounts',
+    tokens: [{"old":"/api/v1/company/bank-accounts","type":0,"val":"api","end":""},{"old":"/api/v1/company/bank-accounts","type":0,"val":"v1","end":""},{"old":"/api/v1/company/bank-accounts","type":0,"val":"company","end":""},{"old":"/api/v1/company/bank-accounts","type":0,"val":"bank-accounts","end":""}],
+    types: placeholder as Registry['bank_accounts.store']['types'],
+  },
+  'bank_accounts.update': {
+    methods: ["PUT"],
+    pattern: '/api/v1/company/bank-accounts/:id',
+    tokens: [{"old":"/api/v1/company/bank-accounts/:id","type":0,"val":"api","end":""},{"old":"/api/v1/company/bank-accounts/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/company/bank-accounts/:id","type":0,"val":"company","end":""},{"old":"/api/v1/company/bank-accounts/:id","type":0,"val":"bank-accounts","end":""},{"old":"/api/v1/company/bank-accounts/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['bank_accounts.update']['types'],
+  },
+  'bank_accounts.destroy': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/company/bank-accounts/:id',
+    tokens: [{"old":"/api/v1/company/bank-accounts/:id","type":0,"val":"api","end":""},{"old":"/api/v1/company/bank-accounts/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/company/bank-accounts/:id","type":0,"val":"company","end":""},{"old":"/api/v1/company/bank-accounts/:id","type":0,"val":"bank-accounts","end":""},{"old":"/api/v1/company/bank-accounts/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['bank_accounts.destroy']['types'],
+  },
   'search_siren': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/clients/search-siren',

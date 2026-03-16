@@ -103,6 +103,8 @@ export default class Create {
           total: Math.round(total * 100) / 100,
           sourceQuoteId: payload.sourceQuoteId || null,
           paymentTerms: payload.paymentTerms || null,
+          paymentMethod: payload.paymentMethod || null,
+          bankAccountId: payload.bankAccountId || null,
         },
         { client: trx }
       )

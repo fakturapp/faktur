@@ -63,6 +63,11 @@ export type ScannedRoutes = {
     'company_update': { paramsTuple?: []; params?: {} }
     'company_bank': { paramsTuple?: []; params?: {} }
     'upload_logo': { paramsTuple?: []; params?: {} }
+    'bank_accounts.index': { paramsTuple?: []; params?: {} }
+    'bank_accounts.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bank_accounts.store': { paramsTuple?: []; params?: {} }
+    'bank_accounts.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bank_accounts.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'search_siren': { paramsTuple?: []; params?: {} }
     'client_list': { paramsTuple?: []; params?: {} }
     'client_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -133,6 +138,7 @@ export type ScannedRoutes = {
     'accept_invite': { paramsTuple?: []; params?: {} }
     'transfer_ownership': { paramsTuple?: []; params?: {} }
     'upload_logo': { paramsTuple?: []; params?: {} }
+    'bank_accounts.store': { paramsTuple?: []; params?: {} }
     'client_create': { paramsTuple?: []; params?: {} }
     'invoice_logo_upload': { paramsTuple?: []; params?: {} }
     'quote_set_next_number': { paramsTuple?: []; params?: {} }
@@ -164,6 +170,8 @@ export type ScannedRoutes = {
     'invite_info': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'serve_logo': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'company_show': { paramsTuple?: []; params?: {} }
+    'bank_accounts.index': { paramsTuple?: []; params?: {} }
+    'bank_accounts.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'search_siren': { paramsTuple?: []; params?: {} }
     'client_list': { paramsTuple?: []; params?: {} }
     'client_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -202,6 +210,8 @@ export type ScannedRoutes = {
     'invite_info': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'serve_logo': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'company_show': { paramsTuple?: []; params?: {} }
+    'bank_accounts.index': { paramsTuple?: []; params?: {} }
+    'bank_accounts.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'search_siren': { paramsTuple?: []; params?: {} }
     'client_list': { paramsTuple?: []; params?: {} }
     'client_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -227,6 +237,7 @@ export type ScannedRoutes = {
     'update_role': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'company_update': { paramsTuple?: []; params?: {} }
     'company_bank': { paramsTuple?: []; params?: {} }
+    'bank_accounts.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'client_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_settings_update': { paramsTuple?: []; params?: {} }
     'quote_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -238,6 +249,7 @@ export type ScannedRoutes = {
     'team_delete': { paramsTuple?: []; params?: {} }
     'revoke_invite': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'remove_member': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bank_accounts.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'client_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'quote_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

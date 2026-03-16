@@ -715,6 +715,66 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/company/media/upload_logo').default['handle']>>>
     }
   }
+  'bank_accounts.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/company/bank-accounts'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/company/finance/bank_accounts').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/company/finance/bank_accounts').default['index']>>>
+    }
+  }
+  'bank_accounts.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/company/bank-accounts/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/company/finance/bank_accounts').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/company/finance/bank_accounts').default['show']>>>
+    }
+  }
+  'bank_accounts.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/company/bank-accounts'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/company/bank_account_validators').createBankAccountValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/company/bank_account_validators').createBankAccountValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/company/finance/bank_accounts').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/company/finance/bank_accounts').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'bank_accounts.update': {
+    methods: ["PUT"]
+    pattern: '/api/v1/company/bank-accounts/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/company/bank_account_validators').updateBankAccountValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/company/bank_account_validators').updateBankAccountValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/company/finance/bank_accounts').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/company/finance/bank_accounts').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'bank_accounts.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/company/bank-accounts/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/company/finance/bank_accounts').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/company/finance/bank_accounts').default['destroy']>>>
+    }
+  }
   'search_siren': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/clients/search-siren'
