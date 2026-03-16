@@ -15,11 +15,6 @@ class EmailService {
   private fromEmail = 'noreply@authguard.net'
   private fromName = 'Faktur'
 
-  /** Base URL for email static assets served by the frontend */
-  private get assetsUrl() {
-    return `${this.frontendUrl}/email`
-  }
-
   private wrapHtml(content: string, title: string) {
     return `
 <!DOCTYPE html>
@@ -40,11 +35,8 @@ class EmailService {
     <table width="520" cellpadding="0" cellspacing="0" border="0" style="max-width: 520px; width: 100%; background: #141118; border: 1px solid rgba(99,102,241,0.12); border-radius: 20px; overflow: hidden; box-shadow: 0 0 80px rgba(99,102,241,0.06), 0 4px 32px rgba(0,0,0,0.4);">
 
       <!-- Header -->
-      <tr><td style="padding: 36px 40px 28px; text-align: center; background: linear-gradient(180deg, rgba(99,102,241,0.08) 0%, transparent 100%);">
-        <a href="${this.frontendUrl}" style="text-decoration: none; display: inline-block;">
-          <img src="${this.frontendUrl}/logo.svg" alt="Faktur" width="52" height="52" style="width: 52px; height: 52px; display: block; margin: 0 auto 8px;">
-          <span style="font-size: 22px; font-weight: 700; color: #ffffff; letter-spacing: -0.5px; display: block;">Faktur</span>
-        </a>
+      <tr><td style="padding: 32px 40px 24px; text-align: center; background: linear-gradient(180deg, rgba(99,102,241,0.08) 0%, transparent 100%);">
+        <a href="${this.frontendUrl}" style="text-decoration: none; font-size: 24px; font-weight: 700; color: #ffffff; letter-spacing: -0.5px;">Faktur</a>
       </td></tr>
 
       <!-- Divider -->
@@ -73,19 +65,10 @@ class EmailService {
 </html>`
   }
 
-  private iconBadge(iconFile: string, bgColor: string, borderColor: string) {
-    return `<table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td align="center" style="padding-bottom: 24px;">
-      <div style="width: 56px; height: 56px; border-radius: 16px; background: ${bgColor}; border: 1px solid ${borderColor}; text-align: center; line-height: 56px;">
-        <img src="${this.assetsUrl}/${iconFile}" alt="" width="26" height="26" style="width: 26px; height: 26px; vertical-align: middle; display: inline-block;">
-      </div>
-    </td></tr></table>`
-  }
-
-  private infoBox(iconFile: string, text: string, bgColor: string, borderColor: string, textColor: string) {
+  private infoBox(text: string, bgColor: string, borderColor: string, textColor: string) {
     return `<table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 24px 0;"><tr>
       <td style="border-radius: 12px; padding: 16px 20px; font-size: 14px; line-height: 1.6; background: ${bgColor}; border: 1px solid ${borderColor}; color: ${textColor};">
-        <img src="${this.assetsUrl}/${iconFile}" alt="" width="16" height="16" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 8px; display: inline-block;">
-        <span style="vertical-align: middle;">${text}</span>
+        ${text}
       </td>
     </tr></table>`
   }
@@ -133,7 +116,6 @@ class EmailService {
     const verifyUrl = `${this.frontendUrl}/verify-email?token=${token}`
 
     const content = `
-      ${this.iconBadge('icon-envelope.svg', 'rgba(99,102,241,0.12)', 'rgba(99,102,241,0.2)')}
       <h1 style="margin: 0 0 12px; font-size: 22px; font-weight: 700; color: #ffffff; letter-spacing: -0.3px; line-height: 1.3; text-align: center;">V&eacute;rifiez votre adresse email</h1>
       <p style="margin: 0 0 24px; font-size: 15px; line-height: 1.7; color: #a1a1aa; text-align: center;">
         Bonjour${name ? ` <span style="color: #c7d2fe; font-weight: 500;">${name}</span>` : ''},<br><br>
@@ -156,14 +138,13 @@ class EmailService {
     const resetUrl = `${this.frontendUrl}/reset-password?token=${token}`
 
     const content = `
-      ${this.iconBadge('icon-lock.svg', 'rgba(245,158,11,0.12)', 'rgba(245,158,11,0.2)')}
       <h1 style="margin: 0 0 12px; font-size: 22px; font-weight: 700; color: #ffffff; letter-spacing: -0.3px; line-height: 1.3; text-align: center;">R&eacute;initialisez votre mot de passe</h1>
       <p style="margin: 0 0 24px; font-size: 15px; line-height: 1.7; color: #a1a1aa; text-align: center;">
         Bonjour${name ? ` <span style="color: #c7d2fe; font-weight: 500;">${name}</span>` : ''},<br><br>
         Nous avons re&ccedil;u une demande de r&eacute;initialisation de votre mot de passe. Cliquez sur le bouton ci-dessous pour en choisir un nouveau.
       </p>
       ${this.ctaButton(resetUrl, 'R&eacute;initialiser le mot de passe')}
-      ${this.infoBox('icon-warning.svg', "Si vous n'&ecirc;tes pas &agrave; l'origine de cette demande, ignorez cet email. Votre mot de passe restera inchang&eacute;.", 'rgba(245,158,11,0.08)', 'rgba(245,158,11,0.15)', '#fbbf24')}
+      ${this.infoBox("Si vous n'&ecirc;tes pas &agrave; l'origine de cette demande, ignorez cet email. Votre mot de passe restera inchang&eacute;.", 'rgba(245,158,11,0.08)', 'rgba(245,158,11,0.15)', '#fbbf24')}
       ${this.validityTag('Valide 10 minutes')}
       ${this.linkFallback(resetUrl)}
     `
@@ -178,7 +159,6 @@ class EmailService {
 
   async sendSecurityCodeEmail(email: string, code: string, name?: string): Promise<void> {
     const content = `
-      ${this.iconBadge('icon-shield.svg', 'rgba(99,102,241,0.12)', 'rgba(99,102,241,0.2)')}
       <h1 style="margin: 0 0 12px; font-size: 22px; font-weight: 700; color: #ffffff; letter-spacing: -0.3px; line-height: 1.3; text-align: center;">Code de v&eacute;rification</h1>
       <p style="margin: 0 0 24px; font-size: 15px; line-height: 1.7; color: #a1a1aa; text-align: center;">
         Bonjour${name ? ` <span style="color: #c7d2fe; font-weight: 500;">${name}</span>` : ''},<br><br>
@@ -204,13 +184,12 @@ class EmailService {
 
   async sendTeamInviteEmail(email: string, inviterName: string, inviteUrl: string): Promise<void> {
     const content = `
-      ${this.iconBadge('icon-users.svg', 'rgba(59,130,246,0.12)', 'rgba(59,130,246,0.2)')}
       <h1 style="margin: 0 0 12px; font-size: 22px; font-weight: 700; color: #ffffff; letter-spacing: -0.3px; line-height: 1.3; text-align: center;">Invitation &agrave; rejoindre une &eacute;quipe</h1>
       <p style="margin: 0 0 24px; font-size: 15px; line-height: 1.7; color: #a1a1aa; text-align: center;">
         <span style="color: #c7d2fe; font-weight: 500;">${inviterName}</span> vous invite &agrave; rejoindre son &eacute;quipe sur Faktur.
       </p>
       ${this.ctaButton(inviteUrl, "Accepter l'invitation")}
-      ${this.infoBox('icon-info.svg', "Si vous n'avez pas encore de compte Faktur, vous pourrez en cr&eacute;er un apr&egrave;s avoir cliqu&eacute; sur le lien.", 'rgba(59,130,246,0.08)', 'rgba(59,130,246,0.15)', '#60a5fa')}
+      ${this.infoBox("Si vous n'avez pas encore de compte Faktur, vous pourrez en cr&eacute;er un apr&egrave;s avoir cliqu&eacute; sur le lien.", 'rgba(59,130,246,0.08)', 'rgba(59,130,246,0.15)', '#60a5fa')}
       ${this.linkFallback(inviteUrl)}
     `
 
@@ -224,14 +203,13 @@ class EmailService {
 
   async sendTwoFactorEnabledEmail(email: string, name?: string): Promise<void> {
     const content = `
-      ${this.iconBadge('icon-check.svg', 'rgba(34,197,94,0.12)', 'rgba(34,197,94,0.2)')}
       <h1 style="margin: 0 0 12px; font-size: 22px; font-weight: 700; color: #ffffff; letter-spacing: -0.3px; line-height: 1.3; text-align: center;">Double authentification activ&eacute;e</h1>
       <p style="margin: 0 0 24px; font-size: 15px; line-height: 1.7; color: #a1a1aa; text-align: center;">
         Bonjour${name ? ` <span style="color: #c7d2fe; font-weight: 500;">${name}</span>` : ''},<br><br>
         La double authentification (2FA) a &eacute;t&eacute; activ&eacute;e sur votre compte avec succ&egrave;s.
       </p>
-      ${this.infoBox('icon-shield-check.svg', "Votre compte est d&eacute;sormais mieux prot&eacute;g&eacute;. Un code de v&eacute;rification vous sera demand&eacute; &agrave; chaque connexion.", 'rgba(34,197,94,0.08)', 'rgba(34,197,94,0.15)', '#4ade80')}
-      ${this.infoBox('icon-warning.svg', "Si vous n'&ecirc;tes pas &agrave; l'origine de cette modification, contactez le support imm&eacute;diatement.", 'rgba(245,158,11,0.08)', 'rgba(245,158,11,0.15)', '#fbbf24')}
+      ${this.infoBox("Votre compte est d&eacute;sormais mieux prot&eacute;g&eacute;. Un code de v&eacute;rification vous sera demand&eacute; &agrave; chaque connexion.", 'rgba(34,197,94,0.08)', 'rgba(34,197,94,0.15)', '#4ade80')}
+      ${this.infoBox("Si vous n'&ecirc;tes pas &agrave; l'origine de cette modification, contactez le support imm&eacute;diatement.", 'rgba(245,158,11,0.08)', 'rgba(245,158,11,0.15)', '#fbbf24')}
     `
 
     await this.send({
