@@ -158,6 +158,24 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+      {/* Welcome banner */}
+      <div className="px-4 lg:px-6">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-500 p-6 md:p-8">
+          <div className="relative z-10">
+            <h1 className="text-xl md:text-2xl font-bold text-white">
+              Bonjour{user?.fullName ? `, ${user.fullName.split(' ')[0]}` : ''} !
+            </h1>
+            <p className="mt-1 text-sm text-indigo-100/80">
+              Voici un apercu de votre activite.
+            </p>
+          </div>
+          {/* Decorative circles */}
+          <div className="absolute -right-6 -top-6 h-32 w-32 rounded-full bg-white/10" />
+          <div className="absolute -right-2 top-8 h-20 w-20 rounded-full bg-white/5" />
+          <div className="absolute right-24 -bottom-4 h-16 w-16 rounded-full bg-white/5" />
+        </div>
+      </div>
+
       <SectionCards cards={statCards} />
       <div className="px-4 lg:px-6">
         <ChartRevenue data={chartData} />

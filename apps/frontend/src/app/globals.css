@@ -140,6 +140,25 @@ body {
   animation: skeleton-shimmer 2.5s ease-in-out infinite;
 }
 
+/* Download shimmer effect for PDF buttons */
+.download-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.download-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 25%,
+    rgba(99, 102, 241, 0.15) 50%,
+    transparent 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
