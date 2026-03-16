@@ -15,101 +15,241 @@ class EmailService {
   private fromEmail = 'noreply@authguard.net'
   private fromName = 'Faktur'
 
-  private get baseStyle() {
+  private wrapHtml(content: string, title: string) {
     return `
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background-color: #09090b;
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <meta name="supported-color-schemes" content="dark">
+  <title>${title}</title>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+  <style>
+    :root { color-scheme: dark; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: #0c0a13;
       color: #fafafa;
       margin: 0;
       padding: 0;
       width: 100%;
       -webkit-font-smoothing: antialiased;
-    `
-  }
-
-  private wrapHtml(content: string, title: string) {
-    return `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${title}</title>
-  <style>
-    body { ${this.baseStyle} }
+      -webkit-text-size-adjust: 100%;
+    }
+    .outer-wrap { padding: 40px 16px; }
     .container {
-      max-width: 480px;
-      margin: 40px auto;
-      background: #18181b;
-      border: 1px solid #27272a;
-      border-radius: 16px;
+      max-width: 520px;
+      margin: 0 auto;
+      background: #141118;
+      border: 1px solid rgba(99, 102, 241, 0.12);
+      border-radius: 20px;
       overflow: hidden;
+      box-shadow: 0 0 80px rgba(99, 102, 241, 0.06), 0 4px 32px rgba(0,0,0,0.4);
     }
     .header {
-      padding: 32px;
+      padding: 36px 40px 28px;
       text-align: center;
-      border-bottom: 1px solid #27272a;
+      background: linear-gradient(180deg, rgba(99, 102, 241, 0.08) 0%, transparent 100%);
     }
-    .logo {
-      font-size: 24px;
+    .logo-img {
+      width: 52px;
+      height: 52px;
+      margin-bottom: 8px;
+    }
+    .logo-text {
+      font-size: 22px;
       font-weight: 700;
-      color: #fff;
+      color: #ffffff;
       text-decoration: none;
       letter-spacing: -0.5px;
+      display: block;
     }
-    .content { padding: 32px; }
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.25), transparent);
+      margin: 0 40px;
+    }
+    .content { padding: 36px 40px; }
+    .icon-badge {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      font-size: 28px;
+      line-height: 1;
+    }
+    .icon-badge-indigo { background: rgba(99, 102, 241, 0.12); border: 1px solid rgba(99, 102, 241, 0.2); }
+    .icon-badge-amber { background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.2); }
+    .icon-badge-green { background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.2); }
+    .icon-badge-blue { background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.2); }
     .h1 {
-      margin: 0 0 16px;
-      font-size: 20px;
-      font-weight: 600;
-      color: #fff;
+      margin: 0 0 12px;
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.3px;
+      line-height: 1.3;
     }
     .text {
       margin: 0 0 24px;
       font-size: 15px;
-      line-height: 1.6;
+      line-height: 1.7;
       color: #a1a1aa;
     }
+    .text-small {
+      margin: 0 0 20px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #71717a;
+    }
+    .name-highlight {
+      color: #c7d2fe;
+      font-weight: 500;
+    }
+    .button-wrap { margin: 28px 0; text-align: center; }
     .button {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-      color: #fff;
+      display: inline-block;
+      padding: 14px 36px;
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #4338ca 100%);
+      color: #ffffff !important;
       text-align: center;
       text-decoration: none;
-      font-weight: 500;
+      font-weight: 600;
       font-size: 15px;
-      border-radius: 8px;
-      box-sizing: border-box;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+      letter-spacing: 0.2px;
+    }
+    .code-box {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(79, 70, 229, 0.04));
+      border: 1px solid rgba(99, 102, 241, 0.15);
+      border-radius: 16px;
+      padding: 28px;
+      text-align: center;
+      margin: 28px 0;
+    }
+    .code-digits {
+      margin: 0;
+      font-size: 40px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: 12px;
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    }
+    .code-label {
+      margin: 12px 0 0;
+      font-size: 12px;
+      color: #6366f1;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+    .info-box {
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 24px 0;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .info-box-green {
+      background: rgba(34, 197, 94, 0.08);
+      border: 1px solid rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+    }
+    .info-box-amber {
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+    }
+    .info-box-icon { margin-right: 8px; font-size: 16px; }
+    .link-fallback {
+      margin: 24px 0 0;
+      padding: 16px 20px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+    }
+    .link-fallback-label {
+      margin: 0 0 6px;
+      font-size: 11px;
+      color: #52525b;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 500;
+    }
+    .link-fallback a {
+      color: #818cf8;
+      text-decoration: none;
+      font-size: 13px;
+      word-break: break-all;
+      line-height: 1.5;
     }
     .footer {
-      padding: 24px;
-      background: #09090b;
-      border-top: 1px solid #27272a;
+      padding: 28px 40px;
+      background: rgba(0,0,0,0.2);
+      border-top: 1px solid rgba(255,255,255,0.04);
       text-align: center;
     }
     .footer-text {
       margin: 0;
       font-size: 12px;
-      color: #52525b;
+      color: #3f3f46;
+      line-height: 1.6;
     }
-    .link { color: #6366f1; text-decoration: none; }
+    .footer-link { color: #52525b; text-decoration: none; }
+    .footer-brand {
+      margin: 0 0 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #52525b;
+      letter-spacing: -0.3px;
+    }
+    .validity-tag {
+      display: inline-block;
+      padding: 4px 12px;
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.15);
+      border-radius: 20px;
+      font-size: 12px;
+      color: #818cf8;
+      font-weight: 500;
+      margin-top: 4px;
+    }
   </style>
 </head>
-<body>
-  <div class="container">
-    <div class="header">
-      <a href="${this.frontendUrl}" class="logo">${this.fromName}</a>
-    </div>
-    <div class="content">
-      ${content}
-    </div>
-    <div class="footer">
-      <p class="footer-text">
-        &copy; ${new Date().getFullYear()} ${this.fromName}. All rights reserved.<br>
-        If you didn't request this email, you can safely ignore it.
-      </p>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #0c0a13; color: #fafafa; margin: 0; padding: 0; width: 100%; -webkit-font-smoothing: antialiased;">
+  <div class="outer-wrap" style="padding: 40px 16px;">
+    <div class="container" style="max-width: 520px; margin: 0 auto; background: #141118; border: 1px solid rgba(99, 102, 241, 0.12); border-radius: 20px; overflow: hidden;">
+      <div class="header" style="padding: 36px 40px 28px; text-align: center; background: linear-gradient(180deg, rgba(99, 102, 241, 0.08) 0%, transparent 100%);">
+        <a href="${this.frontendUrl}" style="text-decoration: none;">
+          <img src="${this.frontendUrl}/logo.svg" alt="Faktur" class="logo-img" width="52" height="52" style="width: 52px; height: 52px; margin-bottom: 8px; display: inline-block;">
+          <span class="logo-text" style="font-size: 22px; font-weight: 700; color: #ffffff; letter-spacing: -0.5px; display: block;">Faktur</span>
+        </a>
+      </div>
+      <div class="divider" style="height: 1px; background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.25), transparent); margin: 0 40px;"></div>
+      <div class="content" style="padding: 36px 40px;">
+        ${content}
+      </div>
+      <div class="footer" style="padding: 28px 40px; background: rgba(0,0,0,0.2); border-top: 1px solid rgba(255,255,255,0.04); text-align: center;">
+        <p class="footer-brand" style="margin: 0 0 8px; font-size: 13px; font-weight: 600; color: #52525b; letter-spacing: -0.3px;">Faktur</p>
+        <p class="footer-text" style="margin: 0; font-size: 12px; color: #3f3f46; line-height: 1.6;">
+          Facturation simple et gratuite.<br>
+          &copy; ${new Date().getFullYear()} Faktur &mdash; Tous droits r&eacute;serv&eacute;s.
+        </p>
+      </div>
     </div>
   </div>
 </body>
@@ -140,26 +280,31 @@ class EmailService {
     const verifyUrl = `${this.frontendUrl}/verify-email?token=${token}`
 
     const content = `
-      <h1 class="h1">Verify your email address</h1>
-      <p class="text">
-        Hi${name ? ` ${name}` : ''},<br><br>
-        Thanks for joining Faktur. To complete your account setup, please verify your email address.
+      <div class="icon-badge icon-badge-indigo" style="width: 56px; height: 56px; border-radius: 16px; display: block; margin-bottom: 24px; font-size: 28px; line-height: 56px; text-align: center; background: rgba(99, 102, 241, 0.12); border: 1px solid rgba(99, 102, 241, 0.2);">
+        &#9993;
+      </div>
+      <h1 class="h1" style="margin: 0 0 12px; font-size: 22px; font-weight: 700; color: #ffffff;">V&eacute;rifiez votre adresse email</h1>
+      <p class="text" style="margin: 0 0 24px; font-size: 15px; line-height: 1.7; color: #a1a1aa;">
+        Bonjour${name ? ` <span class="name-highlight" style="color: #c7d2fe; font-weight: 500;">${name}</span>` : ''},<br><br>
+        Merci d'avoir rejoint Faktur ! Pour finaliser la cr&eacute;ation de votre compte, veuillez confirmer votre adresse email.
       </p>
-      <a href="${verifyUrl}" class="button">Verify Email Address</a>
-      <p class="text" style="margin-top: 24px; font-size: 13px;">
-        This link is valid for <strong>10 minutes</strong> and can only be used once.
+      <div class="button-wrap" style="margin: 28px 0; text-align: center;">
+        <a href="${verifyUrl}" class="button" style="display: inline-block; padding: 14px 36px; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #4338ca 100%); color: #ffffff; text-align: center; text-decoration: none; font-weight: 600; font-size: 15px; border-radius: 12px;">V&eacute;rifier mon email</a>
+      </div>
+      <p class="text-small" style="margin: 0 0 20px; font-size: 13px; line-height: 1.6; color: #71717a;">
+        <span class="validity-tag" style="display: inline-block; padding: 4px 12px; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 20px; font-size: 12px; color: #818cf8; font-weight: 500;">Valide 10 minutes</span>
       </p>
-      <p class="text" style="margin-bottom: 0; font-size: 13px;">
-        Or paste this link in your browser:<br>
-        <a href="${verifyUrl}" class="link" style="word-break: break-all;">${verifyUrl}</a>
-      </p>
+      <div class="link-fallback" style="margin: 24px 0 0; padding: 16px 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px;">
+        <p class="link-fallback-label" style="margin: 0 0 6px; font-size: 11px; color: #52525b; text-transform: uppercase; letter-spacing: 1px; font-weight: 500;">Ou copiez ce lien</p>
+        <a href="${verifyUrl}" style="color: #818cf8; text-decoration: none; font-size: 13px; word-break: break-all; line-height: 1.5;">${verifyUrl}</a>
+      </div>
     `
 
     await this.send({
       to: email,
-      subject: 'Verify your email address - Faktur',
-      html: this.wrapHtml(content, 'Verify Email'),
-      text: `Verify your email: ${verifyUrl}`,
+      subject: 'Vérifiez votre email - Faktur',
+      html: this.wrapHtml(content, 'Vérification email'),
+      text: `Vérifiez votre email : ${verifyUrl}`,
     })
   }
 
@@ -167,100 +312,119 @@ class EmailService {
     const resetUrl = `${this.frontendUrl}/reset-password?token=${token}`
 
     const content = `
-      <h1 class="h1">Reset your password</h1>
-      <p class="text">
-        Hi${name ? ` ${name}` : ''},<br><br>
-        We received a request to reset your password. Click the button below to choose a new password.
+      <div class="icon-badge icon-badge-amber" style="width: 56px; height: 56px; border-radius: 16px; display: block; margin-bottom: 24px; font-size: 28px; line-height: 56px; text-align: center; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.2);">
+        &#128274;
+      </div>
+      <h1 class="h1" style="margin: 0 0 12px; font-size: 22px; font-weight: 700; color: #ffffff;">R&eacute;initialisez votre mot de passe</h1>
+      <p class="text" style="margin: 0 0 24px; font-size: 15px; line-height: 1.7; color: #a1a1aa;">
+        Bonjour${name ? ` <span class="name-highlight" style="color: #c7d2fe; font-weight: 500;">${name}</span>` : ''},<br><br>
+        Nous avons re&ccedil;u une demande de r&eacute;initialisation de votre mot de passe. Cliquez sur le bouton ci-dessous pour en choisir un nouveau.
       </p>
-      <a href="${resetUrl}" class="button">Reset Password</a>
-      <p class="text" style="margin-top: 24px; font-size: 13px;">
-        This link is valid for <strong>10 minutes</strong>. If you didn't request a password reset, you can safely ignore this email.
+      <div class="button-wrap" style="margin: 28px 0; text-align: center;">
+        <a href="${resetUrl}" class="button" style="display: inline-block; padding: 14px 36px; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #4338ca 100%); color: #ffffff; text-align: center; text-decoration: none; font-weight: 600; font-size: 15px; border-radius: 12px;">R&eacute;initialiser le mot de passe</a>
+      </div>
+      <div class="info-box info-box-amber" style="border-radius: 12px; padding: 16px 20px; margin: 24px 0; font-size: 14px; line-height: 1.6; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.15); color: #fbbf24;">
+        <span class="info-box-icon">&#9888;&#65039;</span> Si vous n'&ecirc;tes pas &agrave; l'origine de cette demande, ignorez cet email. Votre mot de passe restera inchang&eacute;.
+      </div>
+      <p class="text-small" style="margin: 0 0 20px; font-size: 13px; line-height: 1.6; color: #71717a;">
+        <span class="validity-tag" style="display: inline-block; padding: 4px 12px; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 20px; font-size: 12px; color: #818cf8; font-weight: 500;">Valide 10 minutes</span>
       </p>
-      <p class="text" style="margin-bottom: 0; font-size: 13px;">
-        Or paste this link in your browser:<br>
-        <a href="${resetUrl}" class="link" style="word-break: break-all;">${resetUrl}</a>
-      </p>
+      <div class="link-fallback" style="margin: 24px 0 0; padding: 16px 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px;">
+        <p class="link-fallback-label" style="margin: 0 0 6px; font-size: 11px; color: #52525b; text-transform: uppercase; letter-spacing: 1px; font-weight: 500;">Ou copiez ce lien</p>
+        <a href="${resetUrl}" style="color: #818cf8; text-decoration: none; font-size: 13px; word-break: break-all; line-height: 1.5;">${resetUrl}</a>
+      </div>
     `
 
     await this.send({
       to: email,
-      subject: 'Reset your password - Faktur',
-      html: this.wrapHtml(content, 'Reset Password'),
-      text: `Reset your password: ${resetUrl}`,
+      subject: 'Réinitialisation du mot de passe - Faktur',
+      html: this.wrapHtml(content, 'Réinitialisation mot de passe'),
+      text: `Réinitialisez votre mot de passe : ${resetUrl}`,
     })
   }
 
   async sendSecurityCodeEmail(email: string, code: string, name?: string): Promise<void> {
     const content = `
-      <h1 class="h1">Security verification code</h1>
-      <p class="text">
-        Hi${name ? ` ${name}` : ''},<br><br>
-        You requested a security verification code. Use the code below to confirm your action.
-      </p>
-      <div style="background: #27272a; border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 24px;">
-        <p style="margin: 0; font-size: 32px; font-weight: 700; color: #fff; letter-spacing: 8px; font-family: monospace;">
-          ${code}
-        </p>
+      <div class="icon-badge icon-badge-indigo" style="width: 56px; height: 56px; border-radius: 16px; display: block; margin-bottom: 24px; font-size: 28px; line-height: 56px; text-align: center; background: rgba(99, 102, 241, 0.12); border: 1px solid rgba(99, 102, 241, 0.2);">
+        &#128737;
       </div>
-      <p class="text" style="font-size: 13px;">
-        This code is valid for <strong>5 minutes</strong>. If you didn't request this code, you can safely ignore this email.
+      <h1 class="h1" style="margin: 0 0 12px; font-size: 22px; font-weight: 700; color: #ffffff;">Code de v&eacute;rification</h1>
+      <p class="text" style="margin: 0 0 24px; font-size: 15px; line-height: 1.7; color: #a1a1aa;">
+        Bonjour${name ? ` <span class="name-highlight" style="color: #c7d2fe; font-weight: 500;">${name}</span>` : ''},<br><br>
+        Utilisez le code ci-dessous pour confirmer votre action. Ne partagez jamais ce code avec qui que ce soit.
+      </p>
+      <div class="code-box" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(79, 70, 229, 0.04)); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 16px; padding: 28px; text-align: center; margin: 28px 0;">
+        <p class="code-digits" style="margin: 0; font-size: 40px; font-weight: 800; color: #ffffff; letter-spacing: 12px; font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;">${code}</p>
+        <p class="code-label" style="margin: 12px 0 0; font-size: 12px; color: #6366f1; font-weight: 500; text-transform: uppercase; letter-spacing: 1.5px;">Code de s&eacute;curit&eacute;</p>
+      </div>
+      <p class="text-small" style="margin: 0 0 20px; font-size: 13px; line-height: 1.6; color: #71717a;">
+        <span class="validity-tag" style="display: inline-block; padding: 4px 12px; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 20px; font-size: 12px; color: #818cf8; font-weight: 500;">Valide 5 minutes</span>
+      </p>
+      <p class="text-small" style="margin: 0; font-size: 13px; line-height: 1.6; color: #71717a;">
+        Si vous n'avez pas demand&eacute; ce code, vous pouvez ignorer cet email en toute s&eacute;curit&eacute;.
       </p>
     `
 
     await this.send({
       to: email,
-      subject: 'Security verification code - Faktur',
-      html: this.wrapHtml(content, 'Security Code'),
-      text: `Your security verification code is: ${code}`,
+      subject: 'Code de vérification - Faktur',
+      html: this.wrapHtml(content, 'Code de vérification'),
+      text: `Votre code de vérification : ${code}`,
     })
   }
 
   async sendTeamInviteEmail(email: string, inviterName: string, inviteUrl: string): Promise<void> {
     const content = `
-      <h1 class="h1">You've been invited to join a team</h1>
-      <p class="text">
-        <strong>${inviterName}</strong> has invited you to join their team on Faktur.
+      <div class="icon-badge icon-badge-blue" style="width: 56px; height: 56px; border-radius: 16px; display: block; margin-bottom: 24px; font-size: 28px; line-height: 56px; text-align: center; background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.2);">
+        &#128101;
+      </div>
+      <h1 class="h1" style="margin: 0 0 12px; font-size: 22px; font-weight: 700; color: #ffffff;">Invitation &agrave; rejoindre une &eacute;quipe</h1>
+      <p class="text" style="margin: 0 0 24px; font-size: 15px; line-height: 1.7; color: #a1a1aa;">
+        <span class="name-highlight" style="color: #c7d2fe; font-weight: 500;">${inviterName}</span> vous invite &agrave; rejoindre son &eacute;quipe sur Faktur.
       </p>
-      <a href="${inviteUrl}" class="button">Accept Invitation</a>
-      <p class="text" style="margin-top: 24px; font-size: 13px;">
-        If you don't have a Faktur account yet, you'll be able to create one after clicking the link.
-      </p>
-      <p class="text" style="margin-bottom: 0; font-size: 13px;">
-        Or paste this link in your browser:<br>
-        <a href="${inviteUrl}" class="link" style="word-break: break-all;">${inviteUrl}</a>
-      </p>
+      <div class="button-wrap" style="margin: 28px 0; text-align: center;">
+        <a href="${inviteUrl}" class="button" style="display: inline-block; padding: 14px 36px; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #4338ca 100%); color: #ffffff; text-align: center; text-decoration: none; font-weight: 600; font-size: 15px; border-radius: 12px;">Accepter l'invitation</a>
+      </div>
+      <div class="info-box" style="border-radius: 12px; padding: 16px 20px; margin: 24px 0; font-size: 14px; line-height: 1.6; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.15); color: #60a5fa;">
+        <span class="info-box-icon">&#128161;</span> Si vous n'avez pas encore de compte Faktur, vous pourrez en cr&eacute;er un apr&egrave;s avoir cliqu&eacute; sur le lien.
+      </div>
+      <div class="link-fallback" style="margin: 24px 0 0; padding: 16px 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px;">
+        <p class="link-fallback-label" style="margin: 0 0 6px; font-size: 11px; color: #52525b; text-transform: uppercase; letter-spacing: 1px; font-weight: 500;">Ou copiez ce lien</p>
+        <a href="${inviteUrl}" style="color: #818cf8; text-decoration: none; font-size: 13px; word-break: break-all; line-height: 1.5;">${inviteUrl}</a>
+      </div>
     `
 
     await this.send({
       to: email,
-      subject: `${inviterName} invited you to Faktur`,
-      html: this.wrapHtml(content, 'Team Invitation'),
-      text: `You've been invited to join a team on Faktur: ${inviteUrl}`,
+      subject: `${inviterName} vous invite sur Faktur`,
+      html: this.wrapHtml(content, 'Invitation équipe'),
+      text: `${inviterName} vous invite à rejoindre son équipe sur Faktur : ${inviteUrl}`,
     })
   }
 
   async sendTwoFactorEnabledEmail(email: string, name?: string): Promise<void> {
     const content = `
-      <h1 class="h1">Two-Factor Authentication Enabled</h1>
-      <p class="text">
-        Hi${name ? ` ${name}` : ''},<br><br>
-        Two-factor authentication (2FA) has been enabled on your account.
-      </p>
-      <div style="background: rgba(22, 163, 74, 0.1); border: 1px solid rgba(22, 163, 74, 0.2); border-radius: 8px; padding: 16px; margin-bottom: 24px;">
-        <p style="margin: 0; color: #4ade80; font-size: 14px;">
-          Your account is now more secure. You will be asked for a verification code when signing in.
-        </p>
+      <div class="icon-badge icon-badge-green" style="width: 56px; height: 56px; border-radius: 16px; display: block; margin-bottom: 24px; font-size: 28px; line-height: 56px; text-align: center; background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.2);">
+        &#9989;
       </div>
-      <p class="text" style="margin-bottom: 0;">
-        If you didn't make this change, please contact support immediately.
+      <h1 class="h1" style="margin: 0 0 12px; font-size: 22px; font-weight: 700; color: #ffffff;">Double authentification activ&eacute;e</h1>
+      <p class="text" style="margin: 0 0 24px; font-size: 15px; line-height: 1.7; color: #a1a1aa;">
+        Bonjour${name ? ` <span class="name-highlight" style="color: #c7d2fe; font-weight: 500;">${name}</span>` : ''},<br><br>
+        La double authentification (2FA) a &eacute;t&eacute; activ&eacute;e sur votre compte avec succ&egrave;s.
       </p>
+      <div class="info-box info-box-green" style="border-radius: 12px; padding: 16px 20px; margin: 24px 0; font-size: 14px; line-height: 1.6; background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.15); color: #4ade80;">
+        <span class="info-box-icon">&#128272;</span> Votre compte est d&eacute;sormais mieux prot&eacute;g&eacute;. Un code de v&eacute;rification vous sera demand&eacute; &agrave; chaque connexion.
+      </div>
+      <div class="info-box info-box-amber" style="border-radius: 12px; padding: 16px 20px; margin: 24px 0; font-size: 14px; line-height: 1.6; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.15); color: #fbbf24;">
+        <span class="info-box-icon">&#9888;&#65039;</span> Si vous n'&ecirc;tes pas &agrave; l'origine de cette modification, contactez le support imm&eacute;diatement.
+      </div>
     `
 
     await this.send({
       to: email,
-      subject: '2FA Enabled - Faktur',
-      html: this.wrapHtml(content, '2FA Enabled'),
-      text: '2FA has been enabled on your account.',
+      subject: '2FA activée - Faktur',
+      html: this.wrapHtml(content, '2FA activée'),
+      text: 'La double authentification a été activée sur votre compte Faktur.',
     })
   }
 }
