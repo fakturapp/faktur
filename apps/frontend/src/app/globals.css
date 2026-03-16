@@ -19,10 +19,10 @@
   --color-secondary-foreground: #fafafa;
   --color-accent: #27272a;
   --color-accent-foreground: #fafafa;
-  --color-sidebar: #18181b;
+  --color-sidebar: #09090b;
   --color-sidebar-foreground: #fafafa;
   --color-sidebar-border: rgba(255, 255, 255, 0.08);
-  --color-sidebar-accent: #27272a;
+  --color-sidebar-accent: #18181b;
   --color-sidebar-accent-foreground: #fafafa;
   --sidebar-width: 16rem;
   --header-height: 3.5rem;
@@ -44,10 +44,10 @@
   --color-muted-foreground: #a1a1aa;
   --color-border: #27272a;
   --color-input: #27272a;
-  --color-sidebar: #18181b;
+  --color-sidebar: #09090b;
   --color-sidebar-foreground: #fafafa;
   --color-sidebar-border: rgba(255, 255, 255, 0.08);
-  --color-sidebar-accent: #27272a;
+  --color-sidebar-accent: #18181b;
   --color-sidebar-accent-foreground: #fafafa;
   --color-secondary: #27272a;
   --color-secondary-foreground: #fafafa;

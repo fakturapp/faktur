@@ -37,6 +37,11 @@ export interface ApiDefinition {
     index: typeof routes['dashboard.index']
     stats: typeof routes['dashboard.stats']
     sidebarCounts: typeof routes['dashboard.sidebarCounts']
+    charts: typeof routes['dashboard.charts'] & {
+      revenue: typeof routes['dashboard.charts.revenue']
+      collected: typeof routes['dashboard.charts.collected']
+      micro: typeof routes['dashboard.charts.micro']
+    }
   }
   serveIcon: typeof routes['serve_icon']
   teamList: typeof routes['team_list']

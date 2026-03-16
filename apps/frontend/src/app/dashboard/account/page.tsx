@@ -353,7 +353,7 @@ export default function AccountPage() {
     >
       {/* Page header with user info */}
       <Card className="overflow-hidden">
-        <div className="h-20 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent" />
+        <div className="h-20 via-primary/10 to-transparent" />
         <CardContent className="px-6 pb-6 -mt-10">
           <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4">
             <div className="relative group">
