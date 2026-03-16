@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -77,6 +77,44 @@ export default function ClientEditPage() {
     address: '', addressComplement: '', postalCode: '', city: '', country: 'FR',
     notes: '',
   })
+
+  const [addressSuggestions, setAddressSuggestions] = useState<{ label: string; name: string; postcode: string; city: string }[]>([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const addressDebounce = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const suggestionsRef = useRef<HTMLDivElement>(null)
+
+  const searchAddress = useCallback((query: string) => {
+    if (addressDebounce.current) clearTimeout(addressDebounce.current)
+    if (query.length < 3) { setAddressSuggestions([]); setShowSuggestions(false); return }
+    addressDebounce.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(query)}&limit=5`)
+        const data = await res.json()
+        if (data?.features?.length) {
+          setAddressSuggestions(data.features.map((f: any) => ({
+            label: f.properties.label,
+            name: f.properties.name,
+            postcode: f.properties.postcode,
+            city: f.properties.city,
+          })))
+          setShowSuggestions(true)
+        } else {
+          setAddressSuggestions([])
+          setShowSuggestions(false)
+        }
+      } catch { setAddressSuggestions([]); setShowSuggestions(false) }
+    }, 300)
+  }, [])
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (suggestionsRef.current && !suggestionsRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   useEffect(() => { loadClient() }, [id])
 
@@ -280,8 +318,39 @@ export default function ClientEditPage() {
                   )}
                   <div className="h-px bg-border" />
                   <div className="flex items-center gap-2 mb-2"><MapPin className="h-4 w-4 text-primary" /><span className="text-sm font-semibold text-foreground">Adresse</span></div>
-                  <div><label className="text-sm font-medium text-foreground mb-1.5 block">Adresse</label><Input value={form.address} onChange={(e) => update('address', e.target.value)} /></div>
-                  <div><label className="text-sm font-medium text-foreground mb-1.5 block">Complement</label><Input value={form.addressComplement} onChange={(e) => update('addressComplement', e.target.value)} /></div>
+                  <div className="relative" ref={suggestionsRef}>
+                    <label className="text-sm font-medium text-foreground mb-1.5 block">Adresse</label>
+                    <div className="relative">
+                      <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        value={form.address}
+                        onChange={(e) => { update('address', e.target.value); searchAddress(e.target.value) }}
+                        onFocus={() => { if (addressSuggestions.length > 0) setShowSuggestions(true) }}
+                        placeholder="Rechercher une adresse..."
+                        className="pl-10"
+                        autoComplete="off"
+                      />
+                    </div>
+                    {showSuggestions && addressSuggestions.length > 0 && (
+                      <div className="absolute z-30 top-full mt-1 w-full rounded-lg border border-border bg-card shadow-lg overflow-hidden">
+                        {addressSuggestions.map((s, i) => (
+                          <button
+                            key={i}
+                            type="button"
+                            onClick={() => {
+                              setForm((prev) => ({ ...prev, address: s.name, postalCode: s.postcode, city: s.city }))
+                              setShowSuggestions(false)
+                            }}
+                            className="w-full text-left px-3 py-2.5 text-sm text-foreground hover:bg-muted/50 transition-colors flex items-center gap-2 border-b border-border last:border-b-0"
+                          >
+                            <MapPin className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                            <span className="truncate">{s.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div><label className="text-sm font-medium text-foreground mb-1.5 block">Complément</label><Input value={form.addressComplement} onChange={(e) => update('addressComplement', e.target.value)} /></div>
                   <div className="grid grid-cols-5 gap-3">
                     <div className="col-span-2"><label className="text-sm font-medium text-foreground mb-1.5 block">Code postal</label><Input value={form.postalCode} onChange={(e) => update('postalCode', e.target.value)} /></div>
                     <div className="col-span-3"><label className="text-sm font-medium text-foreground mb-1.5 block">Ville</label><Input value={form.city} onChange={(e) => update('city', e.target.value)} /></div>
