@@ -196,6 +196,13 @@ export default function CompanyPage() {
     const errors: string[] = []
     if (step === 0) {
       if (!editForm.legalName.trim()) errors.push('Raison sociale')
+      if (!editForm.siren.trim()) errors.push('SIREN')
+      if (!editForm.siret.trim()) errors.push('SIRET')
+    }
+    if (step === 1) {
+      if (!editForm.addressLine1.trim()) errors.push('Adresse')
+      if (!editForm.postalCode.trim()) errors.push('Code postal')
+      if (!editForm.city.trim()) errors.push('Ville')
     }
     return errors
   }
@@ -613,7 +620,7 @@ export default function CompanyPage() {
                   setStepErrors([])
                   setEditStep(i)
                 }}
-                className={`w-full h-2 rounded-full transition-colors ${
+                className={`w-full h-2 rounded-full transition-colors cursor-pointer ${
                   i <= editStep ? 'bg-primary' : 'bg-muted'
                 } ${i < editStep ? 'bg-primary/80' : ''}`}
               />
@@ -654,12 +661,12 @@ export default function CompanyPage() {
               </Field>
               <div className="grid grid-cols-2 gap-4">
                 <Field>
-                  <FieldLabel htmlFor="editSiren">SIREN</FieldLabel>
-                  <Input id="editSiren" value={editForm.siren} onChange={(e) => updateEditForm('siren', e.target.value)} maxLength={9} />
+                  <FieldLabel htmlFor="editSiren">SIREN *</FieldLabel>
+                  <Input id="editSiren" value={editForm.siren} onChange={(e) => updateEditForm('siren', e.target.value)} maxLength={9} className={stepErrors.includes('SIREN') ? 'border-red-500' : ''} />
                 </Field>
                 <Field>
-                  <FieldLabel htmlFor="editSiret">SIRET</FieldLabel>
-                  <Input id="editSiret" value={editForm.siret} onChange={(e) => updateEditForm('siret', e.target.value)} maxLength={14} />
+                  <FieldLabel htmlFor="editSiret">SIRET *</FieldLabel>
+                  <Input id="editSiret" value={editForm.siret} onChange={(e) => updateEditForm('siret', e.target.value)} maxLength={14} className={stepErrors.includes('SIRET') ? 'border-red-500' : ''} />
                 </Field>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -678,8 +685,8 @@ export default function CompanyPage() {
           {editStep === 1 && (
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="editAddress1">Adresse ligne 1</FieldLabel>
-                <Input id="editAddress1" value={editForm.addressLine1} onChange={(e) => updateEditForm('addressLine1', e.target.value)} />
+                <FieldLabel htmlFor="editAddress1">Adresse ligne 1 *</FieldLabel>
+                <Input id="editAddress1" value={editForm.addressLine1} onChange={(e) => updateEditForm('addressLine1', e.target.value)} className={stepErrors.includes('Adresse') ? 'border-red-500' : ''} />
               </Field>
               <Field>
                 <FieldLabel htmlFor="editAddress2">Adresse ligne 2</FieldLabel>
@@ -687,12 +694,12 @@ export default function CompanyPage() {
               </Field>
               <div className="grid grid-cols-2 gap-4">
                 <Field>
-                  <FieldLabel htmlFor="editPostalCode">Code postal</FieldLabel>
-                  <Input id="editPostalCode" value={editForm.postalCode} onChange={(e) => updateEditForm('postalCode', e.target.value)} />
+                  <FieldLabel htmlFor="editPostalCode">Code postal *</FieldLabel>
+                  <Input id="editPostalCode" value={editForm.postalCode} onChange={(e) => updateEditForm('postalCode', e.target.value)} className={stepErrors.includes('Code postal') ? 'border-red-500' : ''} />
                 </Field>
                 <Field>
-                  <FieldLabel htmlFor="editCity">Ville</FieldLabel>
-                  <Input id="editCity" value={editForm.city} onChange={(e) => updateEditForm('city', e.target.value)} />
+                  <FieldLabel htmlFor="editCity">Ville *</FieldLabel>
+                  <Input id="editCity" value={editForm.city} onChange={(e) => updateEditForm('city', e.target.value)} className={stepErrors.includes('Ville') ? 'border-red-500' : ''} />
                 </Field>
               </div>
             </FieldGroup>
