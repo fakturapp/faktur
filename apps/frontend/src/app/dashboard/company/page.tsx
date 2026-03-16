@@ -666,7 +666,9 @@ export default function CompanyPage() {
               id="bankIban"
               value={bankForm.iban}
               onChange={(e) => {
-                const raw = e.target.value.replace(/\s/g, '').toUpperCase().slice(0, 34)
+                let raw = e.target.value.replace(/\s/g, '').toUpperCase().slice(0, 34)
+                // Auto-prefix FR when user starts typing digits
+                if (raw.length > 0 && /^\d/.test(raw)) raw = 'FR' + raw
                 const formatted = raw.replace(/(.{4})/g, '$1 ').trim()
                 setBankForm((p) => ({ ...p, iban: formatted }))
               }}
