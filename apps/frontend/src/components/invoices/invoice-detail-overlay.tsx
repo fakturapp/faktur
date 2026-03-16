@@ -333,13 +333,8 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                     disabled={downloading}
                     className="h-9 px-4 rounded-full bg-card shadow-lg flex items-center gap-2 text-sm font-medium transition-colors border border-border"
                   >
-                    <Download className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-foreground">Télécharger</span>
-                    {downloading ? (
-                      <span className="download-shimmer rounded px-1.5 py-0.5 text-xs font-semibold text-muted-foreground">{invoice.invoiceNumber}</span>
-                    ) : (
-                      <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent font-semibold">{invoice.invoiceNumber}</span>
-                    )}
+                    {downloading ? <Spinner className="h-4 w-4" /> : <Download className="h-4 w-4 text-muted-foreground" />}
+                    <span className="text-foreground">{downloading ? 'Téléchargement...' : 'Télécharger'}</span>
                   </button>
                 </div>
               </div>
