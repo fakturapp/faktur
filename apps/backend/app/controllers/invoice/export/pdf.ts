@@ -75,9 +75,9 @@ export default class Pdf {
       footerMode: (invoiceSettings?.footerMode as 'company_info' | 'vat_exempt' | 'custom') || 'vat_exempt',
     }
 
+    // Always use current logo settings (not the stale logoUrl saved on the invoice)
     const logoSource = invoiceSettings?.logoSource || 'custom'
-    const settingsLogoUrl = logoSource === 'company' ? (company?.logoUrl || null) : (invoiceSettings?.logoUrl || null)
-    const rawLogoUrl = invoice.logoUrl || settingsLogoUrl
+    const rawLogoUrl = logoSource === 'company' ? (company?.logoUrl || null) : (invoiceSettings?.logoUrl || null)
     const resolvedLogoUrl = resolveLogoToBase64(rawLogoUrl)
 
     const quoteData = {
