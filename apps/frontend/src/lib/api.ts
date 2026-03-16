@@ -20,7 +20,11 @@ async function request<T = unknown>(
     const data = await res.json()
 
     if (!res.ok) {
-      return { error: data.message || 'Something went wrong' }
+      const message =
+        data.message ||
+        (Array.isArray(data.errors) && data.errors[0]?.message) ||
+        'Something went wrong'
+      return { error: message }
     }
     return { data }
   } catch {

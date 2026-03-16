@@ -60,6 +60,64 @@ interface BankAccountForm {
   isDefault: boolean
 }
 
+// Bank name → domain mapping for auto-logo
+const BANK_DOMAINS: Record<string, string> = {
+  'bnp paribas': 'bnpparibas.com',
+  'bnp': 'bnpparibas.com',
+  'société générale': 'societegenerale.com',
+  'societe generale': 'societegenerale.com',
+  'crédit agricole': 'credit-agricole.fr',
+  'credit agricole': 'credit-agricole.fr',
+  'caisse d\'épargne': 'caisse-epargne.fr',
+  'caisse d\'epargne': 'caisse-epargne.fr',
+  'lcl': 'lcl.fr',
+  'crédit lyonnais': 'lcl.fr',
+  'credit lyonnais': 'lcl.fr',
+  'cic': 'cic.fr',
+  'crédit mutuel': 'creditmutuel.fr',
+  'credit mutuel': 'creditmutuel.fr',
+  'la banque postale': 'labanquepostale.fr',
+  'banque postale': 'labanquepostale.fr',
+  'boursorama': 'boursorama.com',
+  'boursobank': 'boursorama.com',
+  'hsbc': 'hsbc.fr',
+  'banque populaire': 'banquepopulaire.fr',
+  'fortuneo': 'fortuneo.fr',
+  'ing': 'ing.fr',
+  'n26': 'n26.com',
+  'revolut': 'revolut.com',
+  'qonto': 'qonto.com',
+  'shine': 'shine.fr',
+  'monabanq': 'monabanq.com',
+  'hello bank': 'hellobank.fr',
+  'axa banque': 'axabanque.fr',
+  'crédit du nord': 'credit-du-nord.fr',
+  'credit du nord': 'credit-du-nord.fr',
+  'milleis': 'milleis.fr',
+  'bred': 'bred.fr',
+  'bforbank': 'bforbank.com',
+  'orange bank': 'orangebank.fr',
+  'wise': 'wise.com',
+  'paypal': 'paypal.com',
+  'stripe': 'stripe.com',
+}
+
+function getBankLogoUrl(bankName: string | null): string | null {
+  if (!bankName) return null
+  const normalized = bankName.toLowerCase().trim()
+  // Exact match
+  if (BANK_DOMAINS[normalized]) {
+    return `https://logo.clearbit.com/${BANK_DOMAINS[normalized]}`
+  }
+  // Partial match
+  for (const [key, domain] of Object.entries(BANK_DOMAINS)) {
+    if (normalized.includes(key) || key.includes(normalized)) {
+      return `https://logo.clearbit.com/${domain}`
+    }
+  }
+  return null
+}
+
 const tabs = [
   { id: 'info', label: 'Informations', icon: <Building2 className="h-4 w-4" /> },
   { id: 'bank', label: 'Banque', icon: <CreditCard className="h-4 w-4" /> },
@@ -180,11 +238,13 @@ export default function CompanyPage() {
       // Load full data for editing
       api.get<{ bankAccount: any }>(`/company/bank-accounts/${account.id}`).then(({ data }) => {
         if (data?.bankAccount) {
+          const rawIban = (data.bankAccount.iban || '').replace(/\s/g, '').toUpperCase()
+          const formattedIban = rawIban.replace(/(.{4})/g, '$1 ').trim()
           setBankForm({
             label: data.bankAccount.label,
             bankName: data.bankAccount.bankName || '',
-            iban: data.bankAccount.iban || '',
-            bic: data.bankAccount.bic || '',
+            iban: formattedIban,
+            bic: (data.bankAccount.bic || '').toUpperCase(),
             isEncrypted: data.bankAccount.isEncrypted,
             isDefault: data.bankAccount.isDefault,
           })
@@ -206,7 +266,7 @@ export default function CompanyPage() {
     const payload = {
       label: bankForm.label,
       bankName: bankForm.bankName || undefined,
-      iban: bankForm.iban || undefined,
+      iban: bankForm.iban.replace(/\s/g, '') || undefined,
       bic: bankForm.bic || undefined,
       isEncrypted: bankForm.isEncrypted,
       isDefault: bankForm.isDefault,
@@ -493,9 +553,9 @@ export default function CompanyPage() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-semibold text-foreground">Coordonnees bancaires</h3>
+                    <h3 className="font-semibold text-foreground">Coordonnées bancaires</h3>
                     <p className="text-sm text-muted-foreground mt-0.5">
-                      Gerez vos comptes bancaires pour les factures.
+                      Gérez vos comptes bancaires pour les factures.
                     </p>
                   </div>
                   <Button size="sm" onClick={() => openBankDialog()}>
@@ -508,21 +568,31 @@ export default function CompanyPage() {
                 ) : bankAccounts.length === 0 ? (
                   <div className="flex flex-col items-center py-10 text-center">
                     <CreditCard className="h-8 w-8 text-muted-foreground mb-3" />
-                    <p className="text-sm text-muted-foreground">Aucun compte bancaire enregistre.</p>
+                    <p className="text-sm text-muted-foreground">Aucun compte bancaire enregistré.</p>
                     <p className="text-xs text-muted-foreground mt-1">Ajoutez un compte pour l&apos;afficher sur vos factures.</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {bankAccounts.map((account) => (
+                    {bankAccounts.map((account) => {
+                      const logoUrl = getBankLogoUrl(account.bankName)
+                      return (
                       <div key={account.id} className="flex items-center gap-4 rounded-xl border border-border p-4 hover:bg-muted/30 transition-colors">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                          <Banknote className="h-5 w-5 text-primary" />
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 overflow-hidden">
+                          {logoUrl ? (
+                            <img
+                              src={logoUrl}
+                              alt={account.bankName || ''}
+                              className="h-6 w-6 object-contain"
+                              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden') }}
+                            />
+                          ) : null}
+                          <Banknote className={`h-5 w-5 text-primary ${logoUrl ? 'hidden' : ''}`} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
                             <p className="text-sm font-medium text-foreground truncate">{account.label}</p>
-                            {account.isDefault && <Badge variant="default" className="text-[10px] shrink-0">Par defaut</Badge>}
-                            {account.isEncrypted && <Badge variant="muted" className="text-[10px] shrink-0"><Shield className="h-2.5 w-2.5 mr-0.5" /> Chiffre</Badge>}
+                            {account.isDefault && <Badge variant="default" className="text-[10px] shrink-0">Par défaut</Badge>}
+                            {account.isEncrypted && <Badge variant="muted" className="text-[10px] shrink-0"><Shield className="h-2.5 w-2.5 mr-0.5" /> Chiffré</Badge>}
                           </div>
                           <div className="flex items-center gap-3 mt-0.5">
                             {account.bankName && <span className="text-xs text-muted-foreground">{account.bankName}</span>}
@@ -546,7 +616,8 @@ export default function CompanyPage() {
                           </button>
                         </div>
                       </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 )}
               </div>
@@ -560,7 +631,7 @@ export default function CompanyPage() {
         <DialogTitle>{bankEditId ? 'Modifier le compte bancaire' : 'Ajouter un compte bancaire'}</DialogTitle>
         <div className="space-y-4 mt-4">
           <Field>
-            <FieldLabel htmlFor="bankLabel">Libelle *</FieldLabel>
+            <FieldLabel htmlFor="bankLabel">Libellé *</FieldLabel>
             <Input
               id="bankLabel"
               value={bankForm.label}
@@ -570,30 +641,55 @@ export default function CompanyPage() {
           </Field>
           <Field>
             <FieldLabel htmlFor="bankNameField">Nom de la banque</FieldLabel>
-            <Input
-              id="bankNameField"
-              value={bankForm.bankName}
-              onChange={(e) => setBankForm((p) => ({ ...p, bankName: e.target.value }))}
-              placeholder="Ex: BNP Paribas"
-            />
+            <div className="flex items-center gap-3">
+              {getBankLogoUrl(bankForm.bankName) && (
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-white overflow-hidden">
+                  <img
+                    src={getBankLogoUrl(bankForm.bankName)!}
+                    alt={bankForm.bankName}
+                    className="h-6 w-6 object-contain"
+                  />
+                </div>
+              )}
+              <Input
+                id="bankNameField"
+                value={bankForm.bankName}
+                onChange={(e) => setBankForm((p) => ({ ...p, bankName: e.target.value }))}
+                placeholder="Ex: BNP Paribas"
+                className="flex-1"
+              />
+            </div>
           </Field>
           <Field>
             <FieldLabel htmlFor="bankIban">IBAN</FieldLabel>
             <Input
               id="bankIban"
               value={bankForm.iban}
-              onChange={(e) => setBankForm((p) => ({ ...p, iban: e.target.value }))}
+              onChange={(e) => {
+                const raw = e.target.value.replace(/\s/g, '').toUpperCase().slice(0, 34)
+                const formatted = raw.replace(/(.{4})/g, '$1 ').trim()
+                setBankForm((p) => ({ ...p, iban: formatted }))
+              }}
               placeholder="FR76 XXXX XXXX XXXX XXXX XXXX XXX"
+              className="font-mono tracking-wider"
+              maxLength={42}
             />
+            <FieldDescription>{bankForm.iban.replace(/\s/g, '').length}/34 caractères</FieldDescription>
           </Field>
           <Field>
             <FieldLabel htmlFor="bankBic">BIC / SWIFT</FieldLabel>
             <Input
               id="bankBic"
               value={bankForm.bic}
-              onChange={(e) => setBankForm((p) => ({ ...p, bic: e.target.value }))}
+              onChange={(e) => {
+                const raw = e.target.value.replace(/\s/g, '').toUpperCase().slice(0, 11)
+                setBankForm((p) => ({ ...p, bic: raw }))
+              }}
               placeholder="BNPAFRPP"
+              className="font-mono tracking-wider"
+              maxLength={11}
             />
+            <FieldDescription>{bankForm.bic.length}/11 caractères</FieldDescription>
           </Field>
           <div className="space-y-3">
             <label className="flex items-center gap-3 cursor-pointer">
@@ -606,7 +702,7 @@ export default function CompanyPage() {
               </div>
               <div>
                 <span className="text-sm font-medium text-foreground flex items-center gap-1.5"><Shield className="h-3.5 w-3.5" /> Chiffrement AES-256</span>
-                <span className="text-xs text-muted-foreground block">L&apos;IBAN et le BIC seront chiffres en base de donnees.</span>
+                <span className="text-xs text-muted-foreground block">L&apos;IBAN et le BIC seront chiffrés en base de données.</span>
               </div>
               <input type="checkbox" checked={bankForm.isEncrypted} onChange={(e) => setBankForm((p) => ({ ...p, isEncrypted: e.target.checked }))} className="sr-only" />
             </label>
@@ -620,7 +716,7 @@ export default function CompanyPage() {
               </div>
               <div>
                 <span className="text-sm font-medium text-foreground flex items-center gap-1.5"><Star className="h-3.5 w-3.5" /> Compte par defaut</span>
-                <span className="text-xs text-muted-foreground block">Ce compte sera selectionne par defaut sur les nouvelles factures.</span>
+                <span className="text-xs text-muted-foreground block">Ce compte sera sélectionné par défaut sur les nouvelles factures.</span>
               </div>
               <input type="checkbox" checked={bankForm.isDefault} onChange={(e) => setBankForm((p) => ({ ...p, isDefault: e.target.checked }))} className="sr-only" />
             </label>

@@ -101,11 +101,11 @@ const mainNav: NavItem[] = [
 
 const settingsNav: NavItem = {
   href: '/dashboard/company',
-  label: 'Parametres',
+  label: 'Paramètres',
   icon: Settings,
   children: [
     { href: '/dashboard/company', label: 'Entreprise', icon: Building2 },
-    { href: '/dashboard/team', label: 'Equipe', icon: UsersRound },
+    { href: '/dashboard/team', label: 'Équipe', icon: UsersRound },
     { href: '/dashboard/settings/invoices', label: 'Facturation', icon: CreditCard },
   ],
 }
@@ -234,7 +234,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
                 </div>
                 <div className="flex-1 min-w-0 text-left">
                   <p className="text-sm font-semibold text-foreground leading-tight truncate">
-                    {currentTeam?.name || 'Equipe'}
+                    {currentTeam?.name || 'Équipe'}
                   </p>
                   {currentTeam?.role && (
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
