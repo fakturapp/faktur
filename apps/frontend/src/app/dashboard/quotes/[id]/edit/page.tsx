@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { useRouter, useParams } from 'next/navigation'
+import { useRouter, useParams, useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -36,6 +36,7 @@ function addDays(dateStr: string | null | undefined, days: number) {
 export default function EditQuotePage() {
   const router = useRouter()
   const params = useParams()
+  const searchParams = useSearchParams()
   const quoteId = params.id as string
   const { toast } = useToast()
   const { settings: invoiceSettings, companyLogoUrl, loading: settingsLoading } = useInvoiceSettings()
@@ -155,6 +156,14 @@ export default function EditQuotePage() {
     }
     init()
   }, [quoteId])
+
+  // Auto-open preview mode from ?preview=1 query param
+  useEffect(() => {
+    if (!loading && searchParams.get('preview') === '1') {
+      setMode('preview')
+      window.history.replaceState({}, '', window.location.pathname)
+    }
+  }, [loading, searchParams])
 
   // Handlers
   const handleUpdateLine = useCallback((index: number, partial: Partial<DocumentLine>) => {

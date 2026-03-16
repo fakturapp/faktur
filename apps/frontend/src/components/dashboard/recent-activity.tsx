@@ -1,5 +1,6 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardAction } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -38,15 +39,22 @@ function formatCurrency(cents: number) {
 }
 
 export function RecentActivity({ items }: { items: RecentItem[] }) {
+  const router = useRouter()
+
+  function handleRowClick(item: RecentItem) {
+    const base = item.type === 'invoice' ? '/dashboard/invoices' : '/dashboard/quotes'
+    router.push(`${base}/${item.id}/edit?preview=1`)
+  }
+
   return (
     <div className="px-4 lg:px-6">
       <Card>
         <CardHeader>
-          <CardTitle>Activite recente</CardTitle>
+          <CardTitle>Activité récente</CardTitle>
           <CardDescription>
             {items.length > 0
-              ? `${items.length} document${items.length > 1 ? 's' : ''} recents`
-              : 'Aucun document recent'}
+              ? `${items.length} document${items.length > 1 ? 's' : ''} récents`
+              : 'Aucun document récent'}
           </CardDescription>
           {items.length > 0 && (
             <CardAction>
@@ -64,7 +72,7 @@ export function RecentActivity({ items }: { items: RecentItem[] }) {
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted mb-4">
               <FileText className="h-7 w-7 text-muted-foreground" />
             </div>
-            <p className="text-sm font-medium text-foreground">Aucune activite recente</p>
+            <p className="text-sm font-medium text-foreground">Aucune activité récente</p>
             <p className="text-xs text-muted-foreground mt-1 max-w-xs">
               Créez votre première facture ou devis pour commencer.
             </p>
@@ -94,6 +102,7 @@ export function RecentActivity({ items }: { items: RecentItem[] }) {
                     return (
                       <tr
                         key={item.id}
+                        onClick={() => handleRowClick(item)}
                         className="hover:bg-muted/30 transition-colors group cursor-pointer"
                       >
                         <td className="px-4 py-3.5">
