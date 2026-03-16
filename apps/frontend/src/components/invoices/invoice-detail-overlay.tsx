@@ -368,14 +368,20 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
 
                 <div className="flex-1 overflow-auto">
                   {/* Prominent Edit button */}
-                  <div className="px-5 pt-4 pb-2">
+                  <div className="px-5 pt-4 pb-2 relative group/edit">
                     <Button
                       className="w-full h-11 text-sm font-semibold gap-2"
+                      disabled={invoice.status === 'paid'}
                       onClick={() => { onClose(); router.push(`/dashboard/invoices/${invoice.id}/edit`) }}
                     >
                       <Pencil className="h-4 w-4" />
                       Modifier la facture
                     </Button>
+                    {invoice.status === 'paid' && (
+                      <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover/edit:opacity-100 transition-opacity pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-lg bg-zinc-900 text-white text-xs shadow-lg">
+                        Changez le statut pour pouvoir modifier la facture
+                      </div>
+                    )}
                   </div>
 
                   {/* Status */}
