@@ -53,9 +53,13 @@ export function SecurityVerificationModal({
     }
   }, [cooldown])
 
+  // Reset state when modal opens
   useEffect(() => {
-    if (open && method === 'email' && !sentEmail) {
-      handleSendCode()
+    if (open) {
+      setCodeSent(false)
+      setSentEmail(false)
+      setCode('')
+      setError(null)
     }
   }, [open])
 
@@ -114,6 +118,8 @@ export function SecurityVerificationModal({
 
   function handleClose() {
     setCode('')
+    setCodeSent(false)
+    setSentEmail(false)
     setError(null)
     onClose()
   }

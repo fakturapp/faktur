@@ -47,12 +47,14 @@ export default function AccountPage() {
   const [profileLoading, setProfileLoading] = useState(false)
   const [avatarUploading, setAvatarUploading] = useState(false)
 
-  // Email change
-  const [emailDialogOpen, setEmailDialogOpen] = useState(false)
+  // Email change (multi-step)
+  const [emailStep, setEmailStep] = useState<'idle' | 'verify_current' | 'enter_new' | 'verify_new'>('idle')
   const [newEmail, setNewEmail] = useState('')
-  const [emailCodeOpen, setEmailCodeOpen] = useState(false)
   const [emailCode, setEmailCode] = useState('')
+  const [emailCodeSent, setEmailCodeSent] = useState(false)
   const [emailChangeLoading, setEmailChangeLoading] = useState(false)
+  const [emailCooldown, setEmailCooldown] = useState(0)
+  const emailCooldownRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   // Password
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false)
@@ -163,28 +165,96 @@ export default function AccountPage() {
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
-  async function handleRequestEmailChange(e: React.FormEvent) {
+  // Email cooldown timer
+  function startEmailCooldown() {
+    setEmailCooldown(60)
+    if (emailCooldownRef.current) clearInterval(emailCooldownRef.current)
+    emailCooldownRef.current = setInterval(() => {
+      setEmailCooldown((prev) => {
+        if (prev <= 1) {
+          if (emailCooldownRef.current) clearInterval(emailCooldownRef.current)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+  }
+
+  function maskEmail(email: string) {
+    const [local, domain] = email.split('@')
+    if (!domain) return email
+    const masked = local.length > 2
+      ? local[0] + '***' + local[local.length - 1]
+      : local[0] + '***'
+    return masked + '@' + domain
+  }
+
+  function closeEmailDialog() {
+    setEmailStep('idle')
+    setNewEmail('')
+    setEmailCode('')
+    setEmailCodeSent(false)
+    setEmailChangeLoading(false)
+    setEmailCooldown(0)
+    if (emailCooldownRef.current) clearInterval(emailCooldownRef.current)
+  }
+
+  // Step 1: Send code to current email
+  async function handleEmailSendCurrentCode() {
+    setEmailChangeLoading(true)
+    const { error } = await api.post('/account/security/send-code', {})
+    setEmailChangeLoading(false)
+    if (error) return toast(error, 'error')
+    setEmailCodeSent(true)
+    startEmailCooldown()
+    toast('Code envoyé', 'success')
+  }
+
+  // Step 1: Verify code from current email
+  async function handleEmailVerifyCurrent(e: React.FormEvent) {
+    e.preventDefault()
+    if (!emailCode.trim()) return
+    setEmailChangeLoading(true)
+    const { data, error } = await api.post<{ verified: boolean }>('/account/security/verify', { code: emailCode.trim(), method: 'email' })
+    setEmailChangeLoading(false)
+    if (error) return toast(error, 'error')
+    if (data?.verified) {
+      setEmailCode('')
+      setEmailCodeSent(false)
+      setEmailCooldown(0)
+      setEmailStep('enter_new')
+    }
+  }
+
+  // Step 2: Submit new email → move to verify_new
+  function handleEmailSubmitNew(e: React.FormEvent) {
     e.preventDefault()
     if (!newEmail || newEmail === user?.email) return
+    setEmailStep('verify_new')
+  }
+
+  // Step 3: Send code to new email
+  async function handleEmailSendNewCode() {
     setEmailChangeLoading(true)
     const { error } = await api.post('/account/email/request-change', { newEmail })
     setEmailChangeLoading(false)
     if (error) return toast(error, 'error')
+    setEmailCodeSent(true)
+    startEmailCooldown()
     toast('Code envoyé à ' + newEmail, 'success')
-    setEmailCodeOpen(true)
   }
 
-  async function handleConfirmEmailChange(e: React.FormEvent) {
+  // Step 3: Verify code from new email → complete
+  async function handleEmailConfirmNew(e: React.FormEvent) {
     e.preventDefault()
+    if (!emailCode.trim()) return
     setEmailChangeLoading(true)
-    const { data, error } = await api.post<{ email: string }>('/account/email/confirm-change', { code: emailCode })
+    const { data, error } = await api.post<{ email: string }>('/account/email/confirm-change', { code: emailCode.trim() })
     setEmailChangeLoading(false)
     if (error) return toast(error, 'error')
-    setEmailCodeOpen(false)
-    setEmailCode('')
-    setNewEmail('')
+    closeEmailDialog()
     await refreshUser()
-    toast('Email mis à jour', 'success')
+    toast('Adresse email mise à jour', 'success')
   }
 
   async function handleChangePassword(e: React.FormEvent) {
@@ -451,7 +521,7 @@ export default function AccountPage() {
                     <p className="text-sm text-muted-foreground">{user?.email}</p>
                   </div>
                 </div>
-                <Button variant="outline" size="sm" onClick={() => setEmailDialogOpen(true)}>
+                <Button variant="outline" size="sm" onClick={() => setEmailStep('verify_current')}>
                   Modifier
                 </Button>
               </div>
@@ -492,17 +562,17 @@ export default function AccountPage() {
                       <Smartphone className="h-4.5 w-4.5 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-foreground">Authentification a deux facteurs</h3>
+                      <h3 className="font-semibold text-foreground">Authentification à deux facteurs</h3>
                       <p className="text-xs text-muted-foreground">
                         {user?.twoFactorEnabled
-                          ? 'La 2FA est activee sur votre compte.'
-                          : 'Ajoutez une couche de securite supplementaire.'}
+                          ? 'La 2FA est activée sur votre compte.'
+                          : 'Ajoutez une couche de sécurité supplémentaire.'}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge variant={user?.twoFactorEnabled ? 'success' : 'muted'}>
-                      {user?.twoFactorEnabled ? 'Active' : 'Desactive'}
+                      {user?.twoFactorEnabled ? 'Activée' : 'Désactivée'}
                     </Badge>
                     {!user?.twoFactorEnabled ? (
                       <Button size="sm" onClick={handleSetup2FA} disabled={twoFactorLoading}>
@@ -515,7 +585,7 @@ export default function AccountPage() {
                         className="border-destructive/30 text-destructive hover:bg-destructive/10"
                         onClick={handleDisable2FA}
                       >
-                        Desactiver
+                        Désactiver
                       </Button>
                     )}
                   </div>
@@ -545,7 +615,7 @@ export default function AccountPage() {
 
                   <form onSubmit={handleEnable2FA}>
                     <Field>
-                      <FieldLabel htmlFor="twoFactorCode">Code de verification</FieldLabel>
+                      <FieldLabel htmlFor="twoFactorCode">Code de vérification</FieldLabel>
                       <Input
                         id="twoFactorCode"
                         type="text"
@@ -558,7 +628,7 @@ export default function AccountPage() {
                         autoFocus
                       />
                       <FieldDescription>
-                        Entrez le code a 6 chiffres affiche dans votre application.
+                        Entrez le code à 6 chiffres affiché dans votre application.
                       </FieldDescription>
                     </Field>
 
@@ -574,7 +644,7 @@ export default function AccountPage() {
                         Annuler
                       </Button>
                       <Button type="submit" disabled={twoFactorLoading || twoFactorCode.length !== 6}>
-                        {twoFactorLoading ? <><Spinner /> Verification...</> : 'Activer'}
+                        {twoFactorLoading ? <><Spinner /> Vérification...</> : 'Activer'}
                       </Button>
                     </div>
                   </form>
@@ -583,9 +653,9 @@ export default function AccountPage() {
 
               {twoFactorStep === 'recovery' && (
                 <div>
-                  <h3 className="font-semibold text-foreground mb-1">Codes de recuperation</h3>
+                  <h3 className="font-semibold text-foreground mb-1">Codes de récupération</h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Conservez ces codes en lieu sur. Ils vous permettront d&apos;acceder a votre compte si vous perdez votre appareil d&apos;authentification.
+                    Conservez ces codes en lieu sûr. Ils vous permettront d&apos;accéder à votre compte si vous perdez votre appareil d&apos;authentification.
                   </p>
 
                   <div className="rounded-xl border border-border bg-muted/30 p-4 mb-4">
@@ -607,7 +677,7 @@ export default function AccountPage() {
                       )}
                     </Button>
                     <Button onClick={() => setTwoFactorStep('idle')}>
-                      J&apos;ai sauvegarde mes codes
+                      J&apos;ai sauvegardé mes codes
                     </Button>
                   </div>
                 </div>
@@ -624,11 +694,11 @@ export default function AccountPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-destructive">Zone dangereuse</h3>
-                  <p className="text-xs text-muted-foreground">Actions irreversibles sur votre compte.</p>
+                  <p className="text-xs text-muted-foreground">Actions irréversibles sur votre compte.</p>
                 </div>
               </div>
               <p className="text-sm text-muted-foreground mb-4">
-                La suppression de votre compte entrainera la perte definitive de toutes vos donnees.
+                La suppression de votre compte entraînera la perte définitive de toutes vos données.
               </p>
               <Button
                 variant="outline"
@@ -653,7 +723,7 @@ export default function AccountPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground">Sessions actives</h3>
-                  <p className="text-xs text-muted-foreground">Gerez vos sessions de connexion.</p>
+                  <p className="text-xs text-muted-foreground">Gérez vos sessions de connexion.</p>
                 </div>
               </div>
 
@@ -702,8 +772,8 @@ export default function AccountPage() {
                             )}
                             <p className="text-xs text-muted-foreground">
                               {session.lastUsedAt
-                                ? `Derniere activite le ${new Date(session.lastUsedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`
-                                : `Creee le ${new Date(session.createdAt).toLocaleDateString('fr-FR')}`}
+                                ? `Dernière activité le ${new Date(session.lastUsedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`
+                                : `Créée le ${new Date(session.createdAt).toLocaleDateString('fr-FR')}`}
                             </p>
                           </div>
                         </div>
@@ -715,7 +785,7 @@ export default function AccountPage() {
                           className="shrink-0 border-destructive/30 text-destructive hover:bg-destructive/10"
                           onClick={() => setRevokeConfirm(session.id)}
                         >
-                          <Trash2 className="h-3.5 w-3.5 mr-1.5" /> Revoquer
+                          <Trash2 className="h-3.5 w-3.5 mr-1.5" /> Révoquer
                         </Button>
                       )}
                     </div>
@@ -742,9 +812,9 @@ export default function AccountPage() {
                 <Download className="h-8 w-8 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold text-foreground text-lg">Exporter les donnees</h3>
+                <h3 className="font-semibold text-foreground text-lg">Exporter les données</h3>
                 <p className="text-sm text-muted-foreground mt-1 max-w-md">
-                  Telechargez toutes les donnees d&apos;une equipe (factures, devis, clients, parametres, logos) dans un fichier archive. Vous pouvez optionnellement chiffrer l&apos;export.
+                  Téléchargez toutes les données d&apos;une équipe (factures, devis, clients, paramètres, logos) dans un fichier archive. Vous pouvez optionnellement chiffrer l&apos;export.
                 </p>
               </div>
               <Button onClick={() => setExportModalOpen(true)} size="lg">
@@ -768,16 +838,16 @@ export default function AccountPage() {
 
       {/* Revoke session confirmation */}
       <Dialog open={!!revokeConfirm} onClose={() => setRevokeConfirm(null)}>
-        <DialogTitle>Revoquer cette session</DialogTitle>
+        <DialogTitle>Révoquer cette session</DialogTitle>
         <DialogDescription>
-          Cette session sera deconnectee immediatement. L&apos;appareil devra se reconnecter.
+          Cette session sera déconnectée immédiatement. L&apos;appareil devra se reconnecter.
         </DialogDescription>
         <DialogFooter>
           <Button variant="outline" onClick={() => setRevokeConfirm(null)} disabled={revoking}>
             Annuler
           </Button>
           <Button variant="destructive" onClick={confirmRevokeSession} disabled={revoking}>
-            {revoking ? <Spinner size="sm" /> : 'Revoquer'}
+            {revoking ? <Spinner size="sm" /> : 'Révoquer'}
           </Button>
         </DialogFooter>
       </Dialog>
@@ -811,32 +881,166 @@ export default function AccountPage() {
         </DialogFooter>
       </Dialog>
 
-      {/* Email verification code dialog */}
-      <Dialog open={emailCodeOpen} onClose={() => setEmailCodeOpen(false)}>
-        <DialogTitle>Vérification de l&apos;email</DialogTitle>
-        <DialogDescription>
-          Un code à 6 chiffres a été envoyé à <strong>{newEmail}</strong>. Entrez-le ci-dessous pour confirmer le changement.
-        </DialogDescription>
-        <form onSubmit={handleConfirmEmailChange} className="mt-4">
-          <Input
-            type="text"
-            inputMode="numeric"
-            placeholder="000000"
-            value={emailCode}
-            onChange={(e) => setEmailCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-            className="text-center text-xl tracking-[0.3em] font-mono"
-            maxLength={6}
-            autoFocus
-          />
-          <DialogFooter className="mt-4">
-            <Button type="button" variant="outline" onClick={() => setEmailCodeOpen(false)}>
-              Annuler
-            </Button>
-            <Button type="submit" disabled={emailChangeLoading || emailCode.length !== 6}>
-              {emailChangeLoading ? <><Spinner /> Vérification...</> : 'Confirmer'}
-            </Button>
-          </DialogFooter>
-        </form>
+      {/* Email change multi-step dialog */}
+      <Dialog open={emailStep !== 'idle'} onClose={closeEmailDialog}>
+        {emailStep === 'verify_current' && (
+          <>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+                <Shield className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <DialogTitle>Vérification d&apos;identité</DialogTitle>
+                <p className="text-xs text-muted-foreground mt-0.5">Étape 1 sur 3</p>
+              </div>
+            </div>
+
+            {!emailCodeSent ? (
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Pour modifier votre adresse email, nous devons d&apos;abord vérifier votre identité. Un code de vérification sera envoyé à <strong>{maskEmail(user?.email || '')}</strong>.
+                </p>
+                <div className="flex justify-end gap-3">
+                  <Button variant="outline" onClick={closeEmailDialog}>Annuler</Button>
+                  <Button onClick={handleEmailSendCurrentCode} disabled={emailChangeLoading}>
+                    {emailChangeLoading ? <><Spinner /> Envoi...</> : 'Envoyer le code'}
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handleEmailVerifyCurrent} className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Un code à 6 chiffres a été envoyé à <strong>{maskEmail(user?.email || '')}</strong>. Il est valide pendant 5 minutes.
+                </p>
+                <Input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="000000"
+                  value={emailCode}
+                  onChange={(e) => setEmailCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  className="text-center text-2xl tracking-[0.3em] font-mono"
+                  maxLength={6}
+                  autoFocus
+                />
+                <div className="flex justify-center">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleEmailSendCurrentCode}
+                    disabled={emailChangeLoading || emailCooldown > 0}
+                  >
+                    {emailCooldown > 0 ? `Renvoyer (${emailCooldown}s)` : emailChangeLoading ? <><Spinner /> Envoi...</> : 'Renvoyer le code'}
+                  </Button>
+                </div>
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={closeEmailDialog}>Annuler</Button>
+                  <Button type="submit" disabled={emailChangeLoading || emailCode.length !== 6}>
+                    {emailChangeLoading ? <><Spinner /> Vérification...</> : 'Vérifier'}
+                  </Button>
+                </DialogFooter>
+              </form>
+            )}
+          </>
+        )}
+
+        {emailStep === 'enter_new' && (
+          <>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+                <Globe className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <DialogTitle>Nouvelle adresse email</DialogTitle>
+                <p className="text-xs text-muted-foreground mt-0.5">Étape 2 sur 3</p>
+              </div>
+            </div>
+            <form onSubmit={handleEmailSubmitNew} className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Saisissez la nouvelle adresse email que vous souhaitez utiliser.
+              </p>
+              <Field>
+                <FieldLabel htmlFor="newEmail">Nouvelle adresse email</FieldLabel>
+                <Input
+                  id="newEmail"
+                  type="email"
+                  value={newEmail}
+                  onChange={(e) => setNewEmail(e.target.value)}
+                  placeholder="nouvelle@email.com"
+                  required
+                  autoFocus
+                />
+              </Field>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={closeEmailDialog}>Annuler</Button>
+                <Button type="submit" disabled={!newEmail || newEmail === user?.email}>
+                  Continuer
+                </Button>
+              </DialogFooter>
+            </form>
+          </>
+        )}
+
+        {emailStep === 'verify_new' && (
+          <>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+                <Lock className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <DialogTitle>Vérification du nouvel email</DialogTitle>
+                <p className="text-xs text-muted-foreground mt-0.5">Étape 3 sur 3</p>
+              </div>
+            </div>
+
+            {!emailCodeSent ? (
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Un code de vérification sera envoyé à <strong>{newEmail}</strong> pour confirmer cette adresse.
+                </p>
+                <div className="flex justify-end gap-3">
+                  <Button variant="outline" onClick={() => { setEmailStep('enter_new'); setEmailCodeSent(false) }}>Retour</Button>
+                  <Button onClick={handleEmailSendNewCode} disabled={emailChangeLoading}>
+                    {emailChangeLoading ? <><Spinner /> Envoi...</> : 'Envoyer le code'}
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handleEmailConfirmNew} className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Un code à 6 chiffres a été envoyé à <strong>{newEmail}</strong>. Entrez-le ci-dessous pour confirmer.
+                </p>
+                <Input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="000000"
+                  value={emailCode}
+                  onChange={(e) => setEmailCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  className="text-center text-2xl tracking-[0.3em] font-mono"
+                  maxLength={6}
+                  autoFocus
+                />
+                <div className="flex justify-center">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleEmailSendNewCode}
+                    disabled={emailChangeLoading || emailCooldown > 0}
+                  >
+                    {emailCooldown > 0 ? `Renvoyer (${emailCooldown}s)` : emailChangeLoading ? <><Spinner /> Envoi...</> : 'Renvoyer le code'}
+                  </Button>
+                </div>
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={closeEmailDialog}>Annuler</Button>
+                  <Button type="submit" disabled={emailChangeLoading || emailCode.length !== 6}>
+                    {emailChangeLoading ? <><Spinner /> Vérification...</> : 'Confirmer'}
+                  </Button>
+                </DialogFooter>
+              </form>
+            )}
+          </>
+        )}
       </Dialog>
 
       {/* Disable 2FA dialog */}
@@ -900,25 +1104,6 @@ export default function AccountPage() {
         </form>
       </Dialog>
 
-      {/* Email change dialog */}
-      <Dialog open={emailDialogOpen} onClose={() => { setEmailDialogOpen(false); setNewEmail('') }}>
-        <DialogTitle>Modifier l&apos;adresse email</DialogTitle>
-        <DialogDescription>Un code de verification sera envoye a la nouvelle adresse.</DialogDescription>
-        <form onSubmit={handleRequestEmailChange} className="mt-4 space-y-4">
-          <Field>
-            <FieldLabel htmlFor="newEmail">Nouvelle adresse email</FieldLabel>
-            <Input id="newEmail" type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="nouvelle@email.com" required autoFocus />
-          </Field>
-          <DialogFooter>
-            <Button variant="outline" type="button" onClick={() => { setEmailDialogOpen(false); setNewEmail('') }}>
-              Annuler
-            </Button>
-            <Button type="submit" disabled={emailChangeLoading || !newEmail || newEmail === user?.email}>
-              {emailChangeLoading ? <><Spinner /> Envoi...</> : 'Envoyer le code'}
-            </Button>
-          </DialogFooter>
-        </form>
-      </Dialog>
     </motion.div>
   )
 }
