@@ -3,10 +3,11 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react'
 import { api } from '@/lib/api'
 
-/** Resolve logo URL - relative paths go through Next.js rewrites */
+/** Resolve logo URL - add cache buster to prevent stale logos */
 function resolveLogoUrl(url: string | null): string | null {
   if (!url) return null
-  return url
+  const sep = url.includes('?') ? '&' : '?'
+  return `${url}${sep}_t=${Date.now()}`
 }
 
 export interface InvoiceSettings {
