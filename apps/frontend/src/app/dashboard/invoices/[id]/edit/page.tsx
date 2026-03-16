@@ -12,7 +12,7 @@ import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { api } from '@/lib/api'
 import { A4Sheet, ClientModal, type DocumentLine, type ClientInfo, type CompanyInfo } from '@/components/shared/a4-sheet'
 import { DocumentOptionsPanel } from '@/components/shared/document-options'
-import { Save, ArrowLeft, Eye, Pencil, SlidersHorizontal, Download, Link2, Unlink, Landmark, AlertCircle } from 'lucide-react'
+import { Save, ArrowLeft, Eye, Pencil, SlidersHorizontal, Download, Link2, Unlink, Landmark } from 'lucide-react'
 import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
 
@@ -417,7 +417,7 @@ export default function EditInvoicePage() {
         </div>
         <div className="flex flex-col xl:flex-row gap-5">
           <div className="flex-1 min-w-0 flex justify-center">
-            <div className="w-full max-w-[960px] bg-muted/30 rounded-xl p-6">
+            <div className="w-full max-w-[960px] bg-muted/30 rounded-xl p-3">
               <div className="bg-card rounded-lg border border-border p-8 space-y-6" style={{ aspectRatio: '210/297' }}>
                 <div className="flex justify-between">
                   <div className="space-y-2"><Skeleton className="h-10 w-20 rounded" /><Skeleton className="h-3 w-32" /><Skeleton className="h-3 w-28" /></div>
@@ -543,7 +543,7 @@ export default function EditInvoicePage() {
       {/* Main content */}
       <div className="flex flex-col xl:flex-row gap-5">
         <motion.div variants={fadeUp} custom={1} className="flex-1 min-w-0 order-1">
-          <div className="bg-muted/30 rounded-xl p-6 relative">
+          <div className="bg-muted/30 rounded-xl p-3 relative">
             <button onClick={() => setShowOptions(!showOptions)} className="absolute top-3 right-3 z-10 p-1.5 rounded-lg border border-border bg-card/80 backdrop-blur-sm text-muted-foreground hover:text-foreground transition-colors" title={showOptions ? 'Masquer les options' : 'Afficher les options'}>
               <SlidersHorizontal className="h-4 w-4" />
             </button>
@@ -603,6 +603,7 @@ export default function EditInvoicePage() {
               showFooterText={options.showFooterText}
               footerMode={options.footerMode}
               logoBorderRadius={invoiceSettings.logoBorderRadius}
+              validationErrors={validationErrors}
               onAcceptanceConditionsChange={(v) => handleOptionsChange({ acceptanceConditions: v })}
               onFreeFieldChange={(v) => handleOptionsChange({ freeField: v })}
               onFooterTextChange={(v) => handleOptionsChange({ footerText: v })}
@@ -637,30 +638,20 @@ export default function EditInvoicePage() {
       </div>
 
       {/* Sticky save bar */}
-      <motion.div variants={fadeUp} custom={3} className="sticky bottom-0 -mx-4 lg:-mx-6 px-4 lg:px-6 py-4 bg-background/80 backdrop-blur-md border-t border-border">
-        <AnimatePresence>
-          {validationErrors.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              className="flex items-center justify-center gap-2 mb-3 px-4 py-2.5 rounded-lg bg-red-500/10 border border-red-500/20"
-            >
-              <AlertCircle className="h-4 w-4 text-red-500 shrink-0" />
-              <span className="text-sm text-red-500 font-medium">Des champs sont manquants :</span>
-              <span className="text-sm text-red-400">{validationErrors.join(', ')}</span>
-            </motion.div>
-          )}
-        </AnimatePresence>
-        <div className="flex items-center justify-between">
+      <div className="sticky bottom-4 z-20 flex justify-center pointer-events-none">
+        <motion.div
+          variants={fadeUp}
+          custom={3}
+          className="pointer-events-auto inline-flex items-center gap-4 px-5 py-2.5 rounded-2xl bg-card/90 backdrop-blur-xl border border-border/50 shadow-lg shadow-black/5"
+        >
           <div className="text-sm text-muted-foreground">
             Total : <span className="font-bold text-foreground">{total.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</span>
           </div>
-          <Button onClick={handleSave} disabled={saving} className="min-w-[160px]">
+          <Button onClick={handleSave} disabled={saving} size="sm" className="min-w-[140px] rounded-xl">
             {saving ? (<><Spinner /> Enregistrement...</>) : (<><Save className="h-4 w-4 mr-1.5" /> Sauvegarder</>)}
           </Button>
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
 
       <ClientModal open={clientModalOpen} onClose={() => setClientModalOpen(false)} onSelect={handleSelectClient} />
 
