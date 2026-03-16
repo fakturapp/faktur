@@ -331,24 +331,32 @@ export default function ClientEditPage() {
                         autoComplete="off"
                       />
                     </div>
-                    {showSuggestions && addressSuggestions.length > 0 && (
-                      <div className="absolute z-30 top-full mt-1 w-full rounded-lg border border-border bg-card shadow-lg overflow-hidden">
-                        {addressSuggestions.map((s, i) => (
-                          <button
-                            key={i}
-                            type="button"
-                            onClick={() => {
-                              setForm((prev) => ({ ...prev, address: s.name, postalCode: s.postcode, city: s.city }))
-                              setShowSuggestions(false)
-                            }}
-                            className="w-full text-left px-3 py-2.5 text-sm text-foreground hover:bg-muted/50 transition-colors flex items-center gap-2 border-b border-border last:border-b-0"
-                          >
+                    <AnimatePresence>
+                      {showSuggestions && addressSuggestions.length > 0 && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -4 }}
+                          transition={{ duration: 0.15 }}
+                          className="absolute z-30 top-full mt-1 w-full rounded-lg border border-border bg-card shadow-lg overflow-hidden"
+                        >
+                          {addressSuggestions.map((s, i) => (
+                            <button
+                              key={i}
+                              type="button"
+                              onClick={() => {
+                                setForm((prev) => ({ ...prev, address: s.name, postalCode: s.postcode, city: s.city }))
+                                setShowSuggestions(false)
+                              }}
+                              className="w-full text-left px-3 py-2.5 text-sm text-foreground hover:bg-muted/50 transition-colors flex items-center gap-2 border-b border-border last:border-b-0"
+                            >
                             <MapPin className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                             <span className="truncate">{s.label}</span>
                           </button>
                         ))}
-                      </div>
-                    )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                   <div><label className="text-sm font-medium text-foreground mb-1.5 block">Complément</label><Input value={form.addressComplement} onChange={(e) => update('addressComplement', e.target.value)} /></div>
                   <div className="grid grid-cols-5 gap-3">
