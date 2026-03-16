@@ -365,14 +365,20 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
 
                 <div className="flex-1 overflow-auto">
                   {/* Prominent Edit button */}
-                  <div className="px-5 pt-4 pb-2">
+                  <div className="px-5 pt-4 pb-2 relative group/edit">
                     <Button
                       className="w-full h-11 text-sm font-semibold gap-2"
+                      disabled={quote.status === 'accepted' || quote.status === 'refused'}
                       onClick={() => { onClose(); router.push(`/dashboard/quotes/${quote.id}/edit`) }}
                     >
                       <Pencil className="h-4 w-4" />
                       Modifier le devis
                     </Button>
+                    {(quote.status === 'accepted' || quote.status === 'refused') && (
+                      <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover/edit:opacity-100 transition-opacity pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-lg bg-zinc-900 text-white text-xs shadow-lg">
+                        Changez le statut pour pouvoir modifier le devis
+                      </div>
+                    )}
                   </div>
 
                   {/* Status */}
