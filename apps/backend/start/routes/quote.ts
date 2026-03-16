@@ -1,5 +1,6 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
+import { API_PREFIX } from '#start/routes/_prefix'
 
 const QuoteList = () => import('#controllers/quote/crud/list')
 const QuoteShow = () => import('#controllers/quote/crud/show')
@@ -31,5 +32,5 @@ router
     router.put('/:id', [QuoteUpdate, 'handle'])
     router.delete('/:id', [QuoteDelete, 'handle'])
   })
-  .prefix('/quotes')
+  .prefix(API_PREFIX + '/quotes')
   .use(middleware.auth())

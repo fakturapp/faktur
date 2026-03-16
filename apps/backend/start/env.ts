@@ -40,4 +40,7 @@ export default await Env.create(new URL('../', import.meta.url), {
 
   // Frontend URL (for email links)
   FRONTEND_URL: Env.schema.string.optional(),
+
+  // API prefix (e.g. /api/v1)
+  API_PREFIX: Env.schema.string.optional(),
 })

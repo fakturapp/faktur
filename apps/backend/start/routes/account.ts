@@ -1,5 +1,6 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
+import { API_PREFIX } from '#start/routes/_prefix'
 
 const ProfileShow = () => import('#controllers/account/profile/show')
 const ProfileUpdate = () => import('#controllers/account/profile/update')
@@ -20,7 +21,7 @@ const EmailRequestChange = () => import('#controllers/account/email/email_reques
 const EmailConfirmChange = () => import('#controllers/account/email/email_confirm_change')
 
 // Public route - serve avatars
-router.get('/avatars/:filename', [ServeAvatar, 'handle'])
+router.get(API_PREFIX + '/avatars/:filename', [ServeAvatar, 'handle'])
 
 router
   .group(() => {
@@ -42,5 +43,5 @@ router
     router.post('/email/request-change', [EmailRequestChange, 'handle'])
     router.post('/email/confirm-change', [EmailConfirmChange, 'handle'])
   })
-  .prefix('/account')
+  .prefix(API_PREFIX + '/account')
   .use(middleware.auth())

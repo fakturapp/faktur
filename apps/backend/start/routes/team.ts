@@ -1,5 +1,6 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
+import { API_PREFIX } from '#start/routes/_prefix'
 
 const TeamList = () => import('#controllers/team/core/list')
 const TeamCreate = () => import('#controllers/team/core/create')
@@ -21,7 +22,7 @@ const UploadIcon = () => import('#controllers/team/media/upload_icon')
 const ServeIcon = () => import('#controllers/team/media/serve_icon')
 
 // Public route - serve team icons
-router.get('/team-icons/:filename', [ServeIcon, 'handle'])
+router.get(API_PREFIX + '/team-icons/:filename', [ServeIcon, 'handle'])
 
 router
   .group(() => {
@@ -42,8 +43,8 @@ router
     router.delete('/members/:id', [RemoveMember, 'handle'])
     router.post('/transfer-ownership', [TransferOwnership, 'handle'])
   })
-  .prefix('/team')
+  .prefix(API_PREFIX + '/team')
   .use(middleware.auth())
 
 // Public route for invitation info (no auth needed to view)
-router.get('/invite/:token', [InviteInfo, 'handle'])
+router.get(API_PREFIX + '/invite/:token', [InviteInfo, 'handle'])

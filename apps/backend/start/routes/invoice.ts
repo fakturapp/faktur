@@ -1,5 +1,6 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
+import { API_PREFIX } from '#start/routes/_prefix'
 
 const InvoiceList = () => import('#controllers/invoice/crud/list')
 const InvoiceShow = () => import('#controllers/invoice/crud/show')
@@ -33,5 +34,5 @@ router
     router.put('/:id', [InvoiceUpdate, 'handle'])
     router.delete('/:id', [InvoiceDelete, 'handle'])
   })
-  .prefix('/invoices')
+  .prefix(API_PREFIX + '/invoices')
   .use(middleware.auth())

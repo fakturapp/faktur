@@ -1,5 +1,6 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
+import { API_PREFIX } from '#start/routes/_prefix'
 import {
   loginLimiter,
   registerLimiter,
@@ -39,4 +40,4 @@ router
       })
       .use(middleware.auth())
   })
-  .prefix('/auth')
+  .prefix(API_PREFIX + '/auth')

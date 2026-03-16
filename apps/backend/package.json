@@ -15,7 +15,8 @@
     "test": "node ace test",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "ncu": "ncu -u && npm install"
   },
   "imports": {
     "#controllers/*": "./app/controllers/*.js",

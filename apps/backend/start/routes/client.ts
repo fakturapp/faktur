@@ -1,5 +1,6 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
+import { API_PREFIX } from '#start/routes/_prefix'
 
 const ClientList = () => import('#controllers/client/crud/list')
 const ClientShow = () => import('#controllers/client/crud/show')
@@ -17,5 +18,5 @@ router
     router.put('/:id', [ClientUpdate, 'handle'])
     router.delete('/:id', [ClientDelete, 'handle'])
   })
-  .prefix('/clients')
+  .prefix(API_PREFIX + '/clients')
   .use(middleware.auth())

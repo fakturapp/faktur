@@ -1,5 +1,6 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
+import { API_PREFIX } from '#start/routes/_prefix'
 
 const CreateTeam = () => import('#controllers/onboarding/team/create_team')
 const CreateCompany = () => import('#controllers/onboarding/company/create_company')
@@ -15,5 +16,5 @@ router
     router.get('/company/search', [SearchCompany, 'handle'])
     router.post('/personalization', [CompletePersonalization, 'handle'])
   })
-  .prefix('/onboarding')
+  .prefix(API_PREFIX + '/onboarding')
   .use(middleware.auth())

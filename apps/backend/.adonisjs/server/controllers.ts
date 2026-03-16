@@ -5,27 +5,27 @@
 
 export const controllers = {
   account: {
-    twoFactor: {
-      Disable: () => import('#controllers/account/two_factor/disable'),
-      Enable: () => import('#controllers/account/two_factor/enable'),
-      Setup: () => import('#controllers/account/two_factor/setup'),
+    email: {
+      EmailConfirmChange: () => import('#controllers/account/email/email_confirm_change'),
+      EmailRequestChange: () => import('#controllers/account/email/email_request_change'),
     },
     profile: {
-      Show: () => import('#controllers/account/profile/show'),
-      Update: () => import('#controllers/account/profile/update'),
       Delete: () => import('#controllers/account/profile/delete'),
       ServeAvatar: () => import('#controllers/account/profile/serve_avatar'),
+      Show: () => import('#controllers/account/profile/show'),
+      Update: () => import('#controllers/account/profile/update'),
       UploadAvatar: () => import('#controllers/account/profile/upload_avatar'),
     },
     security: {
       Password: () => import('#controllers/account/security/password'),
-      SecurityVerify: () => import('#controllers/account/security/security_verify'),
       RevokeSession: () => import('#controllers/account/security/revoke_session'),
+      SecurityVerify: () => import('#controllers/account/security/security_verify'),
       Sessions: () => import('#controllers/account/security/sessions'),
     },
-    email: {
-      EmailRequestChange: () => import('#controllers/account/email/email_request_change'),
-      EmailConfirmChange: () => import('#controllers/account/email/email_confirm_change'),
+    twoFactor: {
+      Disable: () => import('#controllers/account/two_factor/disable'),
+      Enable: () => import('#controllers/account/two_factor/enable'),
+      Setup: () => import('#controllers/account/two_factor/setup'),
     },
   },
   auth: {
@@ -51,6 +51,31 @@ export const controllers = {
       Me: () => import('#controllers/auth/session/me'),
     },
   },
+  client: {
+    crud: {
+      Create: () => import('#controllers/client/crud/create'),
+      Delete: () => import('#controllers/client/crud/delete'),
+      List: () => import('#controllers/client/crud/list'),
+      Show: () => import('#controllers/client/crud/show'),
+      Update: () => import('#controllers/client/crud/update'),
+    },
+    lookup: {
+      SearchSiren: () => import('#controllers/client/lookup/search_siren'),
+    },
+  },
+  company: {
+    core: {
+      Show: () => import('#controllers/company/core/show'),
+      Update: () => import('#controllers/company/core/update'),
+    },
+    finance: {
+      Bank: () => import('#controllers/company/finance/bank'),
+    },
+    media: {
+      ServeLogo: () => import('#controllers/company/media/serve_logo'),
+      UploadLogo: () => import('#controllers/company/media/upload_logo'),
+    },
+  },
   dashboard: {
     SidebarCounts: () => import('#controllers/dashboard/sidebar_counts'),
     Stats: () => import('#controllers/dashboard/stats'),
@@ -62,121 +87,96 @@ export const controllers = {
   invoice: {
     crud: {
       Create: () => import('#controllers/invoice/crud/create'),
-      Show: () => import('#controllers/invoice/crud/show'),
-      Update: () => import('#controllers/invoice/crud/update'),
       Delete: () => import('#controllers/invoice/crud/delete'),
       List: () => import('#controllers/invoice/crud/list'),
-    },
-    number: {
-      NextNumber: () => import('#controllers/invoice/number/next_number'),
-      SetNextNumber: () => import('#controllers/invoice/number/set_next_number'),
-      DocumentCount: () => import('#controllers/invoice/number/document_count'),
-    },
-    operations: {
-      Duplicate: () => import('#controllers/invoice/operations/duplicate'),
-      UpdateStatus: () => import('#controllers/invoice/operations/update_status'),
-      UpdateComment: () => import('#controllers/invoice/operations/update_comment'),
-      ConvertQuote: () => import('#controllers/invoice/operations/convert_quote'),
-      UnlinkQuote: () => import('#controllers/invoice/operations/unlink_quote'),
+      Show: () => import('#controllers/invoice/crud/show'),
+      Update: () => import('#controllers/invoice/crud/update'),
     },
     export: {
       Pdf: () => import('#controllers/invoice/export/pdf'),
+    },
+    number: {
+      DocumentCount: () => import('#controllers/invoice/number/document_count'),
+      NextNumber: () => import('#controllers/invoice/number/next_number'),
+      SetNextNumber: () => import('#controllers/invoice/number/set_next_number'),
+    },
+    operations: {
+      ConvertQuote: () => import('#controllers/invoice/operations/convert_quote'),
+      Duplicate: () => import('#controllers/invoice/operations/duplicate'),
+      UnlinkQuote: () => import('#controllers/invoice/operations/unlink_quote'),
+      UpdateComment: () => import('#controllers/invoice/operations/update_comment'),
+      UpdateStatus: () => import('#controllers/invoice/operations/update_status'),
+    },
+  },
+  onboarding: {
+    company: {
+      CreateCompany: () => import('#controllers/onboarding/company/create_company'),
+      SearchCompany: () => import('#controllers/onboarding/company/search_company'),
+      SkipCompany: () => import('#controllers/onboarding/company/skip_company'),
+    },
+    personalization: {
+      CompletePersonalization: () => import('#controllers/onboarding/personalization/complete_personalization'),
+    },
+    team: {
+      CreateTeam: () => import('#controllers/onboarding/team/create_team'),
     },
   },
   quote: {
     crud: {
       Create: () => import('#controllers/quote/crud/create'),
-      Show: () => import('#controllers/quote/crud/show'),
-      Update: () => import('#controllers/quote/crud/update'),
       Delete: () => import('#controllers/quote/crud/delete'),
       List: () => import('#controllers/quote/crud/list'),
-    },
-    number: {
-      NextNumber: () => import('#controllers/quote/number/next_number'),
-      SetNextNumber: () => import('#controllers/quote/number/set_next_number'),
-      DocumentCount: () => import('#controllers/quote/number/document_count'),
-    },
-    operations: {
-      Duplicate: () => import('#controllers/quote/operations/duplicate'),
-      UpdateStatus: () => import('#controllers/quote/operations/update_status'),
-      UpdateComment: () => import('#controllers/quote/operations/update_comment'),
+      Show: () => import('#controllers/quote/crud/show'),
+      Update: () => import('#controllers/quote/crud/update'),
     },
     export: {
       Pdf: () => import('#controllers/quote/export/pdf'),
+    },
+    number: {
+      DocumentCount: () => import('#controllers/quote/number/document_count'),
+      NextNumber: () => import('#controllers/quote/number/next_number'),
+      SetNextNumber: () => import('#controllers/quote/number/set_next_number'),
+    },
+    operations: {
+      Duplicate: () => import('#controllers/quote/operations/duplicate'),
+      UpdateComment: () => import('#controllers/quote/operations/update_comment'),
+      UpdateStatus: () => import('#controllers/quote/operations/update_status'),
+    },
+  },
+  settings: {
+    invoice: {
+      InvoiceLogoUpload: () => import('#controllers/settings/invoice/invoice_logo_upload'),
+      InvoiceSettingsShow: () => import('#controllers/settings/invoice/invoice_settings_show'),
+      InvoiceSettingsUpdate: () => import('#controllers/settings/invoice/invoice_settings_update'),
+      ServeInvoiceLogo: () => import('#controllers/settings/invoice/serve_invoice_logo'),
     },
   },
   team: {
     core: {
       Create: () => import('#controllers/team/core/create'),
-      Show: () => import('#controllers/team/core/show'),
-      List: () => import('#controllers/team/core/list'),
-      Update: () => import('#controllers/team/core/update'),
-      Switch: () => import('#controllers/team/core/switch'),
       Delete: () => import('#controllers/team/core/delete'),
       Export: () => import('#controllers/team/core/export'),
       Import: () => import('#controllers/team/core/import'),
-    },
-    members: {
-      Members: () => import('#controllers/team/members/members'),
-      RemoveMember: () => import('#controllers/team/members/remove_member'),
-      UpdateRole: () => import('#controllers/team/members/update_role'),
-      TransferOwnership: () => import('#controllers/team/members/transfer_ownership'),
+      List: () => import('#controllers/team/core/list'),
+      Show: () => import('#controllers/team/core/show'),
+      Switch: () => import('#controllers/team/core/switch'),
+      Update: () => import('#controllers/team/core/update'),
     },
     invitations: {
-      Invite: () => import('#controllers/team/invitations/invite'),
-      InviteInfo: () => import('#controllers/team/invitations/invite_info'),
       AcceptInvite: () => import('#controllers/team/invitations/accept_invite'),
+      InviteInfo: () => import('#controllers/team/invitations/invite_info'),
+      Invite: () => import('#controllers/team/invitations/invite'),
       RevokeInvite: () => import('#controllers/team/invitations/revoke_invite'),
     },
     media: {
       ServeIcon: () => import('#controllers/team/media/serve_icon'),
       UploadIcon: () => import('#controllers/team/media/upload_icon'),
     },
-  },
-  client: {
-    crud: {
-      Create: () => import('#controllers/client/crud/create'),
-      Show: () => import('#controllers/client/crud/show'),
-      Update: () => import('#controllers/client/crud/update'),
-      Delete: () => import('#controllers/client/crud/delete'),
-      List: () => import('#controllers/client/crud/list'),
-    },
-    lookup: {
-      SearchSiren: () => import('#controllers/client/lookup/search_siren'),
-    },
-  },
-  company: {
-    core: {
-      Show: () => import('#controllers/company/core/show'),
-      Update: () => import('#controllers/company/core/update'),
-    },
-    media: {
-      ServeLogo: () => import('#controllers/company/media/serve_logo'),
-      UploadLogo: () => import('#controllers/company/media/upload_logo'),
-    },
-    finance: {
-      Bank: () => import('#controllers/company/finance/bank'),
-    },
-  },
-  settings: {
-    invoice: {
-      InvoiceSettingsShow: () => import('#controllers/settings/invoice/invoice_settings_show'),
-      InvoiceSettingsUpdate: () => import('#controllers/settings/invoice/invoice_settings_update'),
-      InvoiceLogoUpload: () => import('#controllers/settings/invoice/invoice_logo_upload'),
-      ServeInvoiceLogo: () => import('#controllers/settings/invoice/serve_invoice_logo'),
-    },
-  },
-  onboarding: {
-    team: {
-      CreateTeam: () => import('#controllers/onboarding/team/create_team'),
-    },
-    company: {
-      CreateCompany: () => import('#controllers/onboarding/company/create_company'),
-      SkipCompany: () => import('#controllers/onboarding/company/skip_company'),
-      SearchCompany: () => import('#controllers/onboarding/company/search_company'),
-    },
-    personalization: {
-      CompletePersonalization: () => import('#controllers/onboarding/personalization/complete_personalization'),
+    members: {
+      Members: () => import('#controllers/team/members/members'),
+      RemoveMember: () => import('#controllers/team/members/remove_member'),
+      TransferOwnership: () => import('#controllers/team/members/transfer_ownership'),
+      UpdateRole: () => import('#controllers/team/members/update_role'),
     },
   },
 }

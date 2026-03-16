@@ -1,5 +1,6 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
+import { API_PREFIX } from '#start/routes/_prefix'
 
 const InvoiceSettingsShow = () => import('#controllers/settings/invoice/invoice_settings_show')
 const InvoiceSettingsUpdate = () => import('#controllers/settings/invoice/invoice_settings_update')
@@ -7,7 +8,7 @@ const InvoiceLogoUpload = () => import('#controllers/settings/invoice/invoice_lo
 const ServeInvoiceLogo = () => import('#controllers/settings/invoice/serve_invoice_logo')
 
 // Public route - serve invoice logos
-router.get('/invoice-logos/:filename', [ServeInvoiceLogo, 'handle'])
+router.get(API_PREFIX + '/invoice-logos/:filename', [ServeInvoiceLogo, 'handle'])
 
 router
   .group(() => {
@@ -15,5 +16,5 @@ router
     router.put('/invoices', [InvoiceSettingsUpdate, 'handle'])
     router.post('/invoices/logo', [InvoiceLogoUpload, 'handle'])
   })
-  .prefix('/settings')
+  .prefix(API_PREFIX + '/settings')
   .use(middleware.auth())

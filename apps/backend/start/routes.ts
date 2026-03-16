@@ -1,4 +1,5 @@
 import router from '@adonisjs/core/services/router'
+import { API_PREFIX } from '#start/routes/_prefix'
 
 import '#start/routes/auth'
 import '#start/routes/account'
@@ -12,7 +13,7 @@ import '#start/routes/quote'
 import '#start/routes/invoice'
 import '#start/routes/einvoicing'
 
-router.get('/', async () => {
+router.get(API_PREFIX + '/', async () => {
   return {
     name: 'Faktur API',
     version: '1.0.0',
@@ -20,6 +21,6 @@ router.get('/', async () => {
   }
 })
 
-router.get('/health', async () => {
+router.get(API_PREFIX + '/health', async () => {
   return { status: 'ok' }
 })
