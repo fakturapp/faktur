@@ -127,6 +127,7 @@ export default function TeamPage() {
 
   // Delete team
   const [deleteOpen, setDeleteOpen] = useState(false)
+  const [deleteStep, setDeleteStep] = useState(1)
   const [deleteTeamName, setDeleteTeamName] = useState('')
   const [deletePassword, setDeletePassword] = useState('')
   const [deleting, setDeleting] = useState(false)
@@ -284,8 +285,7 @@ export default function TeamPage() {
       <div className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
         {/* Team header card */}
         <div className="rounded-2xl border border-border/50 overflow-hidden">
-          <div className="h-24 bg-gradient-to-br from-indigo-500/20 via-purple-500/10 to-transparent" />
-          <div className="p-6 -mt-12 flex items-end justify-between">
+          <div className="p-6 flex items-end justify-between">
             <div className="flex items-end gap-4">
               <Skeleton className="h-16 w-16 rounded-xl" />
               <div className="space-y-2 mb-1">
@@ -341,10 +341,7 @@ export default function TeamPage() {
       {/* Team Header Card */}
       <Card className="overflow-hidden border-border/50">
         <div className="relative">
-          {/* Gradient banner */}
-          <div className="h-24 bg-gradient-to-br from-indigo-500/20 via-purple-500/10 to-transparent" />
-
-          <CardContent className="p-6 -mt-12">
+          <CardContent className="p-6">
             <input
               ref={iconInputRef}
               type="file"
@@ -796,52 +793,130 @@ export default function TeamPage() {
         </DialogFooter>
       </Dialog>
 
-      {/* Delete Team Dialog */}
-      <Dialog open={deleteOpen} onClose={() => { setDeleteOpen(false); setDeleteTeamName(''); setDeletePassword('') }}>
-        <DialogTitle>Supprimer l&apos;équipe</DialogTitle>
-        <DialogDescription>
-          Cette action est <strong className="text-destructive">irréversible</strong>. Toutes les factures, devis,
-          clients et données de l&apos;équipe <strong>{team?.name}</strong> seront supprimés définitivement.
-        </DialogDescription>
-
-        <div className="mt-4 space-y-4">
-          <Field>
-            <FieldLabel htmlFor="deleteTeamName">
-              Tapez <strong>{team?.name}</strong> pour confirmer
-            </FieldLabel>
-            <Input
-              id="deleteTeamName"
-              value={deleteTeamName}
-              onChange={(e) => setDeleteTeamName(e.target.value)}
-              placeholder={team?.name || ''}
-            />
-          </Field>
-
-          <Field>
-            <FieldLabel htmlFor="deletePassword">Mot de passe du compte</FieldLabel>
-            <Input
-              id="deletePassword"
-              type="password"
-              value={deletePassword}
-              onChange={(e) => setDeletePassword(e.target.value)}
-              placeholder="Votre mot de passe"
-            />
-          </Field>
+      {/* Delete Team Dialog - Multi-step */}
+      <Dialog open={deleteOpen} onClose={() => { setDeleteOpen(false); setDeleteStep(1); setDeleteTeamName(''); setDeletePassword('') }}>
+        {/* Step indicator */}
+        <div className="flex items-center gap-2 mb-5">
+          {[1, 2, 3].map((s) => (
+            <div key={s} className="flex items-center gap-2">
+              <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold transition-colors ${
+                s < deleteStep ? 'bg-destructive text-white' : s === deleteStep ? 'bg-destructive/15 text-destructive border-2 border-destructive' : 'bg-muted text-muted-foreground'
+              }`}>
+                {s < deleteStep ? <Check className="h-3.5 w-3.5" /> : s}
+              </div>
+              {s < 3 && <div className={`h-0.5 w-8 rounded-full transition-colors ${s < deleteStep ? 'bg-destructive' : 'bg-muted'}`} />}
+            </div>
+          ))}
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => { setDeleteOpen(false); setDeleteTeamName(''); setDeletePassword('') }}>
-            Annuler
-          </Button>
-          <Button
-            variant="outline"
-            className="border-destructive/30 text-destructive hover:bg-destructive/10"
-            onClick={handleDeleteTeam}
-            disabled={deleting || deleteTeamName !== team?.name || !deletePassword}
-          >
-            {deleting ? <><Spinner /> Suppression...</> : <><Trash2 className="h-4 w-4 mr-2" /> Supprimer définitivement</>}
-          </Button>
-        </DialogFooter>
+        <AnimatePresence mode="wait">
+          {deleteStep === 1 && (
+            <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-destructive/10">
+                  <AlertTriangle className="h-5.5 w-5.5 text-destructive" />
+                </div>
+                <div>
+                  <DialogTitle className="mb-0">Supprimer l&apos;équipe</DialogTitle>
+                  <p className="text-xs text-muted-foreground mt-0.5">Étape 1 sur 3 — Avertissement</p>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4 space-y-2">
+                <p className="text-sm font-medium text-destructive">Cette action est irréversible.</p>
+                <p className="text-sm text-muted-foreground">
+                  Toutes les données de l&apos;équipe <strong className="text-foreground">{team?.name}</strong> seront supprimées définitivement :
+                </p>
+                <ul className="text-sm text-muted-foreground space-y-1 ml-4">
+                  <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-destructive/50 shrink-0" /> Toutes les factures et devis</li>
+                  <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-destructive/50 shrink-0" /> Tous les clients</li>
+                  <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-destructive/50 shrink-0" /> Les paramètres et documents</li>
+                  <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-destructive/50 shrink-0" /> Les membres seront retirés</li>
+                </ul>
+              </div>
+
+              <DialogFooter>
+                <Button variant="outline" onClick={() => { setDeleteOpen(false); setDeleteStep(1) }}>
+                  Annuler
+                </Button>
+                <Button
+                  variant="outline"
+                  className="border-destructive/30 text-destructive hover:bg-destructive/10"
+                  onClick={() => setDeleteStep(2)}
+                >
+                  J&apos;ai compris, continuer
+                </Button>
+              </DialogFooter>
+            </motion.div>
+          )}
+
+          {deleteStep === 2 && (
+            <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
+              <DialogTitle>Confirmer le nom</DialogTitle>
+              <p className="text-xs text-muted-foreground mt-0.5 mb-4">Étape 2 sur 3 — Vérification</p>
+
+              <Field>
+                <FieldLabel htmlFor="deleteTeamName">
+                  Tapez <strong className="text-destructive">{team?.name}</strong> pour confirmer
+                </FieldLabel>
+                <Input
+                  id="deleteTeamName"
+                  value={deleteTeamName}
+                  onChange={(e) => setDeleteTeamName(e.target.value)}
+                  placeholder={team?.name || ''}
+                  autoFocus
+                />
+              </Field>
+
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setDeleteStep(1)}>
+                  Retour
+                </Button>
+                <Button
+                  variant="outline"
+                  className="border-destructive/30 text-destructive hover:bg-destructive/10"
+                  onClick={() => setDeleteStep(3)}
+                  disabled={deleteTeamName !== team?.name}
+                >
+                  Continuer
+                </Button>
+              </DialogFooter>
+            </motion.div>
+          )}
+
+          {deleteStep === 3 && (
+            <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
+              <DialogTitle>Mot de passe</DialogTitle>
+              <p className="text-xs text-muted-foreground mt-0.5 mb-4">Étape 3 sur 3 — Authentification</p>
+
+              <Field>
+                <FieldLabel htmlFor="deletePassword">Entrez votre mot de passe pour confirmer</FieldLabel>
+                <Input
+                  id="deletePassword"
+                  type="password"
+                  value={deletePassword}
+                  onChange={(e) => setDeletePassword(e.target.value)}
+                  placeholder="Votre mot de passe"
+                  autoFocus
+                />
+              </Field>
+
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setDeleteStep(2)}>
+                  Retour
+                </Button>
+                <Button
+                  variant="outline"
+                  className="border-destructive/30 text-destructive hover:bg-destructive/10"
+                  onClick={handleDeleteTeam}
+                  disabled={deleting || !deletePassword}
+                >
+                  {deleting ? <><Spinner /> Suppression...</> : <><Trash2 className="h-4 w-4 mr-2" /> Supprimer définitivement</>}
+                </Button>
+              </DialogFooter>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </Dialog>
 
       {/* Team Logo Dialog */}

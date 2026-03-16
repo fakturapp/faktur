@@ -219,7 +219,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
       )}
     >
       {/* Team header */}
-      <div className="px-3 pt-3 pb-3 bg-gradient-to-br from-primary/5 to-transparent">
+      <div className="mx-2 mt-2 px-1 pt-1 pb-1 rounded-xl bg-gradient-to-br from-primary/5 to-transparent">
         {teamsLoaded ? (
           <Dropdown
             align="left"
