@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import {
   Check, Zap, ClipboardList, ChevronDown, ChevronRight, Building2, UserRound,
-  Palette, Pen, Info, Landmark, Banknote,
+  Palette, Pen, Info, Landmark, Banknote, MoreHorizontal,
 } from 'lucide-react'
 import { Tooltip } from '@/components/ui/tooltip'
 import type { ClientInfo } from './a4-sheet'
@@ -373,6 +373,7 @@ export function DocumentOptionsPanel({
                 {[
                   { id: 'bank_transfer', label: 'Virement', icon: Landmark },
                   { id: 'cash', label: 'Espèces', icon: Banknote },
+                  { id: 'other', label: 'Autre', icon: MoreHorizontal },
                 ].map((t) => (
                   <button
                     key={t.id}

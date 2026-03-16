@@ -386,27 +386,6 @@ export default function NewInvoicePage() {
         </div>
       </motion.div>
 
-      {/* Validation notification */}
-      <AnimatePresence>
-        {validationErrors.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2 }}
-            className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl bg-destructive/10 border border-destructive/20"
-          >
-            <div className="flex items-center gap-2 text-sm text-destructive font-medium">
-              <span className="h-2 w-2 rounded-full bg-destructive shrink-0" />
-              Certains champs obligatoires sont manquants
-            </div>
-            <button onClick={() => setValidationErrors([])} className="text-destructive/60 hover:text-destructive transition-colors shrink-0">
-              <X className="h-4 w-4" />
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* First document banner */}
       <FirstDocumentBanner
         documentType="invoice"
@@ -517,7 +496,24 @@ export default function NewInvoicePage() {
       </div>
 
       {/* Sticky save bar */}
-      <div className="sticky bottom-4 z-20 flex justify-center pointer-events-none">
+      <div className="sticky bottom-4 z-20 flex flex-col items-center gap-2 pointer-events-none">
+        <AnimatePresence>
+          {validationErrors.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={{ duration: 0.2 }}
+              className="pointer-events-auto flex items-center gap-2 px-4 py-2 rounded-xl bg-destructive/10 border border-destructive/20 backdrop-blur-xl"
+            >
+              <span className="h-2 w-2 rounded-full bg-destructive animate-pulse shrink-0" />
+              <span className="text-sm text-destructive font-medium">Champs obligatoires manquants</span>
+              <button onClick={() => setValidationErrors([])} className="text-destructive/60 hover:text-destructive transition-colors shrink-0 ml-1">
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
         <motion.div
           variants={fadeUp}
           custom={3}

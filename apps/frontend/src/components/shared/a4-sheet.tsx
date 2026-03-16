@@ -1181,20 +1181,27 @@ export function A4Sheet({
               )}
 
               {/* Payment method + bank account info — invoices only */}
-              {isInvoice && paymentMethod === 'bank_transfer' && bankAccountInfo && (bankAccountInfo.iban || bankAccountInfo.bic || bankAccountInfo.bankName) && (
+              {isInvoice && paymentMethod && (
                 <div className="mt-3 pt-3" style={{ borderTop: `1px solid ${T.borderLight}` }}>
                   <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1.5" style={{ color: T.textMuted }}>
-                    {lang === 'en' ? 'Bank details' : 'Coordonnees bancaires'}
+                    {lang === 'en' ? 'Payment method' : 'Moyen de paiement'}
                   </div>
                   <div className="text-[11px] leading-[1.7]" style={{ color: T.text }}>
-                    {bankAccountInfo.bankName && (
-                      <div><span className="font-semibold">{lang === 'en' ? 'Bank' : 'Banque'} :</span> {bankAccountInfo.bankName}</div>
-                    )}
-                    {bankAccountInfo.iban && (
-                      <div><span className="font-semibold">IBAN :</span> <span className="font-mono">{bankAccountInfo.iban}</span></div>
-                    )}
-                    {bankAccountInfo.bic && (
-                      <div><span className="font-semibold">BIC :</span> <span className="font-mono">{bankAccountInfo.bic}</span></div>
+                    <div className="font-semibold">
+                      {paymentMethod === 'bank_transfer' ? (lang === 'en' ? 'Bank transfer' : 'Virement') : paymentMethod === 'cash' ? (lang === 'en' ? 'Cash' : 'Espèces') : (lang === 'en' ? 'Other' : 'Autre')}
+                    </div>
+                    {paymentMethod === 'bank_transfer' && bankAccountInfo && (bankAccountInfo.iban || bankAccountInfo.bic || bankAccountInfo.bankName) && (
+                      <div className="mt-1">
+                        {bankAccountInfo.bankName && (
+                          <div><span className="font-semibold">{lang === 'en' ? 'Bank' : 'Banque'} :</span> {bankAccountInfo.bankName}</div>
+                        )}
+                        {bankAccountInfo.iban && (
+                          <div><span className="font-semibold">IBAN :</span> <span className="font-mono">{bankAccountInfo.iban}</span></div>
+                        )}
+                        {bankAccountInfo.bic && (
+                          <div><span className="font-semibold">BIC :</span> <span className="font-mono">{bankAccountInfo.bic}</span></div>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>
