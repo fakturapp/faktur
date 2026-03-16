@@ -318,7 +318,7 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                   <button
                     onClick={handleDownloadPdf}
                     disabled={downloading}
-                    className="h-9 px-4 rounded-full bg-card shadow-lg flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors border border-border"
+                    className={`h-9 px-4 rounded-full bg-card shadow-lg flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors border border-border ${downloading ? 'download-shimmer' : ''}`}
                   >
                     {downloading ? <Spinner className="h-4 w-4" /> : <Download className="h-4 w-4" />}
                     {downloading ? 'Téléchargement...' : 'Télécharger PDF'}

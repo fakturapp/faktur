@@ -417,7 +417,7 @@ export default function EditInvoicePage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={handleDownloadPdf} disabled={downloading}>
+          <Button variant="outline" size="sm" onClick={handleDownloadPdf} disabled={downloading} className={downloading ? 'download-shimmer' : ''}>
             {downloading ? <Spinner className="h-3.5 w-3.5 mr-1.5" /> : <Download className="h-3.5 w-3.5 mr-1.5" />}
             {downloading ? 'Génération en cours...' : 'Télécharger le PDF'}
           </Button>

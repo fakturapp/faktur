@@ -283,10 +283,10 @@ export default function QuotesPage() {
                   <button
                     onClick={(e) => handleDownloadPdf(e, quote.id)}
                     disabled={downloadingId === quote.id}
-                    className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
+                    className={`h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0 ${downloadingId === quote.id ? 'download-shimmer' : ''}`}
                     title="Télécharger le PDF"
                   >
-                    <Download className={`h-4 w-4 ${downloadingId === quote.id ? 'animate-pulse' : ''}`} />
+                    <Download className="h-4 w-4" />
                   </button>
 
                   <ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors shrink-0" />
