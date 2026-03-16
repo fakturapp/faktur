@@ -22,6 +22,7 @@ import {
   TrendingUp,
   CalendarDays,
 } from 'lucide-react'
+import { Spinner } from '@/components/ui/spinner'
 import { CreateInvoiceModal } from '@/components/invoices/create-invoice-modal'
 import { InvoiceDetailOverlay } from '@/components/invoices/invoice-detail-overlay'
 
@@ -341,10 +342,10 @@ export default function InvoicesPage() {
                   <button
                     onClick={(e) => handleDownloadPdf(e, invoice.id)}
                     disabled={downloadingId === invoice.id}
-                    className={`h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0 ${downloadingId === invoice.id ? 'download-shimmer' : ''}`}
+                    className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
                     title="Télécharger le PDF"
                   >
-                    <Download className="h-4 w-4" />
+                    {downloadingId === invoice.id ? <Spinner className="h-4 w-4" /> : <Download className="h-4 w-4" />}
                   </button>
 
                   <ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors shrink-0" />

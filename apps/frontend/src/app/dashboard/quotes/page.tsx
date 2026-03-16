@@ -23,6 +23,7 @@ import {
   CalendarDays,
   TrendingUp,
 } from 'lucide-react'
+import { Spinner } from '@/components/ui/spinner'
 import { QuoteDetailOverlay } from '@/components/quotes/quote-detail-overlay'
 
 const fadeUp = {
@@ -333,10 +334,10 @@ export default function QuotesPage() {
                   <button
                     onClick={(e) => handleDownloadPdf(e, quote.id)}
                     disabled={downloadingId === quote.id}
-                    className={`h-8 rounded-lg flex items-center gap-1.5 px-2.5 text-xs font-medium text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0 ${downloadingId === quote.id ? 'download-shimmer' : ''}`}
+                    className="h-8 rounded-lg flex items-center gap-1.5 px-2.5 text-xs font-medium text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
                     title={`Télécharger ${quote.quoteNumber}`}
                   >
-                    <Download className="h-3.5 w-3.5" />
+                    {downloadingId === quote.id ? <Spinner className="h-3.5 w-3.5" /> : <Download className="h-3.5 w-3.5" />}
                     <span className="hidden @[600px]:inline">{quote.quoteNumber}</span>
                   </button>
 
