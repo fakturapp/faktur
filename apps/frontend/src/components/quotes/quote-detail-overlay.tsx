@@ -232,7 +232,7 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
   }
 
   // Always use current settings logo so preview stays in sync with PDF
-  const effectiveLogoUrl = invoiceSettings.logoSource === 'company' ? companyLogoUrl : (invoiceSettings.logoUrl || quote?.logoUrl)
+  const effectiveLogoUrl = invoiceSettings.logoSource === 'company' ? companyLogoUrl : (invoiceSettings.logoUrl || quote?.logoUrl || null)
 
   return (
     <AnimatePresence>
@@ -270,7 +270,7 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
                 <Spinner size="lg" />
               </div>
             ) : quote ? (
-              <div className="w-full max-w-[620px] shrink-0">
+              <div className="w-full max-w-[700px] shrink-0">
                 <A4Sheet
                   mode="preview"
                   logoUrl={effectiveLogoUrl}

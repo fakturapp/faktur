@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState, useCallback } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react'
 import { api } from '@/lib/api'
 
 export interface EmailAccountItem {
@@ -36,11 +36,22 @@ export function useEmail() {
 export function EmailProvider({ children }: { children: React.ReactNode }) {
   const [accounts, setAccounts] = useState<EmailAccountItem[]>([])
   const [loading, setLoading] = useState(true)
+  const retryCount = useRef(0)
 
   const loadAccounts = useCallback(async () => {
-    const { data } = await api.get<{ emailAccounts: EmailAccountItem[] }>('/email/accounts')
-    if (data?.emailAccounts) {
-      setAccounts(data.emailAccounts)
+    try {
+      const { data, error } = await api.get<{ emailAccounts: EmailAccountItem[] }>('/email/accounts')
+      if (data?.emailAccounts) {
+        setAccounts(data.emailAccounts)
+        retryCount.current = 0
+      } else if (error && retryCount.current < 2) {
+        // Retry once after a short delay (covers race with auth)
+        retryCount.current++
+        setTimeout(() => loadAccounts(), 1500)
+        return
+      }
+    } catch {
+      // silently fail
     }
     setLoading(false)
   }, [])

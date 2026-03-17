@@ -6,10 +6,11 @@ import { motion, type Variants } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
+import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { useToast } from '@/components/ui/toast'
 import { useEmail, type EmailAccountItem } from '@/lib/email-context'
 import { api } from '@/lib/api'
-import { Mail, Trash2, Star, Plus, ExternalLink, Server, Zap } from 'lucide-react'
+import { Mail, Trash2, Star, Plus, ExternalLink, Server, Zap, Send } from 'lucide-react'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -20,6 +21,28 @@ const fadeUp = {
   }),
 } satisfies Variants
 
+function EmailAccountSkeleton() {
+  return (
+    <div className="space-y-2">
+      {[0, 1].map((i) => (
+        <div key={i} className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-4 py-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="h-8 w-8 rounded-lg bg-muted animate-pulse shrink-0" />
+            <div className="min-w-0 space-y-1.5">
+              <div className="h-3.5 w-40 rounded bg-muted animate-pulse" />
+              <div className="h-3 w-24 rounded bg-muted animate-pulse" />
+            </div>
+          </div>
+          <div className="flex items-center gap-1 shrink-0">
+            <div className="h-8 w-8 rounded-lg bg-muted animate-pulse" />
+            <div className="h-8 w-8 rounded-lg bg-muted animate-pulse" />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 export default function EmailSettingsPage() {
   const { toast } = useToast()
   const searchParams = useSearchParams()
@@ -27,12 +50,13 @@ export default function EmailSettingsPage() {
   const [connectingGmail, setConnectingGmail] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [settingDefaultId, setSettingDefaultId] = useState<string | null>(null)
+  const [sendingTestId, setSendingTestId] = useState<string | null>(null)
+  const [deleteConfirm, setDeleteConfirm] = useState<EmailAccountItem | null>(null)
 
   useEffect(() => {
     if (searchParams.get('connected') === 'true') {
       toast('Compte Gmail connecté avec succès', 'success')
       refreshAccounts()
-      // Clean URL
       window.history.replaceState({}, '', '/dashboard/settings/email')
     }
     if (searchParams.get('error')) {
@@ -61,6 +85,7 @@ export default function EmailSettingsPage() {
     setDeletingId(account.id)
     const { error } = await api.delete(`/email/accounts/${account.id}`)
     setDeletingId(null)
+    setDeleteConfirm(null)
     if (error) { toast(error, 'error'); return }
     toast('Compte déconnecté', 'success')
     refreshAccounts()
@@ -72,6 +97,17 @@ export default function EmailSettingsPage() {
     setSettingDefaultId(null)
     if (error) { toast(error, 'error'); return }
     refreshAccounts()
+  }
+
+  async function handleSendTest(account: EmailAccountItem) {
+    setSendingTestId(account.id)
+    const { error } = await api.post('/email/test', { emailAccountId: account.id })
+    setSendingTestId(null)
+    if (error) {
+      toast(error, 'error')
+      return
+    }
+    toast(`Email de test envoyé à ${account.email}`, 'success')
   }
 
   const gmailAccounts = accounts.filter((a) => a.provider === 'gmail')
@@ -113,9 +149,7 @@ export default function EmailSettingsPage() {
               </div>
 
               {loading ? (
-                <div className="flex items-center justify-center py-8">
-                  <Spinner />
-                </div>
+                <EmailAccountSkeleton />
               ) : gmailAccounts.length > 0 ? (
                 <div className="space-y-2">
                   {gmailAccounts.map((account) => (
@@ -142,6 +176,18 @@ export default function EmailSettingsPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          onClick={() => handleSendTest(account)}
+                          disabled={sendingTestId === account.id}
+                          className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                          title="Envoyer un email de test"
+                        >
+                          {sendingTestId === account.id ? (
+                            <Spinner className="h-3.5 w-3.5" />
+                          ) : (
+                            <Send className="h-3.5 w-3.5" />
+                          )}
+                        </button>
                         {!account.isDefault && (
                           <button
                             onClick={() => handleSetDefault(account)}
@@ -157,7 +203,7 @@ export default function EmailSettingsPage() {
                           </button>
                         )}
                         <button
-                          onClick={() => handleDelete(account)}
+                          onClick={() => setDeleteConfirm(account)}
                           disabled={deletingId === account.id}
                           className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
                           title="Déconnecter"
@@ -241,6 +287,26 @@ export default function EmailSettingsPage() {
           </Card>
         </motion.div>
       </motion.div>
+
+      {/* Delete confirmation dialog */}
+      <Dialog open={deleteConfirm !== null} onClose={() => setDeleteConfirm(null)} className="max-w-sm">
+        <DialogTitle>Déconnecter le compte</DialogTitle>
+        <DialogDescription>
+          Êtes-vous sûr de vouloir déconnecter <strong className="text-foreground">{deleteConfirm?.email}</strong> ? Vous ne pourrez plus envoyer d&apos;emails via ce compte.
+        </DialogDescription>
+        <DialogFooter>
+          <Button variant="outline" size="sm" onClick={() => setDeleteConfirm(null)}>Annuler</Button>
+          <Button
+            variant="destructive"
+            size="sm"
+            disabled={deletingId !== null}
+            onClick={() => deleteConfirm && handleDelete(deleteConfirm)}
+          >
+            {deletingId ? <Spinner className="h-3.5 w-3.5" /> : <Trash2 className="h-3.5 w-3.5 mr-1" />}
+            Déconnecter
+          </Button>
+        </DialogFooter>
+      </Dialog>
     </div>
   )
 }

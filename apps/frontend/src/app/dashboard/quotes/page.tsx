@@ -135,6 +135,29 @@ export default function QuotesPage() {
     return now.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }).replace(/^\w/, (c) => c.toUpperCase())
   }, [])
 
+  const groupedQuotes = useMemo(() => {
+    const groups: { key: string; label: string; total: number; items: QuoteListItem[] }[] = []
+    const map = new Map<string, { label: string; total: number; items: QuoteListItem[] }>()
+
+    for (const q of quotes) {
+      const d = new Date(q.issueDate)
+      const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, '0')}`
+      if (!map.has(key)) {
+        const label = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }).replace(/^\w/, (c) => c.toUpperCase())
+        map.set(key, { label, total: 0, items: [] })
+      }
+      const group = map.get(key)!
+      group.total += Number(q.total)
+      group.items.push(q)
+    }
+
+    for (const [key, data] of map) {
+      groups.push({ key, ...data })
+    }
+
+    return groups
+  }, [quotes])
+
   function handleStatusChange(id: string, newStatus: string) {
     setQuotes((prev) => prev.map((q) => (q.id === id ? { ...q, status: newStatus as QuoteListItem['status'] } : q)))
   }
@@ -278,74 +301,91 @@ export default function QuotesPage() {
           )}
         </motion.div>
       ) : (
-        <div className="space-y-2">
-          {quotes.map((quote, i) => {
-            return (
-              <motion.div key={quote.id} variants={fadeUp} custom={2 + i * 0.3}>
-                <div
-                  onClick={() => setSelectedQuoteId(quote.id)}
-                  className="w-full flex items-center gap-4 rounded-xl border border-border bg-card/50 hover:bg-card/80 p-4 transition-colors text-left group cursor-pointer"
-                >
-                  {/* Icon */}
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                    {quote.status === 'draft' && <FileText className="h-5 w-5 text-zinc-400" />}
-                    {quote.status === 'sent' && <Send className="h-5 w-5 text-blue-400" />}
-                    {quote.status === 'accepted' && <CheckCircle2 className="h-5 w-5 text-green-400" />}
-                    {quote.status === 'refused' && <XCircle className="h-5 w-5 text-red-400" />}
-                    {quote.status === 'expired' && <Clock className="h-5 w-5 text-amber-400" />}
-                  </div>
-
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <p className="text-sm font-semibold text-foreground truncate">
-                        {quote.quoteNumber}
-                      </p>
-                      <StatusDropdown
-                        id={quote.id}
-                        currentStatus={quote.status}
-                        options={quoteStatusOptions}
-                        endpoint="quotes"
-                        onStatusChange={handleStatusChange}
-                      />
-                    </div>
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                      {quote.clientName && (
-                        <span className="truncate">{quote.clientName}</span>
-                      )}
-                      {quote.subject && (
-                        <span className="truncate">{quote.subject}</span>
-                      )}
-                      <span className="shrink-0">
-                        {new Date(quote.issueDate).toLocaleDateString('fr-FR')}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Amount */}
-                  <div className="text-right shrink-0">
-                    <p className="text-sm font-medium text-foreground">
-                      {Number(quote.total).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
-                    </p>
-                    <p className="text-xs text-muted-foreground">TTC</p>
-                  </div>
-
-                  {/* PDF download */}
-                  <button
-                    onClick={(e) => handleDownloadPdf(e, quote.id)}
-                    disabled={downloadingId === quote.id}
-                    className="h-8 rounded-lg flex items-center gap-1.5 px-2.5 text-xs font-medium text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
-                    title={`Télécharger ${quote.quoteNumber}`}
-                  >
-                    {downloadingId === quote.id ? <Spinner className="h-3.5 w-3.5" /> : <Download className="h-3.5 w-3.5" />}
-                    <span className="hidden @[600px]:inline">{quote.quoteNumber}</span>
-                  </button>
-
-                  <ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors shrink-0" />
+        <div className="space-y-4">
+          {groupedQuotes.map((group, gi) => (
+            <div key={group.key}>
+              {/* Month header */}
+              <motion.div variants={fadeUp} custom={2 + gi * 0.2} className="flex items-center justify-between mb-2 px-1">
+                <div className="flex items-center gap-2">
+                  <CalendarDays className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className="text-sm font-semibold text-foreground">{group.label}</span>
+                  <span className="text-xs text-muted-foreground">({group.items.length})</span>
                 </div>
+                <span className="text-sm font-semibold text-foreground">
+                  {group.total.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
+                </span>
               </motion.div>
-            )
-          })}
+
+              {/* Quotes in this month */}
+              <div className="space-y-2">
+                {group.items.map((quote, i) => (
+                  <motion.div key={quote.id} variants={fadeUp} custom={2 + gi * 0.2 + (i + 1) * 0.05}>
+                    <div
+                      onClick={() => setSelectedQuoteId(quote.id)}
+                      className="w-full flex items-center gap-4 rounded-xl border border-border bg-card/50 hover:bg-card/80 p-4 transition-colors text-left group cursor-pointer"
+                    >
+                      {/* Icon */}
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                        {quote.status === 'draft' && <FileText className="h-5 w-5 text-zinc-400" />}
+                        {quote.status === 'sent' && <Send className="h-5 w-5 text-blue-400" />}
+                        {quote.status === 'accepted' && <CheckCircle2 className="h-5 w-5 text-green-400" />}
+                        {quote.status === 'refused' && <XCircle className="h-5 w-5 text-red-400" />}
+                        {quote.status === 'expired' && <Clock className="h-5 w-5 text-amber-400" />}
+                      </div>
+
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <p className="text-sm font-semibold text-foreground truncate">
+                            {quote.quoteNumber}
+                          </p>
+                          <StatusDropdown
+                            id={quote.id}
+                            currentStatus={quote.status}
+                            options={quoteStatusOptions}
+                            endpoint="quotes"
+                            onStatusChange={handleStatusChange}
+                          />
+                        </div>
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          {quote.clientName && (
+                            <span className="truncate">{quote.clientName}</span>
+                          )}
+                          {quote.subject && (
+                            <span className="truncate">{quote.subject}</span>
+                          )}
+                          <span className="shrink-0">
+                            {new Date(quote.issueDate).toLocaleDateString('fr-FR')}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Amount */}
+                      <div className="text-right shrink-0">
+                        <p className="text-sm font-medium text-foreground">
+                          {Number(quote.total).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
+                        </p>
+                        <p className="text-xs text-muted-foreground">TTC</p>
+                      </div>
+
+                      {/* PDF download */}
+                      <button
+                        onClick={(e) => handleDownloadPdf(e, quote.id)}
+                        disabled={downloadingId === quote.id}
+                        className="h-8 rounded-lg flex items-center gap-1.5 px-2.5 text-xs font-medium text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
+                        title={`Télécharger ${quote.quoteNumber}`}
+                      >
+                        {downloadingId === quote.id ? <Spinner className="h-3.5 w-3.5" /> : <Download className="h-3.5 w-3.5" />}
+                        <span className="hidden @[600px]:inline">{quote.quoteNumber}</span>
+                      </button>
+
+                      <ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors shrink-0" />
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       )}
 

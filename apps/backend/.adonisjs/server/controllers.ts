@@ -98,6 +98,7 @@ export const controllers = {
     },
     send: {
       SendEmail: () => import('#controllers/email/send/send_email'),
+      SendTestEmail: () => import('#controllers/email/send/send_test_email'),
     },
   },
   invoice: {

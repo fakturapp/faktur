@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
+import { DatePicker } from '@/components/ui/date-picker'
 import { getTemplate, type TemplateConfig } from '@/lib/invoice-templates'
 import { getTranslations } from '@/lib/invoice-i18n'
 
@@ -180,29 +181,18 @@ function InlineDateEdit({
   borderDashed?: string
   style?: React.CSSProperties
 }) {
-  const ref = useRef<HTMLInputElement>(null)
-
   if (preview) {
     return <span className={className} style={style}>{fmtDate(value, lang)}</span>
   }
 
   return (
-    <span className={cn('relative inline-flex items-center', className)} style={style}>
-      <span
-        className="cursor-pointer"
-        onClick={() => ref.current?.showPicker?.()}
-      >
-        {fmtDate(value, lang) || '...'}
-      </span>
-      <input
-        ref={ref}
-        type="date"
-        value={value}
-        onChange={(e) => onChange?.(e.target.value)}
-        className="absolute inset-0 opacity-0 cursor-pointer"
-        style={{ width: '100%', height: '100%' }}
-      />
-    </span>
+    <DatePicker
+      value={value}
+      onChange={onChange}
+      lang={lang}
+      accentColor={accentColor}
+      className={className}
+    />
   )
 }
 

@@ -137,14 +137,27 @@ export default function InvoicesPage() {
     return now.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }).replace(/^\w/, (c) => c.toUpperCase())
   }, [])
 
-  const monthInvoiceCount = useMemo(() => {
-    const now = new Date()
-    const y = now.getFullYear()
-    const m = now.getMonth()
-    return invoices.filter((inv) => {
+  const groupedInvoices = useMemo(() => {
+    const groups: { key: string; label: string; total: number; items: InvoiceListItem[] }[] = []
+    const map = new Map<string, { label: string; total: number; items: InvoiceListItem[] }>()
+
+    for (const inv of invoices) {
       const d = new Date(inv.issueDate)
-      return d.getFullYear() === y && d.getMonth() === m
-    }).length
+      const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, '0')}`
+      if (!map.has(key)) {
+        const label = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }).replace(/^\w/, (c) => c.toUpperCase())
+        map.set(key, { label, total: 0, items: [] })
+      }
+      const group = map.get(key)!
+      group.total += Number(inv.total)
+      group.items.push(inv)
+    }
+
+    for (const [key, data] of map) {
+      groups.push({ key, ...data })
+    }
+
+    return groups
   }, [invoices])
 
   function handleStatusChange(id: string, newStatus: string) {
@@ -286,73 +299,90 @@ export default function InvoicesPage() {
           )}
         </motion.div>
       ) : (
-        <div className="space-y-2">
-          {invoices.map((invoice, i) => {
-            return (
-              <motion.div key={invoice.id} variants={fadeUp} custom={2 + i * 0.3}>
-                <div
-                  onClick={() => setSelectedInvoiceId(invoice.id)}
-                  className="w-full flex items-center gap-4 rounded-xl border border-border bg-card/50 hover:bg-card/80 p-4 transition-colors text-left group cursor-pointer"
-                >
-                  {/* Icon */}
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                    {invoice.status === 'draft' && <FileText className="h-5 w-5 text-zinc-400" />}
-                    {invoice.status === 'sent' && <Send className="h-5 w-5 text-blue-400" />}
-                    {invoice.status === 'paid' && <CheckCircle2 className="h-5 w-5 text-green-400" />}
-                    {invoice.status === 'overdue' && <Clock className="h-5 w-5 text-red-400" />}
-                    {invoice.status === 'cancelled' && <Ban className="h-5 w-5 text-orange-400" />}
-                  </div>
-
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <p className="text-sm font-semibold text-foreground truncate">
-                        {invoice.invoiceNumber}
-                      </p>
-                      <StatusDropdown
-                        id={invoice.id}
-                        currentStatus={invoice.status}
-                        options={invoiceStatusOptions}
-                        endpoint="invoices"
-                        onStatusChange={handleStatusChange}
-                      />
-                    </div>
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                      {invoice.clientName && (
-                        <span className="truncate">{invoice.clientName}</span>
-                      )}
-                      {invoice.subject && (
-                        <span className="truncate">{invoice.subject}</span>
-                      )}
-                      <span className="shrink-0">
-                        {new Date(invoice.issueDate).toLocaleDateString('fr-FR')}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Amount */}
-                  <div className="text-right shrink-0">
-                    <p className="text-sm font-medium text-foreground">
-                      {Number(invoice.total).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
-                    </p>
-                    <p className="text-xs text-muted-foreground">TTC</p>
-                  </div>
-
-                  {/* PDF download */}
-                  <button
-                    onClick={(e) => handleDownloadPdf(e, invoice.id)}
-                    disabled={downloadingId === invoice.id}
-                    className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
-                    title="Télécharger le PDF"
-                  >
-                    {downloadingId === invoice.id ? <Spinner className="h-4 w-4" /> : <Download className="h-4 w-4" />}
-                  </button>
-
-                  <ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors shrink-0" />
+        <div className="space-y-4">
+          {groupedInvoices.map((group, gi) => (
+            <div key={group.key}>
+              {/* Month header */}
+              <motion.div variants={fadeUp} custom={2 + gi * 0.2} className="flex items-center justify-between mb-2 px-1">
+                <div className="flex items-center gap-2">
+                  <CalendarDays className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className="text-sm font-semibold text-foreground">{group.label}</span>
+                  <span className="text-xs text-muted-foreground">({group.items.length})</span>
                 </div>
+                <span className="text-sm font-semibold text-foreground">
+                  {group.total.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
+                </span>
               </motion.div>
-            )
-          })}
+
+              {/* Invoices in this month */}
+              <div className="space-y-2">
+                {group.items.map((invoice, i) => (
+                  <motion.div key={invoice.id} variants={fadeUp} custom={2 + gi * 0.2 + (i + 1) * 0.05}>
+                    <div
+                      onClick={() => setSelectedInvoiceId(invoice.id)}
+                      className="w-full flex items-center gap-4 rounded-xl border border-border bg-card/50 hover:bg-card/80 p-4 transition-colors text-left group cursor-pointer"
+                    >
+                      {/* Icon */}
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                        {invoice.status === 'draft' && <FileText className="h-5 w-5 text-zinc-400" />}
+                        {invoice.status === 'sent' && <Send className="h-5 w-5 text-blue-400" />}
+                        {invoice.status === 'paid' && <CheckCircle2 className="h-5 w-5 text-green-400" />}
+                        {invoice.status === 'overdue' && <Clock className="h-5 w-5 text-red-400" />}
+                        {invoice.status === 'cancelled' && <Ban className="h-5 w-5 text-orange-400" />}
+                      </div>
+
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <p className="text-sm font-semibold text-foreground truncate">
+                            {invoice.invoiceNumber}
+                          </p>
+                          <StatusDropdown
+                            id={invoice.id}
+                            currentStatus={invoice.status}
+                            options={invoiceStatusOptions}
+                            endpoint="invoices"
+                            onStatusChange={handleStatusChange}
+                          />
+                        </div>
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          {invoice.clientName && (
+                            <span className="truncate">{invoice.clientName}</span>
+                          )}
+                          {invoice.subject && (
+                            <span className="truncate">{invoice.subject}</span>
+                          )}
+                          <span className="shrink-0">
+                            {new Date(invoice.issueDate).toLocaleDateString('fr-FR')}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Amount */}
+                      <div className="text-right shrink-0">
+                        <p className="text-sm font-medium text-foreground">
+                          {Number(invoice.total).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
+                        </p>
+                        <p className="text-xs text-muted-foreground">TTC</p>
+                      </div>
+
+                      {/* PDF download */}
+                      <button
+                        onClick={(e) => handleDownloadPdf(e, invoice.id)}
+                        disabled={downloadingId === invoice.id}
+                        className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
+                        title="Télécharger le PDF"
+                      >
+                        {downloadingId === invoice.id ? <Spinner className="h-4 w-4" /> : <Download className="h-4 w-4" />}
+                      </button>
+
+                      <ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors shrink-0" />
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       )}
 

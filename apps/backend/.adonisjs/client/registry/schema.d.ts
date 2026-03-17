@@ -1315,4 +1315,16 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/email/send/send_email').default['handle']>>>
     }
   }
+  'send_test_email': {
+    methods: ["POST"]
+    pattern: '/api/v1/email/test'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/email/send/send_test_email').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/email/send/send_test_email').default['handle']>>>
+    }
+  }
 }

@@ -152,10 +152,10 @@ export default function NewQuotePage() {
         footerText: saved?.footerText || invoiceSettings.defaultFooterText || prev.footerText,
         showDeliveryAddress: saved?.showDeliveryAddress ?? invoiceSettings.defaultShowDeliveryAddress ?? prev.showDeliveryAddress,
         language: saved?.language || invoiceSettings.defaultLanguage || prev.language,
-        showSubject: saved?.showSubject ?? !!(invoiceSettings.defaultSubject) || prev.showSubject,
-        showAcceptanceConditions: saved?.showAcceptanceConditions ?? !!(invoiceSettings.defaultAcceptanceConditions) || prev.showAcceptanceConditions,
-        showFreeField: saved?.showFreeField ?? !!(invoiceSettings.defaultFreeField) || prev.showFreeField,
-        showFooterText: saved?.showFooterText ?? !!(invoiceSettings.defaultFooterText) || prev.showFooterText,
+        showSubject: saved?.showSubject ?? (!!(invoiceSettings.defaultSubject) || prev.showSubject),
+        showAcceptanceConditions: saved?.showAcceptanceConditions ?? (!!(invoiceSettings.defaultAcceptanceConditions) || prev.showAcceptanceConditions),
+        showFreeField: saved?.showFreeField ?? (!!(invoiceSettings.defaultFreeField) || prev.showFreeField),
+        showFooterText: saved?.showFooterText ?? (!!(invoiceSettings.defaultFooterText) || prev.showFooterText),
         footerMode: saved?.footerMode || invoiceSettings.footerMode || prev.footerMode,
       }))
       setAccentColor(invoiceSettings.accentColor)

@@ -246,7 +246,7 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
   }
 
   // Always use current settings logo so preview stays in sync with PDF
-  const effectiveLogoUrl = invoiceSettings.logoSource === 'company' ? companyLogoUrl : (invoiceSettings.logoUrl || invoice?.logoUrl)
+  const effectiveLogoUrl = invoiceSettings.logoSource === 'company' ? companyLogoUrl : (invoiceSettings.logoUrl || invoice?.logoUrl || null)
 
   return (
     <AnimatePresence>
@@ -284,7 +284,7 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                 <Spinner size="lg" />
               </div>
             ) : invoice ? (
-              <div className="w-full max-w-[620px] shrink-0">
+              <div className="w-full max-w-[700px] shrink-0">
                 <A4Sheet
                   mode="preview"
                   logoUrl={effectiveLogoUrl}
