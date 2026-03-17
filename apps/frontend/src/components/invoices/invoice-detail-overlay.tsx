@@ -13,6 +13,7 @@ import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { api } from '@/lib/api'
 import { A4Sheet, type DocumentLine, type ClientInfo, type CompanyInfo } from '@/components/shared/a4-sheet'
 import { SendEmailModal } from '@/components/shared/send-email-modal'
+import { EmailHistoryModal } from '@/components/shared/email-history-modal'
 import { useEmail } from '@/lib/email-context'
 import {
   X,
@@ -24,6 +25,7 @@ import {
   Download,
   AlertTriangle,
   MessageSquare,
+  History,
 } from 'lucide-react'
 
 interface InvoiceDetail {
@@ -95,6 +97,7 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
   const [bankAccountInfo, setBankAccountInfo] = useState<{ bankName: string | null; iban: string | null; bic: string | null } | null>(null)
   const [emailModalOpen, setEmailModalOpen] = useState(false)
   const [emailModalMode, setEmailModalMode] = useState<'send' | 'reminder'>('send')
+  const [emailHistoryOpen, setEmailHistoryOpen] = useState(false)
   const { hasEmailConfigured } = useEmail()
   const commentTimeout = useRef<ReturnType<typeof setTimeout>>(undefined)
 
@@ -452,7 +455,7 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                     <div className="relative group/send">
                       <button
                         onClick={handleSendEmail}
-                        disabled={!invoice.client?.email || !hasEmailConfigured}
+                        disabled={!invoice.client?.email || !hasEmailConfigured || invoice.status === 'sent' || invoice.status === 'paid' || invoice.status === 'cancelled' || invoice.status === 'overdue'}
                         className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted/50 transition-colors disabled:opacity-40 disabled:cursor-default"
                       >
                         <Send className="h-4 w-4" /> Envoyer la facture
@@ -462,11 +465,16 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                           Configurez un compte email dans les paramètres
                         </div>
                       )}
+                      {hasEmailConfigured && (invoice.status === 'sent' || invoice.status === 'overdue') && (
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover/send:opacity-100 transition-opacity pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-lg bg-zinc-900 text-white text-xs shadow-lg">
+                          Facture déjà envoyée — utilisez Relancer
+                        </div>
+                      )}
                     </div>
                     <div className="relative group/reminder">
                       <button
                         onClick={handleReminder}
-                        disabled={!invoice.client?.email || !hasEmailConfigured}
+                        disabled={!invoice.client?.email || !hasEmailConfigured || invoice.status === 'draft' || invoice.status === 'paid' || invoice.status === 'cancelled'}
                         className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted/50 transition-colors disabled:opacity-40 disabled:cursor-default"
                       >
                         <Send className="h-4 w-4" /> Relancer la facture
@@ -476,7 +484,18 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                           Configurez un compte email dans les paramètres
                         </div>
                       )}
+                      {hasEmailConfigured && invoice.status === 'draft' && (
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover/reminder:opacity-100 transition-opacity pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-lg bg-zinc-900 text-white text-xs shadow-lg">
+                          Envoyez d&apos;abord la facture
+                        </div>
+                      )}
                     </div>
+                    <button
+                      onClick={() => setEmailHistoryOpen(true)}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted/50 transition-colors"
+                    >
+                      <History className="h-4 w-4" /> Historique des emails
+                    </button>
 
                     {/* Plus d'actions */}
                     <Dropdown
@@ -545,7 +564,19 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
             clientEmail={invoice.client?.email || null}
             clientName={invoice.client?.displayName || null}
             total={invoice.total}
+            emailType={emailModalMode}
             onSent={handleEmailSent}
+          />
+        )}
+
+        {/* Email history modal */}
+        {invoice && (
+          <EmailHistoryModal
+            open={emailHistoryOpen}
+            onClose={() => setEmailHistoryOpen(false)}
+            documentType="invoice"
+            documentId={invoice.id}
+            documentNumber={invoice.invoiceNumber}
           />
         )}
       </motion.div>

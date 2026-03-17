@@ -13,6 +13,7 @@ import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { api } from '@/lib/api'
 import { A4Sheet, type DocumentLine, type ClientInfo, type CompanyInfo } from '@/components/shared/a4-sheet'
 import { SendEmailModal } from '@/components/shared/send-email-modal'
+import { EmailHistoryModal } from '@/components/shared/email-history-modal'
 import { useEmail } from '@/lib/email-context'
 import {
   X,
@@ -24,6 +25,7 @@ import {
   Download,
   Clock,
   MessageSquare,
+  History,
 } from 'lucide-react'
 
 interface QuoteDetail {
@@ -89,6 +91,7 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [emailModalOpen, setEmailModalOpen] = useState(false)
   const [emailModalMode, setEmailModalMode] = useState<'send' | 'reminder'>('send')
+  const [emailHistoryOpen, setEmailHistoryOpen] = useState(false)
   const { hasEmailConfigured } = useEmail()
   const commentTimeout = useRef<ReturnType<typeof setTimeout>>(undefined)
 
@@ -454,6 +457,12 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
                         </div>
                       )}
                     </div>
+                    <button
+                      onClick={() => setEmailHistoryOpen(true)}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted/50 transition-colors"
+                    >
+                      <History className="h-4 w-4" /> Historique des emails
+                    </button>
 
                     {/* Plus d'actions */}
                     <Dropdown
@@ -522,7 +531,19 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
             clientEmail={quote.client?.email || null}
             clientName={quote.client?.displayName || null}
             total={quote.total}
+            emailType={emailModalMode}
             onSent={handleEmailSent}
+          />
+        )}
+
+        {/* Email history modal */}
+        {quote && (
+          <EmailHistoryModal
+            open={emailHistoryOpen}
+            onClose={() => setEmailHistoryOpen(false)}
+            documentType="quote"
+            documentId={quote.id}
+            documentNumber={quote.quoteNumber}
           />
         )}
       </motion.div>

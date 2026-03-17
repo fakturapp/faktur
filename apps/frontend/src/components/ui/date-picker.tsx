@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
@@ -109,78 +110,87 @@ export function DatePicker({
         {formattedValue}
       </span>
 
-      {open && (
-        <div className="absolute top-full left-0 mt-1 z-50 bg-white rounded-xl shadow-xl border border-gray-200 p-3 w-[280px] select-none" style={{ fontFamily: 'inherit' }}>
-          {/* Header */}
-          <div className="flex items-center justify-between mb-2">
-            <button
-              onClick={prevMonth}
-              className="h-7 w-7 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-            <span className="text-sm font-semibold text-gray-900">
-              {months[viewMonth]} {viewYear}
-            </span>
-            <button
-              onClick={nextMonth}
-              className="h-7 w-7 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          </div>
-
-          {/* Day names */}
-          <div className="grid grid-cols-7 mb-1">
-            {days.map((d) => (
-              <div key={d} className="text-center text-[10px] font-medium text-gray-400 py-1">{d}</div>
-            ))}
-          </div>
-
-          {/* Days grid */}
-          <div className="grid grid-cols-7">
-            {Array.from({ length: firstDay }).map((_, i) => (
-              <div key={`empty-${i}`} />
-            ))}
-            {Array.from({ length: daysInMonth }).map((_, i) => {
-              const day = i + 1
-              const dateStr = toDateStr(viewYear, viewMonth, day)
-              const isSelected = dateStr === value
-              const isToday = dateStr === todayStr
-
-              return (
-                <button
-                  key={day}
-                  onClick={() => selectDay(day)}
-                  className={cn(
-                    'h-8 w-8 mx-auto rounded-lg text-xs font-medium transition-all',
-                    isSelected
-                      ? 'text-white font-semibold'
-                      : isToday
-                        ? 'font-semibold text-gray-900 ring-1 ring-inset ring-gray-300'
-                        : 'text-gray-700 hover:bg-gray-100'
-                  )}
-                  style={isSelected ? { backgroundColor: accentColor } : undefined}
-                >
-                  {day}
-                </button>
-              )
-            })}
-          </div>
-
-          {/* Today button */}
-          <button
-            onClick={() => {
-              onChange?.(todayStr)
-              setOpen(false)
-            }}
-            className="w-full mt-2 text-xs font-medium text-center py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
-            style={{ color: accentColor }}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -4, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -4, scale: 0.97 }}
+            transition={{ duration: 0.15, ease: 'easeOut' }}
+            className="absolute top-full left-0 mt-1 z-50 bg-white rounded-xl shadow-xl border border-gray-200 p-3 w-[280px] select-none origin-top-left"
+            style={{ fontFamily: 'inherit' }}
           >
-            {lang === 'en' ? 'Today' : "Aujourd'hui"}
-          </button>
-        </div>
-      )}
+            {/* Header */}
+            <div className="flex items-center justify-between mb-2">
+              <button
+                onClick={prevMonth}
+                className="h-7 w-7 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <span className="text-sm font-semibold text-gray-900">
+                {months[viewMonth]} {viewYear}
+              </span>
+              <button
+                onClick={nextMonth}
+                className="h-7 w-7 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Day names */}
+            <div className="grid grid-cols-7 mb-1">
+              {days.map((d) => (
+                <div key={d} className="text-center text-[10px] font-medium text-gray-400 py-1">{d}</div>
+              ))}
+            </div>
+
+            {/* Days grid */}
+            <div className="grid grid-cols-7">
+              {Array.from({ length: firstDay }).map((_, i) => (
+                <div key={`empty-${i}`} />
+              ))}
+              {Array.from({ length: daysInMonth }).map((_, i) => {
+                const day = i + 1
+                const dateStr = toDateStr(viewYear, viewMonth, day)
+                const isSelected = dateStr === value
+                const isToday = dateStr === todayStr
+
+                return (
+                  <button
+                    key={day}
+                    onClick={() => selectDay(day)}
+                    className={cn(
+                      'h-8 w-8 mx-auto rounded-lg text-xs font-medium transition-all',
+                      isSelected
+                        ? 'text-white font-semibold'
+                        : isToday
+                          ? 'font-semibold text-gray-900 ring-1 ring-inset ring-gray-300'
+                          : 'text-gray-700 hover:bg-gray-100'
+                    )}
+                    style={isSelected ? { backgroundColor: accentColor } : undefined}
+                  >
+                    {day}
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* Today button */}
+            <button
+              onClick={() => {
+                onChange?.(todayStr)
+                setOpen(false)
+              }}
+              className="w-full mt-2 text-xs font-medium text-center py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+              style={{ color: accentColor }}
+            >
+              {lang === 'en' ? 'Today' : "Aujourd'hui"}
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

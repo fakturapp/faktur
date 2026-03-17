@@ -9,6 +9,7 @@ const GmailAuthUrl = () => import('#controllers/email/oauth/gmail_auth_url')
 const GmailCallback = () => import('#controllers/email/oauth/gmail_callback')
 const SendEmail = () => import('#controllers/email/send/send_email')
 const SendTestEmail = () => import('#controllers/email/send/send_test_email')
+const ListEmailLogs = () => import('#controllers/email/logs/list')
 
 // Public route - Gmail OAuth callback (no auth required, redirects to frontend)
 router.get(API_PREFIX + '/email/oauth/gmail/callback', [GmailCallback, 'handle'])
@@ -26,6 +27,9 @@ router
     // Send
     router.post('/send', [SendEmail, 'handle'])
     router.post('/test', [SendTestEmail, 'handle'])
+
+    // Logs
+    router.get('/logs', [ListEmailLogs, 'handle'])
   })
   .prefix(API_PREFIX + '/email')
   .use(middleware.auth())

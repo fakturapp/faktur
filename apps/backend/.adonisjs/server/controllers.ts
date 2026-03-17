@@ -100,6 +100,9 @@ export const controllers = {
       SendEmail: () => import('#controllers/email/send/send_email'),
       SendTestEmail: () => import('#controllers/email/send/send_test_email'),
     },
+    logs: {
+      List: () => import('#controllers/email/logs/list'),
+    },
   },
   invoice: {
     crud: {

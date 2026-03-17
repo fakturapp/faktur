@@ -581,15 +581,6 @@ function renderStandardPage(
   // Totals
   html += renderTotals(quote, tva, discountAmount, lang, i, isClassique)
 
-  // TVA breakdown
-  if (quote.billingType === 'detailed' && tva.length > 0) {
-    html += `<table class="tva-table"><thead><tr><th>${i.vatBreakRate}</th><th style="text-align:right">${i.vatBreakBase}</th><th style="text-align:right">${i.vatBreakAmount}</th></tr></thead><tbody>`
-    for (const tv of tva) {
-      html += `<tr><td>${tv.rate}%</td><td class="right">${fmtC(tv.base, lang)}</td><td class="right">${fmtC(tv.amount, lang)}</td></tr>`
-    }
-    html += '</tbody></table>'
-  }
-
   // VAT exempt
   if (quote.vatExempt) {
     html += `<div class="vat-exempt">${i.vatExempt}</div>`
@@ -806,12 +797,7 @@ function renderPaymentMethods(
 function renderLegalFooter(
   company: CompanyData | null, quote: QuoteData, settings: SettingsData, _T: TemplateConfig, _lang: string, i: I18n, isClassique: boolean,
 ): string {
-  const footerMode = settings.footerMode || 'vat_exempt'
-
-  // VAT exempt mention (default)
-  if (footerMode === 'vat_exempt') {
-    return `<div class="legal-footer"><div class="legal-footer-text" style="font-style:italic">TVA non applicable, art. 293 B du CGI</div></div>`
-  }
+  const footerMode = settings.footerMode === 'custom' ? 'custom' : 'company_info'
 
   // Custom footer text
   if (footerMode === 'custom') {
