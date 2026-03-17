@@ -20,6 +20,7 @@ export const createQuoteValidator = vine.compile(
     deliveryAddress: vine.string().trim().maxLength(500).optional(),
     clientSiren: vine.string().trim().maxLength(20).optional(),
     clientVatNumber: vine.string().trim().maxLength(30).optional(),
+    vatExemptReason: vine.enum(['none', 'not_subject', 'france_no_vat', 'outside_france']).optional(),
     lines: vine.array(
       vine.object({
         description: vine.string().trim().maxLength(500),

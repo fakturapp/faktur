@@ -101,6 +101,7 @@ export default class Create {
           subtotal: Math.round(subtotal * 100) / 100,
           taxAmount: Math.round(taxAmount * 100) / 100,
           total: Math.round(total * 100) / 100,
+          vatExemptReason: payload.vatExemptReason || 'none',
         },
         { client: trx }
       )

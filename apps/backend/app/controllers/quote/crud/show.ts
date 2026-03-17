@@ -57,6 +57,7 @@ export default class Show {
         taxAmount: quote.taxAmount,
         total: quote.total,
         comment: quote.comment,
+        vatExemptReason: quote.vatExemptReason,
         clientId: quote.clientId,
         client: quote.client
           ? {

@@ -71,6 +71,7 @@ export default class Show {
         paymentTerms: invoice.paymentTerms,
         paymentMethod: invoice.paymentMethod,
         bankAccountId: invoice.bankAccountId,
+        vatExemptReason: invoice.vatExemptReason,
         paidDate: invoice.paidDate,
         clientId: invoice.clientId,
         client: invoice.client

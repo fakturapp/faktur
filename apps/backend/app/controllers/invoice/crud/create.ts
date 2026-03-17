@@ -105,6 +105,7 @@ export default class Create {
           paymentTerms: payload.paymentTerms || null,
           paymentMethod: payload.paymentMethod || null,
           bankAccountId: payload.bankAccountId || null,
+          vatExemptReason: payload.vatExemptReason || 'none',
         },
         { client: trx }
       )

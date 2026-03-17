@@ -175,7 +175,7 @@ export function SendEmailModal({
   return (
     <>
       {/* Main email compose dialog */}
-      <Dialog open={open} onClose={handleRequestClose} dismissible={!isDirty && !showSendConfirm} className="max-w-lg">
+      <Dialog open={open} onClose={handleRequestClose} dismissible={false} className="max-w-lg">
         <DialogTitle className="flex items-center gap-2">
           <Send className="h-4 w-4 text-primary" />
           Envoyer par email
@@ -343,11 +343,11 @@ export function SendEmailModal({
           Vous avez modifié le contenu de l&apos;email. Que souhaitez-vous faire ?
         </DialogDescription>
         <DialogFooter>
-          <Button variant="outline" size="sm" onClick={() => setShowCloseConfirm(false)}>
-            Continuer l&apos;édition
-          </Button>
           <Button variant="ghost" size="sm" onClick={() => { setShowCloseConfirm(false); onClose() }}>
             Ignorer et fermer
+          </Button>
+          <Button size="sm" onClick={() => setShowCloseConfirm(false)}>
+            Continuer l&apos;édition
           </Button>
         </DialogFooter>
       </Dialog>

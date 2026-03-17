@@ -92,6 +92,9 @@ export const controllers = {
       List: () => import('#controllers/email/accounts/list'),
       SetDefault: () => import('#controllers/email/accounts/set_default'),
     },
+    logs: {
+      List: () => import('#controllers/email/logs/list'),
+    },
     oauth: {
       GmailAuthUrl: () => import('#controllers/email/oauth/gmail_auth_url'),
       GmailCallback: () => import('#controllers/email/oauth/gmail_callback'),
@@ -99,9 +102,6 @@ export const controllers = {
     send: {
       SendEmail: () => import('#controllers/email/send/send_email'),
       SendTestEmail: () => import('#controllers/email/send/send_test_email'),
-    },
-    logs: {
-      List: () => import('#controllers/email/logs/list'),
     },
   },
   invoice: {

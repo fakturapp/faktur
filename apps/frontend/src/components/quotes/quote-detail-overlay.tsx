@@ -55,6 +55,7 @@ interface QuoteDetail {
   clientVatNumber: string | null
   clientId: string | null
   client: ClientInfo | null
+  vatExemptReason?: 'none' | 'not_subject' | 'france_no_vat' | 'outside_france'
   lines: {
     id: string
     description: string
@@ -324,6 +325,7 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
                   showFreeField={!!quote.freeField}
                   footerMode={invoiceSettings.footerMode}
                   documentFont={invoiceSettings.documentFont}
+                  vatExemptReason={quote.vatExemptReason || 'none'}
                 />
                 {/* Download button */}
                 <div className="flex justify-center mt-3">

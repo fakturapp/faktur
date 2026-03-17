@@ -221,6 +221,39 @@ export class EmailAccountSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class EmailLogSchema extends BaseModel {
+  static $columns = ['body', 'createdAt', 'documentId', 'documentNumber', 'documentType', 'emailType', 'errorMessage', 'fromEmail', 'id', 'status', 'subject', 'teamId', 'toEmail', 'updatedAt'] as const
+  $columns = EmailLogSchema.$columns
+  @column()
+  declare body: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare documentId: string
+  @column()
+  declare documentNumber: string
+  @column()
+  declare documentType: string
+  @column()
+  declare emailType: string
+  @column()
+  declare errorMessage: string | null
+  @column()
+  declare fromEmail: string
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare status: string
+  @column()
+  declare subject: string
+  @column()
+  declare teamId: string
+  @column()
+  declare toEmail: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class InvoiceLineSchema extends BaseModel {
   static $columns = ['createdAt', 'description', 'id', 'invoiceId', 'position', 'quantity', 'saleType', 'total', 'unit', 'unitPrice', 'updatedAt', 'vatRate'] as const
   $columns = InvoiceLineSchema.$columns
@@ -320,7 +353,7 @@ export class InvoiceSettingSchema extends BaseModel {
 }
 
 export class InvoiceSchema extends BaseModel {
-  static $columns = ['accentColor', 'acceptanceConditions', 'bankAccountId', 'billingType', 'clientId', 'clientSiren', 'clientVatNumber', 'comment', 'createdAt', 'deliveryAddress', 'documentTitle', 'dueDate', 'freeField', 'globalDiscountType', 'globalDiscountValue', 'id', 'invoiceNumber', 'issueDate', 'language', 'logoUrl', 'notes', 'paidDate', 'paymentMethod', 'paymentTerms', 'signatureField', 'sourceQuoteId', 'status', 'subject', 'subtotal', 'taxAmount', 'teamId', 'total', 'updatedAt'] as const
+  static $columns = ['accentColor', 'acceptanceConditions', 'bankAccountId', 'billingType', 'clientId', 'clientSiren', 'clientVatNumber', 'comment', 'createdAt', 'deliveryAddress', 'documentTitle', 'dueDate', 'freeField', 'globalDiscountType', 'globalDiscountValue', 'id', 'invoiceNumber', 'issueDate', 'language', 'logoUrl', 'notes', 'paidDate', 'paymentMethod', 'paymentTerms', 'signatureField', 'sourceQuoteId', 'status', 'subject', 'subtotal', 'taxAmount', 'teamId', 'total', 'updatedAt', 'vatExemptReason'] as const
   $columns = InvoiceSchema.$columns
   @column()
   declare accentColor: string
@@ -388,6 +421,8 @@ export class InvoiceSchema extends BaseModel {
   declare total: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+  @column()
+  declare vatExemptReason: string
 }
 
 export class LoginHistorySchema extends BaseModel {
@@ -447,7 +482,7 @@ export class QuoteLineSchema extends BaseModel {
 }
 
 export class QuoteSchema extends BaseModel {
-  static $columns = ['accentColor', 'acceptanceConditions', 'billingType', 'clientId', 'clientSiren', 'clientVatNumber', 'comment', 'createdAt', 'deliveryAddress', 'documentTitle', 'freeField', 'globalDiscountType', 'globalDiscountValue', 'id', 'issueDate', 'language', 'logoUrl', 'notes', 'quoteNumber', 'signatureField', 'status', 'subject', 'subtotal', 'taxAmount', 'teamId', 'total', 'updatedAt', 'validityDate'] as const
+  static $columns = ['accentColor', 'acceptanceConditions', 'billingType', 'clientId', 'clientSiren', 'clientVatNumber', 'comment', 'createdAt', 'deliveryAddress', 'documentTitle', 'freeField', 'globalDiscountType', 'globalDiscountValue', 'id', 'issueDate', 'language', 'logoUrl', 'notes', 'quoteNumber', 'signatureField', 'status', 'subject', 'subtotal', 'taxAmount', 'teamId', 'total', 'updatedAt', 'validityDate', 'vatExemptReason'] as const
   $columns = QuoteSchema.$columns
   @column()
   declare accentColor: string
@@ -505,6 +540,8 @@ export class QuoteSchema extends BaseModel {
   declare updatedAt: DateTime | null
   @column.date()
   declare validityDate: DateTime | null
+  @column()
+  declare vatExemptReason: string
 }
 
 export class RateLimitSchema extends BaseModel {

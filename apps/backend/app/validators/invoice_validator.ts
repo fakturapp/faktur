@@ -24,6 +24,7 @@ export const createInvoiceValidator = vine.compile(
     paymentTerms: vine.string().trim().maxLength(255).optional(),
     paymentMethod: vine.string().trim().maxLength(50).optional(),
     bankAccountId: vine.string().trim().optional(),
+    vatExemptReason: vine.enum(['none', 'not_subject', 'france_no_vat', 'outside_france']).optional(),
     lines: vine.array(
       vine.object({
         description: vine.string().trim().maxLength(500),

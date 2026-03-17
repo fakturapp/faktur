@@ -78,6 +78,7 @@ export default class Update {
         subtotal: Math.round(subtotal * 100) / 100,
         taxAmount: Math.round(taxAmount * 100) / 100,
         total: Math.round(total * 100) / 100,
+        vatExemptReason: payload.vatExemptReason || 'none',
       })
       await quote.save()
 

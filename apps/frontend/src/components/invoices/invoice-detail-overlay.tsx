@@ -60,6 +60,7 @@ interface InvoiceDetail {
   clientVatNumber: string | null
   clientId: string | null
   client: ClientInfo | null
+  vatExemptReason?: 'none' | 'not_subject' | 'france_no_vat' | 'outside_france'
   lines: {
     id: string
     description: string
@@ -340,6 +341,7 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                   showFreeField={!!invoice.freeField}
                   footerMode={invoiceSettings.footerMode}
                   documentFont={invoiceSettings.documentFont}
+                  vatExemptReason={invoice.vatExemptReason || 'none'}
                 />
                 {/* Download button */}
                 <div className="flex justify-center mt-3">

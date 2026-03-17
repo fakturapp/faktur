@@ -286,6 +286,7 @@ export default function NewQuotePage() {
       deliveryAddress: options.deliveryAddress || undefined,
       clientSiren: options.clientSiren || undefined,
       clientVatNumber: options.clientVatNumber || undefined,
+      vatExemptReason: options.vatExemptReason,
       lines: lines
         .filter((l) => l.description.trim())
         .map((l) => ({

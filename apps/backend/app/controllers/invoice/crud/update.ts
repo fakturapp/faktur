@@ -81,6 +81,7 @@ export default class Update {
         paymentTerms: payload.paymentTerms || null,
         paymentMethod: payload.paymentMethod || null,
         bankAccountId: payload.bankAccountId || null,
+        vatExemptReason: payload.vatExemptReason || 'none',
       })
       await invoice.save()
 

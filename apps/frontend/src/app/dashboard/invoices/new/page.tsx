@@ -321,6 +321,7 @@ export default function NewInvoicePage() {
       clientVatNumber: options.clientVatNumber || undefined,
       paymentMethod: paymentMethod || undefined,
       bankAccountId: bankAccountId || undefined,
+      vatExemptReason: options.vatExemptReason,
       lines: lines
         .filter((l) => l.description.trim())
         .map((l) => ({

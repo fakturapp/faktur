@@ -135,7 +135,7 @@ export async function generateInvoicePdf(invoiceId: string, teamId: string): Pro
     taxAmount: invoice.taxAmount,
     total: invoice.total,
     language: invoice.language || 'fr',
-    vatExempt: invoiceSettings?.defaultVatExempt || false,
+    vatExemptReason: invoice.vatExemptReason || 'none',
     footerText: invoiceSettings?.defaultFooterText || null,
     logoBorderRadius: invoiceSettings?.logoBorderRadius ?? 0,
   }
@@ -231,7 +231,7 @@ export async function generateQuotePdf(quoteId: string, teamId: string): Promise
     taxAmount: quote.taxAmount,
     total: quote.total,
     language: quote.language || 'fr',
-    vatExempt: invoiceSettings?.defaultVatExempt || false,
+    vatExemptReason: quote.vatExemptReason || 'none',
     footerText: invoiceSettings?.defaultFooterText || null,
     logoBorderRadius: invoiceSettings?.logoBorderRadius ?? 0,
   }

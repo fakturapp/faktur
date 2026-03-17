@@ -23,7 +23,7 @@ interface QuoteData {
   taxAmount: number
   total: number
   language: string
-  vatExempt?: boolean
+  vatExemptReason?: 'none' | 'not_subject' | 'france_no_vat' | 'outside_france'
   footerText?: string | null
   logoBorderRadius?: number
 }
@@ -136,7 +136,7 @@ interface I18n {
   paymentMethods: string; bankTransfer: string; cash: string; vatNo: string
   company: string; vatBreakRate: string; vatBreakBase: string; vatBreakAmount: string
   bankLabel: string; conditionsAndNotes: string; freeField: string
-  unit: string; quoteNumber: string; vatExempt: string
+  unit: string; quoteNumber: string; vatExemptNotSubject: string; vatExemptFranceNoVat: string; vatExemptOutsideFrance: string
 }
 
 function getI18n(lang: string): I18n {
@@ -151,7 +151,10 @@ function getI18n(lang: string): I18n {
     vatNo: 'VAT No.', company: 'Company',
     vatBreakRate: 'VAT rate', vatBreakBase: 'Base', vatBreakAmount: 'VAT amount',
     bankLabel: 'Bank', conditionsAndNotes: 'Conditions & notes', freeField: 'Additional information',
-    unit: 'Unit', quoteNumber: 'Quote #', vatExempt: 'VAT not applicable, article 293 B of the CGI',
+    unit: 'Unit', quoteNumber: 'Quote #',
+    vatExemptNotSubject: 'VAT not applicable, article 293 B of the CGI',
+    vatExemptFranceNoVat: 'VAT exemption, article 261 of the CGI',
+    vatExemptOutsideFrance: 'VAT not applicable — service performed outside France, article 259-1 of the CGI',
   }
   return {
     quote: 'DEVIS', date: 'Date', validity: 'Validite', issuer: 'Emetteur', recipient: 'Destinataire',
@@ -164,8 +167,19 @@ function getI18n(lang: string): I18n {
     vatNo: 'N\u00b0 TVA', company: 'Societe',
     vatBreakRate: 'Taux TVA', vatBreakBase: 'Base HT', vatBreakAmount: 'Montant TVA',
     bankLabel: 'Banque', conditionsAndNotes: 'Conditions et notes', freeField: 'Champ libre',
-    unit: 'Unite', quoteNumber: 'Devis n\u00b0', vatExempt: 'TVA non applicable, article 293 B du CGI',
+    unit: 'Unite', quoteNumber: 'Devis n\u00b0',
+    vatExemptNotSubject: 'TVA non applicable, article 293 B du CGI',
+    vatExemptFranceNoVat: 'Exon\u00e9ration de TVA, article 261 du CGI',
+    vatExemptOutsideFrance: 'TVA non applicable \u2014 prestation de services r\u00e9alis\u00e9e hors de France, article 259-1 du CGI',
   }
+}
+
+function getVatExemptText(reason: string | undefined, i: I18n): string | null {
+  if (!reason || reason === 'none') return null
+  if (reason === 'not_subject') return i.vatExemptNotSubject
+  if (reason === 'france_no_vat') return i.vatExemptFranceNoVat
+  if (reason === 'outside_france') return i.vatExemptOutsideFrance
+  return null
 }
 
 function buildTvaBreakdown(lines: LineData[], billingType: string) {
@@ -582,8 +596,9 @@ function renderStandardPage(
   html += renderTotals(quote, tva, discountAmount, lang, i, isClassique)
 
   // VAT exempt
-  if (quote.vatExempt) {
-    html += `<div class="vat-exempt">${i.vatExempt}</div>`
+  const vatText = getVatExemptText(quote.vatExemptReason, i)
+  if (vatText) {
+    html += `<div class="vat-exempt">${vatText}</div>`
   }
 
   // Notes
@@ -899,7 +914,8 @@ function renderLateral(
   main += '<div class="bottom-section">'
   main += renderTotals(quote, tva, discountAmount, lang, i, false)
 
-  if (quote.vatExempt) main += `<div class="vat-exempt">${i.vatExempt}</div>`
+  const lateralVatText = getVatExemptText(quote.vatExemptReason, i)
+  if (lateralVatText) main += `<div class="vat-exempt">${lateralVatText}</div>`
   if (quote.notes) main += `<div class="notes-section"><div class="section-label">${i.conditionsAndNotes}</div><div class="notes-text">${esc(quote.notes)}</div></div>`
   if (quote.acceptanceConditions) main += `<div class="conditions-section"><div class="section-label">${i.acceptanceConditions}</div><div class="conditions-text">${esc(quote.acceptanceConditions)}</div></div>`
   if (quote.freeField) main += `<div class="free-field-section"><div class="section-label">${i.freeField}</div><div class="free-field-text">${esc(quote.freeField)}</div></div>`

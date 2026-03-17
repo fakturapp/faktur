@@ -100,6 +100,9 @@ export default class Invoice extends BaseModel {
   @column()
   declare bankAccountId: string | null
 
+  @column()
+  declare vatExemptReason: 'none' | 'not_subject' | 'france_no_vat' | 'outside_france'
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
