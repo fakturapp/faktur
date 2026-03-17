@@ -131,7 +131,7 @@ interface I18n {
   quote: string; date: string; validity: string; issuer: string; recipient: string
   deliveryAddress: string; subject: string; description: string; qty: string
   unitPrice: string; vat: string; amount: string; subtotalHT: string; totalHT: string
-  totalTTC: string; discount: string; notes: string; acceptanceConditions: string
+  totalTVA: string; totalTTC: string; discount: string; notes: string; acceptanceConditions: string
   signatureIssuer: string; signatureClient: string
   paymentMethods: string; bankTransfer: string; cash: string; vatNo: string
   company: string; vatBreakRate: string; vatBreakBase: string; vatBreakAmount: string
@@ -144,7 +144,7 @@ function getI18n(lang: string): I18n {
     quote: 'QUOTE', date: 'Date', validity: 'Valid until', issuer: 'From', recipient: 'To',
     deliveryAddress: 'Delivery address', subject: 'Subject', description: 'Description', qty: 'Qty',
     unitPrice: 'Unit price', vat: 'VAT', amount: 'Amount', subtotalHT: 'Subtotal excl. tax',
-    totalHT: 'Total excl. tax', totalTTC: 'Total incl. tax',
+    totalHT: 'Total excl. tax', totalTVA: 'Total VAT', totalTTC: 'Total incl. tax',
     discount: 'Discount', notes: 'Notes', acceptanceConditions: 'Acceptance conditions',
     signatureIssuer: 'Issuer signature', signatureClient: 'Client signature (preceded by "Approved")',
     paymentMethods: 'Accepted payment methods', bankTransfer: 'Bank transfer', cash: 'Cash',
@@ -160,7 +160,7 @@ function getI18n(lang: string): I18n {
     quote: 'DEVIS', date: 'Date', validity: 'Validite', issuer: 'Emetteur', recipient: 'Destinataire',
     deliveryAddress: 'Adresse de livraison', subject: 'Objet', description: 'Designation', qty: 'Qte',
     unitPrice: 'P.U. HT', vat: 'TVA', amount: 'Montant HT', subtotalHT: 'Sous-total HT',
-    totalHT: 'Total HT', totalTTC: 'Total TTC',
+    totalHT: 'Total HT', totalTVA: 'Total TVA', totalTTC: 'Total TTC',
     discount: 'Remise', notes: 'Notes', acceptanceConditions: "Conditions d'acceptation",
     signatureIssuer: 'Signature emetteur', signatureClient: 'Signature du client (precedee de la mention "Bon pour accord")',
     paymentMethods: 'Moyens de paiement acceptes', bankTransfer: 'Virement bancaire', cash: 'Especes',
@@ -737,6 +737,7 @@ function renderTotals(
   discountAmount: number, lang: string, i: I18n, isClassique: boolean,
 ): string {
   const isDetailed = quote.billingType === 'detailed'
+  const totalTax = tva.reduce((s, tv) => s + tv.amount, 0)
 
   let html = '<div class="totals-wrap"><div class="totals-box">'
 
@@ -745,6 +746,9 @@ function renderTotals(
     html += `<div class="total-row"><span class="label">${i.totalHT}</span><span class="value">${fmtC(quote.subtotal, lang)}</span></div>`
     for (const tv of tva) {
       html += `<div class="total-row sub"><span class="label">${i.vat} ${tv.rate}%</span><span class="value">${fmtC(tv.amount, lang)}</span></div>`
+    }
+    if (totalTax > 0) {
+      html += `<div class="total-row" style="border-top:1px solid ${isClassique ? 'currentColor' : 'inherit'};opacity:0.3;padding-top:4px"><span class="label" style="font-weight:600">${i.totalTVA}</span><span class="value">${fmtC(totalTax, lang)}</span></div>`
     }
     if (discountAmount > 0) {
       html += `<div class="total-row discount"><span class="label">${i.discount}</span><span class="value">-${fmtC(discountAmount, lang)}</span></div>`
@@ -756,6 +760,9 @@ function renderTotals(
       html += `<div class="total-row"><span class="label">${i.totalHT}</span><span class="value">${fmtC(quote.subtotal, lang)}</span></div>`
       for (const tv of tva) {
         html += `<div class="total-row sub"><span class="label">${i.vat} ${tv.rate}% (${fmtC(tv.base, lang)})</span><span class="value">${fmtC(tv.amount, lang)}</span></div>`
+      }
+      if (totalTax > 0) {
+        html += `<div class="total-row"><span class="label" style="font-weight:600">${i.totalTVA}</span><span class="value" style="font-weight:600">${fmtC(totalTax, lang)}</span></div>`
       }
     }
     if (discountAmount > 0) {

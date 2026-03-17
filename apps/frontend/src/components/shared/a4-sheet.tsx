@@ -1082,6 +1082,12 @@ export function A4Sheet({
                           <span className="text-[12px] font-semibold">{fmtCurrency(e.amount, lang)}</span>
                         </div>
                       ))}
+                      {taxAmount > 0 && (
+                        <div className="flex justify-between items-center pt-1" style={{ borderTop: `1px solid ${accentColor}30` }}>
+                          <span className="text-[12px] font-semibold">{t.totalTVA}</span>
+                          <span className="text-[12px] font-semibold">{fmtCurrency(taxAmount, lang)}</span>
+                        </div>
+                      )}
                       {discountAmount > 0 && (
                         <div className="flex justify-between items-center">
                           <span className="text-[12px] font-semibold">{t.discount}</span>
@@ -1111,6 +1117,12 @@ export function A4Sheet({
                         <span className="text-[10px]" style={{ color: T.textMuted }}>{fmtCurrency(e.amount, lang)}</span>
                       </div>
                     ))}
+                    {taxAmount > 0 && (
+                      <div className="flex justify-between py-1" style={{ borderBottom: `1px solid ${T.borderLight}` }}>
+                        <span className="text-[10px] font-semibold" style={{ color: T.text }}>{t.totalTVA}</span>
+                        <span className="text-[10px] font-semibold" style={{ color: T.text }}>{fmtCurrency(taxAmount, lang)}</span>
+                      </div>
+                    )}
                     {discountAmount > 0 && (
                       <div className="flex justify-between py-1" style={{ borderBottom: `1px solid ${T.borderLight}` }}>
                         <span className="text-[10px]" style={{ color: T.textMuted }}>{t.discount}</span>

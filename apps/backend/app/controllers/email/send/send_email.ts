@@ -1,4 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import { readFile } from 'node:fs/promises'
 import vine from '@vinejs/vine'
 import EmailAccount from '#models/email/email_account'
 import EmailLog from '#models/email/email_log'
@@ -86,6 +87,23 @@ export default class SendEmail {
       documentNumber = q?.quoteNumber || payload.documentId
     }
 
+    // Collect all attachments: auto-generated PDF + user-uploaded files
+    const allAttachments: { filename: string; content: Buffer; mimeType: string }[] = [
+      { filename, content: pdfBuffer, mimeType: 'application/pdf' },
+    ]
+
+    const uploadedFiles = request.files('attachments', { size: '10mb' })
+    for (const file of uploadedFiles) {
+      if (file.tmpPath) {
+        const content = await readFile(file.tmpPath)
+        allAttachments.push({
+          filename: file.clientName,
+          content,
+          mimeType: file.headers['content-type'] || 'application/octet-stream',
+        })
+      }
+    }
+
     // Send email
     try {
       await GmailOAuthService.sendEmail({
@@ -95,13 +113,7 @@ export default class SendEmail {
         to: payload.to,
         subject: payload.subject,
         body: payload.body,
-        attachments: [
-          {
-            filename,
-            content: pdfBuffer,
-            mimeType: 'application/pdf',
-          },
-        ],
+        attachments: allAttachments,
       })
     } catch (err) {
       // Log the failed email

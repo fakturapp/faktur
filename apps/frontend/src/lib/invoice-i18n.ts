@@ -16,6 +16,7 @@ export interface InvoiceTranslations {
   vat: string
   amountHT: string
   totalHT: string
+  totalTVA: string
   totalTTC: string
   discount: string
   discountPercent: (v: number) => string
@@ -64,6 +65,7 @@ const fr: InvoiceTranslations = {
   vat: 'TVA',
   amountHT: 'Montant HT',
   totalHT: 'Total HT',
+  totalTVA: 'Total TVA',
   totalTTC: 'Total TTC',
   discount: 'Remise',
   discountPercent: (v) => `Remise (${v}%)`,
@@ -112,6 +114,7 @@ const en: InvoiceTranslations = {
   vat: 'VAT',
   amountHT: 'Amount',
   totalHT: 'Subtotal',
+  totalTVA: 'Total VAT',
   totalTTC: 'Total incl. tax',
   discount: 'Discount',
   discountPercent: (v) => `Discount (${v}%)`,

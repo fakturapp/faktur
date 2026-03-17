@@ -119,15 +119,20 @@ export function SendEmailModal({
   async function handleConfirmSend() {
     setShowSendConfirm(false)
     setSending(true)
-    const { error } = await api.post('/email/send', {
-      documentType,
-      documentId,
-      emailAccountId: selectedAccountId,
-      to,
-      subject,
-      body,
-      emailType,
-    })
+
+    const formData = new FormData()
+    formData.append('documentType', documentType)
+    formData.append('documentId', documentId)
+    formData.append('emailAccountId', selectedAccountId)
+    formData.append('to', to)
+    formData.append('subject', subject)
+    formData.append('body', body)
+    formData.append('emailType', emailType)
+    for (const att of attachments) {
+      formData.append('attachments', att.file)
+    }
+
+    const { error } = await api.upload('/email/send', formData)
     setSending(false)
 
     if (error) {
