@@ -119,4 +119,5 @@ export interface ApiDefinition {
   gmailAuthUrl: typeof routes['gmail_auth_url']
   sendEmail: typeof routes['send_email']
   sendTestEmail: typeof routes['send_test_email']
+  listEmailLogs: typeof routes['list_email_logs']
 }

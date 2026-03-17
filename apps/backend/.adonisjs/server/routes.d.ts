@@ -114,6 +114,7 @@ export type ScannedRoutes = {
     'gmail_auth_url': { paramsTuple?: []; params?: {} }
     'send_email': { paramsTuple?: []; params?: {} }
     'send_test_email': { paramsTuple?: []; params?: {} }
+    'list_email_logs': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'signup': { paramsTuple?: []; params?: {} }
@@ -201,6 +202,7 @@ export type ScannedRoutes = {
     'gmail_callback': { paramsTuple?: []; params?: {} }
     'email_accounts_list': { paramsTuple?: []; params?: {} }
     'gmail_auth_url': { paramsTuple?: []; params?: {} }
+    'list_email_logs': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'me': { paramsTuple?: []; params?: {} }
@@ -244,6 +246,7 @@ export type ScannedRoutes = {
     'gmail_callback': { paramsTuple?: []; params?: {} }
     'email_accounts_list': { paramsTuple?: []; params?: {} }
     'gmail_auth_url': { paramsTuple?: []; params?: {} }
+    'list_email_logs': { paramsTuple?: []; params?: {} }
   }
   PUT: {
     'profile_update': { paramsTuple?: []; params?: {} }

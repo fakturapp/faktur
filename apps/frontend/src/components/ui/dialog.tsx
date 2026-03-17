@@ -9,9 +9,11 @@ interface DialogProps {
   onClose: () => void
   children: React.ReactNode
   className?: string
+  /** When false, clicking the backdrop does NOT close the dialog. Default: true */
+  dismissible?: boolean
 }
 
-export function Dialog({ open, onClose, children, className }: DialogProps) {
+export function Dialog({ open, onClose, children, className, dismissible = true }: DialogProps) {
   React.useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden'
@@ -30,7 +32,7 @@ export function Dialog({ open, onClose, children, className }: DialogProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={onClose}
+            onClick={dismissible ? onClose : undefined}
           />
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 10 }}

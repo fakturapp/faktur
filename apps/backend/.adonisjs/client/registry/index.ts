@@ -666,6 +666,12 @@ const routes = {
     tokens: [{"old":"/api/v1/email/test","type":0,"val":"api","end":""},{"old":"/api/v1/email/test","type":0,"val":"v1","end":""},{"old":"/api/v1/email/test","type":0,"val":"email","end":""},{"old":"/api/v1/email/test","type":0,"val":"test","end":""}],
     types: placeholder as Registry['send_test_email']['types'],
   },
+  'list_email_logs': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/email/logs',
+    tokens: [{"old":"/api/v1/email/logs","type":0,"val":"api","end":""},{"old":"/api/v1/email/logs","type":0,"val":"v1","end":""},{"old":"/api/v1/email/logs","type":0,"val":"email","end":""},{"old":"/api/v1/email/logs","type":0,"val":"logs","end":""}],
+    types: placeholder as Registry['list_email_logs']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

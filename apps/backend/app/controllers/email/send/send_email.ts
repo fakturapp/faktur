@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import vine from '@vinejs/vine'
 import EmailAccount from '#models/email/email_account'
+import EmailLog from '#models/email/email_log'
 import Invoice from '#models/invoice/invoice'
 import Quote from '#models/quote/quote'
 import GmailOAuthService from '#services/email/gmail_oauth_service'
@@ -14,6 +15,7 @@ const sendEmailValidator = vine.compile(
     to: vine.string().trim().email(),
     subject: vine.string().trim().minLength(1).maxLength(500),
     body: vine.string().trim().minLength(1),
+    emailType: vine.enum(['send', 'reminder']).optional(),
   })
 )
 
@@ -74,6 +76,16 @@ export default class SendEmail {
       })
     }
 
+    // Resolve document number for logging
+    let documentNumber = ''
+    if (payload.documentType === 'invoice') {
+      const inv = await Invoice.query().where('id', payload.documentId).where('team_id', teamId).first()
+      documentNumber = inv?.invoiceNumber || payload.documentId
+    } else {
+      const q = await Quote.query().where('id', payload.documentId).where('team_id', teamId).first()
+      documentNumber = q?.quoteNumber || payload.documentId
+    }
+
     // Send email
     try {
       await GmailOAuthService.sendEmail({
@@ -91,11 +103,40 @@ export default class SendEmail {
           },
         ],
       })
-    } catch {
+    } catch (err) {
+      // Log the failed email
+      await EmailLog.create({
+        teamId,
+        documentType: payload.documentType,
+        documentId: payload.documentId,
+        documentNumber,
+        fromEmail: emailAccount.email,
+        toEmail: payload.to,
+        subject: payload.subject,
+        body: payload.body,
+        status: 'error',
+        errorMessage: err instanceof Error ? err.message : 'Unknown error',
+        emailType: payload.emailType || 'send',
+      })
+
       return response.internalServerError({
         message: "Erreur lors de l'envoi de l'email. Veuillez réessayer.",
       })
     }
+
+    // Log the successful email
+    await EmailLog.create({
+      teamId,
+      documentType: payload.documentType,
+      documentId: payload.documentId,
+      documentNumber,
+      fromEmail: emailAccount.email,
+      toEmail: payload.to,
+      subject: payload.subject,
+      body: payload.body,
+      status: 'sent',
+      emailType: payload.emailType || 'send',
+    })
 
     // Update document status to 'sent' if currently 'draft'
     if (payload.documentType === 'invoice') {
