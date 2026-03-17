@@ -86,6 +86,20 @@ export const controllers = {
     Submit: () => import('#controllers/einvoicing/submit'),
     ValidateConnection: () => import('#controllers/einvoicing/validate_connection'),
   },
+  email: {
+    accounts: {
+      Delete: () => import('#controllers/email/accounts/delete'),
+      List: () => import('#controllers/email/accounts/list'),
+      SetDefault: () => import('#controllers/email/accounts/set_default'),
+    },
+    oauth: {
+      GmailAuthUrl: () => import('#controllers/email/oauth/gmail_auth_url'),
+      GmailCallback: () => import('#controllers/email/oauth/gmail_callback'),
+    },
+    send: {
+      SendEmail: () => import('#controllers/email/send/send_email'),
+    },
+  },
   invoice: {
     crud: {
       Create: () => import('#controllers/invoice/crud/create'),
@@ -179,20 +193,6 @@ export const controllers = {
       RemoveMember: () => import('#controllers/team/members/remove_member'),
       TransferOwnership: () => import('#controllers/team/members/transfer_ownership'),
       UpdateRole: () => import('#controllers/team/members/update_role'),
-    },
-  },
-  email: {
-    accounts: {
-      List: () => import('#controllers/email/accounts/list'),
-      Delete: () => import('#controllers/email/accounts/delete'),
-      SetDefault: () => import('#controllers/email/accounts/set_default'),
-    },
-    oauth: {
-      GmailAuthUrl: () => import('#controllers/email/oauth/gmail_auth_url'),
-      GmailCallback: () => import('#controllers/email/oauth/gmail_callback'),
-    },
-    send: {
-      SendEmail: () => import('#controllers/email/send/send_email'),
     },
   },
 }

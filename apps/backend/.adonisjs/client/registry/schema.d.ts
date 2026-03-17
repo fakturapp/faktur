@@ -1243,4 +1243,76 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/einvoicing/validate_connection').default['handle']>>>
     }
   }
+  'gmail_callback': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/email/oauth/gmail/callback'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/email/oauth/gmail_callback').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/email/oauth/gmail_callback').default['handle']>>>
+    }
+  }
+  'email_accounts_list': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/email/accounts'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/email/accounts/list').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/email/accounts/list').default['handle']>>>
+    }
+  }
+  'email_accounts_delete': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/email/accounts/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/email/accounts/delete').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/email/accounts/delete').default['handle']>>>
+    }
+  }
+  'email_accounts_set_default': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/email/accounts/:id/default'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/email/accounts/set_default').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/email/accounts/set_default').default['handle']>>>
+    }
+  }
+  'gmail_auth_url': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/email/oauth/gmail/url'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/email/oauth/gmail_auth_url').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/email/oauth/gmail_auth_url').default['handle']>>>
+    }
+  }
+  'send_email': {
+    methods: ["POST"]
+    pattern: '/api/v1/email/send'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/email/send/send_email').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/email/send/send_email').default['handle']>>>
+    }
+  }
 }

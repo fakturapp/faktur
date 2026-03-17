@@ -6,20 +6,24 @@ const Iridescence = dynamic(() => import('@/components/ui/iridescence'), { ssr: 
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative min-h-screen grid md:grid-cols-2">
-      {/* Left: Form */}
-      <div className="flex items-center justify-center p-6 md:p-12 z-10">{children}</div>
-
-      {/* Right: Iridescence background */}
-      <div className="relative hidden md:block overflow-hidden">
-        <Iridescence color={[0.4, 0.3, 1]} speed={0.6} amplitude={0.15} />
-        <div className="absolute inset-0 flex items-center justify-center z-10">
-          <div className="text-center space-y-4 px-8">
-            <h2 className="text-4xl font-bold text-white drop-shadow-lg">Faktur</h2>
-            <p className="text-lg text-white/80 drop-shadow-md max-w-sm">
-              Devis et facturation professionnels. Gratuit, pour toujours.
-            </p>
+    <div className="relative min-h-screen flex items-center justify-center bg-zinc-950 p-4 md:p-8">
+      <div className="w-full max-w-5xl grid md:grid-cols-2 rounded-3xl overflow-hidden shadow-2xl shadow-black/40 border border-white/5 min-h-[600px]">
+        {/* Left: Iridescence + branding */}
+        <div className="relative hidden md:flex overflow-hidden rounded-l-3xl">
+          <Iridescence color={[0.4, 0.3, 1]} speed={0.6} amplitude={0.15} />
+          <div className="absolute inset-0 flex flex-col items-center justify-center z-10 px-10">
+            <div className="text-center space-y-4">
+              <h2 className="text-4xl font-bold text-white drop-shadow-lg">Faktur</h2>
+              <p className="text-lg text-white/80 drop-shadow-md max-w-sm">
+                Devis et facturation professionnels. Gratuit, pour toujours.
+              </p>
+            </div>
           </div>
+        </div>
+
+        {/* Right: Form */}
+        <div className="flex items-center justify-center p-6 md:p-10 bg-background rounded-r-3xl md:rounded-l-none rounded-3xl md:rounded-3xl">
+          {children}
         </div>
       </div>
     </div>

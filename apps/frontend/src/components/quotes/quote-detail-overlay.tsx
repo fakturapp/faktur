@@ -231,7 +231,8 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
     URL.revokeObjectURL(url)
   }
 
-  const effectiveLogoUrl = quote?.logoUrl || (invoiceSettings.logoSource === 'company' ? companyLogoUrl : invoiceSettings.logoUrl)
+  // Always use current settings logo so preview stays in sync with PDF
+  const effectiveLogoUrl = invoiceSettings.logoSource === 'company' ? companyLogoUrl : (invoiceSettings.logoUrl || quote?.logoUrl)
 
   return (
     <AnimatePresence>

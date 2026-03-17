@@ -38,6 +38,39 @@ function getDefaultDueDate() {
   return d.toISOString().split('T')[0]
 }
 
+const INVOICE_OPTIONS_KEY = 'faktur_invoice_options'
+
+function loadSavedOptions(): Partial<Record<string, any>> | null {
+  try {
+    const raw = localStorage.getItem(INVOICE_OPTIONS_KEY)
+    return raw ? JSON.parse(raw) : null
+  } catch { return null }
+}
+
+function saveOptionsToStorage(opts: Record<string, any>) {
+  try {
+    const toSave = {
+      billingType: opts.billingType,
+      subject: opts.subject,
+      language: opts.language,
+      acceptanceConditions: opts.acceptanceConditions,
+      signatureField: opts.signatureField,
+      freeField: opts.freeField,
+      showNotes: opts.showNotes,
+      vatExemptReason: opts.vatExemptReason,
+      footerText: opts.footerText,
+      showSubject: opts.showSubject,
+      showDeliveryAddress: opts.showDeliveryAddress,
+      showAcceptanceConditions: opts.showAcceptanceConditions,
+      showFreeField: opts.showFreeField,
+      showFooterText: opts.showFooterText,
+      footerMode: opts.footerMode,
+      paymentMethod: opts.paymentMethod,
+    }
+    localStorage.setItem(INVOICE_OPTIONS_KEY, JSON.stringify(toSave))
+  } catch { /* ignore */ }
+}
+
 export default function NewInvoicePage() {
   const router = useRouter()
   const { toast } = useToast()
@@ -135,27 +168,29 @@ export default function NewInvoicePage() {
     init()
   }, [])
 
-  // Sync from settings
+  // Sync from settings + localStorage
   useEffect(() => {
     if (!settingsLoading) {
+      const saved = loadSavedOptions()
       setOptions((prev) => ({
         ...prev,
-        billingType: invoiceSettings.billingType,
-        subject: invoiceSettings.defaultSubject || prev.subject,
-        acceptanceConditions: invoiceSettings.defaultAcceptanceConditions || prev.acceptanceConditions,
-        signatureField: invoiceSettings.defaultSignatureField || prev.signatureField,
-        freeField: invoiceSettings.defaultFreeField || prev.freeField,
-        showNotes: invoiceSettings.defaultShowNotes ?? prev.showNotes,
-        vatExemptReason: invoiceSettings.defaultVatExempt ? 'not_subject' : prev.vatExemptReason,
-        footerText: invoiceSettings.defaultFooterText || prev.footerText,
-        showDeliveryAddress: invoiceSettings.defaultShowDeliveryAddress || prev.showDeliveryAddress,
-        language: invoiceSettings.defaultLanguage || prev.language,
-        showSubject: !!(invoiceSettings.defaultSubject) || prev.showSubject,
-        showAcceptanceConditions: !!(invoiceSettings.defaultAcceptanceConditions) || prev.showAcceptanceConditions,
-        showFreeField: !!(invoiceSettings.defaultFreeField) || prev.showFreeField,
-        showFooterText: !!(invoiceSettings.defaultFooterText) || prev.showFooterText,
-        footerMode: invoiceSettings.footerMode || prev.footerMode,
+        billingType: saved?.billingType || invoiceSettings.billingType,
+        subject: saved?.subject || invoiceSettings.defaultSubject || prev.subject,
+        acceptanceConditions: saved?.acceptanceConditions || invoiceSettings.defaultAcceptanceConditions || prev.acceptanceConditions,
+        signatureField: saved?.signatureField ?? invoiceSettings.defaultSignatureField ?? prev.signatureField,
+        freeField: saved?.freeField || invoiceSettings.defaultFreeField || prev.freeField,
+        showNotes: saved?.showNotes ?? invoiceSettings.defaultShowNotes ?? prev.showNotes,
+        vatExemptReason: saved?.vatExemptReason || (invoiceSettings.defaultVatExempt ? 'not_subject' : prev.vatExemptReason),
+        footerText: saved?.footerText || invoiceSettings.defaultFooterText || prev.footerText,
+        showDeliveryAddress: saved?.showDeliveryAddress ?? invoiceSettings.defaultShowDeliveryAddress ?? prev.showDeliveryAddress,
+        language: saved?.language || invoiceSettings.defaultLanguage || prev.language,
+        showSubject: saved?.showSubject ?? !!(invoiceSettings.defaultSubject) || prev.showSubject,
+        showAcceptanceConditions: saved?.showAcceptanceConditions ?? !!(invoiceSettings.defaultAcceptanceConditions) || prev.showAcceptanceConditions,
+        showFreeField: saved?.showFreeField ?? !!(invoiceSettings.defaultFreeField) || prev.showFreeField,
+        showFooterText: saved?.showFooterText ?? !!(invoiceSettings.defaultFooterText) || prev.showFooterText,
+        footerMode: saved?.footerMode || invoiceSettings.footerMode || prev.footerMode,
       }))
+      if (saved?.paymentMethod) setPaymentMethod(saved.paymentMethod)
       setAccentColor(invoiceSettings.accentColor)
     }
   }, [settingsLoading, invoiceSettings])
@@ -180,9 +215,13 @@ export default function NewInvoicePage() {
   }, [])
 
   const handleOptionsChange = useCallback((partial: Partial<typeof options>) => {
-    setOptions((prev) => ({ ...prev, ...partial }))
+    setOptions((prev) => {
+      const next = { ...prev, ...partial }
+      saveOptionsToStorage({ ...next, paymentMethod })
+      return next
+    })
     setIsDirty(true); setValidationErrors([])
-  }, [])
+  }, [paymentMethod])
 
   const handleSelectClient = useCallback((client: ClientInfo) => {
     setSelectedClient(client)
@@ -487,7 +526,7 @@ export default function NewInvoicePage() {
                   tvaBreakdown={tvaBreakdown}
                   documentType="invoice"
                   paymentMethod={paymentMethod}
-                  onPaymentMethodChange={(v) => { setPaymentMethod(v); setIsDirty(true) }}
+                  onPaymentMethodChange={(v) => { setPaymentMethod(v); saveOptionsToStorage({ ...options, paymentMethod: v }); setIsDirty(true) }}
                   bankAccounts={bankAccounts}
                   bankAccountId={bankAccountId}
                   onBankAccountChange={handleBankAccountChange}

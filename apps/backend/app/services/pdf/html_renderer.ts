@@ -770,30 +770,32 @@ function renderTotals(
    ═══════════════════════════════════════════════════════════ */
 
 function renderPaymentMethods(
-  company: CompanyData | null, settings: SettingsData, _T: TemplateConfig, _lang: string, i: I18n,
+  company: CompanyData | null, settings: SettingsData, _T: TemplateConfig, lang: string, i: I18n,
 ): string {
   // Payment methods are only shown on invoices, not on quotes
   if (settings.documentType === 'quote') return ''
   if (!settings.paymentMethods || settings.paymentMethods.length === 0) return ''
 
-  let html = '<div class="payment-section"><div class="section-label">' + i.paymentMethods + '</div><div class="payment-badges">'
-  if (settings.paymentMethods.includes('bank_transfer')) html += `<span class="payment-badge">${i.bankTransfer}</span>`
-  if (settings.paymentMethods.includes('cash')) html += `<span class="payment-badge">${i.cash}</span>`
-  if (settings.paymentMethods.includes('custom') && settings.customPaymentMethod) {
-    html += `<span class="payment-badge">${esc(settings.customPaymentMethod)}</span>`
-  }
-  html += '</div>'
+  const method = settings.paymentMethods[0]
+  let methodLabel = ''
+  if (method === 'bank_transfer') methodLabel = i.bankTransfer
+  else if (method === 'cash') methodLabel = i.cash
+  else if ((method === 'custom' || method === 'other') && settings.customPaymentMethod) methodLabel = esc(settings.customPaymentMethod)
+  else methodLabel = lang === 'en' ? 'Other' : 'Autre'
+
+  let html = `<div class="payment-section"><div class="section-label">${lang === 'en' ? 'Payment method' : 'Moyen de paiement'}</div>`
+  html += `<div style="font-size:11px;line-height:1.7;color:${_T.text}"><div style="font-weight:600">${methodLabel}</div>`
 
   // Bank details
-  if (settings.paymentMethods.includes('bank_transfer') && company) {
-    html += '<div class="bank-info">'
-    if (company.iban) html += `<div class="bank-item"><strong>IBAN :</strong> ${formatIban(company.iban)}</div>`
-    if (company.bic) html += `<div class="bank-item"><strong>BIC :</strong> ${esc(company.bic)}</div>`
-    if (company.bankName) html += `<div class="bank-item"><strong>${i.bankLabel} :</strong> ${esc(company.bankName)}</div>`
+  if (method === 'bank_transfer' && company && (company.iban || company.bic || company.bankName)) {
+    html += '<div style="margin-top:4px">'
+    if (company.bankName) html += `<div><strong>${i.bankLabel} :</strong> ${esc(company.bankName)}</div>`
+    if (company.iban) html += `<div><strong>IBAN :</strong> ${formatIban(company.iban)}</div>`
+    if (company.bic) html += `<div><strong>BIC :</strong> ${esc(company.bic)}</div>`
     html += '</div>'
   }
 
-  html += '</div>'
+  html += '</div></div>'
   return html
 }
 

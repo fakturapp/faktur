@@ -184,6 +184,43 @@ export class CompanySchema extends BaseModel {
   declare website: string | null
 }
 
+export class EmailAccountSchema extends BaseModel {
+  static $columns = ['accessToken', 'createdAt', 'displayName', 'email', 'id', 'isActive', 'isDefault', 'provider', 'refreshToken', 'smtpHost', 'smtpPassword', 'smtpPort', 'smtpUsername', 'teamId', 'tokenExpiresAt', 'updatedAt'] as const
+  $columns = EmailAccountSchema.$columns
+  @column()
+  declare accessToken: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare displayName: string | null
+  @column()
+  declare email: string
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare isActive: boolean
+  @column()
+  declare isDefault: boolean
+  @column()
+  declare provider: string
+  @column()
+  declare refreshToken: string | null
+  @column()
+  declare smtpHost: string | null
+  @column()
+  declare smtpPassword: string | null
+  @column()
+  declare smtpPort: number | null
+  @column()
+  declare smtpUsername: string | null
+  @column()
+  declare teamId: string
+  @column.dateTime()
+  declare tokenExpiresAt: DateTime | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class InvoiceLineSchema extends BaseModel {
   static $columns = ['createdAt', 'description', 'id', 'invoiceId', 'position', 'quantity', 'saleType', 'total', 'unit', 'unitPrice', 'updatedAt', 'vatRate'] as const
   $columns = InvoiceLineSchema.$columns

@@ -624,6 +624,42 @@ const routes = {
     tokens: [{"old":"/api/v1/einvoicing/validate-connection","type":0,"val":"api","end":""},{"old":"/api/v1/einvoicing/validate-connection","type":0,"val":"v1","end":""},{"old":"/api/v1/einvoicing/validate-connection","type":0,"val":"einvoicing","end":""},{"old":"/api/v1/einvoicing/validate-connection","type":0,"val":"validate-connection","end":""}],
     types: placeholder as Registry['validate_connection']['types'],
   },
+  'gmail_callback': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/email/oauth/gmail/callback',
+    tokens: [{"old":"/api/v1/email/oauth/gmail/callback","type":0,"val":"api","end":""},{"old":"/api/v1/email/oauth/gmail/callback","type":0,"val":"v1","end":""},{"old":"/api/v1/email/oauth/gmail/callback","type":0,"val":"email","end":""},{"old":"/api/v1/email/oauth/gmail/callback","type":0,"val":"oauth","end":""},{"old":"/api/v1/email/oauth/gmail/callback","type":0,"val":"gmail","end":""},{"old":"/api/v1/email/oauth/gmail/callback","type":0,"val":"callback","end":""}],
+    types: placeholder as Registry['gmail_callback']['types'],
+  },
+  'email_accounts_list': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/email/accounts',
+    tokens: [{"old":"/api/v1/email/accounts","type":0,"val":"api","end":""},{"old":"/api/v1/email/accounts","type":0,"val":"v1","end":""},{"old":"/api/v1/email/accounts","type":0,"val":"email","end":""},{"old":"/api/v1/email/accounts","type":0,"val":"accounts","end":""}],
+    types: placeholder as Registry['email_accounts_list']['types'],
+  },
+  'email_accounts_delete': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/email/accounts/:id',
+    tokens: [{"old":"/api/v1/email/accounts/:id","type":0,"val":"api","end":""},{"old":"/api/v1/email/accounts/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/email/accounts/:id","type":0,"val":"email","end":""},{"old":"/api/v1/email/accounts/:id","type":0,"val":"accounts","end":""},{"old":"/api/v1/email/accounts/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['email_accounts_delete']['types'],
+  },
+  'email_accounts_set_default': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/email/accounts/:id/default',
+    tokens: [{"old":"/api/v1/email/accounts/:id/default","type":0,"val":"api","end":""},{"old":"/api/v1/email/accounts/:id/default","type":0,"val":"v1","end":""},{"old":"/api/v1/email/accounts/:id/default","type":0,"val":"email","end":""},{"old":"/api/v1/email/accounts/:id/default","type":0,"val":"accounts","end":""},{"old":"/api/v1/email/accounts/:id/default","type":1,"val":"id","end":""},{"old":"/api/v1/email/accounts/:id/default","type":0,"val":"default","end":""}],
+    types: placeholder as Registry['email_accounts_set_default']['types'],
+  },
+  'gmail_auth_url': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/email/oauth/gmail/url',
+    tokens: [{"old":"/api/v1/email/oauth/gmail/url","type":0,"val":"api","end":""},{"old":"/api/v1/email/oauth/gmail/url","type":0,"val":"v1","end":""},{"old":"/api/v1/email/oauth/gmail/url","type":0,"val":"email","end":""},{"old":"/api/v1/email/oauth/gmail/url","type":0,"val":"oauth","end":""},{"old":"/api/v1/email/oauth/gmail/url","type":0,"val":"gmail","end":""},{"old":"/api/v1/email/oauth/gmail/url","type":0,"val":"url","end":""}],
+    types: placeholder as Registry['gmail_auth_url']['types'],
+  },
+  'send_email': {
+    methods: ["POST"],
+    pattern: '/api/v1/email/send',
+    tokens: [{"old":"/api/v1/email/send","type":0,"val":"api","end":""},{"old":"/api/v1/email/send","type":0,"val":"v1","end":""},{"old":"/api/v1/email/send","type":0,"val":"email","end":""},{"old":"/api/v1/email/send","type":0,"val":"send","end":""}],
+    types: placeholder as Registry['send_email']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

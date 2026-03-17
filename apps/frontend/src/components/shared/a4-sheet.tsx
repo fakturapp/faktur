@@ -163,6 +163,50 @@ function InlineEdit({
 }
 
 /* ═══════════════════════════════════════════════════════════
+   InlineDateEdit — shows formatted date, click to open picker
+   ═══════════════════════════════════════════════════════════ */
+
+function InlineDateEdit({
+  value, onChange, preview = false, className, lang, accentColor = '#6366f1',
+  inputBg = '#ffffff', borderDashed = '#ddd', style,
+}: {
+  value: string
+  onChange?: (v: string) => void
+  preview?: boolean
+  className?: string
+  lang?: string
+  accentColor?: string
+  inputBg?: string
+  borderDashed?: string
+  style?: React.CSSProperties
+}) {
+  const ref = useRef<HTMLInputElement>(null)
+
+  if (preview) {
+    return <span className={className} style={style}>{fmtDate(value, lang)}</span>
+  }
+
+  return (
+    <span className={cn('relative inline-flex items-center', className)} style={style}>
+      <span
+        className="cursor-pointer"
+        onClick={() => ref.current?.showPicker?.()}
+      >
+        {fmtDate(value, lang) || '...'}
+      </span>
+      <input
+        ref={ref}
+        type="date"
+        value={value}
+        onChange={(e) => onChange?.(e.target.value)}
+        className="absolute inset-0 opacity-0 cursor-pointer"
+        style={{ width: '100%', height: '100%' }}
+      />
+    </span>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════
    InlineNumber — click-to-edit number
    ═══════════════════════════════════════════════════════════ */
 
@@ -250,6 +294,7 @@ export function ClientModal({
   const [results, setResults] = useState<ClientInfo[]>([])
   const [loading, setLoading] = useState(false)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const popupRef = useRef<Window | null>(null)
 
   const loadClients = useCallback(async (query: string) => {
     setLoading(true)
@@ -271,17 +316,48 @@ export function ClientModal({
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
   }, [search, open, loadClients])
 
+  // Listen for popup close and refresh
+  useEffect(() => {
+    if (!open) return
+    const interval = setInterval(() => {
+      if (popupRef.current && popupRef.current.closed) {
+        popupRef.current = null
+        loadClients(search)
+      }
+    }, 500)
+    return () => clearInterval(interval)
+  }, [open, search, loadClients])
+
+  function handleAddClient() {
+    const w = 700
+    const h = 700
+    const left = (window.screen.width - w) / 2
+    const top = (window.screen.height - h) / 2
+    popupRef.current = window.open(
+      '/dashboard/clients/create',
+      'createClient',
+      `width=${w},height=${h},left=${left},top=${top},resizable=yes,scrollbars=yes`,
+    )
+  }
+
   return (
     <Dialog open={open} onClose={onClose} className="max-w-lg">
       <div className="flex items-center justify-between mb-4">
         <DialogTitle>Selectionner un client</DialogTitle>
-        <Button variant="ghost" size="icon" onClick={() => loadClients(search)} title="Rafraichir">
-          <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" onClick={() => loadClients(search)} title="Rafraichir">
+            <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
+          </Button>
+        </div>
       </div>
-      <div className="relative mb-4">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input placeholder="Rechercher par nom, email..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" autoFocus />
+      <div className="flex gap-2 mb-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input placeholder="Rechercher par nom, email..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" autoFocus />
+        </div>
+        <Button variant="outline" size="sm" className="shrink-0 gap-1.5" onClick={handleAddClient}>
+          <Plus className="h-3.5 w-3.5" /> Ajouter
+        </Button>
       </div>
       <div className="max-h-[320px] overflow-y-auto -mx-2">
         {loading ? (
@@ -820,102 +896,64 @@ export function A4Sheet({
                     </div>
                     <div className="flex flex-col">
                       <span className="text-[12px] mb-0.5" style={{ color: T.textMuted, letterSpacing: '0.4px' }}>{t.date}</span>
-                      {ed ? (
-                        <input
-                          type="date"
-                          value={issueDate}
-                          onChange={(e) => onIssueDateChange?.(e.target.value)}
-                          className="text-[14px] bg-transparent outline-none cursor-pointer"
-                          style={{
-                            border: `1px solid ${T.editBorderDashed}`,
-                            borderRadius: '6px',
-                            height: '36px',
-                            minWidth: '140px',
-                            padding: '0 10px',
-                            color: T.text,
-                            fontFamily: 'inherit',
-                          }}
-                        />
-                      ) : (
-                        <div
-                          className="flex items-center px-2.5 text-[14px]"
-                          style={{
-                            border: `1px solid ${T.editBorderDashed}`,
-                            borderRadius: '6px',
-                            height: '36px',
-                            minWidth: '140px',
-                            background: T.docBg,
-                            color: T.text,
-                          }}
-                        >
-                          {fmtDate(issueDate, lang)}
-                        </div>
-                      )}
+                      <InlineDateEdit
+                        value={issueDate}
+                        onChange={onIssueDateChange}
+                        preview={!ed}
+                        lang={lang}
+                        className="flex items-center px-2.5 text-[14px] font-medium"
+                        style={{
+                          border: `1px solid ${T.editBorderDashed}`,
+                          borderRadius: '6px',
+                          height: '36px',
+                          minWidth: '140px',
+                          background: ed ? 'transparent' : T.docBg,
+                          color: T.text,
+                        }}
+                      />
                     </div>
                     <div className="flex flex-col">
                       <span className="text-[12px] mb-0.5" style={{ color: T.textMuted, letterSpacing: '0.4px' }}>{validityLabel}</span>
-                      {ed ? (
-                        <input
-                          type="date"
-                          value={validityDate}
-                          onChange={(e) => onValidityDateChange?.(e.target.value)}
-                          className="text-[14px] bg-transparent outline-none cursor-pointer"
-                          style={{
-                            border: `1px dashed ${T.editBorderDashed}`,
-                            borderRadius: '6px',
-                            height: '36px',
-                            minWidth: '140px',
-                            padding: '0 10px',
-                            color: T.text,
-                            fontFamily: 'inherit',
-                          }}
-                        />
-                      ) : (
-                        validityDate && (
-                          <div
-                            className="flex items-center px-2 text-[14px]"
-                            style={{
-                              border: `1px dashed ${T.editBorderDashed}`,
-                              background: T.docBg,
-                              padding: '7px',
-                              color: T.text,
-                            }}
-                          >
-                            <span className="font-medium">{fmtDate(validityDate, lang)}</span>
-                          </div>
-                        )
-                      )}
+                      <InlineDateEdit
+                        value={validityDate}
+                        onChange={onValidityDateChange}
+                        preview={!ed}
+                        lang={lang}
+                        className="flex items-center px-2 text-[14px] font-medium"
+                        style={{
+                          border: `1px dashed ${T.editBorderDashed}`,
+                          borderRadius: '6px',
+                          height: '36px',
+                          minWidth: '140px',
+                          background: ed ? 'transparent' : T.docBg,
+                          color: T.text,
+                        }}
+                      />
                     </div>
                   </div>
                 ) : (
                   <div className="flex gap-4 mb-4 px-3 py-2.5" style={{ backgroundColor: `${accentColor}08`, border: `1px solid ${accentColor}20`, borderRadius: T.borderRadius }}>
                     <div className="text-[11px]" style={{ color: T.textMuted }}>
                       <span className="font-semibold" style={{ color: T.text }}>{t.date} :</span>{' '}
-                      {ed ? (
-                        <input
-                          type="date"
-                          value={issueDate}
-                          onChange={(e) => onIssueDateChange?.(e.target.value)}
-                          className="bg-transparent outline-none cursor-pointer text-[11px] font-medium"
-                          style={{ color: T.textMuted, fontFamily: 'inherit' }}
-                        />
-                      ) : (
-                        <span className="font-medium">{fmtDate(issueDate, lang)}</span>
-                      )}
+                      <InlineDateEdit
+                        value={issueDate}
+                        onChange={onIssueDateChange}
+                        preview={!ed}
+                        lang={lang}
+                        className="font-medium"
+                        style={{ color: T.textMuted }}
+                      />
                     </div>
                     <div className="text-[11px]" style={{ color: T.textMuted }}>
                       <span className="font-semibold" style={{ color: T.text }}>{validityLabel} :</span>{' '}
-                      {ed ? (
-                        <input
-                          type="date"
-                          value={validityDate}
-                          onChange={(e) => onValidityDateChange?.(e.target.value)}
-                          className="bg-transparent outline-none cursor-pointer text-[11px] font-medium"
-                          style={{ color: T.textMuted, fontFamily: 'inherit' }}
-                        />
-                      ) : (
-                        <span className="font-medium">{fmtDate(validityDate, lang)}</span>
-                      )}
+                      <InlineDateEdit
+                        value={validityDate}
+                        onChange={onValidityDateChange}
+                        preview={!ed}
+                        lang={lang}
+                        className="font-medium"
+                        style={{ color: T.textMuted }}
+                      />
                     </div>
                   </div>
                 )
@@ -1188,7 +1226,7 @@ export function A4Sheet({
                   </div>
                   <div className="text-[11px] leading-[1.7]" style={{ color: T.text }}>
                     <div className="font-semibold">
-                      {paymentMethod === 'bank_transfer' ? (lang === 'en' ? 'Bank transfer' : 'Virement') : paymentMethod === 'cash' ? (lang === 'en' ? 'Cash' : 'Espèces') : (lang === 'en' ? 'Other' : 'Autre')}
+                      {paymentMethod === 'bank_transfer' ? (lang === 'en' ? 'Bank transfer' : 'Virement') : paymentMethod === 'cash' ? (lang === 'en' ? 'Cash' : 'Espèces') : (paymentMethod === 'other' && customPaymentMethod ? customPaymentMethod : (lang === 'en' ? 'Other' : 'Autre'))}
                     </div>
                     {paymentMethod === 'bank_transfer' && bankAccountInfo && (bankAccountInfo.iban || bankAccountInfo.bic || bankAccountInfo.bankName) && (
                       <div className="mt-1">

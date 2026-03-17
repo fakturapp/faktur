@@ -112,4 +112,10 @@ export interface ApiDefinition {
   invoiceDelete: typeof routes['invoice_delete']
   eInvoicingSubmit: typeof routes['e_invoicing_submit']
   validateConnection: typeof routes['validate_connection']
+  gmailCallback: typeof routes['gmail_callback']
+  emailAccountsList: typeof routes['email_accounts_list']
+  emailAccountsDelete: typeof routes['email_accounts_delete']
+  emailAccountsSetDefault: typeof routes['email_accounts_set_default']
+  gmailAuthUrl: typeof routes['gmail_auth_url']
+  sendEmail: typeof routes['send_email']
 }

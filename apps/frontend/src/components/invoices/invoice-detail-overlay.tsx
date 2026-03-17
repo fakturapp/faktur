@@ -245,7 +245,8 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
     URL.revokeObjectURL(url)
   }
 
-  const effectiveLogoUrl = invoice?.logoUrl || (invoiceSettings.logoSource === 'company' ? companyLogoUrl : invoiceSettings.logoUrl)
+  // Always use current settings logo so preview stays in sync with PDF
+  const effectiveLogoUrl = invoiceSettings.logoSource === 'company' ? companyLogoUrl : (invoiceSettings.logoUrl || invoice?.logoUrl)
 
   return (
     <AnimatePresence>

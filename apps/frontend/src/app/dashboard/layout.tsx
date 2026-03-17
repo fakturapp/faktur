@@ -15,7 +15,7 @@ import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import { InvoiceSettingsProvider } from '@/lib/invoice-settings-context'
 import { EmailProvider } from '@/lib/email-context'
-import { ArrowRightLeft } from 'lucide-react'
+import { ArrowRightLeft, LogOut } from 'lucide-react'
 
 interface TeamListItem {
   id: string
@@ -36,6 +36,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [switching, setSwitching] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [sidebarBadges, setSidebarBadges] = useState<Record<string, number>>({})
+  const [logoutConfirm, setLogoutConfirm] = useState(false)
+  const [loggingOut, setLoggingOut] = useState(false)
 
   useEffect(() => {
     if (user) {
@@ -61,6 +63,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (team && !team.isCurrent) {
       setSwitchConfirm(team)
     }
+  }
+
+  async function confirmLogout() {
+    setLogoutConfirm(false)
+    setLoggingOut(true)
+    await logout()
   }
 
   async function confirmSwitchTeam() {
@@ -146,7 +154,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           email: user.email,
           avatarUrl: user.avatarUrl,
         }}
-        onLogout={logout}
+        onLogout={() => setLogoutConfirm(true)}
         collapsed={sidebarCollapsed}
         badges={sidebarBadges}
       />
@@ -218,9 +226,33 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </DialogFooter>
       </Dialog>
 
+      {/* Logout confirmation */}
+      <Dialog open={logoutConfirm} onClose={() => setLogoutConfirm(false)}>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-destructive/10">
+            <LogOut className="h-5 w-5 text-destructive" />
+          </div>
+          <div>
+            <DialogTitle>Se deconnecter</DialogTitle>
+            <DialogDescription className="mt-0">
+              Vous allez etre deconnecte de votre compte
+            </DialogDescription>
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setLogoutConfirm(false)}>
+            Annuler
+          </Button>
+          <Button variant="destructive" onClick={confirmLogout}>
+            Se deconnecter
+          </Button>
+        </DialogFooter>
+      </Dialog>
+
       {/* Switching overlay */}
       <AnimatePresence>
-        {switching && (
+        {(switching || loggingOut) && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -229,7 +261,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           >
             <Spinner size="lg" className="text-primary" />
             <p className="mt-4 text-sm font-medium text-foreground">
-              Changement d&apos;équipe en cours...
+              {loggingOut ? 'Deconnexion en cours...' : "Changement d\u0027equipe en cours..."}
             </p>
           </motion.div>
         )}

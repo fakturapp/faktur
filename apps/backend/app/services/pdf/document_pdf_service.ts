@@ -95,10 +95,13 @@ export async function generateInvoicePdf(invoiceId: string, teamId: string): Pro
   const company = await Company.query().where('team_id', teamId).first()
   const invoiceSettings = await InvoiceSetting.query().where('team_id', teamId).first()
 
+  // Use the invoice's specific payment method, not all settings methods
+  const invoicePaymentMethods: string[] = invoice.paymentMethod ? [invoice.paymentMethod] : []
+
   const settingsData = {
     template: invoiceSettings?.template || 'classique',
     darkMode: invoiceSettings?.darkMode || false,
-    paymentMethods: invoiceSettings?.paymentMethods || ['bank_transfer'],
+    paymentMethods: invoicePaymentMethods,
     customPaymentMethod: invoiceSettings?.customPaymentMethod || null,
     documentFont: invoiceSettings?.documentFont || 'Lexend',
     documentType: 'invoice' as const,
