@@ -175,7 +175,7 @@ export function SendEmailModal({
   return (
     <>
       {/* Main email compose dialog */}
-      <Dialog open={open && !showCloseConfirm} onClose={handleRequestClose} dismissible={!isDirty && !showSendConfirm} className="max-w-lg">
+      <Dialog open={open} onClose={handleRequestClose} dismissible={!isDirty && !showSendConfirm} className="max-w-lg">
         <DialogTitle className="flex items-center gap-2">
           <Send className="h-4 w-4 text-primary" />
           Envoyer par email
