@@ -393,7 +393,7 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                       Modifier la facture
                     </Button>
                     {invoice.status === 'paid' && (
-                      <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover/edit:opacity-100 transition-opacity pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-lg bg-zinc-900 text-white text-xs shadow-lg">
+                      <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 translate-y-1 group-hover/edit:opacity-100 group-hover/edit:translate-y-0 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-xl bg-zinc-900 text-white text-xs shadow-lg">
                         Changez le statut pour pouvoir modifier la facture
                       </div>
                     )}
@@ -455,37 +455,37 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                     <div className="relative group/send">
                       <button
                         onClick={handleSendEmail}
-                        disabled={!invoice.client?.email || !hasEmailConfigured || invoice.status === 'sent' || invoice.status === 'paid' || invoice.status === 'cancelled' || invoice.status === 'overdue'}
+                        disabled={!hasEmailConfigured || invoice.status !== 'draft'}
                         className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted/50 transition-colors disabled:opacity-40 disabled:cursor-default"
                       >
                         <Send className="h-4 w-4" /> Envoyer la facture
                       </button>
                       {!hasEmailConfigured && (
-                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover/send:opacity-100 transition-opacity pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-lg bg-zinc-900 text-white text-xs shadow-lg">
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 translate-y-1 group-hover/send:opacity-100 group-hover/send:translate-y-0 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-xl bg-zinc-900 text-white text-xs shadow-lg">
                           Configurez un compte email dans les paramètres
                         </div>
                       )}
-                      {hasEmailConfigured && (invoice.status === 'sent' || invoice.status === 'overdue') && (
-                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover/send:opacity-100 transition-opacity pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-lg bg-zinc-900 text-white text-xs shadow-lg">
-                          Facture déjà envoyée — utilisez Relancer
+                      {hasEmailConfigured && invoice.status !== 'draft' && (
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 translate-y-1 group-hover/send:opacity-100 group-hover/send:translate-y-0 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-xl bg-zinc-900 text-white text-xs shadow-lg">
+                          {invoice.status === 'sent' || invoice.status === 'overdue' ? 'Facture déjà envoyée — utilisez Relancer' : 'Non disponible pour ce statut'}
                         </div>
                       )}
                     </div>
                     <div className="relative group/reminder">
                       <button
                         onClick={handleReminder}
-                        disabled={!invoice.client?.email || !hasEmailConfigured || invoice.status === 'draft' || invoice.status === 'paid' || invoice.status === 'cancelled'}
+                        disabled={!hasEmailConfigured || invoice.status === 'draft' || invoice.status === 'paid' || invoice.status === 'cancelled'}
                         className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted/50 transition-colors disabled:opacity-40 disabled:cursor-default"
                       >
                         <Send className="h-4 w-4" /> Relancer la facture
                       </button>
                       {!hasEmailConfigured && (
-                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover/reminder:opacity-100 transition-opacity pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-lg bg-zinc-900 text-white text-xs shadow-lg">
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 translate-y-1 group-hover/reminder:opacity-100 group-hover/reminder:translate-y-0 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-xl bg-zinc-900 text-white text-xs shadow-lg">
                           Configurez un compte email dans les paramètres
                         </div>
                       )}
                       {hasEmailConfigured && invoice.status === 'draft' && (
-                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover/reminder:opacity-100 transition-opacity pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-lg bg-zinc-900 text-white text-xs shadow-lg">
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 translate-y-1 group-hover/reminder:opacity-100 group-hover/reminder:translate-y-0 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-xl bg-zinc-900 text-white text-xs shadow-lg">
                           Envoyez d&apos;abord la facture
                         </div>
                       )}
