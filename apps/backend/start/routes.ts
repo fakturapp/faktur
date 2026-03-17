@@ -12,6 +12,7 @@ import '#start/routes/settings'
 import '#start/routes/quote'
 import '#start/routes/invoice'
 import '#start/routes/einvoicing'
+import '#start/routes/email'
 
 router.get(API_PREFIX + '/', async () => {
   return {

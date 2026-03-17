@@ -94,21 +94,10 @@ function esc(str: string | null | undefined): string {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
-function maskIban(iban: string): string {
+function formatIban(iban: string): string {
   const clean = iban.replace(/\s/g, '')
-  if (clean.length <= 8) return clean
-  // Show country code (2) + check digits (2) + last 4, mask the rest
-  const visible = clean.slice(0, 4)
-  const masked = clean.slice(4, -4).replace(/./g, '\u2022')
-  const last = clean.slice(-4)
   // Format in groups of 4
-  const full = visible + masked + last
-  return full.match(/.{1,4}/g)?.join(' ') || full
-}
-
-function maskBic(bic: string): string {
-  if (bic.length <= 4) return bic
-  return bic.slice(0, 4) + '\u2022'.repeat(bic.length - 4)
+  return clean.match(/.{1,4}/g)?.join(' ') || clean
 }
 
 function fmtC(n: number, lang: string): string {
@@ -798,8 +787,8 @@ function renderPaymentMethods(
   // Bank details
   if (settings.paymentMethods.includes('bank_transfer') && company) {
     html += '<div class="bank-info">'
-    if (company.iban) html += `<div class="bank-item"><strong>IBAN :</strong> ${maskIban(company.iban)}</div>`
-    if (company.bic) html += `<div class="bank-item"><strong>BIC :</strong> ${maskBic(company.bic)}</div>`
+    if (company.iban) html += `<div class="bank-item"><strong>IBAN :</strong> ${formatIban(company.iban)}</div>`
+    if (company.bic) html += `<div class="bank-item"><strong>BIC :</strong> ${esc(company.bic)}</div>`
     if (company.bankName) html += `<div class="bank-item"><strong>${i.bankLabel} :</strong> ${esc(company.bankName)}</div>`
     html += '</div>'
   }

@@ -1,0 +1,123 @@
+import type { HttpContext } from '@adonisjs/core/http'
+import vine from '@vinejs/vine'
+import EmailAccount from '#models/email/email_account'
+import Invoice from '#models/invoice/invoice'
+import Quote from '#models/quote/quote'
+import GmailOAuthService from '#services/email/gmail_oauth_service'
+import { generateInvoicePdf, generateQuotePdf } from '#services/pdf/document_pdf_service'
+
+const sendEmailValidator = vine.compile(
+  vine.object({
+    documentType: vine.enum(['invoice', 'quote']),
+    documentId: vine.string().trim(),
+    emailAccountId: vine.string().trim(),
+    to: vine.string().trim().email(),
+    subject: vine.string().trim().minLength(1).maxLength(500),
+    body: vine.string().trim().minLength(1),
+  })
+)
+
+export default class SendEmail {
+  async handle({ auth, request, response }: HttpContext) {
+    const user = auth.user!
+    const teamId = user.currentTeamId
+
+    if (!teamId) {
+      return response.badRequest({ message: 'No team selected' })
+    }
+
+    const payload = await request.validateUsing(sendEmailValidator)
+
+    // Verify email account ownership
+    const emailAccount = await EmailAccount.query()
+      .where('id', payload.emailAccountId)
+      .where('team_id', teamId)
+      .first()
+
+    if (!emailAccount) {
+      return response.notFound({ message: 'Email account not found' })
+    }
+
+    if (emailAccount.provider !== 'gmail') {
+      return response.badRequest({ message: 'Only Gmail accounts are supported' })
+    }
+
+    // Generate PDF
+    let pdfBuffer: Buffer
+    let filename: string
+    try {
+      if (payload.documentType === 'invoice') {
+        const result = await generateInvoicePdf(payload.documentId, teamId)
+        pdfBuffer = result.pdfBuffer
+        filename = result.filename
+      } else {
+        const result = await generateQuotePdf(payload.documentId, teamId)
+        pdfBuffer = result.pdfBuffer
+        filename = result.filename
+      }
+    } catch {
+      return response.notFound({ message: 'Document not found' })
+    }
+
+    // Get valid access token (refresh if needed)
+    let accessToken: string
+    try {
+      accessToken = await GmailOAuthService.getValidAccessToken(emailAccount)
+
+      // If token was refreshed, persist the new one
+      if (emailAccount.$isDirty) {
+        await emailAccount.save()
+      }
+    } catch {
+      return response.badRequest({
+        message: 'Impossible de se connecter à Gmail. Veuillez reconnecter votre compte.',
+      })
+    }
+
+    // Send email
+    try {
+      await GmailOAuthService.sendEmail({
+        accessToken,
+        from: emailAccount.email,
+        fromName: emailAccount.displayName,
+        to: payload.to,
+        subject: payload.subject,
+        body: payload.body,
+        attachments: [
+          {
+            filename,
+            content: pdfBuffer,
+            mimeType: 'application/pdf',
+          },
+        ],
+      })
+    } catch {
+      return response.internalServerError({
+        message: "Erreur lors de l'envoi de l'email. Veuillez réessayer.",
+      })
+    }
+
+    // Update document status to 'sent' if currently 'draft'
+    if (payload.documentType === 'invoice') {
+      const invoice = await Invoice.query()
+        .where('id', payload.documentId)
+        .where('team_id', teamId)
+        .first()
+      if (invoice && invoice.status === 'draft') {
+        invoice.status = 'sent'
+        await invoice.save()
+      }
+    } else {
+      const quote = await Quote.query()
+        .where('id', payload.documentId)
+        .where('team_id', teamId)
+        .first()
+      if (quote && quote.status === 'draft') {
+        quote.status = 'sent'
+        await quote.save()
+      }
+    }
+
+    return response.ok({ message: 'Email envoyé avec succès' })
+  }
+}

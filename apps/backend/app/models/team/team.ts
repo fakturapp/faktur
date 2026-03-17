@@ -5,6 +5,7 @@ import User from '#models/account/user'
 import TeamMember from '#models/team/team_member'
 import Company from '#models/team/company'
 import BankAccount from '#models/team/bank_account'
+import EmailAccount from '#models/email/email_account'
 
 export default class Team extends BaseModel {
   @column({ isPrimary: true })
@@ -36,4 +37,7 @@ export default class Team extends BaseModel {
 
   @hasMany(() => BankAccount)
   declare bankAccounts: HasMany<typeof BankAccount>
+
+  @hasMany(() => EmailAccount)
+  declare emailAccounts: HasMany<typeof EmailAccount>
 }

@@ -63,11 +63,11 @@ export default function OnboardingPersonalizationPage() {
       accentColor: selectedColor,
       logoUrl,
     }))
-    router.push('/onboarding/billing')
+    router.push('/onboarding/email')
   }
 
   function handleSkip() {
-    router.push('/onboarding/billing')
+    router.push('/onboarding/email')
   }
 
   return (

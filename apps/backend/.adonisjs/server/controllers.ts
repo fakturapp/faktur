@@ -69,8 +69,8 @@ export const controllers = {
       Update: () => import('#controllers/company/core/update'),
     },
     finance: {
-      Bank: () => import('#controllers/company/finance/bank'),
       BankAccounts: () => import('#controllers/company/finance/bank_accounts'),
+      Bank: () => import('#controllers/company/finance/bank'),
     },
     media: {
       ServeLogo: () => import('#controllers/company/media/serve_logo'),
@@ -78,9 +78,9 @@ export const controllers = {
     },
   },
   dashboard: {
+    Charts: () => import('#controllers/dashboard/charts'),
     SidebarCounts: () => import('#controllers/dashboard/sidebar_counts'),
     Stats: () => import('#controllers/dashboard/stats'),
-    Charts: () => import('#controllers/dashboard/charts'),
   },
   einvoicing: {
     Submit: () => import('#controllers/einvoicing/submit'),
@@ -179,6 +179,20 @@ export const controllers = {
       RemoveMember: () => import('#controllers/team/members/remove_member'),
       TransferOwnership: () => import('#controllers/team/members/transfer_ownership'),
       UpdateRole: () => import('#controllers/team/members/update_role'),
+    },
+  },
+  email: {
+    accounts: {
+      List: () => import('#controllers/email/accounts/list'),
+      Delete: () => import('#controllers/email/accounts/delete'),
+      SetDefault: () => import('#controllers/email/accounts/set_default'),
+    },
+    oauth: {
+      GmailAuthUrl: () => import('#controllers/email/oauth/gmail_auth_url'),
+      GmailCallback: () => import('#controllers/email/oauth/gmail_callback'),
+    },
+    send: {
+      SendEmail: () => import('#controllers/email/send/send_email'),
     },
   },
 }

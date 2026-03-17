@@ -11,6 +11,7 @@ const steps = [
   { id: 'team', label: 'Équipe', path: '/onboarding/team' },
   { id: 'company', label: 'Entreprise', path: '/onboarding/company' },
   { id: 'personalization', label: 'Apparence', path: '/onboarding/personalization' },
+  { id: 'email', label: 'Email', path: '/onboarding/email' },
   { id: 'billing', label: 'Facturation', path: '/onboarding/billing' },
 ]
 

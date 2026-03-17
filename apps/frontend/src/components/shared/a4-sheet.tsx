@@ -1196,10 +1196,10 @@ export function A4Sheet({
                           <div><span className="font-semibold">{lang === 'en' ? 'Bank' : 'Banque'} :</span> {bankAccountInfo.bankName}</div>
                         )}
                         {bankAccountInfo.iban && (
-                          <div><span className="font-semibold">IBAN :</span> <span className="font-mono">{ed ? bankAccountInfo.iban.slice(0, 4) + ' **** **** ****' : bankAccountInfo.iban}</span></div>
+                          <div><span className="font-semibold">IBAN :</span> <span className="font-mono">{bankAccountInfo.iban.slice(0, 4) + ' **** **** ****'}</span></div>
                         )}
                         {bankAccountInfo.bic && (
-                          <div><span className="font-semibold">BIC :</span> <span className="font-mono">{ed ? bankAccountInfo.bic.slice(0, 4) + '****' : bankAccountInfo.bic}</span></div>
+                          <div><span className="font-semibold">BIC :</span> <span className="font-mono">{bankAccountInfo.bic.slice(0, 4) + '****'}</span></div>
                         )}
                       </div>
                     )}

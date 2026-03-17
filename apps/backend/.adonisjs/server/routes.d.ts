@@ -107,6 +107,12 @@ export type ScannedRoutes = {
     'invoice_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'e_invoicing_submit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'validate_connection': { paramsTuple?: []; params?: {} }
+    'gmail_callback': { paramsTuple?: []; params?: {} }
+    'email_accounts_list': { paramsTuple?: []; params?: {} }
+    'email_accounts_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'email_accounts_set_default': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'gmail_auth_url': { paramsTuple?: []; params?: {} }
+    'send_email': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'signup': { paramsTuple?: []; params?: {} }
@@ -149,6 +155,7 @@ export type ScannedRoutes = {
     'invoice_convert_quote': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_duplicate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'e_invoicing_submit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'send_email': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'me': { paramsTuple?: []; params?: {} }
@@ -189,6 +196,9 @@ export type ScannedRoutes = {
     'invoice_pdf': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'validate_connection': { paramsTuple?: []; params?: {} }
+    'gmail_callback': { paramsTuple?: []; params?: {} }
+    'email_accounts_list': { paramsTuple?: []; params?: {} }
+    'gmail_auth_url': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'me': { paramsTuple?: []; params?: {} }
@@ -229,6 +239,9 @@ export type ScannedRoutes = {
     'invoice_pdf': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'validate_connection': { paramsTuple?: []; params?: {} }
+    'gmail_callback': { paramsTuple?: []; params?: {} }
+    'email_accounts_list': { paramsTuple?: []; params?: {} }
+    'gmail_auth_url': { paramsTuple?: []; params?: {} }
   }
   PUT: {
     'profile_update': { paramsTuple?: []; params?: {} }
@@ -253,6 +266,7 @@ export type ScannedRoutes = {
     'client_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'quote_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'email_accounts_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PATCH: {
     'quote_update_status': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -260,6 +274,7 @@ export type ScannedRoutes = {
     'invoice_update_status': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_unlink_quote': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_update_comment': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'email_accounts_set_default': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

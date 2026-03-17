@@ -14,6 +14,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import { InvoiceSettingsProvider } from '@/lib/invoice-settings-context'
+import { EmailProvider } from '@/lib/email-context'
 import { ArrowRightLeft } from 'lucide-react'
 
 interface TeamListItem {
@@ -133,6 +134,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <InvoiceSettingsProvider>
+    <EmailProvider>
     <div className="flex h-screen overflow-hidden bg-sidebar">
       <Sidebar
         teams={teams}
@@ -233,6 +235,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         )}
       </AnimatePresence>
     </div>
+    </EmailProvider>
     </InvoiceSettingsProvider>
   )
 }

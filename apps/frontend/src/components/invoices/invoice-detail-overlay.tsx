@@ -12,6 +12,8 @@ import { useToast } from '@/components/ui/toast'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { api } from '@/lib/api'
 import { A4Sheet, type DocumentLine, type ClientInfo, type CompanyInfo } from '@/components/shared/a4-sheet'
+import { SendEmailModal } from '@/components/shared/send-email-modal'
+import { useEmail } from '@/lib/email-context'
 import {
   X,
   Send,
@@ -43,6 +45,8 @@ interface InvoiceDetail {
   sourceQuoteId: string | null
   sourceQuote: { id: string; quoteNumber: string } | null
   paymentTerms: string | null
+  paymentMethod: string | null
+  bankAccountId: string | null
   documentTitle: string | null
   acceptanceConditions: string | null
   signatureField: boolean
@@ -88,20 +92,32 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
   const [deleting, setDeleting] = useState(false)
   const [downloading, setDownloading] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [bankAccountInfo, setBankAccountInfo] = useState<{ bankName: string | null; iban: string | null; bic: string | null } | null>(null)
+  const [emailModalOpen, setEmailModalOpen] = useState(false)
+  const [emailModalMode, setEmailModalMode] = useState<'send' | 'reminder'>('send')
+  const { hasEmailConfigured } = useEmail()
   const commentTimeout = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   useEffect(() => {
     if (!invoiceId) return
     setLoading(true)
     setInvoice(null)
+    setBankAccountInfo(null)
 
     Promise.all([
       api.get<{ invoice: InvoiceDetail }>(`/invoices/${invoiceId}`),
       api.get<{ company: CompanyInfo }>('/company'),
-    ]).then(([invRes, compRes]) => {
+    ]).then(async ([invRes, compRes]) => {
       if (invRes.data?.invoice) {
         setInvoice(invRes.data.invoice)
         setComment(invRes.data.invoice.comment || '')
+        // Fetch bank account info if invoice has a linked bank account
+        if (invRes.data.invoice.bankAccountId) {
+          const { data: bankData } = await api.get<{ bankAccount: { bankName: string | null; iban: string | null; bic: string | null } }>(`/company/bank-accounts/${invRes.data.invoice.bankAccountId}`)
+          if (bankData?.bankAccount) {
+            setBankAccountInfo(bankData.bankAccount)
+          }
+        }
       }
       if (compRes.data?.company) setCompany(compRes.data.company as CompanyInfo)
       setLoading(false)
@@ -176,27 +192,20 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
   }
 
   function handleSendEmail() {
-    if (!invoice?.client?.email) {
-      toast('Aucun email client renseigné', 'error')
-      return
-    }
-    const subject = encodeURIComponent(`Facture ${invoice.invoiceNumber}`)
-    const body = encodeURIComponent(
-      `Bonjour,\n\nVeuillez trouver ci-joint la facture ${invoice.invoiceNumber} d'un montant de ${Number(invoice.total).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}.\n\nCordialement`
-    )
-    window.open(`mailto:${invoice.client.email}?subject=${subject}&body=${body}`, '_blank')
+    setEmailModalMode('send')
+    setEmailModalOpen(true)
   }
 
   function handleReminder() {
-    if (!invoice?.client?.email) {
-      toast('Aucun email client renseigné', 'error')
-      return
+    setEmailModalMode('reminder')
+    setEmailModalOpen(true)
+  }
+
+  function handleEmailSent() {
+    if (invoice && invoice.status === 'draft') {
+      setInvoice({ ...invoice, status: 'sent' })
+      onStatusChange(invoice.id, 'sent')
     }
-    const subject = encodeURIComponent(`Relance - Facture ${invoice.invoiceNumber}`)
-    const body = encodeURIComponent(
-      `Bonjour,\n\nNous vous rappelons que la facture ${invoice.invoiceNumber} d'un montant de ${Number(invoice.total).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })} reste en attente de règlement.\n\nCordialement`
-    )
-    window.open(`mailto:${invoice.client.email}?subject=${subject}&body=${body}`, '_blank')
   }
 
   async function handleDuplicate() {
@@ -314,6 +323,8 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                   showClientVatNumber={!!invoice.clientVatNumber}
                   paymentMethods={invoiceSettings.paymentMethods}
                   customPaymentMethod={invoiceSettings.customPaymentMethod}
+                  paymentMethod={invoice.paymentMethod}
+                  bankAccountInfo={bankAccountInfo}
                   subject={invoice.subject || ''}
                   onSubjectChange={noop}
                   template={invoiceSettings.template}
@@ -409,7 +420,8 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                         </p>
                         <button
                           onClick={handleReminder}
-                          className="mt-2 px-3 py-1 rounded-full bg-card shadow-sm text-xs font-semibold text-red-500 border border-border hover:bg-muted/50 transition-colors"
+                          disabled={!hasEmailConfigured}
+                          className="mt-2 px-3 py-1 rounded-full bg-card shadow-sm text-xs font-semibold text-red-500 border border-border hover:bg-muted/50 transition-colors disabled:opacity-40 disabled:cursor-default"
                         >
                           Envoyer une relance
                         </button>
@@ -436,20 +448,34 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
 
                   {/* Actions */}
                   <div className="px-5 py-4 border-b border-border space-y-1">
-                    <button
-                      onClick={handleSendEmail}
-                      disabled={!invoice.client?.email}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted/50 transition-colors disabled:opacity-40 disabled:cursor-default"
-                    >
-                      <Send className="h-4 w-4" /> Envoyer la facture
-                    </button>
-                    <button
-                      onClick={handleReminder}
-                      disabled={!invoice.client?.email}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted/50 transition-colors disabled:opacity-40 disabled:cursor-default"
-                    >
-                      <Send className="h-4 w-4" /> Relancer la facture
-                    </button>
+                    <div className="relative group/send">
+                      <button
+                        onClick={handleSendEmail}
+                        disabled={!invoice.client?.email || !hasEmailConfigured}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted/50 transition-colors disabled:opacity-40 disabled:cursor-default"
+                      >
+                        <Send className="h-4 w-4" /> Envoyer la facture
+                      </button>
+                      {!hasEmailConfigured && (
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover/send:opacity-100 transition-opacity pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-lg bg-zinc-900 text-white text-xs shadow-lg">
+                          Configurez un compte email dans les paramètres
+                        </div>
+                      )}
+                    </div>
+                    <div className="relative group/reminder">
+                      <button
+                        onClick={handleReminder}
+                        disabled={!invoice.client?.email || !hasEmailConfigured}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted/50 transition-colors disabled:opacity-40 disabled:cursor-default"
+                      >
+                        <Send className="h-4 w-4" /> Relancer la facture
+                      </button>
+                      {!hasEmailConfigured && (
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover/reminder:opacity-100 transition-opacity pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-lg bg-zinc-900 text-white text-xs shadow-lg">
+                          Configurez un compte email dans les paramètres
+                        </div>
+                      )}
+                    </div>
 
                     {/* Plus d'actions */}
                     <Dropdown
@@ -506,6 +532,21 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
             </Button>
           </DialogFooter>
         </Dialog>
+
+        {/* Send email modal */}
+        {invoice && (
+          <SendEmailModal
+            open={emailModalOpen}
+            onClose={() => setEmailModalOpen(false)}
+            documentType="invoice"
+            documentId={invoice.id}
+            documentNumber={invoice.invoiceNumber}
+            clientEmail={invoice.client?.email || null}
+            clientName={invoice.client?.displayName || null}
+            total={invoice.total}
+            onSent={handleEmailSent}
+          />
+        )}
       </motion.div>
       )}
     </AnimatePresence>

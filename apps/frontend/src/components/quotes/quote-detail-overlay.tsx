@@ -12,6 +12,8 @@ import { useToast } from '@/components/ui/toast'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { api } from '@/lib/api'
 import { A4Sheet, type DocumentLine, type ClientInfo, type CompanyInfo } from '@/components/shared/a4-sheet'
+import { SendEmailModal } from '@/components/shared/send-email-modal'
+import { useEmail } from '@/lib/email-context'
 import {
   X,
   Send,
@@ -85,6 +87,9 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
   const [deleting, setDeleting] = useState(false)
   const [downloading, setDownloading] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [emailModalOpen, setEmailModalOpen] = useState(false)
+  const [emailModalMode, setEmailModalMode] = useState<'send' | 'reminder'>('send')
+  const { hasEmailConfigured } = useEmail()
   const commentTimeout = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   useEffect(() => {
@@ -173,27 +178,20 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
   }
 
   function handleSendEmail() {
-    if (!quote?.client?.email) {
-      toast('Aucun email client renseigné', 'error')
-      return
-    }
-    const subject = encodeURIComponent(`Devis ${quote.quoteNumber}`)
-    const body = encodeURIComponent(
-      `Bonjour,\n\nVeuillez trouver ci-joint le devis ${quote.quoteNumber} d'un montant de ${Number(quote.total).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}.\n\nCordialement`
-    )
-    window.open(`mailto:${quote.client.email}?subject=${subject}&body=${body}`, '_blank')
+    setEmailModalMode('send')
+    setEmailModalOpen(true)
   }
 
   function handleReminder() {
-    if (!quote?.client?.email) {
-      toast('Aucun email client renseigné', 'error')
-      return
+    setEmailModalMode('reminder')
+    setEmailModalOpen(true)
+  }
+
+  function handleEmailSent() {
+    if (quote && quote.status === 'draft') {
+      setQuote({ ...quote, status: 'sent' })
+      onStatusChange(quote.id, 'sent')
     }
-    const subject = encodeURIComponent(`Relance - Devis ${quote.quoteNumber}`)
-    const body = encodeURIComponent(
-      `Bonjour,\n\nNous vous rappelons que le devis ${quote.quoteNumber} d'un montant de ${Number(quote.total).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })} est en attente de votre retour.\n\nCordialement`
-    )
-    window.open(`mailto:${quote.client.email}?subject=${subject}&body=${body}`, '_blank')
   }
 
   async function handleDuplicate() {
@@ -427,20 +425,34 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
 
                   {/* Actions */}
                   <div className="px-5 py-4 border-b border-border space-y-1">
-                    <button
-                      onClick={handleSendEmail}
-                      disabled={!quote.client?.email}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted/50 transition-colors disabled:opacity-40 disabled:cursor-default"
-                    >
-                      <Send className="h-4 w-4" /> Envoyer le devis
-                    </button>
-                    <button
-                      onClick={handleReminder}
-                      disabled={!quote.client?.email}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted/50 transition-colors disabled:opacity-40 disabled:cursor-default"
-                    >
-                      <Send className="h-4 w-4" /> Relancer le client
-                    </button>
+                    <div className="relative group/send">
+                      <button
+                        onClick={handleSendEmail}
+                        disabled={!quote.client?.email || !hasEmailConfigured}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted/50 transition-colors disabled:opacity-40 disabled:cursor-default"
+                      >
+                        <Send className="h-4 w-4" /> Envoyer le devis
+                      </button>
+                      {!hasEmailConfigured && (
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover/send:opacity-100 transition-opacity pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-lg bg-zinc-900 text-white text-xs shadow-lg">
+                          Configurez un compte email dans les paramètres
+                        </div>
+                      )}
+                    </div>
+                    <div className="relative group/reminder">
+                      <button
+                        onClick={handleReminder}
+                        disabled={!quote.client?.email || !hasEmailConfigured}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted/50 transition-colors disabled:opacity-40 disabled:cursor-default"
+                      >
+                        <Send className="h-4 w-4" /> Relancer le client
+                      </button>
+                      {!hasEmailConfigured && (
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover/reminder:opacity-100 transition-opacity pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-lg bg-zinc-900 text-white text-xs shadow-lg">
+                          Configurez un compte email dans les paramètres
+                        </div>
+                      )}
+                    </div>
 
                     {/* Plus d'actions */}
                     <Dropdown
@@ -497,6 +509,21 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
             </Button>
           </DialogFooter>
         </Dialog>
+
+        {/* Send email modal */}
+        {quote && (
+          <SendEmailModal
+            open={emailModalOpen}
+            onClose={() => setEmailModalOpen(false)}
+            documentType="quote"
+            documentId={quote.id}
+            documentNumber={quote.quoteNumber}
+            clientEmail={quote.client?.email || null}
+            clientName={quote.client?.displayName || null}
+            total={quote.total}
+            onSent={handleEmailSent}
+          />
+        )}
       </motion.div>
       )}
     </AnimatePresence>
