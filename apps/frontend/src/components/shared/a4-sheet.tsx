@@ -324,7 +324,7 @@ export function ClientModal({
     const left = (window.screen.width - w) / 2
     const top = (window.screen.height - h) / 2
     popupRef.current = window.open(
-      '/dashboard/clients/create',
+      '/dashboard/clients/create?popup=true',
       'createClient',
       `width=${w},height=${h},left=${left},top=${top},resizable=yes,scrollbars=yes`,
     )

@@ -10,7 +10,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import { InvoiceSettingsProvider } from '@/lib/invoice-settings-context'
@@ -30,6 +30,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { user, loading, logout, refreshUser } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const isPopup = searchParams.get('popup') === 'true'
   const [teams, setTeams] = useState<TeamListItem[]>([])
   const [teamsLoaded, setTeamsLoaded] = useState(false)
   const [switchConfirm, setSwitchConfirm] = useState<TeamListItem | null>(null)
@@ -137,6 +139,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   if (!user) return null
+
+  // Popup mode: minimal layout without sidebar/header (used for client creation popup)
+  if (isPopup) {
+    return (
+      <InvoiceSettingsProvider>
+      <EmailProvider>
+        <div className="min-h-screen bg-background">
+          <main className="flex-1">
+            {children}
+          </main>
+        </div>
+      </EmailProvider>
+      </InvoiceSettingsProvider>
+    )
+  }
 
   const currentTeam = teams.find((t) => t.isCurrent) || null
 

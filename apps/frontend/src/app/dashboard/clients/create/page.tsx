@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useCallback, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
@@ -83,6 +83,8 @@ const slideVariants = {
 
 export default function ClientCreatePage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const isPopup = searchParams.get('popup') === 'true'
   const { toast } = useToast()
   const [step, setStep] = useState(1)
   const [dir, setDir] = useState(1)
@@ -192,7 +194,11 @@ export default function ClientCreatePage() {
     setSaving(false)
     if (apiError) { setError(apiError); return }
     toast('Client créé', 'success')
-    router.push('/dashboard/clients')
+    if (isPopup) {
+      window.close()
+    } else {
+      router.push('/dashboard/clients')
+    }
   }
 
   const canGoNext = () => {
@@ -205,12 +211,14 @@ export default function ClientCreatePage() {
   return (
     <div className="max-w-2xl mx-auto px-4 lg:px-6 py-4 md:py-6">
       {/* Back link */}
-      <Link
-        href="/dashboard/clients"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
-      >
-        <ArrowLeft className="h-4 w-4" /> Retour aux clients
-      </Link>
+      {!isPopup && (
+        <Link
+          href="/dashboard/clients"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
+        >
+          <ArrowLeft className="h-4 w-4" /> Retour aux clients
+        </Link>
+      )}
 
       <h1 className="text-2xl font-bold text-foreground mb-1">Nouveau client</h1>
       <p className="text-muted-foreground text-sm mb-6">Remplissez les informations pour creer un nouveau client.</p>
@@ -500,7 +508,7 @@ export default function ClientCreatePage() {
 
       {/* Footer nav */}
       <div className="flex items-center justify-between mt-6">
-        <Button variant="outline" onClick={step === 1 ? () => router.push('/dashboard/clients') : goBack}>
+        <Button variant="outline" onClick={step === 1 ? () => isPopup ? window.close() : router.push('/dashboard/clients') : goBack}>
           {step === 1 ? 'Annuler' : <><ArrowLeft className="h-4 w-4 mr-1" /> Retour</>}
         </Button>
         {step < 5 ? (
