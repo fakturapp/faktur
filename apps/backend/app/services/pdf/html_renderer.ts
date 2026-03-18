@@ -278,7 +278,7 @@ export function renderQuoteHtml(
 
   /* ── Header ── */
   .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-  .logo img { max-height: 56px; max-width: 110px; object-fit: contain; }
+  .logo img { max-height: 80px; max-width: 160px; object-fit: contain; }
   .logo-placeholder {
     width: 64px; height: 64px; display: flex; align-items: center; justify-content: center;
     background: ${ac}15; border: 2px dashed ${ac}66; border-radius: ${T.borderRadius};
@@ -305,7 +305,7 @@ export function renderQuoteHtml(
   }
   .banner .banner-title { font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: ${contrastText(ac)}; }
   .banner .banner-number { font-size: 11px; margin-top: 2px; color: ${contrastText(ac)}; opacity: 0.8; }
-  .banner .logo img { max-height: 48px; }
+  .banner .logo img { max-height: 64px; }
   .banner-company { font-size: 18px; font-weight: 700; color: ${contrastText(ac)}; }
 
   /* ── Subject ── */
@@ -860,7 +860,7 @@ function renderLateral(
   // Sidebar with company info
   let sidebar = '<div class="sidebar">'
   if (quote.logoUrl) {
-    sidebar += `<div class="section"><img src="${esc(quote.logoUrl)}" alt="Logo" style="max-width:80px;max-height:40px;border-radius:${quote.logoBorderRadius || 0}px" /></div>`
+    sidebar += `<div class="section"><img src="${esc(quote.logoUrl)}" alt="Logo" style="max-width:120px;max-height:60px;border-radius:${quote.logoBorderRadius || 0}px" /></div>`
   }
   if (company) {
     sidebar += '<div class="section">'
