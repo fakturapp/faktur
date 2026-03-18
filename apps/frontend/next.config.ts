@@ -4,7 +4,6 @@ const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333'
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  output: 'standalone',
   async rewrites() {
     return [
       {
