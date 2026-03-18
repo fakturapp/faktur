@@ -11,4 +11,4 @@ cmds = [
 ]
 
 [start]
-cmd = "cd apps/backend/build && node ace migration:run --force && node bin/server.js & cd /app/apps/frontend && npx next start -p 3000 -H 0.0.0.0"
+cmd = "cd apps/backend/build && node ace migration:run --force; node bin/server.js & cd /app/apps/frontend && npx next start -p 3000 -H 0.0.0.0"
