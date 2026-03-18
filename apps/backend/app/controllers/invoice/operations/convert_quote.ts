@@ -4,7 +4,7 @@ import Quote from '#models/quote/quote'
 import Invoice from '#models/invoice/invoice'
 import InvoiceLine from '#models/invoice/invoice_line'
 import InvoiceSetting from '#models/team/invoice_setting'
-import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
+import { encryptModelFields } from '#services/crypto/field_encryption_helper'
 
 export default class ConvertQuote {
   async handle(ctx: HttpContext) {

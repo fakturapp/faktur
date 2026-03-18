@@ -13,7 +13,7 @@ export default class Create {
 
     const kek = keyStore.getKEK(user.id)
     if (!kek) {
-      return response.locked({ code: 'VAULT_LOCKED', message: 'Vault is locked' })
+      return response.status(423).send({ code: 'VAULT_LOCKED', message: 'Vault is locked' })
     }
 
     const team = await Team.create({

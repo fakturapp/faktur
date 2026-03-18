@@ -34,3 +34,4 @@ router
   })
   .prefix(API_PREFIX + '/email')
   .use(middleware.auth())
+  .use(middleware.vault())

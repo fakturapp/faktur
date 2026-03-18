@@ -21,7 +21,9 @@ const sendEmailValidator = vine.compile(
 )
 
 export default class SendEmail {
-  async handle({ auth, request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, request, response } = ctx
+    const dek: Buffer = (ctx as any).dek
     const user = auth.user!
     const teamId = user.currentTeamId
 
@@ -50,11 +52,11 @@ export default class SendEmail {
     let filename: string
     try {
       if (payload.documentType === 'invoice') {
-        const result = await generateInvoicePdf(payload.documentId, teamId)
+        const result = await generateInvoicePdf(payload.documentId, teamId, dek)
         pdfBuffer = result.pdfBuffer
         filename = result.filename
       } else {
-        const result = await generateQuotePdf(payload.documentId, teamId)
+        const result = await generateQuotePdf(payload.documentId, teamId, dek)
         pdfBuffer = result.pdfBuffer
         filename = result.filename
       }
