@@ -45,6 +45,9 @@ export default await Env.create(new URL('../', import.meta.url), {
   // API prefix (e.g. /api/v1)
   API_PREFIX: Env.schema.string.optional(),
 
+  // CORS (comma-separated allowed origins for production)
+  CORS_ORIGIN: Env.schema.string.optional(),
+
   // Google OAuth (for Gmail email sending)
   GOOGLE_CLIENT_ID: Env.schema.string.optional(),
   GOOGLE_CLIENT_SECRET: Env.schema.string.optional(),
