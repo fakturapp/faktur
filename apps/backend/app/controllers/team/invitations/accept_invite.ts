@@ -3,6 +3,8 @@ import { DateTime } from 'luxon'
 import vine from '@vinejs/vine'
 import TeamMember from '#models/team/team_member'
 import Team from '#models/team/team'
+import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
+import keyStore from '#services/crypto/key_store'
 
 const acceptInviteValidator = vine.compile(
   vine.object({
@@ -39,9 +41,21 @@ export default class AcceptInvite {
       .first()
 
     if (existingMember) {
-      // Remove the pending invitation since user is already a member
       await invitation.delete()
       return response.conflict({ message: 'You are already a member of this team' })
+    }
+
+    // Decrypt team DEK from invite and re-encrypt with user's KEK
+    let encryptedTeamDek: string | null = null
+    const kek = keyStore.getKEK(user.id)
+
+    if (invitation.encryptedInviteDek && kek) {
+      const inviteKey = zeroAccessCryptoService.deriveInviteKey(payload.token)
+      const teamDek = zeroAccessCryptoService.decryptDEK(invitation.encryptedInviteDek, inviteKey)
+      encryptedTeamDek = zeroAccessCryptoService.encryptDEK(teamDek, kek)
+
+      // Cache the DEK in memory
+      keyStore.storeDEK(user.id, invitation.teamId, teamDek)
     }
 
     // Accept invitation
@@ -49,6 +63,8 @@ export default class AcceptInvite {
     invitation.status = 'active'
     invitation.joinedAt = DateTime.now()
     invitation.invitationToken = null
+    invitation.encryptedInviteDek = null
+    invitation.encryptedTeamDek = encryptedTeamDek
     await invitation.save()
 
     // Set as current team if user has no current team

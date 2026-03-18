@@ -6,6 +6,8 @@ import TeamMember from '#models/team/team_member'
 import User from '#models/account/user'
 import EmailService from '#services/email/email_service'
 import env from '#start/env'
+import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
+import keyStore from '#services/crypto/key_store'
 
 const inviteValidator = vine.compile(
   vine.object({
@@ -15,7 +17,8 @@ const inviteValidator = vine.compile(
 )
 
 export default class Invite {
-  async handle({ auth, request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, request, response } = ctx
     const user = auth.user!
 
     if (!user.currentTeamId) {
@@ -59,6 +62,14 @@ export default class Invite {
 
     const token = crypto.randomBytes(32).toString('hex')
 
+    // Encrypt team DEK with invite key derived from token
+    const teamDek = keyStore.getDEK(user.id, user.currentTeamId)
+    let encryptedInviteDek: string | null = null
+    if (teamDek) {
+      const inviteKey = zeroAccessCryptoService.deriveInviteKey(token)
+      encryptedInviteDek = zeroAccessCryptoService.encryptDEK(teamDek, inviteKey)
+    }
+
     const member = await TeamMember.create({
       teamId: user.currentTeamId,
       userId: existingUser?.id ?? (null as any),
@@ -67,6 +78,7 @@ export default class Invite {
       invitationToken: token,
       invitedEmail: payload.email,
       invitedAt: DateTime.now(),
+      encryptedInviteDek,
     })
 
     const frontendUrl = env.get('FRONTEND_URL') || 'http://localhost:3000'
