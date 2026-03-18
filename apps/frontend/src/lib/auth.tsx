@@ -2,8 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { api, setVaultLockedHandler } from '@/lib/api'
-import { VaultUnlockModal } from '@/components/modals/vault-unlock-modal'
+import { api } from '@/lib/api'
 
 interface User {
   id: string
@@ -21,7 +20,6 @@ interface User {
 interface AuthContextType {
   user: User | null
   loading: boolean
-  vaultLocked: boolean
   login: (token: string, user: User) => void
   logout: () => Promise<void>
   refreshUser: () => Promise<void>
@@ -30,7 +28,6 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
-  vaultLocked: false,
   login: () => {},
   logout: async () => {},
   refreshUser: async () => {},
@@ -45,18 +42,10 @@ const publicPaths = ['/login', '/register', '/forgot-password', '/reset-password
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const [vaultLocked, setVaultLocked] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
 
   const isPublicPath = publicPaths.some((p) => pathname.startsWith(p))
-
-  // Register the vault locked handler
-  useEffect(() => {
-    setVaultLockedHandler(() => {
-      setVaultLocked(true)
-    })
-  }, [])
 
   const refreshUser = useCallback(async () => {
     const token = localStorage.getItem('faktur_token')
@@ -117,27 +106,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   function login(token: string, userData: User) {
     localStorage.setItem('faktur_token', token)
     setUser(userData)
-    setVaultLocked(false)
   }
 
   async function logout() {
     await api.post('/auth/logout', {})
     localStorage.removeItem('faktur_token')
     setUser(null)
-    setVaultLocked(false)
     router.replace('/login')
   }
 
-  function handleVaultUnlocked() {
-    setVaultLocked(false)
-    // Reload the current page to retry failed requests
-    router.refresh()
-  }
-
   return (
-    <AuthContext.Provider value={{ user, loading, vaultLocked, login, logout, refreshUser }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, refreshUser }}>
       {children}
-      <VaultUnlockModal open={vaultLocked} onUnlocked={handleVaultUnlocked} />
     </AuthContext.Provider>
   )
 }

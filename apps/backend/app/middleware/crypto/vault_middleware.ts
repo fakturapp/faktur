@@ -4,8 +4,8 @@ import keyStore from '#services/crypto/key_store'
 
 /**
  * Vault middleware — ensures the user's DEK is available in memory.
- * If not (e.g. after server restart), returns HTTP 423 Locked so the
- * frontend can prompt for the password to unlock.
+ * If not (e.g. after server restart), returns HTTP 401 to force a full
+ * re-login (Proton model: fully unlocked or fully logged out, no in-between).
  */
 export default class VaultMiddleware {
   async handle(ctx: HttpContext, next: NextFn) {
@@ -16,9 +16,10 @@ export default class VaultMiddleware {
 
     const dek = keyStore.getDEK(user.id, user.currentTeamId)
     if (!dek) {
-      return ctx.response.status(423).json({
-        code: 'VAULT_LOCKED',
-        message: 'Vault is locked. Please unlock with your password.',
+      // DEK not in memory — force full re-login like Proton does
+      return ctx.response.unauthorized({
+        code: 'SESSION_EXPIRED',
+        message: 'Session expired. Please log in again.',
       })
     }
 

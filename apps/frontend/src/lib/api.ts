@@ -1,24 +1,9 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333'
 
-type VaultLockedHandler = () => void
-let onVaultLocked: VaultLockedHandler | null = null
-
-export function setVaultLockedHandler(handler: VaultLockedHandler) {
-  onVaultLocked = handler
-}
-
-function handleVaultLocked(status: number): boolean {
-  if (status === 423 && onVaultLocked) {
-    onVaultLocked()
-    return true
-  }
-  return false
-}
-
 async function request<T = unknown>(
   endpoint: string,
   options: RequestInit = {}
-): Promise<{ data?: T; error?: string; vaultLocked?: boolean }> {
+): Promise<{ data?: T; error?: string }> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('faktur_token') : null
 
   const headers: Record<string, string> = {
@@ -33,8 +18,15 @@ async function request<T = unknown>(
   try {
     const res = await fetch(`${API_URL}${endpoint}`, { ...options, headers })
 
-    if (handleVaultLocked(res.status)) {
-      return { error: 'Vault locked', vaultLocked: true }
+    // Session expired (keys lost after server restart) — force full re-login
+    if (res.status === 401) {
+      const data = await res.json().catch(() => ({}))
+      if (data.code === 'SESSION_EXPIRED') {
+        localStorage.removeItem('faktur_token')
+        window.location.href = '/login'
+        return { error: 'Session expired' }
+      }
+      return { error: data.message || 'Unauthorized' }
     }
 
     const data = await res.json()
@@ -55,7 +47,7 @@ async function request<T = unknown>(
 async function uploadRequest<T = unknown>(
   endpoint: string,
   formData: FormData
-): Promise<{ data?: T; error?: string; vaultLocked?: boolean }> {
+): Promise<{ data?: T; error?: string }> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('faktur_token') : null
 
   const headers: Record<string, string> = {}
@@ -70,8 +62,14 @@ async function uploadRequest<T = unknown>(
       body: formData,
     })
 
-    if (handleVaultLocked(res.status)) {
-      return { error: 'Vault locked', vaultLocked: true }
+    if (res.status === 401) {
+      const data = await res.json().catch(() => ({}))
+      if (data.code === 'SESSION_EXPIRED') {
+        localStorage.removeItem('faktur_token')
+        window.location.href = '/login'
+        return { error: 'Session expired' }
+      }
+      return { error: data.message || 'Unauthorized' }
     }
 
     const data = await res.json()
@@ -85,7 +83,7 @@ async function uploadRequest<T = unknown>(
   }
 }
 
-async function blobRequest(endpoint: string): Promise<{ blob?: Blob; filename?: string; error?: string; vaultLocked?: boolean }> {
+async function blobRequest(endpoint: string): Promise<{ blob?: Blob; filename?: string; error?: string }> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('faktur_token') : null
 
   const headers: Record<string, string> = {}
@@ -96,8 +94,14 @@ async function blobRequest(endpoint: string): Promise<{ blob?: Blob; filename?: 
   try {
     const res = await fetch(`${API_URL}${endpoint}`, { method: 'GET', headers })
 
-    if (handleVaultLocked(res.status)) {
-      return { error: 'Vault locked', vaultLocked: true }
+    if (res.status === 401) {
+      const data = await res.json().catch(() => ({}))
+      if (data.code === 'SESSION_EXPIRED') {
+        localStorage.removeItem('faktur_token')
+        window.location.href = '/login'
+        return { error: 'Session expired' }
+      }
+      return { error: data.message || 'Unauthorized' }
     }
 
     if (!res.ok) {
@@ -118,7 +122,7 @@ async function blobRequest(endpoint: string): Promise<{ blob?: Blob; filename?: 
 async function postBlobRequest(
   endpoint: string,
   body: unknown
-): Promise<{ blob?: Blob; filename?: string; error?: string; vaultLocked?: boolean }> {
+): Promise<{ blob?: Blob; filename?: string; error?: string }> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('faktur_token') : null
 
   const headers: Record<string, string> = { 'Content-Type': 'application/json' }
@@ -133,8 +137,14 @@ async function postBlobRequest(
       body: JSON.stringify(body),
     })
 
-    if (handleVaultLocked(res.status)) {
-      return { error: 'Vault locked', vaultLocked: true }
+    if (res.status === 401) {
+      const data = await res.json().catch(() => ({}))
+      if (data.code === 'SESSION_EXPIRED') {
+        localStorage.removeItem('faktur_token')
+        window.location.href = '/login'
+        return { error: 'Session expired' }
+      }
+      return { error: data.message || 'Unauthorized' }
     }
 
     if (!res.ok) {
