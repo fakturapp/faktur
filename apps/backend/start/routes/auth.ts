@@ -12,6 +12,7 @@ import {
 const Login = () => import('#controllers/auth/session/login')
 const Logout = () => import('#controllers/auth/session/logout')
 const Me = () => import('#controllers/auth/session/me')
+const Unlock = () => import('#controllers/auth/session/unlock')
 
 const Signup = () => import('#controllers/auth/registration/signup')
 
@@ -37,6 +38,7 @@ router
       .group(() => {
         router.post('/logout', [Logout, 'handle'])
         router.get('/me', [Me, 'handle'])
+        router.post('/unlock', [Unlock, 'handle'])
       })
       .use(middleware.auth())
   })

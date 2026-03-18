@@ -12,3 +12,4 @@ router
   })
   .prefix(API_PREFIX + '/einvoicing')
   .use(middleware.auth())
+  .use(middleware.vault())

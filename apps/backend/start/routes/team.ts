@@ -45,6 +45,7 @@ router
   })
   .prefix(API_PREFIX + '/team')
   .use(middleware.auth())
+  .use(middleware.vault())
 
 // Public route for invitation info (no auth needed to view)
 router.get(API_PREFIX + '/invite/:token', [InviteInfo, 'handle'])

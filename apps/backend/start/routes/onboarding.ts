@@ -18,3 +18,4 @@ router
   })
   .prefix(API_PREFIX + '/onboarding')
   .use(middleware.auth())
+  .use(middleware.vault())
