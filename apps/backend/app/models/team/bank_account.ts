@@ -23,9 +23,6 @@ export default class BankAccount extends BaseModel {
   declare bic: string | null
 
   @column()
-  declare isEncrypted: boolean
-
-  @column()
   declare isDefault: boolean
 
   @column.dateTime({ autoCreate: true })

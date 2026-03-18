@@ -6,7 +6,6 @@ export const createBankAccountValidator = vine.compile(
     bankName: vine.string().trim().maxLength(255).optional(),
     iban: vine.string().trim().maxLength(34).optional(),
     bic: vine.string().trim().maxLength(11).optional(),
-    isEncrypted: vine.boolean().optional(),
     isDefault: vine.boolean().optional(),
   })
 )

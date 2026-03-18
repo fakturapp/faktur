@@ -147,7 +147,6 @@ export default class Import {
           iban: baData.iban,
           bic: baData.bic,
           isDefault: baData.isDefault ?? false,
-          isEncrypted: true,
         }
         encryptModelFields(baRecord, [...ENCRYPTED_FIELDS.bankAccount], teamDek)
         await BankAccount.create(baRecord, { client: trx })
