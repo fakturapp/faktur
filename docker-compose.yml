@@ -10,6 +10,8 @@ services:
       TZ: UTC
       HOST: 0.0.0.0
       PORT: 3333
+      LOG_LEVEL: info
+      SESSION_DRIVER: cookie
       APP_KEY: ${APP_KEY:?APP_KEY is required}
       APP_URL: ${APP_URL:-http://localhost:3333}
       DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
@@ -35,6 +37,8 @@ services:
       - backend
     environment:
       NODE_ENV: production
+      HOSTNAME: 0.0.0.0
+      PORT: 3000
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3333/api/v1}
     ports:
       - "${FRONTEND_PORT:-3000}:3000"

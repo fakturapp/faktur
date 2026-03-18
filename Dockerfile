@@ -60,11 +60,14 @@ CMD ["sh", "-c", "node ace migration:run --force && node bin/server.js"]
 # ------------------------------------------------------------------------------
 FROM node:24-alpine AS frontend
 ENV NODE_ENV=production
+ENV HOSTNAME=0.0.0.0
+ENV PORT=3000
 WORKDIR /app
 
+# Standalone output in monorepo preserves directory structure
 COPY --from=build-frontend /app/apps/frontend/.next/standalone/ ./
-COPY --from=build-frontend /app/apps/frontend/.next/static ./.next/static
-COPY --from=build-frontend /app/apps/frontend/public ./public
+COPY --from=build-frontend /app/apps/frontend/.next/static ./apps/frontend/.next/static
+COPY --from=build-frontend /app/apps/frontend/public ./apps/frontend/public
 
 EXPOSE 3000
-CMD ["node", "server.js"]
+CMD ["node", "apps/frontend/server.js"]
