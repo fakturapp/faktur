@@ -2,10 +2,13 @@ import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import db from '@adonisjs/lucid/services/db'
 import User from '#models/account/user'
+import TeamMember from '#models/team/team_member'
 import LoginHistory from '#models/account/login_history'
 import AuditLog from '#models/shared/audit_log'
 import { loginValidator } from '#validators/auth/auth_validators'
 import TwoFactorService from '#services/auth/two_factor_service'
+import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
+import keyStore from '#services/crypto/key_store'
 
 export default class Login {
   async handle({ request, response }: HttpContext) {
@@ -121,6 +124,29 @@ export default class Login {
       userAgent: request.header('user-agent'),
       severity: 'info',
     })
+
+    // Zero-access crypto: derive KEK and load team DEK into memory
+    if (user.saltKdf) {
+      const salt = Buffer.from(user.saltKdf, 'hex')
+      const kek = await zeroAccessCryptoService.deriveKEK(password, salt)
+
+      if (user.currentTeamId) {
+        const teamMember = await TeamMember.query()
+          .where('teamId', user.currentTeamId)
+          .where('userId', user.id)
+          .where('status', 'active')
+          .first()
+
+        if (teamMember?.encryptedTeamDek) {
+          const teamDek = zeroAccessCryptoService.decryptDEK(teamMember.encryptedTeamDek, kek)
+          keyStore.storeKeys(user.id, kek, user.currentTeamId, teamDek)
+        } else {
+          keyStore.storeKeys(user.id, kek, '', Buffer.alloc(0))
+        }
+      } else {
+        keyStore.storeKeys(user.id, kek, '', Buffer.alloc(0))
+      }
+    }
 
     return response.ok({
       message: 'Login successful',
