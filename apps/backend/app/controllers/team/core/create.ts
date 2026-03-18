@@ -3,11 +3,18 @@ import { DateTime } from 'luxon'
 import Team from '#models/team/team'
 import TeamMember from '#models/team/team_member'
 import { createTeamValidator } from '#validators/auth/onboarding_validators'
+import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
+import keyStore from '#services/crypto/key_store'
 
 export default class Create {
   async handle({ auth, request, response }: HttpContext) {
     const user = auth.user!
     const payload = await request.validateUsing(createTeamValidator)
+
+    const kek = keyStore.getKEK(user.id)
+    if (!kek) {
+      return response.locked({ code: 'VAULT_LOCKED', message: 'Vault is locked' })
+    }
 
     const team = await Team.create({
       name: payload.name,
@@ -15,13 +22,20 @@ export default class Create {
       ownerId: user.id,
     })
 
+    const teamDek = zeroAccessCryptoService.generateDEK()
+    const encryptedTeamDek = zeroAccessCryptoService.encryptDEK(teamDek, kek)
+
     await TeamMember.create({
       teamId: team.id,
       userId: user.id,
       role: 'super_admin',
       status: 'active',
       joinedAt: DateTime.now(),
+      encryptedTeamDek,
+      dekVersion: 1,
     })
+
+    keyStore.storeDEK(user.id, team.id, teamDek)
 
     // Switch to the new team and trigger onboarding flow
     user.currentTeamId = team.id
