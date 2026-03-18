@@ -21,9 +21,10 @@ export interface InvoiceSettings {
   darkMode: boolean
   documentFont: string
   eInvoicingEnabled: boolean
-  pdpProvider: string | null
+  pdpProvider: 'b2brouter' | 'sandbox' | null
   pdpApiKey: string | null
   pdpSandbox: boolean
+  defaultOperationCategory: 'service' | 'goods' | 'mixed' | null
   defaultSubject: string | null
   defaultAcceptanceConditions: string | null
   defaultSignatureField: boolean
@@ -63,6 +64,7 @@ const defaultSettings: InvoiceSettings = {
   pdpProvider: null,
   pdpApiKey: null,
   pdpSandbox: true,
+  defaultOperationCategory: 'service',
   defaultSubject: null,
   defaultAcceptanceConditions: null,
   defaultSignatureField: false,

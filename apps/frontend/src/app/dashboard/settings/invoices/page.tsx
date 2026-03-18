@@ -908,61 +908,62 @@ export default function InvoiceSettingsPage() {
                         <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                           <div className="space-y-4 pt-2">
                             <Separator />
+
+                            {/* B2Brouter API key (optional — sandbox by default) */}
                             <div>
-                              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">Plateforme PDP</label>
-                              <div className="grid grid-cols-2 gap-2">
+                              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">Cle API B2Brouter (optionnel)</label>
+                              <Input type="password" placeholder="Laissez vide pour le mode sandbox..."
+                                value={settings.pdpApiKey === '••••••••' ? '' : (settings.pdpApiKey || '')}
+                                onChange={(e) => updateSettings({ pdpApiKey: e.target.value, pdpProvider: e.target.value ? 'b2brouter' : 'sandbox' })} className="text-sm" />
+                              <p className="text-[10px] text-muted-foreground mt-1">
+                                {settings.pdpApiKey && settings.pdpApiKey !== '••••••••'
+                                  ? 'Connecte a B2Brouter — les factures seront envoyees a la PDP'
+                                  : 'Mode sandbox actif — les factures sont generees localement sans envoi PDP'}
+                              </p>
+                            </div>
+
+                            {/* Default operation category */}
+                            <div>
+                              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">Categorie d&apos;operation par defaut</label>
+                              <div className="grid grid-cols-3 gap-2">
                                 {[
-                                  { id: 'chorus_pro', name: 'Chorus Pro (PPF)', desc: 'Portail public gratuit' },
-                                  { id: 'b2brouter', name: 'B2Brouter', desc: 'PDP privee avec API' },
-                                  { id: 'seqino', name: 'Seqino', desc: 'API marque blanche' },
-                                  { id: 'other', name: 'Autre PDP', desc: 'Configuration manuelle' },
-                                ].map((pdp) => (
-                                  <button key={pdp.id} onClick={() => updateSettings({ pdpProvider: pdp.id })}
+                                  { id: 'service', name: 'Prestation', desc: 'Services' },
+                                  { id: 'goods', name: 'Livraison', desc: 'Biens' },
+                                  { id: 'mixed', name: 'Mixte', desc: 'Les deux' },
+                                ].map((cat) => (
+                                  <button key={cat.id} onClick={() => updateSettings({ defaultOperationCategory: cat.id as any })}
                                     className={`rounded-xl border-2 p-3 text-left transition-all ${
-                                      settings.pdpProvider === pdp.id ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
+                                      settings.defaultOperationCategory === cat.id ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
                                     }`}>
-                                    <p className="text-xs font-medium text-foreground">{pdp.name}</p>
-                                    <p className="text-[10px] text-muted-foreground">{pdp.desc}</p>
+                                    <p className="text-xs font-medium text-foreground">{cat.name}</p>
+                                    <p className="text-[10px] text-muted-foreground">{cat.desc}</p>
                                   </button>
                                 ))}
                               </div>
                             </div>
 
-                            {settings.pdpProvider && settings.pdpProvider !== 'chorus_pro' && (
+                            {/* Sandbox indicator */}
+                            <div className="flex items-center gap-2 rounded-lg border border-border p-3">
+                              <AlertTriangle className="h-4 w-4 text-yellow-500 shrink-0" />
                               <div>
-                                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">Cle API PDP</label>
-                                <Input type="password" placeholder="Votre cle API..."
-                                  value={settings.pdpApiKey === '••••••••' ? '' : (settings.pdpApiKey || '')}
-                                  onChange={(e) => updateSettings({ pdpApiKey: e.target.value })} className="text-sm" />
-                                <p className="text-[10px] text-muted-foreground mt-1">Obtenez votre cle API depuis le tableau de bord de votre PDP</p>
+                                <p className="text-xs font-medium text-foreground">
+                                  {settings.pdpApiKey && settings.pdpApiKey !== '••••••••' ? 'Mode production' : 'Mode sandbox'}
+                                </p>
+                                <p className="text-[10px] text-muted-foreground">
+                                  {settings.pdpApiKey && settings.pdpApiKey !== '••••••••'
+                                    ? 'Les factures sont envoyees via B2Brouter vers la DGFiP'
+                                    : 'Aucune facture n\'est envoyee — generation Factur-X locale uniquement'}
+                                </p>
                               </div>
-                            )}
-
-                            <div className="flex items-center justify-between rounded-lg border border-border p-3">
-                              <div className="flex items-center gap-2">
-                                <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                                <div>
-                                  <p className="text-xs font-medium text-foreground">Mode sandbox</p>
-                                  <p className="text-[10px] text-muted-foreground">Tester sans envoyer de vraies factures</p>
-                                </div>
-                              </div>
-                              <button type="button" onClick={() => updateSettings({ pdpSandbox: !settings.pdpSandbox })}
-                                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors shrink-0 ${
-                                  settings.pdpSandbox ? 'bg-yellow-500' : 'bg-muted-foreground/30'
-                                }`}>
-                                <span className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform shadow-sm ${
-                                  settings.pdpSandbox ? 'translate-x-[18px]' : 'translate-x-[3px]'
-                                }`} />
-                              </button>
                             </div>
 
                             <div className="rounded-lg border border-border p-3 space-y-2">
                               <p className="text-xs font-medium text-foreground mb-2">Fonctionnalites incluses</p>
                               {[
-                                'Generation automatique Factur-X (PDF/A-3)',
-                                'Envoi via PDP vers la DGFiP',
-                                'E-reporting automatique',
-                                'Archivage certifie 10 ans',
+                                'Generation automatique Factur-X EN16931 (PDF/A-3)',
+                                'Mentions obligatoires reforme 2026',
+                                'SIREN client et categorie d\'operation',
+                                'Envoi via B2Brouter vers la DGFiP (avec cle API)',
                                 'Suivi des statuts en temps reel',
                               ].map((feature) => (
                                 <div key={feature} className="flex items-center gap-2">

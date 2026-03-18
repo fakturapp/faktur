@@ -477,9 +477,9 @@ export default function NewInvoicePage() {
               deliveryAddress={options.deliveryAddress}
               showDeliveryAddress={options.showDeliveryAddress}
               clientSiren={options.clientSiren}
-              showClientSiren={!!options.clientSiren}
+              showClientSiren={!!options.clientSiren || invoiceSettings.eInvoicingEnabled}
               clientVatNumber={options.clientVatNumber}
-              showClientVatNumber={!!options.clientVatNumber}
+              showClientVatNumber={!!options.clientVatNumber || invoiceSettings.eInvoicingEnabled}
               paymentMethods={invoiceSettings.paymentMethods}
               customPaymentMethod={invoiceSettings.customPaymentMethod}
               bankAccountInfo={bankAccountInfo}
@@ -532,6 +532,7 @@ export default function NewInvoicePage() {
                   bankAccountId={bankAccountId}
                   onBankAccountChange={handleBankAccountChange}
                   loadingBankAccount={loadingBankAccount}
+                  eInvoicingEnabled={invoiceSettings.eInvoicingEnabled}
                 />
               </div>
             </motion.div>
