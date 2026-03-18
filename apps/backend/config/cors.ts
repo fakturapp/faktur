@@ -1,5 +1,20 @@
 import app from '@adonisjs/core/services/app'
+import env from '#start/env'
 import { defineConfig } from '@adonisjs/cors'
+
+/**
+ * Parses CORS_ORIGIN env var (comma-separated) into an array of origins.
+ * Returns true in dev (allow all), or the parsed array in production.
+ */
+function resolveOrigin(): true | string[] {
+  if (app.inDev) return true
+  const raw = env.get('CORS_ORIGIN', '')
+  if (!raw) return []
+  return raw
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean)
+}
 
 /**
  * Configuration options to tweak the CORS policy. The following
@@ -15,10 +30,9 @@ const corsConfig = defineConfig({
 
   /**
    * In development, allow every origin to simplify local front/backend setup.
-   * In production, keep an explicit allowlist (empty by default, so no
-   * cross-origin browser access is allowed until configured).
+   * In production, use the CORS_ORIGIN env var (comma-separated list of allowed origins).
    */
-  origin: app.inDev ? true : [],
+  origin: resolveOrigin(),
 
   /**
    * HTTP methods accepted for cross-origin requests.
