@@ -10,7 +10,7 @@ SESSION_DRIVER = "cookie"
 [phases.build]
 cmds = [
   "npx turbo run build",
-  "cd apps/backend/build && npm ci --omit=dev",
+  "cp package-lock.json apps/backend/build/ && cd apps/backend/build && npm ci --omit=dev",
   "cp -r apps/frontend/.next/static apps/frontend/.next/standalone/apps/frontend/.next/static",
   "if [ -d apps/frontend/public ]; then cp -r apps/frontend/public apps/frontend/.next/standalone/apps/frontend/public; fi"
 ]
