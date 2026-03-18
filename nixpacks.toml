@@ -2,11 +2,7 @@
 # Backend (AdonisJS) on port 3333 + Frontend (Next.js) on port 3000
 
 [phases.setup]
-nixPkgs = ["chromium"]
-
-[variables]
-PUPPETEER_SKIP_CHROMIUM_DOWNLOAD = "true"
-PUPPETEER_EXECUTABLE_PATH = "chromium"
+aptPkgs = ["libnss3", "libgbm1", "libasound2t64", "libpangocairo-1.0-0", "libgtk-3-0", "libxss1", "libxshmfence1", "libatk1.0-0", "libatk-bridge2.0-0", "libcups2"]
 
 [phases.build]
 cmds = [
@@ -15,4 +11,4 @@ cmds = [
 ]
 
 [start]
-cmd = "cd apps/backend/build && node ace migration:run --force && PORT=3333 HOST=0.0.0.0 node bin/server.js & cd /app/apps/frontend && PORT=3000 HOSTNAME=0.0.0.0 npx next start"
+cmd = "cd apps/backend/build && node ace migration:run --force && node bin/server.js & cd /app/apps/frontend && npx next start -p 3000 -H 0.0.0.0"
