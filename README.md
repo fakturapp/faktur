@@ -19,7 +19,6 @@
 - **Authentification** — Inscription, connexion, vérification email, 2FA (TOTP)
 - **Équipes** — Multi-équipes avec rôles (super admin, admin, membre, lecteur)
 - **Thème** — Mode clair et sombre avec basculement instantané
-- **Self-hosted** — Conçu pour être hébergé sur votre propre serveur
 
 ## Stack technique
 
@@ -32,7 +31,13 @@
 | CSS | Tailwind CSS v4 |
 | Animations | Framer Motion |
 
-## Installation
+## Prérequis
+
+- **Node.js** >= 24
+- **PostgreSQL** (14+)
+- **npm** (inclus avec Node.js)
+
+## Installation locale
 
 ```bash
 # Cloner le repo
@@ -45,6 +50,10 @@ npm install
 # Configurer les variables d'environnement
 cp apps/backend/.env.example apps/backend/.env
 cp apps/frontend/.env.example apps/frontend/.env
+# Éditer les fichiers .env avec vos paramètres (voir section ci-dessous)
+
+# Créer la base de données PostgreSQL
+createdb faktur
 
 # Exécuter les migrations
 cd apps/backend
@@ -54,6 +63,8 @@ cd ../..
 # Lancer en développement
 npm run dev
 ```
+
+Le frontend sera accessible sur `http://localhost:3000` et l'API sur `http://localhost:3333`.
 
 ## Variables d'environnement
 
@@ -78,12 +89,10 @@ npm run dev
 |----------|-------------|
 | `NEXT_PUBLIC_API_URL` | URL de l'API backend (défaut: `http://localhost:3333`) |
 
-## Self-hosted
-
-Faktur est conçu pour être auto-hébergé. Déployez-le sur votre propre serveur pour garder le contrôle total de vos données de facturation.
-
 ## Liens
 
+- Dashboard : [dash.fakturapp.cc](https://dash.fakturapp.cc)
+- API : [api.fakturapp.cc](https://api.fakturapp.cc)
 - Site : [fakturapp.cc](https://fakturapp.cc)
 - GitHub : [github.com/fakturapp/faktur](https://github.com/fakturapp/faktur)
 
