@@ -53,7 +53,7 @@ WORKDIR /app
 
 COPY --from=build-backend /app/apps/backend/build/ ./
 EXPOSE 3333
-CMD ["node", "bin/server.js"]
+CMD ["sh", "-c", "node ace migration:run --force && node bin/server.js"]
 
 # ------------------------------------------------------------------------------
 # Stage 6: Production frontend
