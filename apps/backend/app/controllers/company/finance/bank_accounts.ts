@@ -1,7 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import BankAccount from '#models/team/bank_account'
 import Invoice from '#models/invoice/invoice'
-import EncryptionService from '#services/encryption/encryption_service'
+import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import {
   createBankAccountValidator,
   updateBankAccountValidator,
@@ -19,9 +19,11 @@ function maskBic(bic: string): string {
 }
 
 export default class BankAccounts {
-  async index({ auth, response }: HttpContext) {
+  async index(ctx: HttpContext) {
+    const { auth, response } = ctx
     const user = auth.user!
     const teamId = user.currentTeamId
+    const dek: Buffer = (ctx as any).dek
 
     if (!teamId) {
       return response.badRequest({ message: 'No team selected' })
@@ -36,21 +38,19 @@ export default class BankAccounts {
       let iban = a.iban
       let bic = a.bic
 
-      // Decrypt if needed to get raw values for masking
-      if (a.isEncrypted) {
-        if (iban) {
-          try {
-            iban = EncryptionService.decrypt(iban)
-          } catch {
-            iban = null
-          }
+      // Decrypt with zero-access DEK
+      if (iban && zeroAccessCryptoService.isEncryptedField(iban)) {
+        try {
+          iban = zeroAccessCryptoService.decryptField(iban, dek)
+        } catch {
+          iban = null
         }
-        if (bic) {
-          try {
-            bic = EncryptionService.decrypt(bic)
-          } catch {
-            bic = null
-          }
+      }
+      if (bic && zeroAccessCryptoService.isEncryptedField(bic)) {
+        try {
+          bic = zeroAccessCryptoService.decryptField(bic, dek)
+        } catch {
+          bic = null
         }
       }
 
@@ -60,7 +60,7 @@ export default class BankAccounts {
         bankName: a.bankName,
         ibanMasked: iban ? maskIban(iban) : null,
         bicMasked: bic ? maskBic(bic) : null,
-        isEncrypted: a.isEncrypted,
+        isEncrypted: true,
         isDefault: a.isDefault,
         createdAt: a.createdAt,
       }
@@ -69,9 +69,11 @@ export default class BankAccounts {
     return response.ok({ bankAccounts: result })
   }
 
-  async show({ auth, params, response }: HttpContext) {
+  async show(ctx: HttpContext) {
+    const { auth, params, response } = ctx
     const user = auth.user!
     const teamId = user.currentTeamId
+    const dek: Buffer = (ctx as any).dek
 
     if (!teamId) {
       return response.badRequest({ message: 'No team selected' })
@@ -89,20 +91,18 @@ export default class BankAccounts {
     let iban = account.iban
     let bic = account.bic
 
-    if (account.isEncrypted) {
-      if (iban) {
-        try {
-          iban = EncryptionService.decrypt(iban)
-        } catch {
-          iban = null
-        }
+    if (iban && zeroAccessCryptoService.isEncryptedField(iban)) {
+      try {
+        iban = zeroAccessCryptoService.decryptField(iban, dek)
+      } catch {
+        iban = null
       }
-      if (bic) {
-        try {
-          bic = EncryptionService.decrypt(bic)
-        } catch {
-          bic = null
-        }
+    }
+    if (bic && zeroAccessCryptoService.isEncryptedField(bic)) {
+      try {
+        bic = zeroAccessCryptoService.decryptField(bic, dek)
+      } catch {
+        bic = null
       }
     }
 
@@ -113,15 +113,17 @@ export default class BankAccounts {
         bankName: account.bankName,
         iban,
         bic,
-        isEncrypted: account.isEncrypted,
+        isEncrypted: true,
         isDefault: account.isDefault,
       },
     })
   }
 
-  async store({ auth, request, response }: HttpContext) {
+  async store(ctx: HttpContext) {
+    const { auth, request, response } = ctx
     const user = auth.user!
     const teamId = user.currentTeamId
+    const dek: Buffer = (ctx as any).dek
 
     if (!teamId) {
       return response.badRequest({ message: 'No team selected' })
@@ -129,13 +131,12 @@ export default class BankAccounts {
 
     const payload = await request.validateUsing(createBankAccountValidator)
 
-    let iban = payload.iban || null
-    let bic = payload.bic || null
+    // Always encrypt with zero-access DEK
+    let iban: string | null = payload.iban || null
+    let bic: string | null = payload.bic || null
 
-    if (payload.isEncrypted) {
-      if (iban) iban = EncryptionService.encrypt(iban)
-      if (bic) bic = EncryptionService.encrypt(bic)
-    }
+    if (iban) iban = zeroAccessCryptoService.encryptField(iban, dek)
+    if (bic) bic = zeroAccessCryptoService.encryptField(bic, dek)
 
     // If setting as default, unset other defaults
     if (payload.isDefault) {
@@ -151,7 +152,7 @@ export default class BankAccounts {
       bankName: payload.bankName || null,
       iban,
       bic,
-      isEncrypted: payload.isEncrypted ?? false,
+      isEncrypted: true,
       isDefault: payload.isDefault ?? false,
     })
 
@@ -161,15 +162,17 @@ export default class BankAccounts {
         id: account.id,
         label: account.label,
         bankName: account.bankName,
-        isEncrypted: account.isEncrypted,
+        isEncrypted: true,
         isDefault: account.isDefault,
       },
     })
   }
 
-  async update({ auth, params, request, response }: HttpContext) {
+  async update(ctx: HttpContext) {
+    const { auth, params, request, response } = ctx
     const user = auth.user!
     const teamId = user.currentTeamId
+    const dek: Buffer = (ctx as any).dek
 
     if (!teamId) {
       return response.badRequest({ message: 'No team selected' })
@@ -186,13 +189,11 @@ export default class BankAccounts {
 
     const payload = await request.validateUsing(updateBankAccountValidator)
 
-    let iban = payload.iban || null
-    let bic = payload.bic || null
+    let iban: string | null = payload.iban || null
+    let bic: string | null = payload.bic || null
 
-    if (payload.isEncrypted) {
-      if (iban) iban = EncryptionService.encrypt(iban)
-      if (bic) bic = EncryptionService.encrypt(bic)
-    }
+    if (iban) iban = zeroAccessCryptoService.encryptField(iban, dek)
+    if (bic) bic = zeroAccessCryptoService.encryptField(bic, dek)
 
     // If setting as default, unset other defaults
     if (payload.isDefault && !account.isDefault) {
@@ -207,7 +208,7 @@ export default class BankAccounts {
       bankName: payload.bankName || null,
       iban,
       bic,
-      isEncrypted: payload.isEncrypted ?? false,
+      isEncrypted: true,
       isDefault: payload.isDefault ?? false,
     })
     await account.save()
@@ -218,7 +219,7 @@ export default class BankAccounts {
         id: account.id,
         label: account.label,
         bankName: account.bankName,
-        isEncrypted: account.isEncrypted,
+        isEncrypted: true,
         isDefault: account.isDefault,
       },
     })

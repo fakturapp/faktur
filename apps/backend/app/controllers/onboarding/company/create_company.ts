@@ -1,10 +1,13 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Company from '#models/team/company'
 import { createCompanyValidator } from '#validators/auth/onboarding_validators'
+import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 
 export default class CreateCompany {
-  async handle({ auth, request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, request, response } = ctx
     const user = auth.user!
+    const dek: Buffer = (ctx as any).dek
 
     if (!user.currentTeamId) {
       return response.badRequest({ message: 'You must create a team first' })
@@ -17,7 +20,7 @@ export default class CreateCompany {
 
     const payload = await request.validateUsing(createCompanyValidator)
 
-    const company = await Company.create({
+    const companyData: Record<string, any> = {
       teamId: user.currentTeamId,
       legalName: payload.legalName,
       tradeName: payload.tradeName ?? null,
@@ -38,7 +41,11 @@ export default class CreateCompany {
       bankName: payload.bankName ?? null,
       paymentConditions: payload.paymentConditions ?? null,
       currency: payload.currency ?? 'EUR',
-    })
+    }
+
+    encryptModelFields(companyData, [...ENCRYPTED_FIELDS.company], dek)
+
+    const company = await Company.create(companyData)
 
     return response.created({
       message: 'Company created successfully',

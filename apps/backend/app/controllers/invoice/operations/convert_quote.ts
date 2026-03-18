@@ -4,9 +4,12 @@ import Quote from '#models/quote/quote'
 import Invoice from '#models/invoice/invoice'
 import InvoiceLine from '#models/invoice/invoice_line'
 import InvoiceSetting from '#models/team/invoice_setting'
+import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 
 export default class ConvertQuote {
-  async handle({ auth, params, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, params, response } = ctx
+    const dek: Buffer = (ctx as any).dek
     const user = auth.user!
     const teamId = user.currentTeamId
 
@@ -56,39 +59,44 @@ export default class ConvertQuote {
     const dueDateStr = dueDate.toISOString().slice(0, 10)
     const issueDateStr = today.toISOString().slice(0, 10)
 
-    const invoice = await db.transaction(async (trx) => {
-      const inv = await Invoice.create(
-        {
-          teamId,
-          clientId: quote.clientId,
-          invoiceNumber,
-          status: 'draft',
-          subject: quote.subject,
-          issueDate: issueDateStr,
-          dueDate: dueDateStr,
-          billingType: quote.billingType,
-          accentColor: quote.accentColor,
-          logoUrl: quote.logoUrl,
-          language: quote.language,
-          notes: quote.notes,
-          acceptanceConditions: quote.acceptanceConditions,
-          signatureField: quote.signatureField,
-          documentTitle: 'Facture',
-          freeField: quote.freeField,
-          globalDiscountType: quote.globalDiscountType,
-          globalDiscountValue: quote.globalDiscountValue,
-          deliveryAddress: quote.deliveryAddress,
-          clientSiren: quote.clientSiren,
-          clientVatNumber: quote.clientVatNumber,
-          subtotal: quote.subtotal,
-          taxAmount: quote.taxAmount,
-          total: quote.total,
-          sourceQuoteId: quote.id,
-          paymentTerms: '30 jours net',
-        },
-        { client: trx }
-      )
+    // Build invoice data — encrypted fields from quote are already encrypted,
+    // but hardcoded plaintext fields (documentTitle, paymentTerms) need encryption.
+    const invoiceData: Record<string, any> = {
+      teamId,
+      clientId: quote.clientId,
+      invoiceNumber,
+      status: 'draft',
+      subject: quote.subject,
+      issueDate: issueDateStr,
+      dueDate: dueDateStr,
+      billingType: quote.billingType,
+      accentColor: quote.accentColor,
+      logoUrl: quote.logoUrl,
+      language: quote.language,
+      notes: quote.notes,
+      acceptanceConditions: quote.acceptanceConditions,
+      signatureField: quote.signatureField,
+      documentTitle: 'Facture',
+      freeField: quote.freeField,
+      globalDiscountType: quote.globalDiscountType,
+      globalDiscountValue: quote.globalDiscountValue,
+      deliveryAddress: quote.deliveryAddress,
+      clientSiren: quote.clientSiren,
+      clientVatNumber: quote.clientVatNumber,
+      subtotal: quote.subtotal,
+      taxAmount: quote.taxAmount,
+      total: quote.total,
+      sourceQuoteId: quote.id,
+      paymentTerms: '30 jours net',
+    }
 
+    // Only encrypt the hardcoded plaintext fields — the rest are already encrypted from quote
+    encryptModelFields(invoiceData, ['documentTitle', 'paymentTerms'], dek)
+
+    const invoice = await db.transaction(async (trx) => {
+      const inv = await Invoice.create(invoiceData, { client: trx })
+
+      // Lines are already encrypted in the DB, copy as-is
       for (const line of quote.lines) {
         await InvoiceLine.create(
           {

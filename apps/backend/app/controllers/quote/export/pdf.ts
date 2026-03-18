@@ -4,18 +4,25 @@ import Company from '#models/team/company'
 import InvoiceSetting from '#models/team/invoice_setting'
 import { buildFacturXFromQuote, generateFacturXXml } from '#services/pdf/facturx_generator'
 import { generateQuotePdf } from '#services/pdf/document_pdf_service'
+import {
+  decryptModelFields,
+  decryptModelFieldsArray,
+  ENCRYPTED_FIELDS,
+} from '#services/crypto/field_encryption_helper'
 
 export default class Pdf {
-  async handle({ auth, params, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, params, response } = ctx
     const user = auth.user!
     const teamId = user.currentTeamId
+    const dek: Buffer = (ctx as any).dek
 
     if (!teamId) {
       return response.badRequest({ message: 'No team selected' })
     }
 
     try {
-      const { pdfBuffer, filename } = await generateQuotePdf(params.id, teamId)
+      const { pdfBuffer, filename } = await generateQuotePdf(params.id, teamId, dek)
 
       // If e-invoicing is enabled, generate Factur-X headers
       const invoiceSettings = await InvoiceSetting.query().where('team_id', teamId).first()
@@ -28,7 +35,17 @@ export default class Pdf {
           .first()
 
         if (quote) {
+          decryptModelFields(quote, [...ENCRYPTED_FIELDS.quote], dek)
+          decryptModelFieldsArray(quote.lines, [...ENCRYPTED_FIELDS.quoteLine], dek)
+          if (quote.client) {
+            decryptModelFields(quote.client, [...ENCRYPTED_FIELDS.client], dek)
+          }
+
           const company = await Company.query().where('team_id', teamId).first()
+          if (company) {
+            decryptModelFields(company, [...ENCRYPTED_FIELDS.company], dek)
+          }
+
           const quoteData = {
             quoteNumber: quote.quoteNumber,
             subject: quote.subject,
@@ -96,9 +113,11 @@ export default class Pdf {
  * Download Factur-X XML separately for a quote
  */
 export class FacturXml {
-  async handle({ auth, params, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, params, response } = ctx
     const user = auth.user!
     const teamId = user.currentTeamId
+    const dek: Buffer = (ctx as any).dek
 
     if (!teamId) {
       return response.badRequest({ message: 'No team selected' })
@@ -120,7 +139,16 @@ export class FacturXml {
       return response.notFound({ message: 'Quote not found' })
     }
 
+    decryptModelFields(quote, [...ENCRYPTED_FIELDS.quote], dek)
+    decryptModelFieldsArray(quote.lines, [...ENCRYPTED_FIELDS.quoteLine], dek)
+    if (quote.client) {
+      decryptModelFields(quote.client, [...ENCRYPTED_FIELDS.client], dek)
+    }
+
     const company = await Company.query().where('team_id', teamId).first()
+    if (company) {
+      decryptModelFields(company, [...ENCRYPTED_FIELDS.company], dek)
+    }
 
     const quoteData = {
       quoteNumber: quote.quoteNumber,

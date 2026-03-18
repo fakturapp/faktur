@@ -1,10 +1,17 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Company from '#models/team/company'
 import { updateCompanyValidator } from '#validators/auth/onboarding_validators'
+import {
+  encryptModelFields,
+  decryptModelFields,
+  ENCRYPTED_FIELDS,
+} from '#services/crypto/field_encryption_helper'
 
 export default class Update {
-  async handle({ auth, request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, request, response } = ctx
     const user = auth.user!
+    const dek: Buffer = (ctx as any).dek
 
     if (!user.currentTeamId) {
       return response.notFound({ message: 'No team found' })
@@ -18,8 +25,14 @@ export default class Update {
 
     const payload = await request.validateUsing(updateCompanyValidator)
 
-    company.merge(payload as Partial<typeof company>)
+    const data: Record<string, any> = { ...payload }
+    encryptModelFields(data, [...ENCRYPTED_FIELDS.company], dek)
+
+    company.merge(data as Partial<typeof company>)
     await company.save()
+
+    // Decrypt for the response
+    decryptModelFields(company, [...ENCRYPTED_FIELDS.company], dek)
 
     return response.ok({
       message: 'Company updated successfully',

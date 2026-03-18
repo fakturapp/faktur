@@ -3,11 +3,14 @@ import db from '@adonisjs/lucid/services/db'
 import Invoice from '#models/invoice/invoice'
 import InvoiceLine from '#models/invoice/invoice_line'
 import { createInvoiceValidator } from '#validators/invoice_validator'
+import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 
 export default class Update {
-  async handle({ auth, params, request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, params, request, response } = ctx
     const user = auth.user!
     const teamId = user.currentTeamId
+    const dek: Buffer = (ctx as any).dek
 
     if (!teamId) {
       return response.badRequest({ message: 'No team selected' })
@@ -53,50 +56,53 @@ export default class Update {
 
     const total = subtotal + taxAmount - discountAmount
 
+    // Encrypt invoice fields
+    const invoiceUpdateData: Record<string, any> = {
+      clientId: payload.clientId || null,
+      subject: payload.subject || null,
+      issueDate: payload.issueDate,
+      dueDate: payload.dueDate || null,
+      billingType: payload.billingType,
+      accentColor: payload.accentColor,
+      logoUrl: payload.logoUrl || null,
+      language: payload.language || 'fr',
+      notes: payload.notes || null,
+      acceptanceConditions: payload.acceptanceConditions || null,
+      signatureField: payload.signatureField ?? false,
+      documentTitle: payload.documentTitle || null,
+      freeField: payload.freeField || null,
+      globalDiscountType: discountType,
+      globalDiscountValue: discountValue,
+      deliveryAddress: payload.deliveryAddress || null,
+      clientSiren: payload.clientSiren || null,
+      clientVatNumber: payload.clientVatNumber || null,
+      subtotal: Math.round(subtotal * 100) / 100,
+      taxAmount: Math.round(taxAmount * 100) / 100,
+      total: Math.round(total * 100) / 100,
+      paymentTerms: payload.paymentTerms || null,
+      paymentMethod: payload.paymentMethod || null,
+      bankAccountId: payload.bankAccountId || null,
+      vatExemptReason: payload.vatExemptReason || 'none',
+    }
+
+    encryptModelFields(invoiceUpdateData, [...ENCRYPTED_FIELDS.invoice], dek)
+
     await db.transaction(async (trx) => {
       invoice.useTransaction(trx)
-
-      invoice.merge({
-        clientId: payload.clientId || null,
-        subject: payload.subject || null,
-        issueDate: payload.issueDate,
-        dueDate: payload.dueDate || null,
-        billingType: payload.billingType,
-        accentColor: payload.accentColor,
-        logoUrl: payload.logoUrl || null,
-        language: payload.language || 'fr',
-        notes: payload.notes || null,
-        acceptanceConditions: payload.acceptanceConditions || null,
-        signatureField: payload.signatureField ?? false,
-        documentTitle: payload.documentTitle || null,
-        freeField: payload.freeField || null,
-        globalDiscountType: discountType,
-        globalDiscountValue: discountValue,
-        deliveryAddress: payload.deliveryAddress || null,
-        clientSiren: payload.clientSiren || null,
-        clientVatNumber: payload.clientVatNumber || null,
-        subtotal: Math.round(subtotal * 100) / 100,
-        taxAmount: Math.round(taxAmount * 100) / 100,
-        total: Math.round(total * 100) / 100,
-        paymentTerms: payload.paymentTerms || null,
-        paymentMethod: payload.paymentMethod || null,
-        bankAccountId: payload.bankAccountId || null,
-        vatExemptReason: payload.vatExemptReason || 'none',
-      })
+      invoice.merge(invoiceUpdateData)
       await invoice.save()
 
       // Delete existing lines and recreate
       await InvoiceLine.query({ client: trx }).where('invoice_id', invoice.id).delete()
 
       for (const lineData of linesData) {
-        await InvoiceLine.create(
-          {
-            invoiceId: invoice.id,
-            ...lineData,
-            total: Math.round(lineData.total * 100) / 100,
-          },
-          { client: trx }
-        )
+        const lineRecord: Record<string, any> = {
+          invoiceId: invoice.id,
+          ...lineData,
+          total: Math.round(lineData.total * 100) / 100,
+        }
+        encryptModelFields(lineRecord, [...ENCRYPTED_FIELDS.invoiceLine], dek)
+        await InvoiceLine.create(lineRecord, { client: trx })
       }
     })
 

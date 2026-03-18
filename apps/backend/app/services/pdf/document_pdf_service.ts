@@ -6,7 +6,12 @@ import Quote from '#models/quote/quote'
 import Company from '#models/team/company'
 import InvoiceSetting from '#models/team/invoice_setting'
 import BankAccount from '#models/team/bank_account'
-import EncryptionService from '#services/encryption/encryption_service'
+import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
+import {
+  decryptModelFields,
+  decryptModelFieldsArray,
+  ENCRYPTED_FIELDS,
+} from '#services/crypto/field_encryption_helper'
 import { renderQuoteHtml } from '#services/pdf/html_renderer'
 import { generatePdf } from '#services/pdf/pdf_generator'
 
@@ -84,7 +89,7 @@ function buildCompanyData(company: Company | null) {
   }
 }
 
-export async function generateInvoicePdf(invoiceId: string, teamId: string): Promise<{ pdfBuffer: Buffer; filename: string }> {
+export async function generateInvoicePdf(invoiceId: string, teamId: string, dek: Buffer): Promise<{ pdfBuffer: Buffer; filename: string }> {
   const invoice = await Invoice.query()
     .where('id', invoiceId)
     .where('team_id', teamId)
@@ -92,7 +97,18 @@ export async function generateInvoicePdf(invoiceId: string, teamId: string): Pro
     .preload('lines', (q) => q.orderBy('position', 'asc'))
     .firstOrFail()
 
+  // Decrypt invoice, lines, and client
+  decryptModelFields(invoice, [...ENCRYPTED_FIELDS.invoice], dek)
+  decryptModelFieldsArray(invoice.lines, [...ENCRYPTED_FIELDS.invoiceLine], dek)
+  if (invoice.client) {
+    decryptModelFields(invoice.client, [...ENCRYPTED_FIELDS.client], dek)
+  }
+
   const company = await Company.query().where('team_id', teamId).first()
+  if (company) {
+    decryptModelFields(company, [...ENCRYPTED_FIELDS.company], dek)
+  }
+
   const invoiceSettings = await InvoiceSetting.query().where('team_id', teamId).first()
 
   // Use the invoice's specific payment method, not all settings methods
@@ -159,9 +175,11 @@ export async function generateInvoicePdf(invoiceId: string, teamId: string): Pro
     if (bankAccount) {
       let iban = bankAccount.iban
       let bic = bankAccount.bic
-      if (bankAccount.isEncrypted) {
-        if (iban) { try { iban = EncryptionService.decrypt(iban) } catch { iban = null } }
-        if (bic) { try { bic = EncryptionService.decrypt(bic) } catch { bic = null } }
+      if (iban && zeroAccessCryptoService.isEncryptedField(iban)) {
+        try { iban = zeroAccessCryptoService.decryptField(iban, dek) } catch { iban = null }
+      }
+      if (bic && zeroAccessCryptoService.isEncryptedField(bic)) {
+        try { bic = zeroAccessCryptoService.decryptField(bic, dek) } catch { bic = null }
       }
       companyData.iban = iban
       companyData.bic = bic
@@ -183,7 +201,7 @@ export async function generateInvoicePdf(invoiceId: string, teamId: string): Pro
   return { pdfBuffer, filename: `${resolvedName}.pdf` }
 }
 
-export async function generateQuotePdf(quoteId: string, teamId: string): Promise<{ pdfBuffer: Buffer; filename: string }> {
+export async function generateQuotePdf(quoteId: string, teamId: string, dek: Buffer): Promise<{ pdfBuffer: Buffer; filename: string }> {
   const quote = await Quote.query()
     .where('id', quoteId)
     .where('team_id', teamId)
@@ -191,7 +209,18 @@ export async function generateQuotePdf(quoteId: string, teamId: string): Promise
     .preload('lines', (q) => q.orderBy('position', 'asc'))
     .firstOrFail()
 
+  // Decrypt quote, lines, and client
+  decryptModelFields(quote, [...ENCRYPTED_FIELDS.quote], dek)
+  decryptModelFieldsArray(quote.lines, [...ENCRYPTED_FIELDS.quoteLine], dek)
+  if (quote.client) {
+    decryptModelFields(quote.client, [...ENCRYPTED_FIELDS.client], dek)
+  }
+
   const company = await Company.query().where('team_id', teamId).first()
+  if (company) {
+    decryptModelFields(company, [...ENCRYPTED_FIELDS.company], dek)
+  }
+
   const invoiceSettings = await InvoiceSetting.query().where('team_id', teamId).first()
 
   const settingsData = {

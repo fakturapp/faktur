@@ -1,6 +1,8 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import vine from '@vinejs/vine'
 import TeamMember from '#models/team/team_member'
+import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
+import keyStore from '#services/crypto/key_store'
 
 const switchValidator = vine.compile(
   vine.object({
@@ -25,6 +27,13 @@ export default class Switch {
 
     user.currentTeamId = payload.teamId
     await user.save()
+
+    // Load the DEK for the new team if KEK is available
+    const kek = keyStore.getKEK(user.id)
+    if (kek && membership.encryptedTeamDek) {
+      const teamDek = zeroAccessCryptoService.decryptDEK(membership.encryptedTeamDek, kek)
+      keyStore.storeDEK(user.id, payload.teamId, teamDek)
+    }
 
     return response.ok({ message: 'Team switched', currentTeamId: payload.teamId })
   }

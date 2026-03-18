@@ -1,11 +1,18 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import Quote from '#models/quote/quote'
+import {
+  decryptModelFields,
+  decryptModelFieldsArray,
+  ENCRYPTED_FIELDS,
+} from '#services/crypto/field_encryption_helper'
 
 export default class List {
-  async handle({ auth, request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, request, response } = ctx
     const user = auth.user!
     const teamId = user.currentTeamId
+    const dek: Buffer = (ctx as any).dek
 
     if (!teamId) {
       return response.badRequest({ message: 'No team selected' })
@@ -19,7 +26,6 @@ export default class List {
       .where('validityDate', '<', DateTime.now().toSQLDate()!)
       .update({ status: 'expired' })
 
-    const search = request.input('search', '')
     const status = request.input('status', '')
     const page = request.input('page', 1)
     const perPage = request.input('perPage', 20)
@@ -33,16 +39,24 @@ export default class List {
       query.where('status', status)
     }
 
+    // Search on quote_number (clear) only — subject is encrypted
+    const search = request.input('search', '')
     if (search) {
-      query.where((q) => {
-        q.whereILike('quote_number', `%${search}%`)
-          .orWhereILike('subject', `%${search}%`)
-      })
+      query.whereILike('quote_number', `%${search}%`)
     }
 
     const result = await query.paginate(page, perPage)
+    const quotes = result.all()
 
-    const quotesList = result.all().map((q) => ({
+    decryptModelFieldsArray(quotes, [...ENCRYPTED_FIELDS.quote], dek)
+
+    for (const q of quotes) {
+      if (q.client) {
+        decryptModelFields(q.client, [...ENCRYPTED_FIELDS.client], dek)
+      }
+    }
+
+    const quotesList = quotes.map((q) => ({
       id: q.id,
       quoteNumber: q.quoteNumber,
       status: q.status,

@@ -1,11 +1,18 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import Invoice from '#models/invoice/invoice'
+import {
+  decryptModelFields,
+  decryptModelFieldsArray,
+  ENCRYPTED_FIELDS,
+} from '#services/crypto/field_encryption_helper'
 
 export default class List {
-  async handle({ auth, request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, request, response } = ctx
     const user = auth.user!
     const teamId = user.currentTeamId
+    const dek: Buffer = (ctx as any).dek
 
     if (!teamId) {
       return response.badRequest({ message: 'No team selected' })
@@ -19,7 +26,6 @@ export default class List {
       .where('dueDate', '<', DateTime.now().toSQLDate()!)
       .update({ status: 'overdue' })
 
-    const search = request.input('search', '')
     const status = request.input('status', '')
     const page = request.input('page', 1)
     const perPage = request.input('perPage', 20)
@@ -33,16 +39,26 @@ export default class List {
       query.where('status', status)
     }
 
+    // Search on invoice_number (clear) only — subject is encrypted
+    const search = request.input('search', '')
     if (search) {
-      query.where((q) => {
-        q.whereILike('invoice_number', `%${search}%`)
-          .orWhereILike('subject', `%${search}%`)
-      })
+      query.whereILike('invoice_number', `%${search}%`)
     }
 
     const result = await query.paginate(page, perPage)
+    const invoices = result.all()
 
-    const invoicesList = result.all().map((inv) => ({
+    // Decrypt invoice fields
+    decryptModelFieldsArray(invoices, [...ENCRYPTED_FIELDS.invoice], dek)
+
+    // Decrypt client fields for display
+    for (const inv of invoices) {
+      if (inv.client) {
+        decryptModelFields(inv.client, [...ENCRYPTED_FIELDS.client], dek)
+      }
+    }
+
+    const invoicesList = invoices.map((inv) => ({
       id: inv.id,
       invoiceNumber: inv.invoiceNumber,
       status: inv.status,

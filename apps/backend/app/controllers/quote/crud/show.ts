@@ -1,11 +1,18 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import Quote from '#models/quote/quote'
+import {
+  decryptModelFields,
+  decryptModelFieldsArray,
+  ENCRYPTED_FIELDS,
+} from '#services/crypto/field_encryption_helper'
 
 export default class Show {
-  async handle({ auth, params, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, params, response } = ctx
     const user = auth.user!
     const teamId = user.currentTeamId
+    const dek: Buffer = (ctx as any).dek
 
     if (!teamId) {
       return response.badRequest({ message: 'No team selected' })
@@ -29,6 +36,13 @@ export default class Show {
         quote.status = 'expired'
         await quote.save()
       }
+    }
+
+    decryptModelFields(quote, [...ENCRYPTED_FIELDS.quote], dek)
+    decryptModelFieldsArray(quote.lines, [...ENCRYPTED_FIELDS.quoteLine], dek)
+
+    if (quote.client) {
+      decryptModelFields(quote.client, [...ENCRYPTED_FIELDS.client], dek)
     }
 
     return response.ok({

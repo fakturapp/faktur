@@ -1,10 +1,13 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Client from '#models/client/client'
+import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 
 export default class Create {
-  async handle({ auth, request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, request, response } = ctx
     const user = auth.user!
     const teamId = user.currentTeamId
+    const dek: Buffer = (ctx as any).dek
 
     if (!teamId) {
       return response.badRequest({ message: 'No team selected' })
@@ -29,7 +32,7 @@ export default class Create {
       'notes',
     ])
 
-    const client = await Client.create({
+    const clientData: Record<string, any> = {
       teamId,
       type: data.type || 'company',
       companyName: data.companyName || null,
@@ -47,7 +50,11 @@ export default class Create {
       city: data.city || null,
       country: data.country || 'FR',
       notes: data.notes || null,
-    })
+    }
+
+    encryptModelFields(clientData, [...ENCRYPTED_FIELDS.client], dek)
+
+    const client = await Client.create(clientData)
 
     return response.created({
       message: 'Client created',

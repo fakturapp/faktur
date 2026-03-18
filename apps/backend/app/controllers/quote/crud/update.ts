@@ -3,11 +3,14 @@ import db from '@adonisjs/lucid/services/db'
 import Quote from '#models/quote/quote'
 import QuoteLine from '#models/quote/quote_line'
 import { createQuoteValidator } from '#validators/quote_validator'
+import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 
 export default class Update {
-  async handle({ auth, params, request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, params, request, response } = ctx
     const user = auth.user!
     const teamId = user.currentTeamId
+    const dek: Buffer = (ctx as any).dek
 
     if (!teamId) {
       return response.badRequest({ message: 'No team selected' })
@@ -53,47 +56,49 @@ export default class Update {
 
     const total = subtotal + taxAmount - discountAmount
 
+    const quoteUpdateData: Record<string, any> = {
+      clientId: payload.clientId || null,
+      subject: payload.subject || null,
+      issueDate: payload.issueDate,
+      validityDate: payload.validityDate || null,
+      billingType: payload.billingType,
+      accentColor: payload.accentColor,
+      logoUrl: payload.logoUrl || null,
+      language: payload.language || 'fr',
+      notes: payload.notes || null,
+      acceptanceConditions: payload.acceptanceConditions || null,
+      signatureField: payload.signatureField ?? false,
+      documentTitle: payload.documentTitle || null,
+      freeField: payload.freeField || null,
+      globalDiscountType: discountType,
+      globalDiscountValue: discountValue,
+      deliveryAddress: payload.deliveryAddress || null,
+      clientSiren: payload.clientSiren || null,
+      clientVatNumber: payload.clientVatNumber || null,
+      subtotal: Math.round(subtotal * 100) / 100,
+      taxAmount: Math.round(taxAmount * 100) / 100,
+      total: Math.round(total * 100) / 100,
+      vatExemptReason: payload.vatExemptReason || 'none',
+    }
+
+    encryptModelFields(quoteUpdateData, [...ENCRYPTED_FIELDS.quote], dek)
+
     await db.transaction(async (trx) => {
       quote.useTransaction(trx)
-
-      quote.merge({
-        clientId: payload.clientId || null,
-        subject: payload.subject || null,
-        issueDate: payload.issueDate,
-        validityDate: payload.validityDate || null,
-        billingType: payload.billingType,
-        accentColor: payload.accentColor,
-        logoUrl: payload.logoUrl || null,
-        language: payload.language || 'fr',
-        notes: payload.notes || null,
-        acceptanceConditions: payload.acceptanceConditions || null,
-        signatureField: payload.signatureField ?? false,
-        documentTitle: payload.documentTitle || null,
-        freeField: payload.freeField || null,
-        globalDiscountType: discountType,
-        globalDiscountValue: discountValue,
-        deliveryAddress: payload.deliveryAddress || null,
-        clientSiren: payload.clientSiren || null,
-        clientVatNumber: payload.clientVatNumber || null,
-        subtotal: Math.round(subtotal * 100) / 100,
-        taxAmount: Math.round(taxAmount * 100) / 100,
-        total: Math.round(total * 100) / 100,
-        vatExemptReason: payload.vatExemptReason || 'none',
-      })
+      quote.merge(quoteUpdateData)
       await quote.save()
 
       // Delete existing lines and recreate
       await QuoteLine.query({ client: trx }).where('quote_id', quote.id).delete()
 
       for (const lineData of linesData) {
-        await QuoteLine.create(
-          {
-            quoteId: quote.id,
-            ...lineData,
-            total: Math.round(lineData.total * 100) / 100,
-          },
-          { client: trx }
-        )
+        const lineRecord: Record<string, any> = {
+          quoteId: quote.id,
+          ...lineData,
+          total: Math.round(lineData.total * 100) / 100,
+        }
+        encryptModelFields(lineRecord, [...ENCRYPTED_FIELDS.quoteLine], dek)
+        await QuoteLine.create(lineRecord, { client: trx })
       }
     })
 

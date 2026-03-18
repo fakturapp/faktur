@@ -1,10 +1,13 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Client from '#models/client/client'
+import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 
 export default class Update {
-  async handle({ auth, params, request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, params, request, response } = ctx
     const user = auth.user!
     const teamId = user.currentTeamId
+    const dek: Buffer = (ctx as any).dek
 
     if (!teamId) {
       return response.badRequest({ message: 'No team selected' })
@@ -33,6 +36,8 @@ export default class Update {
       'country',
       'notes',
     ])
+
+    encryptModelFields(data, [...ENCRYPTED_FIELDS.client], dek)
 
     client.merge(data)
     await client.save()

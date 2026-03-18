@@ -2,11 +2,18 @@ import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import Invoice from '#models/invoice/invoice'
 import Quote from '#models/quote/quote'
+import {
+  decryptModelFields,
+  decryptModelFieldsArray,
+  ENCRYPTED_FIELDS,
+} from '#services/crypto/field_encryption_helper'
 
 export default class Show {
-  async handle({ auth, params, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, params, response } = ctx
     const user = auth.user!
     const teamId = user.currentTeamId
+    const dek: Buffer = (ctx as any).dek
 
     if (!teamId) {
       return response.badRequest({ message: 'No team selected' })
@@ -30,6 +37,17 @@ export default class Show {
         invoice.status = 'overdue'
         await invoice.save()
       }
+    }
+
+    // Decrypt invoice fields
+    decryptModelFields(invoice, [...ENCRYPTED_FIELDS.invoice], dek)
+
+    // Decrypt lines
+    decryptModelFieldsArray(invoice.lines, [...ENCRYPTED_FIELDS.invoiceLine], dek)
+
+    // Decrypt client
+    if (invoice.client) {
+      decryptModelFields(invoice.client, [...ENCRYPTED_FIELDS.client], dek)
     }
 
     let sourceQuote: { id: string; quoteNumber: string } | null = null

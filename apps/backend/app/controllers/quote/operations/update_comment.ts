@@ -1,10 +1,13 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Quote from '#models/quote/quote'
+import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 
 export default class UpdateComment {
-  async handle({ auth, params, request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, params, request, response } = ctx
     const user = auth.user!
     const teamId = user.currentTeamId
+    const dek: Buffer = (ctx as any).dek
 
     if (!teamId) {
       return response.badRequest({ message: 'No team selected' })
@@ -20,7 +23,7 @@ export default class UpdateComment {
     }
 
     const { comment } = request.only(['comment'])
-    quote.comment = comment || null
+    quote.comment = comment ? zeroAccessCryptoService.encryptField(comment, dek) : null
     await quote.save()
 
     return response.ok({ message: 'Comment updated' })
