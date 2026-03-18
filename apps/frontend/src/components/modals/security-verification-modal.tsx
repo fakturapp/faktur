@@ -133,7 +133,7 @@ export function SecurityVerificationModal({
   const isExpired = expiresAt ? new Date() > expiresAt : false
 
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={open} onClose={handleClose} zIndex="z-[60]">
       <div className="flex items-center gap-3 mb-4">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
           <Shield className="h-5 w-5 text-primary" />

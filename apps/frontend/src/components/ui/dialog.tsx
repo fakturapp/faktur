@@ -11,9 +11,11 @@ interface DialogProps {
   className?: string
   /** When false, clicking the backdrop does NOT close the dialog. Default: true */
   dismissible?: boolean
+  /** Custom z-index class for the overlay (default: "z-50") */
+  zIndex?: string
 }
 
-export function Dialog({ open, onClose, children, className, dismissible = true }: DialogProps) {
+export function Dialog({ open, onClose, children, className, dismissible = true, zIndex = 'z-50' }: DialogProps) {
   React.useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden'
@@ -26,7 +28,7 @@ export function Dialog({ open, onClose, children, className, dismissible = true 
   return (
     <AnimatePresence>
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className={cn('fixed inset-0 flex items-center justify-center', zIndex)}>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
