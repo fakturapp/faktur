@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { api } from '@/lib/api'
+import { CryptoResetModal } from '@/components/modals/crypto-reset-modal'
 
 interface User {
   id: string
@@ -15,6 +16,7 @@ interface User {
   currentTeamId: string | null
   lastLoginAt: string | null
   createdAt: string
+  cryptoResetNeeded: boolean
 }
 
 interface AuthContextType {
@@ -115,9 +117,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.replace('/login')
   }
 
+  async function handleCryptoRecovered() {
+    await refreshUser()
+  }
+
+  async function handleCryptoWiped() {
+    await refreshUser()
+    router.replace('/onboarding/team')
+  }
+
   return (
     <AuthContext.Provider value={{ user, loading, login, logout, refreshUser }}>
       {children}
+      <CryptoResetModal
+        open={!!user?.cryptoResetNeeded}
+        onRecovered={handleCryptoRecovered}
+        onWiped={handleCryptoWiped}
+      />
     </AuthContext.Provider>
   )
 }

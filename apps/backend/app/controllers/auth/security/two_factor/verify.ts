@@ -85,6 +85,7 @@ export default class Verify {
         avatarUrl: user.avatarUrl,
         onboardingCompleted: user.onboardingCompleted,
         currentTeamId: user.currentTeamId,
+        cryptoResetNeeded: user.cryptoResetNeeded || false,
       },
       token: token.value!.release(),
     })

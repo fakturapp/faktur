@@ -15,6 +15,7 @@ export default class Me {
         currentTeamId: user.currentTeamId,
         lastLoginAt: user.lastLoginAt,
         createdAt: user.createdAt,
+        cryptoResetNeeded: user.cryptoResetNeeded || false,
       },
     })
   }

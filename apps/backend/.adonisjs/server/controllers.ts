@@ -33,6 +33,8 @@ export const controllers = {
       Signup: () => import('#controllers/auth/registration/signup'),
     },
     security: {
+      CryptoRecover: () => import('#controllers/auth/security/crypto_recover'),
+      CryptoWipe: () => import('#controllers/auth/security/crypto_wipe'),
       email: {
         Resend: () => import('#controllers/auth/security/email/resend'),
         Verify: () => import('#controllers/auth/security/email/verify'),
