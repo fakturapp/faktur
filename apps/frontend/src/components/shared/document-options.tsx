@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import {
   Check, Zap, ClipboardList, ChevronDown, ChevronRight, Building2, UserRound,
-  Palette, Pen, Info, Landmark, Banknote, MoreHorizontal,
+  Palette, Pen, Info, Landmark, Banknote, MoreHorizontal, Shield,
 } from 'lucide-react'
 import { Tooltip } from '@/components/ui/tooltip'
 import type { ClientInfo } from './a4-sheet'
@@ -61,6 +61,7 @@ interface DocumentOptionsProps {
   bankAccountId?: string
   onBankAccountChange?: (id: string) => void
   loadingBankAccount?: boolean
+  eInvoicingEnabled?: boolean
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -168,9 +169,10 @@ export function DocumentOptionsPanel({
   documentType = 'invoice',
   paymentMethod = '', onPaymentMethodChange,
   bankAccounts = [], bankAccountId = '', onBankAccountChange, loadingBankAccount = false,
+  eInvoicingEnabled = false,
 }: DocumentOptionsProps) {
-  const [showSiren, setShowSiren] = useState(!!options.clientSiren)
-  const [showVat, setShowVat] = useState(!!options.clientVatNumber)
+  const [showSiren, setShowSiren] = useState(!!options.clientSiren || eInvoicingEnabled)
+  const [showVat, setShowVat] = useState(!!options.clientVatNumber || eInvoicingEnabled)
   const [showTitle, setShowTitle] = useState(!!options.documentTitle)
   const [showDiscount, setShowDiscount] = useState(options.globalDiscountType !== 'none')
 
@@ -322,23 +324,32 @@ export function DocumentOptionsPanel({
             label="Adresse de livraison"
           />
 
+          {eInvoicingEnabled && (
+            <div className="flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 p-2 mb-2">
+              <Shield className="h-3.5 w-3.5 text-primary shrink-0" />
+              <p className="text-[10px] text-primary font-medium">E-facturation active — SIREN et TVA obligatoires</p>
+            </div>
+          )}
+
           <OptionCheckbox
-            checked={showSiren}
+            checked={showSiren || eInvoicingEnabled}
             onToggle={() => {
+              if (eInvoicingEnabled) return
               setShowSiren(!showSiren)
               if (showSiren) onChange({ clientSiren: '' })
               else if (selectedClient?.type === 'company' && selectedClient.siren) {
                 onChange({ clientSiren: selectedClient.siren })
               }
             }}
-            label="SIREN"
+            label={eInvoicingEnabled ? 'SIREN (obligatoire)' : 'SIREN'}
           >
             {selectedClient?.type === 'company' ? (
               <Input
                 placeholder="123456789"
                 value={options.clientSiren}
                 onChange={(e) => onChange({ clientSiren: e.target.value })}
-                className="h-7 text-sm"
+                className={cn('h-7 text-sm', eInvoicingEnabled && options.clientSiren && 'bg-muted text-muted-foreground')}
+                readOnly={eInvoicingEnabled && !!options.clientSiren}
               />
             ) : (
               <p className="text-[11px] text-muted-foreground italic">Non applicable (client particulier)</p>
@@ -346,21 +357,23 @@ export function DocumentOptionsPanel({
           </OptionCheckbox>
 
           <OptionCheckbox
-            checked={showVat}
+            checked={showVat || eInvoicingEnabled}
             onToggle={() => {
+              if (eInvoicingEnabled) return
               setShowVat(!showVat)
               if (showVat) onChange({ clientVatNumber: '' })
               else if (selectedClient?.vatNumber) {
                 onChange({ clientVatNumber: selectedClient.vatNumber })
               }
             }}
-            label="TVA intracommunautaire"
+            label={eInvoicingEnabled ? 'TVA intracommunautaire (obligatoire)' : 'TVA intracommunautaire'}
           >
             <Input
               placeholder="FR12345678901"
               value={options.clientVatNumber}
               onChange={(e) => onChange({ clientVatNumber: e.target.value })}
-              className="h-7 text-sm"
+              className={cn('h-7 text-sm', eInvoicingEnabled && options.clientVatNumber && 'bg-muted text-muted-foreground')}
+              readOnly={eInvoicingEnabled && !!options.clientVatNumber}
             />
           </OptionCheckbox>
         </CollapsibleSection>
