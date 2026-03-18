@@ -47,7 +47,6 @@ interface BankAccountItem {
   bankName: string | null
   ibanMasked: string | null
   bicMasked: string | null
-  isEncrypted: boolean
   isDefault: boolean
 }
 
@@ -56,7 +55,6 @@ interface BankAccountForm {
   bankName: string
   iban: string
   bic: string
-  isEncrypted: boolean
   isDefault: boolean
 }
 
@@ -159,7 +157,7 @@ export default function CompanyPage() {
   const [bankSaving, setBankSaving] = useState(false)
   const [bankDeleting, setBankDeleting] = useState<string | null>(null)
   const [bankForm, setBankForm] = useState<BankAccountForm>({
-    label: '', bankName: '', iban: '', bic: '', isEncrypted: false, isDefault: false,
+    label: '', bankName: '', iban: '', bic: '', isDefault: false,
   })
 
   const [paymentForm, setPaymentForm] = useState({
@@ -351,14 +349,13 @@ export default function CompanyPage() {
             bankName: data.bankAccount.bankName || '',
             iban: formattedIban,
             bic: (data.bankAccount.bic || '').toUpperCase(),
-            isEncrypted: data.bankAccount.isEncrypted,
             isDefault: data.bankAccount.isDefault,
           })
         }
       })
     } else {
       setBankEditId(null)
-      setBankForm({ label: '', bankName: '', iban: '', bic: '', isEncrypted: false, isDefault: false })
+      setBankForm({ label: '', bankName: '', iban: '', bic: '', isDefault: false })
     }
     setBankDialogOpen(true)
   }
@@ -374,7 +371,6 @@ export default function CompanyPage() {
       bankName: bankForm.bankName || undefined,
       iban: bankForm.iban.replace(/\s/g, '') || undefined,
       bic: bankForm.bic || undefined,
-      isEncrypted: bankForm.isEncrypted,
       isDefault: bankForm.isDefault,
     }
     const { error } = bankEditId
@@ -867,7 +863,7 @@ export default function CompanyPage() {
                           <div className="flex items-center gap-2">
                             <p className="text-sm font-medium text-foreground truncate">{account.label}</p>
                             {account.isDefault && <Badge variant="default" className="text-[10px] shrink-0">Par défaut</Badge>}
-                            {account.isEncrypted && <Badge variant="muted" className="text-[10px] shrink-0"><Shield className="h-2.5 w-2.5 mr-0.5" /> Chiffré</Badge>}
+                            <Badge variant="muted" className="text-[10px] shrink-0"><Shield className="h-2.5 w-2.5 mr-0.5" /> Chiffré</Badge>
                           </div>
                           <div className="flex items-center gap-3 mt-0.5">
                             {account.bankName && <span className="text-xs text-muted-foreground">{account.bankName}</span>}
@@ -969,20 +965,13 @@ export default function CompanyPage() {
             <FieldDescription>{bankForm.bic.length}/11 caractères</FieldDescription>
           </Field>
           <div className="space-y-3">
-            <label className="flex items-center gap-3 cursor-pointer">
-              <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-colors ${bankForm.isEncrypted ? 'bg-primary border-primary' : 'border-muted-foreground/30'}`}>
-                {bankForm.isEncrypted && (
-                  <svg className="h-3 w-3 text-primary-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                )}
-              </div>
+            <div className="flex items-center gap-3 rounded-lg bg-muted/50 px-3 py-2">
+              <Shield className="h-4 w-4 text-primary shrink-0" />
               <div>
-                <span className="text-sm font-medium text-foreground flex items-center gap-1.5"><Shield className="h-3.5 w-3.5" /> Chiffrement AES-256</span>
-                <span className="text-xs text-muted-foreground block">L&apos;IBAN et le BIC seront chiffrés en base de données.</span>
+                <span className="text-sm font-medium text-foreground">Chiffrement zero-access</span>
+                <span className="text-xs text-muted-foreground block">L&apos;IBAN et le BIC sont automatiquement chiffrés (AES-256-GCM).</span>
               </div>
-              <input type="checkbox" checked={bankForm.isEncrypted} onChange={(e) => setBankForm((p) => ({ ...p, isEncrypted: e.target.checked }))} className="sr-only" />
-            </label>
+            </div>
             <label className="flex items-center gap-3 cursor-pointer">
               <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-colors ${bankForm.isDefault ? 'bg-primary border-primary' : 'border-muted-foreground/30'}`}>
                 {bankForm.isDefault && (

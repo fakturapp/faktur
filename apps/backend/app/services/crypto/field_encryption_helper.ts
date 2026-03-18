@@ -106,4 +106,8 @@ export const ENCRYPTED_FIELDS = {
   ] as const,
 
   bankAccount: ['iban', 'bic'] as const,
+
+  emailLog: ['fromEmail', 'toEmail', 'subject', 'body', 'errorMessage'] as const,
+
+  invoiceSetting: ['pdpApiKey'] as const,
 } as const

@@ -1,16 +1,25 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import InvoiceSetting from '#models/team/invoice_setting'
 import { updateInvoiceSettingsValidator } from '#validators/invoice_settings_validator'
+import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 
 export default class InvoiceSettingsUpdate {
-  async handle({ auth, request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, request, response } = ctx
     const user = auth.user!
+    const dek: Buffer = (ctx as any).dek
 
     if (!user.currentTeamId) {
       return response.notFound({ message: 'No team found' })
     }
 
     const payload = await request.validateUsing(updateInvoiceSettingsValidator)
+
+    // Encrypt pdpApiKey if provided
+    let pdpApiKeyToStore: string | null = null
+    if (payload.pdpApiKey && payload.pdpApiKey !== '••••••••') {
+      pdpApiKeyToStore = zeroAccessCryptoService.encryptField(payload.pdpApiKey, dek)
+    }
 
     let settings = await InvoiceSetting.findBy('teamId', user.currentTeamId)
 
@@ -27,7 +36,7 @@ export default class InvoiceSettingsUpdate {
         documentFont: payload.documentFont || 'Lexend',
         eInvoicingEnabled: payload.eInvoicingEnabled ?? false,
         pdpProvider: (payload.pdpProvider || null) as 'b2brouter' | 'sandbox' | null,
-        pdpApiKey: payload.pdpApiKey || null,
+        pdpApiKey: pdpApiKeyToStore,
         pdpSandbox: payload.pdpSandbox ?? true,
         defaultSubject: payload.defaultSubject || null,
         defaultAcceptanceConditions: payload.defaultAcceptanceConditions || null,
@@ -55,7 +64,7 @@ export default class InvoiceSettingsUpdate {
       if (payload.eInvoicingEnabled !== undefined) settings.eInvoicingEnabled = payload.eInvoicingEnabled
       if (payload.pdpProvider !== undefined) settings.pdpProvider = (payload.pdpProvider || null) as 'b2brouter' | 'sandbox' | null
       if (payload.pdpApiKey !== undefined && payload.pdpApiKey !== '••••••••') {
-        settings.pdpApiKey = payload.pdpApiKey || null
+        settings.pdpApiKey = pdpApiKeyToStore
       }
       if (payload.pdpSandbox !== undefined) settings.pdpSandbox = payload.pdpSandbox
       if (payload.defaultSubject !== undefined) settings.defaultSubject = payload.defaultSubject || null

@@ -7,6 +7,7 @@ import Invoice from '#models/invoice/invoice'
 import Quote from '#models/quote/quote'
 import GmailOAuthService from '#services/email/gmail_oauth_service'
 import { generateInvoicePdf, generateQuotePdf } from '#services/pdf/document_pdf_service'
+import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 
 const sendEmailValidator = vine.compile(
   vine.object({
@@ -118,8 +119,8 @@ export default class SendEmail {
         attachments: allAttachments,
       })
     } catch (err) {
-      // Log the failed email
-      await EmailLog.create({
+      // Log the failed email (encrypt sensitive fields)
+      const failedLogData: Record<string, any> = {
         teamId,
         documentType: payload.documentType,
         documentId: payload.documentId,
@@ -131,15 +132,17 @@ export default class SendEmail {
         status: 'error',
         errorMessage: err instanceof Error ? err.message : 'Unknown error',
         emailType: payload.emailType || 'send',
-      })
+      }
+      encryptModelFields(failedLogData, [...ENCRYPTED_FIELDS.emailLog], dek)
+      await EmailLog.create(failedLogData)
 
       return response.internalServerError({
         message: "Erreur lors de l'envoi de l'email. Veuillez réessayer.",
       })
     }
 
-    // Log the successful email
-    await EmailLog.create({
+    // Log the successful email (encrypt sensitive fields)
+    const successLogData: Record<string, any> = {
       teamId,
       documentType: payload.documentType,
       documentId: payload.documentId,
@@ -150,7 +153,9 @@ export default class SendEmail {
       body: payload.body,
       status: 'sent',
       emailType: payload.emailType || 'send',
-    })
+    }
+    encryptModelFields(successLogData, [...ENCRYPTED_FIELDS.emailLog], dek)
+    await EmailLog.create(successLogData)
 
     // Update document status to 'sent' if currently 'draft'
     if (payload.documentType === 'invoice') {

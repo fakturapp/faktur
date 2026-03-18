@@ -106,6 +106,9 @@ export default class EInvoicingSubmit {
     const facturxDoc = buildFacturXFromQuote(quoteData, linesData, clientData, companyData)
     const xml = generateFacturXXml(facturxDoc)
 
+    // Decrypt pdpApiKey before building config
+    decryptModelFields(invoiceSettings, [...ENCRYPTED_FIELDS.invoiceSetting], dek)
+
     // Validate XML
     const pdpConfig = buildPdpConfig(invoiceSettings)
 

@@ -60,7 +60,7 @@ export default class BankAccounts {
         bankName: a.bankName,
         ibanMasked: iban ? maskIban(iban) : null,
         bicMasked: bic ? maskBic(bic) : null,
-        isEncrypted: true,
+
         isDefault: a.isDefault,
         createdAt: a.createdAt,
       }
@@ -113,7 +113,7 @@ export default class BankAccounts {
         bankName: account.bankName,
         iban,
         bic,
-        isEncrypted: true,
+
         isDefault: account.isDefault,
       },
     })
@@ -152,7 +152,6 @@ export default class BankAccounts {
       bankName: payload.bankName || null,
       iban,
       bic,
-      isEncrypted: true,
       isDefault: payload.isDefault ?? false,
     })
 
@@ -162,7 +161,7 @@ export default class BankAccounts {
         id: account.id,
         label: account.label,
         bankName: account.bankName,
-        isEncrypted: true,
+
         isDefault: account.isDefault,
       },
     })
@@ -208,7 +207,6 @@ export default class BankAccounts {
       bankName: payload.bankName || null,
       iban,
       bic,
-      isEncrypted: true,
       isDefault: payload.isDefault ?? false,
     })
     await account.save()
@@ -219,7 +217,7 @@ export default class BankAccounts {
         id: account.id,
         label: account.label,
         bankName: account.bankName,
-        isEncrypted: true,
+
         isDefault: account.isDefault,
       },
     })
