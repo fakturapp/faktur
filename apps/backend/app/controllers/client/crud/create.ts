@@ -1,6 +1,10 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Client from '#models/client/client'
-import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
+import {
+  encryptModelFields,
+  decryptModelFields,
+  ENCRYPTED_FIELDS,
+} from '#services/crypto/field_encryption_helper'
 
 export default class Create {
   async handle(ctx: HttpContext) {
@@ -55,6 +59,9 @@ export default class Create {
     encryptModelFields(clientData, [...ENCRYPTED_FIELDS.client], dek)
 
     const client = await Client.create(clientData)
+
+    // Decrypt after create so displayName returns plaintext
+    decryptModelFields(client, [...ENCRYPTED_FIELDS.client], dek)
 
     return response.created({
       message: 'Client created',
