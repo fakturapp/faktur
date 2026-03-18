@@ -23,6 +23,7 @@ import {
   Copy,
   Trash2,
   Download,
+  Printer,
   Clock,
   MessageSquare,
   History,
@@ -89,6 +90,7 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
   const [duplicating, setDuplicating] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [downloading, setDownloading] = useState(false)
+  const [printing, setPrinting] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [emailModalOpen, setEmailModalOpen] = useState(false)
   const [emailModalMode, setEmailModalMode] = useState<'send' | 'reminder'>('send')
@@ -235,6 +237,29 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
     URL.revokeObjectURL(url)
   }
 
+  async function handlePrint() {
+    setPrinting(true)
+    const { blob, error } = await api.downloadBlob(`/quotes/${quoteId}/pdf`)
+    setPrinting(false)
+    if (error || !blob) { toast(error || 'Erreur', 'error'); return }
+    const url = URL.createObjectURL(blob)
+    const iframe = document.createElement('iframe')
+    iframe.style.position = 'fixed'
+    iframe.style.top = '-10000px'
+    iframe.style.left = '-10000px'
+    iframe.style.width = '0'
+    iframe.style.height = '0'
+    iframe.src = url
+    document.body.appendChild(iframe)
+    iframe.onload = () => {
+      iframe.contentWindow?.print()
+      setTimeout(() => {
+        document.body.removeChild(iframe)
+        URL.revokeObjectURL(url)
+      }, 1000)
+    }
+  }
+
   // Always use current settings logo so preview stays in sync with PDF
   const effectiveLogoUrl = invoiceSettings.logoSource === 'company' ? companyLogoUrl : (invoiceSettings.logoUrl || quote?.logoUrl || null)
 
@@ -327,8 +352,8 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
                   documentFont={invoiceSettings.documentFont}
                   vatExemptReason={quote.vatExemptReason || 'none'}
                 />
-                {/* Download button */}
-                <div className="flex justify-center mt-3">
+                {/* Download & Print buttons */}
+                <div className="flex justify-center gap-2 mt-3">
                   <button
                     onClick={handleDownloadPdf}
                     disabled={downloading}
@@ -336,6 +361,14 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
                   >
                     {downloading ? <Spinner className="h-4 w-4" /> : <Download className="h-4 w-4 text-muted-foreground" />}
                     <span className="text-foreground">{downloading ? 'Téléchargement...' : 'Télécharger'}</span>
+                  </button>
+                  <button
+                    onClick={handlePrint}
+                    disabled={printing}
+                    className="h-9 px-4 rounded-full bg-card shadow-lg flex items-center gap-2 text-sm font-medium transition-colors border border-border"
+                  >
+                    {printing ? <Spinner className="h-4 w-4" /> : <Printer className="h-4 w-4 text-muted-foreground" />}
+                    <span className="text-foreground">{printing ? 'Préparation...' : 'Imprimer'}</span>
                   </button>
                 </div>
               </div>
