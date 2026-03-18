@@ -1,11 +1,13 @@
 /**
  * Factur-X / ZUGFeRD XML generator
  *
- * Generates CII (Cross Industry Invoice) XML conforming to Factur-X BASIC profile.
- * This XML is embedded into the PDF as an attachment to create a Factur-X document.
+ * Generates CII (Cross Industry Invoice) XML conforming to Factur-X EN16931 profile.
+ * This profile is required for the French e-invoicing reform (September 2026).
+ * The XML is embedded into the PDF as an attachment to create a Factur-X document.
  *
  * Reference: https://fnfe-mpe.org/factur-x/
  * Format: UN/CEFACT Cross-Industry Invoice (CII) D16B
+ * Profile: urn:factur-x.eu:1p0:en16931
  */
 
 interface FacturXSeller {
@@ -41,7 +43,7 @@ interface FacturXLine {
   total: number
 }
 
-interface FacturXDocument {
+export interface FacturXDocument {
   documentNumber: string
   documentType: 'quote' | 'invoice'
   issueDate: string
@@ -56,6 +58,8 @@ interface FacturXDocument {
   vatBreakdown: { rate: number; base: number; amount: number }[]
   notes?: string | null
   language?: string
+  /** Operation category for French e-invoicing reform */
+  operationCategory?: 'service' | 'goods' | 'mixed' | null
 }
 
 function escapeXml(str: string): string {
@@ -68,7 +72,6 @@ function escapeXml(str: string): string {
 }
 
 function formatDate(dateStr: string): string {
-  // Convert YYYY-MM-DD to YYYYMMDD format required by CII
   return dateStr.replace(/-/g, '')
 }
 
@@ -89,13 +92,25 @@ function getCountryCode(country?: string | null): string {
   if (lower === 'suisse' || lower === 'switzerland' || lower === 'ch') return 'CH'
   if (lower === 'luxembourg' || lower === 'lu') return 'LU'
   if (lower === 'allemagne' || lower === 'germany' || lower === 'de') return 'DE'
-  // If already a 2-letter code
   if (lower.length === 2) return lower.toUpperCase()
   return 'FR'
 }
 
 /**
- * Generate Factur-X CII XML (BASIC profile)
+ * Map operation category to BuyerReference value for French e-invoicing reform.
+ */
+function getOperationCategoryCode(category?: 'service' | 'goods' | 'mixed' | null): string | null {
+  switch (category) {
+    case 'service': return 'SERVICE'
+    case 'goods': return 'LIVRAISON'
+    case 'mixed': return 'MIXTE'
+    default: return null
+  }
+}
+
+/**
+ * Generate Factur-X CII XML (EN16931 profile).
+ * Conforms to the French e-invoicing reform requirements.
  */
 export function generateFacturXXml(doc: FacturXDocument): string {
   const typeCode = getDocumentTypeCode(doc.documentType)
@@ -107,7 +122,7 @@ export function generateFacturXXml(doc: FacturXDocument): string {
 <rsm:CrossIndustryInvoice xmlns:rsm="urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100" xmlns:qdt="urn:un:unece:uncefact:data:standard:QualifiedDataType:100" xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100" xmlns:udt="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100">
   <rsm:ExchangedDocumentContext>
     <ram:GuidelineSpecifiedDocumentContextParameter>
-      <ram:ID>urn:factur-x.eu:1p0:basic</ram:ID>
+      <ram:ID>urn:factur-x.eu:1p0:en16931</ram:ID>
     </ram:GuidelineSpecifiedDocumentContextParameter>
   </rsm:ExchangedDocumentContext>
   <rsm:ExchangedDocument>
@@ -161,7 +176,16 @@ export function generateFacturXXml(doc: FacturXDocument): string {
 
   // ── Trade agreement (seller + buyer) ──
   xml += `
-    <ram:ApplicableHeaderTradeAgreement>
+    <ram:ApplicableHeaderTradeAgreement>`
+
+  // BuyerReference for operation category (French e-invoicing reform)
+  const opCatCode = getOperationCategoryCode(doc.operationCategory)
+  if (opCatCode) {
+    xml += `
+      <ram:BuyerReference>${escapeXml(opCatCode)}</ram:BuyerReference>`
+  }
+
+  xml += `
       <ram:SellerTradeParty>
         <ram:Name>${escapeXml(doc.seller.name)}</ram:Name>`
 
@@ -316,7 +340,7 @@ export function generateFacturXXml(doc: FacturXDocument): string {
 }
 
 /**
- * Build FacturXDocument from quote/invoice data (same shape as pdf controller)
+ * Build a FacturXDocument from quote data.
  */
 export function buildFacturXFromQuote(
   quoteData: any,
@@ -324,7 +348,65 @@ export function buildFacturXFromQuote(
   clientData: any | null,
   companyData: any | null
 ): FacturXDocument {
-  // Build VAT breakdown
+  const { vatBreakdown, seller, buyer, lines } = buildCommonFacturXParts(linesData, clientData, companyData)
+
+  return {
+    documentNumber: quoteData.quoteNumber,
+    documentType: 'quote',
+    issueDate: quoteData.issueDate || new Date().toISOString().slice(0, 10),
+    dueDate: quoteData.validityDate,
+    currencyCode: 'EUR',
+    seller,
+    buyer,
+    lines,
+    subtotalHT: quoteData.subtotal || 0,
+    totalVAT: quoteData.taxAmount || 0,
+    totalTTC: quoteData.total || 0,
+    vatBreakdown,
+    notes: quoteData.notes,
+    language: quoteData.language,
+  }
+}
+
+/**
+ * Build a FacturXDocument from invoice data.
+ */
+export function buildFacturXFromInvoice(
+  invoiceData: any,
+  linesData: any[],
+  clientData: any | null,
+  companyData: any | null
+): FacturXDocument {
+  const { vatBreakdown, seller, buyer, lines } = buildCommonFacturXParts(linesData, clientData, companyData)
+
+  return {
+    documentNumber: invoiceData.invoiceNumber,
+    documentType: 'invoice',
+    issueDate: invoiceData.issueDate || new Date().toISOString().slice(0, 10),
+    dueDate: invoiceData.dueDate,
+    currencyCode: 'EUR',
+    seller,
+    buyer,
+    lines,
+    subtotalHT: invoiceData.subtotal || 0,
+    totalVAT: invoiceData.taxAmount || 0,
+    totalTTC: invoiceData.total || 0,
+    vatBreakdown,
+    notes: invoiceData.notes,
+    language: invoiceData.language,
+    operationCategory: invoiceData.operationCategory || null,
+  }
+}
+
+/**
+ * Build common Factur-X parts (VAT breakdown, seller, buyer, lines)
+ * shared between invoice and quote builders.
+ */
+function buildCommonFacturXParts(
+  linesData: any[],
+  clientData: any | null,
+  companyData: any | null
+) {
   const vatMap = new Map<number, { base: number; amount: number }>()
   for (const line of linesData) {
     if (line.saleType === 'section') continue
@@ -381,20 +463,5 @@ export function buildFacturXFromQuote(
       total: (l.quantity || 1) * (l.unitPrice || 0),
     }))
 
-  return {
-    documentNumber: quoteData.quoteNumber,
-    documentType: 'quote',
-    issueDate: quoteData.issueDate || new Date().toISOString().slice(0, 10),
-    dueDate: quoteData.validityDate,
-    currencyCode: 'EUR',
-    seller,
-    buyer,
-    lines,
-    subtotalHT: quoteData.subtotal || 0,
-    totalVAT: quoteData.taxAmount || 0,
-    totalTTC: quoteData.total || 0,
-    vatBreakdown,
-    notes: quoteData.notes,
-    language: quoteData.language,
-  }
+  return { vatBreakdown, seller, buyer, lines }
 }
