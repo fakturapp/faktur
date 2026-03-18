@@ -43,23 +43,14 @@ WORKDIR /app/apps/frontend
 RUN npm run build
 
 # ------------------------------------------------------------------------------
-# Stage 5: Production (combined backend + frontend with turbo)
+# Stage 5: Production (combined backend + frontend)
 # ------------------------------------------------------------------------------
 FROM base AS production
 
-# Root monorepo config for turbo
-COPY package.json turbo.json ./
-
-# Install turbo globally
-RUN npm install -g turbo
-
 # -- Backend (build output with node_modules already installed) --
 COPY --from=build-backend /app/apps/backend/build/ ./apps/backend/
-# Hardcode PORT=3333 in backend start script so it won't inherit container PORT
-RUN sed -i 's/"start": "node bin\/server.js"/"start": "PORT=3333 HOST=0.0.0.0 node bin\/server.js"/' apps/backend/package.json
 
 # -- Frontend (standalone) --
-# Copy standalone output — in monorepo it preserves apps/frontend/ structure
 COPY --from=build-frontend /app/apps/frontend/.next/standalone/ ./standalone-tmp/
 RUN mkdir -p apps/frontend/.next \
     && cp -r standalone-tmp/apps/frontend/* apps/frontend/ \
@@ -68,9 +59,6 @@ RUN mkdir -p apps/frontend/.next \
 COPY --from=build-frontend /app/apps/frontend/.next/static ./apps/frontend/.next/static
 COPY --from=build-frontend /app/apps/frontend/public ./apps/frontend/public
 
-# Frontend package.json with start script — hardcode PORT=3000
-RUN printf '{"name":"@faktur/frontend","private":true,"scripts":{"start":"PORT=3000 HOSTNAME=0.0.0.0 node server.js"}}\n' > apps/frontend/package.json
-
 EXPOSE 3333 3000
-# Unset PORT to avoid both apps inheriting container's PORT, each app sets its own
-CMD ["sh", "-c", "cd /app/apps/backend && unset PORT && node ace migration:run --force && cd /app && turbo start"]
+# Backend on 3333 (background) + Frontend on 3000 (foreground)
+CMD ["sh", "-c", "cd /app/apps/backend && PORT=3333 HOST=0.0.0.0 node ace migration:run --force && PORT=3333 HOST=0.0.0.0 node bin/server.js & cd /app/apps/frontend && PORT=3000 HOSTNAME=0.0.0.0 node server.js"]
