@@ -29,6 +29,10 @@
       "outputs": [],
       "cache": false
     },
+    "start": {
+      "cache": false,
+      "persistent": true
+    },
     "typecheck": {
       "dependsOn": ["^build"],
       "outputs": []

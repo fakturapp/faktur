@@ -18,6 +18,7 @@
     "lint": "turbo lint",
     "format": "turbo format",
     "typecheck": "turbo typecheck",
+    "start": "turbo start",
     "ncu": "ncu -u && npm install"
   },
   "devDependencies": {

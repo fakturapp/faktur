@@ -1,6 +1,6 @@
 # ==============================================================================
 # Faktur - Multi-stage Docker build (Backend + Frontend)
-# For Dokploy deployment
+# Single container: backend (port 3333) + frontend (port 3000)
 # ==============================================================================
 
 # ------------------------------------------------------------------------------
@@ -28,8 +28,6 @@ FROM deps AS build-backend
 COPY apps/backend/ ./apps/backend/
 WORKDIR /app/apps/backend
 RUN node ace build --ignore-ts-errors
-WORKDIR /app/apps/backend/build
-RUN npm ci --omit=dev
 
 # ------------------------------------------------------------------------------
 # Stage 4: Build frontend (Next.js standalone)
@@ -42,32 +40,36 @@ WORKDIR /app/apps/frontend
 RUN npm run build
 
 # ------------------------------------------------------------------------------
-# Stage 5: Production backend
+# Stage 5: Production (combined backend + frontend with turbo)
 # ------------------------------------------------------------------------------
-FROM node:24-alpine AS backend
-RUN apk add --no-cache libc6-compat chromium nss freetype harfbuzz ca-certificates ttf-freefont
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
-ENV NODE_ENV=production
-WORKDIR /app
+FROM base AS production
 
-COPY --from=build-backend /app/apps/backend/build/ ./
-EXPOSE 3333
-CMD ["sh", "-c", "node ace migration:run --force && node bin/server.js"]
+# Root monorepo config for turbo
+COPY package.json turbo.json ./
 
-# ------------------------------------------------------------------------------
-# Stage 6: Production frontend
-# ------------------------------------------------------------------------------
-FROM node:24-alpine AS frontend
-ENV NODE_ENV=production
-ENV HOSTNAME=0.0.0.0
-ENV PORT=3000
-WORKDIR /app
+# Install turbo globally
+RUN npm install -g turbo
 
-# Standalone output in monorepo preserves directory structure
-COPY --from=build-frontend /app/apps/frontend/.next/standalone/ ./
+# -- Backend --
+COPY --from=build-backend /app/apps/backend/build/ ./apps/backend/
+COPY package-lock.json /tmp/package-lock.json
+RUN cp /tmp/package-lock.json apps/backend/ \
+    && cd apps/backend \
+    && npm ci --omit=dev \
+    && rm package-lock.json
+
+# -- Frontend (standalone) --
+# Copy standalone output — in monorepo it preserves apps/frontend/ structure
+COPY --from=build-frontend /app/apps/frontend/.next/standalone/ ./standalone-tmp/
+RUN mkdir -p apps/frontend/.next \
+    && cp -r standalone-tmp/apps/frontend/* apps/frontend/ \
+    && cp -r standalone-tmp/node_modules apps/frontend/node_modules 2>/dev/null || true \
+    && rm -rf standalone-tmp
 COPY --from=build-frontend /app/apps/frontend/.next/static ./apps/frontend/.next/static
 COPY --from=build-frontend /app/apps/frontend/public ./apps/frontend/public
 
-EXPOSE 3000
-CMD ["node", "apps/frontend/server.js"]
+# Frontend package.json with start script for turbo
+RUN printf '{"name":"@faktur/frontend","private":true,"scripts":{"start":"HOSTNAME=0.0.0.0 PORT=3000 node server.js"}}\n' > apps/frontend/package.json
+
+EXPOSE 3333 3000
+CMD ["sh", "-c", "cd /app/apps/backend && node ace migration:run --force && cd /app && turbo start"]
