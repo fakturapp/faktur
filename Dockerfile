@@ -28,6 +28,9 @@ FROM deps AS build-backend
 COPY apps/backend/ ./apps/backend/
 WORKDIR /app/apps/backend
 RUN node ace build --ignore-ts-errors
+# Install production deps inside build output
+WORKDIR /app/apps/backend/build
+RUN npm install --omit=dev
 
 # ------------------------------------------------------------------------------
 # Stage 4: Build frontend (Next.js standalone)
@@ -50,13 +53,8 @@ COPY package.json turbo.json ./
 # Install turbo globally
 RUN npm install -g turbo
 
-# -- Backend --
+# -- Backend (build output with node_modules already installed) --
 COPY --from=build-backend /app/apps/backend/build/ ./apps/backend/
-COPY package-lock.json /tmp/package-lock.json
-RUN cp /tmp/package-lock.json apps/backend/ \
-    && cd apps/backend \
-    && npm ci --omit=dev \
-    && rm package-lock.json
 
 # -- Frontend (standalone) --
 # Copy standalone output — in monorepo it preserves apps/frontend/ structure
