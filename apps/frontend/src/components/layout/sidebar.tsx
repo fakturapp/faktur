@@ -35,6 +35,7 @@ import {
   UsersRound,
   CreditCard,
   Mail,
+  Info,
 } from 'lucide-react'
 
 interface TeamListItem {
@@ -340,6 +341,22 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
         <div className="mx-1 my-2 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
         <NavLink item={settingsNav} pathname={pathname} badges={badges} />
       </nav>
+
+      {/* About link */}
+      <div className="px-3 pb-2">
+        <Link
+          href="/dashboard/about"
+          className={cn(
+            'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-all duration-300 ease-in-out relative',
+            pathname === '/dashboard/about'
+              ? 'bg-gradient-to-r from-primary/10 to-transparent text-sidebar-accent-foreground border-l-2 border-primary'
+              : 'text-muted-foreground hover:bg-sidebar-accent/50 hover:text-foreground'
+          )}
+        >
+          <Info className={cn('h-4 w-4 shrink-0', pathname === '/dashboard/about' && 'text-primary')} />
+          <span>À propos</span>
+        </Link>
+      </div>
 
       <div className="mx-3 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
 
