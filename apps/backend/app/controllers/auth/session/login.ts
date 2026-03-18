@@ -130,20 +130,27 @@ export default class Login {
       const salt = Buffer.from(user.saltKdf, 'hex')
       const kek = await zeroAccessCryptoService.deriveKEK(password, salt)
 
-      if (user.currentTeamId) {
-        const teamMember = await TeamMember.query()
-          .where('teamId', user.currentTeamId)
-          .where('userId', user.id)
-          .where('status', 'active')
-          .first()
+      // If crypto reset is needed (password was reset without old password),
+      // the DEKs are still encrypted with the OLD KEK — skip loading them.
+      if (!user.cryptoResetNeeded) {
+        if (user.currentTeamId) {
+          const teamMember = await TeamMember.query()
+            .where('teamId', user.currentTeamId)
+            .where('userId', user.id)
+            .where('status', 'active')
+            .first()
 
-        if (teamMember?.encryptedTeamDek) {
-          const teamDek = zeroAccessCryptoService.decryptDEK(teamMember.encryptedTeamDek, kek)
-          keyStore.storeKeys(user.id, kek, user.currentTeamId, teamDek)
+          if (teamMember?.encryptedTeamDek) {
+            const teamDek = zeroAccessCryptoService.decryptDEK(teamMember.encryptedTeamDek, kek)
+            keyStore.storeKeys(user.id, kek, user.currentTeamId, teamDek)
+          } else {
+            keyStore.storeKeys(user.id, kek, '', Buffer.alloc(0))
+          }
         } else {
           keyStore.storeKeys(user.id, kek, '', Buffer.alloc(0))
         }
       } else {
+        // Store only the KEK (new one), no DEKs yet
         keyStore.storeKeys(user.id, kek, '', Buffer.alloc(0))
       }
     }
@@ -159,6 +166,7 @@ export default class Login {
         avatarUrl: user.avatarUrl,
         onboardingCompleted: user.onboardingCompleted,
         currentTeamId: user.currentTeamId,
+        cryptoResetNeeded: user.cryptoResetNeeded || false,
       },
       token: token.value!.release(),
     })

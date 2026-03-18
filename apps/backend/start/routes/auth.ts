@@ -19,6 +19,8 @@ const PasswordReset = () => import('#controllers/auth/security/password_reset/re
 const VerifyEmail = () => import('#controllers/auth/security/email/verify')
 const ResendVerification = () => import('#controllers/auth/security/email/resend')
 const TwoFactorVerify = () => import('#controllers/auth/security/two_factor/verify')
+const CryptoRecover = () => import('#controllers/auth/security/crypto_recover')
+const CryptoWipe = () => import('#controllers/auth/security/crypto_wipe')
 
 router
   .group(() => {
@@ -36,6 +38,8 @@ router
       .group(() => {
         router.post('/logout', [Logout, 'handle'])
         router.get('/me', [Me, 'handle'])
+        router.post('/crypto/recover', [CryptoRecover, 'handle'])
+        router.post('/crypto/wipe', [CryptoWipe, 'handle'])
       })
       .use(middleware.auth())
   })

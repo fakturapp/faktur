@@ -81,6 +81,12 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column({ serializeAs: null })
   declare keyVersion: number
 
+  @column()
+  declare cryptoResetNeeded: boolean
+
+  @column({ serializeAs: null })
+  declare oldSaltKdf: string | null
+
   // Team & Onboarding
   @column()
   declare currentTeamId: string | null
