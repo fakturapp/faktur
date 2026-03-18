@@ -10,7 +10,12 @@ import Invoice from '#models/invoice/invoice'
 import Quote from '#models/quote/quote'
 import InvoiceSetting from '#models/team/invoice_setting'
 import BankAccount from '#models/team/bank_account'
-import EncryptionService from '#services/encryption/encryption_service'
+import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
+import {
+  decryptModelFields,
+  decryptModelFieldsArray,
+  ENCRYPTED_FIELDS,
+} from '#services/crypto/field_encryption_helper'
 
 const MAGIC = Buffer.from('FPDATA1')
 const FLAG_ENCRYPTED = 0x01
@@ -30,38 +35,48 @@ interface ExportData {
   bankAccounts?: Record<string, unknown>[]
 }
 
-export async function collectTeamData(teamId: string, options?: { includeBankAccounts?: boolean }): Promise<ExportData> {
+export async function collectTeamData(teamId: string, dek: Buffer, options?: { includeBankAccounts?: boolean }): Promise<ExportData> {
   const team = await Team.find(teamId)
   if (!team) throw new Error('Team not found')
 
   const company = await Company.query().where('teamId', teamId).first()
+  if (company) {
+    decryptModelFields(company, [...ENCRYPTED_FIELDS.company], dek)
+  }
 
   const clients = await Client.query().where('teamId', teamId)
+  decryptModelFieldsArray(clients, [...ENCRYPTED_FIELDS.client], dek)
 
   const invoices = await Invoice.query()
     .where('teamId', teamId)
     .preload('lines', (q) => q.orderBy('position', 'asc'))
+  for (const inv of invoices) {
+    decryptModelFields(inv, [...ENCRYPTED_FIELDS.invoice], dek)
+    decryptModelFieldsArray(inv.lines, [...ENCRYPTED_FIELDS.invoiceLine], dek)
+  }
 
   const quotes = await Quote.query()
     .where('teamId', teamId)
     .preload('lines', (q) => q.orderBy('position', 'asc'))
+  for (const q of quotes) {
+    decryptModelFields(q, [...ENCRYPTED_FIELDS.quote], dek)
+    decryptModelFieldsArray(q.lines, [...ENCRYPTED_FIELDS.quoteLine], dek)
+  }
 
   const settings = await InvoiceSetting.query().where('teamId', teamId).first()
 
-  // Collect bank accounts if requested, decrypting encrypted fields
+  // Collect bank accounts if requested, decrypting with zero-access DEK
   let bankAccountsData: Record<string, unknown>[] | undefined
   if (options?.includeBankAccounts) {
     const bankAccounts = await BankAccount.query().where('teamId', teamId)
     bankAccountsData = bankAccounts.map((ba) => {
       let iban = ba.iban
       let bic = ba.bic
-      if (ba.isEncrypted) {
-        if (iban) {
-          try { iban = EncryptionService.decrypt(iban) } catch { iban = null }
-        }
-        if (bic) {
-          try { bic = EncryptionService.decrypt(bic) } catch { bic = null }
-        }
+      if (iban && zeroAccessCryptoService.isEncryptedField(iban)) {
+        try { iban = zeroAccessCryptoService.decryptField(iban, dek) } catch { iban = null }
+      }
+      if (bic && zeroAccessCryptoService.isEncryptedField(bic)) {
+        try { bic = zeroAccessCryptoService.decryptField(bic, dek) } catch { bic = null }
       }
       return {
         label: ba.label,

@@ -13,7 +13,9 @@ const exportValidator = vine.compile(
 )
 
 export default class Export {
-  async handle({ auth, request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, request, response } = ctx
+    const dek: Buffer = (ctx as any).dek
     const user = auth.user!
     const teamId = user.currentTeamId
 
@@ -41,7 +43,7 @@ export default class Export {
     }
 
     // Collect and export data
-    const data = await collectTeamData(teamId, { includeBankAccounts: payload.includeBankAccounts ?? false })
+    const data = await collectTeamData(teamId, dek, { includeBankAccounts: payload.includeBankAccounts ?? false })
     const logoFiles = collectLogoFiles(data)
     const zipBuffer = await createZipBuffer(data, logoFiles)
 
