@@ -42,7 +42,7 @@ export default class EmailConfirmChange {
       userId: user.id,
       action: 'user.email_changed',
       ipAddress: request.ip(),
-      metadata: JSON.stringify({ oldEmail, newEmail: user.email }),
+      metadata: { oldEmail, newEmail: user.email },
     })
 
     return response.ok({ message: 'Email mis à jour avec succès', email: user.email })

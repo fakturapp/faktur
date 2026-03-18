@@ -10,7 +10,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import { InvoiceSettingsProvider } from '@/lib/invoice-settings-context'
@@ -30,8 +30,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { user, loading, logout, refreshUser } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
-  const searchParams = useSearchParams()
-  const isPopup = searchParams.get('popup') === 'true'
+  const [isPopup, setIsPopup] = useState(false)
   const [teams, setTeams] = useState<TeamListItem[]>([])
   const [teamsLoaded, setTeamsLoaded] = useState(false)
   const [switchConfirm, setSwitchConfirm] = useState<TeamListItem | null>(null)
@@ -40,6 +39,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [sidebarBadges, setSidebarBadges] = useState<Record<string, number>>({})
   const [logoutConfirm, setLogoutConfirm] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    setIsPopup(params.get('popup') === 'true')
+  }, [pathname])
 
   useEffect(() => {
     if (user) {
@@ -188,18 +192,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <RouteProgressBar />
 
         <main className="flex-1 overflow-y-auto">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={pathname}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.25, ease: 'easeInOut' }}
-              className="@container/main flex flex-1 flex-col gap-2"
-            >
-              {children}
-            </motion.div>
-          </AnimatePresence>
+          <div className="@container/main flex flex-1 flex-col gap-2">
+            {children}
+          </div>
         </main>
       </div>
 

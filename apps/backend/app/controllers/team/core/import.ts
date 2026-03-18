@@ -41,7 +41,7 @@ export default class Import {
     const decryptionPassword = request.input('decryptionPassword')
 
     // Read file buffer
-    let buffer = readFileSync(file.tmpPath!)
+    let buffer: Buffer<ArrayBuffer> = Buffer.from(readFileSync(file.tmpPath!))
 
     // Check if encrypted (.fpdata)
     const magic = buffer.subarray(0, 7).toString()
@@ -50,7 +50,7 @@ export default class Import {
         return response.unprocessableEntity({ message: 'Ce fichier est chiffré. Veuillez fournir un mot de passe.' })
       }
       try {
-        buffer = decryptBuffer(buffer, decryptionPassword)
+        buffer = Buffer.from(decryptBuffer(buffer, decryptionPassword))
       } catch {
         return response.unprocessableEntity({ message: 'Mot de passe de déchiffrement incorrect' })
       }

@@ -1,0 +1,14 @@
+node_modules
+.git
+.github
+.vscode
+.claude
+*.md
+.env
+.env.*
+!.env.example
+!.env.exemple
+apps/backend/build
+apps/backend/tmp
+apps/frontend/.next
+apps/frontend/out

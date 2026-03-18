@@ -104,7 +104,7 @@ export default class Login {
     // Store IP and user agent on the token
     await db
       .from('auth_access_tokens')
-      .where('id', token.identifier)
+      .where('id', String(token.identifier))
       .update({
         ip_address: request.ip(),
         user_agent: (request.header('user-agent') || '').slice(0, 512),

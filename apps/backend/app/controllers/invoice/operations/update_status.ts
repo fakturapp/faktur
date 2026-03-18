@@ -30,7 +30,7 @@ export default class UpdateStatus {
     invoice.status = status
 
     if (status === 'paid') {
-      invoice.paidDate = DateTime.now()
+      invoice.paidDate = DateTime.now().toISO()
     } else {
       invoice.paidDate = null as any
     }
