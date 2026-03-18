@@ -1,0 +1,18 @@
+# Nixpacks config for Dokploy deployment
+# Backend (AdonisJS) on port 3333 + Frontend (Next.js) on port 3000
+
+[phases.setup]
+nixPkgs = ["chromium"]
+
+[variables]
+PUPPETEER_SKIP_CHROMIUM_DOWNLOAD = "true"
+PUPPETEER_EXECUTABLE_PATH = "chromium"
+
+[phases.build]
+cmds = [
+  "npx turbo run build",
+  "cd apps/backend/build && npm install --omit=dev"
+]
+
+[start]
+cmd = "cd apps/backend/build && node ace migration:run --force && PORT=3333 HOST=0.0.0.0 node bin/server.js & cd /app/apps/frontend && PORT=3000 HOSTNAME=0.0.0.0 npx next start"
