@@ -23,7 +23,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   APP_URL: Env.schema.string({ format: 'url', tld: false }),
 
   // Session (keep for shield CSRF)
-  SESSION_DRIVER: Env.schema.enum.optional(['cookie', 'memory'] as const),
+  SESSION_DRIVER: Env.schema.enum(['cookie', 'memory'] as const),
 
   // Database (PostgreSQL)
   DATABASE_URL: Env.schema.string.optional(),
