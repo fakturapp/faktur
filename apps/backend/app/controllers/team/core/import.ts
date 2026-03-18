@@ -14,11 +14,21 @@ import Invoice from '#models/invoice/invoice'
 import InvoiceLine from '#models/invoice/invoice_line'
 import Quote from '#models/quote/quote'
 import QuoteLine from '#models/quote/quote_line'
+import BankAccount from '#models/team/bank_account'
 import { decryptBuffer } from '#services/team/export_service'
+import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
+import keyStore from '#services/crypto/key_store'
+import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 
 export default class Import {
-  async handle({ auth, request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, request, response } = ctx
     const user = auth.user!
+    const kek = keyStore.getKEK(user.id)
+
+    if (!kek) {
+      return response.status(423).send({ code: 'VAULT_LOCKED', message: 'Vault locked' })
+    }
 
     const file = request.file('file', {
       size: '50mb',
@@ -82,10 +92,15 @@ export default class Import {
     const invoicesData = readJson('export/invoices.json') || []
     const quotesData = readJson('export/quotes.json') || []
     const settingsData = readJson('export/settings.json')
+    const bankAccountsData = readJson('export/bank_accounts.json') || []
 
     if (!metadata || !teamData) {
       return response.unprocessableEntity({ message: 'Format de fichier invalide : données manquantes' })
     }
+
+    // Generate a new team DEK for the imported team
+    const teamDek = zeroAccessCryptoService.generateDEK()
+    const encryptedTeamDek = zeroAccessCryptoService.encryptDEK(teamDek, kek)
 
     // Create team with all data in a transaction
     const team = await db.transaction(async (trx) => {
@@ -95,21 +110,27 @@ export default class Import {
         { client: trx }
       )
 
-      // Create team member (owner)
+      // Create team member (owner) with encrypted DEK
       await TeamMember.create(
-        { teamId: newTeam.id, userId: user.id, role: 'super_admin', status: 'active' },
+        {
+          teamId: newTeam.id,
+          userId: user.id,
+          role: 'super_admin',
+          status: 'active',
+          encryptedTeamDek,
+          dekVersion: 1,
+        },
         { client: trx }
       )
 
-      // Create company
+      // Create company (encrypt sensitive fields)
       if (companyData) {
-        await Company.create(
-          { teamId: newTeam.id, ...companyData },
-          { client: trx }
-        )
+        const cData: Record<string, any> = { teamId: newTeam.id, ...companyData }
+        encryptModelFields(cData, [...ENCRYPTED_FIELDS.company], teamDek)
+        await Company.create(cData, { client: trx })
       }
 
-      // Create invoice settings
+      // Create invoice settings (no encrypted fields)
       if (settingsData) {
         await InvoiceSetting.create(
           { teamId: newTeam.id, ...settingsData },
@@ -117,67 +138,80 @@ export default class Import {
         )
       }
 
-      // Create clients and build ID mapping
+      // Create bank accounts (encrypt iban/bic)
+      for (const baData of bankAccountsData) {
+        const baRecord: Record<string, any> = {
+          teamId: newTeam.id,
+          label: baData.label,
+          bankName: baData.bankName,
+          iban: baData.iban,
+          bic: baData.bic,
+          isDefault: baData.isDefault ?? false,
+          isEncrypted: true,
+        }
+        encryptModelFields(baRecord, [...ENCRYPTED_FIELDS.bankAccount], teamDek)
+        await BankAccount.create(baRecord, { client: trx })
+      }
+
+      // Create clients and build ID mapping (encrypt sensitive fields)
       const clientIdMap: Record<string, string> = {}
-      for (const clientData of clientsData) {
-        const originalId = clientData.originalId
-        const { originalId: _, ...rest } = clientData
-        const newClient = await Client.create(
-          { teamId: newTeam.id, ...rest },
-          { client: trx }
-        )
+      for (const clientData2 of clientsData) {
+        const originalId = clientData2.originalId
+        const { originalId: _, ...rest } = clientData2
+        const clientRecord: Record<string, any> = { teamId: newTeam.id, ...rest }
+        encryptModelFields(clientRecord, [...ENCRYPTED_FIELDS.client], teamDek)
+        const newClient = await Client.create(clientRecord, { client: trx })
         if (originalId) {
           clientIdMap[originalId] = newClient.id
         }
       }
 
-      // Create invoices with lines
+      // Create invoices with lines (encrypt sensitive fields)
       for (const invData of invoicesData) {
         const { lines, clientId, sourceQuoteId, ...rest } = invData
-        const newInvoice = await Invoice.create(
-          {
-            teamId: newTeam.id,
-            clientId: clientId ? (clientIdMap[clientId] || null) : null,
-            sourceQuoteId: null, // Reset source quote reference
-            ...rest,
-          },
-          { client: trx }
-        )
+        const invRecord: Record<string, any> = {
+          teamId: newTeam.id,
+          clientId: clientId ? (clientIdMap[clientId] || null) : null,
+          sourceQuoteId: null,
+          ...rest,
+        }
+        encryptModelFields(invRecord, [...ENCRYPTED_FIELDS.invoice], teamDek)
+        const newInvoice = await Invoice.create(invRecord, { client: trx })
 
         if (lines && lines.length > 0) {
           for (const line of lines) {
-            await InvoiceLine.create(
-              { invoiceId: newInvoice.id, ...line },
-              { client: trx }
-            )
+            const lineRecord: Record<string, any> = { invoiceId: newInvoice.id, ...line }
+            encryptModelFields(lineRecord, [...ENCRYPTED_FIELDS.invoiceLine], teamDek)
+            await InvoiceLine.create(lineRecord, { client: trx })
           }
         }
       }
 
-      // Create quotes with lines
+      // Create quotes with lines (encrypt sensitive fields)
       for (const qData of quotesData) {
         const { lines, clientId, ...rest } = qData
-        const newQuote = await Quote.create(
-          {
-            teamId: newTeam.id,
-            clientId: clientId ? (clientIdMap[clientId] || null) : null,
-            ...rest,
-          },
-          { client: trx }
-        )
+        const qRecord: Record<string, any> = {
+          teamId: newTeam.id,
+          clientId: clientId ? (clientIdMap[clientId] || null) : null,
+          ...rest,
+        }
+        encryptModelFields(qRecord, [...ENCRYPTED_FIELDS.quote], teamDek)
+        const newQuote = await Quote.create(qRecord, { client: trx })
 
         if (lines && lines.length > 0) {
           for (const line of lines) {
-            await QuoteLine.create(
-              { quoteId: newQuote.id, ...line },
-              { client: trx }
-            )
+            const lineRecord: Record<string, any> = { quoteId: newQuote.id, ...line }
+            encryptModelFields(lineRecord, [...ENCRYPTED_FIELDS.quoteLine], teamDek)
+            await QuoteLine.create(lineRecord, { client: trx })
           }
         }
       }
 
       return newTeam
     })
+
+    // Store the new team DEK in memory
+    keyStore.storeDEK(user.id, team.id, teamDek)
 
     // Restore logo assets from ZIP
     const uploadsBase = join(app.tmpPath(), 'uploads')

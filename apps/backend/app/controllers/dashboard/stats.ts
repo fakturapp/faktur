@@ -3,11 +3,14 @@ import db from '@adonisjs/lucid/services/db'
 import Invoice from '#models/invoice/invoice'
 import Quote from '#models/quote/quote'
 import { DateTime } from 'luxon'
+import { decryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 
 export default class Stats {
-  async handle({ auth, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, response } = ctx
     const user = auth.user!
     const teamId = user.currentTeamId
+    const dek: Buffer = (ctx as any).dek
 
     if (!teamId) {
       return response.ok({
@@ -185,6 +188,18 @@ export default class Stats {
         .orderBy('created_at', 'desc')
         .limit(10),
     ])
+
+    // Decrypt client fields for display names
+    for (const inv of recentInvoices) {
+      if (inv.client) {
+        decryptModelFields(inv.client, [...ENCRYPTED_FIELDS.client], dek)
+      }
+    }
+    for (const q of recentQuotes) {
+      if (q.client) {
+        decryptModelFields(q.client, [...ENCRYPTED_FIELDS.client], dek)
+      }
+    }
 
     const recent = [
       ...recentInvoices.map((inv) => ({
