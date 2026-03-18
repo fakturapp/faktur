@@ -1,9 +1,24 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333'
 
+type VaultLockedHandler = () => void
+let onVaultLocked: VaultLockedHandler | null = null
+
+export function setVaultLockedHandler(handler: VaultLockedHandler) {
+  onVaultLocked = handler
+}
+
+function handleVaultLocked(status: number): boolean {
+  if (status === 423 && onVaultLocked) {
+    onVaultLocked()
+    return true
+  }
+  return false
+}
+
 async function request<T = unknown>(
   endpoint: string,
   options: RequestInit = {}
-): Promise<{ data?: T; error?: string }> {
+): Promise<{ data?: T; error?: string; vaultLocked?: boolean }> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('faktur_token') : null
 
   const headers: Record<string, string> = {
@@ -17,6 +32,11 @@ async function request<T = unknown>(
 
   try {
     const res = await fetch(`${API_URL}${endpoint}`, { ...options, headers })
+
+    if (handleVaultLocked(res.status)) {
+      return { error: 'Vault locked', vaultLocked: true }
+    }
+
     const data = await res.json()
 
     if (!res.ok) {
@@ -35,7 +55,7 @@ async function request<T = unknown>(
 async function uploadRequest<T = unknown>(
   endpoint: string,
   formData: FormData
-): Promise<{ data?: T; error?: string }> {
+): Promise<{ data?: T; error?: string; vaultLocked?: boolean }> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('faktur_token') : null
 
   const headers: Record<string, string> = {}
@@ -49,6 +69,11 @@ async function uploadRequest<T = unknown>(
       headers,
       body: formData,
     })
+
+    if (handleVaultLocked(res.status)) {
+      return { error: 'Vault locked', vaultLocked: true }
+    }
+
     const data = await res.json()
 
     if (!res.ok) {
@@ -60,7 +85,7 @@ async function uploadRequest<T = unknown>(
   }
 }
 
-async function blobRequest(endpoint: string): Promise<{ blob?: Blob; filename?: string; error?: string }> {
+async function blobRequest(endpoint: string): Promise<{ blob?: Blob; filename?: string; error?: string; vaultLocked?: boolean }> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('faktur_token') : null
 
   const headers: Record<string, string> = {}
@@ -70,6 +95,10 @@ async function blobRequest(endpoint: string): Promise<{ blob?: Blob; filename?: 
 
   try {
     const res = await fetch(`${API_URL}${endpoint}`, { method: 'GET', headers })
+
+    if (handleVaultLocked(res.status)) {
+      return { error: 'Vault locked', vaultLocked: true }
+    }
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({ message: 'Download failed' }))
@@ -89,7 +118,7 @@ async function blobRequest(endpoint: string): Promise<{ blob?: Blob; filename?: 
 async function postBlobRequest(
   endpoint: string,
   body: unknown
-): Promise<{ blob?: Blob; filename?: string; error?: string }> {
+): Promise<{ blob?: Blob; filename?: string; error?: string; vaultLocked?: boolean }> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('faktur_token') : null
 
   const headers: Record<string, string> = { 'Content-Type': 'application/json' }
@@ -103,6 +132,10 @@ async function postBlobRequest(
       headers,
       body: JSON.stringify(body),
     })
+
+    if (handleVaultLocked(res.status)) {
+      return { error: 'Vault locked', vaultLocked: true }
+    }
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({ message: 'Download failed' }))
