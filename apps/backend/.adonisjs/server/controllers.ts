@@ -49,7 +49,6 @@ export const controllers = {
       Login: () => import('#controllers/auth/session/login'),
       Logout: () => import('#controllers/auth/session/logout'),
       Me: () => import('#controllers/auth/session/me'),
-      Unlock: () => import('#controllers/auth/session/unlock'),
     },
   },
   client: {

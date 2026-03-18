@@ -16,7 +16,7 @@ export default class CreateTeam {
 
     const kek = keyStore.getKEK(user.id)
     if (!kek) {
-      return response.status(423).send({ code: 'VAULT_LOCKED', message: 'Vault is locked' })
+      return response.unauthorized({ code: 'SESSION_EXPIRED', message: 'Session expired. Please log in again.' })
     }
 
     const payload = await request.validateUsing(createTeamValidator)
