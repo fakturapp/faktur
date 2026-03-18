@@ -1,18 +1,15 @@
 /**
  * PDP (Plateforme de Dematerialisation Partenaire) Integration Service
  *
- * Provides a unified interface for communicating with different PDP providers.
- * Supports:
- * - Chorus Pro (PPF - public platform)
- * - B2Brouter (private PDP)
- * - Seqino (API marque blanche)
- * - Custom PDP providers
+ * Provides a unified interface for communicating with B2Brouter PDP.
+ * B2Brouter is the only supported PDP provider (free tier available).
  *
- * In sandbox mode, all operations return simulated responses.
+ * When no API key is configured, all operations run in sandbox mode
+ * with simulated responses — no errors, no cost.
  */
 
 export interface PdpConfig {
-  provider: string
+  provider: 'b2brouter' | 'sandbox'
   apiKey: string | null
   sandbox: boolean
 }
@@ -40,7 +37,27 @@ export interface PdpValidationResult {
 }
 
 /**
- * Validate PDP connection credentials
+ * Build a PdpConfig from InvoiceSetting fields.
+ * Falls back to sandbox if no API key is provided.
+ */
+export function buildPdpConfig(settings: {
+  pdpProvider?: string | null
+  pdpApiKey?: string | null
+  pdpSandbox?: boolean
+}): PdpConfig {
+  const hasApiKey = !!settings.pdpApiKey
+  const isSandbox = settings.pdpSandbox || !hasApiKey
+
+  return {
+    provider: isSandbox ? 'sandbox' : 'b2brouter',
+    apiKey: settings.pdpApiKey || null,
+    sandbox: isSandbox,
+  }
+}
+
+/**
+ * Validate PDP connection credentials.
+ * In sandbox mode, always returns success.
  */
 export async function validatePdpConnection(config: PdpConfig): Promise<{ connected: boolean; message: string }> {
   if (config.sandbox) {
@@ -48,23 +65,15 @@ export async function validatePdpConnection(config: PdpConfig): Promise<{ connec
   }
 
   if (!config.apiKey) {
-    return { connected: false, message: 'Cle API manquante' }
+    return { connected: true, message: 'Mode sandbox (aucune cle API)' }
   }
 
-  switch (config.provider) {
-    case 'chorus_pro':
-      return await validateChorusPro(config)
-    case 'b2brouter':
-      return await validateB2BRouter(config)
-    case 'seqino':
-      return await validateSeqino(config)
-    default:
-      return await validateGenericPdp(config)
-  }
+  return await validateB2BRouter(config)
 }
 
 /**
- * Submit an e-invoice via PDP
+ * Submit an e-invoice via PDP.
+ * In sandbox mode, returns a simulated success response.
  */
 export async function submitInvoice(
   config: PdpConfig,
@@ -83,20 +92,12 @@ export async function submitInvoice(
     }
   }
 
-  switch (config.provider) {
-    case 'chorus_pro':
-      return await submitToChorusPro(config, xml, metadata)
-    case 'b2brouter':
-      return await submitToB2BRouter(config, xml, metadata)
-    case 'seqino':
-      return await submitToSeqino(config, xml, metadata)
-    default:
-      return await submitToGenericPdp(config, xml, metadata)
-  }
+  return await submitToB2BRouter(config, xml, metadata)
 }
 
 /**
- * Check status of a previously submitted document
+ * Check status of a previously submitted document.
+ * In sandbox mode, returns a simulated "accepted" status.
  */
 export async function checkStatus(config: PdpConfig, trackingId: string): Promise<PdpStatusResult> {
   if (config.sandbox) {
@@ -108,23 +109,14 @@ export async function checkStatus(config: PdpConfig, trackingId: string): Promis
     }
   }
 
-  switch (config.provider) {
-    case 'chorus_pro':
-      return await checkChorusProStatus(config, trackingId)
-    case 'b2brouter':
-      return await checkB2BRouterStatus(config, trackingId)
-    case 'seqino':
-      return await checkSeqinoStatus(config, trackingId)
-    default:
-      return await checkGenericPdpStatus(config, trackingId)
-  }
+  return await checkB2BRouterStatus(config, trackingId)
 }
 
 /**
- * Validate XML before submission
+ * Validate XML structure before submission.
+ * Performs basic structural checks on the CII XML.
  */
 export async function validateXml(_config: PdpConfig, xml: string): Promise<PdpValidationResult> {
-  // Basic structural validation
   const errors: string[] = []
   const warnings: string[] = []
 
@@ -156,16 +148,8 @@ export async function validateXml(_config: PdpConfig, xml: string): Promise<PdpV
 }
 
 // ═══════════════════════════════════════════════════════════
-// Provider-specific implementations
-// These are stubs that will be replaced with actual API calls
-// when connecting to real PDP providers.
+// B2Brouter implementation
 // ═══════════════════════════════════════════════════════════
-
-async function validateChorusPro(_config: PdpConfig): Promise<{ connected: boolean; message: string }> {
-  // Chorus Pro uses PISTE OAuth2 authentication
-  // API: https://chorus-pro.gouv.fr/qualif/
-  return { connected: false, message: 'Integration Chorus Pro en cours de developpement' }
-}
 
 async function validateB2BRouter(config: PdpConfig): Promise<{ connected: boolean; message: string }> {
   try {
@@ -177,37 +161,6 @@ async function validateB2BRouter(config: PdpConfig): Promise<{ connected: boolea
       : { connected: false, message: `Erreur B2Brouter: ${resp.status}` }
   } catch {
     return { connected: false, message: 'Impossible de contacter B2Brouter' }
-  }
-}
-
-async function validateSeqino(config: PdpConfig): Promise<{ connected: boolean; message: string }> {
-  try {
-    const resp = await fetch('https://api.seqino.com/v1/status', {
-      headers: { 'X-Api-Key': config.apiKey || '' },
-    })
-    return resp.ok
-      ? { connected: true, message: 'Connexion Seqino reussie' }
-      : { connected: false, message: `Erreur Seqino: ${resp.status}` }
-  } catch {
-    return { connected: false, message: 'Impossible de contacter Seqino' }
-  }
-}
-
-async function validateGenericPdp(_config: PdpConfig): Promise<{ connected: boolean; message: string }> {
-  return { connected: false, message: 'Configuration PDP personnalisee requise' }
-}
-
-async function submitToChorusPro(
-  _config: PdpConfig,
-  _xml: string,
-  _metadata: { documentNumber: string; documentType: string }
-): Promise<PdpSubmissionResult> {
-  return {
-    success: false,
-    trackingId: null,
-    status: 'error',
-    message: 'Integration Chorus Pro en cours de developpement',
-    timestamp: new Date().toISOString(),
   }
 }
 
@@ -257,69 +210,6 @@ async function submitToB2BRouter(
   }
 }
 
-async function submitToSeqino(
-  config: PdpConfig,
-  xml: string,
-  _metadata: { documentNumber: string; documentType: string }
-): Promise<PdpSubmissionResult> {
-  try {
-    const resp = await fetch('https://api.seqino.com/v1/invoices/submit', {
-      method: 'POST',
-      headers: {
-        'X-Api-Key': config.apiKey || '',
-        'Content-Type': 'application/xml',
-      },
-      body: xml,
-    })
-
-    if (resp.ok) {
-      const data = (await resp.json()) as any
-      return {
-        success: true,
-        trackingId: data.trackingId || data.id || null,
-        status: 'submitted',
-        message: 'Document soumis via Seqino',
-        externalId: data.id,
-        timestamp: new Date().toISOString(),
-      }
-    }
-
-    return {
-      success: false,
-      trackingId: null,
-      status: 'error',
-      message: `Erreur Seqino: ${resp.status}`,
-      timestamp: new Date().toISOString(),
-    }
-  } catch (err: any) {
-    return {
-      success: false,
-      trackingId: null,
-      status: 'error',
-      message: `Erreur reseau: ${err.message}`,
-      timestamp: new Date().toISOString(),
-    }
-  }
-}
-
-async function submitToGenericPdp(
-  _config: PdpConfig,
-  _xml: string,
-  _metadata: { documentNumber: string; documentType: string }
-): Promise<PdpSubmissionResult> {
-  return {
-    success: false,
-    trackingId: null,
-    status: 'error',
-    message: 'PDP personnalisee non configuree',
-    timestamp: new Date().toISOString(),
-  }
-}
-
-async function checkChorusProStatus(_config: PdpConfig, trackingId: string): Promise<PdpStatusResult> {
-  return { trackingId, status: 'pending', message: 'Integration Chorus Pro en cours', updatedAt: new Date().toISOString() }
-}
-
 async function checkB2BRouterStatus(config: PdpConfig, trackingId: string): Promise<PdpStatusResult> {
   try {
     const resp = await fetch(`https://app.b2brouter.net/api/v1/invoices/${trackingId}`, {
@@ -333,23 +223,4 @@ async function checkB2BRouterStatus(config: PdpConfig, trackingId: string): Prom
   } catch {
     return { trackingId, status: 'error', message: 'Erreur reseau', updatedAt: new Date().toISOString() }
   }
-}
-
-async function checkSeqinoStatus(config: PdpConfig, trackingId: string): Promise<PdpStatusResult> {
-  try {
-    const resp = await fetch(`https://api.seqino.com/v1/invoices/${trackingId}/status`, {
-      headers: { 'X-Api-Key': config.apiKey || '' },
-    })
-    if (resp.ok) {
-      const data = (await resp.json()) as any
-      return { trackingId, status: data.status || 'pending', message: data.message || '', updatedAt: new Date().toISOString() }
-    }
-    return { trackingId, status: 'error', message: `Erreur: ${resp.status}`, updatedAt: new Date().toISOString() }
-  } catch {
-    return { trackingId, status: 'error', message: 'Erreur reseau', updatedAt: new Date().toISOString() }
-  }
-}
-
-async function checkGenericPdpStatus(_config: PdpConfig, trackingId: string): Promise<PdpStatusResult> {
-  return { trackingId, status: 'error', message: 'PDP personnalisee non configuree', updatedAt: new Date().toISOString() }
 }

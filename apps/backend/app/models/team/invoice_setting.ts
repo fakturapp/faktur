@@ -47,13 +47,16 @@ export default class InvoiceSetting extends BaseModel {
   declare eInvoicingEnabled: boolean
 
   @column()
-  declare pdpProvider: string | null
+  declare pdpProvider: 'b2brouter' | 'sandbox' | null
 
   @column()
   declare pdpApiKey: string | null
 
   @column()
   declare pdpSandbox: boolean
+
+  @column()
+  declare defaultOperationCategory: 'service' | 'goods' | 'mixed' | null
 
   @column()
   declare defaultSubject: string | null

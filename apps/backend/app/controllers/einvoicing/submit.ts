@@ -3,10 +3,17 @@ import Quote from '#models/quote/quote'
 import Company from '#models/team/company'
 import InvoiceSetting from '#models/team/invoice_setting'
 import { buildFacturXFromQuote, generateFacturXXml } from '#services/pdf/facturx_generator'
-import { submitInvoice, validateXml, type PdpConfig } from '#services/einvoicing/pdp_service'
+import { submitInvoice, validateXml, buildPdpConfig } from '#services/einvoicing/pdp_service'
+import {
+  decryptModelFields,
+  decryptModelFieldsArray,
+  ENCRYPTED_FIELDS,
+} from '#services/crypto/field_encryption_helper'
 
 export default class EInvoicingSubmit {
-  async handle({ auth, params, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, params, response } = ctx
+    const dek: Buffer = (ctx as any).dek
     const user = auth.user!
     const teamId = user.currentTeamId
 
@@ -30,7 +37,17 @@ export default class EInvoicingSubmit {
       return response.notFound({ message: 'Document non trouve' })
     }
 
+    // Decrypt fields for XML generation
+    decryptModelFields(quote, [...ENCRYPTED_FIELDS.quote], dek)
+    decryptModelFieldsArray(quote.lines, [...ENCRYPTED_FIELDS.quoteLine], dek)
+    if (quote.client) {
+      decryptModelFields(quote.client, [...ENCRYPTED_FIELDS.client], dek)
+    }
+
     const company = await Company.query().where('team_id', teamId).first()
+    if (company) {
+      decryptModelFields(company, [...ENCRYPTED_FIELDS.company], dek)
+    }
 
     // Build Factur-X XML
     const quoteData = {
@@ -90,11 +107,7 @@ export default class EInvoicingSubmit {
     const xml = generateFacturXXml(facturxDoc)
 
     // Validate XML
-    const pdpConfig: PdpConfig = {
-      provider: invoiceSettings.pdpProvider || 'chorus_pro',
-      apiKey: invoiceSettings.pdpApiKey,
-      sandbox: invoiceSettings.pdpSandbox,
-    }
+    const pdpConfig = buildPdpConfig(invoiceSettings)
 
     const validation = await validateXml(pdpConfig, xml)
     if (!validation.valid) {
