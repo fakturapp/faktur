@@ -73,6 +73,7 @@
     "@vinejs/vine": "^4.3.0",
     "adm-zip": "^0.5.16",
     "archiver": "^7.0.1",
+    "argon2": "^0.44.0",
     "googleapis": "^171.4.0",
     "helmet": "^8.1.0",
     "luxon": "^3.7.2",
