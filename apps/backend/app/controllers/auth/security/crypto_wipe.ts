@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import db from '@adonisjs/lucid/services/db'
+import User from '#models/account/user'
 import Team from '#models/team/team'
 import TeamMember from '#models/team/team_member'
 import keyStore from '#services/crypto/key_store'
@@ -8,7 +9,7 @@ import keyStore from '#services/crypto/key_store'
  * POST /auth/crypto/wipe
  * User cannot recover data (forgot old password).
  * Wipes ALL teams/data owned by the user and restarts from onboarding.
- * Requires { confirm: "SUPPRIMER" } in request body for safety.
+ * Requires { confirm: "SUPPRIMER", password: "<current password>" } in request body for safety.
  */
 export default class CryptoWipe {
   async handle({ auth, request, response }: HttpContext) {
@@ -18,9 +19,22 @@ export default class CryptoWipe {
       return response.badRequest({ message: 'No crypto reset needed' })
     }
 
-    const { confirm } = request.only(['confirm'])
+    const { confirm, password } = request.only(['confirm', 'password'])
     if (confirm !== 'SUPPRIMER') {
       return response.unprocessableEntity({ message: 'Confirmation required: type SUPPRIMER' })
+    }
+
+    if (!password) {
+      return response.badRequest({ message: 'Password is required' })
+    }
+
+    // Verify the current password
+    const passwordValid = await User.verifyCredentials(user.email, password)
+      .then(() => true)
+      .catch(() => false)
+
+    if (!passwordValid) {
+      return response.unauthorized({ message: 'Mot de passe incorrect' })
     }
 
     const newKek = keyStore.getKEK(user.id)
