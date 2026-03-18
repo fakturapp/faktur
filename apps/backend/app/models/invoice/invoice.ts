@@ -103,6 +103,9 @@ export default class Invoice extends BaseModel {
   @column()
   declare vatExemptReason: 'none' | 'not_subject' | 'france_no_vat' | 'outside_france'
 
+  @column()
+  declare operationCategory: 'service' | 'goods' | 'mixed' | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
