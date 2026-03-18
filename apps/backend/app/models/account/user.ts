@@ -74,6 +74,13 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column.dateTime()
   declare securityCodeExpiresAt: DateTime | null
 
+  // Zero-Access Crypto
+  @column({ serializeAs: null })
+  declare saltKdf: string | null
+
+  @column({ serializeAs: null })
+  declare keyVersion: number
+
   // Team & Onboarding
   @column()
   declare currentTeamId: string | null

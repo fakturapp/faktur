@@ -32,6 +32,16 @@ export default class TeamMember extends BaseModel {
   @column.dateTime()
   declare joinedAt: DateTime | null
 
+  // Zero-Access Crypto
+  @column({ serializeAs: null })
+  declare encryptedTeamDek: string | null
+
+  @column()
+  declare dekVersion: number
+
+  @column({ serializeAs: null })
+  declare encryptedInviteDek: string | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
