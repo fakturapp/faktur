@@ -1,3 +1,4 @@
 import env from '#start/env'
 
-export const API_PREFIX = env.get('API_PREFIX', '')
+const raw = env.get('API_PREFIX', '')
+export const API_PREFIX = raw === '/' ? '' : raw.replace(/\/+$/, '')
