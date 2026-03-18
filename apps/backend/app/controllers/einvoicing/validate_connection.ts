@@ -1,6 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import InvoiceSetting from '#models/team/invoice_setting'
-import { validatePdpConnection, type PdpConfig } from '#services/einvoicing/pdp_service'
+import { validatePdpConnection, buildPdpConfig } from '#services/einvoicing/pdp_service'
 
 export default class ValidateConnection {
   async handle({ auth, response }: HttpContext) {
@@ -16,12 +16,7 @@ export default class ValidateConnection {
       return response.forbidden({ message: 'La facturation electronique n\'est pas activee' })
     }
 
-    const pdpConfig: PdpConfig = {
-      provider: invoiceSettings.pdpProvider || 'chorus_pro',
-      apiKey: invoiceSettings.pdpApiKey,
-      sandbox: invoiceSettings.pdpSandbox,
-    }
-
+    const pdpConfig = buildPdpConfig(invoiceSettings)
     const result = await validatePdpConnection(pdpConfig)
 
     return response.ok({
