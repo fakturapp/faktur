@@ -1,0 +1,19 @@
+# Nixpacks config for Dokploy single-application deployment
+# Runs both backend (port 3333) and frontend (port 3000) in one container
+
+[variables]
+PUPPETEER_SKIP_CHROMIUM_DOWNLOAD = "true"
+PUPPETEER_EXECUTABLE_PATH = "/usr/bin/chromium"
+LOG_LEVEL = "info"
+SESSION_DRIVER = "cookie"
+
+[phases.build]
+cmds = [
+  "npx turbo run build",
+  "cd apps/backend/build && npm ci --omit=dev",
+  "cp -r apps/frontend/.next/static apps/frontend/.next/standalone/apps/frontend/.next/static",
+  "if [ -d apps/frontend/public ]; then cp -r apps/frontend/public apps/frontend/.next/standalone/apps/frontend/public; fi"
+]
+
+[start]
+cmd = "cd /app/apps/backend/build && node ace migration:run --force && (node bin/server.js &) && cd /app/apps/frontend/.next/standalone && HOSTNAME=0.0.0.0 PORT=3000 node apps/frontend/server.js"
