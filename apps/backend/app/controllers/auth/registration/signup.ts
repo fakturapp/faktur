@@ -5,10 +5,13 @@ import { registerValidator } from '#validators/auth/auth_validators'
 import TokenService from '#services/auth/token_service'
 import EmailService from '#services/email/email_service'
 import AuditLog from '#models/shared/audit_log'
+import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 
 export default class Signup {
   async handle({ request, response }: HttpContext) {
     const data = await request.validateUsing(registerValidator)
+
+    const saltKdf = zeroAccessCryptoService.generateSalt()
 
     const user = await User.create({
       fullName: data.fullName,
@@ -18,6 +21,8 @@ export default class Signup {
       twoFactorEnabled: false,
       status: 'active',
       failedLoginAttempts: 0,
+      saltKdf: saltKdf.toString('hex'),
+      keyVersion: 1,
     })
 
     const { token, hash: tokenHash } = TokenService.generateEmailVerificationToken()
