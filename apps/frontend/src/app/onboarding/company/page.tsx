@@ -12,6 +12,7 @@ import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/componen
 import { useAuth } from '@/lib/auth'
 import { api } from '@/lib/api'
 import { Spinner } from '@/components/ui/spinner'
+import { PhoneInput } from '@/components/ui/phone-input'
 import { Building2, Search, Phone, Mail, Globe, ChevronLeft, MapPin, CreditCard, AlertTriangle } from 'lucide-react'
 
 const fadeUp = {
@@ -322,13 +323,14 @@ export default function OnboardingCompanyPage() {
                     </p>
                   </motion.div>
 
-                  <motion.div variants={fadeUp} custom={13} className="grid grid-cols-2 gap-4">
+                  <motion.div variants={fadeUp} custom={13}>
                     <Field>
-                      <FieldLabel htmlFor="phone">
-                        <span className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5" /> Téléphone</span>
-                      </FieldLabel>
-                      <Input id="phone" type="tel" placeholder="+33 1 23 45 67 89" value={form.phone} onChange={(e) => updateForm('phone', e.target.value)} />
+                      <FieldLabel htmlFor="phone">Téléphone</FieldLabel>
+                      <PhoneInput id="phone" value={form.phone} onChange={(v) => updateForm('phone', v)} />
                     </Field>
+                  </motion.div>
+
+                  <motion.div variants={fadeUp} custom={10}>
                     <Field>
                       <FieldLabel htmlFor="email">
                         <span className="flex items-center gap-1.5"><Mail className="h-3.5 w-3.5" /> Email</span>

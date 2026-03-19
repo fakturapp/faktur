@@ -10,6 +10,7 @@ import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
 import { Skeleton } from '@/components/ui/skeleton'
+import { PhoneInput } from '@/components/ui/phone-input'
 import { api } from '@/lib/api'
 import { useToast } from '@/components/ui/toast'
 import {
@@ -442,16 +443,7 @@ export function ClientEditPanel({ open, clientId, onClose, onUpdated, onDeleted 
 
                         <div>
                           <label className="text-sm font-medium text-foreground mb-1.5 block">Téléphone</label>
-                          <div className="relative">
-                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input
-                              type="tel"
-                              value={form.phone}
-                              onChange={(e) => update('phone', e.target.value)}
-                              placeholder="06 12 34 56 78"
-                              className="pl-10"
-                            />
-                          </div>
+                          <PhoneInput value={form.phone} onChange={(v) => update('phone', v)} />
                         </div>
 
                         <div className="flex items-center justify-between rounded-xl border border-border p-4">

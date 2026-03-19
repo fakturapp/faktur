@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/toast'
+import { PhoneInput } from '@/components/ui/phone-input'
 import { api } from '@/lib/api'
 import {
   ArrowLeft,
@@ -373,7 +374,7 @@ export default function ClientEditPage() {
               {activeTab === 'contacts' && (
                 <div className="space-y-5">
                   <div><label className="text-sm font-medium text-foreground mb-1.5 block">Email</label><div className="relative"><Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input type="email" value={form.email} onChange={(e) => update('email', e.target.value)} placeholder="client@exemple.fr" className="pl-10" /></div></div>
-                  <div><label className="text-sm font-medium text-foreground mb-1.5 block">Téléphone</label><div className="relative"><Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" /><Input type="tel" value={form.phone} onChange={(e) => update('phone', e.target.value)} placeholder="06 12 34 56 78" className="pl-10" /></div></div>
+                  <div><label className="text-sm font-medium text-foreground mb-1.5 block">Téléphone</label><PhoneInput value={form.phone} onChange={(v) => update('phone', v)} /></div>
                   <div className="flex items-center justify-between rounded-xl border border-border p-4">
                     <div><p className="text-sm font-medium text-foreground">Inclure dans les envois email</p><p className="text-xs text-muted-foreground mt-0.5">Utiliser cette adresse par defaut</p></div>
                     <Switch checked={form.includeInEmails} onChange={(v) => update('includeInEmails', v)} />

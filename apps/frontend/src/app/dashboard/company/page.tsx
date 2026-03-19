@@ -15,6 +15,8 @@ import { Select } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
 import { Dialog, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
+import { PhoneInput } from '@/components/ui/phone-input'
+import { IbanInput } from '@/components/ui/iban-input'
 import { Building2, CreditCard, Receipt, Info, Banknote, Coins, PenLine, Lock, ImagePlus, Trash2, Plus, Shield, Star, Pencil, AlertCircle, Check, MapPin, Phone, Globe, ChevronLeft, ChevronRight as ChevronRightIcon } from 'lucide-react'
 
 interface Company {
@@ -706,7 +708,7 @@ export default function CompanyPage() {
               <div className="grid grid-cols-2 gap-4">
                 <Field>
                   <FieldLabel htmlFor="editPhone">Téléphone</FieldLabel>
-                  <Input id="editPhone" value={editForm.phone} onChange={(e) => updateEditForm('phone', e.target.value)} />
+                  <PhoneInput id="editPhone" value={editForm.phone} onChange={(v) => updateEditForm('phone', v)} />
                 </Field>
                 <Field>
                   <FieldLabel htmlFor="editEmail">Email</FieldLabel>
@@ -933,19 +935,10 @@ export default function CompanyPage() {
           </Field>
           <Field>
             <FieldLabel htmlFor="bankIban">IBAN</FieldLabel>
-            <Input
+            <IbanInput
               id="bankIban"
               value={bankForm.iban}
-              onChange={(e) => {
-                let raw = e.target.value.replace(/\s/g, '').toUpperCase().slice(0, 34)
-                // Auto-prefix FR when user starts typing digits
-                if (raw.length > 0 && /^\d/.test(raw)) raw = 'FR' + raw
-                const formatted = raw.replace(/(.{4})/g, '$1 ').trim()
-                setBankForm((p) => ({ ...p, iban: formatted }))
-              }}
-              placeholder="FR76 XXXX XXXX XXXX XXXX XXXX XXX"
-              className="font-mono tracking-wider"
-              maxLength={42}
+              onChange={(raw) => setBankForm((p) => ({ ...p, iban: raw }))}
             />
             <FieldDescription>{bankForm.iban.replace(/\s/g, '').length}/34 caractères</FieldDescription>
           </Field>
