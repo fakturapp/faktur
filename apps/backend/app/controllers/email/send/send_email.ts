@@ -7,6 +7,7 @@ import Invoice from '#models/invoice/invoice'
 import Quote from '#models/quote/quote'
 import GmailOAuthService from '#services/email/gmail_oauth_service'
 import ResendUserService from '#services/email/resend_user_service'
+import SmtpService from '#services/email/smtp_service'
 import { generateInvoicePdf, generateQuotePdf } from '#services/pdf/document_pdf_service'
 import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 
@@ -45,7 +46,7 @@ export default class SendEmail {
       return response.notFound({ message: 'Email account not found' })
     }
 
-    if (!['gmail', 'resend'].includes(emailAccount.provider)) {
+    if (!['gmail', 'resend', 'smtp'].includes(emailAccount.provider)) {
       return response.badRequest({ message: 'Provider non supporté' })
     }
 
@@ -126,6 +127,22 @@ export default class SendEmail {
         }
         await ResendUserService.sendEmail({
           encryptedApiKey: emailAccount.accessToken,
+          from: emailAccount.email,
+          fromName: emailAccount.displayName,
+          to: payload.to,
+          subject: payload.subject,
+          body: payload.body,
+          attachments: allAttachments,
+        })
+      } else if (emailAccount.provider === 'smtp') {
+        if (!emailAccount.smtpHost || !emailAccount.smtpPort || !emailAccount.smtpUsername || !emailAccount.smtpPassword) {
+          throw new Error('Configuration SMTP incomplète')
+        }
+        await SmtpService.sendEmail({
+          host: emailAccount.smtpHost,
+          port: emailAccount.smtpPort,
+          encryptedUsername: emailAccount.smtpUsername,
+          encryptedPassword: emailAccount.smtpPassword,
           from: emailAccount.email,
           fromName: emailAccount.displayName,
           to: payload.to,
