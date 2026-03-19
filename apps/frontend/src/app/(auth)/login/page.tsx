@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -31,7 +31,7 @@ const OAUTH_ERRORS: Record<string, string> = {
   account_inactive: 'Ce compte est désactivé.',
 }
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { user, login, logout, loading: authLoading } = useAuth()
@@ -412,5 +412,13 @@ export default function LoginPage() {
         <a href="/legal/privacy" target="_blank" className="hover:text-muted-foreground transition-colors underline underline-offset-2">Politique de confidentialité</a>.
       </motion.p>
     </motion.div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginContent />
+    </Suspense>
   )
 }

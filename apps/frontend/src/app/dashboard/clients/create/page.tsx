@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useCallback, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -81,7 +81,7 @@ const slideVariants = {
   exit: (dir: number) => ({ x: dir > 0 ? -60 : 60, opacity: 0 }),
 }
 
-export default function ClientCreatePage() {
+function ClientCreateContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const isPopup = searchParams.get('popup') === 'true'
@@ -522,5 +522,13 @@ export default function ClientCreatePage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function ClientCreatePage() {
+  return (
+    <Suspense>
+      <ClientCreateContent />
+    </Suspense>
   )
 }

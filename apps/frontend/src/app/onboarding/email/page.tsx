@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
@@ -38,7 +38,7 @@ type DialogStep = 'choose' | 'configure' | 'testing' | 'success' | 'error'
 
 const providerLabel: Record<string, string> = { gmail: 'Gmail', resend: 'Resend', smtp: 'SMTP' }
 
-export default function OnboardingEmailPage() {
+function OnboardingEmailContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { toast } = useToast()
@@ -795,5 +795,13 @@ export default function OnboardingEmailPage() {
         </AnimatePresence>
       </Dialog>
     </motion.div>
+  )
+}
+
+export default function OnboardingEmailPage() {
+  return (
+    <Suspense>
+      <OnboardingEmailContent />
+    </Suspense>
   )
 }

@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 
-export default function OAuthCallbackPage() {
+function OAuthCallbackContent() {
   const searchParams = useSearchParams()
 
   useEffect(() => {
@@ -29,5 +29,13 @@ export default function OAuthCallbackPage() {
         <p className="text-sm text-muted-foreground">Fermeture en cours...</p>
       </div>
     </div>
+  )
+}
+
+export default function OAuthCallbackPage() {
+  return (
+    <Suspense>
+      <OAuthCallbackContent />
+    </Suspense>
   )
 }

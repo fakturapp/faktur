@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, Suspense } from 'react'
 import { useRouter, useParams, useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import { Button } from '@/components/ui/button'
@@ -33,7 +33,7 @@ function addDays(dateStr: string | null | undefined, days: number) {
   return base.toISOString().split('T')[0]
 }
 
-export default function EditQuotePage() {
+function EditQuoteContent() {
   const router = useRouter()
   const params = useParams()
   const searchParams = useSearchParams()
@@ -632,5 +632,13 @@ export default function EditQuotePage() {
         </DialogFooter>
       </Dialog>
     </motion.div>
+  )
+}
+
+export default function EditQuotePage() {
+  return (
+    <Suspense>
+      <EditQuoteContent />
+    </Suspense>
   )
 }

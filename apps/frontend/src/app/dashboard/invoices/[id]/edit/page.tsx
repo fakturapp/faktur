@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useParams, useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
@@ -34,7 +34,7 @@ function addDays(dateStr: string | null | undefined, days: number) {
   return base.toISOString().split('T')[0]
 }
 
-export default function EditInvoicePage() {
+function EditInvoiceContent() {
   const params = useParams()
   const searchParams = useSearchParams()
   const invoiceId = params.id as string
@@ -676,5 +676,13 @@ export default function EditInvoicePage() {
         </DialogFooter>
       </Dialog>
     </motion.div>
+  )
+}
+
+export default function EditInvoicePage() {
+  return (
+    <Suspense>
+      <EditInvoiceContent />
+    </Suspense>
   )
 }
