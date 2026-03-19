@@ -91,6 +91,54 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/auth/security/password_reset/reset').default['handle']>>>
     }
   }
+  'google_auth_url': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/auth/oauth/google/url'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/auth/oauth/google_auth_url').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/auth/oauth/google_auth_url').default['handle']>>>
+    }
+  }
+  'google_callback': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/auth/oauth/google/callback'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/auth/oauth/google_callback').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/auth/oauth/google_callback').default['handle']>>>
+    }
+  }
+  'google_decode_profile': {
+    methods: ["POST"]
+    pattern: '/api/v1/auth/oauth/google/decode'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/auth/oauth/google_decode_profile').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/auth/oauth/google_decode_profile').default['handle']>>>
+    }
+  }
+  'google_register': {
+    methods: ["POST"]
+    pattern: '/api/v1/auth/oauth/google/register'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/auth/oauth/google_register').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/auth/oauth/google_register').default['handle']>>>
+    }
+  }
   'logout': {
     methods: ["POST"]
     pattern: '/api/v1/auth/logout'
@@ -317,6 +365,42 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/account/email/email_confirm_change').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/email/email_confirm_change').default['handle']>>>
+    }
+  }
+  'list_providers': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/account/providers'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/account/providers/list').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/providers/list').default['handle']>>>
+    }
+  }
+  'link_provider': {
+    methods: ["POST"]
+    pattern: '/api/v1/account/providers/link'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/account/providers/link').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/providers/link').default['handle']>>>
+    }
+  }
+  'unlink_provider': {
+    methods: ["POST"]
+    pattern: '/api/v1/account/providers/unlink'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/account/providers/unlink').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/providers/unlink').default['handle']>>>
     }
   }
   'create_team': {

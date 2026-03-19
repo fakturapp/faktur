@@ -52,4 +52,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   GOOGLE_CLIENT_ID: Env.schema.string.optional(),
   GOOGLE_CLIENT_SECRET: Env.schema.string.optional(),
   GOOGLE_REDIRECT_URI: Env.schema.string.optional(),
+
+  // Google OAuth (for login/register authentication)
+  GOOGLE_AUTH_REDIRECT_URI: Env.schema.string.optional(),
 })

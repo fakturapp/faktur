@@ -22,6 +22,12 @@ const TwoFactorVerify = () => import('#controllers/auth/security/two_factor/veri
 const CryptoRecover = () => import('#controllers/auth/security/crypto_recover')
 const CryptoWipe = () => import('#controllers/auth/security/crypto_wipe')
 
+// OAuth Google
+const GoogleAuthUrl = () => import('#controllers/auth/oauth/google_auth_url')
+const GoogleCallback = () => import('#controllers/auth/oauth/google_callback')
+const GoogleDecodeProfile = () => import('#controllers/auth/oauth/google_decode_profile')
+const GoogleRegister = () => import('#controllers/auth/oauth/google_register')
+
 router
   .group(() => {
     router.post('/sign-up', [Signup, 'handle']).use(registerLimiter)
@@ -33,6 +39,12 @@ router
 
     router.post('/password/forgot', [PasswordResetRequest, 'handle']).use(passwordResetLimiter)
     router.post('/password/reset', [PasswordReset, 'handle']).use(passwordResetLimiter)
+
+    // OAuth Google (public)
+    router.get('/oauth/google/url', [GoogleAuthUrl, 'handle'])
+    router.get('/oauth/google/callback', [GoogleCallback, 'handle'])
+    router.post('/oauth/google/decode', [GoogleDecodeProfile, 'handle'])
+    router.post('/oauth/google/register', [GoogleRegister, 'handle']).use(registerLimiter)
 
     router
       .group(() => {

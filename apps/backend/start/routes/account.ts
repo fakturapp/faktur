@@ -20,7 +20,11 @@ const TwoFactorDisable = () => import('#controllers/account/two_factor/disable')
 const EmailRequestChange = () => import('#controllers/account/email/email_request_change')
 const EmailConfirmChange = () => import('#controllers/account/email/email_confirm_change')
 
-// Public route - serve avatars
+const ListProviders = () => import('#controllers/account/providers/list')
+const LinkProvider = () => import('#controllers/account/providers/link')
+const UnlinkProvider = () => import('#controllers/account/providers/unlink')
+
+// Public routes
 router.get(API_PREFIX + '/avatars/:filename', [ServeAvatar, 'handle'])
 
 router
@@ -42,6 +46,10 @@ router
 
     router.post('/email/request-change', [EmailRequestChange, 'handle'])
     router.post('/email/confirm-change', [EmailConfirmChange, 'handle'])
+
+    router.get('/providers', [ListProviders, 'handle'])
+    router.post('/providers/link', [LinkProvider, 'handle'])
+    router.post('/providers/unlink', [UnlinkProvider, 'handle'])
   })
   .prefix(API_PREFIX + '/account')
   .use(middleware.auth())
