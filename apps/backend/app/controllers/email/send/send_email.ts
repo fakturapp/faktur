@@ -6,6 +6,8 @@ import EmailLog from '#models/email/email_log'
 import Invoice from '#models/invoice/invoice'
 import Quote from '#models/quote/quote'
 import GmailOAuthService from '#services/email/gmail_oauth_service'
+import ResendUserService from '#services/email/resend_user_service'
+import SmtpService from '#services/email/smtp_service'
 import { generateInvoicePdf, generateQuotePdf } from '#services/pdf/document_pdf_service'
 import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 
@@ -44,8 +46,8 @@ export default class SendEmail {
       return response.notFound({ message: 'Email account not found' })
     }
 
-    if (emailAccount.provider !== 'gmail') {
-      return response.badRequest({ message: 'Only Gmail accounts are supported' })
+    if (!['gmail', 'resend', 'smtp'].includes(emailAccount.provider)) {
+      return response.badRequest({ message: 'Provider non supporté' })
     }
 
     // Generate PDF
@@ -65,19 +67,19 @@ export default class SendEmail {
       return response.notFound({ message: 'Document not found' })
     }
 
-    // Get valid access token (refresh if needed)
-    let accessToken: string
-    try {
-      accessToken = await GmailOAuthService.getValidAccessToken(emailAccount)
-
-      // If token was refreshed, persist the new one
-      if (emailAccount.$isDirty) {
-        await emailAccount.save()
+    // For Gmail: get valid access token (refresh if needed)
+    let accessToken: string | undefined
+    if (emailAccount.provider === 'gmail') {
+      try {
+        accessToken = await GmailOAuthService.getValidAccessToken(emailAccount)
+        if (emailAccount.$isDirty) {
+          await emailAccount.save()
+        }
+      } catch {
+        return response.badRequest({
+          message: 'Impossible de se connecter à Gmail. Veuillez reconnecter votre compte.',
+        })
       }
-    } catch {
-      return response.badRequest({
-        message: 'Impossible de se connecter à Gmail. Veuillez reconnecter votre compte.',
-      })
     }
 
     // Resolve document number for logging
@@ -107,17 +109,48 @@ export default class SendEmail {
       }
     }
 
-    // Send email
+    // Send email via the appropriate provider
     try {
-      await GmailOAuthService.sendEmail({
-        accessToken,
-        from: emailAccount.email,
-        fromName: emailAccount.displayName,
-        to: payload.to,
-        subject: payload.subject,
-        body: payload.body,
-        attachments: allAttachments,
-      })
+      if (emailAccount.provider === 'gmail') {
+        await GmailOAuthService.sendEmail({
+          accessToken: accessToken!,
+          from: emailAccount.email,
+          fromName: emailAccount.displayName,
+          to: payload.to,
+          subject: payload.subject,
+          body: payload.body,
+          attachments: allAttachments,
+        })
+      } else if (emailAccount.provider === 'resend') {
+        if (!emailAccount.accessToken) {
+          throw new Error('Clé API Resend manquante')
+        }
+        await ResendUserService.sendEmail({
+          encryptedApiKey: emailAccount.accessToken,
+          from: emailAccount.email,
+          fromName: emailAccount.displayName,
+          to: payload.to,
+          subject: payload.subject,
+          body: payload.body,
+          attachments: allAttachments,
+        })
+      } else if (emailAccount.provider === 'smtp') {
+        if (!emailAccount.smtpHost || !emailAccount.smtpPort || !emailAccount.smtpUsername || !emailAccount.smtpPassword) {
+          throw new Error('Configuration SMTP incomplète')
+        }
+        await SmtpService.sendEmail({
+          host: emailAccount.smtpHost,
+          port: emailAccount.smtpPort,
+          encryptedUsername: emailAccount.smtpUsername,
+          encryptedPassword: emailAccount.smtpPassword,
+          from: emailAccount.email,
+          fromName: emailAccount.displayName,
+          to: payload.to,
+          subject: payload.subject,
+          body: payload.body,
+          attachments: allAttachments,
+        })
+      }
     } catch (err) {
       // Log the failed email (encrypt sensitive fields)
       const failedLogData: Record<string, any> = {

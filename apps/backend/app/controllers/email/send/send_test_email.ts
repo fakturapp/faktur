@@ -2,6 +2,8 @@ import type { HttpContext } from '@adonisjs/core/http'
 import vine from '@vinejs/vine'
 import EmailAccount from '#models/email/email_account'
 import GmailOAuthService from '#services/email/gmail_oauth_service'
+import ResendUserService from '#services/email/resend_user_service'
+import SmtpService from '#services/email/smtp_service'
 
 const testEmailValidator = vine.compile(
   vine.object({
@@ -29,32 +31,11 @@ export default class SendTestEmail {
       return response.notFound({ message: 'Email account not found' })
     }
 
-    if (emailAccount.provider !== 'gmail') {
-      return response.badRequest({ message: 'Only Gmail accounts are supported' })
+    if (!['gmail', 'resend', 'smtp'].includes(emailAccount.provider)) {
+      return response.badRequest({ message: 'Provider non supporté' })
     }
 
-    // Get valid access token (refresh if needed)
-    let accessToken: string
-    try {
-      accessToken = await GmailOAuthService.getValidAccessToken(emailAccount)
-      if (emailAccount.$isDirty) {
-        await emailAccount.save()
-      }
-    } catch {
-      return response.badRequest({
-        message: 'Impossible de se connecter à Gmail. Veuillez reconnecter votre compte.',
-      })
-    }
-
-    // Send test email to self
-    try {
-      await GmailOAuthService.sendEmail({
-        accessToken,
-        from: emailAccount.email,
-        fromName: emailAccount.displayName,
-        to: emailAccount.email,
-        subject: 'Test — Faktur',
-        body: `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 480px; margin: 0 auto; padding: 32px 0;">
+    const testBody = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 480px; margin: 0 auto; padding: 32px 0;">
   <div style="background: #18181b; border-radius: 16px; padding: 32px; color: #fafafa;">
     <h2 style="margin: 0 0 12px; font-size: 18px; font-weight: 600;">Email de test</h2>
     <p style="margin: 0 0 20px; font-size: 14px; color: #a1a1aa; line-height: 1.6;">
@@ -64,8 +45,60 @@ export default class SendTestEmail {
       Envoyé automatiquement depuis Faktur
     </div>
   </div>
-</div>`,
-      })
+</div>`
+
+    try {
+      if (emailAccount.provider === 'gmail') {
+        let accessToken: string
+        try {
+          accessToken = await GmailOAuthService.getValidAccessToken(emailAccount)
+          if (emailAccount.$isDirty) {
+            await emailAccount.save()
+          }
+        } catch {
+          return response.badRequest({
+            message: 'Impossible de se connecter à Gmail. Veuillez reconnecter votre compte.',
+          })
+        }
+
+        await GmailOAuthService.sendEmail({
+          accessToken,
+          from: emailAccount.email,
+          fromName: emailAccount.displayName,
+          to: emailAccount.email,
+          subject: 'Test — Faktur',
+          body: testBody,
+        })
+      } else if (emailAccount.provider === 'resend') {
+        if (!emailAccount.accessToken) {
+          return response.badRequest({ message: 'Clé API Resend manquante' })
+        }
+
+        await ResendUserService.sendEmail({
+          encryptedApiKey: emailAccount.accessToken,
+          from: emailAccount.email,
+          fromName: emailAccount.displayName,
+          to: emailAccount.email,
+          subject: 'Test — Faktur',
+          body: testBody,
+        })
+      } else if (emailAccount.provider === 'smtp') {
+        if (!emailAccount.smtpHost || !emailAccount.smtpPort || !emailAccount.smtpUsername || !emailAccount.smtpPassword) {
+          return response.badRequest({ message: 'Configuration SMTP incomplète' })
+        }
+
+        await SmtpService.sendEmail({
+          host: emailAccount.smtpHost,
+          port: emailAccount.smtpPort,
+          encryptedUsername: emailAccount.smtpUsername,
+          encryptedPassword: emailAccount.smtpPassword,
+          from: emailAccount.email,
+          fromName: emailAccount.displayName,
+          to: emailAccount.email,
+          subject: 'Test — Faktur',
+          body: testBody,
+        })
+      }
     } catch {
       return response.internalServerError({
         message: "Erreur lors de l'envoi de l'email de test. Veuillez réessayer.",

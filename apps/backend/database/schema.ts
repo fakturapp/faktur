@@ -62,7 +62,7 @@ export class AuthAccessTokenSchema extends BaseModel {
 }
 
 export class BankAccountSchema extends BaseModel {
-  static $columns = ['bankName', 'bic', 'createdAt', 'iban', 'id', 'isDefault', 'isEncrypted', 'label', 'teamId', 'updatedAt'] as const
+  static $columns = ['bankName', 'bic', 'createdAt', 'iban', 'id', 'isDefault', 'label', 'teamId', 'updatedAt'] as const
   $columns = BankAccountSchema.$columns
   @column()
   declare bankName: string | null
@@ -76,8 +76,6 @@ export class BankAccountSchema extends BaseModel {
   declare id: string
   @column()
   declare isDefault: boolean
-  @column()
-  declare isEncrypted: boolean
   @column()
   declare label: string
   @column()
@@ -239,17 +237,17 @@ export class EmailLogSchema extends BaseModel {
   @column()
   declare errorMessage: string | null
   @column()
-  declare fromEmail: string
+  declare fromEmail: string | null
   @column({ isPrimary: true })
   declare id: string
   @column()
   declare status: string
   @column()
-  declare subject: string
+  declare subject: string | null
   @column()
   declare teamId: string
   @column()
-  declare toEmail: string
+  declare toEmail: string | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }
@@ -260,7 +258,7 @@ export class InvoiceLineSchema extends BaseModel {
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()
-  declare description: string
+  declare description: string | null
   @column({ isPrimary: true })
   declare id: string
   @column()
@@ -284,7 +282,7 @@ export class InvoiceLineSchema extends BaseModel {
 }
 
 export class InvoiceSettingSchema extends BaseModel {
-  static $columns = ['accentColor', 'billingType', 'createdAt', 'customPaymentMethod', 'darkMode', 'defaultAcceptanceConditions', 'defaultFooterText', 'defaultFreeField', 'defaultLanguage', 'defaultShowDeliveryAddress', 'defaultShowNotes', 'defaultSignatureField', 'defaultSubject', 'defaultVatExempt', 'documentFont', 'eInvoicingEnabled', 'footerMode', 'id', 'invoiceFilenamePattern', 'logoBorderRadius', 'logoSource', 'logoUrl', 'nextInvoiceNumber', 'nextQuoteNumber', 'paymentMethods', 'pdpApiKey', 'pdpProvider', 'pdpSandbox', 'quoteFilenamePattern', 'teamId', 'template', 'updatedAt'] as const
+  static $columns = ['accentColor', 'billingType', 'createdAt', 'customPaymentMethod', 'darkMode', 'defaultAcceptanceConditions', 'defaultFooterText', 'defaultFreeField', 'defaultLanguage', 'defaultOperationCategory', 'defaultShowDeliveryAddress', 'defaultShowNotes', 'defaultSignatureField', 'defaultSubject', 'defaultVatExempt', 'documentFont', 'eInvoicingEnabled', 'footerMode', 'id', 'invoiceFilenamePattern', 'logoBorderRadius', 'logoSource', 'logoUrl', 'nextInvoiceNumber', 'nextQuoteNumber', 'paymentMethods', 'pdpApiKey', 'pdpProvider', 'pdpSandbox', 'quoteFilenamePattern', 'teamId', 'template', 'updatedAt'] as const
   $columns = InvoiceSettingSchema.$columns
   @column()
   declare accentColor: string
@@ -304,6 +302,8 @@ export class InvoiceSettingSchema extends BaseModel {
   declare defaultFreeField: string | null
   @column()
   declare defaultLanguage: string | null
+  @column()
+  declare defaultOperationCategory: string | null
   @column()
   declare defaultShowDeliveryAddress: boolean | null
   @column()
@@ -353,7 +353,7 @@ export class InvoiceSettingSchema extends BaseModel {
 }
 
 export class InvoiceSchema extends BaseModel {
-  static $columns = ['accentColor', 'acceptanceConditions', 'bankAccountId', 'billingType', 'clientId', 'clientSiren', 'clientVatNumber', 'comment', 'createdAt', 'deliveryAddress', 'documentTitle', 'dueDate', 'freeField', 'globalDiscountType', 'globalDiscountValue', 'id', 'invoiceNumber', 'issueDate', 'language', 'logoUrl', 'notes', 'paidDate', 'paymentMethod', 'paymentTerms', 'signatureField', 'sourceQuoteId', 'status', 'subject', 'subtotal', 'taxAmount', 'teamId', 'total', 'updatedAt', 'vatExemptReason'] as const
+  static $columns = ['accentColor', 'acceptanceConditions', 'bankAccountId', 'billingType', 'clientId', 'clientSiren', 'clientVatNumber', 'comment', 'createdAt', 'deliveryAddress', 'documentTitle', 'dueDate', 'freeField', 'globalDiscountType', 'globalDiscountValue', 'id', 'invoiceNumber', 'issueDate', 'language', 'logoUrl', 'notes', 'operationCategory', 'paidDate', 'paymentMethod', 'paymentTerms', 'signatureField', 'sourceQuoteId', 'status', 'subject', 'subtotal', 'taxAmount', 'teamId', 'total', 'updatedAt', 'vatExemptReason'] as const
   $columns = InvoiceSchema.$columns
   @column()
   declare accentColor: string
@@ -397,6 +397,8 @@ export class InvoiceSchema extends BaseModel {
   declare logoUrl: string | null
   @column()
   declare notes: string | null
+  @column()
+  declare operationCategory: string | null
   @column.date()
   declare paidDate: DateTime | null
   @column()
@@ -458,7 +460,7 @@ export class QuoteLineSchema extends BaseModel {
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()
-  declare description: string
+  declare description: string | null
   @column({ isPrimary: true })
   declare id: string
   @column()
@@ -556,10 +558,16 @@ export class RateLimitSchema extends BaseModel {
 }
 
 export class TeamMemberSchema extends BaseModel {
-  static $columns = ['createdAt', 'id', 'invitationToken', 'invitedAt', 'invitedEmail', 'joinedAt', 'role', 'status', 'teamId', 'updatedAt', 'userId'] as const
+  static $columns = ['createdAt', 'dekVersion', 'encryptedInviteDek', 'encryptedTeamDek', 'id', 'invitationToken', 'invitedAt', 'invitedEmail', 'joinedAt', 'role', 'status', 'teamId', 'updatedAt', 'userId'] as const
   $columns = TeamMemberSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
+  @column()
+  declare dekVersion: number | null
+  @column()
+  declare encryptedInviteDek: string | null
+  @column()
+  declare encryptedTeamDek: string | null
   @column({ isPrimary: true })
   declare id: string
   @column()
@@ -600,12 +608,14 @@ export class TeamSchema extends BaseModel {
 }
 
 export class UserSchema extends BaseModel {
-  static $columns = ['avatarUrl', 'createdAt', 'currentTeamId', 'email', 'emailVerificationSentAt', 'emailVerificationToken', 'emailVerified', 'failedLoginAttempts', 'fullName', 'id', 'lastLoginAt', 'lockedUntil', 'onboardingCompleted', 'password', 'passwordResetExpiresAt', 'passwordResetToken', 'pendingEmail', 'recoveryCodesEncrypted', 'securityCode', 'securityCodeExpiresAt', 'status', 'twoFactorEnabled', 'twoFactorSecretEncrypted', 'updatedAt'] as const
+  static $columns = ['avatarUrl', 'createdAt', 'cryptoResetNeeded', 'currentTeamId', 'email', 'emailVerificationSentAt', 'emailVerificationToken', 'emailVerified', 'failedLoginAttempts', 'fullName', 'id', 'keyVersion', 'lastLoginAt', 'lockedUntil', 'oldSaltKdf', 'onboardingCompleted', 'password', 'passwordResetExpiresAt', 'passwordResetToken', 'pendingEmail', 'recoveryCodesEncrypted', 'saltKdf', 'securityCode', 'securityCodeExpiresAt', 'status', 'twoFactorEnabled', 'twoFactorSecretEncrypted', 'updatedAt'] as const
   $columns = UserSchema.$columns
   @column()
   declare avatarUrl: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
+  @column()
+  declare cryptoResetNeeded: boolean
   @column()
   declare currentTeamId: string | null
   @column()
@@ -622,10 +632,14 @@ export class UserSchema extends BaseModel {
   declare fullName: string | null
   @column({ isPrimary: true })
   declare id: string
+  @column()
+  declare keyVersion: number | null
   @column.dateTime()
   declare lastLoginAt: DateTime | null
   @column.dateTime()
   declare lockedUntil: DateTime | null
+  @column()
+  declare oldSaltKdf: string | null
   @column()
   declare onboardingCompleted: boolean
   @column({ serializeAs: null })
@@ -638,6 +652,8 @@ export class UserSchema extends BaseModel {
   declare pendingEmail: string | null
   @column()
   declare recoveryCodesEncrypted: string | null
+  @column()
+  declare saltKdf: string | null
   @column()
   declare securityCode: string | null
   @column.dateTime()

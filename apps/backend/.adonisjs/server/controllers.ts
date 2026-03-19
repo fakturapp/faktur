@@ -27,6 +27,11 @@ export const controllers = {
       Enable: () => import('#controllers/account/two_factor/enable'),
       Setup: () => import('#controllers/account/two_factor/setup'),
     },
+    providers: {
+      List: () => import('#controllers/account/providers/list'),
+      Link: () => import('#controllers/account/providers/link'),
+      Unlink: () => import('#controllers/account/providers/unlink'),
+    },
   },
   auth: {
     registration: {
@@ -51,6 +56,12 @@ export const controllers = {
       Login: () => import('#controllers/auth/session/login'),
       Logout: () => import('#controllers/auth/session/logout'),
       Me: () => import('#controllers/auth/session/me'),
+    },
+    oauth: {
+      GoogleAuthUrl: () => import('#controllers/auth/oauth/google_auth_url'),
+      GoogleCallback: () => import('#controllers/auth/oauth/google_callback'),
+      GoogleDecodeProfile: () => import('#controllers/auth/oauth/google_decode_profile'),
+      GoogleRegister: () => import('#controllers/auth/oauth/google_register'),
     },
   },
   client: {
@@ -104,6 +115,12 @@ export const controllers = {
     send: {
       SendEmail: () => import('#controllers/email/send/send_email'),
       SendTestEmail: () => import('#controllers/email/send/send_test_email'),
+    },
+    resend: {
+      Configure: () => import('#controllers/email/resend/configure'),
+    },
+    smtp: {
+      Configure: () => import('#controllers/email/smtp/configure'),
     },
   },
   invoice: {

@@ -48,6 +48,30 @@ const routes = {
     tokens: [{"old":"/api/v1/auth/password/reset","type":0,"val":"api","end":""},{"old":"/api/v1/auth/password/reset","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/password/reset","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/password/reset","type":0,"val":"password","end":""},{"old":"/api/v1/auth/password/reset","type":0,"val":"reset","end":""}],
     types: placeholder as Registry['password_reset']['types'],
   },
+  'google_auth_url': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/auth/oauth/google/url',
+    tokens: [{"old":"/api/v1/auth/oauth/google/url","type":0,"val":"api","end":""},{"old":"/api/v1/auth/oauth/google/url","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/oauth/google/url","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/oauth/google/url","type":0,"val":"oauth","end":""},{"old":"/api/v1/auth/oauth/google/url","type":0,"val":"google","end":""},{"old":"/api/v1/auth/oauth/google/url","type":0,"val":"url","end":""}],
+    types: placeholder as Registry['google_auth_url']['types'],
+  },
+  'google_callback': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/auth/oauth/google/callback',
+    tokens: [{"old":"/api/v1/auth/oauth/google/callback","type":0,"val":"api","end":""},{"old":"/api/v1/auth/oauth/google/callback","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/oauth/google/callback","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/oauth/google/callback","type":0,"val":"oauth","end":""},{"old":"/api/v1/auth/oauth/google/callback","type":0,"val":"google","end":""},{"old":"/api/v1/auth/oauth/google/callback","type":0,"val":"callback","end":""}],
+    types: placeholder as Registry['google_callback']['types'],
+  },
+  'google_decode_profile': {
+    methods: ["POST"],
+    pattern: '/api/v1/auth/oauth/google/decode',
+    tokens: [{"old":"/api/v1/auth/oauth/google/decode","type":0,"val":"api","end":""},{"old":"/api/v1/auth/oauth/google/decode","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/oauth/google/decode","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/oauth/google/decode","type":0,"val":"oauth","end":""},{"old":"/api/v1/auth/oauth/google/decode","type":0,"val":"google","end":""},{"old":"/api/v1/auth/oauth/google/decode","type":0,"val":"decode","end":""}],
+    types: placeholder as Registry['google_decode_profile']['types'],
+  },
+  'google_register': {
+    methods: ["POST"],
+    pattern: '/api/v1/auth/oauth/google/register',
+    tokens: [{"old":"/api/v1/auth/oauth/google/register","type":0,"val":"api","end":""},{"old":"/api/v1/auth/oauth/google/register","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/oauth/google/register","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/oauth/google/register","type":0,"val":"oauth","end":""},{"old":"/api/v1/auth/oauth/google/register","type":0,"val":"google","end":""},{"old":"/api/v1/auth/oauth/google/register","type":0,"val":"register","end":""}],
+    types: placeholder as Registry['google_register']['types'],
+  },
   'logout': {
     methods: ["POST"],
     pattern: '/api/v1/auth/logout',
@@ -59,6 +83,18 @@ const routes = {
     pattern: '/api/v1/auth/me',
     tokens: [{"old":"/api/v1/auth/me","type":0,"val":"api","end":""},{"old":"/api/v1/auth/me","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/me","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/me","type":0,"val":"me","end":""}],
     types: placeholder as Registry['me']['types'],
+  },
+  'crypto_recover': {
+    methods: ["POST"],
+    pattern: '/api/v1/auth/crypto/recover',
+    tokens: [{"old":"/api/v1/auth/crypto/recover","type":0,"val":"api","end":""},{"old":"/api/v1/auth/crypto/recover","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/crypto/recover","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/crypto/recover","type":0,"val":"crypto","end":""},{"old":"/api/v1/auth/crypto/recover","type":0,"val":"recover","end":""}],
+    types: placeholder as Registry['crypto_recover']['types'],
+  },
+  'crypto_wipe': {
+    methods: ["POST"],
+    pattern: '/api/v1/auth/crypto/wipe',
+    tokens: [{"old":"/api/v1/auth/crypto/wipe","type":0,"val":"api","end":""},{"old":"/api/v1/auth/crypto/wipe","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/crypto/wipe","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/crypto/wipe","type":0,"val":"crypto","end":""},{"old":"/api/v1/auth/crypto/wipe","type":0,"val":"wipe","end":""}],
+    types: placeholder as Registry['crypto_wipe']['types'],
   },
   'serve_avatar': {
     methods: ["GET","HEAD"],
@@ -149,6 +185,24 @@ const routes = {
     pattern: '/api/v1/account/email/confirm-change',
     tokens: [{"old":"/api/v1/account/email/confirm-change","type":0,"val":"api","end":""},{"old":"/api/v1/account/email/confirm-change","type":0,"val":"v1","end":""},{"old":"/api/v1/account/email/confirm-change","type":0,"val":"account","end":""},{"old":"/api/v1/account/email/confirm-change","type":0,"val":"email","end":""},{"old":"/api/v1/account/email/confirm-change","type":0,"val":"confirm-change","end":""}],
     types: placeholder as Registry['email_confirm_change']['types'],
+  },
+  'list_providers': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/account/providers',
+    tokens: [{"old":"/api/v1/account/providers","type":0,"val":"api","end":""},{"old":"/api/v1/account/providers","type":0,"val":"v1","end":""},{"old":"/api/v1/account/providers","type":0,"val":"account","end":""},{"old":"/api/v1/account/providers","type":0,"val":"providers","end":""}],
+    types: placeholder as Registry['list_providers']['types'],
+  },
+  'link_provider': {
+    methods: ["POST"],
+    pattern: '/api/v1/account/providers/link',
+    tokens: [{"old":"/api/v1/account/providers/link","type":0,"val":"api","end":""},{"old":"/api/v1/account/providers/link","type":0,"val":"v1","end":""},{"old":"/api/v1/account/providers/link","type":0,"val":"account","end":""},{"old":"/api/v1/account/providers/link","type":0,"val":"providers","end":""},{"old":"/api/v1/account/providers/link","type":0,"val":"link","end":""}],
+    types: placeholder as Registry['link_provider']['types'],
+  },
+  'unlink_provider': {
+    methods: ["POST"],
+    pattern: '/api/v1/account/providers/unlink',
+    tokens: [{"old":"/api/v1/account/providers/unlink","type":0,"val":"api","end":""},{"old":"/api/v1/account/providers/unlink","type":0,"val":"v1","end":""},{"old":"/api/v1/account/providers/unlink","type":0,"val":"account","end":""},{"old":"/api/v1/account/providers/unlink","type":0,"val":"providers","end":""},{"old":"/api/v1/account/providers/unlink","type":0,"val":"unlink","end":""}],
+    types: placeholder as Registry['unlink_provider']['types'],
   },
   'create_team': {
     methods: ["POST"],
@@ -653,6 +707,18 @@ const routes = {
     pattern: '/api/v1/email/oauth/gmail/url',
     tokens: [{"old":"/api/v1/email/oauth/gmail/url","type":0,"val":"api","end":""},{"old":"/api/v1/email/oauth/gmail/url","type":0,"val":"v1","end":""},{"old":"/api/v1/email/oauth/gmail/url","type":0,"val":"email","end":""},{"old":"/api/v1/email/oauth/gmail/url","type":0,"val":"oauth","end":""},{"old":"/api/v1/email/oauth/gmail/url","type":0,"val":"gmail","end":""},{"old":"/api/v1/email/oauth/gmail/url","type":0,"val":"url","end":""}],
     types: placeholder as Registry['gmail_auth_url']['types'],
+  },
+  'configure_resend': {
+    methods: ["POST"],
+    pattern: '/api/v1/email/resend/configure',
+    tokens: [{"old":"/api/v1/email/resend/configure","type":0,"val":"api","end":""},{"old":"/api/v1/email/resend/configure","type":0,"val":"v1","end":""},{"old":"/api/v1/email/resend/configure","type":0,"val":"email","end":""},{"old":"/api/v1/email/resend/configure","type":0,"val":"resend","end":""},{"old":"/api/v1/email/resend/configure","type":0,"val":"configure","end":""}],
+    types: placeholder as Registry['configure_resend']['types'],
+  },
+  'configure_smtp': {
+    methods: ["POST"],
+    pattern: '/api/v1/email/smtp/configure',
+    tokens: [{"old":"/api/v1/email/smtp/configure","type":0,"val":"api","end":""},{"old":"/api/v1/email/smtp/configure","type":0,"val":"v1","end":""},{"old":"/api/v1/email/smtp/configure","type":0,"val":"email","end":""},{"old":"/api/v1/email/smtp/configure","type":0,"val":"smtp","end":""},{"old":"/api/v1/email/smtp/configure","type":0,"val":"configure","end":""}],
+    types: placeholder as Registry['configure_smtp']['types'],
   },
   'send_email': {
     methods: ["POST"],

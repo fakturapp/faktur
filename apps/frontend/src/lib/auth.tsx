@@ -17,6 +17,7 @@ interface User {
   lastLoginAt: string | null
   createdAt: string
   cryptoResetNeeded: boolean
+  hasGoogleProvider: boolean
 }
 
 interface AuthContextType {
@@ -39,7 +40,7 @@ export function useAuth() {
   return useContext(AuthContext)
 }
 
-const publicPaths = ['/login', '/register', '/forgot-password', '/reset-password', '/verify-email', '/2fa', '/invite']
+const publicPaths = ['/login', '/register', '/forgot-password', '/reset-password', '/verify-email', '/2fa', '/invite', '/legal', '/oauth']
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
@@ -81,7 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (user && isPublicPath) {
       // Let these pages handle their own "already logged in" state
-      if (pathname === '/login' || pathname.startsWith('/verify-email') || pathname.startsWith('/invite')) {
+      if (pathname === '/login' || pathname.startsWith('/verify-email') || pathname.startsWith('/invite') || pathname.startsWith('/legal')) {
         return
       }
       if (!user.onboardingCompleted) {
