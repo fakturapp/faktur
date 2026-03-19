@@ -13,6 +13,8 @@ export type ScannedRoutes = {
     'password_reset': { paramsTuple?: []; params?: {} }
     'logout': { paramsTuple?: []; params?: {} }
     'me': { paramsTuple?: []; params?: {} }
+    'crypto_recover': { paramsTuple?: []; params?: {} }
+    'crypto_wipe': { paramsTuple?: []; params?: {} }
     'serve_avatar': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'profile_show': { paramsTuple?: []; params?: {} }
     'profile_update': { paramsTuple?: []; params?: {} }
@@ -112,6 +114,7 @@ export type ScannedRoutes = {
     'email_accounts_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'email_accounts_set_default': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'gmail_auth_url': { paramsTuple?: []; params?: {} }
+    'configure_resend': { paramsTuple?: []; params?: {} }
     'send_email': { paramsTuple?: []; params?: {} }
     'send_test_email': { paramsTuple?: []; params?: {} }
     'list_email_logs': { paramsTuple?: []; params?: {} }
@@ -125,6 +128,8 @@ export type ScannedRoutes = {
     'password_reset_request': { paramsTuple?: []; params?: {} }
     'password_reset': { paramsTuple?: []; params?: {} }
     'logout': { paramsTuple?: []; params?: {} }
+    'crypto_recover': { paramsTuple?: []; params?: {} }
+    'crypto_wipe': { paramsTuple?: []; params?: {} }
     'upload_avatar': { paramsTuple?: []; params?: {} }
     'two_factor_setup': { paramsTuple?: []; params?: {} }
     'two_factor_enable': { paramsTuple?: []; params?: {} }
@@ -157,6 +162,7 @@ export type ScannedRoutes = {
     'invoice_convert_quote': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_duplicate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'e_invoicing_submit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'configure_resend': { paramsTuple?: []; params?: {} }
     'send_email': { paramsTuple?: []; params?: {} }
     'send_test_email': { paramsTuple?: []; params?: {} }
   }

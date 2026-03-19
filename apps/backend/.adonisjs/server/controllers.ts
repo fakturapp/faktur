@@ -105,6 +105,9 @@ export const controllers = {
       SendEmail: () => import('#controllers/email/send/send_email'),
       SendTestEmail: () => import('#controllers/email/send/send_test_email'),
     },
+    resend: {
+      Configure: () => import('#controllers/email/resend/configure'),
+    },
   },
   invoice: {
     crud: {
