@@ -7,6 +7,7 @@ import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
 import LoginHistory from '#models/account/login_history'
 import AuditLog from '#models/shared/audit_log'
+import AuthProvider from '#models/account/auth_provider'
 import Team from '#models/team/team'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
@@ -116,6 +117,9 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   @hasMany(() => AuditLog)
   declare auditLogs: HasMany<typeof AuditLog>
+
+  @hasMany(() => AuthProvider)
+  declare authProviders: HasMany<typeof AuthProvider>
 
   static accessTokens = DbAccessTokensProvider.forModel(User)
 

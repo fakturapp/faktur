@@ -11,6 +11,10 @@ export type ScannedRoutes = {
     'two_factor_verify': { paramsTuple?: []; params?: {} }
     'password_reset_request': { paramsTuple?: []; params?: {} }
     'password_reset': { paramsTuple?: []; params?: {} }
+    'google_auth_url': { paramsTuple?: []; params?: {} }
+    'google_callback': { paramsTuple?: []; params?: {} }
+    'google_decode_profile': { paramsTuple?: []; params?: {} }
+    'google_register': { paramsTuple?: []; params?: {} }
     'logout': { paramsTuple?: []; params?: {} }
     'me': { paramsTuple?: []; params?: {} }
     'crypto_recover': { paramsTuple?: []; params?: {} }
@@ -30,6 +34,9 @@ export type ScannedRoutes = {
     'security_verify.verify': { paramsTuple?: []; params?: {} }
     'email_request_change': { paramsTuple?: []; params?: {} }
     'email_confirm_change': { paramsTuple?: []; params?: {} }
+    'list_providers': { paramsTuple?: []; params?: {} }
+    'link_provider': { paramsTuple?: []; params?: {} }
+    'unlink_provider': { paramsTuple?: []; params?: {} }
     'create_team': { paramsTuple?: []; params?: {} }
     'create_company': { paramsTuple?: []; params?: {} }
     'skip_company': { paramsTuple?: []; params?: {} }
@@ -128,6 +135,8 @@ export type ScannedRoutes = {
     'two_factor_verify': { paramsTuple?: []; params?: {} }
     'password_reset_request': { paramsTuple?: []; params?: {} }
     'password_reset': { paramsTuple?: []; params?: {} }
+    'google_decode_profile': { paramsTuple?: []; params?: {} }
+    'google_register': { paramsTuple?: []; params?: {} }
     'logout': { paramsTuple?: []; params?: {} }
     'crypto_recover': { paramsTuple?: []; params?: {} }
     'crypto_wipe': { paramsTuple?: []; params?: {} }
@@ -139,6 +148,8 @@ export type ScannedRoutes = {
     'security_verify.verify': { paramsTuple?: []; params?: {} }
     'email_request_change': { paramsTuple?: []; params?: {} }
     'email_confirm_change': { paramsTuple?: []; params?: {} }
+    'link_provider': { paramsTuple?: []; params?: {} }
+    'unlink_provider': { paramsTuple?: []; params?: {} }
     'create_team': { paramsTuple?: []; params?: {} }
     'create_company': { paramsTuple?: []; params?: {} }
     'skip_company': { paramsTuple?: []; params?: {} }
@@ -169,10 +180,13 @@ export type ScannedRoutes = {
     'send_test_email': { paramsTuple?: []; params?: {} }
   }
   GET: {
+    'google_auth_url': { paramsTuple?: []; params?: {} }
+    'google_callback': { paramsTuple?: []; params?: {} }
     'me': { paramsTuple?: []; params?: {} }
     'serve_avatar': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'profile_show': { paramsTuple?: []; params?: {} }
     'sessions_list': { paramsTuple?: []; params?: {} }
+    'list_providers': { paramsTuple?: []; params?: {} }
     'search_company': { paramsTuple?: []; params?: {} }
     'dashboard.index': { paramsTuple?: []; params?: {} }
     'dashboard.stats': { paramsTuple?: []; params?: {} }
@@ -213,10 +227,13 @@ export type ScannedRoutes = {
     'list_email_logs': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
+    'google_auth_url': { paramsTuple?: []; params?: {} }
+    'google_callback': { paramsTuple?: []; params?: {} }
     'me': { paramsTuple?: []; params?: {} }
     'serve_avatar': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'profile_show': { paramsTuple?: []; params?: {} }
     'sessions_list': { paramsTuple?: []; params?: {} }
+    'list_providers': { paramsTuple?: []; params?: {} }
     'search_company': { paramsTuple?: []; params?: {} }
     'dashboard.index': { paramsTuple?: []; params?: {} }
     'dashboard.stats': { paramsTuple?: []; params?: {} }
