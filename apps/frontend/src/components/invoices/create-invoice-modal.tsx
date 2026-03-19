@@ -12,6 +12,7 @@ import { Pagination } from '@/components/ui/pagination'
 import { Dropdown, DropdownItem } from '@/components/ui/dropdown'
 import { useToast } from '@/components/ui/toast'
 import { api } from '@/lib/api'
+import { Button } from '@/components/ui/button'
 import {
   RefreshCw,
   FilePlus,
@@ -21,6 +22,8 @@ import {
   ChevronRight,
   Filter,
   Check,
+  Building2,
+  Lock,
 } from 'lucide-react'
 
 interface QuoteItem {
@@ -66,6 +69,8 @@ export function CreateInvoiceModal({ open, onClose }: CreateInvoiceModalProps) {
   const [quotePage, setQuotePage] = useState(1)
   const [quoteMeta, setQuoteMeta] = useState<PaginationMeta | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const [hasCompany, setHasCompany] = useState<boolean | null>(null)
+  const [checkingCompany, setCheckingCompany] = useState(false)
 
   const handleSearchChange = useCallback((value: string) => {
     setSearch(value)
@@ -75,6 +80,16 @@ export function CreateInvoiceModal({ open, onClose }: CreateInvoiceModalProps) {
       setQuotePage(1)
     }, 300)
   }, [])
+
+  useEffect(() => {
+    if (open && hasCompany === null) {
+      setCheckingCompany(true)
+      api.get<{ company: unknown }>('/company').then(({ data }) => {
+        setHasCompany(!!data?.company)
+        setCheckingCompany(false)
+      })
+    }
+  }, [open, hasCompany])
 
   useEffect(() => {
     if (!open) {
@@ -151,7 +166,43 @@ export function CreateInvoiceModal({ open, onClose }: CreateInvoiceModalProps) {
   return (
     <Dialog open={open} onClose={onClose} className="max-w-lg">
       <AnimatePresence mode="wait">
-        {step === 'choose' ? (
+        {checkingCompany ? (
+          <motion.div
+            key="loading"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex items-center justify-center py-12"
+          >
+            <Spinner className="text-primary" />
+          </motion.div>
+        ) : hasCompany === false ? (
+          <motion.div
+            key="no-company"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center py-4"
+          >
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-500/10 mx-auto mb-4">
+              <Lock className="h-7 w-7 text-orange-500" />
+            </div>
+            <DialogTitle>Entreprise requise</DialogTitle>
+            <p className="text-sm text-muted-foreground mt-2 mb-6 leading-relaxed">
+              Vous devez d&apos;abord configurer votre entreprise avant de pouvoir
+              créer des factures. Vos informations légales apparaîtront sur chaque document.
+            </p>
+            <div className="flex gap-3">
+              <Button variant="outline" className="flex-1" onClick={onClose}>
+                Annuler
+              </Button>
+              <Button
+                className="flex-1 gap-2"
+                onClick={() => { onClose(); router.push('/dashboard/company') }}
+              >
+                <Building2 className="h-4 w-4" /> Configurer l&apos;entreprise
+              </Button>
+            </div>
+          </motion.div>
+        ) : step === 'choose' ? (
           <motion.div
             key="choose"
             initial={{ opacity: 0, x: -20 }}

@@ -11,7 +11,7 @@ import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { api } from '@/lib/api'
 import { A4Sheet, ClientModal, type DocumentLine, type ClientInfo, type CompanyInfo } from '@/components/shared/a4-sheet'
 import { DocumentOptionsPanel } from '@/components/shared/document-options'
-import { Save, ArrowLeft, Eye, Pencil, SlidersHorizontal, X } from 'lucide-react'
+import { Save, ArrowLeft, Eye, Pencil, SlidersHorizontal, X, Lock, Building2 } from 'lucide-react'
 import { Dialog, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
 import { FirstDocumentBanner } from '@/components/shared/first-document-banner'
@@ -344,6 +344,36 @@ export default function NewInvoicePage() {
       toast('Facture créée', 'success')
       router.push('/dashboard/invoices')
     }
+  }
+
+  // Blocage si pas d'entreprise configurée
+  if (!loading && !settingsLoading && !company) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center max-w-md mx-auto px-6"
+        >
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-500/10 mx-auto mb-5">
+            <Lock className="h-8 w-8 text-orange-500" />
+          </div>
+          <h2 className="text-xl font-bold text-foreground mb-2">Entreprise requise</h2>
+          <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
+            Vous devez configurer les informations de votre entreprise avant de pouvoir
+            créer des factures. Ces informations apparaîtront sur chaque document généré.
+          </p>
+          <div className="flex gap-3 justify-center">
+            <Button variant="outline" onClick={() => router.push('/dashboard')}>
+              Retour
+            </Button>
+            <Button className="gap-2" onClick={() => router.push('/dashboard/company')}>
+              <Building2 className="h-4 w-4" /> Configurer l&apos;entreprise
+            </Button>
+          </div>
+        </motion.div>
+      </div>
+    )
   }
 
   // Loading skeleton

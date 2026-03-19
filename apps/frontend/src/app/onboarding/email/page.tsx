@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/toast'
 import { api } from '@/lib/api'
-import { Mail, Check, Plus } from 'lucide-react'
+import { Mail, Check, Plus, ChevronLeft } from 'lucide-react'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -96,12 +96,13 @@ export default function OnboardingEmailPage() {
             <div>
               <h1 className="text-2xl font-bold">Configurez votre email</h1>
               <p className="mt-2 text-sm text-muted-foreground">
-                Connectez votre compte Gmail pour envoyer vos factures et devis directement depuis l&apos;application.
+                Connectez votre compte Gmail pour envoyer vos factures et devis
+                directement depuis l&apos;application.
               </p>
             </div>
           </motion.div>
 
-          {/* Gmail card */}
+          {/* Carte Gmail */}
           <motion.div variants={fadeUp} custom={1} className="mb-6">
             <div className="rounded-xl border border-border bg-muted/20 p-5">
               <div className="flex items-center gap-3 mb-4">
@@ -160,8 +161,29 @@ export default function OnboardingEmailPage() {
             </div>
           </motion.div>
 
+          {/* Info */}
+          <motion.div variants={fadeUp} custom={2} className="mb-6">
+            <div className="rounded-lg border border-border/50 bg-muted/10 p-4">
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                <strong className="text-foreground">Pourquoi connecter un email ?</strong>
+                <br />
+                Cela vous permet d&apos;envoyer vos factures et devis directement depuis Faktur
+                en un clic, sans quitter l&apos;application. Vos identifiants Google ne sont
+                jamais stockés — seul un token OAuth sécurisé est conservé.
+              </p>
+            </div>
+          </motion.div>
+
           {/* Actions */}
-          <motion.div variants={fadeUp} custom={2} className="flex gap-3">
+          <motion.div variants={fadeUp} custom={3} className="flex gap-3">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => router.push('/onboarding/personalization')}
+              className="gap-1.5"
+            >
+              <ChevronLeft className="h-4 w-4" /> Précédent
+            </Button>
             <Button
               type="button"
               variant="outline"
@@ -178,7 +200,7 @@ export default function OnboardingEmailPage() {
             </Button>
           </motion.div>
 
-          <motion.div variants={fadeUp} custom={3} className="mt-4">
+          <motion.div variants={fadeUp} custom={4} className="mt-4">
             <p className="text-xs text-muted-foreground text-center">
               Vous pourrez configurer votre email à tout moment dans les paramètres.
             </p>
