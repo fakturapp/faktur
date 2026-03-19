@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
@@ -35,7 +35,7 @@ const providerMeta: Record<string, { label: string; color: string; bgColor: stri
   smtp: { label: 'SMTP', color: 'text-blue-500', bgColor: 'bg-blue-500/10', icon: Server },
 }
 
-export default function EmailSettingsPage() {
+function EmailSettingsContent() {
   const { toast } = useToast()
   const searchParams = useSearchParams()
   const { accounts, loading, refreshAccounts } = useEmail()
@@ -825,5 +825,13 @@ export default function EmailSettingsPage() {
         </DialogFooter>
       </Dialog>
     </div>
+  )
+}
+
+export default function EmailSettingsPage() {
+  return (
+    <Suspense>
+      <EmailSettingsContent />
+    </Suspense>
   )
 }
