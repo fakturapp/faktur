@@ -1,7 +1,7 @@
 'use client'
 
 import { useAuth } from '@/lib/auth'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { Skeleton } from '@/components/ui/skeleton'
 import { motion } from 'framer-motion'
 import { CheckCircle2 } from 'lucide-react'
@@ -18,6 +18,7 @@ const steps = [
 export default function OnboardingLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
   const pathname = usePathname()
+  const router = useRouter()
 
   if (loading || !user) {
     return (
@@ -31,7 +32,7 @@ export default function OnboardingLayout({ children }: { children: React.ReactNo
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6">
-      {/* Progress steps */}
+      {/* Barre de progression */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -40,11 +41,27 @@ export default function OnboardingLayout({ children }: { children: React.ReactNo
         {steps.map((step, i) => {
           const isActive = i === currentStepIndex
           const isCompleted = i < currentStepIndex
+          const isClickable = isCompleted
 
           return (
             <div key={step.id} className="flex items-center gap-3">
-              {i > 0 && <div className="h-px w-12 bg-border" />}
-              <div className="flex items-center gap-2">
+              {i > 0 && (
+                <div
+                  className={cn(
+                    'h-px w-12 transition-colors',
+                    isCompleted ? 'bg-success' : 'bg-border'
+                  )}
+                />
+              )}
+              <button
+                onClick={() => isClickable && router.push(step.path)}
+                disabled={!isClickable}
+                className={cn(
+                  'flex items-center gap-2 transition-opacity',
+                  isClickable && 'cursor-pointer hover:opacity-80',
+                  !isClickable && !isActive && 'opacity-50'
+                )}
+              >
                 <div
                   className={cn(
                     'flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium transition-colors',
@@ -57,20 +74,21 @@ export default function OnboardingLayout({ children }: { children: React.ReactNo
                 </div>
                 <span
                   className={cn(
-                    'text-sm font-medium',
+                    'text-sm font-medium hidden sm:inline',
                     isActive ? 'text-foreground' : 'text-muted-foreground'
                   )}
                 >
                   {step.label}
                 </span>
-              </div>
+              </button>
             </div>
           )
         })}
       </motion.div>
 
-      {/* Content */}
+      {/* Étape courante */}
       <motion.div
+        key={pathname}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}

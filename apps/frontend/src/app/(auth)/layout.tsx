@@ -7,7 +7,7 @@ const Iridescence = dynamic(() => import('@/components/ui/iridescence'), { ssr: 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-zinc-950 p-4 md:p-8">
-      <div className="w-full max-w-5xl grid md:grid-cols-2 rounded-3xl overflow-hidden shadow-2xl shadow-black/40 border border-white/5 min-h-[600px]">
+      <div className="w-full max-w-5xl grid md:grid-cols-2 rounded-3xl shadow-2xl shadow-black/40 border border-white/5 min-h-[600px]">
         {/* Left: Iridescence + branding */}
         <div className="relative hidden md:flex overflow-hidden rounded-l-3xl">
           <Iridescence color={[0.4, 0.3, 1]} speed={0.6} amplitude={0.15} />
@@ -22,7 +22,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </div>
 
         {/* Right: Form */}
-        <div className="flex items-center justify-center p-6 md:p-10 bg-background rounded-r-3xl md:rounded-l-none rounded-3xl md:rounded-3xl">
+        <div className="flex items-center justify-center p-6 md:p-10 bg-background rounded-3xl md:rounded-l-none overflow-y-auto max-h-[90vh]">
           {children}
         </div>
       </div>

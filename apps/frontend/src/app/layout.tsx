@@ -7,9 +7,68 @@ import { Providers } from './providers'
 const lexend = Lexend({ subsets: ['latin'], variable: '--font-lexend' })
 
 export const metadata: Metadata = {
-  title: 'Faktur - Facturation gratuite',
-  description: 'Professional invoicing and quoting software, 100% free.',
-  icons: { icon: '/favicon.svg' },
+  title: {
+    default: 'Faktur - Facturation professionnelle gratuite',
+    template: '%s | Faktur',
+  },
+  description:
+    'Faktur simplifie votre facturation. Creez des devis et factures professionnels en quelques clics. Gratuit, securise et concu pour les entrepreneurs.',
+  keywords: [
+    'facturation',
+    'facture',
+    'devis',
+    'facturation gratuite',
+    'logiciel facturation',
+    'facture en ligne',
+    'PME',
+    'freelance',
+    'entrepreneur',
+    'gestion commerciale',
+  ],
+  authors: [{ name: 'Faktur' }],
+  creator: 'Faktur',
+  publisher: 'Faktur',
+  metadataBase: new URL('https://faktur.app'),
+  openGraph: {
+    type: 'website',
+    locale: 'fr_FR',
+    url: 'https://faktur.app',
+    siteName: 'Faktur',
+    title: 'Faktur - Facturation professionnelle gratuite',
+    description:
+      'Creez des devis et factures professionnels en quelques clics. Gratuit, securise et concu pour les entrepreneurs.',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Faktur - Facturation professionnelle',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Faktur - Facturation professionnelle gratuite',
+    description:
+      'Creez des devis et factures professionnels en quelques clics. Gratuit et securise.',
+    images: ['/og-image.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  icons: {
+    icon: '/favicon.svg',
+    apple: '/apple-touch-icon.png',
+  },
+  manifest: '/site.webmanifest',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -11,8 +11,14 @@ export type ScannedRoutes = {
     'two_factor_verify': { paramsTuple?: []; params?: {} }
     'password_reset_request': { paramsTuple?: []; params?: {} }
     'password_reset': { paramsTuple?: []; params?: {} }
+    'google_auth_url': { paramsTuple?: []; params?: {} }
+    'google_callback': { paramsTuple?: []; params?: {} }
+    'google_decode_profile': { paramsTuple?: []; params?: {} }
+    'google_register': { paramsTuple?: []; params?: {} }
     'logout': { paramsTuple?: []; params?: {} }
     'me': { paramsTuple?: []; params?: {} }
+    'crypto_recover': { paramsTuple?: []; params?: {} }
+    'crypto_wipe': { paramsTuple?: []; params?: {} }
     'serve_avatar': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'profile_show': { paramsTuple?: []; params?: {} }
     'profile_update': { paramsTuple?: []; params?: {} }
@@ -28,6 +34,9 @@ export type ScannedRoutes = {
     'security_verify.verify': { paramsTuple?: []; params?: {} }
     'email_request_change': { paramsTuple?: []; params?: {} }
     'email_confirm_change': { paramsTuple?: []; params?: {} }
+    'list_providers': { paramsTuple?: []; params?: {} }
+    'link_provider': { paramsTuple?: []; params?: {} }
+    'unlink_provider': { paramsTuple?: []; params?: {} }
     'create_team': { paramsTuple?: []; params?: {} }
     'create_company': { paramsTuple?: []; params?: {} }
     'skip_company': { paramsTuple?: []; params?: {} }
@@ -112,6 +121,8 @@ export type ScannedRoutes = {
     'email_accounts_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'email_accounts_set_default': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'gmail_auth_url': { paramsTuple?: []; params?: {} }
+    'configure_resend': { paramsTuple?: []; params?: {} }
+    'configure_smtp': { paramsTuple?: []; params?: {} }
     'send_email': { paramsTuple?: []; params?: {} }
     'send_test_email': { paramsTuple?: []; params?: {} }
     'list_email_logs': { paramsTuple?: []; params?: {} }
@@ -124,7 +135,11 @@ export type ScannedRoutes = {
     'two_factor_verify': { paramsTuple?: []; params?: {} }
     'password_reset_request': { paramsTuple?: []; params?: {} }
     'password_reset': { paramsTuple?: []; params?: {} }
+    'google_decode_profile': { paramsTuple?: []; params?: {} }
+    'google_register': { paramsTuple?: []; params?: {} }
     'logout': { paramsTuple?: []; params?: {} }
+    'crypto_recover': { paramsTuple?: []; params?: {} }
+    'crypto_wipe': { paramsTuple?: []; params?: {} }
     'upload_avatar': { paramsTuple?: []; params?: {} }
     'two_factor_setup': { paramsTuple?: []; params?: {} }
     'two_factor_enable': { paramsTuple?: []; params?: {} }
@@ -133,6 +148,8 @@ export type ScannedRoutes = {
     'security_verify.verify': { paramsTuple?: []; params?: {} }
     'email_request_change': { paramsTuple?: []; params?: {} }
     'email_confirm_change': { paramsTuple?: []; params?: {} }
+    'link_provider': { paramsTuple?: []; params?: {} }
+    'unlink_provider': { paramsTuple?: []; params?: {} }
     'create_team': { paramsTuple?: []; params?: {} }
     'create_company': { paramsTuple?: []; params?: {} }
     'skip_company': { paramsTuple?: []; params?: {} }
@@ -157,14 +174,19 @@ export type ScannedRoutes = {
     'invoice_convert_quote': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_duplicate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'e_invoicing_submit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'configure_resend': { paramsTuple?: []; params?: {} }
+    'configure_smtp': { paramsTuple?: []; params?: {} }
     'send_email': { paramsTuple?: []; params?: {} }
     'send_test_email': { paramsTuple?: []; params?: {} }
   }
   GET: {
+    'google_auth_url': { paramsTuple?: []; params?: {} }
+    'google_callback': { paramsTuple?: []; params?: {} }
     'me': { paramsTuple?: []; params?: {} }
     'serve_avatar': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'profile_show': { paramsTuple?: []; params?: {} }
     'sessions_list': { paramsTuple?: []; params?: {} }
+    'list_providers': { paramsTuple?: []; params?: {} }
     'search_company': { paramsTuple?: []; params?: {} }
     'dashboard.index': { paramsTuple?: []; params?: {} }
     'dashboard.stats': { paramsTuple?: []; params?: {} }
@@ -205,10 +227,13 @@ export type ScannedRoutes = {
     'list_email_logs': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
+    'google_auth_url': { paramsTuple?: []; params?: {} }
+    'google_callback': { paramsTuple?: []; params?: {} }
     'me': { paramsTuple?: []; params?: {} }
     'serve_avatar': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'profile_show': { paramsTuple?: []; params?: {} }
     'sessions_list': { paramsTuple?: []; params?: {} }
+    'list_providers': { paramsTuple?: []; params?: {} }
     'search_company': { paramsTuple?: []; params?: {} }
     'dashboard.index': { paramsTuple?: []; params?: {} }
     'dashboard.stats': { paramsTuple?: []; params?: {} }

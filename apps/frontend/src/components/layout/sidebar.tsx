@@ -36,6 +36,7 @@ import {
   CreditCard,
   Mail,
   Info,
+  Scale,
 } from 'lucide-react'
 
 interface TeamListItem {
@@ -356,6 +357,14 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
           <Info className={cn('h-4 w-4 shrink-0', pathname === '/dashboard/about' && 'text-primary')} />
           <span>À propos</span>
         </Link>
+        <Link
+          href="/legal"
+          target="_blank"
+          className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-all duration-300 ease-in-out relative text-muted-foreground hover:bg-sidebar-accent/50 hover:text-foreground"
+        >
+          <Scale className="h-4 w-4 shrink-0" />
+          <span>Informations légales</span>
+        </Link>
       </div>
 
       <div className="mx-3 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
@@ -378,7 +387,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
                   {user.fullName || user.email}
                 </p>
                 <p className="text-xs text-muted-foreground truncate">
-                  {user.email}
+                  Plan Free
                 </p>
               </div>
               <MoreHorizontal className="h-4 w-4 text-muted-foreground shrink-0" />
