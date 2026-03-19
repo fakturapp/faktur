@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import AuthProvider from '#models/account/auth_provider'
+import keyStore from '#services/crypto/key_store'
 
 export default class Me {
   async handle({ auth, response }: HttpContext) {
@@ -9,6 +10,12 @@ export default class Me {
       .where('userId', user.id)
       .where('provider', 'google')
       .first()
+
+    // Check if vault is locked (crypto enabled but DEK not in memory)
+    const vaultLocked =
+      user.saltKdf && user.currentTeamId
+        ? !keyStore.isUnlocked(user.id, user.currentTeamId)
+        : false
 
     return response.ok({
       user: {
@@ -24,6 +31,7 @@ export default class Me {
         createdAt: user.createdAt,
         cryptoResetNeeded: user.cryptoResetNeeded || false,
         hasGoogleProvider: !!googleProvider,
+        vaultLocked,
       },
     })
   }

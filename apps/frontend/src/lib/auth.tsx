@@ -19,6 +19,7 @@ interface User {
   createdAt: string
   cryptoResetNeeded: boolean
   hasGoogleProvider: boolean
+  vaultLocked: boolean
 }
 
 interface AuthContextType {
@@ -136,7 +137,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         onRecovered={handleCryptoRecovered}
         onWiped={handleCryptoWiped}
       />
-      <VaultUnlockModal />
+      <VaultUnlockModal forceOpen={!!user?.vaultLocked && !user?.cryptoResetNeeded} />
     </AuthContext.Provider>
   )
 }

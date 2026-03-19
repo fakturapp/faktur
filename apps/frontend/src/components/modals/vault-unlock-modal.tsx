@@ -9,13 +9,19 @@ import { Spinner } from '@/components/ui/spinner'
 import { Lock, Eye, EyeOff } from 'lucide-react'
 import { api, onVaultLocked } from '@/lib/api'
 
-export function VaultUnlockModal() {
+export function VaultUnlockModal({ forceOpen = false }: { forceOpen?: boolean }) {
   const [open, setOpen] = useState(false)
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  // Proactive trigger from auth provider (vaultLocked in /auth/me)
+  useEffect(() => {
+    if (forceOpen) setOpen(true)
+  }, [forceOpen])
+
+  // Reactive trigger from 423 API responses
   useEffect(() => {
     return onVaultLocked(() => {
       setOpen(true)
