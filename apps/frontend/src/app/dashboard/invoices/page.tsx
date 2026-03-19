@@ -324,7 +324,7 @@ export default function InvoicesPage() {
                     >
                       {/* Icon */}
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                        {invoice.status === 'draft' && <FileText className="h-5 w-5 text-zinc-400" />}
+                        {invoice.status === 'draft' && <FileText className="h-5 w-5 text-muted-foreground" />}
                         {invoice.status === 'sent' && <Send className="h-5 w-5 text-blue-400" />}
                         {invoice.status === 'paid' && <CheckCircle2 className="h-5 w-5 text-green-400" />}
                         {invoice.status === 'overdue' && <Clock className="h-5 w-5 text-red-400" />}

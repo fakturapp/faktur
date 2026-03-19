@@ -82,7 +82,7 @@ const roleIcons: Record<string, React.ReactNode> = {
 const roleColors: Record<string, string> = {
   super_admin: 'text-amber-400 bg-amber-400/10 border-amber-400/20',
   admin: 'text-indigo-400 bg-indigo-400/10 border-indigo-400/20',
-  member: 'text-zinc-400 bg-zinc-400/10 border-zinc-400/20',
+  member: 'text-muted-foreground bg-muted-foreground/10 border-muted-foreground/20',
   viewer: 'text-zinc-500 bg-zinc-500/10 border-zinc-500/20',
 }
 

@@ -621,7 +621,7 @@ export default function CompanyPage() {
                 } ${i < editStep ? 'bg-primary/80' : ''}`}
               />
               {/* Tooltip */}
-              <div className="absolute -top-9 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20 whitespace-nowrap px-2.5 py-1 rounded-md bg-zinc-900 text-white text-[11px] shadow-lg">
+              <div className="absolute -top-9 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20 whitespace-nowrap px-2.5 py-1 rounded-md bg-foreground text-background text-[11px] shadow-lg">
                 {step.label} — {step.tooltip}
               </div>
             </div>

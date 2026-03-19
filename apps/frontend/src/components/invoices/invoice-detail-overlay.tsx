@@ -428,7 +428,7 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                       Modifier la facture
                     </Button>
                     {invoice.status === 'paid' && (
-                      <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 translate-y-1 group-hover/edit:opacity-100 group-hover/edit:translate-y-0 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-xl bg-zinc-900 text-white text-xs shadow-lg">
+                      <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 translate-y-1 group-hover/edit:opacity-100 group-hover/edit:translate-y-0 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-xl bg-foreground text-background text-xs shadow-lg">
                         Changez le statut pour pouvoir modifier la facture
                       </div>
                     )}
@@ -496,12 +496,12 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                         <Send className="h-4 w-4" /> Envoyer la facture
                       </button>
                       {!hasEmailConfigured && (
-                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 translate-y-1 group-hover/send:opacity-100 group-hover/send:translate-y-0 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-xl bg-zinc-900 text-white text-xs shadow-lg">
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 translate-y-1 group-hover/send:opacity-100 group-hover/send:translate-y-0 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-xl bg-foreground text-background text-xs shadow-lg">
                           Configurez un compte email dans les paramètres
                         </div>
                       )}
                       {hasEmailConfigured && invoice.status !== 'draft' && (
-                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 translate-y-1 group-hover/send:opacity-100 group-hover/send:translate-y-0 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-xl bg-zinc-900 text-white text-xs shadow-lg">
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 translate-y-1 group-hover/send:opacity-100 group-hover/send:translate-y-0 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-xl bg-foreground text-background text-xs shadow-lg">
                           {invoice.status === 'sent' || invoice.status === 'overdue' ? 'Facture déjà envoyée — utilisez Relancer' : 'Non disponible pour ce statut'}
                         </div>
                       )}
@@ -515,12 +515,12 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                         <Send className="h-4 w-4" /> Relancer la facture
                       </button>
                       {!hasEmailConfigured && (
-                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 translate-y-1 group-hover/reminder:opacity-100 group-hover/reminder:translate-y-0 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-xl bg-zinc-900 text-white text-xs shadow-lg">
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 translate-y-1 group-hover/reminder:opacity-100 group-hover/reminder:translate-y-0 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-xl bg-foreground text-background text-xs shadow-lg">
                           Configurez un compte email dans les paramètres
                         </div>
                       )}
                       {hasEmailConfigured && invoice.status === 'draft' && (
-                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 translate-y-1 group-hover/reminder:opacity-100 group-hover/reminder:translate-y-0 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-xl bg-zinc-900 text-white text-xs shadow-lg">
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 translate-y-1 group-hover/reminder:opacity-100 group-hover/reminder:translate-y-0 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-xl bg-foreground text-background text-xs shadow-lg">
                           Envoyez d&apos;abord la facture
                         </div>
                       )}

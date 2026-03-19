@@ -210,8 +210,8 @@ export default function InvoiceDraftsPage() {
                 href={`/dashboard/invoices/${invoice.id}/edit`}
                 className="w-full flex items-center gap-4 rounded-xl border border-border bg-card/50 hover:bg-card/80 p-4 transition-colors text-left group"
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-400/10">
-                  <FileText className="h-5 w-5 text-zinc-400" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted-foreground/10">
+                  <FileText className="h-5 w-5 text-muted-foreground" />
                 </div>
 
                 <div className="flex-1 min-w-0">
@@ -219,7 +219,7 @@ export default function InvoiceDraftsPage() {
                     <p className="text-sm font-semibold text-foreground truncate">
                       {invoice.invoiceNumber}
                     </p>
-                    <Badge variant="muted" className="text-[10px] shrink-0 text-zinc-400 bg-zinc-400/10">
+                    <Badge variant="muted" className="text-[10px] shrink-0 text-muted-foreground bg-muted-foreground/10">
                       Brouillon
                     </Badge>
                   </div>
