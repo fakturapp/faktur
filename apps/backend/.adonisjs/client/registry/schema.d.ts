@@ -1339,6 +1339,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/email/resend/configure').default['handle']>>>
     }
   }
+  'configure_smtp': {
+    methods: ["POST"]
+    pattern: '/api/v1/email/smtp/configure'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/email/smtp/configure').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/email/smtp/configure').default['handle']>>>
+    }
+  }
   'send_email': {
     methods: ["POST"]
     pattern: '/api/v1/email/send'

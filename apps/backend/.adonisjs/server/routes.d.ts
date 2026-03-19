@@ -115,6 +115,7 @@ export type ScannedRoutes = {
     'email_accounts_set_default': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'gmail_auth_url': { paramsTuple?: []; params?: {} }
     'configure_resend': { paramsTuple?: []; params?: {} }
+    'configure_smtp': { paramsTuple?: []; params?: {} }
     'send_email': { paramsTuple?: []; params?: {} }
     'send_test_email': { paramsTuple?: []; params?: {} }
     'list_email_logs': { paramsTuple?: []; params?: {} }
@@ -163,6 +164,7 @@ export type ScannedRoutes = {
     'invoice_duplicate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'e_invoicing_submit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'configure_resend': { paramsTuple?: []; params?: {} }
+    'configure_smtp': { paramsTuple?: []; params?: {} }
     'send_email': { paramsTuple?: []; params?: {} }
     'send_test_email': { paramsTuple?: []; params?: {} }
   }

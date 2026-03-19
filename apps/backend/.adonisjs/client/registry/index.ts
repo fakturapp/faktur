@@ -672,6 +672,12 @@ const routes = {
     tokens: [{"old":"/api/v1/email/resend/configure","type":0,"val":"api","end":""},{"old":"/api/v1/email/resend/configure","type":0,"val":"v1","end":""},{"old":"/api/v1/email/resend/configure","type":0,"val":"email","end":""},{"old":"/api/v1/email/resend/configure","type":0,"val":"resend","end":""},{"old":"/api/v1/email/resend/configure","type":0,"val":"configure","end":""}],
     types: placeholder as Registry['configure_resend']['types'],
   },
+  'configure_smtp': {
+    methods: ["POST"],
+    pattern: '/api/v1/email/smtp/configure',
+    tokens: [{"old":"/api/v1/email/smtp/configure","type":0,"val":"api","end":""},{"old":"/api/v1/email/smtp/configure","type":0,"val":"v1","end":""},{"old":"/api/v1/email/smtp/configure","type":0,"val":"email","end":""},{"old":"/api/v1/email/smtp/configure","type":0,"val":"smtp","end":""},{"old":"/api/v1/email/smtp/configure","type":0,"val":"configure","end":""}],
+    types: placeholder as Registry['configure_smtp']['types'],
+  },
   'send_email': {
     methods: ["POST"],
     pattern: '/api/v1/email/send',
