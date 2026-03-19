@@ -8,6 +8,7 @@ const EmailAccountsSetDefault = () => import('#controllers/email/accounts/set_de
 const GmailAuthUrl = () => import('#controllers/email/oauth/gmail_auth_url')
 const GmailCallback = () => import('#controllers/email/oauth/gmail_callback')
 const ConfigureResend = () => import('#controllers/email/resend/configure')
+const ConfigureSmtp = () => import('#controllers/email/smtp/configure')
 const SendEmail = () => import('#controllers/email/send/send_email')
 const SendTestEmail = () => import('#controllers/email/send/send_test_email')
 const ListEmailLogs = () => import('#controllers/email/logs/list')
@@ -27,6 +28,9 @@ router
 
     // Resend
     router.post('/resend/configure', [ConfigureResend, 'handle'])
+
+    // SMTP
+    router.post('/smtp/configure', [ConfigureSmtp, 'handle'])
 
     // Send (POST only — reject GET with 405)
     router.post('/send', [SendEmail, 'handle'])

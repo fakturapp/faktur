@@ -3,6 +3,7 @@ import vine from '@vinejs/vine'
 import EmailAccount from '#models/email/email_account'
 import GmailOAuthService from '#services/email/gmail_oauth_service'
 import ResendUserService from '#services/email/resend_user_service'
+import SmtpService from '#services/email/smtp_service'
 
 const testEmailValidator = vine.compile(
   vine.object({
@@ -30,7 +31,7 @@ export default class SendTestEmail {
       return response.notFound({ message: 'Email account not found' })
     }
 
-    if (!['gmail', 'resend'].includes(emailAccount.provider)) {
+    if (!['gmail', 'resend', 'smtp'].includes(emailAccount.provider)) {
       return response.badRequest({ message: 'Provider non supporté' })
     }
 
@@ -75,6 +76,22 @@ export default class SendTestEmail {
 
         await ResendUserService.sendEmail({
           encryptedApiKey: emailAccount.accessToken,
+          from: emailAccount.email,
+          fromName: emailAccount.displayName,
+          to: emailAccount.email,
+          subject: 'Test — Faktur',
+          body: testBody,
+        })
+      } else if (emailAccount.provider === 'smtp') {
+        if (!emailAccount.smtpHost || !emailAccount.smtpPort || !emailAccount.smtpUsername || !emailAccount.smtpPassword) {
+          return response.badRequest({ message: 'Configuration SMTP incomplète' })
+        }
+
+        await SmtpService.sendEmail({
+          host: emailAccount.smtpHost,
+          port: emailAccount.smtpPort,
+          encryptedUsername: emailAccount.smtpUsername,
+          encryptedPassword: emailAccount.smtpPassword,
           from: emailAccount.email,
           fromName: emailAccount.displayName,
           to: emailAccount.email,

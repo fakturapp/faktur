@@ -12,7 +12,7 @@ import { useEmail, type EmailAccountItem } from '@/lib/email-context'
 import { api } from '@/lib/api'
 import { Input } from '@/components/ui/input'
 import { Field, FieldLabel, FieldDescription } from '@/components/ui/field'
-import { Mail, Trash2, Star, Plus, ExternalLink, Server, Zap, Send, Eye, EyeOff, Key } from 'lucide-react'
+import { Mail, Trash2, Star, Plus, Server, Zap, Send, Eye, EyeOff, Key } from 'lucide-react'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -59,6 +59,15 @@ export default function EmailSettingsPage() {
   const [resendDisplayName, setResendDisplayName] = useState('')
   const [configuringResend, setConfiguringResend] = useState(false)
   const [showResendKey, setShowResendKey] = useState(false)
+  // SMTP state
+  const [smtpHost, setSmtpHost] = useState('')
+  const [smtpPort, setSmtpPort] = useState('587')
+  const [smtpUsername, setSmtpUsername] = useState('')
+  const [smtpPassword, setSmtpPassword] = useState('')
+  const [smtpFromEmail, setSmtpFromEmail] = useState('')
+  const [smtpDisplayName, setSmtpDisplayName] = useState('')
+  const [configuringSmtp, setConfiguringSmtp] = useState(false)
+  const [showSmtpPassword, setShowSmtpPassword] = useState(false)
 
   useEffect(() => {
     if (searchParams.get('connected') === 'true') {
@@ -141,8 +150,39 @@ export default function EmailSettingsPage() {
     refreshAccounts()
   }
 
+  async function handleConfigureSmtp() {
+    if (!smtpHost.trim() || !smtpUsername.trim() || !smtpPassword.trim() || !smtpFromEmail.trim()) {
+      toast('Veuillez remplir tous les champs obligatoires', 'error')
+      return
+    }
+    setConfiguringSmtp(true)
+    const { data, error } = await api.post<{ message: string }>('/email/smtp/configure', {
+      host: smtpHost.trim(),
+      port: Number(smtpPort) || 587,
+      username: smtpUsername.trim(),
+      password: smtpPassword.trim(),
+      fromEmail: smtpFromEmail.trim(),
+      displayName: smtpDisplayName.trim() || undefined,
+    })
+    setConfiguringSmtp(false)
+    if (error) {
+      toast(error, 'error')
+      return
+    }
+    toast(data?.message || 'Compte SMTP configuré', 'success')
+    setSmtpHost('')
+    setSmtpPort('587')
+    setSmtpUsername('')
+    setSmtpPassword('')
+    setSmtpFromEmail('')
+    setSmtpDisplayName('')
+    setShowSmtpPassword(false)
+    refreshAccounts()
+  }
+
   const gmailAccounts = accounts.filter((a) => a.provider === 'gmail')
   const resendAccounts = accounts.filter((a) => a.provider === 'resend')
+  const smtpAccounts = accounts.filter((a) => a.provider === 'smtp')
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
@@ -416,27 +456,167 @@ export default function EmailSettingsPage() {
           </Card>
         </motion.div>
 
-        {/* SMTP (coming soon) */}
+        {/* SMTP */}
         <motion.div variants={fadeUp} custom={3}>
-          <Card className="overflow-hidden border-border/50 opacity-60">
+          <Card className="overflow-hidden border-border/50">
             <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10">
-                    <Server className="h-5 w-5 text-blue-500" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h2 className="text-sm font-semibold text-foreground">SMTP</h2>
-                      <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
-                        Bientôt
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">Connectez votre propre serveur SMTP</p>
-                  </div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10">
+                  <Server className="h-5 w-5 text-blue-500" />
                 </div>
-                <Button variant="outline" size="sm" disabled className="gap-2">
-                  <ExternalLink className="h-3.5 w-3.5" /> Configurer
+                <div>
+                  <h2 className="text-sm font-semibold text-foreground">SMTP</h2>
+                  <p className="text-xs text-muted-foreground">Connectez votre propre serveur SMTP</p>
+                </div>
+              </div>
+
+              {/* Existing SMTP accounts */}
+              {smtpAccounts.length > 0 && (
+                <div className="space-y-2 mb-4">
+                  {smtpAccounts.map((account) => (
+                    <div
+                      key={account.id}
+                      className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-4 py-3"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10 text-blue-500 text-xs font-bold shrink-0">
+                          <Server className="h-3.5 w-3.5" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium text-foreground truncate">{account.email}</p>
+                            {account.isDefault && (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                                <Star className="h-2.5 w-2.5" /> Par défaut
+                              </span>
+                            )}
+                          </div>
+                          {account.displayName && (
+                            <p className="text-xs text-muted-foreground truncate">{account.displayName}</p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          onClick={() => handleSendTest(account)}
+                          disabled={sendingTestId === account.id}
+                          className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                          title="Envoyer un email de test"
+                        >
+                          {sendingTestId === account.id ? <Spinner className="h-3.5 w-3.5" /> : <Send className="h-3.5 w-3.5" />}
+                        </button>
+                        {!account.isDefault && (
+                          <button
+                            onClick={() => handleSetDefault(account)}
+                            disabled={settingDefaultId === account.id}
+                            className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                            title="Définir par défaut"
+                          >
+                            {settingDefaultId === account.id ? <Spinner className="h-3.5 w-3.5" /> : <Star className="h-3.5 w-3.5" />}
+                          </button>
+                        )}
+                        <button
+                          onClick={() => setDeleteConfirm(account)}
+                          disabled={deletingId === account.id}
+                          className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                          title="Supprimer"
+                        >
+                          {deletingId === account.id ? <Spinner className="h-3.5 w-3.5" /> : <Trash2 className="h-3.5 w-3.5" />}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* SMTP config form */}
+              <div className="rounded-lg border border-dashed border-border bg-muted/10 p-4 space-y-3">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  {smtpAccounts.length > 0 ? 'Ajouter un autre serveur' : 'Configurer SMTP'}
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  <Field>
+                    <FieldLabel htmlFor="smtpHost" className="text-xs">Serveur SMTP</FieldLabel>
+                    <Input
+                      id="smtpHost"
+                      value={smtpHost}
+                      onChange={(e) => setSmtpHost(e.target.value)}
+                      placeholder="smtp.example.com"
+                      className="text-xs"
+                    />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="smtpPort" className="text-xs">Port</FieldLabel>
+                    <Input
+                      id="smtpPort"
+                      type="number"
+                      value={smtpPort}
+                      onChange={(e) => setSmtpPort(e.target.value)}
+                      placeholder="587"
+                      className="text-xs"
+                    />
+                    <FieldDescription className="text-[11px]">587 (TLS) ou 465 (SSL)</FieldDescription>
+                  </Field>
+                </div>
+                <Field>
+                  <FieldLabel htmlFor="smtpUsername" className="text-xs">Identifiant</FieldLabel>
+                  <Input
+                    id="smtpUsername"
+                    value={smtpUsername}
+                    onChange={(e) => setSmtpUsername(e.target.value)}
+                    placeholder="user@example.com"
+                    className="text-xs"
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="smtpPassword" className="text-xs">Mot de passe</FieldLabel>
+                  <div className="relative">
+                    <Input
+                      id="smtpPassword"
+                      type={showSmtpPassword ? 'text' : 'password'}
+                      value={smtpPassword}
+                      onChange={(e) => setSmtpPassword(e.target.value)}
+                      placeholder="Mot de passe ou clé d'application"
+                      className="pr-10 text-xs"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowSmtpPassword(!showSmtpPassword)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {showSmtpPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                    </button>
+                  </div>
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="smtpFromEmail" className="text-xs">Email d&apos;envoi</FieldLabel>
+                  <Input
+                    id="smtpFromEmail"
+                    type="email"
+                    value={smtpFromEmail}
+                    onChange={(e) => setSmtpFromEmail(e.target.value)}
+                    placeholder="facturation@votredomaine.com"
+                    className="text-xs"
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="smtpDisplayName" className="text-xs">Nom d&apos;affichage <span className="text-muted-foreground font-normal">(optionnel)</span></FieldLabel>
+                  <Input
+                    id="smtpDisplayName"
+                    value={smtpDisplayName}
+                    onChange={(e) => setSmtpDisplayName(e.target.value)}
+                    placeholder="Mon Entreprise"
+                    className="text-xs"
+                  />
+                </Field>
+                <Button
+                  size="sm"
+                  onClick={handleConfigureSmtp}
+                  disabled={configuringSmtp || !smtpHost.trim() || !smtpUsername.trim() || !smtpPassword.trim() || !smtpFromEmail.trim()}
+                  className="w-full gap-2"
+                >
+                  {configuringSmtp ? <Spinner className="h-3.5 w-3.5" /> : <Server className="h-3.5 w-3.5" />}
+                  Configurer
                 </Button>
               </div>
             </CardContent>
