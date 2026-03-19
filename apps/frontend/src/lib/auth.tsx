@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState, useCallback } from 'rea
 import { useRouter, usePathname } from 'next/navigation'
 import { api } from '@/lib/api'
 import { CryptoResetModal } from '@/components/modals/crypto-reset-modal'
+import { VaultUnlockModal } from '@/components/modals/vault-unlock-modal'
 
 interface User {
   id: string
@@ -135,6 +136,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         onRecovered={handleCryptoRecovered}
         onWiped={handleCryptoWiped}
       />
+      <VaultUnlockModal />
     </AuthContext.Provider>
   )
 }
