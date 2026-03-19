@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
+import Link from 'next/link'
 import {
   Github,
   Globe,
@@ -14,10 +15,16 @@ import {
   Layers,
   Paintbrush,
   Sparkles,
+  Shield,
+  Lock,
+  FileText,
+  Scale,
+  ScrollText,
+  Cookie,
 } from 'lucide-react'
 
 const links = [
-  { label: 'GitHub', href: 'https://github.com/fakturapp/faktur', icon: Github },
+  { label: 'GitHub', href: 'https://github.com/faktur/fakturapp', icon: Github },
   { label: 'Site web', href: 'https://fakturapp.cc', icon: Globe },
   { label: 'Dashboard', href: 'https://dash.fakturapp.cc', icon: Layout },
   { label: 'API', href: 'https://api.fakturapp.cc', icon: Server },
@@ -32,12 +39,20 @@ const stack = [
   { name: 'Framer Motion', description: 'Animations', icon: Sparkles },
 ]
 
+const legalLinks = [
+  { label: 'Mentions légales', href: '/dashboard/legal', icon: Scale },
+  { label: 'Conditions générales', href: '/dashboard/legal/terms', icon: ScrollText },
+  { label: 'Politique de confidentialité', href: '/dashboard/legal/privacy', icon: Lock },
+  { label: 'Politique de sécurité', href: '/dashboard/legal/security', icon: Shield },
+  { label: 'Politique de cookies', href: '/dashboard/legal/cookies', icon: Cookie },
+]
+
 export default function AboutPage() {
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-6 px-4 lg:px-6 py-4 md:py-6 max-w-3xl"
+      className="space-y-6 px-4 lg:px-6 py-4 md:py-6 max-w-3xl mx-auto"
     >
       {/* Header */}
       <Card className="overflow-hidden">
@@ -47,7 +62,7 @@ export default function AboutPage() {
             <div>
               <h1 className="text-2xl font-bold text-foreground">Faktur</h1>
               <p className="text-sm text-muted-foreground mt-1">
-                Logiciel de facturation gratuit et open-source.
+                Logiciel de facturation gratuit avec chiffrement zero-access.
               </p>
               <Badge variant="muted" className="mt-3">v0.1.0</Badge>
             </div>
@@ -68,6 +83,24 @@ export default function AboutPage() {
             <div>
               <p className="text-sm font-medium text-foreground">danbenba</p>
               <p className="text-xs text-muted-foreground">Créateur & Développeur</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Sécurité */}
+      <Card>
+        <CardContent className="p-6">
+          <h2 className="text-sm font-semibold text-foreground mb-3">Sécurité</h2>
+          <div className="flex items-start gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4">
+            <Shield className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-foreground">Chiffrement zero-access</p>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                Vos données sont chiffrées avec votre mot de passe via AES-256-GCM.
+                Même avec un accès complet au serveur, personne ne peut lire vos informations.
+                Architecture inspirée de Proton.
+              </p>
             </div>
           </div>
         </CardContent>
@@ -119,6 +152,34 @@ export default function AboutPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Informations légales */}
+      <Card>
+        <CardContent className="p-6">
+          <h2 className="text-sm font-semibold text-foreground mb-4">Informations légales</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {legalLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="flex items-center gap-3 rounded-xl border border-border p-3 hover:bg-muted/50 transition-colors group"
+              >
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted">
+                  <link.icon className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <span className="text-sm font-medium text-foreground flex-1">{link.label}</span>
+              </Link>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Footer */}
+      <div className="text-center pb-4">
+        <p className="text-xs text-muted-foreground">
+          Personal Use License &mdash; Copyright &copy; 2026 danbenba
+        </p>
+      </div>
     </motion.div>
   )
 }
