@@ -412,7 +412,7 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
                       Modifier le devis
                     </Button>
                     {(quote.status === 'accepted' || quote.status === 'refused') && (
-                      <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 translate-y-1 group-hover/edit:opacity-100 group-hover/edit:translate-y-0 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-xl bg-zinc-900 text-white text-xs shadow-lg">
+                      <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 translate-y-1 group-hover/edit:opacity-100 group-hover/edit:translate-y-0 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-xl bg-foreground text-background text-xs shadow-lg">
                         Changez le statut pour pouvoir modifier le devis
                       </div>
                     )}
@@ -473,12 +473,12 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
                         <Send className="h-4 w-4" /> Envoyer le devis
                       </button>
                       {!hasEmailConfigured && (
-                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 translate-y-1 group-hover/send:opacity-100 group-hover/send:translate-y-0 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-xl bg-zinc-900 text-white text-xs shadow-lg">
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 translate-y-1 group-hover/send:opacity-100 group-hover/send:translate-y-0 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-xl bg-foreground text-background text-xs shadow-lg">
                           Configurez un compte email dans les paramètres
                         </div>
                       )}
                       {hasEmailConfigured && quote.status !== 'draft' && (
-                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 translate-y-1 group-hover/send:opacity-100 group-hover/send:translate-y-0 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-xl bg-zinc-900 text-white text-xs shadow-lg">
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 translate-y-1 group-hover/send:opacity-100 group-hover/send:translate-y-0 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-xl bg-foreground text-background text-xs shadow-lg">
                           Devis déjà envoyé — utilisez Relancer
                         </div>
                       )}
@@ -492,12 +492,12 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
                         <Send className="h-4 w-4" /> Relancer le client
                       </button>
                       {!hasEmailConfigured && (
-                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 translate-y-1 group-hover/reminder:opacity-100 group-hover/reminder:translate-y-0 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-xl bg-zinc-900 text-white text-xs shadow-lg">
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 translate-y-1 group-hover/reminder:opacity-100 group-hover/reminder:translate-y-0 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-xl bg-foreground text-background text-xs shadow-lg">
                           Configurez un compte email dans les paramètres
                         </div>
                       )}
                       {hasEmailConfigured && quote.status === 'draft' && (
-                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 translate-y-1 group-hover/reminder:opacity-100 group-hover/reminder:translate-y-0 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-xl bg-zinc-900 text-white text-xs shadow-lg">
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 translate-y-1 group-hover/reminder:opacity-100 group-hover/reminder:translate-y-0 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-xl bg-foreground text-background text-xs shadow-lg">
                           Envoyez d&apos;abord le devis
                         </div>
                       )}
