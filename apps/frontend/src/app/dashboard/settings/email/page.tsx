@@ -10,7 +10,9 @@ import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/componen
 import { useToast } from '@/components/ui/toast'
 import { useEmail, type EmailAccountItem } from '@/lib/email-context'
 import { api } from '@/lib/api'
-import { Mail, Trash2, Star, Plus, ExternalLink, Server, Zap, Send } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Field, FieldLabel, FieldDescription } from '@/components/ui/field'
+import { Mail, Trash2, Star, Plus, ExternalLink, Server, Zap, Send, Eye, EyeOff, Key } from 'lucide-react'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -52,6 +54,11 @@ export default function EmailSettingsPage() {
   const [settingDefaultId, setSettingDefaultId] = useState<string | null>(null)
   const [sendingTestId, setSendingTestId] = useState<string | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<EmailAccountItem | null>(null)
+  const [resendApiKey, setResendApiKey] = useState('')
+  const [resendFromEmail, setResendFromEmail] = useState('')
+  const [resendDisplayName, setResendDisplayName] = useState('')
+  const [configuringResend, setConfiguringResend] = useState(false)
+  const [showResendKey, setShowResendKey] = useState(false)
 
   useEffect(() => {
     if (searchParams.get('connected') === 'true') {
@@ -110,7 +117,32 @@ export default function EmailSettingsPage() {
     toast(`Email de test envoyé à ${account.email}`, 'success')
   }
 
+  async function handleConfigureResend() {
+    if (!resendApiKey.trim() || !resendFromEmail.trim()) {
+      toast('Veuillez remplir la clé API et l\'email d\'envoi', 'error')
+      return
+    }
+    setConfiguringResend(true)
+    const { data, error } = await api.post<{ message: string }>('/email/resend/configure', {
+      apiKey: resendApiKey.trim(),
+      fromEmail: resendFromEmail.trim(),
+      displayName: resendDisplayName.trim() || undefined,
+    })
+    setConfiguringResend(false)
+    if (error) {
+      toast(error, 'error')
+      return
+    }
+    toast(data?.message || 'Compte Resend configuré', 'success')
+    setResendApiKey('')
+    setResendFromEmail('')
+    setResendDisplayName('')
+    setShowResendKey(false)
+    refreshAccounts()
+  }
+
   const gmailAccounts = accounts.filter((a) => a.provider === 'gmail')
+  const resendAccounts = accounts.filter((a) => a.provider === 'resend')
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
@@ -233,27 +265,151 @@ export default function EmailSettingsPage() {
           </Card>
         </motion.div>
 
-        {/* Resend (coming soon) */}
+        {/* Resend */}
         <motion.div variants={fadeUp} custom={2}>
-          <Card className="overflow-hidden border-border/50 mb-4 opacity-60">
+          <Card className="overflow-hidden border-border/50 mb-4">
             <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/10">
-                    <Zap className="h-5 w-5 text-violet-500" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h2 className="text-sm font-semibold text-foreground">Resend</h2>
-                      <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
-                        Bientôt
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">API transactionnelle pour des envois fiables</p>
-                  </div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/10">
+                  <Zap className="h-5 w-5 text-violet-500" />
                 </div>
-                <Button variant="outline" size="sm" disabled className="gap-2">
-                  <ExternalLink className="h-3.5 w-3.5" /> Configurer
+                <div>
+                  <h2 className="text-sm font-semibold text-foreground">Resend</h2>
+                  <p className="text-xs text-muted-foreground">API transactionnelle pour des envois fiables</p>
+                </div>
+              </div>
+
+              {/* Existing Resend accounts */}
+              {resendAccounts.length > 0 && (
+                <div className="space-y-2 mb-4">
+                  {resendAccounts.map((account) => (
+                    <div
+                      key={account.id}
+                      className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-4 py-3"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/10 text-violet-500 text-xs font-bold shrink-0">
+                          <Key className="h-3.5 w-3.5" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium text-foreground truncate">{account.email}</p>
+                            {account.isDefault && (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                                <Star className="h-2.5 w-2.5" /> Par défaut
+                              </span>
+                            )}
+                          </div>
+                          {account.displayName && (
+                            <p className="text-xs text-muted-foreground truncate">{account.displayName}</p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          onClick={() => handleSendTest(account)}
+                          disabled={sendingTestId === account.id}
+                          className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                          title="Envoyer un email de test"
+                        >
+                          {sendingTestId === account.id ? (
+                            <Spinner className="h-3.5 w-3.5" />
+                          ) : (
+                            <Send className="h-3.5 w-3.5" />
+                          )}
+                        </button>
+                        {!account.isDefault && (
+                          <button
+                            onClick={() => handleSetDefault(account)}
+                            disabled={settingDefaultId === account.id}
+                            className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                            title="Définir par défaut"
+                          >
+                            {settingDefaultId === account.id ? (
+                              <Spinner className="h-3.5 w-3.5" />
+                            ) : (
+                              <Star className="h-3.5 w-3.5" />
+                            )}
+                          </button>
+                        )}
+                        <button
+                          onClick={() => setDeleteConfirm(account)}
+                          disabled={deletingId === account.id}
+                          className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                          title="Supprimer"
+                        >
+                          {deletingId === account.id ? (
+                            <Spinner className="h-3.5 w-3.5" />
+                          ) : (
+                            <Trash2 className="h-3.5 w-3.5" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Add Resend account form */}
+              <div className="rounded-lg border border-dashed border-border bg-muted/10 p-4 space-y-3">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  {resendAccounts.length > 0 ? 'Ajouter un autre compte' : 'Configurer Resend'}
+                </p>
+                <Field>
+                  <FieldLabel htmlFor="resendApiKey" className="text-xs">Clé API</FieldLabel>
+                  <div className="relative">
+                    <Input
+                      id="resendApiKey"
+                      type={showResendKey ? 'text' : 'password'}
+                      value={resendApiKey}
+                      onChange={(e) => setResendApiKey(e.target.value)}
+                      placeholder="re_xxxxxxxxxx..."
+                      className="pr-10 font-mono text-xs"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowResendKey(!showResendKey)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {showResendKey ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                    </button>
+                  </div>
+                  <FieldDescription className="text-[11px]">
+                    Disponible dans votre <a href="https://resend.com/api-keys" target="_blank" rel="noopener noreferrer">tableau de bord Resend</a>
+                  </FieldDescription>
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="resendFromEmail" className="text-xs">Email d&apos;envoi</FieldLabel>
+                  <Input
+                    id="resendFromEmail"
+                    type="email"
+                    value={resendFromEmail}
+                    onChange={(e) => setResendFromEmail(e.target.value)}
+                    placeholder="facturation@votredomaine.com"
+                    className="text-xs"
+                  />
+                  <FieldDescription className="text-[11px]">
+                    Le domaine doit être vérifié dans Resend
+                  </FieldDescription>
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="resendDisplayName" className="text-xs">Nom d&apos;affichage <span className="text-muted-foreground font-normal">(optionnel)</span></FieldLabel>
+                  <Input
+                    id="resendDisplayName"
+                    value={resendDisplayName}
+                    onChange={(e) => setResendDisplayName(e.target.value)}
+                    placeholder="Mon Entreprise"
+                    className="text-xs"
+                  />
+                </Field>
+                <Button
+                  size="sm"
+                  onClick={handleConfigureResend}
+                  disabled={configuringResend || !resendApiKey.trim() || !resendFromEmail.trim()}
+                  className="w-full gap-2"
+                >
+                  {configuringResend ? <Spinner className="h-3.5 w-3.5" /> : <Zap className="h-3.5 w-3.5" />}
+                  Configurer
                 </Button>
               </div>
             </CardContent>
