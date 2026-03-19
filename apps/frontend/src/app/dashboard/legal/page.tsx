@@ -1,9 +1,43 @@
 'use client'
 
+import Link from 'next/link'
 import { Card, CardContent } from '@/components/ui/card'
-import { Scale } from 'lucide-react'
+import { Scale, ScrollText, Lock, Shield, Cookie, ChevronRight } from 'lucide-react'
 
-export default function MentionsLegalesPage() {
+const legalPages = [
+  {
+    href: '/dashboard/legal/mentions',
+    icon: Scale,
+    title: 'Mentions légales',
+    description: 'Éditeur, hébergeur et informations légales obligatoires',
+  },
+  {
+    href: '/dashboard/legal/terms',
+    icon: ScrollText,
+    title: "Conditions générales d'utilisation",
+    description: "Règles d'utilisation du service Faktur",
+  },
+  {
+    href: '/dashboard/legal/privacy',
+    icon: Lock,
+    title: 'Politique de confidentialité',
+    description: 'Comment nous collectons et protégeons vos données (RGPD)',
+  },
+  {
+    href: '/dashboard/legal/security',
+    icon: Shield,
+    title: 'Politique de sécurité',
+    description: 'Architecture de chiffrement zero-access et mesures de protection',
+  },
+  {
+    href: '/dashboard/legal/cookies',
+    icon: Cookie,
+    title: 'Politique de cookies',
+    description: 'Cookies utilisés et gestion de vos préférences',
+  },
+]
+
+export default function LegalHubPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
@@ -11,85 +45,39 @@ export default function MentionsLegalesPage() {
           <Scale className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-foreground">Mentions légales</h1>
-          <p className="text-sm text-muted-foreground">Dernière mise à jour : 19 mars 2026</p>
+          <h1 className="text-xl font-bold text-foreground">Informations légales</h1>
+          <p className="text-sm text-muted-foreground">Transparence et respect de vos droits</p>
         </div>
       </div>
 
       <Card>
-        <CardContent className="p-6 space-y-6">
-          <section className="space-y-2">
-            <h2 className="text-sm font-semibold text-foreground">1. Éditeur du site</h2>
-            <div className="text-sm text-muted-foreground space-y-1 leading-relaxed">
-              <p>Le site <strong className="text-foreground">Faktur</strong> (fakturapp.cc, dash.fakturapp.cc, api.fakturapp.cc) est édité par :</p>
-              <ul className="list-disc list-inside space-y-0.5 ml-2">
-                <li>Nom : danbenba</li>
-                <li>Statut : Personne physique</li>
-                <li>Contact : contact@fakturapp.cc</li>
-                <li>Site web : fakturapp.cc</li>
-              </ul>
-            </div>
-          </section>
-
-          <section className="space-y-2">
-            <h2 className="text-sm font-semibold text-foreground">2. Directeur de la publication</h2>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Le directeur de la publication est danbenba, joignable à contact@fakturapp.cc.
-            </p>
-          </section>
-
-          <section className="space-y-2">
-            <h2 className="text-sm font-semibold text-foreground">3. Hébergement</h2>
-            <div className="text-sm text-muted-foreground space-y-1 leading-relaxed">
-              <p>Le site et l&apos;application sont hébergés par :</p>
-              <ul className="list-disc list-inside space-y-0.5 ml-2">
-                <li>Hébergeur : Hetzner Online GmbH</li>
-                <li>Adresse : Industriestr. 25, 91710 Gunzenhausen, Allemagne</li>
-                <li>Site web : hetzner.com</li>
-              </ul>
-              <p className="mt-2">
-                Les serveurs sont situés dans l&apos;Union européenne (Allemagne), conformément au RGPD.
-              </p>
-            </div>
-          </section>
-
-          <section className="space-y-2">
-            <h2 className="text-sm font-semibold text-foreground">4. Propriété intellectuelle</h2>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              L&apos;ensemble du contenu du site (textes, images, logos, code source, design) est la propriété
-              exclusive de danbenba et est protégé par le droit d&apos;auteur. Le code source est disponible
-              sous <strong className="text-foreground">Personal Use License</strong> — usage personnel uniquement.
-              Toute reproduction, redistribution ou utilisation commerciale est interdite sans autorisation écrite.
-            </p>
-          </section>
-
-          <section className="space-y-2">
-            <h2 className="text-sm font-semibold text-foreground">5. Responsabilité</h2>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              L&apos;éditeur s&apos;efforce d&apos;assurer l&apos;exactitude des informations diffusées sur le site,
-              mais ne saurait être tenu responsable des erreurs, omissions ou résultats obtenus suite à
-              l&apos;utilisation de ces informations. L&apos;accès au site peut être interrompu à tout moment
-              pour des raisons de maintenance ou de force majeure.
-            </p>
-          </section>
-
-          <section className="space-y-2">
-            <h2 className="text-sm font-semibold text-foreground">6. Liens hypertextes</h2>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Le site peut contenir des liens vers des sites tiers. L&apos;éditeur n&apos;exerce aucun contrôle
-              sur ces sites et décline toute responsabilité quant à leur contenu.
-            </p>
-          </section>
-
-          <section className="space-y-2">
-            <h2 className="text-sm font-semibold text-foreground">7. Droit applicable</h2>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Les présentes mentions légales sont régies par le droit français. Tout litige sera soumis
-              aux tribunaux compétents.
-            </p>
-          </section>
+        <CardContent className="p-6">
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Chez Faktur, nous nous engageons à respecter votre vie privée et à protéger vos données.
+            Notre service utilise un chiffrement zero-access : même nous ne pouvons pas lire vos données sensibles.
+            Retrouvez ci-dessous l&apos;ensemble de nos documents légaux.
+          </p>
         </CardContent>
       </Card>
+
+      <div className="space-y-3">
+        {legalPages.map((page) => (
+          <Link key={page.href} href={page.href}>
+            <Card className="transition-colors hover:bg-muted/50 cursor-pointer group">
+              <CardContent className="p-4 flex items-center gap-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+                  <page.icon className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-foreground">{page.title}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{page.description}</p>
+                </div>
+                <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 group-hover:text-foreground transition-colors" />
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
+      </div>
     </div>
   )
 }

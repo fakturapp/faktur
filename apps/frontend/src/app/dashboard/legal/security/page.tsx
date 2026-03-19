@@ -22,7 +22,7 @@ export default function SecurityPolicyPage() {
           { icon: Lock, title: 'Chiffrement AES-256-GCM', desc: 'Toutes les données sensibles sont chiffrées individuellement' },
           { icon: Key, title: 'Zero-access', desc: 'Le serveur ne peut jamais lire vos données' },
           { icon: Eye, title: '2FA disponible', desc: 'Authentification à deux facteurs (TOTP)' },
-          { icon: Server, title: 'Hébergement UE', desc: 'Serveurs en Allemagne (Hetzner)' },
+          { icon: Server, title: 'Hébergement France', desc: 'Serveurs en France (OVHcloud)' },
         ].map((item) => (
           <Card key={item.title}>
             <CardContent className="p-4 flex items-start gap-3">
@@ -139,7 +139,7 @@ export default function SecurityPolicyPage() {
             <h2 className="text-sm font-semibold text-foreground">6. Infrastructure</h2>
             <div className="text-sm text-muted-foreground leading-relaxed">
               <ul className="list-disc list-inside space-y-0.5 ml-2">
-                <li>Serveurs hébergés chez Hetzner (Allemagne, UE)</li>
+                <li>Serveurs hébergés chez OVHcloud (France, UE)</li>
                 <li>Communications HTTPS/TLS obligatoires</li>
                 <li>Headers de sécurité (Helmet, CORS, Shield)</li>
                 <li>Protection CSRF intégrée</li>
@@ -155,7 +155,7 @@ export default function SecurityPolicyPage() {
                 Si vous découvrez une vulnérabilité, <strong className="text-foreground">ne créez pas d&apos;issue publique</strong>.
                 Envoyez un email à :
               </p>
-              <p className="font-medium text-foreground">contact@fakturapp.cc</p>
+              <p className="font-medium text-foreground">contact@danbenba.dev</p>
               <p>
                 Nous nous engageons à accuser réception sous 48 heures et à fournir
                 une évaluation initiale sous 7 jours.

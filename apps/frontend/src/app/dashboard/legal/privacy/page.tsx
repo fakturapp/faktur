@@ -33,7 +33,7 @@ export default function PrivacyPage() {
               <p>Le responsable du traitement des données est :</p>
               <ul className="list-disc list-inside space-y-0.5 ml-2">
                 <li>Nom : danbenba</li>
-                <li>Contact : contact@fakturapp.cc</li>
+                <li>Contact : contact@danbenba.dev</li>
               </ul>
             </div>
           </section>
@@ -122,13 +122,13 @@ export default function PrivacyPage() {
             <div className="text-sm text-muted-foreground space-y-2 leading-relaxed">
               <p>Vos données ne sont jamais vendues. Elles peuvent être partagées avec :</p>
               <ul className="list-disc list-inside space-y-0.5 ml-2">
-                <li><strong className="text-foreground/80">Hetzner</strong> (hébergement) — serveurs en Allemagne, UE</li>
+                <li><strong className="text-foreground/80">OVHcloud</strong> (hébergement) — serveurs en France, UE</li>
                 <li><strong className="text-foreground/80">Resend</strong> (emails transactionnels) — pour l&apos;envoi des emails de vérification</li>
                 <li><strong className="text-foreground/80">Google</strong> (Gmail OAuth) — uniquement si vous connectez votre compte Gmail pour l&apos;envoi de factures</li>
               </ul>
               <p>
-                Aucun transfert de données en dehors de l&apos;Union européenne n&apos;est effectué
-                sans les garanties appropriées (clauses contractuelles types).
+                Toutes les données sont hébergées en France.
+                Aucun transfert en dehors de l&apos;UE n&apos;est effectué sans les garanties appropriées.
               </p>
             </div>
           </section>
@@ -158,7 +158,7 @@ export default function PrivacyPage() {
                 <li><strong className="text-foreground/80">Droit à la limitation</strong> : restreindre le traitement</li>
               </ul>
               <p>
-                Pour exercer vos droits, contactez-nous à contact@fakturapp.cc.
+                Pour exercer vos droits, contactez-nous à contact@danbenba.dev.
                 Vous pouvez également introduire une réclamation auprès de la CNIL (cnil.fr).
               </p>
             </div>
@@ -173,7 +173,7 @@ export default function PrivacyPage() {
                 <li>Communications HTTPS/TLS obligatoires</li>
                 <li>Authentification à deux facteurs (2FA) disponible</li>
                 <li>Rate limiting et protection contre les attaques</li>
-                <li>Serveurs hébergés dans l&apos;Union européenne</li>
+                <li>Serveurs hébergés en France (OVHcloud)</li>
               </ul>
             </div>
           </section>
@@ -182,7 +182,7 @@ export default function PrivacyPage() {
             <h2 className="text-sm font-semibold text-foreground">11. Contact</h2>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Pour toute question relative à la protection de vos données, contactez-nous
-              à l&apos;adresse : contact@fakturapp.cc
+              à l&apos;adresse : contact@danbenba.dev
             </p>
           </section>
         </CardContent>

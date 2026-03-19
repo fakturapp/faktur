@@ -23,7 +23,7 @@ export default function TermsPage() {
             <p className="text-sm text-muted-foreground leading-relaxed">
               Les présentes conditions générales d&apos;utilisation (CGU) ont pour objet de définir les
               modalités d&apos;accès et d&apos;utilisation du service Faktur, accessible à l&apos;adresse
-              dash.fakturapp.cc. En créant un compte, l&apos;utilisateur accepte sans réserve les présentes CGU.
+              Faktur. En créant un compte, l&apos;utilisateur accepte sans réserve les présentes CGU.
             </p>
           </section>
 
@@ -164,7 +164,7 @@ export default function TermsPage() {
             <h2 className="text-sm font-semibold text-foreground">13. Contact</h2>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Pour toute question relative aux présentes CGU, vous pouvez contacter l&apos;éditeur
-              à l&apos;adresse : contact@fakturapp.cc
+              à l&apos;adresse : contact@danbenba.dev
             </p>
           </section>
         </CardContent>

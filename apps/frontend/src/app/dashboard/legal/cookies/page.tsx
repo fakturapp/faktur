@@ -95,7 +95,7 @@ export default function CookiesPage() {
             <h2 className="text-sm font-semibold text-foreground">5. Contact</h2>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Pour toute question relative aux cookies, contactez-nous
-              à l&apos;adresse : contact@fakturapp.cc
+              à l&apos;adresse : contact@danbenba.dev
             </p>
           </section>
         </CardContent>
