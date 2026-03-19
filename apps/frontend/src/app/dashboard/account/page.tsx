@@ -17,7 +17,7 @@ import { useAuth } from '@/lib/auth'
 import { useToast } from '@/components/ui/toast'
 import { api } from '@/lib/api'
 import { Spinner } from '@/components/ui/spinner'
-import { User, Shield, Monitor, Trash2, Smartphone, Copy, Check, Camera, Globe, MapPin, Download, Lock, AlertTriangle, Calendar, Link2, Unlink } from 'lucide-react'
+import { User, Shield, Monitor, Trash2, Smartphone, Copy, Check, Camera, Globe, MapPin, Download, Lock, AlertTriangle, Calendar, Link2, Unlink, Eye, EyeOff } from 'lucide-react'
 
 const tabs = [
   { id: 'profile', label: 'Profil', icon: <User className="h-4 w-4" /> },
@@ -62,6 +62,10 @@ export default function AccountPage() {
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [passwordLoading, setPasswordLoading] = useState(false)
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [showDeletePassword, setShowDeletePassword] = useState(false)
 
   // Sessions
   const [sessions, setSessions] = useState<Session[]>([])
@@ -1004,13 +1008,17 @@ export default function AccountPage() {
         <DialogDescription>
           Cette action est irréversible. Toutes vos données seront perdues. Entrez votre mot de passe pour confirmer.
         </DialogDescription>
-        <div className="mt-4">
+        <div className="mt-4 relative">
           <Input
-            type="password"
+            type={showDeletePassword ? 'text' : 'password'}
             placeholder="Votre mot de passe"
             value={deletePassword}
             onChange={(e) => setDeletePassword(e.target.value)}
+            className="pr-10"
           />
+          <button type="button" onClick={() => setShowDeletePassword(!showDeletePassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors" tabIndex={-1}>
+            {showDeletePassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </button>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => setDeleteOpen(false)}>
@@ -1223,24 +1231,39 @@ export default function AccountPage() {
       </Dialog>
 
       {/* Password change dialog */}
-      <Dialog open={passwordDialogOpen} onClose={() => { setPasswordDialogOpen(false); setCurrentPassword(''); setNewPassword(''); setConfirmPassword('') }}>
+      <Dialog open={passwordDialogOpen} onClose={() => { setPasswordDialogOpen(false); setCurrentPassword(''); setNewPassword(''); setConfirmPassword(''); setShowCurrentPassword(false); setShowNewPassword(false); setShowConfirmPassword(false) }}>
         <DialogTitle>Modifier le mot de passe</DialogTitle>
         <DialogDescription>Entrez votre mot de passe actuel puis choisissez un nouveau mot de passe.</DialogDescription>
         <form onSubmit={handleChangePassword} className="mt-4 space-y-4">
           <Field>
             <FieldLabel htmlFor="currentPassword">Mot de passe actuel</FieldLabel>
-            <Input id="currentPassword" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} required autoFocus />
+            <div className="relative">
+              <Input id="currentPassword" type={showCurrentPassword ? 'text' : 'password'} value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} required autoFocus className="pr-10" />
+              <button type="button" onClick={() => setShowCurrentPassword(!showCurrentPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors" tabIndex={-1}>
+                {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </Field>
           <Field>
             <FieldLabel htmlFor="newPassword">Nouveau mot de passe</FieldLabel>
-            <Input id="newPassword" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
+            <div className="relative">
+              <Input id="newPassword" type={showNewPassword ? 'text' : 'password'} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required className="pr-10" />
+              <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors" tabIndex={-1}>
+                {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </Field>
           <Field>
             <FieldLabel htmlFor="confirmPassword">Confirmer le mot de passe</FieldLabel>
-            <Input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+            <div className="relative">
+              <Input id="confirmPassword" type={showConfirmPassword ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required className="pr-10" />
+              <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors" tabIndex={-1}>
+                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </Field>
           <DialogFooter>
-            <Button variant="outline" type="button" onClick={() => { setPasswordDialogOpen(false); setCurrentPassword(''); setNewPassword(''); setConfirmPassword('') }}>
+            <Button variant="outline" type="button" onClick={() => { setPasswordDialogOpen(false); setCurrentPassword(''); setNewPassword(''); setConfirmPassword(''); setShowCurrentPassword(false); setShowNewPassword(false); setShowConfirmPassword(false) }}>
               Annuler
             </Button>
             <Button type="submit" disabled={passwordLoading || !currentPassword || !newPassword || !confirmPassword}>
