@@ -40,11 +40,11 @@ const stack = [
 ]
 
 const legalLinks = [
-  { label: 'Mentions légales', href: '/dashboard/legal', icon: Scale },
-  { label: 'Conditions générales', href: '/dashboard/legal/terms', icon: ScrollText },
-  { label: 'Politique de confidentialité', href: '/dashboard/legal/privacy', icon: Lock },
-  { label: 'Politique de sécurité', href: '/dashboard/legal/security', icon: Shield },
-  { label: 'Politique de cookies', href: '/dashboard/legal/cookies', icon: Cookie },
+  { label: 'Mentions légales', href: '/legal/mentions', icon: Scale },
+  { label: 'Conditions générales', href: '/legal/terms', icon: ScrollText },
+  { label: 'Politique de confidentialité', href: '/legal/privacy', icon: Lock },
+  { label: 'Politique de sécurité', href: '/legal/security', icon: Shield },
+  { label: 'Politique de cookies', href: '/legal/cookies', icon: Cookie },
 ]
 
 export default function AboutPage() {

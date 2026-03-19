@@ -358,15 +358,11 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
           <span>À propos</span>
         </Link>
         <Link
-          href="/dashboard/legal"
-          className={cn(
-            'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-all duration-300 ease-in-out relative',
-            pathname.startsWith('/dashboard/legal')
-              ? 'bg-gradient-to-r from-primary/10 to-transparent text-sidebar-accent-foreground border-l-2 border-primary'
-              : 'text-muted-foreground hover:bg-sidebar-accent/50 hover:text-foreground'
-          )}
+          href="/legal"
+          target="_blank"
+          className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-all duration-300 ease-in-out relative text-muted-foreground hover:bg-sidebar-accent/50 hover:text-foreground"
         >
-          <Scale className={cn('h-4 w-4 shrink-0', pathname.startsWith('/dashboard/legal') && 'text-primary')} />
+          <Scale className="h-4 w-4 shrink-0" />
           <span>Informations légales</span>
         </Link>
       </div>
@@ -391,7 +387,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
                   {user.fullName || user.email}
                 </p>
                 <p className="text-xs text-muted-foreground truncate">
-                  {user.email}
+                  Plan Free
                 </p>
               </div>
               <MoreHorizontal className="h-4 w-4 text-muted-foreground shrink-0" />

@@ -187,7 +187,7 @@ export default function RegisterPage() {
                   />
                   <span className="text-sm text-muted-foreground leading-tight">
                     J&apos;accepte les{' '}
-                    <a href="/dashboard/legal/terms" target="_blank" className="text-primary underline-offset-2 hover:underline">
+                    <a href="/legal/terms" target="_blank" className="text-primary underline-offset-2 hover:underline">
                       Conditions g&eacute;n&eacute;rales d&apos;utilisation
                     </a>
                   </span>
@@ -202,7 +202,7 @@ export default function RegisterPage() {
                   />
                   <span className="text-sm text-muted-foreground leading-tight">
                     J&apos;accepte la{' '}
-                    <a href="/dashboard/legal/privacy" target="_blank" className="text-primary underline-offset-2 hover:underline">
+                    <a href="/legal/privacy" target="_blank" className="text-primary underline-offset-2 hover:underline">
                       Politique de confidentialit&eacute;
                     </a>
                   </span>

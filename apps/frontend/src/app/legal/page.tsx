@@ -6,31 +6,31 @@ import { Scale, ScrollText, Lock, Shield, Cookie, ChevronRight } from 'lucide-re
 
 const legalPages = [
   {
-    href: '/dashboard/legal/mentions',
+    href: '/legal/mentions',
     icon: Scale,
     title: 'Mentions légales',
     description: 'Éditeur, hébergeur et informations légales obligatoires',
   },
   {
-    href: '/dashboard/legal/terms',
+    href: '/legal/terms',
     icon: ScrollText,
     title: "Conditions générales d'utilisation",
     description: "Règles d'utilisation du service Faktur",
   },
   {
-    href: '/dashboard/legal/privacy',
+    href: '/legal/privacy',
     icon: Lock,
     title: 'Politique de confidentialité',
     description: 'Comment nous collectons et protégeons vos données (RGPD)',
   },
   {
-    href: '/dashboard/legal/security',
+    href: '/legal/security',
     icon: Shield,
     title: 'Politique de sécurité',
     description: 'Architecture de chiffrement zero-access et mesures de protection',
   },
   {
-    href: '/dashboard/legal/cookies',
+    href: '/legal/cookies',
     icon: Cookie,
     title: 'Politique de cookies',
     description: 'Cookies utilisés et gestion de vos préférences',
@@ -60,7 +60,7 @@ export default function LegalHubPage() {
         </CardContent>
       </Card>
 
-      <div className="space-y-3">
+      <div className="grid gap-3">
         {legalPages.map((page) => (
           <Link key={page.href} href={page.href}>
             <Card className="transition-colors hover:bg-muted/50 cursor-pointer group">
