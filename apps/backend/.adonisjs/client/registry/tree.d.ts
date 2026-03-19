@@ -120,6 +120,7 @@ export interface ApiDefinition {
   emailAccountsSetDefault: typeof routes['email_accounts_set_default']
   gmailAuthUrl: typeof routes['gmail_auth_url']
   configureResend: typeof routes['configure_resend']
+  configureSmtp: typeof routes['configure_smtp']
   sendEmail: typeof routes['send_email']
   sendTestEmail: typeof routes['send_test_email']
   listEmailLogs: typeof routes['list_email_logs']

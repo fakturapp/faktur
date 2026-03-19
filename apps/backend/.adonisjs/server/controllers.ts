@@ -108,6 +108,9 @@ export const controllers = {
     resend: {
       Configure: () => import('#controllers/email/resend/configure'),
     },
+    smtp: {
+      Configure: () => import('#controllers/email/smtp/configure'),
+    },
   },
   invoice: {
     crud: {
