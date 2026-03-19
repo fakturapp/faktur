@@ -8,10 +8,11 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Field, FieldGroup, FieldLabel, FieldDescription, FieldError } from '@/components/ui/field'
 import { Separator } from '@/components/ui/separator'
+import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { useAuth } from '@/lib/auth'
 import { api } from '@/lib/api'
 import { Spinner } from '@/components/ui/spinner'
-import { Building2, Search, Phone, Mail, Globe, ChevronLeft, MapPin, CreditCard } from 'lucide-react'
+import { Building2, Search, Phone, Mail, Globe, ChevronLeft, MapPin, CreditCard, AlertTriangle } from 'lucide-react'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -68,6 +69,7 @@ export default function OnboardingCompanyPage() {
   const [searching, setSearching] = useState(false)
   const [showManual, setShowManual] = useState(false)
   const [showBankFields, setShowBankFields] = useState(false)
+  const [showSkipConfirm, setShowSkipConfirm] = useState(false)
 
   const [form, setForm] = useState({
     legalName: '',
@@ -408,7 +410,7 @@ export default function OnboardingCompanyPage() {
                   type="button"
                   variant="outline"
                   className="flex-1"
-                  onClick={handleSkip}
+                  onClick={() => setShowSkipConfirm(true)}
                   disabled={loading}
                 >
                   Passer cette étape
@@ -431,6 +433,33 @@ export default function OnboardingCompanyPage() {
           </form>
         </CardContent>
       </Card>
+      {/* Skip confirmation modal */}
+      <Dialog open={showSkipConfirm} onClose={() => setShowSkipConfirm(false)} className="max-w-sm">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 shrink-0">
+            <AlertTriangle className="h-5 w-5 text-amber-500" />
+          </div>
+          <DialogTitle className="mb-0">Passer cette étape ?</DialogTitle>
+        </div>
+        <DialogDescription>
+          Sans les informations de votre entreprise, vous ne pourrez pas créer de factures ni de devis.
+          Vous pourrez les compléter plus tard dans les paramètres.
+        </DialogDescription>
+        <DialogFooter>
+          <Button variant="outline" size="sm" onClick={() => setShowSkipConfirm(false)}>
+            Rester ici
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="border-amber-500/30 text-amber-500 hover:bg-amber-500/10"
+            onClick={() => { setShowSkipConfirm(false); handleSkip() }}
+            disabled={loading}
+          >
+            {loading ? <><Spinner className="h-3.5 w-3.5" /> Passage...</> : 'Passer quand même'}
+          </Button>
+        </DialogFooter>
+      </Dialog>
     </motion.div>
   )
 }
