@@ -2,17 +2,20 @@
 
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { motion, type Variants } from 'framer-motion'
+import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Spinner } from '@/components/ui/spinner'
+import { Input } from '@/components/ui/input'
+import { Field, FieldLabel, FieldDescription } from '@/components/ui/field'
 import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/toast'
 import { useEmail, type EmailAccountItem } from '@/lib/email-context'
 import { api } from '@/lib/api'
-import { Input } from '@/components/ui/input'
-import { Field, FieldLabel, FieldDescription } from '@/components/ui/field'
-import { Mail, Trash2, Star, Plus, Server, Zap, Send, Eye, EyeOff, Key } from 'lucide-react'
+import {
+  Mail, Plus, Server, Zap, Send, Eye, EyeOff, Key, Star, Trash2,
+  ArrowLeft, ArrowRight, X, CheckCircle2, XCircle, Check, MoreHorizontal,
+} from 'lucide-react'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -23,51 +26,59 @@ const fadeUp = {
   }),
 } satisfies Variants
 
-function EmailAccountSkeleton() {
-  return (
-    <div className="space-y-2">
-      {[0, 1].map((i) => (
-        <div key={i} className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-4 py-3">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="h-8 w-8 rounded-lg bg-muted animate-pulse shrink-0" />
-            <div className="min-w-0 space-y-1.5">
-              <div className="h-3.5 w-40 rounded bg-muted animate-pulse" />
-              <div className="h-3 w-24 rounded bg-muted animate-pulse" />
-            </div>
-          </div>
-          <div className="flex items-center gap-1 shrink-0">
-            <div className="h-8 w-8 rounded-lg bg-muted animate-pulse" />
-            <div className="h-8 w-8 rounded-lg bg-muted animate-pulse" />
-          </div>
-        </div>
-      ))}
-    </div>
-  )
+type ProviderType = 'gmail' | 'resend' | 'smtp'
+type DialogStep = 'choose' | 'configure' | 'testing' | 'success' | 'error'
+
+const providerMeta: Record<string, { label: string; color: string; bgColor: string; icon: typeof Mail }> = {
+  gmail: { label: 'Gmail', color: 'text-red-500', bgColor: 'bg-red-500/10', icon: Mail },
+  resend: { label: 'Resend', color: 'text-violet-500', bgColor: 'bg-violet-500/10', icon: Zap },
+  smtp: { label: 'SMTP', color: 'text-blue-500', bgColor: 'bg-blue-500/10', icon: Server },
 }
 
 export default function EmailSettingsPage() {
   const { toast } = useToast()
   const searchParams = useSearchParams()
   const { accounts, loading, refreshAccounts } = useEmail()
-  const [connectingGmail, setConnectingGmail] = useState(false)
+
+  // Account actions
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [settingDefaultId, setSettingDefaultId] = useState<string | null>(null)
   const [sendingTestId, setSendingTestId] = useState<string | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<EmailAccountItem | null>(null)
+
+  // Add provider dialog
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [dialogStep, setDialogStep] = useState<DialogStep>('choose')
+  const [selectedProvider, setSelectedProvider] = useState<ProviderType | null>(null)
+  const [configError, setConfigError] = useState('')
+  const [connecting, setConnecting] = useState(false)
+
+  // Resend fields
   const [resendApiKey, setResendApiKey] = useState('')
   const [resendFromEmail, setResendFromEmail] = useState('')
   const [resendDisplayName, setResendDisplayName] = useState('')
-  const [configuringResend, setConfiguringResend] = useState(false)
   const [showResendKey, setShowResendKey] = useState(false)
-  // SMTP state
+
+  // SMTP fields
   const [smtpHost, setSmtpHost] = useState('')
   const [smtpPort, setSmtpPort] = useState('587')
   const [smtpUsername, setSmtpUsername] = useState('')
   const [smtpPassword, setSmtpPassword] = useState('')
   const [smtpFromEmail, setSmtpFromEmail] = useState('')
   const [smtpDisplayName, setSmtpDisplayName] = useState('')
-  const [configuringSmtp, setConfiguringSmtp] = useState(false)
   const [showSmtpPassword, setShowSmtpPassword] = useState(false)
+
+  // Validation
+  const [touched, setTouched] = useState<Record<string, boolean>>({})
+
+  // Success state
+  const [newAccountId, setNewAccountId] = useState<string | null>(null)
+  const [newAccountEmail, setNewAccountEmail] = useState('')
+  const [sendingTest, setSendingTest] = useState(false)
+  const [testSent, setTestSent] = useState(false)
+
+  // Action menus
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null)
 
   useEffect(() => {
     if (searchParams.get('connected') === 'true') {
@@ -86,15 +97,133 @@ export default function EmailSettingsPage() {
     }
   }, [searchParams, toast, refreshAccounts])
 
+  // Close menus on click outside
+  useEffect(() => {
+    if (!openMenuId) return
+    function handleClick() { setOpenMenuId(null) }
+    window.addEventListener('click', handleClick)
+    return () => window.removeEventListener('click', handleClick)
+  }, [openMenuId])
+
+  function openDialog() {
+    setDialogStep('choose')
+    setSelectedProvider(null)
+    setConfigError('')
+    setTouched({})
+    setNewAccountId(null)
+    setNewAccountEmail('')
+    setTestSent(false)
+    resetForms()
+    setDialogOpen(true)
+  }
+
+  function closeDialog() {
+    setDialogOpen(false)
+  }
+
+  function resetForms() {
+    setResendApiKey(''); setResendFromEmail(''); setResendDisplayName(''); setShowResendKey(false)
+    setSmtpHost(''); setSmtpPort('587'); setSmtpUsername(''); setSmtpPassword('')
+    setSmtpFromEmail(''); setSmtpDisplayName(''); setShowSmtpPassword(false)
+  }
+
+  function selectProvider(p: ProviderType) {
+    setSelectedProvider(p)
+    setConfigError('')
+    setTouched({})
+    if (p === 'gmail') {
+      handleConnectGmail()
+    } else {
+      setDialogStep('configure')
+    }
+  }
+
   async function handleConnectGmail() {
-    setConnectingGmail(true)
+    setConnecting(true)
     const { data, error } = await api.get<{ url: string }>('/email/oauth/gmail/url?returnTo=/dashboard/settings/email')
-    setConnectingGmail(false)
+    setConnecting(false)
     if (error || !data?.url) {
       toast(error || 'Erreur', 'error')
       return
     }
     window.location.href = data.url
+  }
+
+  function isFieldMissing(field: string, value: string) {
+    return touched[field] && !value.trim()
+  }
+
+  async function handleConfigure() {
+    setConfigError('')
+
+    if (selectedProvider === 'resend') {
+      const t: Record<string, boolean> = { resendApiKey: true, resendFromEmail: true }
+      setTouched(t)
+      if (!resendApiKey.trim() || !resendFromEmail.trim()) {
+        setConfigError('Veuillez remplir tous les champs obligatoires')
+        return
+      }
+      setDialogStep('testing')
+      const { data, error } = await api.post<{ message: string; emailAccount?: { id: string; email: string } }>('/email/resend/configure', {
+        apiKey: resendApiKey.trim(),
+        fromEmail: resendFromEmail.trim(),
+        displayName: resendDisplayName.trim() || undefined,
+      })
+      if (error) {
+        setConfigError(error)
+        setDialogStep('error')
+        return
+      }
+      setNewAccountId(data?.emailAccount?.id || null)
+      setNewAccountEmail(data?.emailAccount?.email || resendFromEmail)
+      setDialogStep('success')
+      refreshAccounts()
+    }
+
+    if (selectedProvider === 'smtp') {
+      const t: Record<string, boolean> = { smtpHost: true, smtpUsername: true, smtpPassword: true, smtpFromEmail: true }
+      setTouched(t)
+      if (!smtpHost.trim() || !smtpUsername.trim() || !smtpPassword.trim() || !smtpFromEmail.trim()) {
+        setConfigError('Veuillez remplir tous les champs obligatoires')
+        return
+      }
+      setDialogStep('testing')
+      const { data, error } = await api.post<{ message: string; emailAccount?: { id: string; email: string } }>('/email/smtp/configure', {
+        host: smtpHost.trim(),
+        port: Number(smtpPort) || 587,
+        username: smtpUsername.trim(),
+        password: smtpPassword.trim(),
+        fromEmail: smtpFromEmail.trim(),
+        displayName: smtpDisplayName.trim() || undefined,
+      })
+      if (error) {
+        setConfigError(error)
+        setDialogStep('error')
+        return
+      }
+      setNewAccountId(data?.emailAccount?.id || null)
+      setNewAccountEmail(data?.emailAccount?.email || smtpFromEmail)
+      setDialogStep('success')
+      refreshAccounts()
+    }
+  }
+
+  async function handleSendTestFromDialog() {
+    if (!newAccountId) return
+    setSendingTest(true)
+    const { error } = await api.post('/email/test', { emailAccountId: newAccountId })
+    setSendingTest(false)
+    if (error) { toast(error, 'error'); return }
+    setTestSent(true)
+    toast(`Email de test envoyé à ${newAccountEmail}`, 'success')
+  }
+
+  async function handleSendTest(account: EmailAccountItem) {
+    setSendingTestId(account.id)
+    const { error } = await api.post('/email/test', { emailAccountId: account.id })
+    setSendingTestId(null)
+    if (error) { toast(error, 'error'); return }
+    toast(`Email de test envoyé à ${account.email}`, 'success')
   }
 
   async function handleDelete(account: EmailAccountItem) {
@@ -112,533 +241,585 @@ export default function EmailSettingsPage() {
     const { error } = await api.patch(`/email/accounts/${account.id}/default`, {})
     setSettingDefaultId(null)
     if (error) { toast(error, 'error'); return }
+    toast(`${account.email} est maintenant le compte par défaut`, 'success')
     refreshAccounts()
   }
-
-  async function handleSendTest(account: EmailAccountItem) {
-    setSendingTestId(account.id)
-    const { error } = await api.post('/email/test', { emailAccountId: account.id })
-    setSendingTestId(null)
-    if (error) {
-      toast(error, 'error')
-      return
-    }
-    toast(`Email de test envoyé à ${account.email}`, 'success')
-  }
-
-  async function handleConfigureResend() {
-    if (!resendApiKey.trim() || !resendFromEmail.trim()) {
-      toast('Veuillez remplir la clé API et l\'email d\'envoi', 'error')
-      return
-    }
-    setConfiguringResend(true)
-    const { data, error } = await api.post<{ message: string }>('/email/resend/configure', {
-      apiKey: resendApiKey.trim(),
-      fromEmail: resendFromEmail.trim(),
-      displayName: resendDisplayName.trim() || undefined,
-    })
-    setConfiguringResend(false)
-    if (error) {
-      toast(error, 'error')
-      return
-    }
-    toast(data?.message || 'Compte Resend configuré', 'success')
-    setResendApiKey('')
-    setResendFromEmail('')
-    setResendDisplayName('')
-    setShowResendKey(false)
-    refreshAccounts()
-  }
-
-  async function handleConfigureSmtp() {
-    if (!smtpHost.trim() || !smtpUsername.trim() || !smtpPassword.trim() || !smtpFromEmail.trim()) {
-      toast('Veuillez remplir tous les champs obligatoires', 'error')
-      return
-    }
-    setConfiguringSmtp(true)
-    const { data, error } = await api.post<{ message: string }>('/email/smtp/configure', {
-      host: smtpHost.trim(),
-      port: Number(smtpPort) || 587,
-      username: smtpUsername.trim(),
-      password: smtpPassword.trim(),
-      fromEmail: smtpFromEmail.trim(),
-      displayName: smtpDisplayName.trim() || undefined,
-    })
-    setConfiguringSmtp(false)
-    if (error) {
-      toast(error, 'error')
-      return
-    }
-    toast(data?.message || 'Compte SMTP configuré', 'success')
-    setSmtpHost('')
-    setSmtpPort('587')
-    setSmtpUsername('')
-    setSmtpPassword('')
-    setSmtpFromEmail('')
-    setSmtpDisplayName('')
-    setShowSmtpPassword(false)
-    refreshAccounts()
-  }
-
-  const gmailAccounts = accounts.filter((a) => a.provider === 'gmail')
-  const resendAccounts = accounts.filter((a) => a.provider === 'resend')
-  const smtpAccounts = accounts.filter((a) => a.provider === 'smtp')
 
   return (
-    <div className="p-6 max-w-3xl mx-auto">
+    <div className="px-4 lg:px-6 py-4 md:py-6 max-w-3xl mx-auto">
       <motion.div initial="hidden" animate="visible">
-        <motion.div variants={fadeUp} custom={0} className="mb-6">
-          <h1 className="text-2xl font-bold text-foreground">Email</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Configurez vos comptes email pour envoyer vos factures et devis directement depuis l&apos;application.
-          </p>
+        {/* Header */}
+        <motion.div variants={fadeUp} custom={0} className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Email</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Gérez vos comptes email pour envoyer factures et devis.
+            </p>
+          </div>
+          <Button onClick={openDialog} className="gap-2">
+            <Plus className="h-4 w-4" />
+            Ajouter
+          </Button>
         </motion.div>
 
-        {/* Gmail */}
+        {/* Accounts list */}
         <motion.div variants={fadeUp} custom={1}>
-          <Card className="overflow-hidden border-border/50 mb-4">
+          <Card className="overflow-hidden border-border/50">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-500/10">
-                    <Mail className="h-5 w-5 text-red-500" />
-                  </div>
-                  <div>
-                    <h2 className="text-sm font-semibold text-foreground">Gmail</h2>
-                    <p className="text-xs text-muted-foreground">Envoyez vos emails via votre compte Google</p>
-                  </div>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleConnectGmail}
-                  disabled={connectingGmail}
-                  className="gap-2"
-                >
-                  {connectingGmail ? <Spinner className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
-                  {gmailAccounts.length > 0 ? 'Ajouter un compte' : 'Connecter Gmail'}
-                </Button>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Comptes connectés
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {accounts.length} compte{accounts.length !== 1 ? 's' : ''}
+                </p>
               </div>
 
               {loading ? (
-                <EmailAccountSkeleton />
-              ) : gmailAccounts.length > 0 ? (
                 <div className="space-y-2">
-                  {gmailAccounts.map((account) => (
-                    <div
-                      key={account.id}
-                      className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-4 py-3"
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-500/10 text-red-500 text-xs font-bold shrink-0">
-                          {account.email.charAt(0).toUpperCase()}
+                  {[0, 1].map((i) => (
+                    <div key={i} className="flex items-center gap-3 rounded-xl border border-border px-4 py-3">
+                      <div className="h-9 w-9 rounded-lg bg-muted animate-pulse shrink-0" />
+                      <div className="flex-1 space-y-1.5">
+                        <div className="h-3.5 w-40 rounded bg-muted animate-pulse" />
+                        <div className="h-3 w-24 rounded bg-muted animate-pulse" />
+                      </div>
+                      <div className="h-8 w-8 rounded-lg bg-muted animate-pulse" />
+                    </div>
+                  ))}
+                </div>
+              ) : accounts.length > 0 ? (
+                <div className="space-y-2">
+                  {accounts.map((acc, i) => {
+                    const meta = providerMeta[acc.provider] || providerMeta.smtp
+                    const Icon = meta.icon
+                    return (
+                      <motion.div
+                        key={acc.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.05 }}
+                        className="group flex items-center gap-3 rounded-xl border border-border hover:border-border/80 px-4 py-3 transition-colors"
+                      >
+                        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${meta.bgColor}`}>
+                          <Icon className={`h-4 w-4 ${meta.color}`} />
                         </div>
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2">
-                            <p className="text-sm font-medium text-foreground truncate">{account.email}</p>
-                            {account.isDefault && (
+                            <p className="text-sm font-medium text-foreground truncate">{acc.email}</p>
+                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ${meta.bgColor} ${meta.color}`}>
+                              {meta.label}
+                            </span>
+                            {acc.isDefault && (
                               <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
                                 <Star className="h-2.5 w-2.5" /> Par défaut
                               </span>
                             )}
                           </div>
-                          {account.displayName && (
-                            <p className="text-xs text-muted-foreground truncate">{account.displayName}</p>
+                          {acc.displayName && (
+                            <p className="text-xs text-muted-foreground truncate">{acc.displayName}</p>
                           )}
                         </div>
-                      </div>
-                      <div className="flex items-center gap-1 shrink-0">
-                        <button
-                          onClick={() => handleSendTest(account)}
-                          disabled={sendingTestId === account.id}
-                          className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                          title="Envoyer un email de test"
-                        >
-                          {sendingTestId === account.id ? (
-                            <Spinner className="h-3.5 w-3.5" />
-                          ) : (
-                            <Send className="h-3.5 w-3.5" />
-                          )}
-                        </button>
-                        {!account.isDefault && (
+
+                        {/* Actions */}
+                        <div className="flex items-center gap-1 shrink-0">
                           <button
-                            onClick={() => handleSetDefault(account)}
-                            disabled={settingDefaultId === account.id}
+                            onClick={() => handleSendTest(acc)}
+                            disabled={sendingTestId === acc.id}
                             className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                            title="Définir par défaut"
+                            title="Envoyer un email de test"
                           >
-                            {settingDefaultId === account.id ? (
-                              <Spinner className="h-3.5 w-3.5" />
-                            ) : (
-                              <Star className="h-3.5 w-3.5" />
-                            )}
+                            {sendingTestId === acc.id ? <Spinner className="h-3.5 w-3.5" /> : <Send className="h-3.5 w-3.5" />}
                           </button>
-                        )}
-                        <button
-                          onClick={() => setDeleteConfirm(account)}
-                          disabled={deletingId === account.id}
-                          className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                          title="Déconnecter"
-                        >
-                          {deletingId === account.id ? (
-                            <Spinner className="h-3.5 w-3.5" />
-                          ) : (
-                            <Trash2 className="h-3.5 w-3.5" />
+                          {!acc.isDefault && (
+                            <button
+                              onClick={() => handleSetDefault(acc)}
+                              disabled={settingDefaultId === acc.id}
+                              className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-amber-500 hover:bg-amber-500/10 transition-colors"
+                              title="Définir par défaut"
+                            >
+                              {settingDefaultId === acc.id ? <Spinner className="h-3.5 w-3.5" /> : <Star className="h-3.5 w-3.5" />}
+                            </button>
                           )}
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                          <button
+                            onClick={() => setDeleteConfirm(acc)}
+                            disabled={deletingId === acc.id}
+                            className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                            title="Supprimer"
+                          >
+                            {deletingId === acc.id ? <Spinner className="h-3.5 w-3.5" /> : <Trash2 className="h-3.5 w-3.5" />}
+                          </button>
+                        </div>
+                      </motion.div>
+                    )
+                  })}
                 </div>
               ) : (
-                <div className="rounded-lg border border-dashed border-border bg-muted/20 p-6 text-center">
-                  <Mail className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">
-                    Aucun compte Gmail connecté
+                <div className="rounded-xl border border-dashed border-border bg-muted/10 p-10 text-center">
+                  <Mail className="h-10 w-10 text-muted-foreground/30 mx-auto mb-3" />
+                  <p className="text-sm font-medium text-foreground">Aucun compte email</p>
+                  <p className="text-xs text-muted-foreground mt-1 mb-4">
+                    Ajoutez un fournisseur pour commencer à envoyer des emails depuis Faktur.
                   </p>
-                  <p className="text-xs text-muted-foreground/70 mt-1">
-                    Connectez votre compte Google pour envoyer des emails
-                  </p>
+                  <Button onClick={openDialog} variant="outline" size="sm" className="gap-2">
+                    <Plus className="h-3.5 w-3.5" />
+                    Ajouter un fournisseur
+                  </Button>
                 </div>
               )}
             </CardContent>
           </Card>
         </motion.div>
 
-        {/* Resend */}
-        <motion.div variants={fadeUp} custom={2}>
-          <Card className="overflow-hidden border-border/50 mb-4">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/10">
-                  <Zap className="h-5 w-5 text-violet-500" />
-                </div>
-                <div>
-                  <h2 className="text-sm font-semibold text-foreground">Resend</h2>
-                  <p className="text-xs text-muted-foreground">API transactionnelle pour des envois fiables</p>
-                </div>
-              </div>
+        {/* Info card */}
+        <motion.div variants={fadeUp} custom={2} className="mt-4">
+          <div className="rounded-lg border border-border/50 bg-muted/10 p-4">
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              <strong className="text-foreground">Sécurité</strong> — Vos identifiants sont chiffrés avant stockage et ne sont jamais accessibles en clair.
+              Les connexions Gmail utilisent OAuth 2.0, aucun mot de passe n&apos;est stocké.
+            </p>
+          </div>
+        </motion.div>
+      </motion.div>
 
-              {/* Existing Resend accounts */}
-              {resendAccounts.length > 0 && (
-                <div className="space-y-2 mb-4">
-                  {resendAccounts.map((account) => (
-                    <div
-                      key={account.id}
-                      className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-4 py-3"
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/10 text-violet-500 text-xs font-bold shrink-0">
-                          <Key className="h-3.5 w-3.5" />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-2">
-                            <p className="text-sm font-medium text-foreground truncate">{account.email}</p>
-                            {account.isDefault && (
-                              <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
-                                <Star className="h-2.5 w-2.5" /> Par défaut
-                              </span>
-                            )}
-                          </div>
-                          {account.displayName && (
-                            <p className="text-xs text-muted-foreground truncate">{account.displayName}</p>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1 shrink-0">
-                        <button
-                          onClick={() => handleSendTest(account)}
-                          disabled={sendingTestId === account.id}
-                          className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                          title="Envoyer un email de test"
-                        >
-                          {sendingTestId === account.id ? (
-                            <Spinner className="h-3.5 w-3.5" />
-                          ) : (
-                            <Send className="h-3.5 w-3.5" />
-                          )}
-                        </button>
-                        {!account.isDefault && (
-                          <button
-                            onClick={() => handleSetDefault(account)}
-                            disabled={settingDefaultId === account.id}
-                            className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                            title="Définir par défaut"
-                          >
-                            {settingDefaultId === account.id ? (
-                              <Spinner className="h-3.5 w-3.5" />
-                            ) : (
-                              <Star className="h-3.5 w-3.5" />
-                            )}
-                          </button>
-                        )}
-                        <button
-                          onClick={() => setDeleteConfirm(account)}
-                          disabled={deletingId === account.id}
-                          className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                          title="Supprimer"
-                        >
-                          {deletingId === account.id ? (
-                            <Spinner className="h-3.5 w-3.5" />
-                          ) : (
-                            <Trash2 className="h-3.5 w-3.5" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+      {/* ======= Add Provider Dialog ======= */}
+      <Dialog open={dialogOpen} onClose={closeDialog} dismissible={dialogStep === 'choose'} className="max-w-lg">
+        <AnimatePresence mode="wait">
+          {/* Step 1: Choose provider */}
+          {dialogStep === 'choose' && (
+            <motion.div
+              key="choose"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div className="flex items-center justify-between mb-1">
+                <DialogTitle>Ajouter un fournisseur</DialogTitle>
+                <button onClick={closeDialog} className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              <DialogDescription className="mb-6">
+                Sélectionnez le service que vous souhaitez utiliser pour envoyer vos emails.
+              </DialogDescription>
+
+              <div className="space-y-3">
+                <button
+                  onClick={() => selectProvider('gmail')}
+                  disabled={connecting}
+                  className="w-full flex items-center gap-4 rounded-xl border border-border p-4 hover:bg-muted/50 hover:border-red-500/30 transition-all text-left group"
+                >
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-red-500/10 group-hover:bg-red-500/15 transition-colors">
+                    <Mail className="h-5 w-5 text-red-500" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground">Gmail</p>
+                    <p className="text-xs text-muted-foreground">Connexion via OAuth Google — le plus simple</p>
+                  </div>
+                  {connecting ? <Spinner className="h-4 w-4" /> : <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />}
+                </button>
+
+                <button
+                  onClick={() => selectProvider('resend')}
+                  className="w-full flex items-center gap-4 rounded-xl border border-border p-4 hover:bg-muted/50 hover:border-violet-500/30 transition-all text-left group"
+                >
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-violet-500/10 group-hover:bg-violet-500/15 transition-colors">
+                    <Zap className="h-5 w-5 text-violet-500" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground">Resend</p>
+                    <p className="text-xs text-muted-foreground">API transactionnelle — domaine personnalisé</p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                </button>
+
+                <button
+                  onClick={() => selectProvider('smtp')}
+                  className="w-full flex items-center gap-4 rounded-xl border border-border p-4 hover:bg-muted/50 hover:border-blue-500/30 transition-all text-left group"
+                >
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 group-hover:bg-blue-500/15 transition-colors">
+                    <Server className="h-5 w-5 text-blue-500" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground">SMTP</p>
+                    <p className="text-xs text-muted-foreground">Serveur personnalisé — configuration avancée</p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Step 2: Configure Resend */}
+          {dialogStep === 'configure' && selectedProvider === 'resend' && (
+            <motion.div
+              key="resend-config"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <button
+                  onClick={() => { setDialogStep('choose'); setConfigError('') }}
+                  className="h-7 w-7 rounded-lg flex items-center justify-center hover:bg-muted/50 transition-colors"
+                >
+                  <ArrowLeft className="h-4 w-4 text-muted-foreground" />
+                </button>
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/10">
+                  <Zap className="h-4 w-4 text-violet-500" />
+                </div>
+                <DialogTitle className="text-base">Configurer Resend</DialogTitle>
+              </div>
+              <DialogDescription className="mb-5 ml-10">
+                Renseignez votre clé API et l&apos;email d&apos;envoi.
+              </DialogDescription>
+
+              {configError && (
+                <div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3 text-center text-sm text-destructive mb-4">
+                  {configError}
                 </div>
               )}
 
-              {/* Add Resend account form */}
-              <div className="rounded-lg border border-dashed border-border bg-muted/10 p-4 space-y-3">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  {resendAccounts.length > 0 ? 'Ajouter un autre compte' : 'Configurer Resend'}
-                </p>
+              <div className="space-y-4">
                 <Field>
-                  <FieldLabel htmlFor="resendApiKey" className="text-xs">Clé API</FieldLabel>
+                  <FieldLabel htmlFor="dlg-resendApiKey">Clé API <span className="text-destructive">*</span></FieldLabel>
                   <div className="relative">
                     <Input
-                      id="resendApiKey"
+                      id="dlg-resendApiKey"
                       type={showResendKey ? 'text' : 'password'}
                       value={resendApiKey}
                       onChange={(e) => setResendApiKey(e.target.value)}
+                      onBlur={() => setTouched((p) => ({ ...p, resendApiKey: true }))}
                       placeholder="re_xxxxxxxxxx..."
-                      className="pr-10 font-mono text-xs"
+                      className={`pr-10 font-mono text-sm ${isFieldMissing('resendApiKey', resendApiKey) ? 'border-destructive focus:ring-destructive/20' : ''}`}
                     />
                     <button
                       type="button"
                       onClick={() => setShowResendKey(!showResendKey)}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      {showResendKey ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                      {showResendKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
-                  <FieldDescription className="text-[11px]">
-                    Disponible dans votre <a href="https://resend.com/api-keys" target="_blank" rel="noopener noreferrer">tableau de bord Resend</a>
+                  {isFieldMissing('resendApiKey', resendApiKey) && (
+                    <p className="text-xs text-destructive mt-1">Ce champ est requis</p>
+                  )}
+                  <FieldDescription>
+                    Disponible dans votre <a href="https://resend.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">tableau de bord Resend</a>
                   </FieldDescription>
                 </Field>
+
                 <Field>
-                  <FieldLabel htmlFor="resendFromEmail" className="text-xs">Email d&apos;envoi</FieldLabel>
+                  <FieldLabel htmlFor="dlg-resendFromEmail">Email d&apos;envoi <span className="text-destructive">*</span></FieldLabel>
                   <Input
-                    id="resendFromEmail"
+                    id="dlg-resendFromEmail"
                     type="email"
                     value={resendFromEmail}
                     onChange={(e) => setResendFromEmail(e.target.value)}
+                    onBlur={() => setTouched((p) => ({ ...p, resendFromEmail: true }))}
                     placeholder="facturation@votredomaine.com"
-                    className="text-xs"
+                    className={isFieldMissing('resendFromEmail', resendFromEmail) ? 'border-destructive focus:ring-destructive/20' : ''}
                   />
-                  <FieldDescription className="text-[11px]">
-                    Le domaine doit être vérifié dans Resend
-                  </FieldDescription>
+                  {isFieldMissing('resendFromEmail', resendFromEmail) && (
+                    <p className="text-xs text-destructive mt-1">Ce champ est requis</p>
+                  )}
+                  <FieldDescription>Le domaine doit être vérifié dans Resend</FieldDescription>
                 </Field>
+
                 <Field>
-                  <FieldLabel htmlFor="resendDisplayName" className="text-xs">Nom d&apos;affichage <span className="text-muted-foreground font-normal">(optionnel)</span></FieldLabel>
+                  <FieldLabel htmlFor="dlg-resendDisplayName">
+                    Nom d&apos;affichage <span className="text-muted-foreground font-normal">(optionnel)</span>
+                  </FieldLabel>
                   <Input
-                    id="resendDisplayName"
+                    id="dlg-resendDisplayName"
                     value={resendDisplayName}
                     onChange={(e) => setResendDisplayName(e.target.value)}
                     placeholder="Mon Entreprise"
-                    className="text-xs"
                   />
                 </Field>
-                <Button
-                  size="sm"
-                  onClick={handleConfigureResend}
-                  disabled={configuringResend || !resendApiKey.trim() || !resendFromEmail.trim()}
-                  className="w-full gap-2"
-                >
-                  {configuringResend ? <Spinner className="h-3.5 w-3.5" /> : <Zap className="h-3.5 w-3.5" />}
-                  Configurer
+              </div>
+
+              <DialogFooter>
+                <Button variant="outline" onClick={() => { setDialogStep('choose'); setConfigError('') }}>
+                  Retour
                 </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+                <Button onClick={handleConfigure} className="gap-2">
+                  <Key className="h-4 w-4" />
+                  Tester et connecter
+                </Button>
+              </DialogFooter>
+            </motion.div>
+          )}
 
-        {/* SMTP */}
-        <motion.div variants={fadeUp} custom={3}>
-          <Card className="overflow-hidden border-border/50">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10">
-                  <Server className="h-5 w-5 text-blue-500" />
+          {/* Step 2: Configure SMTP */}
+          {dialogStep === 'configure' && selectedProvider === 'smtp' && (
+            <motion.div
+              key="smtp-config"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <button
+                  onClick={() => { setDialogStep('choose'); setConfigError('') }}
+                  className="h-7 w-7 rounded-lg flex items-center justify-center hover:bg-muted/50 transition-colors"
+                >
+                  <ArrowLeft className="h-4 w-4 text-muted-foreground" />
+                </button>
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10">
+                  <Server className="h-4 w-4 text-blue-500" />
                 </div>
-                <div>
-                  <h2 className="text-sm font-semibold text-foreground">SMTP</h2>
-                  <p className="text-xs text-muted-foreground">Connectez votre propre serveur SMTP</p>
-                </div>
+                <DialogTitle className="text-base">Configurer SMTP</DialogTitle>
               </div>
+              <DialogDescription className="mb-5 ml-10">
+                Renseignez les paramètres de votre serveur SMTP.
+              </DialogDescription>
 
-              {/* Existing SMTP accounts */}
-              {smtpAccounts.length > 0 && (
-                <div className="space-y-2 mb-4">
-                  {smtpAccounts.map((account) => (
-                    <div
-                      key={account.id}
-                      className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-4 py-3"
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10 text-blue-500 text-xs font-bold shrink-0">
-                          <Server className="h-3.5 w-3.5" />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-2">
-                            <p className="text-sm font-medium text-foreground truncate">{account.email}</p>
-                            {account.isDefault && (
-                              <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
-                                <Star className="h-2.5 w-2.5" /> Par défaut
-                              </span>
-                            )}
-                          </div>
-                          {account.displayName && (
-                            <p className="text-xs text-muted-foreground truncate">{account.displayName}</p>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1 shrink-0">
-                        <button
-                          onClick={() => handleSendTest(account)}
-                          disabled={sendingTestId === account.id}
-                          className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                          title="Envoyer un email de test"
-                        >
-                          {sendingTestId === account.id ? <Spinner className="h-3.5 w-3.5" /> : <Send className="h-3.5 w-3.5" />}
-                        </button>
-                        {!account.isDefault && (
-                          <button
-                            onClick={() => handleSetDefault(account)}
-                            disabled={settingDefaultId === account.id}
-                            className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                            title="Définir par défaut"
-                          >
-                            {settingDefaultId === account.id ? <Spinner className="h-3.5 w-3.5" /> : <Star className="h-3.5 w-3.5" />}
-                          </button>
-                        )}
-                        <button
-                          onClick={() => setDeleteConfirm(account)}
-                          disabled={deletingId === account.id}
-                          className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                          title="Supprimer"
-                        >
-                          {deletingId === account.id ? <Spinner className="h-3.5 w-3.5" /> : <Trash2 className="h-3.5 w-3.5" />}
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+              {configError && (
+                <div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3 text-center text-sm text-destructive mb-4">
+                  {configError}
                 </div>
               )}
 
-              {/* SMTP config form */}
-              <div className="rounded-lg border border-dashed border-border bg-muted/10 p-4 space-y-3">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  {smtpAccounts.length > 0 ? 'Ajouter un autre serveur' : 'Configurer SMTP'}
-                </p>
-                <div className="grid grid-cols-2 gap-3">
-                  <Field>
-                    <FieldLabel htmlFor="smtpHost" className="text-xs">Serveur SMTP</FieldLabel>
+              <div className="space-y-3">
+                <div className="grid grid-cols-3 gap-3">
+                  <Field className="col-span-2">
+                    <FieldLabel htmlFor="dlg-smtpHost">Serveur <span className="text-destructive">*</span></FieldLabel>
                     <Input
-                      id="smtpHost"
+                      id="dlg-smtpHost"
                       value={smtpHost}
                       onChange={(e) => setSmtpHost(e.target.value)}
+                      onBlur={() => setTouched((p) => ({ ...p, smtpHost: true }))}
                       placeholder="smtp.example.com"
-                      className="text-xs"
+                      className={isFieldMissing('smtpHost', smtpHost) ? 'border-destructive focus:ring-destructive/20' : ''}
                     />
+                    {isFieldMissing('smtpHost', smtpHost) && <p className="text-xs text-destructive mt-1">Requis</p>}
                   </Field>
                   <Field>
-                    <FieldLabel htmlFor="smtpPort" className="text-xs">Port</FieldLabel>
+                    <FieldLabel htmlFor="dlg-smtpPort">Port</FieldLabel>
                     <Input
-                      id="smtpPort"
+                      id="dlg-smtpPort"
                       type="number"
                       value={smtpPort}
                       onChange={(e) => setSmtpPort(e.target.value)}
                       placeholder="587"
-                      className="text-xs"
                     />
-                    <FieldDescription className="text-[11px]">587 (TLS) ou 465 (SSL)</FieldDescription>
                   </Field>
                 </div>
+
                 <Field>
-                  <FieldLabel htmlFor="smtpUsername" className="text-xs">Identifiant</FieldLabel>
+                  <FieldLabel htmlFor="dlg-smtpUsername">Identifiant <span className="text-destructive">*</span></FieldLabel>
                   <Input
-                    id="smtpUsername"
+                    id="dlg-smtpUsername"
                     value={smtpUsername}
                     onChange={(e) => setSmtpUsername(e.target.value)}
+                    onBlur={() => setTouched((p) => ({ ...p, smtpUsername: true }))}
                     placeholder="user@example.com"
-                    className="text-xs"
+                    className={isFieldMissing('smtpUsername', smtpUsername) ? 'border-destructive focus:ring-destructive/20' : ''}
                   />
+                  {isFieldMissing('smtpUsername', smtpUsername) && <p className="text-xs text-destructive mt-1">Requis</p>}
                 </Field>
+
                 <Field>
-                  <FieldLabel htmlFor="smtpPassword" className="text-xs">Mot de passe</FieldLabel>
+                  <FieldLabel htmlFor="dlg-smtpPassword">Mot de passe <span className="text-destructive">*</span></FieldLabel>
                   <div className="relative">
                     <Input
-                      id="smtpPassword"
+                      id="dlg-smtpPassword"
                       type={showSmtpPassword ? 'text' : 'password'}
                       value={smtpPassword}
                       onChange={(e) => setSmtpPassword(e.target.value)}
+                      onBlur={() => setTouched((p) => ({ ...p, smtpPassword: true }))}
                       placeholder="Mot de passe ou clé d'application"
-                      className="pr-10 text-xs"
+                      className={`pr-10 ${isFieldMissing('smtpPassword', smtpPassword) ? 'border-destructive focus:ring-destructive/20' : ''}`}
                     />
                     <button
                       type="button"
                       onClick={() => setShowSmtpPassword(!showSmtpPassword)}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      {showSmtpPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                      {showSmtpPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
+                  {isFieldMissing('smtpPassword', smtpPassword) && <p className="text-xs text-destructive mt-1">Requis</p>}
                 </Field>
+
                 <Field>
-                  <FieldLabel htmlFor="smtpFromEmail" className="text-xs">Email d&apos;envoi</FieldLabel>
+                  <FieldLabel htmlFor="dlg-smtpFromEmail">Email d&apos;envoi <span className="text-destructive">*</span></FieldLabel>
                   <Input
-                    id="smtpFromEmail"
+                    id="dlg-smtpFromEmail"
                     type="email"
                     value={smtpFromEmail}
                     onChange={(e) => setSmtpFromEmail(e.target.value)}
+                    onBlur={() => setTouched((p) => ({ ...p, smtpFromEmail: true }))}
                     placeholder="facturation@votredomaine.com"
-                    className="text-xs"
+                    className={isFieldMissing('smtpFromEmail', smtpFromEmail) ? 'border-destructive focus:ring-destructive/20' : ''}
                   />
+                  {isFieldMissing('smtpFromEmail', smtpFromEmail) && <p className="text-xs text-destructive mt-1">Requis</p>}
                 </Field>
+
                 <Field>
-                  <FieldLabel htmlFor="smtpDisplayName" className="text-xs">Nom d&apos;affichage <span className="text-muted-foreground font-normal">(optionnel)</span></FieldLabel>
+                  <FieldLabel htmlFor="dlg-smtpDisplayName">
+                    Nom d&apos;affichage <span className="text-muted-foreground font-normal">(optionnel)</span>
+                  </FieldLabel>
                   <Input
-                    id="smtpDisplayName"
+                    id="dlg-smtpDisplayName"
                     value={smtpDisplayName}
                     onChange={(e) => setSmtpDisplayName(e.target.value)}
                     placeholder="Mon Entreprise"
-                    className="text-xs"
                   />
                 </Field>
+              </div>
+
+              <DialogFooter>
+                <Button variant="outline" onClick={() => { setDialogStep('choose'); setConfigError('') }}>
+                  Retour
+                </Button>
+                <Button onClick={handleConfigure} className="gap-2">
+                  <Server className="h-4 w-4" />
+                  Tester et connecter
+                </Button>
+              </DialogFooter>
+            </motion.div>
+          )}
+
+          {/* Step 3: Testing connection */}
+          {dialogStep === 'testing' && (
+            <motion.div
+              key="testing"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              className="flex flex-col items-center py-8"
+            >
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
+                className="mb-6"
+              >
+                <Spinner className="h-8 w-8 text-primary" />
+              </motion.div>
+              <DialogTitle className="text-center">Test de connexion en cours...</DialogTitle>
+              <DialogDescription className="text-center">
+                Vérification de vos identifiants avec le serveur.
+              </DialogDescription>
+            </motion.div>
+          )}
+
+          {/* Step 4: Success */}
+          {dialogStep === 'success' && (
+            <motion.div
+              key="success"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ type: 'spring', bounce: 0.3, duration: 0.5 }}
+            >
+              <div className="flex flex-col items-center py-4">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', bounce: 0.5, delay: 0.1 }}
+                  className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10 mb-4"
+                >
+                  <CheckCircle2 className="h-8 w-8 text-emerald-500" />
+                </motion.div>
+                <DialogTitle className="text-center">Compte connecté avec succès</DialogTitle>
+                <DialogDescription className="text-center">
+                  Votre compte <span className="font-medium text-foreground">{newAccountEmail}</span> est prêt à envoyer des emails.
+                </DialogDescription>
+              </div>
+
+              <div className="mt-4 rounded-xl border border-border bg-muted/10 p-4">
+                <p className="text-sm font-medium text-foreground mb-2">Envoyer un email de test ?</p>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Un email de test sera envoyé à <span className="font-medium">{newAccountEmail}</span> pour vérifier que tout fonctionne.
+                </p>
                 <Button
                   size="sm"
-                  onClick={handleConfigureSmtp}
-                  disabled={configuringSmtp || !smtpHost.trim() || !smtpUsername.trim() || !smtpPassword.trim() || !smtpFromEmail.trim()}
+                  variant="outline"
+                  onClick={handleSendTestFromDialog}
+                  disabled={sendingTest || testSent}
                   className="w-full gap-2"
                 >
-                  {configuringSmtp ? <Spinner className="h-3.5 w-3.5" /> : <Server className="h-3.5 w-3.5" />}
-                  Configurer
+                  {sendingTest ? (
+                    <><Spinner className="h-3.5 w-3.5" /> Envoi en cours...</>
+                  ) : testSent ? (
+                    <><Check className="h-3.5 w-3.5 text-emerald-500" /> Email de test envoyé</>
+                  ) : (
+                    <><Send className="h-3.5 w-3.5" /> Envoyer un email de test</>
+                  )}
                 </Button>
               </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </motion.div>
+
+              <DialogFooter>
+                <Button onClick={closeDialog} className="w-full">
+                  Terminé
+                </Button>
+              </DialogFooter>
+            </motion.div>
+          )}
+
+          {/* Step 4 alt: Error */}
+          {dialogStep === 'error' && (
+            <motion.div
+              key="error"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ type: 'spring', bounce: 0.3, duration: 0.5 }}
+            >
+              <div className="flex flex-col items-center py-4">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', bounce: 0.5, delay: 0.1 }}
+                  className="flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10 mb-4"
+                >
+                  <XCircle className="h-8 w-8 text-destructive" />
+                </motion.div>
+                <DialogTitle className="text-center">Échec de la connexion</DialogTitle>
+                <DialogDescription className="text-center">
+                  {configError || 'Impossible de se connecter. Vérifiez vos paramètres et réessayez.'}
+                </DialogDescription>
+              </div>
+
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setDialogStep('configure')}>
+                  Modifier les paramètres
+                </Button>
+                <Button onClick={closeDialog}>
+                  Fermer
+                </Button>
+              </DialogFooter>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </Dialog>
 
       {/* Delete confirmation dialog */}
       <Dialog open={deleteConfirm !== null} onClose={() => setDeleteConfirm(null)} className="max-w-sm">
-        <DialogTitle>Déconnecter le compte</DialogTitle>
-        <DialogDescription>
-          Êtes-vous sûr de vouloir déconnecter <strong className="text-foreground">{deleteConfirm?.email}</strong> ? Vous ne pourrez plus envoyer d&apos;emails via ce compte.
-        </DialogDescription>
+        <div className="flex flex-col items-center py-2">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 mb-4">
+            <Trash2 className="h-5 w-5 text-destructive" />
+          </div>
+          <DialogTitle className="text-center">Déconnecter le compte</DialogTitle>
+          <DialogDescription className="text-center">
+            Êtes-vous sûr de vouloir déconnecter <strong className="text-foreground">{deleteConfirm?.email}</strong> ? Vous ne pourrez plus envoyer d&apos;emails via ce compte.
+          </DialogDescription>
+        </div>
         <DialogFooter>
-          <Button variant="outline" size="sm" onClick={() => setDeleteConfirm(null)}>Annuler</Button>
+          <Button variant="outline" onClick={() => setDeleteConfirm(null)}>Annuler</Button>
           <Button
             variant="destructive"
-            size="sm"
             disabled={deletingId !== null}
             onClick={() => deleteConfirm && handleDelete(deleteConfirm)}
+            className="gap-2"
           >
-            {deletingId ? <Spinner className="h-3.5 w-3.5" /> : <Trash2 className="h-3.5 w-3.5 mr-1" />}
+            {deletingId ? <Spinner className="h-3.5 w-3.5" /> : <Trash2 className="h-3.5 w-3.5" />}
             Déconnecter
           </Button>
         </DialogFooter>
