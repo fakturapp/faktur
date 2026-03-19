@@ -21,6 +21,7 @@ const ResendVerification = () => import('#controllers/auth/security/email/resend
 const TwoFactorVerify = () => import('#controllers/auth/security/two_factor/verify')
 const CryptoRecover = () => import('#controllers/auth/security/crypto_recover')
 const CryptoWipe = () => import('#controllers/auth/security/crypto_wipe')
+const VaultUnlock = () => import('#controllers/auth/vault/unlock')
 
 // OAuth Google
 const GoogleAuthUrl = () => import('#controllers/auth/oauth/google_auth_url')
@@ -52,6 +53,7 @@ router
         router.get('/me', [Me, 'handle'])
         router.post('/crypto/recover', [CryptoRecover, 'handle'])
         router.post('/crypto/wipe', [CryptoWipe, 'handle'])
+        router.post('/vault/unlock', [VaultUnlock, 'handle'])
       })
       .use(middleware.auth())
   })
