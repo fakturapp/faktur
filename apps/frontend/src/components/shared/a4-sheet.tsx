@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import {
   Trash2, Search, X, Building2, UserRound,
-  RefreshCw, MousePointerClick, FileText, Plus, Type, ChevronDown,
+  RefreshCw, MousePointerClick, FileText, Plus, Type, ChevronDown, Package,
 } from 'lucide-react'
 import { api } from '@/lib/api'
 import { Dialog, DialogTitle } from '@/components/ui/dialog'
@@ -382,13 +382,14 @@ export function ClientModal({
    ═══════════════════════════════════════════════════════════ */
 
 function AddLineDropdown({
-  isClassique, accentColor, T, t, onAddLine,
+  isClassique, accentColor, T, t, onAddLine, onCatalogClick,
 }: {
   isClassique: boolean
   accentColor: string
   T: any
   t: any
   onAddLine: (type: 'standard' | 'section') => void
+  onCatalogClick?: () => void
 }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -464,6 +465,20 @@ function AddLineDropdown({
             >
               <Type className="h-3 w-3" /> Section
             </button>
+            {onCatalogClick && (
+              <>
+                <div style={{ height: '1px', background: `${T.borderLight}` }} />
+                <button
+                  onClick={() => { onCatalogClick(); setOpen(false) }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-[12px] transition-colors"
+                  style={{ color: T.text }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = `${accentColor}10`)}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                >
+                  <Package className="h-3 w-3" /> Depuis le catalogue
+                </button>
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
@@ -494,6 +509,7 @@ interface A4SheetProps {
   lines: DocumentLine[]
   onUpdateLine: (index: number, partial: Partial<DocumentLine>) => void
   onAddLine: (type: 'standard' | 'section') => void
+  onCatalogClick?: () => void
   onRemoveLine: (index: number) => void
   subtotal: number
   taxAmount: number
@@ -544,7 +560,7 @@ export function A4Sheet({
   mode, logoUrl, accentColor, documentTitle, quoteNumber, onQuoteNumberChange,
   issueDate, validityDate,
   billingType, company, onCompanyFieldChange, client, onClientClick, onClearClient, onClientFieldChange,
-  lines, onUpdateLine, onAddLine, onRemoveLine,
+  lines, onUpdateLine, onAddLine, onCatalogClick, onRemoveLine,
   subtotal, taxAmount, discountAmount, total, tvaBreakdown,
   notes, onNotesChange, acceptanceConditions, signatureField, freeField,
   deliveryAddress, showDeliveryAddress, clientSiren, showClientSiren,
@@ -1057,7 +1073,7 @@ export function A4Sheet({
               </div>
 
               {/* ── Add line dropdown (edit mode) ── */}
-              {ed && <AddLineDropdown isClassique={isClassique} accentColor={accentColor} T={T} t={t} onAddLine={onAddLine} />}
+              {ed && <AddLineDropdown isClassique={isClassique} accentColor={accentColor} T={T} t={t} onAddLine={onAddLine} onCatalogClick={onCatalogClick} />}
 
             </div>
             {/* ═══ END TOP SECTION ═══ */}

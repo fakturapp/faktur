@@ -37,6 +37,7 @@ import {
   Mail,
   Info,
   Scale,
+  Package,
 } from 'lucide-react'
 
 interface TeamListItem {
@@ -101,6 +102,7 @@ const mainNav: NavItem[] = [
     ],
   },
   { href: '/dashboard/clients', label: 'Clients', icon: Users },
+  { href: '/dashboard/products', label: 'Catalogue', icon: Package },
 ]
 
 const settingsNav: NavItem = {

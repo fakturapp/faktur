@@ -14,6 +14,7 @@ import { DocumentOptionsPanel } from '@/components/shared/document-options'
 import { Save, ArrowLeft, Eye, Pencil, Download, SlidersHorizontal, X } from 'lucide-react'
 import { Dialog, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
+import { ProductCatalogModal, type CatalogProduct } from '@/components/products/product-catalog-modal'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -49,6 +50,7 @@ function EditQuoteContent() {
   const [company, setCompany] = useState<CompanyInfo | null>(null)
   const [selectedClient, setSelectedClient] = useState<ClientInfo | null>(null)
   const [clientModalOpen, setClientModalOpen] = useState(false)
+  const [catalogModalOpen, setCatalogModalOpen] = useState(false)
   const [accentColor, setAccentColor] = useState('#6366f1')
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
   const [showOptions, setShowOptions] = useState(true)
@@ -497,6 +499,7 @@ function EditQuoteContent() {
             lines={lines}
             onUpdateLine={handleUpdateLine}
             onAddLine={handleAddLine}
+            onCatalogClick={() => setCatalogModalOpen(true)}
             onRemoveLine={handleRemoveLine}
             subtotal={subtotal}
             taxAmount={taxAmount}
@@ -611,6 +614,26 @@ function EditQuoteContent() {
         open={clientModalOpen}
         onClose={() => setClientModalOpen(false)}
         onSelect={handleSelectClient}
+      />
+
+      {/* ── Product Catalog Modal ── */}
+      <ProductCatalogModal
+        open={catalogModalOpen}
+        onClose={() => setCatalogModalOpen(false)}
+        onSelect={(product: CatalogProduct) => {
+          const newLine: DocumentLine = {
+            id: generateId(),
+            type: 'standard',
+            description: product.name + (product.description ? `\n${product.description}` : ''),
+            saleType: product.saleType || '',
+            quantity: 1,
+            unit: product.unit || '',
+            unitPrice: Number(product.unitPrice),
+            vatRate: Number(product.vatRate),
+          }
+          setLines((prev) => [...prev, newLine])
+          setIsDirty(true)
+        }}
       />
 
       {/* ── Unsaved changes dialog ── */}

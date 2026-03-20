@@ -15,6 +15,7 @@ import { Save, ArrowLeft, Eye, Pencil, SlidersHorizontal, X, Lock, Building2 } f
 import { Dialog, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
 import { FirstDocumentBanner } from '@/components/shared/first-document-banner'
+import { ProductCatalogModal, type CatalogProduct } from '@/components/products/product-catalog-modal'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -83,6 +84,7 @@ export default function NewInvoicePage() {
   const [company, setCompany] = useState<CompanyInfo | null>(null)
   const [selectedClient, setSelectedClient] = useState<ClientInfo | null>(null)
   const [clientModalOpen, setClientModalOpen] = useState(false)
+  const [catalogModalOpen, setCatalogModalOpen] = useState(false)
   const [accentColor, setAccentColor] = useState('#6366f1')
   const [showOptions, setShowOptions] = useState(true)
 
@@ -493,6 +495,7 @@ export default function NewInvoicePage() {
               lines={lines}
               onUpdateLine={handleUpdateLine}
               onAddLine={handleAddLine}
+              onCatalogClick={() => setCatalogModalOpen(true)}
               onRemoveLine={handleRemoveLine}
               subtotal={subtotal}
               taxAmount={taxAmount}
@@ -604,6 +607,25 @@ export default function NewInvoicePage() {
       </div>
 
       <ClientModal open={clientModalOpen} onClose={() => setClientModalOpen(false)} onSelect={handleSelectClient} />
+
+      <ProductCatalogModal
+        open={catalogModalOpen}
+        onClose={() => setCatalogModalOpen(false)}
+        onSelect={(product: CatalogProduct) => {
+          const newLine: DocumentLine = {
+            id: generateId(),
+            type: 'standard',
+            description: product.name + (product.description ? `\n${product.description}` : ''),
+            saleType: product.saleType || '',
+            quantity: 1,
+            unit: product.unit || '',
+            unitPrice: Number(product.unitPrice),
+            vatRate: Number(product.vatRate),
+          }
+          setLines((prev) => [...prev, newLine])
+          setIsDirty(true)
+        }}
+      />
 
       <Dialog open={showModal} onClose={cancelNavigation} className="max-w-sm">
         <DialogTitle>Modifications non enregistrées</DialogTitle>
