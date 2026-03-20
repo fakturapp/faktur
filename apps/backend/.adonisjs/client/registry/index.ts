@@ -1050,6 +1050,18 @@ const routes = {
     tokens: [{"old":"/api/v1/ai/generate-reminder","type":0,"val":"api","end":""},{"old":"/api/v1/ai/generate-reminder","type":0,"val":"v1","end":""},{"old":"/api/v1/ai/generate-reminder","type":0,"val":"ai","end":""},{"old":"/api/v1/ai/generate-reminder","type":0,"val":"generate-reminder","end":""}],
     types: placeholder as Registry['generate_reminder']['types'],
   },
+  'generate_document': {
+    methods: ["POST"],
+    pattern: '/api/v1/ai/generate-document',
+    tokens: [{"old":"/api/v1/ai/generate-document","type":0,"val":"api","end":""},{"old":"/api/v1/ai/generate-document","type":0,"val":"v1","end":""},{"old":"/api/v1/ai/generate-document","type":0,"val":"ai","end":""},{"old":"/api/v1/ai/generate-document","type":0,"val":"generate-document","end":""}],
+    types: placeholder as Registry['generate_document']['types'],
+  },
+  'chat_document': {
+    methods: ["POST"],
+    pattern: '/api/v1/ai/chat-document',
+    tokens: [{"old":"/api/v1/ai/chat-document","type":0,"val":"api","end":""},{"old":"/api/v1/ai/chat-document","type":0,"val":"v1","end":""},{"old":"/api/v1/ai/chat-document","type":0,"val":"ai","end":""},{"old":"/api/v1/ai/chat-document","type":0,"val":"chat-document","end":""}],
+    types: placeholder as Registry['chat_document']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

@@ -2095,4 +2095,28 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ai/generate_reminder').default['handle']>>>
     }
   }
+  'generate_document': {
+    methods: ["POST"]
+    pattern: '/api/v1/ai/generate-document'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/ai/generate_document').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ai/generate_document').default['handle']>>>
+    }
+  }
+  'chat_document': {
+    methods: ["POST"]
+    pattern: '/api/v1/ai/chat-document'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/ai/chat_document').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ai/chat_document').default['handle']>>>
+    }
+  }
 }

@@ -183,4 +183,6 @@ export interface ApiDefinition {
   suggestInvoiceLines: typeof routes['suggest_invoice_lines']
   dashboardSummary: typeof routes['dashboard_summary']
   generateReminder: typeof routes['generate_reminder']
+  generateDocument: typeof routes['generate_document']
+  chatDocument: typeof routes['chat_document']
 }

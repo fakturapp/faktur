@@ -6,6 +6,8 @@ const GenerateText = () => import('#controllers/ai/generate_text')
 const SuggestInvoiceLines = () => import('#controllers/ai/suggest_invoice_lines')
 const DashboardSummary = () => import('#controllers/ai/dashboard_summary')
 const GenerateReminder = () => import('#controllers/ai/generate_reminder')
+const GenerateDocument = () => import('#controllers/ai/generate_document')
+const ChatDocument = () => import('#controllers/ai/chat_document')
 
 router
   .group(() => {
@@ -13,6 +15,8 @@ router
     router.post('/suggest-invoice-lines', [SuggestInvoiceLines, 'handle'])
     router.get('/dashboard-summary', [DashboardSummary, 'handle'])
     router.post('/generate-reminder', [GenerateReminder, 'handle'])
+    router.post('/generate-document', [GenerateDocument, 'handle'])
+    router.post('/chat-document', [ChatDocument, 'handle'])
   })
   .prefix(API_PREFIX + '/ai')
   .use(middleware.auth())

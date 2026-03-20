@@ -178,6 +178,8 @@ export type ScannedRoutes = {
     'suggest_invoice_lines': { paramsTuple?: []; params?: {} }
     'dashboard_summary': { paramsTuple?: []; params?: {} }
     'generate_reminder': { paramsTuple?: []; params?: {} }
+    'generate_document': { paramsTuple?: []; params?: {} }
+    'chat_document': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'signup': { paramsTuple?: []; params?: {} }
@@ -246,6 +248,8 @@ export type ScannedRoutes = {
     'generate_text': { paramsTuple?: []; params?: {} }
     'suggest_invoice_lines': { paramsTuple?: []; params?: {} }
     'generate_reminder': { paramsTuple?: []; params?: {} }
+    'generate_document': { paramsTuple?: []; params?: {} }
+    'chat_document': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'google_auth_url': { paramsTuple?: []; params?: {} }

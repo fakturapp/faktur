@@ -313,5 +313,7 @@ export const controllers = {
     SuggestInvoiceLines: () => import('#controllers/ai/suggest_invoice_lines'),
     DashboardSummary: () => import('#controllers/ai/dashboard_summary'),
     GenerateReminder: () => import('#controllers/ai/generate_reminder'),
+    GenerateDocument: () => import('#controllers/ai/generate_document'),
+    ChatDocument: () => import('#controllers/ai/chat_document'),
   },
 }
