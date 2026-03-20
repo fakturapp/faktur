@@ -399,8 +399,8 @@ export class InvoiceSchema extends BaseModel {
   declare notes: string | null
   @column()
   declare operationCategory: string | null
-  @column.date()
-  declare paidDate: DateTime | null
+  @column()
+  declare paidDate: string | null
   @column()
   declare paymentMethod: string | null
   @column()

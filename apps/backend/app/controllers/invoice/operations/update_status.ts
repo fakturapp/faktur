@@ -11,8 +11,8 @@ export default class UpdateStatus {
       return response.badRequest({ message: 'No team selected' })
     }
 
-    const { status } = request.only(['status'])
-    const validStatuses = ['draft', 'sent', 'paid', 'overdue', 'cancelled']
+    const { status, paidDate } = request.only(['status', 'paidDate'])
+    const validStatuses = ['draft', 'sent', 'paid', 'partial', 'overdue', 'cancelled']
 
     if (!validStatuses.includes(status)) {
       return response.badRequest({ message: 'Invalid status' })
@@ -30,13 +30,17 @@ export default class UpdateStatus {
     invoice.status = status
 
     if (status === 'paid') {
-      invoice.paidDate = DateTime.now().toISO()
-    } else {
-      invoice.paidDate = null as any
+      if (paidDate && typeof paidDate === 'string') {
+        invoice.paidDate = paidDate
+      } else {
+        invoice.paidDate = DateTime.now().toFormat('yyyy-MM-dd')
+      }
+    } else if (status !== 'partial') {
+      invoice.paidDate = null
     }
 
     await invoice.save()
 
-    return response.ok({ invoice: { id: invoice.id, status: invoice.status } })
+    return response.ok({ invoice: { id: invoice.id, status: invoice.status, paidDate: invoice.paidDate } })
   }
 }
