@@ -58,7 +58,8 @@ export default class InvoiceSettingsUpdate {
         footerMode: payload.footerMode || 'vat_exempt',
         logoBorderRadius: payload.logoBorderRadius ?? 0,
         aiEnabled: payload.aiEnabled ?? false,
-        aiModel: payload.aiModel || 'claude-sonnet-4-5-20250929',
+        aiProvider: payload.aiProvider || 'gemini',
+        aiModel: payload.aiModel || 'gemini-2.5-flash-lite',
         aiCustomApiKey: aiCustomApiKeyToStore,
       })
     } else {
@@ -90,7 +91,8 @@ export default class InvoiceSettingsUpdate {
       if (payload.footerMode !== undefined) settings.footerMode = payload.footerMode || 'vat_exempt'
       if (payload.logoBorderRadius !== undefined) settings.logoBorderRadius = payload.logoBorderRadius
       if (payload.aiEnabled !== undefined) settings.aiEnabled = payload.aiEnabled
-      if (payload.aiModel !== undefined) settings.aiModel = payload.aiModel || 'claude-sonnet-4-5-20250929'
+      if (payload.aiProvider !== undefined) settings.aiProvider = payload.aiProvider || 'gemini'
+      if (payload.aiModel !== undefined) settings.aiModel = payload.aiModel || 'gemini-2.5-flash-lite'
       if (payload.aiCustomApiKey !== undefined && payload.aiCustomApiKey !== '••••••••') {
         settings.aiCustomApiKey = aiCustomApiKeyToStore
       }
@@ -127,7 +129,8 @@ export default class InvoiceSettingsUpdate {
         footerMode: settings.footerMode || 'vat_exempt',
         logoBorderRadius: settings.logoBorderRadius ?? 0,
         aiEnabled: settings.aiEnabled ?? false,
-        aiModel: settings.aiModel || 'claude-sonnet-4-5-20250929',
+        aiProvider: settings.aiProvider || 'gemini',
+        aiModel: settings.aiModel || 'gemini-2.5-flash-lite',
         aiCustomApiKey: settings.aiCustomApiKey ? '••••••••' : null,
       },
     })

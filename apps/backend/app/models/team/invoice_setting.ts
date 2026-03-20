@@ -107,6 +107,9 @@ export default class InvoiceSetting extends BaseModel {
   declare aiEnabled: boolean
 
   @column()
+  declare aiProvider: string
+
+  @column()
   declare aiModel: string
 
   @column()

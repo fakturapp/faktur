@@ -2,7 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import Invoice from '#models/invoice/invoice'
 import Expense from '#models/expense/expense'
-import ClaudeService from '#services/ai/claude_service'
+import AiService from '#services/ai/ai_service'
 
 export default class DashboardSummary {
   async handle(ctx: HttpContext) {
@@ -15,9 +15,9 @@ export default class DashboardSummary {
       return response.badRequest({ message: 'No team selected' })
     }
 
-    const claude = new ClaudeService()
+    const ai = new AiService()
 
-    if (!(await claude.isEnabled(teamId))) {
+    if (!(await ai.isEnabled(teamId))) {
       return response.forbidden({ message: 'AI is not enabled.' })
     }
 
@@ -54,7 +54,7 @@ Factures en retard: ${overdueCount} pour ${overdueTotal.toFixed(2)}€
 Dépenses ce mois: ${expensesThisMonth.toFixed(2)}€`
 
     try {
-      const summary = await claude.generate(teamId, dek, systemPrompt, metricsText, 256)
+      const summary = await ai.generate(teamId, dek, systemPrompt, metricsText, 256)
       return response.ok({ summary: summary.trim() })
     } catch (error: any) {
       return response.internalServerError({ message: 'AI summary failed', error: error.message })

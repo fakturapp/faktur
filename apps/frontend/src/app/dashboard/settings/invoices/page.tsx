@@ -45,6 +45,7 @@ import {
   Sparkles,
   Bot,
   Key,
+  ExternalLink,
 } from 'lucide-react'
 
 const fadeUp = {
@@ -872,7 +873,7 @@ export default function InvoiceSettingsPage() {
                       </div>
                       <div>
                         <h2 className="text-base font-semibold text-foreground">Intelligence artificielle</h2>
-                        <p className="text-xs text-muted-foreground">Powered by Claude — génération de texte, suggestions et résumés</p>
+                        <p className="text-xs text-muted-foreground">Génération de texte, suggestions et résumés automatiques</p>
                       </div>
                     </div>
 
@@ -913,13 +914,71 @@ export default function InvoiceSettingsPage() {
                           <div className="space-y-4 pt-2">
                             <Separator />
 
-                            {/* Model selector */}
+                            {/* Provider selector */}
                             <div>
-                              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">Modèle IA</label>
+                              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">Fournisseur IA</label>
+                              <div className="grid grid-cols-3 gap-2">
+                                {([
+                                  {
+                                    id: 'gemini' as const,
+                                    name: 'Gemini',
+                                    desc: 'Google AI',
+                                    badge: 'Gratuit',
+                                    badgeColor: 'bg-emerald-500/10 text-emerald-600',
+                                    icon: <Zap className="h-4 w-4" />,
+                                    iconBg: 'bg-blue-500/10 text-blue-500',
+                                  },
+                                  {
+                                    id: 'groq' as const,
+                                    name: 'Groq',
+                                    desc: 'Llama 3.3',
+                                    badge: 'Gratuit',
+                                    badgeColor: 'bg-emerald-500/10 text-emerald-600',
+                                    icon: <Zap className="h-4 w-4" />,
+                                    iconBg: 'bg-orange-500/10 text-orange-500',
+                                  },
+                                  {
+                                    id: 'claude' as const,
+                                    name: 'Claude',
+                                    desc: 'Anthropic',
+                                    badge: 'Payant',
+                                    badgeColor: 'bg-amber-500/10 text-amber-600',
+                                    icon: <Sparkles className="h-4 w-4" />,
+                                    iconBg: 'bg-violet-500/10 text-violet-500',
+                                  },
+                                ]).map((provider) => (
+                                  <button key={provider.id}
+                                    onClick={() => {
+                                      const defaultModels: Record<string, string> = {
+                                        claude: 'claude-sonnet-4-5-20250929',
+                                        gemini: 'gemini-2.5-flash-lite',
+                                        groq: 'llama-3.3-70b-versatile',
+                                      }
+                                      updateSettings({ aiProvider: provider.id, aiModel: defaultModels[provider.id], aiCustomApiKey: null })
+                                    }}
+                                    className={`rounded-xl border-2 p-3 text-left transition-all relative ${
+                                      settings.aiProvider === provider.id ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
+                                    }`}>
+                                    <div className={`flex h-8 w-8 items-center justify-center rounded-lg mb-2 ${provider.iconBg}`}>
+                                      {provider.icon}
+                                    </div>
+                                    <p className="text-xs font-semibold text-foreground">{provider.name}</p>
+                                    <p className="text-[10px] text-muted-foreground">{provider.desc}</p>
+                                    <span className={`absolute top-2 right-2 text-[9px] font-medium px-1.5 py-0.5 rounded-full ${provider.badgeColor}`}>
+                                      {provider.badge}
+                                    </span>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Model selector (changes based on provider) */}
+                            <div>
+                              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">Modèle</label>
                               <div className="grid grid-cols-2 gap-2">
-                                {[
+                                {settings.aiProvider === 'claude' && ([
                                   { id: 'claude-sonnet-4-5-20250929', name: 'Claude Sonnet', desc: 'Rapide et économique' },
-                                  { id: 'claude-opus-4-6', name: 'Claude Opus', desc: 'Plus puissant, plus lent' },
+                                  { id: 'claude-opus-4-6', name: 'Claude Opus', desc: 'Plus puissant' },
                                 ].map((model) => (
                                   <button key={model.id} onClick={() => updateSettings({ aiModel: model.id })}
                                     className={`rounded-xl border-2 p-3 text-left transition-all ${
@@ -928,25 +987,65 @@ export default function InvoiceSettingsPage() {
                                     <p className="text-xs font-medium text-foreground">{model.name}</p>
                                     <p className="text-[10px] text-muted-foreground">{model.desc}</p>
                                   </button>
-                                ))}
+                                )))}
+                                {settings.aiProvider === 'gemini' && ([
+                                  { id: 'gemini-2.5-flash-lite', name: 'Flash Lite', desc: '1 000 req/jour gratuit' },
+                                  { id: 'gemini-2.5-flash', name: 'Flash', desc: '250 req/jour gratuit' },
+                                  { id: 'gemini-2.5-pro', name: 'Pro', desc: '100 req/jour gratuit' },
+                                ].map((model) => (
+                                  <button key={model.id} onClick={() => updateSettings({ aiModel: model.id })}
+                                    className={`rounded-xl border-2 p-3 text-left transition-all ${
+                                      settings.aiModel === model.id ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
+                                    }`}>
+                                    <p className="text-xs font-medium text-foreground">{model.name}</p>
+                                    <p className="text-[10px] text-muted-foreground">{model.desc}</p>
+                                  </button>
+                                )))}
+                                {settings.aiProvider === 'groq' && ([
+                                  { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B', desc: 'Puissant, gratuit' },
+                                  { id: 'llama-3.1-8b-instant', name: 'Llama 3.1 8B', desc: 'Ultra rapide' },
+                                ].map((model) => (
+                                  <button key={model.id} onClick={() => updateSettings({ aiModel: model.id })}
+                                    className={`rounded-xl border-2 p-3 text-left transition-all ${
+                                      settings.aiModel === model.id ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
+                                    }`}>
+                                    <p className="text-xs font-medium text-foreground">{model.name}</p>
+                                    <p className="text-[10px] text-muted-foreground">{model.desc}</p>
+                                  </button>
+                                )))}
                               </div>
                             </div>
 
-                            {/* Custom API key */}
+                            {/* API key */}
                             <div>
                               <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
                                 <Key className="h-3 w-3" />
-                                Clé API personnalisée (optionnel)
+                                Clé API {settings.aiProvider === 'claude' ? '(obligatoire)' : '(optionnel)'}
                               </label>
-                              <Input type="password" placeholder="Laissez vide pour utiliser la clé par défaut..."
+                              <Input type="password"
+                                placeholder={settings.aiProvider === 'claude' ? 'sk-ant-...' : 'Laissez vide pour utiliser la clé par défaut...'}
                                 value={settings.aiCustomApiKey === '••••••••' ? '' : (settings.aiCustomApiKey || '')}
                                 onChange={(e) => updateSettings({ aiCustomApiKey: e.target.value || null })}
                                 className="text-sm" />
-                              <p className="text-[10px] text-muted-foreground mt-1">
-                                {settings.aiCustomApiKey && settings.aiCustomApiKey !== '••••••••'
-                                  ? 'Votre clé personnalisée sera utilisée — les tokens sont facturés sur votre propre compte Anthropic'
-                                  : 'La clé par défaut du serveur sera utilisée'}
-                              </p>
+                              <div className="flex items-center justify-between mt-1.5">
+                                <p className="text-[10px] text-muted-foreground">
+                                  {settings.aiCustomApiKey && settings.aiCustomApiKey !== '••••••••'
+                                    ? 'Votre clé personnalisée sera utilisée'
+                                    : settings.aiProvider === 'claude'
+                                    ? 'Une clé API Anthropic est requise pour Claude'
+                                    : 'La clé par défaut du serveur sera utilisée'}
+                                </p>
+                                <a href={
+                                  settings.aiProvider === 'claude' ? 'https://console.anthropic.com/settings/keys'
+                                    : settings.aiProvider === 'gemini' ? 'https://aistudio.google.com/apikey'
+                                    : 'https://console.groq.com/keys'
+                                  }
+                                  target="_blank" rel="noopener noreferrer"
+                                  className="text-[10px] text-primary hover:underline flex items-center gap-1 shrink-0"
+                                >
+                                  Obtenir une clé <ExternalLink className="h-2.5 w-2.5" />
+                                </a>
+                              </div>
                             </div>
 
                             {/* Features list */}

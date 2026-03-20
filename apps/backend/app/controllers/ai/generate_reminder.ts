@@ -3,7 +3,7 @@ import vine from '@vinejs/vine'
 import Invoice from '#models/invoice/invoice'
 import Client from '#models/client/client'
 import Company from '#models/team/company'
-import ClaudeService from '#services/ai/claude_service'
+import AiService from '#services/ai/ai_service'
 import { decryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 
 const reminderValidator = vine.compile(
@@ -24,9 +24,9 @@ export default class GenerateReminder {
       return response.badRequest({ message: 'No team selected' })
     }
 
-    const claude = new ClaudeService()
+    const ai = new AiService()
 
-    if (!(await claude.isEnabled(teamId))) {
+    if (!(await ai.isEnabled(teamId))) {
       return response.forbidden({ message: 'AI is not enabled.' })
     }
 
@@ -97,7 +97,7 @@ Jours de retard: ${daysOverdue}
 Ton souhaité: ${tone}`
 
     try {
-      const result = await claude.generate(teamId, dek, systemPrompt, contextText, 512)
+      const result = await ai.generate(teamId, dek, systemPrompt, contextText, 512)
 
       // Parse JSON
       const jsonMatch = result.match(/\{[\s\S]*\}/)

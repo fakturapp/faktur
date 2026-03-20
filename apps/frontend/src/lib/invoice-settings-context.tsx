@@ -39,6 +39,7 @@ export interface InvoiceSettings {
   footerMode: 'company_info' | 'custom'
   logoBorderRadius: number
   aiEnabled: boolean
+  aiProvider: 'claude' | 'gemini' | 'groq'
   aiModel: string
   aiCustomApiKey: string | null
 }
@@ -82,7 +83,8 @@ const defaultSettings: InvoiceSettings = {
   footerMode: 'company_info',
   logoBorderRadius: 0,
   aiEnabled: false,
-  aiModel: 'claude-sonnet-4-5-20250929',
+  aiProvider: 'gemini',
+  aiModel: 'gemini-2.5-flash-lite',
   aiCustomApiKey: null,
 }
 

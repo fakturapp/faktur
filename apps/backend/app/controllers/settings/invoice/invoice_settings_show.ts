@@ -47,7 +47,8 @@ export default class InvoiceSettingsShow {
           footerMode: 'vat_exempt',
           logoBorderRadius: 0,
           aiEnabled: false,
-          aiModel: 'claude-sonnet-4-5-20250929',
+          aiProvider: 'gemini',
+          aiModel: 'gemini-2.5-flash-lite',
           aiCustomApiKey: null,
         },
       })
@@ -83,7 +84,8 @@ export default class InvoiceSettingsShow {
         footerMode: settings.footerMode || 'vat_exempt',
         logoBorderRadius: settings.logoBorderRadius ?? 0,
         aiEnabled: settings.aiEnabled ?? false,
-        aiModel: settings.aiModel || 'claude-sonnet-4-5-20250929',
+        aiProvider: settings.aiProvider || 'gemini',
+        aiModel: settings.aiModel || 'gemini-2.5-flash-lite',
         aiCustomApiKey: settings.aiCustomApiKey ? '••••••••' : null,
       },
     })

@@ -1,7 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import vine from '@vinejs/vine'
 import Invoice from '#models/invoice/invoice'
-import ClaudeService from '#services/ai/claude_service'
+import AiService from '#services/ai/ai_service'
 import { decryptModelFields, decryptModelFieldsArray, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 
 const suggestValidator = vine.compile(
@@ -22,9 +22,9 @@ export default class SuggestInvoiceLines {
       return response.badRequest({ message: 'No team selected' })
     }
 
-    const claude = new ClaudeService()
+    const ai = new AiService()
 
-    if (!(await claude.isEnabled(teamId))) {
+    if (!(await ai.isEnabled(teamId))) {
       return response.forbidden({ message: 'AI is not enabled. Activate it in Settings > AI.' })
     }
 
@@ -81,7 +81,7 @@ Règles:
 - Réponds UNIQUEMENT avec le JSON, rien d'autre`
 
     try {
-      const result = await claude.generate(
+      const result = await ai.generate(
         teamId, dek, systemPrompt,
         `${historyContext}${userDescription}`,
         1024
