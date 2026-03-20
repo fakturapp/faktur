@@ -33,7 +33,7 @@ export function VaultUnlockModal({ forceOpen = false }: { forceOpen?: boolean })
     setError('')
     setLoading(true)
 
-    const { error: err } = await api.post('/auth/vault/unlock', { password })
+    const { data, error: err } = await api.post<{ vaultKey?: string }>('/auth/vault/unlock', { password })
     setLoading(false)
 
     if (err && err !== 'VAULT_LOCKED') {
@@ -41,6 +41,9 @@ export function VaultUnlockModal({ forceOpen = false }: { forceOpen?: boolean })
     }
 
     if (!err) {
+      if (data?.vaultKey) {
+        localStorage.setItem('faktur_vault_key', data.vaultKey)
+      }
       setOpen(false)
       setPassword('')
       setShowPassword(false)

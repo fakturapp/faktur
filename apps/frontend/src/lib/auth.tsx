@@ -25,7 +25,7 @@ interface User {
 interface AuthContextType {
   user: User | null
   loading: boolean
-  login: (token: string, user: User) => void
+  login: (token: string, user: User, vaultKey?: string) => void
   logout: () => Promise<void>
   refreshUser: () => Promise<void>
 }
@@ -108,14 +108,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user, loading, pathname, isPublicPath, router])
 
-  function login(token: string, userData: User) {
+  function login(token: string, userData: User, vaultKey?: string) {
     localStorage.setItem('faktur_token', token)
+    if (vaultKey) {
+      localStorage.setItem('faktur_vault_key', vaultKey)
+    }
     setUser(userData)
   }
 
   async function logout() {
     await api.post('/auth/logout', {})
     localStorage.removeItem('faktur_token')
+    localStorage.removeItem('faktur_vault_key')
     setUser(null)
     router.replace('/login')
   }

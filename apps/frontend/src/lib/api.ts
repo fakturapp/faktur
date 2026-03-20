@@ -17,6 +17,7 @@ function handleVaultOrSession(data: any, status: number): { error: string } | nu
   }
   if (status === 401 && data.code === 'SESSION_EXPIRED') {
     localStorage.removeItem('faktur_token')
+    localStorage.removeItem('faktur_vault_key')
     window.location.href = '/login'
     return { error: 'Session expired' }
   }
@@ -28,6 +29,7 @@ async function request<T = unknown>(
   options: RequestInit = {}
 ): Promise<{ data?: T; error?: string }> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('faktur_token') : null
+  const vaultKey = typeof window !== 'undefined' ? localStorage.getItem('faktur_vault_key') : null
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -36,6 +38,9 @@ async function request<T = unknown>(
 
   if (token) {
     headers['Authorization'] = `Bearer ${token}`
+  }
+  if (vaultKey) {
+    headers['X-Vault-Key'] = vaultKey
   }
 
   try {
@@ -68,10 +73,14 @@ async function uploadRequest<T = unknown>(
   formData: FormData
 ): Promise<{ data?: T; error?: string }> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('faktur_token') : null
+  const vaultKey = typeof window !== 'undefined' ? localStorage.getItem('faktur_vault_key') : null
 
   const headers: Record<string, string> = {}
   if (token) {
     headers['Authorization'] = `Bearer ${token}`
+  }
+  if (vaultKey) {
+    headers['X-Vault-Key'] = vaultKey
   }
 
   try {
@@ -101,10 +110,14 @@ async function uploadRequest<T = unknown>(
 
 async function blobRequest(endpoint: string): Promise<{ blob?: Blob; filename?: string; error?: string }> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('faktur_token') : null
+  const vaultKey = typeof window !== 'undefined' ? localStorage.getItem('faktur_vault_key') : null
 
   const headers: Record<string, string> = {}
   if (token) {
     headers['Authorization'] = `Bearer ${token}`
+  }
+  if (vaultKey) {
+    headers['X-Vault-Key'] = vaultKey
   }
 
   try {
@@ -137,10 +150,14 @@ async function postBlobRequest(
   body: unknown
 ): Promise<{ blob?: Blob; filename?: string; error?: string }> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('faktur_token') : null
+  const vaultKey = typeof window !== 'undefined' ? localStorage.getItem('faktur_vault_key') : null
 
   const headers: Record<string, string> = { 'Content-Type': 'application/json' }
   if (token) {
     headers['Authorization'] = `Bearer ${token}`
+  }
+  if (vaultKey) {
+    headers['X-Vault-Key'] = vaultKey
   }
 
   try {

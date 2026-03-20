@@ -17,6 +17,7 @@ export interface ApiDefinition {
   me: typeof routes['me']
   cryptoRecover: typeof routes['crypto_recover']
   cryptoWipe: typeof routes['crypto_wipe']
+  vaultUnlock: typeof routes['vault_unlock']
   serveAvatar: typeof routes['serve_avatar']
   profileShow: typeof routes['profile_show']
   profileUpdate: typeof routes['profile_update']

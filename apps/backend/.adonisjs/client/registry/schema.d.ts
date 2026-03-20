@@ -187,6 +187,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/auth/security/crypto_wipe').default['handle']>>>
     }
   }
+  'vault_unlock': {
+    methods: ["POST"]
+    pattern: '/api/v1/auth/vault/unlock'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/auth/vault/unlock').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/auth/vault/unlock').default['handle']>>>
+    }
+  }
   'serve_avatar': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/avatars/:filename'

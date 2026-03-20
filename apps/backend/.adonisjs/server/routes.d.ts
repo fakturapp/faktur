@@ -19,6 +19,7 @@ export type ScannedRoutes = {
     'me': { paramsTuple?: []; params?: {} }
     'crypto_recover': { paramsTuple?: []; params?: {} }
     'crypto_wipe': { paramsTuple?: []; params?: {} }
+    'vault_unlock': { paramsTuple?: []; params?: {} }
     'serve_avatar': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'profile_show': { paramsTuple?: []; params?: {} }
     'profile_update': { paramsTuple?: []; params?: {} }
@@ -140,6 +141,7 @@ export type ScannedRoutes = {
     'logout': { paramsTuple?: []; params?: {} }
     'crypto_recover': { paramsTuple?: []; params?: {} }
     'crypto_wipe': { paramsTuple?: []; params?: {} }
+    'vault_unlock': { paramsTuple?: []; params?: {} }
     'upload_avatar': { paramsTuple?: []; params?: {} }
     'two_factor_setup': { paramsTuple?: []; params?: {} }
     'two_factor_enable': { paramsTuple?: []; params?: {} }

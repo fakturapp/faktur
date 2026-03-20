@@ -44,6 +44,36 @@ class EncryptionService {
     return decrypted
   }
 
+  encryptWithCustomKey(plaintext: string, customKey: Buffer): string {
+    const iv = crypto.randomBytes(this.ivLength)
+    const cipher = crypto.createCipheriv(this.algorithm, customKey, iv) as CipherGCM
+
+    let encrypted = cipher.update(plaintext, 'utf8', 'hex')
+    encrypted += cipher.final('hex')
+
+    const tag = cipher.getAuthTag()
+    return `${iv.toString('hex')}:${tag.toString('hex')}:${encrypted}`
+  }
+
+  decryptWithCustomKey(ciphertext: string, customKey: Buffer): string {
+    const [ivHex, tagHex, encrypted] = ciphertext.split(':')
+
+    if (!ivHex || !tagHex || !encrypted) {
+      throw new Error('Invalid ciphertext format')
+    }
+
+    const iv = Buffer.from(ivHex, 'hex')
+    const tag = Buffer.from(tagHex, 'hex')
+
+    const decipher = crypto.createDecipheriv(this.algorithm, customKey, iv) as DecipherGCM
+    decipher.setAuthTag(tag)
+
+    let decrypted = decipher.update(encrypted, 'hex', 'utf8')
+    decrypted += decipher.final('utf8')
+
+    return decrypted
+  }
+
   hash(value: string): string {
     return crypto.createHash('sha256').update(value).digest('hex')
   }

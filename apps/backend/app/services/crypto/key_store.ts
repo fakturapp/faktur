@@ -4,7 +4,7 @@ interface UserKeys {
   expiresAt: number
 }
 
-const DEFAULT_TTL_MS = 7 * 24 * 60 * 60 * 1000 // 7 days (matches token TTL)
+const DEFAULT_TTL_MS = 15 * 24 * 60 * 60 * 1000 // 15 days (matches token TTL)
 
 class KeyStore {
   private store = new Map<string, UserKeys>()

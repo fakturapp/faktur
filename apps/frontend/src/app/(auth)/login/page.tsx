@@ -122,6 +122,7 @@ function LoginContent() {
       email?: string
       userId?: string
       user?: any
+      vaultKey?: string
     }>('/auth/login', { email, password, turnstileToken })
     setLoading(false)
 
@@ -142,7 +143,7 @@ function LoginContent() {
     }
 
     if (data?.token && data?.user) {
-      login(data.token, data.user)
+      login(data.token, data.user, data.vaultKey)
       if (!data.user.onboardingCompleted) {
         router.push('/onboarding/team')
       } else {

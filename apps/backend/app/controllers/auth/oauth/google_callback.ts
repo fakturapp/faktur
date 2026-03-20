@@ -127,7 +127,7 @@ export default class GoogleCallback {
       await user.save()
 
       const token = await User.accessTokens.create(user, ['*'], {
-        expiresIn: '7 days',
+        expiresIn: '15 days',
       })
 
       await db

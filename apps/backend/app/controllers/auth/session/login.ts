@@ -8,7 +8,9 @@ import AuditLog from '#models/shared/audit_log'
 import { loginValidator } from '#validators/auth/auth_validators'
 import TwoFactorService from '#services/auth/two_factor_service'
 import TurnstileService from '#services/security/turnstile_service'
+import crypto from 'node:crypto'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
+import encryptionService from '#services/encryption/encryption_service'
 import keyStore from '#services/crypto/key_store'
 
 export default class Login {
@@ -108,7 +110,7 @@ export default class Login {
     await user.save()
 
     const token = await User.accessTokens.create(user, ['*'], {
-      expiresIn: '7 days',
+      expiresIn: '15 days',
     })
 
     // Store IP and user agent on the token
@@ -160,6 +162,32 @@ export default class Login {
         // Store only the KEK (new one), no DEKs yet
         keyStore.storeKeys(user.id, kek, '', Buffer.alloc(0))
       }
+
+      // Dual-key split: encrypt KEK with sessionKey (client) then ENCRYPTION_KEY (server)
+      const sessionKey = crypto.randomBytes(32)
+      const layer1 = encryptionService.encryptWithCustomKey(kek.toString('hex'), sessionKey)
+      const layer2 = encryptionService.encrypt(layer1)
+      await db
+        .from('auth_access_tokens')
+        .where('id', String(token.identifier))
+        .update({ encrypted_kek: layer2 })
+
+      return response.ok({
+        message: 'Login successful',
+        user: {
+          id: user.id,
+          fullName: user.fullName,
+          email: user.email,
+          emailVerified: user.emailVerified,
+          twoFactorEnabled: user.twoFactorEnabled,
+          avatarUrl: user.avatarUrl,
+          onboardingCompleted: user.onboardingCompleted,
+          currentTeamId: user.currentTeamId,
+          cryptoResetNeeded: user.cryptoResetNeeded || false,
+        },
+        token: token.value!.release(),
+        vaultKey: sessionKey.toString('hex'),
+      })
     }
 
     return response.ok({

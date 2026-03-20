@@ -1,8 +1,11 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import vine from '@vinejs/vine'
+import db from '@adonisjs/lucid/services/db'
 import User from '#models/account/user'
 import TeamMember from '#models/team/team_member'
+import crypto from 'node:crypto'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
+import encryptionService from '#services/encryption/encryption_service'
 import keyStore from '#services/crypto/key_store'
 
 const unlockValidator = vine.compile(
@@ -51,6 +54,16 @@ export default class VaultUnlock {
       keyStore.storeKeys(user.id, kek, '', Buffer.alloc(0))
     }
 
-    return response.ok({ message: 'Vault unlocked' })
+    // Dual-key split: encrypt KEK with sessionKey (client) then ENCRYPTION_KEY (server)
+    const tokenId = user.currentAccessToken.identifier
+    const sessionKey = crypto.randomBytes(32)
+    const layer1 = encryptionService.encryptWithCustomKey(kek.toString('hex'), sessionKey)
+    const layer2 = encryptionService.encrypt(layer1)
+    await db
+      .from('auth_access_tokens')
+      .where('id', String(tokenId))
+      .update({ encrypted_kek: layer2 })
+
+    return response.ok({ message: 'Vault unlocked', vaultKey: sessionKey.toString('hex') })
   }
 }

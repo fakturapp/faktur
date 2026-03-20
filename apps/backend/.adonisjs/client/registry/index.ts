@@ -96,6 +96,12 @@ const routes = {
     tokens: [{"old":"/api/v1/auth/crypto/wipe","type":0,"val":"api","end":""},{"old":"/api/v1/auth/crypto/wipe","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/crypto/wipe","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/crypto/wipe","type":0,"val":"crypto","end":""},{"old":"/api/v1/auth/crypto/wipe","type":0,"val":"wipe","end":""}],
     types: placeholder as Registry['crypto_wipe']['types'],
   },
+  'vault_unlock': {
+    methods: ["POST"],
+    pattern: '/api/v1/auth/vault/unlock',
+    tokens: [{"old":"/api/v1/auth/vault/unlock","type":0,"val":"api","end":""},{"old":"/api/v1/auth/vault/unlock","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/vault/unlock","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/vault/unlock","type":0,"val":"vault","end":""},{"old":"/api/v1/auth/vault/unlock","type":0,"val":"unlock","end":""}],
+    types: placeholder as Registry['vault_unlock']['types'],
+  },
   'serve_avatar': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/avatars/:filename',
