@@ -20,7 +20,7 @@ interface Attachment {
 interface SendEmailModalProps {
   open: boolean
   onClose: () => void
-  documentType: 'invoice' | 'quote'
+  documentType: 'invoice' | 'quote' | 'credit_note'
   documentId: string
   documentNumber: string
   clientEmail: string | null
@@ -60,20 +60,39 @@ export function SendEmailModal({
   const fileInputRef = useRef<HTMLInputElement>(null)
   const initialValues = useRef({ to: '', subject: '', body: '' })
 
-  const docLabel = documentType === 'invoice' ? 'facture' : 'devis'
-  const docLabelCap = documentType === 'invoice' ? 'Facture' : 'Devis'
+  const docLabelCap = documentType === 'invoice' ? 'Facture' : documentType === 'credit_note' ? 'Avoir' : 'Devis'
   const formattedTotal = Number(total).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
 
   useEffect(() => {
-    if (open) {
-      const newTo = clientEmail || ''
-      const newSubject = `${docLabelCap} ${documentNumber}`
-      const newBody = `Bonjour${clientName ? ` ${clientName}` : ''},\n\nVeuillez trouver ci-joint la ${docLabel} ${documentNumber} d'un montant de ${formattedTotal}.\n\nCordialement`
+    if (!open) return
+
+    const templateType = documentType === 'invoice' ? 'invoice_send' : documentType === 'credit_note' ? 'credit_note_send' : 'quote_send'
+
+    async function init() {
+      // Try to load custom template
+      let tplSubject = `${docLabelCap} ${documentNumber}`
+      let tplBody = `Bonjour${clientName ? ` ${clientName}` : ''},\n\nVeuillez trouver ci-joint ${documentType === 'quote' ? 'le' : documentType === 'credit_note' ? "l'avoir" : 'la'} ${docLabelCap.toLowerCase()} ${documentNumber} d'un montant de ${formattedTotal}.\n\nCordialement`
+
+      const { data } = await api.get<{ templates: Record<string, { subject: string; body: string }> }>('/email/templates')
+      if (data?.templates?.[templateType]) {
+        const tpl = data.templates[templateType]
+        tplSubject = tpl.subject
+          .replace(/\{type\}/g, docLabelCap)
+          .replace(/\{numero\}/g, documentNumber)
+          .replace(/\{montant\}/g, formattedTotal)
+          .replace(/\{client_name\}/g, clientName ? ` ${clientName}` : '')
+        tplBody = tpl.body
+          .replace(/\{type\}/g, docLabelCap)
+          .replace(/\{type_lower\}/g, docLabelCap.toLowerCase())
+          .replace(/\{numero\}/g, documentNumber)
+          .replace(/\{montant\}/g, formattedTotal)
+          .replace(/\{client_name\}/g, clientName ? ` ${clientName}` : '')
+      }
 
       setSelectedAccountId(defaultAccount?.id || '')
-      setTo(newTo)
-      setSubject(newSubject)
-      setBody(newBody)
+      setTo(clientEmail || '')
+      setSubject(tplSubject)
+      setBody(tplBody)
       setSending(false)
       setIsDirty(false)
       setAttachments([])
@@ -81,9 +100,12 @@ export function SendEmailModal({
       setShowCloseConfirm(false)
       setShowAttachmentModal(null)
 
-      initialValues.current = { to: newTo, subject: newSubject, body: newBody }
+      initialValues.current = { to: clientEmail || '', subject: tplSubject, body: tplBody }
     }
-  }, [open, defaultAccount, clientEmail, clientName, documentNumber, docLabel, docLabelCap, formattedTotal])
+
+    init()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, documentType, documentNumber])
 
   // Track dirty state
   const checkDirty = useCallback(() => {

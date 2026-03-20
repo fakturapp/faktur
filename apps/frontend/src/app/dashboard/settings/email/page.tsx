@@ -12,9 +12,11 @@ import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/toast'
 import { useEmail, type EmailAccountItem } from '@/lib/email-context'
 import { api } from '@/lib/api'
+import { Textarea } from '@/components/ui/textarea'
 import {
   Mail, Plus, Server, Zap, Send, Eye, EyeOff, Key, Star, Trash2,
   ArrowLeft, ArrowRight, X, CheckCircle2, XCircle, Check, MoreHorizontal,
+  FileText, Receipt, FileMinus2,
 } from 'lucide-react'
 
 const fadeUp = {
@@ -80,6 +82,17 @@ function EmailSettingsContent() {
   // Action menus
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
 
+  // Email templates
+  type TemplateType = 'invoice_send' | 'quote_send' | 'credit_note_send'
+  const [templates, setTemplates] = useState<Record<TemplateType, { subject: string; body: string }>>({
+    invoice_send: { subject: '', body: '' },
+    quote_send: { subject: '', body: '' },
+    credit_note_send: { subject: '', body: '' },
+  })
+  const [templatesLoaded, setTemplatesLoaded] = useState(false)
+  const [savingTemplate, setSavingTemplate] = useState<TemplateType | null>(null)
+  const [editingTemplate, setEditingTemplate] = useState<TemplateType | null>(null)
+
   useEffect(() => {
     if (searchParams.get('connected') === 'true') {
       toast('Compte Gmail connecté avec succès', 'success')
@@ -104,6 +117,37 @@ function EmailSettingsContent() {
     window.addEventListener('click', handleClick)
     return () => window.removeEventListener('click', handleClick)
   }, [openMenuId])
+
+  // Load email templates
+  useEffect(() => {
+    async function loadTemplates() {
+      const { data } = await api.get<{ templates: Record<TemplateType, { subject: string; body: string }> }>('/email/templates')
+      if (data?.templates) {
+        setTemplates(data.templates)
+        setTemplatesLoaded(true)
+      }
+    }
+    loadTemplates()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  async function handleSaveTemplate(type: TemplateType) {
+    setSavingTemplate(type)
+    const tpl = templates[type]
+    const { error } = await api.put('/email/templates', {
+      templateType: type,
+      subject: tpl.subject,
+      body: tpl.body,
+    })
+    setSavingTemplate(null)
+    if (error) { toast(error, 'error'); return }
+    toast('Template enregistré', 'success')
+    setEditingTemplate(null)
+  }
+
+  function updateTemplate(type: TemplateType, field: 'subject' | 'body', value: string) {
+    setTemplates((prev) => ({ ...prev, [type]: { ...prev[type], [field]: value } }))
+  }
 
   function openDialog() {
     setDialogStep('choose')
@@ -379,6 +423,109 @@ function EmailSettingsContent() {
               Les connexions Gmail utilisent OAuth 2.0, aucun mot de passe n&apos;est stocké.
             </p>
           </div>
+        </motion.div>
+
+        {/* Email Templates */}
+        <motion.div variants={fadeUp} custom={3} className="mt-6">
+          <Card className="overflow-hidden border-border/50">
+            <CardContent className="p-6">
+              <div className="mb-4">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
+                  Templates d&apos;email
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Personnalisez les messages par défaut. Variables : <code className="text-primary">{'{type}'}</code> <code className="text-primary">{'{numero}'}</code> <code className="text-primary">{'{montant}'}</code> <code className="text-primary">{'{client_name}'}</code>
+                </p>
+              </div>
+
+              {templatesLoaded ? (
+                <div className="space-y-3">
+                  {([
+                    { type: 'invoice_send' as TemplateType, label: 'Facture', icon: FileText, color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
+                    { type: 'quote_send' as TemplateType, label: 'Devis', icon: Receipt, color: 'text-orange-500', bgColor: 'bg-orange-500/10' },
+                    { type: 'credit_note_send' as TemplateType, label: 'Avoir', icon: FileMinus2, color: 'text-violet-500', bgColor: 'bg-violet-500/10' },
+                  ]).map((item) => (
+                    <div key={item.type} className="rounded-xl border border-border p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2.5">
+                          <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${item.bgColor}`}>
+                            <item.icon className={`h-4 w-4 ${item.color}`} />
+                          </div>
+                          <p className="text-sm font-semibold text-foreground">Envoi {item.label}</p>
+                        </div>
+                        {editingTemplate === item.type ? (
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setEditingTemplate(null)}
+                            >
+                              Annuler
+                            </Button>
+                            <Button
+                              size="sm"
+                              disabled={savingTemplate === item.type}
+                              onClick={() => handleSaveTemplate(item.type)}
+                            >
+                              {savingTemplate === item.type ? <Spinner className="h-3.5 w-3.5" /> : 'Enregistrer'}
+                            </Button>
+                          </div>
+                        ) : (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setEditingTemplate(item.type)}
+                          >
+                            Modifier
+                          </Button>
+                        )}
+                      </div>
+
+                      {editingTemplate === item.type ? (
+                        <div className="space-y-3">
+                          <div>
+                            <label className="text-xs font-medium text-muted-foreground block mb-1">Objet</label>
+                            <Input
+                              value={templates[item.type].subject}
+                              onChange={(e) => updateTemplate(item.type, 'subject', e.target.value)}
+                              placeholder="Objet de l'email"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-xs font-medium text-muted-foreground block mb-1">Message</label>
+                            <Textarea
+                              value={templates[item.type].body}
+                              onChange={(e) => updateTemplate(item.type, 'body', e.target.value)}
+                              rows={5}
+                              placeholder="Corps de l'email"
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-1.5">
+                          <p className="text-xs text-muted-foreground">
+                            <span className="font-medium text-foreground">Objet :</span> {templates[item.type].subject}
+                          </p>
+                          <p className="text-xs text-muted-foreground line-clamp-2">
+                            <span className="font-medium text-foreground">Message :</span> {templates[item.type].body}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {[0, 1, 2].map((i) => (
+                    <div key={i} className="rounded-xl border border-border p-4">
+                      <div className="h-4 w-32 rounded bg-muted animate-pulse mb-2" />
+                      <div className="h-3 w-full rounded bg-muted animate-pulse" />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </motion.div>
       </motion.div>
 

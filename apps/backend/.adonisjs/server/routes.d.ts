@@ -126,6 +126,8 @@ export type ScannedRoutes = {
     'configure_smtp': { paramsTuple?: []; params?: {} }
     'send_email': { paramsTuple?: []; params?: {} }
     'send_test_email': { paramsTuple?: []; params?: {} }
+    'email_template_list': { paramsTuple?: []; params?: {} }
+    'email_template_update': { paramsTuple?: []; params?: {} }
     'list_email_logs': { paramsTuple?: []; params?: {} }
     'product_list': { paramsTuple?: []; params?: {} }
     'product_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -139,6 +141,7 @@ export type ScannedRoutes = {
     'credit_note_convert_invoice': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'credit_note_update_status': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'credit_note_update_comment': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'credit_note_download_pdf': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'credit_note_duplicate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'credit_note_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'credit_note_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -268,12 +271,14 @@ export type ScannedRoutes = {
     'gmail_callback': { paramsTuple?: []; params?: {} }
     'email_accounts_list': { paramsTuple?: []; params?: {} }
     'gmail_auth_url': { paramsTuple?: []; params?: {} }
+    'email_template_list': { paramsTuple?: []; params?: {} }
     'list_email_logs': { paramsTuple?: []; params?: {} }
     'product_list': { paramsTuple?: []; params?: {} }
     'product_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'credit_note_next_number': { paramsTuple?: []; params?: {} }
     'credit_note_list': { paramsTuple?: []; params?: {} }
     'credit_note_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'credit_note_download_pdf': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recurring_invoice_list': { paramsTuple?: []; params?: {} }
     'recurring_invoice_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'reminder_settings_get': { paramsTuple?: []; params?: {} }
@@ -326,12 +331,14 @@ export type ScannedRoutes = {
     'gmail_callback': { paramsTuple?: []; params?: {} }
     'email_accounts_list': { paramsTuple?: []; params?: {} }
     'gmail_auth_url': { paramsTuple?: []; params?: {} }
+    'email_template_list': { paramsTuple?: []; params?: {} }
     'list_email_logs': { paramsTuple?: []; params?: {} }
     'product_list': { paramsTuple?: []; params?: {} }
     'product_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'credit_note_next_number': { paramsTuple?: []; params?: {} }
     'credit_note_list': { paramsTuple?: []; params?: {} }
     'credit_note_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'credit_note_download_pdf': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recurring_invoice_list': { paramsTuple?: []; params?: {} }
     'recurring_invoice_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'reminder_settings_get': { paramsTuple?: []; params?: {} }
@@ -351,6 +358,7 @@ export type ScannedRoutes = {
     'invoice_settings_update': { paramsTuple?: []; params?: {} }
     'quote_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'email_template_update': { paramsTuple?: []; params?: {} }
     'product_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'credit_note_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recurring_invoice_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

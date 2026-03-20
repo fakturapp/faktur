@@ -12,6 +12,7 @@ const CreditNoteConvertInvoice = () => import('#controllers/credit_note/operatio
 const CreditNoteUpdateStatus = () => import('#controllers/credit_note/operations/update_status')
 const CreditNoteDuplicate = () => import('#controllers/credit_note/operations/duplicate')
 const CreditNoteUpdateComment = () => import('#controllers/credit_note/operations/update_comment')
+const CreditNoteDownloadPdf = () => import('#controllers/credit_note/operations/download_pdf')
 
 router
   .group(() => {
@@ -22,6 +23,7 @@ router
     router.post('/convert-invoice/:id', [CreditNoteConvertInvoice, 'handle'])
     router.patch('/:id/status', [CreditNoteUpdateStatus, 'handle'])
     router.patch('/:id/comment', [CreditNoteUpdateComment, 'handle'])
+    router.get('/:id/pdf', [CreditNoteDownloadPdf, 'handle'])
     router.post('/:id/duplicate', [CreditNoteDuplicate, 'handle'])
     router.put('/:id', [CreditNoteUpdate, 'handle'])
     router.delete('/:id', [CreditNoteDelete, 'handle'])

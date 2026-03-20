@@ -12,6 +12,8 @@ const ConfigureSmtp = () => import('#controllers/email/smtp/configure')
 const SendEmail = () => import('#controllers/email/send/send_email')
 const SendTestEmail = () => import('#controllers/email/send/send_test_email')
 const ListEmailLogs = () => import('#controllers/email/logs/list')
+const EmailTemplateList = () => import('#controllers/email/templates/list')
+const EmailTemplateUpdate = () => import('#controllers/email/templates/update')
 
 // Public route - Gmail OAuth callback (no auth required, redirects to frontend)
 router.get(API_PREFIX + '/email/oauth/gmail/callback', [GmailCallback, 'handle'])
@@ -36,6 +38,10 @@ router
     router.post('/send', [SendEmail, 'handle'])
     router.get('/send', async ({ response }) => response.status(405).send({ message: 'Method not allowed. Use POST.' }))
     router.post('/test', [SendTestEmail, 'handle'])
+
+    // Templates
+    router.get('/templates', [EmailTemplateList, 'handle'])
+    router.put('/templates', [EmailTemplateUpdate, 'handle'])
 
     // Logs
     router.get('/logs', [ListEmailLogs, 'handle'])

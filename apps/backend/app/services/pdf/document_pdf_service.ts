@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join, extname } from 'node:path'
 import Invoice from '#models/invoice/invoice'
 import Quote from '#models/quote/quote'
+import CreditNote from '#models/credit_note/credit_note'
 import Company from '#models/team/company'
 import InvoiceSetting from '#models/team/invoice_setting'
 import BankAccount from '#models/team/bank_account'
@@ -286,6 +287,95 @@ export async function generateQuotePdf(quoteId: string, teamId: string, dek: Buf
     numero: quote.quoteNumber,
     date: quote.issueDate ? new Date(quote.issueDate.toString()).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10),
     client: quote.client?.displayName || quote.client?.companyName || 'client',
+    entreprise: company?.legalName || company?.tradeName || 'entreprise',
+  })
+
+  return { pdfBuffer, filename: `${resolvedName}.pdf` }
+}
+
+export async function generateCreditNotePdf(creditNoteId: string, teamId: string, dek: Buffer): Promise<{ pdfBuffer: Buffer; filename: string }> {
+  const creditNote = await CreditNote.query()
+    .where('id', creditNoteId)
+    .where('team_id', teamId)
+    .preload('client')
+    .preload('lines', (q) => q.orderBy('position', 'asc'))
+    .firstOrFail()
+
+  decryptModelFields(creditNote, [...ENCRYPTED_FIELDS.creditNote], dek)
+  decryptModelFieldsArray(creditNote.lines, [...ENCRYPTED_FIELDS.creditNoteLine], dek)
+  if (creditNote.client) {
+    decryptModelFields(creditNote.client, [...ENCRYPTED_FIELDS.client], dek)
+  }
+
+  const company = await Company.query().where('team_id', teamId).first()
+  if (company) {
+    decryptModelFields(company, [...ENCRYPTED_FIELDS.company], dek)
+  }
+
+  const invoiceSettings = await InvoiceSetting.query().where('team_id', teamId).first()
+
+  const settingsData = {
+    template: invoiceSettings?.template || 'classique',
+    darkMode: invoiceSettings?.darkMode || false,
+    paymentMethods: [] as string[],
+    customPaymentMethod: null as string | null,
+    documentFont: invoiceSettings?.documentFont || 'Lexend',
+    documentType: 'credit_note' as const,
+    footerMode: (invoiceSettings?.footerMode as 'company_info' | 'vat_exempt' | 'custom') || 'vat_exempt',
+  }
+
+  const logoSource = invoiceSettings?.logoSource || 'custom'
+  const rawLogoUrl = logoSource === 'company' ? (company?.logoUrl || null) : (invoiceSettings?.logoUrl || null)
+  const resolvedLogoUrl = resolveLogoToBase64(rawLogoUrl)
+
+  const quoteData = {
+    quoteNumber: creditNote.creditNoteNumber,
+    status: creditNote.status,
+    subject: creditNote.subject,
+    issueDate: creditNote.issueDate,
+    validityDate: null as string | null,
+    billingType: creditNote.billingType,
+    accentColor: creditNote.accentColor,
+    logoUrl: resolvedLogoUrl,
+    notes: creditNote.notes,
+    acceptanceConditions: creditNote.acceptanceConditions,
+    signatureField: creditNote.signatureField,
+    documentTitle: creditNote.documentTitle || 'Avoir',
+    freeField: creditNote.freeField,
+    globalDiscountType: creditNote.globalDiscountType,
+    globalDiscountValue: creditNote.globalDiscountValue,
+    deliveryAddress: creditNote.deliveryAddress,
+    clientSiren: creditNote.clientSiren,
+    clientVatNumber: creditNote.clientVatNumber,
+    subtotal: creditNote.subtotal,
+    taxAmount: creditNote.taxAmount,
+    total: creditNote.total,
+    language: creditNote.language || 'fr',
+    vatExemptReason: creditNote.vatExemptReason || 'none',
+    footerText: invoiceSettings?.defaultFooterText || null,
+    logoBorderRadius: invoiceSettings?.logoBorderRadius ?? 0,
+  }
+
+  const linesData = creditNote.lines.map((l) => ({
+    description: l.description,
+    saleType: l.saleType,
+    quantity: l.quantity,
+    unit: l.unit,
+    unitPrice: l.unitPrice,
+    vatRate: l.vatRate,
+    total: l.total,
+  }))
+
+  const clientData = buildClientData(creditNote.client)
+  const companyData = buildCompanyData(company)
+
+  const html = renderQuoteHtml(quoteData, linesData, clientData, companyData, settingsData)
+  const pdfBuffer = await generatePdf(html)
+
+  const resolvedName = resolveFilenamePattern('AV-{numero}', {
+    numero: creditNote.creditNoteNumber,
+    date: creditNote.issueDate ? new Date(creditNote.issueDate.toString()).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10),
+    client: creditNote.client?.displayName || creditNote.client?.companyName || 'client',
     entreprise: company?.legalName || company?.tradeName || 'entreprise',
   })
 

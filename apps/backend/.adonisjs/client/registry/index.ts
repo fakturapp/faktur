@@ -738,6 +738,18 @@ const routes = {
     tokens: [{"old":"/api/v1/email/test","type":0,"val":"api","end":""},{"old":"/api/v1/email/test","type":0,"val":"v1","end":""},{"old":"/api/v1/email/test","type":0,"val":"email","end":""},{"old":"/api/v1/email/test","type":0,"val":"test","end":""}],
     types: placeholder as Registry['send_test_email']['types'],
   },
+  'email_template_list': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/email/templates',
+    tokens: [{"old":"/api/v1/email/templates","type":0,"val":"api","end":""},{"old":"/api/v1/email/templates","type":0,"val":"v1","end":""},{"old":"/api/v1/email/templates","type":0,"val":"email","end":""},{"old":"/api/v1/email/templates","type":0,"val":"templates","end":""}],
+    types: placeholder as Registry['email_template_list']['types'],
+  },
+  'email_template_update': {
+    methods: ["PUT"],
+    pattern: '/api/v1/email/templates',
+    tokens: [{"old":"/api/v1/email/templates","type":0,"val":"api","end":""},{"old":"/api/v1/email/templates","type":0,"val":"v1","end":""},{"old":"/api/v1/email/templates","type":0,"val":"email","end":""},{"old":"/api/v1/email/templates","type":0,"val":"templates","end":""}],
+    types: placeholder as Registry['email_template_update']['types'],
+  },
   'list_email_logs': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/email/logs',
@@ -815,6 +827,12 @@ const routes = {
     pattern: '/api/v1/credit-notes/:id/comment',
     tokens: [{"old":"/api/v1/credit-notes/:id/comment","type":0,"val":"api","end":""},{"old":"/api/v1/credit-notes/:id/comment","type":0,"val":"v1","end":""},{"old":"/api/v1/credit-notes/:id/comment","type":0,"val":"credit-notes","end":""},{"old":"/api/v1/credit-notes/:id/comment","type":1,"val":"id","end":""},{"old":"/api/v1/credit-notes/:id/comment","type":0,"val":"comment","end":""}],
     types: placeholder as Registry['credit_note_update_comment']['types'],
+  },
+  'credit_note_download_pdf': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/credit-notes/:id/pdf',
+    tokens: [{"old":"/api/v1/credit-notes/:id/pdf","type":0,"val":"api","end":""},{"old":"/api/v1/credit-notes/:id/pdf","type":0,"val":"v1","end":""},{"old":"/api/v1/credit-notes/:id/pdf","type":0,"val":"credit-notes","end":""},{"old":"/api/v1/credit-notes/:id/pdf","type":1,"val":"id","end":""},{"old":"/api/v1/credit-notes/:id/pdf","type":0,"val":"pdf","end":""}],
+    types: placeholder as Registry['credit_note_download_pdf']['types'],
   },
   'credit_note_duplicate': {
     methods: ["POST"],

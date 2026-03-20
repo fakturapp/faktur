@@ -125,6 +125,10 @@ export const controllers = {
     smtp: {
       Configure: () => import('#controllers/email/smtp/configure'),
     },
+    templates: {
+      List: () => import('#controllers/email/templates/list'),
+      Update: () => import('#controllers/email/templates/update'),
+    },
   },
   invoice: {
     crud: {
@@ -244,6 +248,7 @@ export const controllers = {
       UpdateStatus: () => import('#controllers/credit_note/operations/update_status'),
       Duplicate: () => import('#controllers/credit_note/operations/duplicate'),
       UpdateComment: () => import('#controllers/credit_note/operations/update_comment'),
+      DownloadPdf: () => import('#controllers/credit_note/operations/download_pdf'),
     },
   },
   recurringInvoice: {

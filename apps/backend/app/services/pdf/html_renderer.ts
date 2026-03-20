@@ -81,7 +81,7 @@ interface SettingsData {
   paymentMethods: string[]
   customPaymentMethod: string | null
   documentFont: string
-  documentType?: 'quote' | 'invoice'
+  documentType?: 'quote' | 'invoice' | 'credit_note'
   footerMode?: 'company_info' | 'vat_exempt' | 'custom'
 }
 

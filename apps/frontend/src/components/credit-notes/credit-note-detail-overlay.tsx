@@ -12,6 +12,9 @@ import { useToast } from '@/components/ui/toast'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { api } from '@/lib/api'
 import { A4Sheet, type DocumentLine, type ClientInfo, type CompanyInfo } from '@/components/shared/a4-sheet'
+import { SendEmailModal } from '@/components/shared/send-email-modal'
+import { EmailHistoryModal } from '@/components/shared/email-history-modal'
+import { useEmail } from '@/lib/email-context'
 import {
   X,
   Pencil,
@@ -22,6 +25,8 @@ import {
   Printer,
   MessageSquare,
   FileText,
+  Send,
+  Mail,
 } from 'lucide-react'
 
 interface CreditNoteDetail {
@@ -79,6 +84,7 @@ export function CreditNoteDetailOverlay({ creditNoteId, onClose, onStatusChange,
   const router = useRouter()
   const { toast } = useToast()
   const { settings: invoiceSettings, companyLogoUrl } = useInvoiceSettings()
+  const { hasEmailConfigured } = useEmail()
   const [loading, setLoading] = useState(true)
   const [creditNote, setCreditNote] = useState<CreditNoteDetail | null>(null)
   const [company, setCompany] = useState<CompanyInfo | null>(null)
@@ -89,6 +95,8 @@ export function CreditNoteDetailOverlay({ creditNoteId, onClose, onStatusChange,
   const [downloading, setDownloading] = useState(false)
   const [printing, setPrinting] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [showSendEmail, setShowSendEmail] = useState(false)
+  const [showEmailHistory, setShowEmailHistory] = useState(false)
   const commentTimeout = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   useEffect(() => {
@@ -199,12 +207,39 @@ export function CreditNoteDetailOverlay({ creditNoteId, onClose, onStatusChange,
   }
 
   async function handleDownloadPdf() {
-    // Credit notes don't have PDF export yet — placeholder
-    toast('Export PDF bientôt disponible', 'info')
+    if (!creditNote) return
+    setDownloading(true)
+    const { blob, filename, error } = await api.downloadBlob(`/credit-notes/${creditNote.id}/pdf`)
+    setDownloading(false)
+    if (error || !blob) { toast(error || 'Erreur', 'error'); return }
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename || `${creditNote.creditNoteNumber}.pdf`
+    a.click()
+    URL.revokeObjectURL(url)
   }
 
   async function handlePrint() {
-    toast('Impression bientôt disponible', 'info')
+    if (!creditNote) return
+    setPrinting(true)
+    const { blob, error } = await api.downloadBlob(`/credit-notes/${creditNote.id}/pdf`)
+    setPrinting(false)
+    if (error || !blob) { toast(error || 'Erreur', 'error'); return }
+    const url = URL.createObjectURL(blob)
+    const w = window.open(url)
+    if (w) { w.onload = () => w.print() }
+  }
+
+  function handleSendEmail() {
+    setShowSendEmail(true)
+  }
+
+  function handleEmailSent() {
+    if (creditNote && creditNote.status === 'draft') {
+      setCreditNote({ ...creditNote, status: 'sent' })
+      onStatusChange(creditNote.id, 'sent')
+    }
   }
 
   const effectiveLogoUrl = invoiceSettings.logoSource === 'company' ? companyLogoUrl : (invoiceSettings.logoUrl || creditNote?.logoUrl || null)
@@ -346,8 +381,8 @@ export function CreditNoteDetailOverlay({ creditNoteId, onClose, onStatusChange,
                 </div>
 
                 <div className="flex-1 overflow-auto">
-                  {/* Edit button */}
-                  <div className="px-5 pt-4 pb-2">
+                  {/* Actions */}
+                  <div className="px-5 pt-4 pb-2 space-y-2">
                     <Button
                       className="w-full h-11 text-sm font-semibold gap-2"
                       disabled={creditNote.status === 'finalized'}
@@ -356,6 +391,16 @@ export function CreditNoteDetailOverlay({ creditNoteId, onClose, onStatusChange,
                       <Pencil className="h-4 w-4" />
                       Modifier l&apos;avoir
                     </Button>
+                    {hasEmailConfigured && (
+                      <Button
+                        variant="outline"
+                        className="w-full h-11 text-sm font-semibold gap-2"
+                        onClick={handleSendEmail}
+                      >
+                        <Send className="h-4 w-4" />
+                        Envoyer par email
+                      </Button>
+                    )}
                   </div>
 
                   {/* Status */}
@@ -414,6 +459,10 @@ export function CreditNoteDetailOverlay({ creditNoteId, onClose, onStatusChange,
                       }
                       className="min-w-[200px]"
                     >
+                      <DropdownItem onClick={() => setShowEmailHistory(true)}>
+                        <Mail className="h-4 w-4" /> Historique emails
+                      </DropdownItem>
+                      <DropdownSeparator />
                       <DropdownItem onClick={handleDuplicate}>
                         {duplicating ? <Spinner /> : <Copy className="h-4 w-4" />} Dupliquer
                       </DropdownItem>
@@ -459,6 +508,29 @@ export function CreditNoteDetailOverlay({ creditNoteId, onClose, onStatusChange,
             </Button>
           </DialogFooter>
         </Dialog>
+
+        {creditNote && (
+          <>
+            <SendEmailModal
+              open={showSendEmail}
+              onClose={() => setShowSendEmail(false)}
+              documentType="credit_note"
+              documentId={creditNote.id}
+              documentNumber={creditNote.creditNoteNumber}
+              clientEmail={creditNote.client?.email || null}
+              clientName={creditNote.client?.displayName || null}
+              total={creditNote.total}
+              onSent={handleEmailSent}
+            />
+            <EmailHistoryModal
+              open={showEmailHistory}
+              onClose={() => setShowEmailHistory(false)}
+              documentType="credit_note"
+              documentId={creditNote.id}
+              documentNumber={creditNote.creditNoteNumber}
+            />
+          </>
+        )}
       </motion.div>
       )}
     </AnimatePresence>

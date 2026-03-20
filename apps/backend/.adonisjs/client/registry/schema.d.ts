@@ -1471,6 +1471,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/email/send/send_test_email').default['handle']>>>
     }
   }
+  'email_template_list': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/email/templates'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/email/templates/list').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/email/templates/list').default['handle']>>>
+    }
+  }
+  'email_template_update': {
+    methods: ["PUT"]
+    pattern: '/api/v1/email/templates'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/email/templates/update').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/email/templates/update').default['handle']>>>
+    }
+  }
   'list_email_logs': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/email/logs'
@@ -1625,6 +1649,18 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/credit_note/operations/update_comment').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/credit_note/operations/update_comment').default['handle']>>>
+    }
+  }
+  'credit_note_download_pdf': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/credit-notes/:id/pdf'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/credit_note/operations/download_pdf').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/credit_note/operations/download_pdf').default['handle']>>>
     }
   }
   'credit_note_duplicate': {

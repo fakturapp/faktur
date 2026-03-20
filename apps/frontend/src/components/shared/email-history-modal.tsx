@@ -24,9 +24,9 @@ interface EmailLogEntry {
 interface EmailHistoryModalProps {
   open: boolean
   onClose: () => void
-  documentType: 'invoice' | 'quote'
+  documentType: 'invoice' | 'quote' | 'credit_note'
   documentId: string
-  documentNumber: string
+  documentNumber?: string
 }
 
 const statusConfig = {

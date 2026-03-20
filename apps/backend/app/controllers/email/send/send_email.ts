@@ -5,15 +5,16 @@ import EmailAccount from '#models/email/email_account'
 import EmailLog from '#models/email/email_log'
 import Invoice from '#models/invoice/invoice'
 import Quote from '#models/quote/quote'
+import CreditNote from '#models/credit_note/credit_note'
 import GmailOAuthService from '#services/email/gmail_oauth_service'
 import ResendUserService from '#services/email/resend_user_service'
 import SmtpService from '#services/email/smtp_service'
-import { generateInvoicePdf, generateQuotePdf } from '#services/pdf/document_pdf_service'
+import { generateInvoicePdf, generateQuotePdf, generateCreditNotePdf } from '#services/pdf/document_pdf_service'
 import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 
 const sendEmailValidator = vine.compile(
   vine.object({
-    documentType: vine.enum(['invoice', 'quote']),
+    documentType: vine.enum(['invoice', 'quote', 'credit_note']),
     documentId: vine.string().trim(),
     emailAccountId: vine.string().trim(),
     to: vine.string().trim().email(),
@@ -58,6 +59,10 @@ export default class SendEmail {
         const result = await generateInvoicePdf(payload.documentId, teamId, dek)
         pdfBuffer = result.pdfBuffer
         filename = result.filename
+      } else if (payload.documentType === 'credit_note') {
+        const result = await generateCreditNotePdf(payload.documentId, teamId, dek)
+        pdfBuffer = result.pdfBuffer
+        filename = result.filename
       } else {
         const result = await generateQuotePdf(payload.documentId, teamId, dek)
         pdfBuffer = result.pdfBuffer
@@ -87,6 +92,9 @@ export default class SendEmail {
     if (payload.documentType === 'invoice') {
       const inv = await Invoice.query().where('id', payload.documentId).where('team_id', teamId).first()
       documentNumber = inv?.invoiceNumber || payload.documentId
+    } else if (payload.documentType === 'credit_note') {
+      const cn = await CreditNote.query().where('id', payload.documentId).where('team_id', teamId).first()
+      documentNumber = cn?.creditNoteNumber || payload.documentId
     } else {
       const q = await Quote.query().where('id', payload.documentId).where('team_id', teamId).first()
       documentNumber = q?.quoteNumber || payload.documentId
@@ -199,6 +207,15 @@ export default class SendEmail {
       if (invoice && invoice.status === 'draft') {
         invoice.status = 'sent'
         await invoice.save()
+      }
+    } else if (payload.documentType === 'credit_note') {
+      const cn = await CreditNote.query()
+        .where('id', payload.documentId)
+        .where('team_id', teamId)
+        .first()
+      if (cn && cn.status === 'draft') {
+        cn.status = 'sent'
+        await cn.save()
       }
     } else {
       const quote = await Quote.query()
