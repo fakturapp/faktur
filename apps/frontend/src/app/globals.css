@@ -1,29 +1,29 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-background: #09090b;
-  --color-foreground: #fafafa;
-  --color-card: #18181b;
-  --color-card-foreground: #fafafa;
+  --color-background: #ffffff;
+  --color-foreground: #1e293b;
+  --color-card: #ffffff;
+  --color-card-foreground: #1e293b;
   --color-primary: #6366f1;
   --color-primary-foreground: #ffffff;
-  --color-muted: #27272a;
-  --color-muted-foreground: #a1a1aa;
-  --color-border: #27272a;
-  --color-input: #27272a;
+  --color-muted: #f1f5f9;
+  --color-muted-foreground: #64748b;
+  --color-border: #e2e8f0;
+  --color-input: #e2e8f0;
   --color-ring: #6366f1;
   --color-destructive: #ef4444;
   --color-destructive-foreground: #ffffff;
   --color-success: #22c55e;
-  --color-secondary: #27272a;
-  --color-secondary-foreground: #fafafa;
-  --color-accent: #27272a;
-  --color-accent-foreground: #fafafa;
-  --color-sidebar: #09090b;
-  --color-sidebar-foreground: #fafafa;
-  --color-sidebar-border: rgba(255, 255, 255, 0.08);
-  --color-sidebar-accent: #18181b;
-  --color-sidebar-accent-foreground: #fafafa;
+  --color-secondary: #f1f5f9;
+  --color-secondary-foreground: #1e293b;
+  --color-accent: #f1f5f9;
+  --color-accent-foreground: #1e293b;
+  --color-sidebar: #ffffff;
+  --color-sidebar-foreground: #1e293b;
+  --color-sidebar-border: #e2e8f0;
+  --color-sidebar-accent: #f1f5f9;
+  --color-sidebar-accent-foreground: #1e293b;
   --sidebar-width: 16rem;
   --header-height: 3.5rem;
   --color-chart-1: #6366f1;
@@ -35,7 +35,27 @@
   --font-sans: 'Lexend', ui-sans-serif, system-ui, sans-serif;
 }
 
-:root, .dark {
+:root, .light {
+  --color-background: #ffffff;
+  --color-foreground: #1e293b;
+  --color-card: #ffffff;
+  --color-card-foreground: #1e293b;
+  --color-muted: #f1f5f9;
+  --color-muted-foreground: #64748b;
+  --color-border: #e2e8f0;
+  --color-input: #e2e8f0;
+  --color-sidebar: #ffffff;
+  --color-sidebar-foreground: #1e293b;
+  --color-sidebar-border: #e2e8f0;
+  --color-sidebar-accent: #f1f5f9;
+  --color-sidebar-accent-foreground: #1e293b;
+  --color-secondary: #f1f5f9;
+  --color-secondary-foreground: #1e293b;
+  --color-accent: #f1f5f9;
+  --color-accent-foreground: #1e293b;
+}
+
+.dark {
   --color-background: #09090b;
   --color-foreground: #fafafa;
   --color-card: #18181b;
@@ -53,26 +73,6 @@
   --color-secondary-foreground: #fafafa;
   --color-accent: #27272a;
   --color-accent-foreground: #fafafa;
-}
-
-.light {
-  --color-background: #ffffff;
-  --color-foreground: #09090b;
-  --color-card: #f4f4f5;
-  --color-card-foreground: #09090b;
-  --color-muted: #f4f4f5;
-  --color-muted-foreground: #71717a;
-  --color-border: #e4e4e7;
-  --color-input: #e4e4e7;
-  --color-sidebar: #f9fafb;
-  --color-sidebar-foreground: #09090b;
-  --color-sidebar-border: rgba(0, 0, 0, 0.08);
-  --color-sidebar-accent: #f4f4f5;
-  --color-sidebar-accent-foreground: #09090b;
-  --color-secondary: #f4f4f5;
-  --color-secondary-foreground: #09090b;
-  --color-accent: #f4f4f5;
-  --color-accent-foreground: #09090b;
 }
 
 * {
@@ -178,11 +178,19 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.15);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
 }
 

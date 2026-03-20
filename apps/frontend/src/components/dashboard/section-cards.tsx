@@ -24,9 +24,24 @@ interface SectionCardsProps {
 }
 
 const cardThemes = [
-  { gradient: 'from-indigo-500/15 via-indigo-500/5 to-transparent', accent: 'bg-indigo-500/15 text-indigo-400 ring-indigo-500/20', icon: DollarSign, trendBg: 'bg-indigo-500/10 text-indigo-300 border-indigo-500/20' },
-  { gradient: 'from-amber-500/15 via-amber-500/5 to-transparent', accent: 'bg-amber-500/15 text-amber-400 ring-amber-500/20', icon: AlertCircle, trendBg: 'bg-amber-500/10 text-amber-300 border-amber-500/20' },
-  { gradient: 'from-emerald-500/15 via-emerald-500/5 to-transparent', accent: 'bg-emerald-500/15 text-emerald-400 ring-emerald-500/20', icon: Wallet, trendBg: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20' },
+  {
+    gradient: 'from-indigo-500/10 via-indigo-500/5 to-transparent dark:from-indigo-500/15',
+    accent: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 ring-indigo-500/20',
+    icon: DollarSign,
+    trendBg: 'bg-indigo-50 text-indigo-600 border-indigo-200 dark:bg-indigo-500/10 dark:text-indigo-300 dark:border-indigo-500/20',
+  },
+  {
+    gradient: 'from-amber-500/10 via-amber-500/5 to-transparent dark:from-amber-500/15',
+    accent: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 ring-amber-500/20',
+    icon: AlertCircle,
+    trendBg: 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-300 dark:border-amber-500/20',
+  },
+  {
+    gradient: 'from-emerald-500/10 via-emerald-500/5 to-transparent dark:from-emerald-500/15',
+    accent: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 ring-emerald-500/20',
+    icon: Wallet,
+    trendBg: 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:border-emerald-500/20',
+  },
 ]
 
 export function SectionCards({ cards }: SectionCardsProps) {
@@ -36,7 +51,7 @@ export function SectionCards({ cards }: SectionCardsProps) {
         const theme = cardThemes[index % cardThemes.length]
         const Icon = theme.icon
         return (
-          <Card key={stat.label} className={`@container/card relative overflow-hidden bg-gradient-to-br ${theme.gradient}`}>
+          <Card key={stat.label} className={`@container/card relative overflow-hidden bg-gradient-to-br ${theme.gradient} shadow-sm`}>
             <CardHeader>
               <CardDescription>{stat.label}</CardDescription>
               <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">

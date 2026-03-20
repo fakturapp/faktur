@@ -56,7 +56,7 @@ export function ChartRevenue({ data }: ChartRevenueProps) {
                 onClick={() => setTimeRange(range.value)}
                 className={`px-4 py-1.5 text-xs font-medium rounded-md transition-colors ${
                   timeRange === range.value
-                    ? 'bg-card text-foreground shadow-sm'
+                    ? 'bg-muted dark:bg-card text-foreground shadow-sm'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >

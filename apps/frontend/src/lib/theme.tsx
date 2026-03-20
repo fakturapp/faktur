@@ -12,13 +12,13 @@ interface ThemeContextValue {
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  theme: 'dark',
-  resolvedTheme: 'dark',
+  theme: 'light',
+  resolvedTheme: 'light',
   setTheme: () => {},
 })
 
 function getSystemTheme(): ResolvedTheme {
-  if (typeof window === 'undefined') return 'dark'
+  if (typeof window === 'undefined') return 'light'
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
@@ -32,7 +32,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const stored = localStorage.getItem('faktur_theme') as Theme | null
-    const t = stored || 'dark'
+    const t = stored || 'light'
     setThemeState(t)
     const resolved = resolveTheme(t)
     setResolvedTheme(resolved)
