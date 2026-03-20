@@ -18,6 +18,8 @@ import '#start/routes/credit_note'
 import '#start/routes/recurring_invoice'
 import '#start/routes/reminder'
 import '#start/routes/expense'
+import '#start/routes/tax'
+import '#start/routes/export'
 
 router.get(API_PREFIX + '/', async () => {
   return {
