@@ -50,6 +50,7 @@ export type ScannedRoutes = {
     'dashboard.charts.revenue': { paramsTuple?: []; params?: {} }
     'dashboard.charts.collected': { paramsTuple?: []; params?: {} }
     'dashboard.charts.micro': { paramsTuple?: []; params?: {} }
+    'dashboard.cashFlow': { paramsTuple?: []; params?: {} }
     'serve_icon': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'team_list': { paramsTuple?: []; params?: {} }
     'team_create': { paramsTuple?: []; params?: {} }
@@ -84,6 +85,10 @@ export type ScannedRoutes = {
     'client_create': { paramsTuple?: []; params?: {} }
     'client_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'client_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'client_contact_index': { paramsTuple: [ParamValue]; params: {'clientId': ParamValue} }
+    'client_contact_store': { paramsTuple: [ParamValue]; params: {'clientId': ParamValue} }
+    'client_contact_update': { paramsTuple: [ParamValue,ParamValue]; params: {'clientId': ParamValue,'id': ParamValue} }
+    'client_contact_destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'clientId': ParamValue,'id': ParamValue} }
     'serve_invoice_logo': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'invoice_settings_show': { paramsTuple?: []; params?: {} }
     'invoice_settings_update': { paramsTuple?: []; params?: {} }
@@ -115,6 +120,9 @@ export type ScannedRoutes = {
     'invoice_duplicate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoice_payment_index': { paramsTuple: [ParamValue]; params: {'invoiceId': ParamValue} }
+    'invoice_payment_store': { paramsTuple: [ParamValue]; params: {'invoiceId': ParamValue} }
+    'invoice_payment_destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'invoiceId': ParamValue,'id': ParamValue} }
     'e_invoicing_submit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'validate_connection': { paramsTuple?: []; params?: {} }
     'gmail_callback': { paramsTuple?: []; params?: {} }
@@ -163,6 +171,9 @@ export type ScannedRoutes = {
     'expense_category_list': { paramsTuple?: []; params?: {} }
     'expense_category_create': { paramsTuple?: []; params?: {} }
     'expense_category_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'parse_receipt': { paramsTuple?: []; params?: {} }
+    'vat_report': { paramsTuple?: []; params?: {} }
+    'fec_export': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'signup': { paramsTuple?: []; params?: {} }
@@ -203,6 +214,7 @@ export type ScannedRoutes = {
     'upload_logo': { paramsTuple?: []; params?: {} }
     'bank_accounts.store': { paramsTuple?: []; params?: {} }
     'client_create': { paramsTuple?: []; params?: {} }
+    'client_contact_store': { paramsTuple: [ParamValue]; params: {'clientId': ParamValue} }
     'invoice_logo_upload': { paramsTuple?: []; params?: {} }
     'quote_set_next_number': { paramsTuple?: []; params?: {} }
     'quote_create': { paramsTuple?: []; params?: {} }
@@ -211,6 +223,7 @@ export type ScannedRoutes = {
     'invoice_create': { paramsTuple?: []; params?: {} }
     'invoice_convert_quote': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_duplicate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoice_payment_store': { paramsTuple: [ParamValue]; params: {'invoiceId': ParamValue} }
     'e_invoicing_submit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'configure_resend': { paramsTuple?: []; params?: {} }
     'configure_smtp': { paramsTuple?: []; params?: {} }
@@ -225,6 +238,7 @@ export type ScannedRoutes = {
     'send_reminder': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'expense_create': { paramsTuple?: []; params?: {} }
     'expense_category_create': { paramsTuple?: []; params?: {} }
+    'parse_receipt': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'google_auth_url': { paramsTuple?: []; params?: {} }
@@ -242,6 +256,7 @@ export type ScannedRoutes = {
     'dashboard.charts.revenue': { paramsTuple?: []; params?: {} }
     'dashboard.charts.collected': { paramsTuple?: []; params?: {} }
     'dashboard.charts.micro': { paramsTuple?: []; params?: {} }
+    'dashboard.cashFlow': { paramsTuple?: []; params?: {} }
     'serve_icon': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'team_list': { paramsTuple?: []; params?: {} }
     'team_show': { paramsTuple?: []; params?: {} }
@@ -254,6 +269,7 @@ export type ScannedRoutes = {
     'search_siren': { paramsTuple?: []; params?: {} }
     'client_list': { paramsTuple?: []; params?: {} }
     'client_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'client_contact_index': { paramsTuple: [ParamValue]; params: {'clientId': ParamValue} }
     'serve_invoice_logo': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'invoice_settings_show': { paramsTuple?: []; params?: {} }
     'quote_next_number': { paramsTuple?: []; params?: {} }
@@ -267,6 +283,7 @@ export type ScannedRoutes = {
     'invoice_list': { paramsTuple?: []; params?: {} }
     'invoice_pdf': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoice_payment_index': { paramsTuple: [ParamValue]; params: {'invoiceId': ParamValue} }
     'validate_connection': { paramsTuple?: []; params?: {} }
     'gmail_callback': { paramsTuple?: []; params?: {} }
     'email_accounts_list': { paramsTuple?: []; params?: {} }
@@ -285,6 +302,8 @@ export type ScannedRoutes = {
     'list_reminders': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'expense_list': { paramsTuple?: []; params?: {} }
     'expense_category_list': { paramsTuple?: []; params?: {} }
+    'vat_report': { paramsTuple?: []; params?: {} }
+    'fec_export': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'google_auth_url': { paramsTuple?: []; params?: {} }
@@ -302,6 +321,7 @@ export type ScannedRoutes = {
     'dashboard.charts.revenue': { paramsTuple?: []; params?: {} }
     'dashboard.charts.collected': { paramsTuple?: []; params?: {} }
     'dashboard.charts.micro': { paramsTuple?: []; params?: {} }
+    'dashboard.cashFlow': { paramsTuple?: []; params?: {} }
     'serve_icon': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'team_list': { paramsTuple?: []; params?: {} }
     'team_show': { paramsTuple?: []; params?: {} }
@@ -314,6 +334,7 @@ export type ScannedRoutes = {
     'search_siren': { paramsTuple?: []; params?: {} }
     'client_list': { paramsTuple?: []; params?: {} }
     'client_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'client_contact_index': { paramsTuple: [ParamValue]; params: {'clientId': ParamValue} }
     'serve_invoice_logo': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'invoice_settings_show': { paramsTuple?: []; params?: {} }
     'quote_next_number': { paramsTuple?: []; params?: {} }
@@ -327,6 +348,7 @@ export type ScannedRoutes = {
     'invoice_list': { paramsTuple?: []; params?: {} }
     'invoice_pdf': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoice_payment_index': { paramsTuple: [ParamValue]; params: {'invoiceId': ParamValue} }
     'validate_connection': { paramsTuple?: []; params?: {} }
     'gmail_callback': { paramsTuple?: []; params?: {} }
     'email_accounts_list': { paramsTuple?: []; params?: {} }
@@ -345,6 +367,8 @@ export type ScannedRoutes = {
     'list_reminders': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'expense_list': { paramsTuple?: []; params?: {} }
     'expense_category_list': { paramsTuple?: []; params?: {} }
+    'vat_report': { paramsTuple?: []; params?: {} }
+    'fec_export': { paramsTuple?: []; params?: {} }
   }
   PUT: {
     'profile_update': { paramsTuple?: []; params?: {} }
@@ -355,6 +379,7 @@ export type ScannedRoutes = {
     'company_bank': { paramsTuple?: []; params?: {} }
     'bank_accounts.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'client_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'client_contact_update': { paramsTuple: [ParamValue,ParamValue]; params: {'clientId': ParamValue,'id': ParamValue} }
     'invoice_settings_update': { paramsTuple?: []; params?: {} }
     'quote_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -373,8 +398,10 @@ export type ScannedRoutes = {
     'remove_member': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'bank_accounts.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'client_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'client_contact_destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'clientId': ParamValue,'id': ParamValue} }
     'quote_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoice_payment_destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'invoiceId': ParamValue,'id': ParamValue} }
     'email_accounts_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'product_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'credit_note_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

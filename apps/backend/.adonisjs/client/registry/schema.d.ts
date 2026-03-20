@@ -559,6 +559,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/charts').default['micro']>>>
     }
   }
+  'dashboard.cashFlow': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/dashboard/cash-flow'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/cash_flow').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/cash_flow').default['handle']>>>
+    }
+  }
   'serve_icon': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/team-icons/:filename'
@@ -967,6 +979,54 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/client/crud/delete').default['handle']>>>
     }
   }
+  'client_contact_index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/clients/:clientId/contacts'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { clientId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/client/contacts/index').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/client/contacts/index').default['handle']>>>
+    }
+  }
+  'client_contact_store': {
+    methods: ["POST"]
+    pattern: '/api/v1/clients/:clientId/contacts'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { clientId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/client/contacts/store').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/client/contacts/store').default['handle']>>>
+    }
+  }
+  'client_contact_update': {
+    methods: ["PUT"]
+    pattern: '/api/v1/clients/:clientId/contacts/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { clientId: ParamValue; id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/client/contacts/update').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/client/contacts/update').default['handle']>>>
+    }
+  }
+  'client_contact_destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/clients/:clientId/contacts/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { clientId: ParamValue; id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/client/contacts/destroy').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/client/contacts/destroy').default['handle']>>>
+    }
+  }
   'serve_invoice_logo': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/invoice-logos/:filename'
@@ -1337,6 +1397,42 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/crud/delete').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/crud/delete').default['handle']>>>
+    }
+  }
+  'invoice_payment_index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/invoices/:invoiceId/payments'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { invoiceId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/payments/index').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/payments/index').default['handle']>>>
+    }
+  }
+  'invoice_payment_store': {
+    methods: ["POST"]
+    pattern: '/api/v1/invoices/:invoiceId/payments'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { invoiceId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/payments/store').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/payments/store').default['handle']>>>
+    }
+  }
+  'invoice_payment_destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/invoices/:invoiceId/payments/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { invoiceId: ParamValue; id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/payments/destroy').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/payments/destroy').default['handle']>>>
     }
   }
   'e_invoicing_submit': {
@@ -1913,6 +2009,42 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/expense/categories/delete').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/expense/categories/delete').default['handle']>>>
+    }
+  }
+  'parse_receipt': {
+    methods: ["POST"]
+    pattern: '/api/v1/expenses/parse-receipt'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/expense/ocr/parse_receipt').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/expense/ocr/parse_receipt').default['handle']>>>
+    }
+  }
+  'vat_report': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/tax/vat-report'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/tax/vat_report').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/tax/vat_report').default['handle']>>>
+    }
+  }
+  'fec_export': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/export/fec'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/export/fec_export').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/export/fec_export').default['handle']>>>
     }
   }
 }

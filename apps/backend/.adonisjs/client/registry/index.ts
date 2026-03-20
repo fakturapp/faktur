@@ -282,6 +282,12 @@ const routes = {
     tokens: [{"old":"/api/v1/dashboard/charts/micro-thresholds","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/charts/micro-thresholds","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/charts/micro-thresholds","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/charts/micro-thresholds","type":0,"val":"charts","end":""},{"old":"/api/v1/dashboard/charts/micro-thresholds","type":0,"val":"micro-thresholds","end":""}],
     types: placeholder as Registry['dashboard.charts.micro']['types'],
   },
+  'dashboard.cashFlow': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/dashboard/cash-flow',
+    tokens: [{"old":"/api/v1/dashboard/cash-flow","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/cash-flow","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/cash-flow","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/cash-flow","type":0,"val":"cash-flow","end":""}],
+    types: placeholder as Registry['dashboard.cashFlow']['types'],
+  },
   'serve_icon': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/team-icons/:filename',
@@ -486,6 +492,30 @@ const routes = {
     tokens: [{"old":"/api/v1/clients/:id","type":0,"val":"api","end":""},{"old":"/api/v1/clients/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/clients/:id","type":0,"val":"clients","end":""},{"old":"/api/v1/clients/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['client_delete']['types'],
   },
+  'client_contact_index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/clients/:clientId/contacts',
+    tokens: [{"old":"/api/v1/clients/:clientId/contacts","type":0,"val":"api","end":""},{"old":"/api/v1/clients/:clientId/contacts","type":0,"val":"v1","end":""},{"old":"/api/v1/clients/:clientId/contacts","type":0,"val":"clients","end":""},{"old":"/api/v1/clients/:clientId/contacts","type":1,"val":"clientId","end":""},{"old":"/api/v1/clients/:clientId/contacts","type":0,"val":"contacts","end":""}],
+    types: placeholder as Registry['client_contact_index']['types'],
+  },
+  'client_contact_store': {
+    methods: ["POST"],
+    pattern: '/api/v1/clients/:clientId/contacts',
+    tokens: [{"old":"/api/v1/clients/:clientId/contacts","type":0,"val":"api","end":""},{"old":"/api/v1/clients/:clientId/contacts","type":0,"val":"v1","end":""},{"old":"/api/v1/clients/:clientId/contacts","type":0,"val":"clients","end":""},{"old":"/api/v1/clients/:clientId/contacts","type":1,"val":"clientId","end":""},{"old":"/api/v1/clients/:clientId/contacts","type":0,"val":"contacts","end":""}],
+    types: placeholder as Registry['client_contact_store']['types'],
+  },
+  'client_contact_update': {
+    methods: ["PUT"],
+    pattern: '/api/v1/clients/:clientId/contacts/:id',
+    tokens: [{"old":"/api/v1/clients/:clientId/contacts/:id","type":0,"val":"api","end":""},{"old":"/api/v1/clients/:clientId/contacts/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/clients/:clientId/contacts/:id","type":0,"val":"clients","end":""},{"old":"/api/v1/clients/:clientId/contacts/:id","type":1,"val":"clientId","end":""},{"old":"/api/v1/clients/:clientId/contacts/:id","type":0,"val":"contacts","end":""},{"old":"/api/v1/clients/:clientId/contacts/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['client_contact_update']['types'],
+  },
+  'client_contact_destroy': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/clients/:clientId/contacts/:id',
+    tokens: [{"old":"/api/v1/clients/:clientId/contacts/:id","type":0,"val":"api","end":""},{"old":"/api/v1/clients/:clientId/contacts/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/clients/:clientId/contacts/:id","type":0,"val":"clients","end":""},{"old":"/api/v1/clients/:clientId/contacts/:id","type":1,"val":"clientId","end":""},{"old":"/api/v1/clients/:clientId/contacts/:id","type":0,"val":"contacts","end":""},{"old":"/api/v1/clients/:clientId/contacts/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['client_contact_destroy']['types'],
+  },
   'serve_invoice_logo': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/invoice-logos/:filename',
@@ -671,6 +701,24 @@ const routes = {
     pattern: '/api/v1/invoices/:id',
     tokens: [{"old":"/api/v1/invoices/:id","type":0,"val":"api","end":""},{"old":"/api/v1/invoices/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/invoices/:id","type":0,"val":"invoices","end":""},{"old":"/api/v1/invoices/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['invoice_delete']['types'],
+  },
+  'invoice_payment_index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/invoices/:invoiceId/payments',
+    tokens: [{"old":"/api/v1/invoices/:invoiceId/payments","type":0,"val":"api","end":""},{"old":"/api/v1/invoices/:invoiceId/payments","type":0,"val":"v1","end":""},{"old":"/api/v1/invoices/:invoiceId/payments","type":0,"val":"invoices","end":""},{"old":"/api/v1/invoices/:invoiceId/payments","type":1,"val":"invoiceId","end":""},{"old":"/api/v1/invoices/:invoiceId/payments","type":0,"val":"payments","end":""}],
+    types: placeholder as Registry['invoice_payment_index']['types'],
+  },
+  'invoice_payment_store': {
+    methods: ["POST"],
+    pattern: '/api/v1/invoices/:invoiceId/payments',
+    tokens: [{"old":"/api/v1/invoices/:invoiceId/payments","type":0,"val":"api","end":""},{"old":"/api/v1/invoices/:invoiceId/payments","type":0,"val":"v1","end":""},{"old":"/api/v1/invoices/:invoiceId/payments","type":0,"val":"invoices","end":""},{"old":"/api/v1/invoices/:invoiceId/payments","type":1,"val":"invoiceId","end":""},{"old":"/api/v1/invoices/:invoiceId/payments","type":0,"val":"payments","end":""}],
+    types: placeholder as Registry['invoice_payment_store']['types'],
+  },
+  'invoice_payment_destroy': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/invoices/:invoiceId/payments/:id',
+    tokens: [{"old":"/api/v1/invoices/:invoiceId/payments/:id","type":0,"val":"api","end":""},{"old":"/api/v1/invoices/:invoiceId/payments/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/invoices/:invoiceId/payments/:id","type":0,"val":"invoices","end":""},{"old":"/api/v1/invoices/:invoiceId/payments/:id","type":1,"val":"invoiceId","end":""},{"old":"/api/v1/invoices/:invoiceId/payments/:id","type":0,"val":"payments","end":""},{"old":"/api/v1/invoices/:invoiceId/payments/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['invoice_payment_destroy']['types'],
   },
   'e_invoicing_submit': {
     methods: ["POST"],
@@ -959,6 +1007,24 @@ const routes = {
     pattern: '/api/v1/expenses/categories/:id',
     tokens: [{"old":"/api/v1/expenses/categories/:id","type":0,"val":"api","end":""},{"old":"/api/v1/expenses/categories/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/expenses/categories/:id","type":0,"val":"expenses","end":""},{"old":"/api/v1/expenses/categories/:id","type":0,"val":"categories","end":""},{"old":"/api/v1/expenses/categories/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['expense_category_delete']['types'],
+  },
+  'parse_receipt': {
+    methods: ["POST"],
+    pattern: '/api/v1/expenses/parse-receipt',
+    tokens: [{"old":"/api/v1/expenses/parse-receipt","type":0,"val":"api","end":""},{"old":"/api/v1/expenses/parse-receipt","type":0,"val":"v1","end":""},{"old":"/api/v1/expenses/parse-receipt","type":0,"val":"expenses","end":""},{"old":"/api/v1/expenses/parse-receipt","type":0,"val":"parse-receipt","end":""}],
+    types: placeholder as Registry['parse_receipt']['types'],
+  },
+  'vat_report': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/tax/vat-report',
+    tokens: [{"old":"/api/v1/tax/vat-report","type":0,"val":"api","end":""},{"old":"/api/v1/tax/vat-report","type":0,"val":"v1","end":""},{"old":"/api/v1/tax/vat-report","type":0,"val":"tax","end":""},{"old":"/api/v1/tax/vat-report","type":0,"val":"vat-report","end":""}],
+    types: placeholder as Registry['vat_report']['types'],
+  },
+  'fec_export': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/export/fec',
+    tokens: [{"old":"/api/v1/export/fec","type":0,"val":"api","end":""},{"old":"/api/v1/export/fec","type":0,"val":"v1","end":""},{"old":"/api/v1/export/fec","type":0,"val":"export","end":""},{"old":"/api/v1/export/fec","type":0,"val":"fec","end":""}],
+    types: placeholder as Registry['fec_export']['types'],
   },
 } as const satisfies Record<string, AdonisEndpoint>
 

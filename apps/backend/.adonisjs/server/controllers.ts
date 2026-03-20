@@ -78,6 +78,12 @@ export const controllers = {
     lookup: {
       SearchSiren: () => import('#controllers/client/lookup/search_siren'),
     },
+    contacts: {
+      Index: () => import('#controllers/client/contacts/index'),
+      Store: () => import('#controllers/client/contacts/store'),
+      Update: () => import('#controllers/client/contacts/update'),
+      Destroy: () => import('#controllers/client/contacts/destroy'),
+    },
   },
   company: {
     core: {
@@ -97,6 +103,7 @@ export const controllers = {
     Charts: () => import('#controllers/dashboard/charts'),
     SidebarCounts: () => import('#controllers/dashboard/sidebar_counts'),
     Stats: () => import('#controllers/dashboard/stats'),
+    CashFlow: () => import('#controllers/dashboard/cash_flow'),
   },
   einvoicing: {
     Submit: () => import('#controllers/einvoicing/submit'),
@@ -152,6 +159,11 @@ export const controllers = {
       UnlinkQuote: () => import('#controllers/invoice/operations/unlink_quote'),
       UpdateComment: () => import('#controllers/invoice/operations/update_comment'),
       UpdateStatus: () => import('#controllers/invoice/operations/update_status'),
+    },
+    payments: {
+      Index: () => import('#controllers/invoice/payments/index'),
+      Store: () => import('#controllers/invoice/payments/store'),
+      Destroy: () => import('#controllers/invoice/payments/destroy'),
     },
   },
   onboarding: {
@@ -286,5 +298,14 @@ export const controllers = {
       Create: () => import('#controllers/expense/categories/create'),
       Delete: () => import('#controllers/expense/categories/delete'),
     },
+    ocr: {
+      ParseReceipt: () => import('#controllers/expense/ocr/parse_receipt'),
+    },
+  },
+  tax: {
+    VatReport: () => import('#controllers/tax/vat_report'),
+  },
+  export: {
+    FecExport: () => import('#controllers/export/fec_export'),
   },
 }

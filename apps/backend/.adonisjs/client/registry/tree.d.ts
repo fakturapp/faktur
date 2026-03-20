@@ -52,6 +52,7 @@ export interface ApiDefinition {
       collected: typeof routes['dashboard.charts.collected']
       micro: typeof routes['dashboard.charts.micro']
     }
+    cashFlow: typeof routes['dashboard.cashFlow']
   }
   serveIcon: typeof routes['serve_icon']
   teamList: typeof routes['team_list']
@@ -89,6 +90,10 @@ export interface ApiDefinition {
   clientCreate: typeof routes['client_create']
   clientUpdate: typeof routes['client_update']
   clientDelete: typeof routes['client_delete']
+  clientContactIndex: typeof routes['client_contact_index']
+  clientContactStore: typeof routes['client_contact_store']
+  clientContactUpdate: typeof routes['client_contact_update']
+  clientContactDestroy: typeof routes['client_contact_destroy']
   serveInvoiceLogo: typeof routes['serve_invoice_logo']
   invoiceSettingsShow: typeof routes['invoice_settings_show']
   invoiceSettingsUpdate: typeof routes['invoice_settings_update']
@@ -120,6 +125,9 @@ export interface ApiDefinition {
   invoiceDuplicate: typeof routes['invoice_duplicate']
   invoiceUpdate: typeof routes['invoice_update']
   invoiceDelete: typeof routes['invoice_delete']
+  invoicePaymentIndex: typeof routes['invoice_payment_index']
+  invoicePaymentStore: typeof routes['invoice_payment_store']
+  invoicePaymentDestroy: typeof routes['invoice_payment_destroy']
   eInvoicingSubmit: typeof routes['e_invoicing_submit']
   validateConnection: typeof routes['validate_connection']
   gmailCallback: typeof routes['gmail_callback']
@@ -168,4 +176,7 @@ export interface ApiDefinition {
   expenseCategoryList: typeof routes['expense_category_list']
   expenseCategoryCreate: typeof routes['expense_category_create']
   expenseCategoryDelete: typeof routes['expense_category_delete']
+  parseReceipt: typeof routes['parse_receipt']
+  vatReport: typeof routes['vat_report']
+  fecExport: typeof routes['fec_export']
 }
