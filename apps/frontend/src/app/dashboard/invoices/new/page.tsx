@@ -11,7 +11,10 @@ import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { api } from '@/lib/api'
 import { A4Sheet, ClientModal, type DocumentLine, type ClientInfo, type CompanyInfo } from '@/components/shared/a4-sheet'
 import { DocumentOptionsPanel } from '@/components/shared/document-options'
-import { Save, ArrowLeft, Eye, Pencil, SlidersHorizontal, X, Lock, Building2 } from 'lucide-react'
+import { Save, ArrowLeft, Eye, Pencil, SlidersHorizontal, X, Lock, Building2, Sparkles, Settings } from 'lucide-react'
+import { retrieveAiDocument, clearAiDocument } from '@/lib/ai-document'
+import { Tabs } from '@/components/ui/tabs'
+import { AiChatSidebar } from '@/components/ai/ai-chat-sidebar'
 import { Dialog, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
 import { FirstDocumentBanner } from '@/components/shared/first-document-banner'
@@ -87,6 +90,9 @@ export default function NewInvoicePage() {
   const [catalogModalOpen, setCatalogModalOpen] = useState(false)
   const [accentColor, setAccentColor] = useState('#6366f1')
   const [showOptions, setShowOptions] = useState(true)
+
+  const [aiChatEnabled, setAiChatEnabled] = useState(false)
+  const [sidebarTab, setSidebarTab] = useState<'options' | 'chat'>('options')
 
   const [lines, setLines] = useState<DocumentLine[]>([
     { id: generateId(), type: 'standard', description: '', saleType: '', quantity: 1, unit: '', unitPrice: 0, vatRate: 20 },
@@ -196,6 +202,46 @@ export default function NewInvoicePage() {
       setAccentColor(invoiceSettings.accentColor)
     }
   }, [settingsLoading, invoiceSettings])
+
+  // Load AI-generated document from sessionStorage
+  useEffect(() => {
+    if (loading || settingsLoading) return
+    const aiDoc = retrieveAiDocument()
+    if (aiDoc && aiDoc.type === 'invoice') {
+      clearAiDocument()
+      setOptions((prev) => ({
+        ...prev,
+        subject: aiDoc.subject,
+        showSubject: true,
+        acceptanceConditions: aiDoc.acceptanceConditions || prev.acceptanceConditions,
+        showAcceptanceConditions: !!(aiDoc.acceptanceConditions) || prev.showAcceptanceConditions,
+      }))
+      setNotes(aiDoc.notes || '')
+      setLines(
+        aiDoc.lines.map((line) => ({
+          id: generateId(),
+          type: 'standard' as const,
+          description: line.description,
+          saleType: '',
+          quantity: line.quantity,
+          unit: '',
+          unitPrice: line.unitPrice,
+          vatRate: line.vatRate,
+        }))
+      )
+      if (aiDoc.clientId) {
+        api.get<{ clients: Array<{ id: string; displayName: string; type: 'company' | 'individual'; siren?: string; vatNumber?: string; address?: string; addressComplement?: string; postalCode?: string; city?: string }> }>(
+          `/clients?search=`
+        ).then(({ data }) => {
+          const client = data?.clients?.find((c) => c.id === aiDoc.clientId)
+          if (client) setSelectedClient(client)
+        })
+      }
+      setAiChatEnabled(true)
+      setSidebarTab('chat')
+      setIsDirty(true)
+    }
+  }, [loading, settingsLoading])
 
   // Handlers
   const handleUpdateLine = useCallback((index: number, partial: Partial<DocumentLine>) => {
@@ -546,29 +592,75 @@ export default function NewInvoicePage() {
           {showOptions && (
             <motion.div initial={{ opacity: 0, x: 20, width: 0 }} animate={{ opacity: 1, x: 0, width: 300 }} exit={{ opacity: 0, x: 20, width: 0 }} transition={{ duration: 0.25, ease: 'easeInOut' }} className="xl:shrink-0 order-2 overflow-hidden">
               <div className="xl:sticky xl:top-4 w-[300px]">
-                <DocumentOptionsPanel
-                  options={options}
-                  onChange={handleOptionsChange}
-                  accentColor={accentColor}
-                  onAccentColorChange={setAccentColor}
-                  selectedClient={selectedClient}
-                  onOpenClientModal={() => setClientModalOpen(true)}
-                  subtotal={subtotal}
-                  taxAmount={taxAmount}
-                  discountAmount={discountAmount}
-                  total={total}
-                  tvaBreakdown={tvaBreakdown}
-                  documentType="invoice"
-                  paymentMethod={paymentMethod}
-                  onPaymentMethodChange={(v) => { setPaymentMethod(v); saveOptionsToStorage({ ...options, paymentMethod: v }); setIsDirty(true) }}
-                  bankAccounts={bankAccounts}
-                  bankAccountId={bankAccountId}
-                  onBankAccountChange={handleBankAccountChange}
-                  loadingBankAccount={loadingBankAccount}
-                  eInvoicingEnabled={invoiceSettings.eInvoicingEnabled}
-                  notes={notes}
-                  onNotesChange={setNotes}
-                />
+                {aiChatEnabled && (
+                  <Tabs
+                    tabs={[
+                      { id: 'options', label: 'Options', icon: <Settings className="h-3.5 w-3.5" /> },
+                      { id: 'chat', label: 'Chat IA', icon: <Sparkles className="h-3.5 w-3.5" /> },
+                    ]}
+                    activeTab={sidebarTab}
+                    onChange={(id) => setSidebarTab(id as 'options' | 'chat')}
+                    className="mb-3"
+                  />
+                )}
+
+                {sidebarTab === 'options' ? (
+                  <DocumentOptionsPanel
+                    options={options}
+                    onChange={handleOptionsChange}
+                    accentColor={accentColor}
+                    onAccentColorChange={setAccentColor}
+                    selectedClient={selectedClient}
+                    onOpenClientModal={() => setClientModalOpen(true)}
+                    subtotal={subtotal}
+                    taxAmount={taxAmount}
+                    discountAmount={discountAmount}
+                    total={total}
+                    tvaBreakdown={tvaBreakdown}
+                    documentType="invoice"
+                    paymentMethod={paymentMethod}
+                    onPaymentMethodChange={(v) => { setPaymentMethod(v); saveOptionsToStorage({ ...options, paymentMethod: v }); setIsDirty(true) }}
+                    bankAccounts={bankAccounts}
+                    bankAccountId={bankAccountId}
+                    onBankAccountChange={handleBankAccountChange}
+                    loadingBankAccount={loadingBankAccount}
+                    eInvoicingEnabled={invoiceSettings.eInvoicingEnabled}
+                    notes={notes}
+                    onNotesChange={setNotes}
+                  />
+                ) : (
+                  <AiChatSidebar
+                    documentType="invoice"
+                    subject={options.subject}
+                    lines={lines.filter((l) => l.type === 'standard').map((l) => ({
+                      description: l.description,
+                      quantity: l.quantity,
+                      unitPrice: l.unitPrice,
+                      vatRate: l.vatRate,
+                    }))}
+                    notes={notes}
+                    acceptanceConditions={options.acceptanceConditions}
+                    onDocumentUpdate={(doc) => {
+                      if (doc.subject) handleOptionsChange({ subject: doc.subject })
+                      if (doc.notes !== undefined) setNotes(doc.notes)
+                      if (doc.acceptanceConditions !== undefined) {
+                        handleOptionsChange({ acceptanceConditions: doc.acceptanceConditions, showAcceptanceConditions: !!doc.acceptanceConditions })
+                      }
+                      if (doc.lines) {
+                        setLines(doc.lines.map((l) => ({
+                          id: generateId(),
+                          type: 'standard' as const,
+                          description: l.description,
+                          saleType: '',
+                          quantity: l.quantity,
+                          unit: '',
+                          unitPrice: l.unitPrice,
+                          vatRate: l.vatRate,
+                        })))
+                      }
+                    }}
+                  />
+                )}
               </div>
             </motion.div>
           )}
