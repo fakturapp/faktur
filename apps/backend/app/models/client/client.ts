@@ -1,7 +1,8 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, belongsTo } from '@adonisjs/lucid/orm'
-import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import { BaseModel, column, belongsTo, hasMany } from '@adonisjs/lucid/orm'
+import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import Team from '#models/team/team'
+import ClientContact from '#models/client/client_contact'
 
 export default class Client extends BaseModel {
   @column({ isPrimary: true })
@@ -71,6 +72,9 @@ export default class Client extends BaseModel {
 
   @belongsTo(() => Team)
   declare team: BelongsTo<typeof Team>
+
+  @hasMany(() => ClientContact)
+  declare contacts: HasMany<typeof ClientContact>
 
   get displayName(): string {
     if (this.type === 'company') {

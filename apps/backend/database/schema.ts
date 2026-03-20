@@ -944,6 +944,37 @@ export class ExpenseSchema extends BaseModel {
   declare vatRate: string
 }
 
+export class ClientContactSchema extends BaseModel {
+  static $columns = ['clientId', 'createdAt', 'email', 'firstName', 'id', 'includeInEmails', 'isPrimary', 'lastName', 'notes', 'phone', 'role', 'teamId', 'updatedAt'] as const
+  $columns = ClientContactSchema.$columns
+  @column()
+  declare clientId: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare email: string | null
+  @column()
+  declare firstName: string | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare includeInEmails: boolean
+  @column()
+  declare isPrimary: boolean
+  @column()
+  declare lastName: string | null
+  @column()
+  declare notes: string | null
+  @column()
+  declare phone: string | null
+  @column()
+  declare role: string | null
+  @column()
+  declare teamId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class InvoicePaymentSchema extends BaseModel {
   static $columns = ['amount', 'createdAt', 'id', 'invoiceId', 'notes', 'paymentDate', 'paymentMethod', 'teamId', 'updatedAt'] as const
   $columns = InvoicePaymentSchema.$columns

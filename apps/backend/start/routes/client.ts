@@ -8,6 +8,10 @@ const ClientCreate = () => import('#controllers/client/crud/create')
 const ClientUpdate = () => import('#controllers/client/crud/update')
 const ClientDelete = () => import('#controllers/client/crud/delete')
 const SearchSiren = () => import('#controllers/client/lookup/search_siren')
+const ClientContactIndex = () => import('#controllers/client/contacts/index')
+const ClientContactStore = () => import('#controllers/client/contacts/store')
+const ClientContactUpdate = () => import('#controllers/client/contacts/update')
+const ClientContactDestroy = () => import('#controllers/client/contacts/destroy')
 
 router
   .group(() => {
@@ -17,6 +21,12 @@ router
     router.post('/', [ClientCreate, 'handle'])
     router.put('/:id', [ClientUpdate, 'handle'])
     router.delete('/:id', [ClientDelete, 'handle'])
+
+    // Client contacts
+    router.get('/:clientId/contacts', [ClientContactIndex, 'handle'])
+    router.post('/:clientId/contacts', [ClientContactStore, 'handle'])
+    router.put('/:clientId/contacts/:id', [ClientContactUpdate, 'handle'])
+    router.delete('/:clientId/contacts/:id', [ClientContactDestroy, 'handle'])
   })
   .prefix(API_PREFIX + '/clients')
   .use(middleware.auth())

@@ -146,4 +146,6 @@ export const ENCRYPTED_FIELDS = {
   expense: ['description', 'supplier', 'notes'] as const,
 
   invoicePayment: ['paymentMethod', 'notes'] as const,
+
+  clientContact: ['firstName', 'lastName', 'email', 'phone', 'role', 'notes'] as const,
 } as const
