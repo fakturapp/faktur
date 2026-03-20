@@ -127,6 +127,11 @@ export type ScannedRoutes = {
     'send_email': { paramsTuple?: []; params?: {} }
     'send_test_email': { paramsTuple?: []; params?: {} }
     'list_email_logs': { paramsTuple?: []; params?: {} }
+    'product_list': { paramsTuple?: []; params?: {} }
+    'product_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'product_create': { paramsTuple?: []; params?: {} }
+    'product_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'product_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   POST: {
     'signup': { paramsTuple?: []; params?: {} }
@@ -180,6 +185,7 @@ export type ScannedRoutes = {
     'configure_smtp': { paramsTuple?: []; params?: {} }
     'send_email': { paramsTuple?: []; params?: {} }
     'send_test_email': { paramsTuple?: []; params?: {} }
+    'product_create': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'google_auth_url': { paramsTuple?: []; params?: {} }
@@ -227,6 +233,8 @@ export type ScannedRoutes = {
     'email_accounts_list': { paramsTuple?: []; params?: {} }
     'gmail_auth_url': { paramsTuple?: []; params?: {} }
     'list_email_logs': { paramsTuple?: []; params?: {} }
+    'product_list': { paramsTuple?: []; params?: {} }
+    'product_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   HEAD: {
     'google_auth_url': { paramsTuple?: []; params?: {} }
@@ -274,6 +282,8 @@ export type ScannedRoutes = {
     'email_accounts_list': { paramsTuple?: []; params?: {} }
     'gmail_auth_url': { paramsTuple?: []; params?: {} }
     'list_email_logs': { paramsTuple?: []; params?: {} }
+    'product_list': { paramsTuple?: []; params?: {} }
+    'product_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PUT: {
     'profile_update': { paramsTuple?: []; params?: {} }
@@ -287,6 +297,7 @@ export type ScannedRoutes = {
     'invoice_settings_update': { paramsTuple?: []; params?: {} }
     'quote_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'product_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   DELETE: {
     'session_revoke': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -299,6 +310,7 @@ export type ScannedRoutes = {
     'quote_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'email_accounts_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'product_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PATCH: {
     'quote_update_status': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

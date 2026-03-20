@@ -132,4 +132,9 @@ export interface ApiDefinition {
   sendEmail: typeof routes['send_email']
   sendTestEmail: typeof routes['send_test_email']
   listEmailLogs: typeof routes['list_email_logs']
+  productList: typeof routes['product_list']
+  productShow: typeof routes['product_show']
+  productCreate: typeof routes['product_create']
+  productUpdate: typeof routes['product_update']
+  productDelete: typeof routes['product_delete']
 }

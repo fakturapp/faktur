@@ -221,4 +221,11 @@ export const controllers = {
       UpdateRole: () => import('#controllers/team/members/update_role'),
     },
   },
+  product: {
+    List: () => import('#controllers/product/list'),
+    Show: () => import('#controllers/product/show'),
+    Create: () => import('#controllers/product/create'),
+    Update: () => import('#controllers/product/update'),
+    Delete: () => import('#controllers/product/delete'),
+  },
 }

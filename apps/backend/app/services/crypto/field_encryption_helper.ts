@@ -110,4 +110,6 @@ export const ENCRYPTED_FIELDS = {
   emailLog: ['fromEmail', 'toEmail', 'subject', 'body', 'errorMessage'] as const,
 
   invoiceSetting: ['pdpApiKey'] as const,
+
+  product: ['name', 'description', 'reference', 'unit', 'saleType'] as const,
 } as const
