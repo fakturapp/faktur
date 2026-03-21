@@ -11,10 +11,13 @@ import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { api } from '@/lib/api'
 import { A4Sheet, ClientModal, type DocumentLine, type ClientInfo, type CompanyInfo } from '@/components/shared/a4-sheet'
 import { DocumentOptionsPanel } from '@/components/shared/document-options'
-import { Save, ArrowLeft, Eye, Pencil, Download, SlidersHorizontal, X } from 'lucide-react'
+import { Save, ArrowLeft, Eye, Pencil, Download, SlidersHorizontal, X, Sparkles, Settings } from 'lucide-react'
 import { Dialog, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
 import { ProductCatalogModal, type CatalogProduct } from '@/components/products/product-catalog-modal'
+import { Tabs } from '@/components/ui/tabs'
+import { AiChatSidebar } from '@/components/ai/ai-chat-sidebar'
+import { AiSheetOverlay } from '@/components/ai/ai-sheet-overlay'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -54,6 +57,8 @@ function EditQuoteContent() {
   const [accentColor, setAccentColor] = useState('#6366f1')
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
   const [showOptions, setShowOptions] = useState(true)
+  const [sidebarTab, setSidebarTab] = useState<'options' | 'chat'>('options')
+  const [aiProcessing, setAiProcessing] = useState(false)
 
   const [lines, setLines] = useState<DocumentLine[]>([])
 
@@ -472,14 +477,23 @@ function EditQuoteContent() {
         {/* A4 Sheet */}
         <motion.div variants={fadeUp} custom={1} className="flex-1 min-w-0 order-1">
           <div className="rounded-xl relative">
-          {/* Toggle options button */}
-          <button
-            onClick={() => setShowOptions(!showOptions)}
-            className="absolute top-3 right-3 z-10 p-1.5 rounded-lg border border-border bg-card/80 backdrop-blur-sm text-muted-foreground hover:text-foreground transition-colors"
-            title={showOptions ? 'Masquer les options' : 'Afficher les options'}
-          >
-            <SlidersHorizontal className="h-4 w-4" />
-          </button>
+          {/* Toggle options + AI button */}
+          <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
+            {invoiceSettings.aiEnabled && (
+              <button onClick={() => { setShowOptions(true); setSidebarTab('chat') }} className="p-1.5 rounded-lg border border-border bg-card/80 backdrop-blur-sm text-purple-500 hover:text-purple-400 hover:bg-purple-500/10 transition-colors" title="Chat IA">
+                <Sparkles className="h-4 w-4" />
+              </button>
+            )}
+            <button
+              onClick={() => setShowOptions(!showOptions)}
+              className="p-1.5 rounded-lg border border-border bg-card/80 backdrop-blur-sm text-muted-foreground hover:text-foreground transition-colors"
+              title={showOptions ? 'Masquer les options' : 'Afficher les options'}
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+            </button>
+          </div>
+          <div className="relative">
+          <AiSheetOverlay open={aiProcessing} />
           <A4Sheet
             mode={mode}
             logoUrl={logoUrl || (invoiceSettings.logoSource === 'company' ? companyLogoUrl : invoiceSettings.logoUrl)}
@@ -543,6 +557,7 @@ function EditQuoteContent() {
             onValidityDateChange={(d) => handleOptionsChange({ validityDate: d })}
           />
           </div>
+          </div>
         </motion.div>
 
         {/* Right Sidebar */}
@@ -556,22 +571,69 @@ function EditQuoteContent() {
               className="xl:shrink-0 order-2 overflow-hidden"
             >
               <div className="xl:sticky xl:top-4 w-[300px]">
-                <DocumentOptionsPanel
-                  options={options}
-                  onChange={handleOptionsChange}
-                  accentColor={accentColor}
-                  onAccentColorChange={setAccentColor}
-                  selectedClient={selectedClient}
-                  onOpenClientModal={() => setClientModalOpen(true)}
-                  subtotal={subtotal}
-                  taxAmount={taxAmount}
-                  discountAmount={discountAmount}
-                  total={total}
-                  tvaBreakdown={tvaBreakdown}
-                  documentType="quote"
-                  notes={notes}
-                  onNotesChange={setNotes}
-                />
+                {invoiceSettings.aiEnabled && (
+                  <Tabs
+                    tabs={[
+                      { id: 'options', label: 'Options', icon: <Settings className="h-3.5 w-3.5" /> },
+                      { id: 'chat', label: 'Chat IA', icon: <Sparkles className="h-3.5 w-3.5" /> },
+                    ]}
+                    activeTab={sidebarTab}
+                    onChange={(id) => setSidebarTab(id as 'options' | 'chat')}
+                    className="mb-3"
+                  />
+                )}
+
+                {sidebarTab === 'options' ? (
+                  <DocumentOptionsPanel
+                    options={options}
+                    onChange={handleOptionsChange}
+                    accentColor={accentColor}
+                    onAccentColorChange={setAccentColor}
+                    selectedClient={selectedClient}
+                    onOpenClientModal={() => setClientModalOpen(true)}
+                    subtotal={subtotal}
+                    taxAmount={taxAmount}
+                    discountAmount={discountAmount}
+                    total={total}
+                    tvaBreakdown={tvaBreakdown}
+                    documentType="quote"
+                    notes={notes}
+                    onNotesChange={setNotes}
+                  />
+                ) : (
+                  <AiChatSidebar
+                    documentType="quote"
+                    subject={options.subject}
+                    lines={lines.filter((l) => l.type === 'standard').map((l) => ({
+                      description: l.description,
+                      quantity: l.quantity,
+                      unitPrice: l.unitPrice,
+                      vatRate: l.vatRate,
+                    }))}
+                    notes={notes}
+                    acceptanceConditions={options.acceptanceConditions}
+                    onProcessingChange={setAiProcessing}
+                    onDocumentUpdate={(doc) => {
+                      if (doc.subject) handleOptionsChange({ subject: doc.subject })
+                      if (doc.notes !== undefined) setNotes(doc.notes)
+                      if (doc.acceptanceConditions !== undefined) {
+                        handleOptionsChange({ acceptanceConditions: doc.acceptanceConditions, showAcceptanceConditions: !!doc.acceptanceConditions })
+                      }
+                      if (doc.lines) {
+                        setLines(doc.lines.map((l) => ({
+                          id: generateId(),
+                          type: 'standard' as const,
+                          description: l.description,
+                          saleType: '',
+                          quantity: l.quantity,
+                          unit: '',
+                          unitPrice: l.unitPrice,
+                          vatRate: l.vatRate,
+                        })))
+                      }
+                    }}
+                  />
+                )}
               </div>
             </motion.div>
           )}

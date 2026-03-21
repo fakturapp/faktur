@@ -50,6 +50,9 @@ export default class InvoiceSettingsShow {
           aiProvider: 'gemini',
           aiModel: 'gemini-2.5-flash-lite',
           aiCustomApiKey: null,
+          aiApiKeyClaude: null,
+          aiApiKeyGemini: null,
+          aiApiKeyGroq: null,
         },
       })
     }
@@ -87,6 +90,9 @@ export default class InvoiceSettingsShow {
         aiProvider: settings.aiProvider || 'gemini',
         aiModel: settings.aiModel || 'gemini-2.5-flash-lite',
         aiCustomApiKey: settings.aiCustomApiKey ? '••••••••' : null,
+        aiApiKeyClaude: settings.aiApiKeyClaude ? '••••••••' + settings.aiApiKeyClaude.slice(-4) : null,
+        aiApiKeyGemini: settings.aiApiKeyGemini ? '••••••••' + settings.aiApiKeyGemini.slice(-4) : null,
+        aiApiKeyGroq: settings.aiApiKeyGroq ? '••••••••' + settings.aiApiKeyGroq.slice(-4) : null,
       },
     })
   }

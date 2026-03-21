@@ -19,6 +19,8 @@ const chatDocumentValidator = vine.compile(
       acceptanceConditions: vine.string().trim().optional(),
     }),
     type: vine.enum(['invoice', 'quote']),
+    provider: vine.enum(['claude', 'gemini', 'groq']).optional(),
+    model: vine.string().trim().maxLength(100).optional(),
   })
 )
 
@@ -74,7 +76,9 @@ Règles:
         dek,
         systemPrompt,
         payload.message,
-        2048
+        2048,
+        payload.provider,
+        payload.model,
       )
 
       // Parse JSON from response

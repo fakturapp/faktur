@@ -15,6 +15,9 @@ import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { TEMPLATES, getTemplate } from '@/lib/invoice-templates'
 import { TemplateThumbnail } from '@/components/shared/template-thumbnail'
 import { Badge } from '@/components/ui/badge'
+import { AnthropicIcon } from '@/components/icons/anthropic-icon'
+import { GoogleIcon } from '@/components/icons/google-icon'
+import { GroqIcon } from '@/components/icons/groq-icon'
 import {
   ImagePlus,
   Palette,
@@ -146,14 +149,20 @@ export default function InvoiceSettingsPage() {
   const [aiKeyMode, setAiKeyMode] = useState<'server' | 'custom'>('server')
   const [showAiKey, setShowAiKey] = useState(false)
   const [showPdpKey, setShowPdpKey] = useState(false)
+  const [aiKeyModalProvider, setAiKeyModalProvider] = useState<'claude' | 'gemini' | 'groq' | null>(null)
+  const [aiKeyModalValue, setAiKeyModalValue] = useState('')
+  const [aiKeyModalShow, setAiKeyModalShow] = useState(false)
+  const [aiDeleteConfirmProvider, setAiDeleteConfirmProvider] = useState<'claude' | 'gemini' | 'groq' | null>(null)
 
   useEffect(() => {
-    if (settings.aiCustomApiKey && settings.aiCustomApiKey !== '••••••••') {
+    const hasAnyKey = settings.aiApiKeyClaude || settings.aiApiKeyGemini || settings.aiApiKeyGroq ||
+      (settings.aiCustomApiKey && settings.aiCustomApiKey !== '••••••••')
+    if (hasAnyKey) {
       setAiKeyMode('custom')
     } else if (settings.aiCustomApiKey === '••••••••') {
       setAiKeyMode('custom')
     }
-  }, [settings.aiCustomApiKey])
+  }, [settings.aiCustomApiKey, settings.aiApiKeyClaude, settings.aiApiKeyGemini, settings.aiApiKeyGroq])
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const currentTemplate = getTemplate(settings.template, settings.darkMode)
@@ -926,115 +935,13 @@ export default function InvoiceSettingsPage() {
                           <div className="space-y-4 pt-2">
                             <Separator />
 
-                            {/* Provider selector */}
-                            <div>
-                              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">Fournisseur IA</label>
-                              <div className="grid grid-cols-3 gap-2">
-                                {([
-                                  {
-                                    id: 'gemini' as const,
-                                    name: 'Gemini',
-                                    desc: 'Google AI',
-                                    badge: 'Gratuit',
-                                    badgeColor: 'bg-emerald-500/10 text-emerald-600',
-                                    icon: <Zap className="h-4 w-4" />,
-                                    iconBg: 'bg-blue-500/10 text-blue-500',
-                                  },
-                                  {
-                                    id: 'groq' as const,
-                                    name: 'Groq',
-                                    desc: 'Llama 3.3',
-                                    badge: 'Gratuit',
-                                    badgeColor: 'bg-emerald-500/10 text-emerald-600',
-                                    icon: <Zap className="h-4 w-4" />,
-                                    iconBg: 'bg-orange-500/10 text-orange-500',
-                                  },
-                                  {
-                                    id: 'claude' as const,
-                                    name: 'Claude',
-                                    desc: 'Anthropic',
-                                    badge: 'Payant',
-                                    badgeColor: 'bg-amber-500/10 text-amber-600',
-                                    icon: <Sparkles className="h-4 w-4" />,
-                                    iconBg: 'bg-violet-500/10 text-violet-500',
-                                  },
-                                ]).map((provider) => (
-                                  <button key={provider.id}
-                                    onClick={() => {
-                                      const defaultModels: Record<string, string> = {
-                                        claude: 'claude-sonnet-4-5-20250929',
-                                        gemini: 'gemini-2.5-flash-lite',
-                                        groq: 'llama-3.3-70b-versatile',
-                                      }
-                                      updateSettings({ aiProvider: provider.id, aiModel: defaultModels[provider.id], aiCustomApiKey: null })
-                                    }}
-                                    className={`rounded-xl border-2 p-3 text-left transition-all relative ${
-                                      settings.aiProvider === provider.id ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
-                                    }`}>
-                                    <div className={`flex h-8 w-8 items-center justify-center rounded-lg mb-2 ${provider.iconBg}`}>
-                                      {provider.icon}
-                                    </div>
-                                    <p className="text-xs font-semibold text-foreground">{provider.name}</p>
-                                    <p className="text-[10px] text-muted-foreground">{provider.desc}</p>
-                                    <span className={`absolute top-2 right-2 text-[9px] font-medium px-1.5 py-0.5 rounded-full ${provider.badgeColor}`}>
-                                      {provider.badge}
-                                    </span>
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-
-                            {/* Model selector (changes based on provider) */}
-                            <div>
-                              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">Modèle</label>
-                              <div className="grid grid-cols-2 gap-2">
-                                {settings.aiProvider === 'claude' && ([
-                                  { id: 'claude-sonnet-4-5-20250929', name: 'Claude Sonnet', desc: 'Rapide et économique' },
-                                  { id: 'claude-opus-4-6', name: 'Claude Opus', desc: 'Plus puissant' },
-                                ].map((model) => (
-                                  <button key={model.id} onClick={() => updateSettings({ aiModel: model.id })}
-                                    className={`rounded-xl border-2 p-3 text-left transition-all ${
-                                      settings.aiModel === model.id ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
-                                    }`}>
-                                    <p className="text-xs font-medium text-foreground">{model.name}</p>
-                                    <p className="text-[10px] text-muted-foreground">{model.desc}</p>
-                                  </button>
-                                )))}
-                                {settings.aiProvider === 'gemini' && ([
-                                  { id: 'gemini-2.5-flash-lite', name: 'Flash Lite', desc: '1 000 req/jour gratuit' },
-                                  { id: 'gemini-2.5-flash', name: 'Flash', desc: '250 req/jour gratuit' },
-                                  { id: 'gemini-2.5-pro', name: 'Pro', desc: '100 req/jour gratuit' },
-                                ].map((model) => (
-                                  <button key={model.id} onClick={() => updateSettings({ aiModel: model.id })}
-                                    className={`rounded-xl border-2 p-3 text-left transition-all ${
-                                      settings.aiModel === model.id ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
-                                    }`}>
-                                    <p className="text-xs font-medium text-foreground">{model.name}</p>
-                                    <p className="text-[10px] text-muted-foreground">{model.desc}</p>
-                                  </button>
-                                )))}
-                                {settings.aiProvider === 'groq' && ([
-                                  { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B', desc: 'Puissant, gratuit' },
-                                  { id: 'llama-3.1-8b-instant', name: 'Llama 3.1 8B', desc: 'Ultra rapide' },
-                                ].map((model) => (
-                                  <button key={model.id} onClick={() => updateSettings({ aiModel: model.id })}
-                                    className={`rounded-xl border-2 p-3 text-left transition-all ${
-                                      settings.aiModel === model.id ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
-                                    }`}>
-                                    <p className="text-xs font-medium text-foreground">{model.name}</p>
-                                    <p className="text-[10px] text-muted-foreground">{model.desc}</p>
-                                  </button>
-                                )))}
-                              </div>
-                            </div>
-
-                            {/* API key source */}
+                            {/* API Source */}
                             <div>
                               <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
                                 <Key className="h-3 w-3" />
-                                Clé API
+                                Source API
                               </label>
-                              <div className="grid grid-cols-2 gap-2 mb-3">
+                              <div className="grid grid-cols-2 gap-2">
                                 <button
                                   onClick={() => {
                                     setAiKeyMode('server')
@@ -1063,53 +970,173 @@ export default function InvoiceSettingsPage() {
                                     <div className="flex h-6 w-6 items-center justify-center rounded-md bg-amber-500/10">
                                       <Key className="h-3 w-3 text-amber-500" />
                                     </div>
-                                    <p className="text-xs font-semibold text-foreground">Ma propre clé</p>
+                                    <p className="text-xs font-semibold text-foreground">Mes propres clés</p>
                                   </div>
-                                  <p className="text-[10px] text-muted-foreground">Utiliser ma clé API perso</p>
+                                  <p className="text-[10px] text-muted-foreground">Utiliser mes clés API perso</p>
                                 </button>
                               </div>
+                            </div>
 
-                              <AnimatePresence>
-                                {aiKeyMode === 'custom' && (
-                                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                                    <div className="relative">
-                                      <Input
-                                        type={showAiKey ? 'text' : 'password'}
-                                        placeholder={settings.aiProvider === 'claude' ? 'sk-ant-...' : settings.aiProvider === 'gemini' ? 'AIza...' : 'gsk_...'}
-                                        value={settings.aiCustomApiKey === '••••••••' ? '' : (settings.aiCustomApiKey || '')}
-                                        onChange={(e) => updateSettings({ aiCustomApiKey: e.target.value || null })}
-                                        className="text-sm pr-10 font-mono"
-                                      />
-                                      <button
-                                        type="button"
-                                        onClick={() => setShowAiKey(!showAiKey)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                                      >
-                                        {showAiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                      </button>
-                                    </div>
-                                    <div className="flex items-center justify-between mt-1.5">
-                                      <p className="text-[10px] text-muted-foreground">
-                                        {settings.aiCustomApiKey && settings.aiCustomApiKey !== '••••••••'
-                                          ? 'Votre clé personnalisée sera utilisée'
-                                          : settings.aiCustomApiKey === '••••••••'
-                                          ? 'Clé personnalisée configurée'
-                                          : 'Entrez votre clé API pour ce fournisseur'}
-                                      </p>
-                                      <a href={
-                                        settings.aiProvider === 'claude' ? 'https://console.anthropic.com/settings/keys'
-                                          : settings.aiProvider === 'gemini' ? 'https://aistudio.google.com/apikey'
-                                          : 'https://console.groq.com/keys'
+                            {/* Per-provider API keys (visible in custom mode) */}
+                            <AnimatePresence>
+                              {aiKeyMode === 'custom' && (
+                                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                                  <div className="space-y-2">
+                                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider block">Mes clés API</label>
+                                    {([
+                                      { id: 'gemini' as const, name: 'Gemini', desc: 'Google AI', icon: <GoogleIcon className="h-4 w-4" />, iconBg: 'bg-blue-500/10', key: settings.aiApiKeyGemini, link: 'https://aistudio.google.com/apikey' },
+                                      { id: 'groq' as const, name: 'Groq', desc: 'Llama 3.3', icon: <GroqIcon className="h-4 w-4 text-orange-500" />, iconBg: 'bg-orange-500/10', key: settings.aiApiKeyGroq, link: 'https://console.groq.com/keys' },
+                                      { id: 'claude' as const, name: 'Claude', desc: 'Anthropic', icon: <AnthropicIcon className="h-4 w-4 text-violet-500" />, iconBg: 'bg-violet-500/10', key: settings.aiApiKeyClaude, link: 'https://console.anthropic.com/settings/keys' },
+                                    ]).map((p) => (
+                                      <div key={p.id} className="flex items-center gap-3 rounded-xl border-2 border-border p-3">
+                                        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${p.iconBg}`}>
+                                          {p.icon}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                          <p className="text-xs font-semibold text-foreground">{p.name}</p>
+                                          {p.key ? (
+                                            <p className="text-[10px] text-muted-foreground font-mono truncate">{p.key}</p>
+                                          ) : (
+                                            <p className="text-[10px] text-muted-foreground">Non configurée</p>
+                                          )}
+                                        </div>
+                                        <div className="flex items-center gap-1 shrink-0">
+                                          {p.key && (
+                                            <button
+                                              onClick={() => setAiDeleteConfirmProvider(p.id)}
+                                              className="text-[10px] text-destructive/70 hover:text-destructive transition-colors px-1.5 py-1 rounded"
+                                            >
+                                              <Trash2 className="h-3 w-3" />
+                                            </button>
+                                          )}
+                                          <button
+                                            onClick={() => {
+                                              setAiKeyModalProvider(p.id)
+                                              setAiKeyModalValue('')
+                                              setAiKeyModalShow(false)
+                                            }}
+                                            className="text-[10px] text-primary hover:text-primary/80 font-medium transition-colors px-2 py-1 rounded-lg border border-primary/20 hover:bg-primary/5"
+                                          >
+                                            {p.key ? 'Modifier' : 'Configurer'}
+                                          </button>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+
+                            {/* Provider selector */}
+                            <div>
+                              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">Fournisseur IA</label>
+                              <div className="grid grid-cols-3 gap-2">
+                                {([
+                                  {
+                                    id: 'gemini' as const,
+                                    name: 'Gemini',
+                                    desc: 'Google AI',
+                                    badge: 'Gratuit',
+                                    badgeColor: 'bg-emerald-500/10 text-emerald-600',
+                                    icon: <GoogleIcon className="h-4 w-4" />,
+                                    iconBg: 'bg-blue-500/10',
+                                    hasKey: !!settings.aiApiKeyGemini,
+                                  },
+                                  {
+                                    id: 'groq' as const,
+                                    name: 'Groq',
+                                    desc: 'Llama 3.3',
+                                    badge: 'Gratuit',
+                                    badgeColor: 'bg-emerald-500/10 text-emerald-600',
+                                    icon: <GroqIcon className="h-4 w-4 text-orange-500" />,
+                                    iconBg: 'bg-orange-500/10',
+                                    hasKey: !!settings.aiApiKeyGroq,
+                                  },
+                                  {
+                                    id: 'claude' as const,
+                                    name: 'Claude',
+                                    desc: 'Anthropic',
+                                    badge: 'Payant',
+                                    badgeColor: 'bg-amber-500/10 text-amber-600',
+                                    icon: <AnthropicIcon className="h-4 w-4 text-violet-500" />,
+                                    iconBg: 'bg-violet-500/10',
+                                    hasKey: !!settings.aiApiKeyClaude,
+                                  },
+                                ]).map((provider) => {
+                                  const disabled = aiKeyMode === 'custom' && !provider.hasKey
+                                  return (
+                                    <button key={provider.id}
+                                      disabled={disabled}
+                                      onClick={() => {
+                                        const defaultModels: Record<string, string> = {
+                                          claude: 'claude-sonnet-4-5-20250929',
+                                          gemini: 'gemini-2.5-flash-lite',
+                                          groq: 'llama-3.3-70b-versatile',
                                         }
-                                        target="_blank" rel="noopener noreferrer"
-                                        className="text-[10px] text-primary hover:underline flex items-center gap-1 shrink-0"
-                                      >
-                                        Obtenir une clé <ExternalLink className="h-2.5 w-2.5" />
-                                      </a>
-                                    </div>
-                                  </motion.div>
-                                )}
-                              </AnimatePresence>
+                                        updateSettings({ aiProvider: provider.id, aiModel: defaultModels[provider.id] })
+                                      }}
+                                      className={`rounded-xl border-2 p-3 text-left transition-all relative ${
+                                        settings.aiProvider === provider.id ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
+                                      } ${disabled ? 'opacity-40 cursor-not-allowed' : ''}`}>
+                                      <div className={`flex h-8 w-8 items-center justify-center rounded-lg mb-2 ${provider.iconBg}`}>
+                                        {provider.icon}
+                                      </div>
+                                      <p className="text-xs font-semibold text-foreground">{provider.name}</p>
+                                      <p className="text-[10px] text-muted-foreground">{provider.desc}</p>
+                                      <span className={`absolute top-2 right-2 text-[9px] font-medium px-1.5 py-0.5 rounded-full ${provider.badgeColor}`}>
+                                        {provider.badge}
+                                      </span>
+                                    </button>
+                                  )
+                                })}
+                              </div>
+                            </div>
+
+                            {/* Model selector (changes based on provider) */}
+                            <div>
+                              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">Modèle</label>
+                              <div className="grid grid-cols-2 gap-2">
+                                {settings.aiProvider === 'claude' && ([
+                                  { id: 'claude-sonnet-4-5-20250929', name: 'Claude Sonnet', desc: 'Rapide et économique', badge: 'Rapide' },
+                                  { id: 'claude-opus-4-6', name: 'Claude Opus', desc: 'Plus puissant', badge: 'Intelligent' },
+                                ].map((model) => (
+                                  <button key={model.id} onClick={() => updateSettings({ aiModel: model.id })}
+                                    className={`rounded-xl border-2 p-3 text-left transition-all relative ${
+                                      settings.aiModel === model.id ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
+                                    }`}>
+                                    <p className="text-xs font-medium text-foreground">{model.name}</p>
+                                    <p className="text-[10px] text-muted-foreground">{model.desc}</p>
+                                    <span className="absolute top-2 right-2 text-[8px] font-medium px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">{model.badge}</span>
+                                  </button>
+                                )))}
+                                {settings.aiProvider === 'gemini' && ([
+                                  { id: 'gemini-2.5-flash-lite', name: 'Flash Lite', desc: '1 000 req/jour gratuit', badge: 'Rapide' },
+                                  { id: 'gemini-2.5-flash', name: 'Flash', desc: '250 req/jour gratuit', badge: 'Intelligent' },
+                                  { id: 'gemini-2.5-pro', name: 'Pro', desc: '100 req/jour gratuit', badge: 'Intelligent' },
+                                ].map((model) => (
+                                  <button key={model.id} onClick={() => updateSettings({ aiModel: model.id })}
+                                    className={`rounded-xl border-2 p-3 text-left transition-all relative ${
+                                      settings.aiModel === model.id ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
+                                    }`}>
+                                    <p className="text-xs font-medium text-foreground">{model.name}</p>
+                                    <p className="text-[10px] text-muted-foreground">{model.desc}</p>
+                                    <span className="absolute top-2 right-2 text-[8px] font-medium px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">{model.badge}</span>
+                                  </button>
+                                )))}
+                                {settings.aiProvider === 'groq' && ([
+                                  { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B', desc: 'Puissant, gratuit', badge: 'Intelligent' },
+                                  { id: 'llama-3.1-8b-instant', name: 'Llama 3.1 8B', desc: 'Ultra rapide', badge: 'Rapide' },
+                                ].map((model) => (
+                                  <button key={model.id} onClick={() => updateSettings({ aiModel: model.id })}
+                                    className={`rounded-xl border-2 p-3 text-left transition-all relative ${
+                                      settings.aiModel === model.id ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
+                                    }`}>
+                                    <p className="text-xs font-medium text-foreground">{model.name}</p>
+                                    <p className="text-[10px] text-muted-foreground">{model.desc}</p>
+                                    <span className="absolute top-2 right-2 text-[8px] font-medium px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">{model.badge}</span>
+                                  </button>
+                                )))}
+                              </div>
                             </div>
 
                             {/* Features list */}
@@ -1526,6 +1553,121 @@ export default function InvoiceSettingsPage() {
           <DialogFooter>
             <Button onClick={() => { setShowBetaWarningModal(false); toast('Facturation électronique activée', 'success') }}>
               J&apos;ai compris
+            </Button>
+          </DialogFooter>
+        </div>
+      </Dialog>
+
+      {/* AI API Key Configuration Modal */}
+      <Dialog open={aiKeyModalProvider !== null} onClose={() => setAiKeyModalProvider(null)}>
+        <div className="p-6 max-w-md">
+          <div className="flex items-center gap-3 mb-4">
+            <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${
+              aiKeyModalProvider === 'claude' ? 'bg-violet-500/10' : aiKeyModalProvider === 'gemini' ? 'bg-blue-500/10' : 'bg-orange-500/10'
+            }`}>
+              {aiKeyModalProvider === 'claude' && <AnthropicIcon className="h-6 w-6 text-violet-500" />}
+              {aiKeyModalProvider === 'gemini' && <GoogleIcon className="h-6 w-6" />}
+              {aiKeyModalProvider === 'groq' && <GroqIcon className="h-6 w-6 text-orange-500" />}
+            </div>
+            <div>
+              <DialogTitle>
+                Clé API {aiKeyModalProvider === 'claude' ? 'Claude (Anthropic)' : aiKeyModalProvider === 'gemini' ? 'Gemini (Google)' : 'Groq'}
+              </DialogTitle>
+              <DialogDescription>Entrez votre clé API personnelle</DialogDescription>
+            </div>
+          </div>
+          <div className="space-y-3 mb-6">
+            <div className="relative">
+              <Input
+                type={aiKeyModalShow ? 'text' : 'password'}
+                value={aiKeyModalValue}
+                onChange={(e) => setAiKeyModalValue(e.target.value)}
+                placeholder={aiKeyModalProvider === 'claude' ? 'sk-ant-api03-...' : aiKeyModalProvider === 'gemini' ? 'AIzaSy...' : 'gsk_...'}
+                className="pr-10 font-mono text-sm"
+              />
+              <button
+                type="button"
+                onClick={() => setAiKeyModalShow(!aiKeyModalShow)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {aiKeyModalShow ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            <a
+              href={aiKeyModalProvider === 'claude' ? 'https://console.anthropic.com/settings/keys' : aiKeyModalProvider === 'gemini' ? 'https://aistudio.google.com/apikey' : 'https://console.groq.com/keys'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors"
+            >
+              <ExternalLink className="h-3 w-3" />
+              Obtenir une clé {aiKeyModalProvider === 'claude' ? 'Anthropic' : aiKeyModalProvider === 'gemini' ? 'Google AI' : 'Groq'}
+            </a>
+            <div className="flex items-start gap-2 rounded-lg border border-border p-3">
+              <Shield className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
+              <p className="text-[11px] text-muted-foreground leading-relaxed">
+                Votre clé est chiffrée de bout en bout et ne sera jamais visible en clair après l&apos;enregistrement.
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setAiKeyModalProvider(null)}>Annuler</Button>
+            <Button
+              disabled={!aiKeyModalValue.trim()}
+              onClick={() => {
+                if (!aiKeyModalProvider || !aiKeyModalValue.trim()) return
+                const keyField = aiKeyModalProvider === 'claude' ? 'aiApiKeyClaude' : aiKeyModalProvider === 'gemini' ? 'aiApiKeyGemini' : 'aiApiKeyGroq'
+                updateSettings({ [keyField]: aiKeyModalValue.trim() })
+                toast('Clé API enregistrée', 'success')
+                setAiKeyModalProvider(null)
+                setAiKeyModalValue('')
+                setAiKeyModalShow(false)
+              }}
+            >
+              <Key className="h-4 w-4 mr-2" /> Enregistrer
+            </Button>
+          </DialogFooter>
+        </div>
+      </Dialog>
+
+      {/* AI API Key Delete Confirmation Modal */}
+      <Dialog open={aiDeleteConfirmProvider !== null} onClose={() => setAiDeleteConfirmProvider(null)}>
+        <div className="p-6 max-w-sm">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-destructive/10">
+              <Trash2 className="h-6 w-6 text-destructive" />
+            </div>
+            <div>
+              <DialogTitle>Supprimer la clé API</DialogTitle>
+              <DialogDescription>
+                {aiDeleteConfirmProvider === 'claude' ? 'Claude (Anthropic)' : aiDeleteConfirmProvider === 'gemini' ? 'Gemini (Google)' : 'Groq'}
+              </DialogDescription>
+            </div>
+          </div>
+          <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
+            Êtes-vous sûr de vouloir supprimer cette clé API ? Vous devrez en saisir une nouvelle pour utiliser ce fournisseur avec vos propres clés.
+          </p>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setAiDeleteConfirmProvider(null)}>Annuler</Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (!aiDeleteConfirmProvider) return
+                const keyField = aiDeleteConfirmProvider === 'claude' ? 'aiApiKeyClaude' : aiDeleteConfirmProvider === 'gemini' ? 'aiApiKeyGemini' : 'aiApiKeyGroq'
+                updateSettings({ [keyField]: null })
+                // If we just deleted the key for the active provider, switch to another provider that has a key
+                if (settings.aiProvider === aiDeleteConfirmProvider) {
+                  const fallbacks = ['gemini', 'groq', 'claude'] as const
+                  const defaultModels: Record<string, string> = { claude: 'claude-sonnet-4-5-20250929', gemini: 'gemini-2.5-flash-lite', groq: 'llama-3.3-70b-versatile' }
+                  const next = fallbacks.find((p) => p !== aiDeleteConfirmProvider && settings[`aiApiKey${p.charAt(0).toUpperCase() + p.slice(1)}` as keyof typeof settings])
+                  if (next) {
+                    updateSettings({ aiProvider: next, aiModel: defaultModels[next] })
+                  }
+                }
+                toast('Clé API supprimée', 'success')
+                setAiDeleteConfirmProvider(null)
+              }}
+            >
+              <Trash2 className="h-4 w-4 mr-2" /> Supprimer
             </Button>
           </DialogFooter>
         </div>

@@ -23,6 +23,13 @@ const ENV_KEYS: Record<AiProvider, string> = {
   groq: 'GROQ_API_KEY',
 }
 
+// Provider-specific key column names
+const PROVIDER_KEY_FIELDS: Record<AiProvider, 'aiApiKeyClaude' | 'aiApiKeyGemini' | 'aiApiKeyGroq'> = {
+  claude: 'aiApiKeyClaude',
+  gemini: 'aiApiKeyGemini',
+  groq: 'aiApiKeyGroq',
+}
+
 export default class AiService {
   /**
    * Check if AI is enabled for the team.
@@ -33,38 +40,57 @@ export default class AiService {
   }
 
   /**
-   * Resolve the provider for the team.
+   * Resolve the provider for the team (or use override).
    */
-  private async getProvider(teamId: string): Promise<AiProvider> {
+  private async getProvider(teamId: string, overrideProvider?: string): Promise<AiProvider> {
+    if (overrideProvider && ['claude', 'gemini', 'groq'].includes(overrideProvider)) {
+      return overrideProvider as AiProvider
+    }
     const settings = await InvoiceSetting.findBy('teamId', teamId)
     return (settings?.aiProvider as AiProvider) || 'gemini'
   }
 
   /**
-   * Resolve the API key: custom team key (decrypted) or default env key.
+   * Resolve the API key: per-provider key → legacy custom key → env var.
    */
-  private async getApiKey(teamId: string, dek: Buffer): Promise<string | null> {
+  private async getApiKey(teamId: string, dek: Buffer, provider: AiProvider): Promise<string | null> {
     const settings = await InvoiceSetting.findBy('teamId', teamId)
-    const provider = (settings?.aiProvider as AiProvider) || 'gemini'
 
-    if (settings?.aiCustomApiKey) {
+    // 1. Try per-provider key
+    const providerKeyField = PROVIDER_KEY_FIELDS[provider]
+    const providerKey = settings?.[providerKeyField]
+    if (providerKey) {
       try {
-        return zeroAccessCryptoService.decryptField(settings.aiCustomApiKey, dek)
+        return zeroAccessCryptoService.decryptField(providerKey, dek)
       } catch {
-        // Decryption failed, fall through to default key
+        // Decryption failed, fall through
       }
     }
 
+    // 2. Fallback: legacy aiCustomApiKey (only if provider matches settings.aiProvider)
+    if (settings?.aiCustomApiKey && (settings?.aiProvider as AiProvider) === provider) {
+      try {
+        return zeroAccessCryptoService.decryptField(settings.aiCustomApiKey, dek)
+      } catch {
+        // Decryption failed, fall through
+      }
+    }
+
+    // 3. Fallback: environment variable
     return env.get(ENV_KEYS[provider] as any, '')
   }
 
   /**
-   * Resolve the model from team settings.
+   * Resolve the model from team settings (or use override).
    */
-  private async getModel(teamId: string): Promise<string> {
+  private async getModel(teamId: string, provider: AiProvider, overrideModel?: string): Promise<string> {
+    if (overrideModel) return overrideModel
     const settings = await InvoiceSetting.findBy('teamId', teamId)
-    const provider = (settings?.aiProvider as AiProvider) || 'gemini'
-    return settings?.aiModel || DEFAULT_MODELS[provider]
+    // Only use saved model if provider matches
+    if ((settings?.aiProvider as AiProvider) === provider && settings?.aiModel) {
+      return settings.aiModel
+    }
+    return DEFAULT_MODELS[provider]
   }
 
   /**
@@ -75,11 +101,13 @@ export default class AiService {
     dek: Buffer,
     systemPrompt: string,
     userPrompt: string,
-    maxTokens: number = 1024
+    maxTokens: number = 1024,
+    overrideProvider?: string,
+    overrideModel?: string,
   ): Promise<string> {
-    const provider = await this.getProvider(teamId)
-    const apiKey = await this.getApiKey(teamId, dek)
-    const model = await this.getModel(teamId)
+    const provider = await this.getProvider(teamId, overrideProvider)
+    const apiKey = await this.getApiKey(teamId, dek, provider)
+    const model = await this.getModel(teamId, provider, overrideModel)
 
     if (!apiKey) {
       throw new Error(`No API key configured for ${provider}. Set ${ENV_KEYS[provider]} or add a custom key in settings.`)
@@ -105,11 +133,13 @@ export default class AiService {
     dek: Buffer,
     systemPrompt: string,
     messages: ChatMessage[],
-    maxTokens: number = 1024
+    maxTokens: number = 1024,
+    overrideProvider?: string,
+    overrideModel?: string,
   ): Promise<string> {
-    const provider = await this.getProvider(teamId)
-    const apiKey = await this.getApiKey(teamId, dek)
-    const model = await this.getModel(teamId)
+    const provider = await this.getProvider(teamId, overrideProvider)
+    const apiKey = await this.getApiKey(teamId, dek, provider)
+    const model = await this.getModel(teamId, provider, overrideModel)
 
     if (!apiKey) {
       throw new Error(`No API key configured for ${provider}.`)

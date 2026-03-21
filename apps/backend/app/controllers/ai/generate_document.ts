@@ -10,6 +10,8 @@ const generateDocumentValidator = vine.compile(
     type: vine.enum(['invoice', 'quote']),
     prompt: vine.string().trim().minLength(5).maxLength(2000),
     clientId: vine.string().trim().optional(),
+    provider: vine.enum(['claude', 'gemini', 'groq']).optional(),
+    model: vine.string().trim().maxLength(100).optional(),
   })
 )
 
@@ -94,7 +96,9 @@ Règles:
         dek,
         systemPrompt,
         payload.prompt,
-        2048
+        2048,
+        payload.provider,
+        payload.model,
       )
 
       // Parse JSON from response

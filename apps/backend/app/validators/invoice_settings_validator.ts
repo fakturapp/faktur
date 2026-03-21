@@ -31,5 +31,8 @@ export const updateInvoiceSettingsValidator = vine.compile(
     aiProvider: vine.enum(['claude', 'gemini', 'groq']).optional(),
     aiModel: vine.string().trim().maxLength(100).optional(),
     aiCustomApiKey: vine.string().trim().maxLength(500).optional().nullable(),
+    aiApiKeyClaude: vine.string().trim().maxLength(500).optional().nullable(),
+    aiApiKeyGemini: vine.string().trim().maxLength(500).optional().nullable(),
+    aiApiKeyGroq: vine.string().trim().maxLength(500).optional().nullable(),
   })
 )

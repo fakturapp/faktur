@@ -42,6 +42,9 @@ export interface InvoiceSettings {
   aiProvider: 'claude' | 'gemini' | 'groq'
   aiModel: string
   aiCustomApiKey: string | null
+  aiApiKeyClaude: string | null
+  aiApiKeyGemini: string | null
+  aiApiKeyGroq: string | null
 }
 
 interface InvoiceSettingsContextType {
@@ -86,6 +89,9 @@ const defaultSettings: InvoiceSettings = {
   aiProvider: 'gemini',
   aiModel: 'gemini-2.5-flash-lite',
   aiCustomApiKey: null,
+  aiApiKeyClaude: null,
+  aiApiKeyGemini: null,
+  aiApiKeyGroq: null,
 }
 
 const InvoiceSettingsContext = createContext<InvoiceSettingsContextType>({

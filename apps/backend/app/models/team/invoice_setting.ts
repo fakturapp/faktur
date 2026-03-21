@@ -115,6 +115,15 @@ export default class InvoiceSetting extends BaseModel {
   @column()
   declare aiCustomApiKey: string | null
 
+  @column()
+  declare aiApiKeyClaude: string | null
+
+  @column()
+  declare aiApiKeyGemini: string | null
+
+  @column()
+  declare aiApiKeyGroq: string | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

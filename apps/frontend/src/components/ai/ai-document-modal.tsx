@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/toast'
+import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { api } from '@/lib/api'
 import { storeAiDocument, type AiDocumentData } from '@/lib/ai-document'
 import { cn } from '@/lib/utils'
@@ -20,8 +21,47 @@ import {
   Building2,
   FileText,
   Wand2,
+  ChevronDown,
 } from 'lucide-react'
 import { ShinyText } from '@/components/ui/shiny-text'
+import { AnthropicIcon } from '@/components/icons/anthropic-icon'
+import { GoogleIcon } from '@/components/icons/google-icon'
+import { GroqIcon } from '@/components/icons/groq-icon'
+
+const AI_MODEL_PREF_KEY = 'faktur_ai_model_pref'
+
+const AI_PROVIDERS = [
+  { id: 'gemini' as const, name: 'Gemini', icon: GoogleIcon, iconClass: '', iconBg: 'bg-blue-500/10' },
+  { id: 'groq' as const, name: 'Groq', icon: GroqIcon, iconClass: 'text-orange-500', iconBg: 'bg-orange-500/10' },
+  { id: 'claude' as const, name: 'Claude', icon: AnthropicIcon, iconClass: 'text-violet-500', iconBg: 'bg-violet-500/10' },
+] as const
+
+const AI_MODELS: Record<string, { id: string; name: string; badge: string }[]> = {
+  gemini: [
+    { id: 'gemini-2.5-flash-lite', name: 'Flash Lite', badge: 'Rapide' },
+    { id: 'gemini-2.5-flash', name: 'Flash', badge: 'Intelligent' },
+    { id: 'gemini-2.5-pro', name: 'Pro', badge: 'Intelligent' },
+  ],
+  groq: [
+    { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B', badge: 'Intelligent' },
+    { id: 'llama-3.1-8b-instant', name: 'Llama 3.1 8B', badge: 'Rapide' },
+  ],
+  claude: [
+    { id: 'claude-sonnet-4-5-20250929', name: 'Sonnet', badge: 'Rapide' },
+    { id: 'claude-opus-4-6', name: 'Opus', badge: 'Intelligent' },
+  ],
+}
+
+function loadModelPref(): { provider: string; model: string } | null {
+  try {
+    const raw = localStorage.getItem(AI_MODEL_PREF_KEY)
+    return raw ? JSON.parse(raw) : null
+  } catch { return null }
+}
+
+function saveModelPref(provider: string, model: string) {
+  try { localStorage.setItem(AI_MODEL_PREF_KEY, JSON.stringify({ provider, model })) } catch {}
+}
 
 interface ClientInfo {
   id: string
@@ -38,6 +78,7 @@ interface AiDocumentModalProps {
 export function AiDocumentModal({ open, onClose, type }: AiDocumentModalProps) {
   const router = useRouter()
   const { toast } = useToast()
+  const { settings } = useInvoiceSettings()
   const [step, setStep] = useState<'prompt' | 'client' | 'generating'>('prompt')
   const [prompt, setPrompt] = useState('')
   const [selectedClient, setSelectedClient] = useState<ClientInfo | null>(null)
@@ -45,6 +86,9 @@ export function AiDocumentModal({ open, onClose, type }: AiDocumentModalProps) {
   const [clientSearch, setClientSearch] = useState('')
   const [loadingClients, setLoadingClients] = useState(false)
   const [generating, setGenerating] = useState(false)
+  const [selectedProvider, setSelectedProvider] = useState(settings.aiProvider)
+  const [selectedModel, setSelectedModel] = useState(settings.aiModel)
+  const [showModelDropdown, setShowModelDropdown] = useState(false)
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   useEffect(() => {
@@ -54,8 +98,19 @@ export function AiDocumentModal({ open, onClose, type }: AiDocumentModalProps) {
       setSelectedClient(null)
       setClientSearch('')
       setClients([])
+      setShowModelDropdown(false)
+    } else {
+      // Restore saved model preference or use settings
+      const pref = loadModelPref()
+      if (pref) {
+        setSelectedProvider(pref.provider as any)
+        setSelectedModel(pref.model)
+      } else {
+        setSelectedProvider(settings.aiProvider)
+        setSelectedModel(settings.aiModel)
+      }
     }
-  }, [open])
+  }, [open, settings.aiProvider, settings.aiModel])
 
   const loadClients = useCallback(async (query: string) => {
     setLoadingClients(true)
@@ -85,6 +140,8 @@ export function AiDocumentModal({ open, onClose, type }: AiDocumentModalProps) {
     setStep('generating')
     setGenerating(true)
 
+    saveModelPref(selectedProvider, selectedModel)
+
     const { data, error } = await api.post<{
       document: {
         subject: string
@@ -96,6 +153,8 @@ export function AiDocumentModal({ open, onClose, type }: AiDocumentModalProps) {
       type,
       prompt: prompt.trim(),
       clientId: selectedClient?.id,
+      provider: selectedProvider,
+      model: selectedModel,
     })
 
     setGenerating(false)
@@ -153,6 +212,77 @@ export function AiDocumentModal({ open, onClose, type }: AiDocumentModalProps) {
               autoFocus
             />
 
+            {/* Model selector */}
+            <div className="relative mt-3">
+              <button
+                type="button"
+                onClick={() => setShowModelDropdown(!showModelDropdown)}
+                className="w-full flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2 text-left transition-all hover:border-primary/30"
+              >
+                {(() => {
+                  const p = AI_PROVIDERS.find((x) => x.id === selectedProvider)
+                  const Icon = p?.icon
+                  return Icon ? <Icon className={cn('h-3.5 w-3.5', p.iconClass)} /> : null
+                })()}
+                <span className="text-xs text-foreground font-medium flex-1">
+                  {AI_PROVIDERS.find((x) => x.id === selectedProvider)?.name} — {AI_MODELS[selectedProvider]?.find((m) => m.id === selectedModel)?.name || selectedModel}
+                </span>
+                <span className={cn(
+                  'text-[8px] font-medium px-1.5 py-0.5 rounded-full bg-primary/10 text-primary',
+                )}>
+                  {AI_MODELS[selectedProvider]?.find((m) => m.id === selectedModel)?.badge}
+                </span>
+                <ChevronDown className={cn('h-3.5 w-3.5 text-muted-foreground transition-transform', showModelDropdown && 'rotate-180')} />
+              </button>
+
+              <AnimatePresence>
+                {showModelDropdown && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute top-full left-0 right-0 mt-1 z-20 rounded-xl border border-border bg-card shadow-xl overflow-hidden"
+                  >
+                    {AI_PROVIDERS.map((p) => {
+                      const hasKey = p.id === 'claude' ? !!settings.aiApiKeyClaude : p.id === 'gemini' ? !!settings.aiApiKeyGemini : !!settings.aiApiKeyGroq
+                      const disabled = settings.aiCustomApiKey === null && !hasKey && settings.aiApiKeyClaude === null && settings.aiApiKeyGemini === null && settings.aiApiKeyGroq === null ? false : (!hasKey && settings.aiCustomApiKey !== null)
+                      const Icon = p.icon
+                      return (
+                        <div key={p.id}>
+                          <div className="px-3 py-1.5 flex items-center gap-2 border-b border-border/50 bg-muted/30">
+                            <Icon className={cn('h-3 w-3', p.iconClass)} />
+                            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{p.name}</span>
+                          </div>
+                          {AI_MODELS[p.id]?.map((m) => (
+                            <button
+                              key={m.id}
+                              disabled={disabled}
+                              onClick={() => {
+                                setSelectedProvider(p.id)
+                                setSelectedModel(m.id)
+                                setShowModelDropdown(false)
+                              }}
+                              className={cn(
+                                'w-full flex items-center gap-2 px-3 py-2 text-left transition-all text-xs',
+                                selectedProvider === p.id && selectedModel === m.id
+                                  ? 'bg-primary/5 text-primary'
+                                  : 'text-foreground hover:bg-muted/50',
+                                disabled && 'opacity-40 cursor-not-allowed'
+                              )}
+                            >
+                              <span className="flex-1 font-medium">{m.name}</span>
+                              <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">{m.badge}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )
+                    })}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
             <div className="flex gap-3 mt-4">
               <Button variant="outline" className="flex-1" onClick={onClose}>
                 Annuler
@@ -187,7 +317,7 @@ export function AiDocumentModal({ open, onClose, type }: AiDocumentModalProps) {
             </div>
 
             <p className="text-xs text-muted-foreground mb-3">
-              Optionnel — le client sera associé au document généré
+              Sélectionnez un client pour {type === 'invoice' ? 'la facture' : 'le devis'}
             </p>
 
             <div className="relative mb-3">
@@ -243,7 +373,7 @@ export function AiDocumentModal({ open, onClose, type }: AiDocumentModalProps) {
               <Button variant="outline" className="flex-1" onClick={() => setStep('prompt')}>
                 <ArrowLeft className="h-4 w-4 mr-1.5" /> Retour
               </Button>
-              <Button className="flex-1 gap-2" onClick={handleGenerate}>
+              <Button className="flex-1 gap-2" onClick={handleGenerate} disabled={!selectedClient}>
                 <Wand2 className="h-4 w-4" /> Générer
               </Button>
             </div>
