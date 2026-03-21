@@ -153,6 +153,7 @@ export default function InvoiceSettingsPage() {
   const [aiKeyModalValue, setAiKeyModalValue] = useState('')
   const [aiKeyModalShow, setAiKeyModalShow] = useState(false)
   const [aiDeleteConfirmProvider, setAiDeleteConfirmProvider] = useState<'claude' | 'gemini' | 'groq' | null>(null)
+  const [showAiParamsModal, setShowAiParamsModal] = useState(false)
 
   useEffect(() => {
     const hasAnyKey = settings.aiApiKeyClaude || settings.aiApiKeyGemini || settings.aiApiKeyGroq ||
@@ -935,98 +936,6 @@ export default function InvoiceSettingsPage() {
                           <div className="space-y-4 pt-2">
                             <Separator />
 
-                            {/* API Source */}
-                            <div>
-                              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                                <Key className="h-3 w-3" />
-                                Source API
-                              </label>
-                              <div className="grid grid-cols-2 gap-2">
-                                <button
-                                  onClick={() => {
-                                    setAiKeyMode('server')
-                                    updateSettings({ aiCustomApiKey: null })
-                                    setShowAiKey(false)
-                                  }}
-                                  className={`rounded-xl border-2 p-3 text-left transition-all ${
-                                    aiKeyMode === 'server' ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
-                                  }`}
-                                >
-                                  <div className="flex items-center gap-2 mb-1">
-                                    <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/10">
-                                      <Sparkles className="h-3 w-3 text-primary" />
-                                    </div>
-                                    <p className="text-xs font-semibold text-foreground">API de Faktur</p>
-                                  </div>
-                                  <p className="text-[10px] text-muted-foreground">Utiliser la clé du serveur</p>
-                                </button>
-                                <button
-                                  onClick={() => setAiKeyMode('custom')}
-                                  className={`rounded-xl border-2 p-3 text-left transition-all ${
-                                    aiKeyMode === 'custom' ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
-                                  }`}
-                                >
-                                  <div className="flex items-center gap-2 mb-1">
-                                    <div className="flex h-6 w-6 items-center justify-center rounded-md bg-amber-500/10">
-                                      <Key className="h-3 w-3 text-amber-500" />
-                                    </div>
-                                    <p className="text-xs font-semibold text-foreground">Mes propres clés</p>
-                                  </div>
-                                  <p className="text-[10px] text-muted-foreground">Utiliser mes clés API perso</p>
-                                </button>
-                              </div>
-                            </div>
-
-                            {/* Per-provider API keys (visible in custom mode) */}
-                            <AnimatePresence>
-                              {aiKeyMode === 'custom' && (
-                                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                                  <div className="space-y-2">
-                                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider block">Mes clés API</label>
-                                    {([
-                                      { id: 'gemini' as const, name: 'Gemini', desc: 'Google AI', icon: <GoogleIcon className="h-4 w-4" />, iconBg: 'bg-blue-500/10', key: settings.aiApiKeyGemini, link: 'https://aistudio.google.com/apikey' },
-                                      { id: 'groq' as const, name: 'Groq', desc: 'Llama 3.3', icon: <GroqIcon className="h-4 w-4 text-orange-500" />, iconBg: 'bg-orange-500/10', key: settings.aiApiKeyGroq, link: 'https://console.groq.com/keys' },
-                                      { id: 'claude' as const, name: 'Claude', desc: 'Anthropic', icon: <AnthropicIcon className="h-4 w-4 text-violet-500" />, iconBg: 'bg-violet-500/10', key: settings.aiApiKeyClaude, link: 'https://console.anthropic.com/settings/keys' },
-                                    ]).map((p) => (
-                                      <div key={p.id} className="flex items-center gap-3 rounded-xl border-2 border-border p-3">
-                                        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${p.iconBg}`}>
-                                          {p.icon}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                          <p className="text-xs font-semibold text-foreground">{p.name}</p>
-                                          {p.key ? (
-                                            <p className="text-[10px] text-muted-foreground font-mono truncate">{p.key}</p>
-                                          ) : (
-                                            <p className="text-[10px] text-muted-foreground">Non configurée</p>
-                                          )}
-                                        </div>
-                                        <div className="flex items-center gap-1 shrink-0">
-                                          {p.key && (
-                                            <button
-                                              onClick={() => setAiDeleteConfirmProvider(p.id)}
-                                              className="text-[10px] text-destructive/70 hover:text-destructive transition-colors px-1.5 py-1 rounded"
-                                            >
-                                              <Trash2 className="h-3 w-3" />
-                                            </button>
-                                          )}
-                                          <button
-                                            onClick={() => {
-                                              setAiKeyModalProvider(p.id)
-                                              setAiKeyModalValue('')
-                                              setAiKeyModalShow(false)
-                                            }}
-                                            className="text-[10px] text-primary hover:text-primary/80 font-medium transition-colors px-2 py-1 rounded-lg border border-primary/20 hover:bg-primary/5"
-                                          >
-                                            {p.key ? 'Modifier' : 'Configurer'}
-                                          </button>
-                                        </div>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
-
                             {/* Provider selector */}
                             <div>
                               <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">Fournisseur IA</label>
@@ -1138,6 +1047,27 @@ export default function InvoiceSettingsPage() {
                                 )))}
                               </div>
                             </div>
+
+                            {/* Plus de paramètres button */}
+                            <button
+                              onClick={() => setShowAiParamsModal(true)}
+                              className="w-full flex items-center justify-between rounded-xl border-2 border-border p-3.5 text-left transition-all hover:border-primary/30 hover:bg-primary/5 group"
+                            >
+                              <div className="flex items-center gap-3">
+                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted group-hover:bg-primary/10 transition-colors">
+                                  <Key className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                                </div>
+                                <div>
+                                  <p className="text-xs font-semibold text-foreground">Plus de paramètres</p>
+                                  <p className="text-[10px] text-muted-foreground">
+                                    {aiKeyMode === 'custom'
+                                      ? `Mode personnalisé — ${[settings.aiApiKeyClaude, settings.aiApiKeyGemini, settings.aiApiKeyGroq].filter(Boolean).length} clé(s) configurée(s)`
+                                      : 'Mode serveur — API de Faktur'}
+                                  </p>
+                                </div>
+                              </div>
+                              <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                            </button>
 
                             {/* Features list */}
                             <div className="rounded-lg border border-border p-3 space-y-2">
@@ -1554,6 +1484,110 @@ export default function InvoiceSettingsPage() {
             <Button onClick={() => { setShowBetaWarningModal(false); toast('Facturation électronique activée', 'success') }}>
               J&apos;ai compris
             </Button>
+          </DialogFooter>
+        </div>
+      </Dialog>
+
+      {/* AI Params Modal — "Plus de paramètres" */}
+      <Dialog open={showAiParamsModal} onClose={() => setShowAiParamsModal(false)}>
+        <div className="p-6 max-w-lg w-full">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+              <Settings2 className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <DialogTitle>Paramètres avancés IA</DialogTitle>
+              <DialogDescription>Gérez la source API et vos clés personnelles</DialogDescription>
+            </div>
+          </div>
+
+          {/* Mode switch */}
+          <div className="mb-5">
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">Source API</label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => { setAiKeyMode('server'); updateSettings({ aiCustomApiKey: null }) }}
+                className={`rounded-xl border-2 p-3 text-left transition-all ${aiKeyMode === 'server' ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'}`}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <Shield className="h-3.5 w-3.5 text-primary" />
+                  <p className="text-xs font-semibold text-foreground">API Faktur</p>
+                </div>
+                <p className="text-[10px] text-muted-foreground">Utiliser notre API — aucune clé requise</p>
+              </button>
+              <button
+                onClick={() => setAiKeyMode('custom')}
+                className={`rounded-xl border-2 p-3 text-left transition-all ${aiKeyMode === 'custom' ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'}`}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <Key className="h-3.5 w-3.5 text-primary" />
+                  <p className="text-xs font-semibold text-foreground">Mes propres clés</p>
+                </div>
+                <p className="text-[10px] text-muted-foreground">Configurer vos clés API personnelles</p>
+              </button>
+            </div>
+          </div>
+
+          {/* Per-provider keys (shown when custom) */}
+          <AnimatePresence>
+            {aiKeyMode === 'custom' && (
+              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                <Separator className="mb-4" />
+                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">Clés API</label>
+                <div className="space-y-2">
+                  {([
+                    { id: 'claude' as const, name: 'Claude (Anthropic)', icon: <AnthropicIcon className="h-4 w-4 text-violet-500" />, iconBg: 'bg-violet-500/10', key: settings.aiApiKeyClaude },
+                    { id: 'gemini' as const, name: 'Gemini (Google)', icon: <GoogleIcon className="h-4 w-4" />, iconBg: 'bg-blue-500/10', key: settings.aiApiKeyGemini },
+                    { id: 'groq' as const, name: 'Groq', icon: <GroqIcon className="h-4 w-4 text-orange-500" />, iconBg: 'bg-orange-500/10', key: settings.aiApiKeyGroq },
+                  ]).map((provider) => (
+                    <div key={provider.id} className="flex items-center gap-3 rounded-xl border border-border p-3">
+                      <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${provider.iconBg}`}>
+                        {provider.icon}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-foreground">{provider.name}</p>
+                        {provider.key ? (
+                          <p className="text-[11px] text-muted-foreground font-mono truncate">{provider.key}</p>
+                        ) : (
+                          <p className="text-[11px] text-muted-foreground/60 italic">Non configurée</p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 px-2 text-xs"
+                          onClick={() => { setAiKeyModalValue(''); setAiKeyModalShow(false); setAiKeyModalProvider(provider.id) }}
+                        >
+                          <PenLine className="h-3 w-3 mr-1" />
+                          {provider.key ? 'Modifier' : 'Configurer'}
+                        </Button>
+                        {provider.key && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 px-2 text-xs text-destructive hover:text-destructive"
+                            onClick={() => setAiDeleteConfirmProvider(provider.id)}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-start gap-2 rounded-lg border border-border p-3 mt-3">
+                  <Shield className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    Vos clés sont chiffrées de bout en bout via notre système Zero-Access. Elles ne sont jamais stockées en clair.
+                  </p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <DialogFooter className="mt-5">
+            <Button onClick={() => setShowAiParamsModal(false)}>Fermer</Button>
           </DialogFooter>
         </div>
       </Dialog>
