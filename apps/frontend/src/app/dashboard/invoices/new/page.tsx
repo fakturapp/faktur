@@ -212,6 +212,7 @@ export default function NewInvoicePage() {
         ...prev,
         subject: aiDoc.subject,
         showSubject: true,
+        billingType: 'detailed',
         acceptanceConditions: aiDoc.acceptanceConditions || prev.acceptanceConditions,
         showAcceptanceConditions: !!(aiDoc.acceptanceConditions) || prev.showAcceptanceConditions,
       }))
@@ -662,6 +663,7 @@ export default function NewInvoicePage() {
                         handleOptionsChange({ acceptanceConditions: doc.acceptanceConditions, showAcceptanceConditions: !!doc.acceptanceConditions })
                       }
                       if (doc.lines) {
+                        handleOptionsChange({ billingType: 'detailed' })
                         setLines(doc.lines.map((l) => ({
                           id: generateId(),
                           type: 'standard' as const,

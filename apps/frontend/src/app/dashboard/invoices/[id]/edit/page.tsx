@@ -664,6 +664,7 @@ function EditInvoiceContent() {
                         handleOptionsChange({ acceptanceConditions: doc.acceptanceConditions, showAcceptanceConditions: !!doc.acceptanceConditions })
                       }
                       if (doc.lines) {
+                        handleOptionsChange({ billingType: 'detailed' })
                         setLines(doc.lines.map((l) => ({
                           id: generateId(),
                           type: 'standard' as const,
