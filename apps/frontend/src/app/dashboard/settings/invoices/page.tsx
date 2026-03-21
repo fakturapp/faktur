@@ -146,7 +146,6 @@ export default function InvoiceSettingsPage() {
   const [showEInvoicingModal, setShowEInvoicingModal] = useState(false)
   const [showBetaWarningModal, setShowBetaWarningModal] = useState(false)
   const [activeTab, setActiveTab] = useState('apparence')
-  const [aiKeyMode, setAiKeyMode] = useState<'server' | 'custom'>('server')
   const [showAiKey, setShowAiKey] = useState(false)
   const [showPdpKey, setShowPdpKey] = useState(false)
   const [aiKeyModalProvider, setAiKeyModalProvider] = useState<'claude' | 'gemini' | 'groq' | null>(null)
@@ -155,15 +154,7 @@ export default function InvoiceSettingsPage() {
   const [aiDeleteConfirmProvider, setAiDeleteConfirmProvider] = useState<'claude' | 'gemini' | 'groq' | null>(null)
   const [showAiParamsModal, setShowAiParamsModal] = useState(false)
 
-  useEffect(() => {
-    const hasAnyKey = settings.aiApiKeyClaude || settings.aiApiKeyGemini || settings.aiApiKeyGroq ||
-      (settings.aiCustomApiKey && settings.aiCustomApiKey !== '••••••••')
-    if (hasAnyKey) {
-      setAiKeyMode('custom')
-    } else if (settings.aiCustomApiKey === '••••••••') {
-      setAiKeyMode('custom')
-    }
-  }, [settings.aiCustomApiKey, settings.aiApiKeyClaude, settings.aiApiKeyGemini, settings.aiApiKeyGroq])
+  const aiKeyMode = settings.aiKeyMode
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const currentTemplate = getTemplate(settings.template, settings.darkMode)
@@ -1506,7 +1497,7 @@ export default function InvoiceSettingsPage() {
             <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">Source API</label>
             <div className="grid grid-cols-2 gap-2">
               <button
-                onClick={() => { setAiKeyMode('server'); updateSettings({ aiCustomApiKey: null }) }}
+                onClick={() => updateSettings({ aiKeyMode: 'server' })}
                 className={`rounded-xl border-2 p-3 text-left transition-all ${aiKeyMode === 'server' ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'}`}
               >
                 <div className="flex items-center gap-2 mb-1">
@@ -1516,7 +1507,7 @@ export default function InvoiceSettingsPage() {
                 <p className="text-[10px] text-muted-foreground">Utiliser notre API — aucune clé requise</p>
               </button>
               <button
-                onClick={() => setAiKeyMode('custom')}
+                onClick={() => updateSettings({ aiKeyMode: 'custom' })}
                 className={`rounded-xl border-2 p-3 text-left transition-all ${aiKeyMode === 'custom' ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'}`}
               >
                 <div className="flex items-center gap-2 mb-1">

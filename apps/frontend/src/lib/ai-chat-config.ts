@@ -66,18 +66,28 @@ export const CHAT_PROVIDERS: ProviderConfig[] = [
 
 export const CHAT_MODELS: Record<ProviderId, ModelConfig[]> = {
   gemini: [
-    { id: 'gemini-2.5-flash-lite', name: 'Flash Lite', badge: 'Rapide', badgeColor: 'bg-emerald-500/10 text-emerald-400' },
-    { id: 'gemini-2.5-flash', name: 'Flash', badge: 'Équilibré', badgeColor: 'bg-blue-500/10 text-blue-400' },
-    { id: 'gemini-2.5-pro', name: 'Pro', badge: 'Intelligent', badgeColor: 'bg-purple-500/10 text-purple-400' },
+    { id: 'gemini-2.5-flash-lite', name: 'Flash Lite' },
+    { id: 'gemini-2.5-flash', name: 'Flash' },
+    { id: 'gemini-2.5-pro', name: 'Pro' },
   ],
   groq: [
-    { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B', badge: 'Intelligent', badgeColor: 'bg-purple-500/10 text-purple-400' },
-    { id: 'llama-3.1-8b-instant', name: 'Llama 3.1 8B', badge: 'Rapide', badgeColor: 'bg-emerald-500/10 text-emerald-400' },
+    { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B' },
+    { id: 'llama-3.1-8b-instant', name: 'Llama 3.1 8B' },
   ],
   claude: [
-    { id: 'claude-sonnet-4-5-20250929', name: 'Sonnet', badge: 'Équilibré', badgeColor: 'bg-blue-500/10 text-blue-400' },
-    { id: 'claude-opus-4-6', name: 'Opus', badge: 'Intelligent', badgeColor: 'bg-purple-500/10 text-purple-400' },
+    { id: 'claude-sonnet-4-5-20250929', name: 'Sonnet' },
+    { id: 'claude-opus-4-6', name: 'Opus' },
   ],
+}
+
+// ─── AI Source Mode ──────────────────────────────────────────────────────
+
+export type AiSourceMode = 'faktur' | 'apikey'
+
+export interface AiSourceConfig {
+  id: AiSourceMode
+  label: string
+  description: string
 }
 
 // ─── Chat Messages ───────────────────────────────────────────────────────

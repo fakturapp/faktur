@@ -71,6 +71,7 @@ export default class InvoiceSettingsUpdate {
         invoiceFilenamePattern: payload.invoiceFilenamePattern || 'FAC-{numero}',
         footerMode: payload.footerMode || 'vat_exempt',
         logoBorderRadius: payload.logoBorderRadius ?? 0,
+        aiKeyMode: payload.aiKeyMode || 'server',
         aiEnabled: payload.aiEnabled ?? false,
         aiProvider: payload.aiProvider || 'gemini',
         aiModel: payload.aiModel || 'gemini-2.5-flash-lite',
@@ -107,6 +108,7 @@ export default class InvoiceSettingsUpdate {
       if (payload.invoiceFilenamePattern !== undefined) settings.invoiceFilenamePattern = payload.invoiceFilenamePattern || 'FAC-{numero}'
       if (payload.footerMode !== undefined) settings.footerMode = payload.footerMode || 'vat_exempt'
       if (payload.logoBorderRadius !== undefined) settings.logoBorderRadius = payload.logoBorderRadius
+      if (payload.aiKeyMode !== undefined) settings.aiKeyMode = payload.aiKeyMode || 'server'
       if (payload.aiEnabled !== undefined) settings.aiEnabled = payload.aiEnabled
       if (payload.aiProvider !== undefined) settings.aiProvider = payload.aiProvider || 'gemini'
       if (payload.aiModel !== undefined) settings.aiModel = payload.aiModel || 'gemini-2.5-flash-lite'
@@ -154,6 +156,7 @@ export default class InvoiceSettingsUpdate {
         invoiceFilenamePattern: settings.invoiceFilenamePattern || 'FAC-{numero}',
         footerMode: settings.footerMode || 'vat_exempt',
         logoBorderRadius: settings.logoBorderRadius ?? 0,
+        aiKeyMode: settings.aiKeyMode || 'server',
         aiEnabled: settings.aiEnabled ?? false,
         aiProvider: settings.aiProvider || 'gemini',
         aiModel: settings.aiModel || 'gemini-2.5-flash-lite',

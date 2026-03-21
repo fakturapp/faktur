@@ -418,9 +418,12 @@ export function AiChatSidebar({
                         {CHAT_PROVIDERS.map((p) => {
                           const Icon = PROVIDER_ICONS[p.id]
                           const isActive = chatProvider === p.id
+                          const hasKey = p.id === 'claude' ? !!settings.aiApiKeyClaude : p.id === 'gemini' ? !!settings.aiApiKeyGemini : !!settings.aiApiKeyGroq
+                          const isDisabled = settings.aiKeyMode === 'custom' && !hasKey
                           return (
                             <button
                               key={p.id}
+                              disabled={isDisabled}
                               onClick={() => {
                                 setChatProvider(p.id)
                                 // Auto-select first model of new provider
@@ -432,7 +435,8 @@ export function AiChatSidebar({
                                 'w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left transition-all',
                                 isActive
                                   ? 'bg-primary/5 border border-primary/20'
-                                  : 'hover:bg-muted/50 border border-transparent'
+                                  : 'hover:bg-muted/50 border border-transparent',
+                                isDisabled && 'opacity-40 cursor-not-allowed'
                               )}
                             >
                               <div className={cn('flex h-7 w-7 items-center justify-center rounded-lg', p.iconBg)}>
@@ -441,10 +445,10 @@ export function AiChatSidebar({
                               <div className="flex-1 min-w-0">
                                 <div className="text-[11px] font-medium text-foreground">{p.name}</div>
                                 <div className="text-[9px] text-muted-foreground">
-                                  {CHAT_MODELS[p.id]?.length} modèles
+                                  {isDisabled ? 'Clé non configurée' : `${CHAT_MODELS[p.id]?.length} modèles`}
                                 </div>
                               </div>
-                              {isActive && <Check className="h-3.5 w-3.5 text-primary shrink-0" />}
+                              {isActive && !isDisabled && <Check className="h-3.5 w-3.5 text-primary shrink-0" />}
                             </button>
                           )
                         })}

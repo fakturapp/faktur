@@ -52,16 +52,18 @@ export default class AiService {
 
   /**
    * Resolve the API key: per-provider key → legacy custom key → env var.
+   * In custom mode, skip env var fallback.
    */
-  private async getApiKey(teamId: string, dek: Buffer, provider: AiProvider): Promise<string | null> {
+  private async getApiKey(teamId: string, dek: Buffer, provider: AiProvider): Promise<{ key: string | null; source: 'custom' | 'server' }> {
     const settings = await InvoiceSetting.findBy('teamId', teamId)
+    const keyMode = (settings?.aiKeyMode as 'server' | 'custom') || 'server'
 
     // 1. Try per-provider key
     const providerKeyField = PROVIDER_KEY_FIELDS[provider]
     const providerKey = settings?.[providerKeyField]
     if (providerKey) {
       try {
-        return zeroAccessCryptoService.decryptField(providerKey, dek)
+        return { key: zeroAccessCryptoService.decryptField(providerKey, dek), source: 'custom' }
       } catch {
         // Decryption failed, fall through
       }
@@ -70,14 +72,32 @@ export default class AiService {
     // 2. Fallback: legacy aiCustomApiKey (only if provider matches settings.aiProvider)
     if (settings?.aiCustomApiKey && (settings?.aiProvider as AiProvider) === provider) {
       try {
-        return zeroAccessCryptoService.decryptField(settings.aiCustomApiKey, dek)
+        return { key: zeroAccessCryptoService.decryptField(settings.aiCustomApiKey, dek), source: 'custom' }
       } catch {
         // Decryption failed, fall through
       }
     }
 
-    // 3. Fallback: environment variable
-    return env.get(ENV_KEYS[provider] as any, '')
+    // 3. In custom mode, do NOT fall back to server env vars
+    if (keyMode === 'custom') {
+      return { key: null, source: 'custom' }
+    }
+
+    // 4. Fallback: environment variable (server mode only)
+    return { key: env.get(ENV_KEYS[provider] as any, '') || null, source: 'server' }
+  }
+
+  /**
+   * Check which providers are available for the team.
+   */
+  async getAvailableProviders(teamId: string, dek: Buffer): Promise<Array<{ provider: AiProvider; available: boolean; source: 'custom' | 'server' }>> {
+    const providers: AiProvider[] = ['gemini', 'groq', 'claude']
+    const results = []
+    for (const provider of providers) {
+      const { key, source } = await this.getApiKey(teamId, dek, provider)
+      results.push({ provider, available: !!key, source })
+    }
+    return results
   }
 
   /**
@@ -106,10 +126,13 @@ export default class AiService {
     overrideModel?: string,
   ): Promise<string> {
     const provider = await this.getProvider(teamId, overrideProvider)
-    const apiKey = await this.getApiKey(teamId, dek, provider)
+    const { key: apiKey, source } = await this.getApiKey(teamId, dek, provider)
     const model = await this.getModel(teamId, provider, overrideModel)
 
     if (!apiKey) {
+      if (source === 'custom') {
+        throw new Error(`Aucune clé API configurée pour ${provider}. Ajoutez votre clé dans Paramètres > IA > Plus de paramètres.`)
+      }
       throw new Error(`No API key configured for ${provider}. Set ${ENV_KEYS[provider]} or add a custom key in settings.`)
     }
 
@@ -138,10 +161,13 @@ export default class AiService {
     overrideModel?: string,
   ): Promise<string> {
     const provider = await this.getProvider(teamId, overrideProvider)
-    const apiKey = await this.getApiKey(teamId, dek, provider)
+    const { key: apiKey, source } = await this.getApiKey(teamId, dek, provider)
     const model = await this.getModel(teamId, provider, overrideModel)
 
     if (!apiKey) {
+      if (source === 'custom') {
+        throw new Error(`Aucune clé API configurée pour ${provider}. Ajoutez votre clé dans Paramètres > IA > Plus de paramètres.`)
+      }
       throw new Error(`No API key configured for ${provider}.`)
     }
 

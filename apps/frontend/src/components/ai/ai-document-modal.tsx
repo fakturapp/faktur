@@ -246,13 +246,14 @@ export function AiDocumentModal({ open, onClose, type }: AiDocumentModalProps) {
                   >
                     {AI_PROVIDERS.map((p) => {
                       const hasKey = p.id === 'claude' ? !!settings.aiApiKeyClaude : p.id === 'gemini' ? !!settings.aiApiKeyGemini : !!settings.aiApiKeyGroq
-                      const disabled = settings.aiCustomApiKey === null && !hasKey && settings.aiApiKeyClaude === null && settings.aiApiKeyGemini === null && settings.aiApiKeyGroq === null ? false : (!hasKey && settings.aiCustomApiKey !== null)
+                      const disabled = settings.aiKeyMode === 'custom' && !hasKey
                       const Icon = p.icon
                       return (
                         <div key={p.id}>
-                          <div className="px-3 py-1.5 flex items-center gap-2 border-b border-border/50 bg-muted/30">
+                          <div className={cn('px-3 py-1.5 flex items-center gap-2 border-b border-border/50 bg-muted/30', disabled && 'opacity-50')}>
                             <Icon className={cn('h-3 w-3', p.iconClass)} />
                             <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{p.name}</span>
+                            {disabled && <span className="text-[8px] text-destructive/70 ml-auto">Clé manquante</span>}
                           </div>
                           {AI_MODELS[p.id]?.map((m) => (
                             <button

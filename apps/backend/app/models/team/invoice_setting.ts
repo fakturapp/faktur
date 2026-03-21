@@ -104,6 +104,9 @@ export default class InvoiceSetting extends BaseModel {
   declare nextQuoteNumber: string | null
 
   @column()
+  declare aiKeyMode: 'server' | 'custom'
+
+  @column()
   declare aiEnabled: boolean
 
   @column()

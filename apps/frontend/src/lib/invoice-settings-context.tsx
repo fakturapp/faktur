@@ -38,6 +38,7 @@ export interface InvoiceSettings {
   invoiceFilenamePattern: string
   footerMode: 'company_info' | 'custom'
   logoBorderRadius: number
+  aiKeyMode: 'server' | 'custom'
   aiEnabled: boolean
   aiProvider: 'claude' | 'gemini' | 'groq'
   aiModel: string
@@ -85,6 +86,7 @@ const defaultSettings: InvoiceSettings = {
   invoiceFilenamePattern: 'FAC-{numéro}',
   footerMode: 'company_info',
   logoBorderRadius: 0,
+  aiKeyMode: 'server',
   aiEnabled: false,
   aiProvider: 'gemini',
   aiModel: 'gemini-2.5-flash-lite',
