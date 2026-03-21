@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -25,6 +25,7 @@ import {
   Check,
   Trash2,
   Eye,
+  EyeOff,
   Zap,
   ClipboardList,
   LayoutTemplate,
@@ -142,6 +143,17 @@ export default function InvoiceSettingsPage() {
   const [showEInvoicingModal, setShowEInvoicingModal] = useState(false)
   const [showBetaWarningModal, setShowBetaWarningModal] = useState(false)
   const [activeTab, setActiveTab] = useState('apparence')
+  const [aiKeyMode, setAiKeyMode] = useState<'server' | 'custom'>('server')
+  const [showAiKey, setShowAiKey] = useState(false)
+  const [showPdpKey, setShowPdpKey] = useState(false)
+
+  useEffect(() => {
+    if (settings.aiCustomApiKey && settings.aiCustomApiKey !== '••••••••') {
+      setAiKeyMode('custom')
+    } else if (settings.aiCustomApiKey === '••••••••') {
+      setAiKeyMode('custom')
+    }
+  }, [settings.aiCustomApiKey])
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const currentTemplate = getTemplate(settings.template, settings.darkMode)
@@ -1016,36 +1028,88 @@ export default function InvoiceSettingsPage() {
                               </div>
                             </div>
 
-                            {/* API key */}
+                            {/* API key source */}
                             <div>
                               <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
                                 <Key className="h-3 w-3" />
-                                Clé API {settings.aiProvider === 'claude' ? '(obligatoire)' : '(optionnel)'}
+                                Clé API
                               </label>
-                              <Input type="password"
-                                placeholder={settings.aiProvider === 'claude' ? 'sk-ant-...' : 'Laissez vide pour utiliser la clé par défaut...'}
-                                value={settings.aiCustomApiKey === '••••••••' ? '' : (settings.aiCustomApiKey || '')}
-                                onChange={(e) => updateSettings({ aiCustomApiKey: e.target.value || null })}
-                                className="text-sm" />
-                              <div className="flex items-center justify-between mt-1.5">
-                                <p className="text-[10px] text-muted-foreground">
-                                  {settings.aiCustomApiKey && settings.aiCustomApiKey !== '••••••••'
-                                    ? 'Votre clé personnalisée sera utilisée'
-                                    : settings.aiProvider === 'claude'
-                                    ? 'Une clé API Anthropic est requise pour Claude'
-                                    : 'La clé par défaut du serveur sera utilisée'}
-                                </p>
-                                <a href={
-                                  settings.aiProvider === 'claude' ? 'https://console.anthropic.com/settings/keys'
-                                    : settings.aiProvider === 'gemini' ? 'https://aistudio.google.com/apikey'
-                                    : 'https://console.groq.com/keys'
-                                  }
-                                  target="_blank" rel="noopener noreferrer"
-                                  className="text-[10px] text-primary hover:underline flex items-center gap-1 shrink-0"
+                              <div className="grid grid-cols-2 gap-2 mb-3">
+                                <button
+                                  onClick={() => {
+                                    setAiKeyMode('server')
+                                    updateSettings({ aiCustomApiKey: null })
+                                    setShowAiKey(false)
+                                  }}
+                                  className={`rounded-xl border-2 p-3 text-left transition-all ${
+                                    aiKeyMode === 'server' ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
+                                  }`}
                                 >
-                                  Obtenir une clé <ExternalLink className="h-2.5 w-2.5" />
-                                </a>
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/10">
+                                      <Sparkles className="h-3 w-3 text-primary" />
+                                    </div>
+                                    <p className="text-xs font-semibold text-foreground">API de Faktur</p>
+                                  </div>
+                                  <p className="text-[10px] text-muted-foreground">Utiliser la clé du serveur</p>
+                                </button>
+                                <button
+                                  onClick={() => setAiKeyMode('custom')}
+                                  className={`rounded-xl border-2 p-3 text-left transition-all ${
+                                    aiKeyMode === 'custom' ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
+                                  }`}
+                                >
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <div className="flex h-6 w-6 items-center justify-center rounded-md bg-amber-500/10">
+                                      <Key className="h-3 w-3 text-amber-500" />
+                                    </div>
+                                    <p className="text-xs font-semibold text-foreground">Ma propre clé</p>
+                                  </div>
+                                  <p className="text-[10px] text-muted-foreground">Utiliser ma clé API perso</p>
+                                </button>
                               </div>
+
+                              <AnimatePresence>
+                                {aiKeyMode === 'custom' && (
+                                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                                    <div className="relative">
+                                      <Input
+                                        type={showAiKey ? 'text' : 'password'}
+                                        placeholder={settings.aiProvider === 'claude' ? 'sk-ant-...' : settings.aiProvider === 'gemini' ? 'AIza...' : 'gsk_...'}
+                                        value={settings.aiCustomApiKey === '••••••••' ? '' : (settings.aiCustomApiKey || '')}
+                                        onChange={(e) => updateSettings({ aiCustomApiKey: e.target.value || null })}
+                                        className="text-sm pr-10 font-mono"
+                                      />
+                                      <button
+                                        type="button"
+                                        onClick={() => setShowAiKey(!showAiKey)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                                      >
+                                        {showAiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                      </button>
+                                    </div>
+                                    <div className="flex items-center justify-between mt-1.5">
+                                      <p className="text-[10px] text-muted-foreground">
+                                        {settings.aiCustomApiKey && settings.aiCustomApiKey !== '••••••••'
+                                          ? 'Votre clé personnalisée sera utilisée'
+                                          : settings.aiCustomApiKey === '••••••••'
+                                          ? 'Clé personnalisée configurée'
+                                          : 'Entrez votre clé API pour ce fournisseur'}
+                                      </p>
+                                      <a href={
+                                        settings.aiProvider === 'claude' ? 'https://console.anthropic.com/settings/keys'
+                                          : settings.aiProvider === 'gemini' ? 'https://aistudio.google.com/apikey'
+                                          : 'https://console.groq.com/keys'
+                                        }
+                                        target="_blank" rel="noopener noreferrer"
+                                        className="text-[10px] text-primary hover:underline flex items-center gap-1 shrink-0"
+                                      >
+                                        Obtenir une clé <ExternalLink className="h-2.5 w-2.5" />
+                                      </a>
+                                    </div>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
                             </div>
 
                             {/* Features list */}
@@ -1127,14 +1191,27 @@ export default function InvoiceSettingsPage() {
 
                             {/* B2Brouter API key (optional — sandbox by default) */}
                             <div>
-                              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">Cle API B2Brouter (optionnel)</label>
-                              <Input type="password" placeholder="Laissez vide pour le mode sandbox..."
-                                value={settings.pdpApiKey === '••••••••' ? '' : (settings.pdpApiKey || '')}
-                                onChange={(e) => updateSettings({ pdpApiKey: e.target.value, pdpProvider: e.target.value ? 'b2brouter' : 'sandbox' })} className="text-sm" />
+                              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 block">Clé API B2Brouter (optionnel)</label>
+                              <div className="relative">
+                                <Input
+                                  type={showPdpKey ? 'text' : 'password'}
+                                  placeholder="Laissez vide pour le mode sandbox..."
+                                  value={settings.pdpApiKey === '••••••••' ? '' : (settings.pdpApiKey || '')}
+                                  onChange={(e) => updateSettings({ pdpApiKey: e.target.value, pdpProvider: e.target.value ? 'b2brouter' : 'sandbox' })}
+                                  className="text-sm pr-10 font-mono"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => setShowPdpKey(!showPdpKey)}
+                                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                                >
+                                  {showPdpKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                </button>
+                              </div>
                               <p className="text-[10px] text-muted-foreground mt-1">
                                 {settings.pdpApiKey && settings.pdpApiKey !== '••••••••'
-                                  ? 'Connecte a B2Brouter — les factures seront envoyees a la PDP'
-                                  : 'Mode sandbox actif — les factures sont generees localement sans envoi PDP'}
+                                  ? 'Connecté à B2Brouter — les factures seront envoyées à la PDP'
+                                  : 'Mode sandbox actif — les factures sont générées localement sans envoi PDP'}
                               </p>
                             </div>
 
