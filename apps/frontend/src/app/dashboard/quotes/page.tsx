@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { motion, type Variants } from 'framer-motion'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -22,11 +23,14 @@ import {
   Download,
   CalendarDays,
   TrendingUp,
+  FilePlus,
+  Sparkles,
 } from 'lucide-react'
 import { Spinner } from '@/components/ui/spinner'
+import { Dropdown, DropdownItem } from '@/components/ui/dropdown'
 import { QuoteDetailOverlay } from '@/components/quotes/quote-detail-overlay'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
-import { CreateQuoteModal } from '@/components/quotes/create-quote-modal'
+import { AiDocumentModal } from '@/components/ai/ai-document-modal'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -60,9 +64,10 @@ interface PaginationMeta {
 }
 
 export default function QuotesPage() {
+  const router = useRouter()
   const { toast } = useToast()
   const { settings } = useInvoiceSettings()
-  const [createModalOpen, setCreateModalOpen] = useState(false)
+  const [aiModalOpen, setAiModalOpen] = useState(false)
   const [loading, setLoading] = useState(true)
   const [quotes, setQuotes] = useState<QuoteListItem[]>([])
   const [search, setSearch] = useState('')
@@ -187,9 +192,22 @@ export default function QuotesPage() {
           </p>
         </div>
         {settings.aiEnabled ? (
-          <Button onClick={() => setCreateModalOpen(true)}>
-            <Plus className="h-4 w-4 mr-1.5" /> Créer un devis
-          </Button>
+          <Dropdown
+            trigger={
+              <Button>
+                <Plus className="h-4 w-4 mr-1.5" /> Créer un devis
+              </Button>
+            }
+          >
+            <DropdownItem onClick={() => router.push('/dashboard/quotes/new')}>
+              <FilePlus className="h-4 w-4 text-muted-foreground" />
+              Créer un devis
+            </DropdownItem>
+            <DropdownItem onClick={() => setAiModalOpen(true)}>
+              <Sparkles className="h-4 w-4 text-purple-500" />
+              Créer avec l&apos;IA
+            </DropdownItem>
+          </Dropdown>
         ) : (
           <Link href="/dashboard/quotes/new">
             <Button>
@@ -408,12 +426,11 @@ export default function QuotesPage() {
         onDelete={handleDeleteFromOverlay}
       />
 
-      {settings.aiEnabled && (
-        <CreateQuoteModal
-          open={createModalOpen}
-          onClose={() => setCreateModalOpen(false)}
-        />
-      )}
+      <AiDocumentModal
+        open={aiModalOpen}
+        onClose={() => setAiModalOpen(false)}
+        type="quote"
+      />
     </motion.div>
   )
 }

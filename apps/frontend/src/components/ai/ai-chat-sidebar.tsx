@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Spinner } from '@/components/ui/spinner'
+import { ShinyText } from '@/components/ui/shiny-text'
 import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import { Send, Sparkles, User } from 'lucide-react'
@@ -169,8 +170,15 @@ export function AiChatSidebar({
             <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-purple-500/10">
               <Sparkles className="h-3 w-3 text-purple-500" />
             </div>
-            <div className="bg-muted/50 rounded-xl px-3 py-2">
+            <div className="bg-muted/50 rounded-xl px-3 py-2 flex items-center gap-2">
               <Spinner className="h-3.5 w-3.5" />
+              <ShinyText
+                text="Génération..."
+                className="text-xs font-medium"
+                color="#a78bfa"
+                shineColor="#e0e7ff"
+                speed={1.5}
+              />
             </div>
           </motion.div>
         )}

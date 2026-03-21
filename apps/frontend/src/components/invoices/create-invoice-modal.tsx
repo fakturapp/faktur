@@ -24,10 +24,7 @@ import {
   Check,
   Building2,
   Lock,
-  Sparkles,
 } from 'lucide-react'
-import { useInvoiceSettings } from '@/lib/invoice-settings-context'
-import { AiDocumentModal } from '@/components/ai/ai-document-modal'
 
 interface QuoteItem {
   id: string
@@ -62,9 +59,7 @@ interface PaginationMeta {
 export function CreateInvoiceModal({ open, onClose }: CreateInvoiceModalProps) {
   const router = useRouter()
   const { toast } = useToast()
-  const { settings } = useInvoiceSettings()
   const [step, setStep] = useState<'choose' | 'select-quote'>('choose')
-  const [aiModalOpen, setAiModalOpen] = useState(false)
   const [quotes, setQuotes] = useState<QuoteItem[]>([])
   const [loadingQuotes, setLoadingQuotes] = useState(false)
   const [search, setSearch] = useState('')
@@ -169,7 +164,6 @@ export function CreateInvoiceModal({ open, onClose }: CreateInvoiceModalProps) {
   }
 
   return (
-    <>
     <Dialog open={open} onClose={onClose} className="max-w-lg">
       <AnimatePresence mode="wait">
         {checkingCompany ? (
@@ -221,7 +215,7 @@ export function CreateInvoiceModal({ open, onClose }: CreateInvoiceModalProps) {
               Choisissez comment créer votre facture
             </p>
 
-            <div className={`grid ${settings.aiEnabled ? 'grid-cols-3' : 'grid-cols-2'} gap-3`}>
+            <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={handleConvertChoice}
                 className="flex flex-col items-center gap-3 rounded-xl border border-border bg-card/50 hover:bg-card/80 hover:border-primary/30 p-6 transition-all text-center group"
@@ -247,21 +241,6 @@ export function CreateInvoiceModal({ open, onClose }: CreateInvoiceModalProps) {
                   <p className="text-xs text-muted-foreground mt-0.5">Créer de zéro</p>
                 </div>
               </button>
-
-              {settings.aiEnabled && (
-                <button
-                  onClick={() => { onClose(); setAiModalOpen(true) }}
-                  className="flex flex-col items-center gap-3 rounded-xl border border-border bg-card/50 hover:bg-card/80 hover:border-purple-500/30 p-6 transition-all text-center group"
-                >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/10 group-hover:bg-purple-500/20 transition-colors">
-                    <Sparkles className="h-6 w-6 text-purple-500" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">Créer avec l&apos;IA</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">Générée par intelligence artificielle</p>
-                  </div>
-                </button>
-              )}
             </div>
           </motion.div>
         ) : (
@@ -395,12 +374,5 @@ export function CreateInvoiceModal({ open, onClose }: CreateInvoiceModalProps) {
         )}
       </AnimatePresence>
     </Dialog>
-
-    <AiDocumentModal
-      open={aiModalOpen}
-      onClose={() => setAiModalOpen(false)}
-      type="invoice"
-    />
-    </>
   )
 }

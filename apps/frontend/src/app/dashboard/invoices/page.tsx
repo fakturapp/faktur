@@ -21,10 +21,15 @@ import {
   Ban,
   TrendingUp,
   CalendarDays,
+  FilePlus,
+  Sparkles,
 } from 'lucide-react'
 import { Spinner } from '@/components/ui/spinner'
+import { Dropdown, DropdownItem } from '@/components/ui/dropdown'
 import { CreateInvoiceModal } from '@/components/invoices/create-invoice-modal'
 import { InvoiceDetailOverlay } from '@/components/invoices/invoice-detail-overlay'
+import { useInvoiceSettings } from '@/lib/invoice-settings-context'
+import { AiDocumentModal } from '@/components/ai/ai-document-modal'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -60,6 +65,8 @@ interface PaginationMeta {
 
 export default function InvoicesPage() {
   const { toast } = useToast()
+  const { settings } = useInvoiceSettings()
+  const [aiModalOpen, setAiModalOpen] = useState(false)
   const [loading, setLoading] = useState(true)
   const [invoices, setInvoices] = useState<InvoiceListItem[]>([])
   const [search, setSearch] = useState('')
@@ -184,9 +191,28 @@ export default function InvoicesPage() {
             {meta?.total ?? 0} facture{(meta?.total ?? 0) > 1 ? 's' : ''} au total
           </p>
         </div>
-        <Button onClick={() => setShowCreateModal(true)}>
-          <Plus className="h-4 w-4 mr-1.5" /> Créer une facture
-        </Button>
+        {settings.aiEnabled ? (
+          <Dropdown
+            trigger={
+              <Button>
+                <Plus className="h-4 w-4 mr-1.5" /> Créer une facture
+              </Button>
+            }
+          >
+            <DropdownItem onClick={() => setShowCreateModal(true)}>
+              <FilePlus className="h-4 w-4 text-muted-foreground" />
+              Créer une facture
+            </DropdownItem>
+            <DropdownItem onClick={() => setAiModalOpen(true)}>
+              <Sparkles className="h-4 w-4 text-purple-500" />
+              Créer avec l&apos;IA
+            </DropdownItem>
+          </Dropdown>
+        ) : (
+          <Button onClick={() => setShowCreateModal(true)}>
+            <Plus className="h-4 w-4 mr-1.5" /> Créer une facture
+          </Button>
+        )}
       </motion.div>
 
       {/* Monthly summary */}
@@ -395,6 +421,12 @@ export default function InvoicesPage() {
         onClose={() => setSelectedInvoiceId(null)}
         onStatusChange={handleStatusChange}
         onDelete={handleDeleteFromOverlay}
+      />
+
+      <AiDocumentModal
+        open={aiModalOpen}
+        onClose={() => setAiModalOpen(false)}
+        type="invoice"
       />
     </motion.div>
   )
