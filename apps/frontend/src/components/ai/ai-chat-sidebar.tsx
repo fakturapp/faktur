@@ -20,10 +20,9 @@ import {
   Check,
   Server,
   Key,
-  Zap,
-  FileText,
   ChevronRight,
   ArrowLeft,
+  RotateCcw,
 } from 'lucide-react'
 import { AnthropicIcon } from '@/components/icons/anthropic-icon'
 import { GoogleIcon } from '@/components/icons/google-icon'
@@ -105,6 +104,8 @@ interface AiChatSidebarProps {
     acceptanceConditions?: string
   }) => void
   onProcessingChange?: (processing: boolean) => void
+  onErrorChange?: (error: string | null) => void
+  onRetryRef?: React.MutableRefObject<(() => void) | null>
 }
 
 export function AiChatSidebar({
@@ -121,6 +122,8 @@ export function AiChatSidebar({
   clientEmail,
   onDocumentUpdate,
   onProcessingChange,
+  onErrorChange,
+  onRetryRef,
 }: AiChatSidebarProps) {
   const { settings } = useInvoiceSettings()
 
@@ -141,7 +144,7 @@ export function AiChatSidebar({
   const [chatModel, setChatModel] = useState(settings.aiModel)
   const [chatMode, setChatMode] = useState<ChatMode>('edition')
   const [aiSource, setAiSource] = useState<AiSourceMode>('faktur')
-  const [detailLevel, setDetailLevel] = useState<'rapide' | 'complet'>('complet')
+  const detailLevel = 'complet' as const
   const [showSettings, setShowSettings] = useState(false)
   const [settingsMenu, setSettingsMenu] = useState<'main' | 'source' | 'provider' | 'model' | 'mode'>('main')
   const [documentHistory, setDocumentHistory] = useState<DocumentSnapshot[]>([])
@@ -151,6 +154,16 @@ export function AiChatSidebar({
   const dropdownRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const thinkingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const lastUserMessageRef = useRef<string>('')
+
+  // ─── Expose retry to parent ─────────────────────────────────────────
+  useEffect(() => {
+    if (onRetryRef) {
+      onRetryRef.current = () => {
+        if (lastUserMessageRef.current) handleSend(lastUserMessageRef.current)
+      }
+    }
+  })
 
   // ─── Restore preferences ────────────────────────────────────────────
   useEffect(() => {
@@ -270,23 +283,30 @@ export function AiChatSidebar({
   }
 
   // ─── Send message ───────────────────────────────────────────────────
-  async function handleSend() {
-    const message = input.trim()
+  async function handleSend(retryMessage?: string) {
+    const message = retryMessage || input.trim()
     if (!message || loading) return
 
-    setInput('')
-    if (inputRef.current) {
-      inputRef.current.style.height = 'auto'
+    if (!retryMessage) {
+      setInput('')
+      if (inputRef.current) {
+        inputRef.current.style.height = 'auto'
+      }
     }
 
-    const userMsg: ChatMessage = {
-      id: nextMsgId(),
-      role: 'user',
-      content: message,
-      mode: chatMode,
-      timestamp: Date.now(),
+    lastUserMessageRef.current = message
+    onErrorChange?.(null)
+
+    if (!retryMessage) {
+      const userMsg: ChatMessage = {
+        id: nextMsgId(),
+        role: 'user',
+        content: message,
+        mode: chatMode,
+        timestamp: Date.now(),
+      }
+      setMessages((prev) => [...prev, userMsg])
     }
-    setMessages((prev) => [...prev, userMsg])
     setLoading(true)
 
     const snapshotBefore = getCurrentSnapshot()
@@ -322,13 +342,17 @@ export function AiChatSidebar({
     onProcessingChange?.(false)
 
     if (error || !data) {
-      const errMsg = (error as any)?.message || 'Désolé, une erreur est survenue. Réessayez.'
+      const errObj = error as any
+      const errMsg = errObj?.message || 'Désolé, une erreur est survenue.'
+      const errDetail = errObj?.detail ? `\n\n**Détail** :\n\`\`\`\n${errObj.detail}\n\`\`\`` : ''
+      onErrorChange?.(errMsg + (errObj?.detail ? '\n\n' + errObj.detail : ''))
       setMessages((prev) => [
         ...prev,
-        { id: nextMsgId(), role: 'assistant', content: `**Erreur** : ${errMsg}`, mode: chatMode, timestamp: Date.now() },
+        { id: nextMsgId(), role: 'assistant', content: `**Erreur** : ${errMsg}${errDetail}`, mode: chatMode, timestamp: Date.now(), isError: true },
       ])
       return
     }
+    onErrorChange?.(null)
 
     if (chatMode === 'edition') {
       if (data.document) {
@@ -400,8 +424,6 @@ export function AiChatSidebar({
   const ProviderIcon = PROVIDER_ICONS[chatProvider]
   const CurrentModeIcon = MODE_ICONS[chatMode]
   const thinkingText = THINKING_STEPS[chatMode][thinkingStep] || 'Réflexion...'
-  const hasClient = !!clientName
-
   // ─── Settings dropdown rendered via portal ─────────────────────────
   const settingsDropdown = (
     <AnimatePresence>
@@ -717,40 +739,6 @@ export function AiChatSidebar({
         </div>
       </div>
 
-      {/* ─── Context bar (client + options) ──────────────────────── */}
-      <div className="px-3 py-2 border-b border-border/50 flex items-center gap-2 flex-wrap">
-        {/* Client indicator */}
-        <div className={cn(
-          'flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px]',
-          hasClient ? 'bg-emerald-500/10 text-emerald-400' : 'bg-muted/50 text-muted-foreground/50'
-        )}>
-          <User className="h-2.5 w-2.5" />
-          <span className="font-medium truncate max-w-[100px]">{clientName || 'Aucun client'}</span>
-        </div>
-
-        {/* SIREN indicator */}
-        {clientSiren && (
-          <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-blue-500/10 text-blue-400 text-[10px]">
-            <FileText className="h-2.5 w-2.5" />
-            <span className="font-mono">{clientSiren}</span>
-          </div>
-        )}
-
-        {/* Detail level toggle */}
-        <button
-          onClick={() => setDetailLevel((p) => p === 'rapide' ? 'complet' : 'rapide')}
-          className={cn(
-            'flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium ml-auto transition-colors',
-            detailLevel === 'rapide'
-              ? 'bg-amber-500/10 text-amber-400'
-              : 'bg-indigo-500/10 text-indigo-400'
-          )}
-        >
-          <Zap className="h-2.5 w-2.5" />
-          {detailLevel === 'rapide' ? 'Rapide' : 'Complet'}
-        </button>
-      </div>
-
       {/* ─── Messages ───────────────────────────────────────────── */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 py-3 space-y-3">
         <AnimatePresence initial={false}>
@@ -792,6 +780,17 @@ export function AiChatSidebar({
                         onRevert={() => handleModificationAction(msg.id, mod.id, 'revert')}
                       />
                     ))}
+
+                    {msg.isError && lastUserMessageRef.current && (
+                      <button
+                        onClick={() => handleSend(lastUserMessageRef.current)}
+                        disabled={loading}
+                        className="flex items-center gap-1 mt-2 px-2.5 py-1.5 rounded-lg bg-primary/10 text-primary text-[10px] font-medium hover:bg-primary/20 transition-colors disabled:opacity-50"
+                      >
+                        <RotateCcw className="h-2.5 w-2.5" />
+                        Réessayer
+                      </button>
+                    )}
 
                     <div className="flex items-center gap-1 mt-1.5 pt-1 border-t border-border/20">
                       {(() => {

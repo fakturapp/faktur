@@ -105,6 +105,7 @@ export interface ChatMessage {
   mode: ChatMode
   timestamp: number
   modifications?: ChatModification[]
+  isError?: boolean
 }
 
 export interface DocumentLine {

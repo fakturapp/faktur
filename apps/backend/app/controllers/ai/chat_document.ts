@@ -6,10 +6,10 @@ const chatDocumentValidator = vine.compile(
   vine.object({
     message: vine.string().trim().minLength(1).maxLength(2000),
     currentDocument: vine.object({
-      subject: vine.string().trim(),
+      subject: vine.string().trim().optional(),
       lines: vine.array(
         vine.object({
-          description: vine.string().trim(),
+          description: vine.string().trim().optional(),
           quantity: vine.number(),
           unitPrice: vine.number(),
           vatRate: vine.number(),
@@ -243,50 +243,84 @@ export default class ChatDocument {
         payload.source as 'faktur' | 'apikey' | undefined,
       )
 
-      // Parse JSON from response
-      const jsonMatch = result.match(/\{[\s\S]*\}/)
+      // Parse JSON from response — strip markdown code fences if present
+      let cleaned = result.trim()
+      if (cleaned.startsWith('```')) {
+        cleaned = cleaned.replace(/^```(?:json)?\s*\n?/, '').replace(/\n?\s*```$/, '')
+      }
+
+      const jsonMatch = cleaned.match(/\{[\s\S]*\}/)
       if (!jsonMatch) {
-        return response.badRequest({ message: 'Failed to parse AI response' })
+        return response.badRequest({ message: 'Failed to parse AI response', detail: result.slice(0, 500) })
       }
 
       const parsed = JSON.parse(jsonMatch[0])
 
+      // ── Question mode — just return the message ────────────────
       if (mode === 'question') {
         return response.ok({
           message: parsed.message || result,
         })
       }
 
-      if (mode === 'libre') {
-        if (!parsed.document?.subject || !Array.isArray(parsed.document?.lines)) {
-          return response.badRequest({ message: 'Invalid document structure from AI' })
+      // ── Extract document from various AI response shapes ───────
+      // Some models return { document: { subject, lines } }
+      // Others return { subject, lines } (flat)
+      // Others return { message, document: { subject, lines } }
+      let doc = parsed.document || null
+      if (!doc || !Array.isArray(doc.lines)) {
+        // Fallback: flat structure
+        if (Array.isArray(parsed.lines)) {
+          doc = {
+            subject: parsed.subject ?? '',
+            lines: parsed.lines,
+            notes: parsed.notes ?? '',
+            acceptanceConditions: parsed.acceptanceConditions ?? '',
+          }
         }
+      }
+
+      if (!doc || !Array.isArray(doc.lines) || doc.lines.length === 0) {
+        return response.badRequest({
+          message: 'Invalid document structure from AI',
+          detail: JSON.stringify(parsed).slice(0, 500),
+        })
+      }
+
+      // Sanitize document fields
+      doc.subject = typeof doc.subject === 'string' ? doc.subject : ''
+      doc.notes = typeof doc.notes === 'string' ? doc.notes : ''
+      doc.acceptanceConditions = typeof doc.acceptanceConditions === 'string' ? doc.acceptanceConditions : ''
+      doc.lines = doc.lines
+        .filter((l: any) => l && typeof l === 'object')
+        .map((l: any) => ({
+          description: typeof l.description === 'string' ? l.description : '',
+          quantity: typeof l.quantity === 'number' && l.quantity > 0 ? l.quantity : 1,
+          unitPrice: typeof l.unitPrice === 'number' ? l.unitPrice : 0,
+          vatRate: typeof l.vatRate === 'number' ? l.vatRate : 20,
+        }))
+
+      if (doc.lines.length === 0) {
+        return response.badRequest({
+          message: 'Invalid document structure from AI',
+          detail: JSON.stringify(parsed).slice(0, 500),
+        })
+      }
+
+      const aiMessage = parsed.message || 'Document mis à jour.'
+
+      if (mode === 'libre') {
         return response.ok({
-          message: parsed.message || 'Modifications appliquées.',
-          document: parsed.document,
+          message: aiMessage,
+          document: doc,
           modifications: parsed.modifications || [],
         })
       }
 
       // Edition mode
-      if (!parsed.document?.subject || !Array.isArray(parsed.document?.lines)) {
-        if (parsed.subject && Array.isArray(parsed.lines)) {
-          return response.ok({
-            message: parsed.message || 'Document mis à jour.',
-            document: {
-              subject: parsed.subject,
-              lines: parsed.lines,
-              notes: parsed.notes || '',
-              acceptanceConditions: parsed.acceptanceConditions || '',
-            },
-          })
-        }
-        return response.badRequest({ message: 'Invalid document structure from AI' })
-      }
-
       return response.ok({
-        message: parsed.message || 'Document mis à jour.',
-        document: parsed.document,
+        message: aiMessage,
+        document: doc,
       })
     } catch (error: any) {
       const msg = error.message || 'Unknown error'

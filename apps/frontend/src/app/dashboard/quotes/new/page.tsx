@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import { Button } from '@/components/ui/button'
@@ -91,6 +91,8 @@ export default function NewQuotePage() {
 
   const [sidebarTab, setSidebarTab] = useState<'options' | 'chat'>('options')
   const [aiProcessing, setAiProcessing] = useState(false)
+  const [aiError, setAiError] = useState<string | null>(null)
+  const aiRetryRef = useRef<(() => void) | null>(null)
 
   const [lines, setLines] = useState<DocumentLine[]>([
     { id: generateId(), type: 'standard', description: '', saleType: '', quantity: 1, unit: '', unitPrice: 0, vatRate: 20 },
@@ -551,7 +553,12 @@ export default function NewQuotePage() {
             onNumberChange={setQuoteNumber}
           />
           <div className="relative">
-          <AiSheetOverlay open={aiProcessing} />
+          <AiSheetOverlay
+            open={aiProcessing}
+            error={aiError}
+            onRetry={() => aiRetryRef.current?.()}
+            onDismissError={() => setAiError(null)}
+          />
           <A4Sheet
             mode={mode}
             logoUrl={invoiceSettings.logoSource === 'company' ? companyLogoUrl : invoiceSettings.logoUrl}
@@ -675,6 +682,8 @@ export default function NewQuotePage() {
                     clientAddress={selectedClient ? [selectedClient.address, selectedClient.postalCode, selectedClient.city].filter(Boolean).join(', ') : undefined}
                     clientEmail={selectedClient?.email || undefined}
                     onProcessingChange={setAiProcessing}
+                    onErrorChange={setAiError}
+                    onRetryRef={aiRetryRef}
                     onDocumentUpdate={(doc) => {
                       if (doc.subject) handleOptionsChange({ subject: doc.subject })
                       if (doc.notes !== undefined) setNotes(doc.notes)
