@@ -562,7 +562,7 @@ export function AiChatSidebar({
       {/* ─── Header ─────────────────────────────────────────────── */}
       <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
         <Sparkles className="h-4 w-4 text-purple-500 shrink-0" />
-        <span className="text-sm font-semibold text-foreground shrink-0">Assistant IA</span>
+        <span className="text-sm font-semibold text-foreground shrink-0">Faktur AI</span>
 
         <div className={cn(
           'flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ml-auto',

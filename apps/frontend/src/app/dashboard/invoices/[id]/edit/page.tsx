@@ -525,7 +525,7 @@ function EditInvoiceContent() {
           <div className="rounded-xl relative">
             <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
               {invoiceSettings.aiEnabled && (
-                <button onClick={() => { setShowOptions(true); setSidebarTab('chat') }} className="p-1.5 rounded-lg border border-border bg-card/80 backdrop-blur-sm text-purple-500 hover:text-purple-400 hover:bg-purple-500/10 transition-colors" title="Chat IA">
+                <button onClick={() => { setShowOptions(true); setSidebarTab('chat') }} className="p-1.5 rounded-lg border border-border bg-card/80 backdrop-blur-sm text-purple-500 hover:text-purple-400 hover:bg-purple-500/10 transition-colors" title="Faktur AI">
                   <Sparkles className="h-4 w-4" />
                 </button>
               )}
@@ -612,7 +612,7 @@ function EditInvoiceContent() {
                   <Tabs
                     tabs={[
                       { id: 'options', label: 'Options', icon: <Settings className="h-3.5 w-3.5" /> },
-                      { id: 'chat', label: 'Chat IA', icon: <Sparkles className="h-3.5 w-3.5" /> },
+                      { id: 'chat', label: 'Faktur AI', icon: <Sparkles className="h-3.5 w-3.5" /> },
                     ]}
                     activeTab={sidebarTab}
                     onChange={(id) => setSidebarTab(id as 'options' | 'chat')}
