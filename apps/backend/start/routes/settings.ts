@@ -18,3 +18,4 @@ router
   })
   .prefix(API_PREFIX + '/settings')
   .use(middleware.auth())
+  .use(middleware.vault())
