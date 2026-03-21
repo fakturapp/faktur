@@ -1,52 +1,61 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Spinner } from '@/components/ui/spinner'
 import { ShinyText } from '@/components/ui/shiny-text'
+import { MarkdownRenderer, ModificationBlock } from '@/components/ui/markdown-renderer'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
-import { Send, Sparkles, User, ChevronDown } from 'lucide-react'
+import {
+  Send,
+  Sparkles,
+  User,
+  ChevronDown,
+  Settings2,
+  Pencil,
+  HelpCircle,
+  Wand2,
+  Check,
+  RotateCcw,
+} from 'lucide-react'
 import { AnthropicIcon } from '@/components/icons/anthropic-icon'
 import { GoogleIcon } from '@/components/icons/google-icon'
 import { GroqIcon } from '@/components/icons/groq-icon'
+import {
+  type ChatMode,
+  type ProviderId,
+  type ChatMessage,
+  type ChatModification,
+  type DocumentSnapshot,
+  type DocumentLine,
+  CHAT_MODES,
+  CHAT_PROVIDERS,
+  CHAT_MODELS,
+  loadChatPreferences,
+  saveChatPreferences,
+} from '@/lib/ai-chat-config'
 
-const AI_CHAT_MODEL_KEY = 'faktur_ai_chat_model_pref'
-
-const CHAT_PROVIDERS = [
-  { id: 'gemini' as const, name: 'Gemini', icon: GoogleIcon, iconClass: '', iconBg: 'bg-blue-500/10' },
-  { id: 'groq' as const, name: 'Groq', icon: GroqIcon, iconClass: 'text-orange-500', iconBg: 'bg-orange-500/10' },
-  { id: 'claude' as const, name: 'Claude', icon: AnthropicIcon, iconClass: 'text-violet-500', iconBg: 'bg-violet-500/10' },
-] as const
-
-const CHAT_MODELS: Record<string, { id: string; name: string }[]> = {
-  gemini: [
-    { id: 'gemini-2.5-flash-lite', name: 'Flash Lite' },
-    { id: 'gemini-2.5-flash', name: 'Flash' },
-    { id: 'gemini-2.5-pro', name: 'Pro' },
-  ],
-  groq: [
-    { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B' },
-    { id: 'llama-3.1-8b-instant', name: 'Llama 3.1 8B' },
-  ],
-  claude: [
-    { id: 'claude-sonnet-4-5-20250929', name: 'Sonnet' },
-    { id: 'claude-opus-4-6', name: 'Opus' },
-  ],
+// Map provider ids to icon components
+const PROVIDER_ICONS: Record<ProviderId, typeof AnthropicIcon> = {
+  gemini: GoogleIcon,
+  groq: GroqIcon,
+  claude: AnthropicIcon,
 }
 
-interface ChatMessage {
-  role: 'user' | 'assistant'
-  content: string
+const MODE_ICONS = {
+  edition: Pencil,
+  question: HelpCircle,
+  libre: Wand2,
+} as const
+
+let messageIdCounter = 0
+function nextMsgId() {
+  return `msg_${Date.now()}_${++messageIdCounter}`
 }
 
-interface DocumentLine {
-  description: string
-  quantity: number
-  unitPrice: number
-  vatRate: number
-}
+// ─── Props ───────────────────────────────────────────────────────────────
 
 interface AiChatSidebarProps {
   documentType: 'invoice' | 'quote'
@@ -73,57 +82,130 @@ export function AiChatSidebar({
   onProcessingChange,
 }: AiChatSidebarProps) {
   const { settings } = useInvoiceSettings()
+
+  // ─── State ──────────────────────────────────────────────────────────
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
+      id: nextMsgId(),
       role: 'assistant',
-      content: `Bonjour ! Je suis votre assistant IA. Vous pouvez me demander de modifier le contenu : ajouter/supprimer des lignes, changer les prix, modifier l'objet, etc.`,
+      content: `Bonjour ! Je suis votre assistant IA. Choisissez un **mode** dans les paramètres pour commencer :\n\n- **Édition** : Modifier le contenu du document\n- **Question** : Poser des questions de conformité\n- **Libre** : Instructions libres avec suggestions`,
+      mode: 'edition',
+      timestamp: Date.now(),
     },
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
-  const [chatProvider, setChatProvider] = useState(settings.aiProvider)
+  const [chatProvider, setChatProvider] = useState<ProviderId>(settings.aiProvider)
   const [chatModel, setChatModel] = useState(settings.aiModel)
-  const [showModelPicker, setShowModelPicker] = useState(false)
+  const [chatMode, setChatMode] = useState<ChatMode>('edition')
+  const [showSettings, setShowSettings] = useState(false)
+  const [settingsTab, setSettingsTab] = useState<'provider' | 'model' | 'mode'>('provider')
+  const [documentHistory, setDocumentHistory] = useState<DocumentSnapshot[]>([])
   const scrollRef = useRef<HTMLDivElement>(null)
+  const settingsRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLTextAreaElement>(null)
 
-  // Restore model pref
+  // ─── Restore preferences ────────────────────────────────────────────
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(AI_CHAT_MODEL_KEY)
-      if (raw) {
-        const pref = JSON.parse(raw)
-        setChatProvider(pref.provider)
-        setChatModel(pref.model)
-      }
-    } catch {}
+    const prefs = loadChatPreferences()
+    if (prefs) {
+      setChatProvider(prefs.provider)
+      setChatModel(prefs.model)
+      setChatMode(prefs.mode)
+    }
   }, [])
 
+  // ─── Auto-scroll ────────────────────────────────────────────────────
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
-  }, [messages])
+  }, [messages, loading])
 
+  // ─── Close settings on outside click ────────────────────────────────
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (settingsRef.current && !settingsRef.current.contains(e.target as Node)) {
+        setShowSettings(false)
+      }
+    }
+    if (showSettings) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showSettings])
+
+  // ─── Get current document snapshot ──────────────────────────────────
+  const getCurrentSnapshot = useCallback((): DocumentSnapshot => ({
+    subject,
+    lines: [...lines],
+    notes,
+    acceptanceConditions,
+  }), [subject, lines, notes, acceptanceConditions])
+
+  // ─── Handle modification accept/revert ──────────────────────────────
+  function handleModificationAction(messageId: string, modId: string, action: 'accept' | 'revert') {
+    setMessages((prev) =>
+      prev.map((msg) => {
+        if (msg.id !== messageId || !msg.modifications) return msg
+        return {
+          ...msg,
+          modifications: msg.modifications.map((mod) => {
+            if (mod.id !== modId) return mod
+            if (action === 'accept') {
+              return { ...mod, accepted: true, reverted: false }
+            } else {
+              // Revert: restore previous document state
+              if (mod.documentSnapshot) {
+                onDocumentUpdate(mod.documentSnapshot)
+              }
+              return { ...mod, reverted: true, accepted: false }
+            }
+          }),
+        }
+      })
+    )
+  }
+
+  // ─── Send message ───────────────────────────────────────────────────
   async function handleSend() {
     const message = input.trim()
     if (!message || loading) return
 
     setInput('')
-    setMessages((prev) => [...prev, { role: 'user', content: message }])
-    setLoading(true)
-    onProcessingChange?.(true)
+    if (inputRef.current) {
+      inputRef.current.style.height = 'auto'
+    }
 
-    try {
-      localStorage.setItem(AI_CHAT_MODEL_KEY, JSON.stringify({ provider: chatProvider, model: chatModel }))
-    } catch {}
+    const userMsg: ChatMessage = {
+      id: nextMsgId(),
+      role: 'user',
+      content: message,
+      mode: chatMode,
+      timestamp: Date.now(),
+    }
+    setMessages((prev) => [...prev, userMsg])
+    setLoading(true)
+
+    // Save snapshot before modification
+    const snapshotBefore = getCurrentSnapshot()
+
+    // Only show overlay for edition and libre modes (they modify the doc)
+    if (chatMode !== 'question') {
+      onProcessingChange?.(true)
+    }
+
+    saveChatPreferences({ provider: chatProvider, model: chatModel, mode: chatMode })
 
     const { data, error } = await api.post<{
-      document: {
+      message: string
+      document?: {
         subject: string
         lines: DocumentLine[]
         notes?: string
         acceptanceConditions?: string
       }
+      modifications?: Array<{ content: string }>
     }>('/ai/chat-document', {
       message,
       currentDocument: {
@@ -135,33 +217,101 @@ export function AiChatSidebar({
       type: documentType,
       provider: chatProvider,
       model: chatModel,
+      mode: chatMode,
     })
 
     setLoading(false)
     onProcessingChange?.(false)
 
-    if (error || !data?.document) {
+    if (error || !data) {
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: 'Désolé, une erreur est survenue. Réessayez.' },
+        {
+          id: nextMsgId(),
+          role: 'assistant',
+          content: 'Désolé, une erreur est survenue. Réessayez.',
+          mode: chatMode,
+          timestamp: Date.now(),
+        },
       ])
       return
     }
 
-    // Apply changes
-    onDocumentUpdate({
-      subject: data.document.subject,
-      lines: data.document.lines,
-      notes: data.document.notes || '',
-      acceptanceConditions: data.document.acceptanceConditions || '',
-    })
+    // Build assistant response based on mode
+    if (chatMode === 'edition') {
+      // Edition mode: apply document changes directly
+      if (data.document) {
+        setDocumentHistory((prev) => [...prev, snapshotBefore])
+        onDocumentUpdate({
+          subject: data.document.subject,
+          lines: data.document.lines,
+          notes: data.document.notes || '',
+          acceptanceConditions: data.document.acceptanceConditions || '',
+        })
+      }
 
-    setMessages((prev) => [
-      ...prev,
-      { role: 'assistant', content: 'Document mis à jour !' },
-    ])
+      const assistantMsg: ChatMessage = {
+        id: nextMsgId(),
+        role: 'assistant',
+        content: data.message || '**Document mis à jour !** Les modifications ont été appliquées.',
+        mode: chatMode,
+        timestamp: Date.now(),
+        modifications: data.document
+          ? [{
+              id: `mod_${Date.now()}`,
+              content: 'Les modifications ont été appliquées au document.',
+              documentSnapshot: snapshotBefore,
+            }]
+          : undefined,
+      }
+      setMessages((prev) => [...prev, assistantMsg])
+
+    } else if (chatMode === 'question') {
+      // Question mode: return markdown formatted response, no doc modification
+      const assistantMsg: ChatMessage = {
+        id: nextMsgId(),
+        role: 'assistant',
+        content: data.message || 'Je n\'ai pas pu générer de réponse.',
+        mode: chatMode,
+        timestamp: Date.now(),
+      }
+      setMessages((prev) => [...prev, assistantMsg])
+
+    } else if (chatMode === 'libre') {
+      // Libre mode: apply changes + show modifications with accept/revert
+      if (data.document) {
+        setDocumentHistory((prev) => [...prev, snapshotBefore])
+        onDocumentUpdate({
+          subject: data.document.subject,
+          lines: data.document.lines,
+          notes: data.document.notes || '',
+          acceptanceConditions: data.document.acceptanceConditions || '',
+        })
+      }
+
+      const modifications: ChatModification[] = data.modifications?.map((m, i) => ({
+        id: `mod_${Date.now()}_${i}`,
+        content: m.content,
+        documentSnapshot: snapshotBefore,
+      })) || (data.document ? [{
+        id: `mod_${Date.now()}`,
+        content: data.message || 'Modification appliquée.',
+        documentSnapshot: snapshotBefore,
+      }] : [])
+
+      const assistantMsg: ChatMessage = {
+        id: nextMsgId(),
+        role: 'assistant',
+        content: data.message || 'Voici les modifications proposées :',
+        mode: chatMode,
+        timestamp: Date.now(),
+        modifications: modifications.length > 0 ? modifications : undefined,
+      }
+      setMessages((prev) => [...prev, assistantMsg])
+    }
   }
 
+  // ─── Keyboard ───────────────────────────────────────────────────────
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
@@ -169,74 +319,246 @@ export function AiChatSidebar({
     }
   }
 
+  // ─── Auto-resize textarea ──────────────────────────────────────────
+  function handleInputChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+    setInput(e.target.value)
+    e.target.style.height = 'auto'
+    e.target.style.height = Math.min(e.target.scrollHeight, 100) + 'px'
+  }
+
+  // ─── Current mode config ───────────────────────────────────────────
+  const currentMode = CHAT_MODES.find((m) => m.id === chatMode)!
+  const currentProvider = CHAT_PROVIDERS.find((p) => p.id === chatProvider)!
+  const currentModelName = CHAT_MODELS[chatProvider]?.find((m) => m.id === chatModel)?.name || 'Modèle'
+  const CurrentModeIcon = MODE_ICONS[chatMode]
+  const ProviderIcon = PROVIDER_ICONS[chatProvider]
+
   return (
     <div className="flex flex-col h-[calc(100vh-200px)] max-h-[600px] rounded-2xl border border-border bg-card/50">
-      {/* Header */}
+      {/* ─── Header ─────────────────────────────────────────────── */}
       <div className="relative flex items-center gap-2 px-4 py-3 border-b border-border">
         <Sparkles className="h-4 w-4 text-purple-500 shrink-0" />
         <span className="text-sm font-semibold text-foreground shrink-0">Assistant IA</span>
-        <button
-          onClick={() => setShowModelPicker(!showModelPicker)}
-          className="ml-auto flex items-center gap-1 rounded-md border border-border px-2 py-1 text-[10px] text-muted-foreground hover:text-foreground hover:border-primary/30 transition-colors"
-        >
-          {(() => {
-            const p = CHAT_PROVIDERS.find((x) => x.id === chatProvider)
-            const Icon = p?.icon
-            return Icon ? <Icon className={cn('h-3 w-3', p.iconClass)} /> : null
-          })()}
-          <span className="max-w-[60px] truncate">{CHAT_MODELS[chatProvider]?.find((m) => m.id === chatModel)?.name || 'Modèle'}</span>
-          <ChevronDown className={cn('h-3 w-3 transition-transform', showModelPicker && 'rotate-180')} />
-        </button>
 
-        <AnimatePresence>
-          {showModelPicker && (
-            <motion.div
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.15 }}
-              className="absolute top-full right-2 mt-1 z-20 w-48 rounded-xl border border-border bg-card shadow-xl overflow-hidden"
-            >
-              {CHAT_PROVIDERS.map((p) => {
-                const Icon = p.icon
-                return (
-                  <div key={p.id}>
-                    <div className="px-3 py-1 flex items-center gap-1.5 border-b border-border/50 bg-muted/30">
-                      <Icon className={cn('h-2.5 w-2.5', p.iconClass)} />
-                      <span className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider">{p.name}</span>
-                    </div>
-                    {CHAT_MODELS[p.id]?.map((m) => (
-                      <button
-                        key={m.id}
-                        onClick={() => {
-                          setChatProvider(p.id)
-                          setChatModel(m.id)
-                          setShowModelPicker(false)
-                        }}
-                        className={cn(
-                          'w-full px-3 py-1.5 text-left text-[11px] transition-all',
-                          chatProvider === p.id && chatModel === m.id
-                            ? 'bg-primary/5 text-primary font-medium'
-                            : 'text-foreground hover:bg-muted/50'
-                        )}
+        {/* Mode indicator pill */}
+        <div className={cn(
+          'flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium',
+          chatMode === 'edition' && 'bg-blue-500/10 text-blue-400',
+          chatMode === 'question' && 'bg-amber-500/10 text-amber-400',
+          chatMode === 'libre' && 'bg-purple-500/10 text-purple-400',
+        )}>
+          <CurrentModeIcon className="h-2.5 w-2.5" />
+          {currentMode.label}
+        </div>
+
+        {/* Settings button */}
+        <div ref={settingsRef} className="relative ml-auto">
+          <button
+            onClick={() => setShowSettings(!showSettings)}
+            className={cn(
+              'flex items-center gap-1.5 rounded-lg border px-2 py-1.5 text-[10px] transition-all',
+              showSettings
+                ? 'border-primary/40 bg-primary/5 text-primary'
+                : 'border-border text-muted-foreground hover:text-foreground hover:border-primary/30'
+            )}
+          >
+            <Settings2 className="h-3 w-3" />
+            <ProviderIcon className={cn('h-3 w-3', currentProvider.iconClass)} />
+            <span className="max-w-[50px] truncate">{currentModelName}</span>
+            <ChevronDown className={cn('h-2.5 w-2.5 transition-transform', showSettings && 'rotate-180')} />
+          </button>
+
+          {/* ─── Settings Dropdown ──────────────────────────────── */}
+          <AnimatePresence>
+            {showSettings && (
+              <motion.div
+                initial={{ opacity: 0, y: -6, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -6, scale: 0.95 }}
+                transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                className="absolute top-full right-0 mt-1.5 z-30 w-64 rounded-xl border border-border bg-card shadow-2xl shadow-black/20 overflow-hidden"
+              >
+                {/* Settings tabs */}
+                <div className="flex border-b border-border">
+                  {(['provider', 'model', 'mode'] as const).map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setSettingsTab(tab)}
+                      className={cn(
+                        'flex-1 px-2 py-2 text-[10px] font-medium transition-colors relative',
+                        settingsTab === tab
+                          ? 'text-primary'
+                          : 'text-muted-foreground hover:text-foreground'
+                      )}
+                    >
+                      {tab === 'provider' ? 'Provider' : tab === 'model' ? 'Modèle' : 'Mode'}
+                      {settingsTab === tab && (
+                        <motion.div
+                          layoutId="settings-tab-indicator"
+                          className="absolute bottom-0 left-1 right-1 h-0.5 bg-primary rounded-full"
+                        />
+                      )}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Tab content */}
+                <div className="p-1.5 max-h-[280px] overflow-y-auto">
+                  <AnimatePresence mode="wait">
+                    {/* Provider tab */}
+                    {settingsTab === 'provider' && (
+                      <motion.div
+                        key="provider"
+                        initial={{ opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 8 }}
+                        transition={{ duration: 0.12 }}
+                        className="space-y-0.5"
                       >
-                        {m.name}
-                      </button>
-                    ))}
-                  </div>
-                )
-              })}
-            </motion.div>
-          )}
-        </AnimatePresence>
+                        {CHAT_PROVIDERS.map((p) => {
+                          const Icon = PROVIDER_ICONS[p.id]
+                          const isActive = chatProvider === p.id
+                          return (
+                            <button
+                              key={p.id}
+                              onClick={() => {
+                                setChatProvider(p.id)
+                                // Auto-select first model of new provider
+                                const firstModel = CHAT_MODELS[p.id]?.[0]
+                                if (firstModel) setChatModel(firstModel.id)
+                                setSettingsTab('model')
+                              }}
+                              className={cn(
+                                'w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left transition-all',
+                                isActive
+                                  ? 'bg-primary/5 border border-primary/20'
+                                  : 'hover:bg-muted/50 border border-transparent'
+                              )}
+                            >
+                              <div className={cn('flex h-7 w-7 items-center justify-center rounded-lg', p.iconBg)}>
+                                <Icon className={cn('h-3.5 w-3.5', p.iconClass)} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-[11px] font-medium text-foreground">{p.name}</div>
+                                <div className="text-[9px] text-muted-foreground">
+                                  {CHAT_MODELS[p.id]?.length} modèles
+                                </div>
+                              </div>
+                              {isActive && <Check className="h-3.5 w-3.5 text-primary shrink-0" />}
+                            </button>
+                          )
+                        })}
+                      </motion.div>
+                    )}
+
+                    {/* Model tab */}
+                    {settingsTab === 'model' && (
+                      <motion.div
+                        key="model"
+                        initial={{ opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 8 }}
+                        transition={{ duration: 0.12 }}
+                        className="space-y-0.5"
+                      >
+                        <div className="px-2 py-1 mb-1">
+                          <div className="flex items-center gap-1.5">
+                            <ProviderIcon className={cn('h-2.5 w-2.5', currentProvider.iconClass)} />
+                            <span className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider">
+                              {currentProvider.name}
+                            </span>
+                          </div>
+                        </div>
+                        {CHAT_MODELS[chatProvider]?.map((m) => {
+                          const isActive = chatModel === m.id
+                          return (
+                            <button
+                              key={m.id}
+                              onClick={() => {
+                                setChatModel(m.id)
+                                setShowSettings(false)
+                              }}
+                              className={cn(
+                                'w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left transition-all',
+                                isActive
+                                  ? 'bg-primary/5 border border-primary/20'
+                                  : 'hover:bg-muted/50 border border-transparent'
+                              )}
+                            >
+                              <div className="flex-1 min-w-0">
+                                <div className="text-[11px] font-medium text-foreground">{m.name}</div>
+                              </div>
+                              {m.badge && (
+                                <span className={cn('px-1.5 py-0.5 rounded-md text-[9px] font-medium', m.badgeColor)}>
+                                  {m.badge}
+                                </span>
+                              )}
+                              {isActive && <Check className="h-3.5 w-3.5 text-primary shrink-0" />}
+                            </button>
+                          )
+                        })}
+                      </motion.div>
+                    )}
+
+                    {/* Mode tab */}
+                    {settingsTab === 'mode' && (
+                      <motion.div
+                        key="mode"
+                        initial={{ opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 8 }}
+                        transition={{ duration: 0.12 }}
+                        className="space-y-0.5"
+                      >
+                        {CHAT_MODES.map((m) => {
+                          const isActive = chatMode === m.id
+                          const ModeIcon = MODE_ICONS[m.id]
+                          return (
+                            <button
+                              key={m.id}
+                              onClick={() => {
+                                setChatMode(m.id)
+                                setShowSettings(false)
+                              }}
+                              className={cn(
+                                'w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left transition-all',
+                                isActive
+                                  ? 'bg-primary/5 border border-primary/20'
+                                  : 'hover:bg-muted/50 border border-transparent'
+                              )}
+                            >
+                              <div className={cn(
+                                'flex h-7 w-7 items-center justify-center rounded-lg',
+                                m.id === 'edition' && 'bg-blue-500/10',
+                                m.id === 'question' && 'bg-amber-500/10',
+                                m.id === 'libre' && 'bg-purple-500/10',
+                              )}>
+                                <ModeIcon className={cn('h-3.5 w-3.5', m.color)} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-[11px] font-medium text-foreground">{m.label}</div>
+                                <div className="text-[9px] text-muted-foreground">{m.description}</div>
+                              </div>
+                              {isActive && <Check className="h-3.5 w-3.5 text-primary shrink-0" />}
+                            </button>
+                          )
+                        })}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
 
-      {/* Messages */}
+      {/* ─── Messages ───────────────────────────────────────────── */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 py-3 space-y-3">
         <AnimatePresence initial={false}>
-          {messages.map((msg, i) => (
+          {messages.map((msg) => (
             <motion.div
-              key={i}
+              key={msg.id}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2 }}
@@ -250,15 +572,42 @@ export function AiChatSidebar({
                   <Sparkles className="h-3 w-3 text-purple-500" />
                 </div>
               )}
-              <div
-                className={cn(
-                  'max-w-[85%] rounded-xl px-3 py-2 text-xs leading-relaxed',
-                  msg.role === 'user'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted/50 text-foreground'
+              <div className={cn(
+                'max-w-[85%] rounded-xl px-3 py-2',
+                msg.role === 'user'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted/50 text-foreground'
+              )}>
+                {msg.role === 'user' ? (
+                  <div className="text-xs leading-relaxed">{msg.content}</div>
+                ) : (
+                  <>
+                    <MarkdownRenderer content={msg.content} />
+
+                    {/* Modifications with Accept/Revert (Libre & Edition modes) */}
+                    {msg.modifications?.map((mod) => (
+                      <ModificationBlock
+                        key={mod.id}
+                        content={mod.content}
+                        accepted={mod.accepted}
+                        reverted={mod.reverted}
+                        onAccept={() => handleModificationAction(msg.id, mod.id, 'accept')}
+                        onRevert={() => handleModificationAction(msg.id, mod.id, 'revert')}
+                      />
+                    ))}
+
+                    {/* Mode indicator on assistant messages */}
+                    <div className="flex items-center gap-1 mt-1.5 pt-1 border-t border-border/20">
+                      {(() => {
+                        const MIcon = MODE_ICONS[msg.mode]
+                        return <MIcon className={cn('h-2 w-2', CHAT_MODES.find(m => m.id === msg.mode)?.color)} />
+                      })()}
+                      <span className="text-[8px] text-muted-foreground/60">
+                        {CHAT_MODES.find(m => m.id === msg.mode)?.label}
+                      </span>
+                    </div>
+                  </>
                 )}
-              >
-                {msg.content}
               </div>
               {msg.role === 'user' && (
                 <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 mt-0.5">
@@ -269,6 +618,7 @@ export function AiChatSidebar({
           ))}
         </AnimatePresence>
 
+        {/* Loading indicator */}
         {loading && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -281,7 +631,7 @@ export function AiChatSidebar({
             <div className="bg-muted/50 rounded-xl px-3 py-2 flex items-center gap-2">
               <Spinner className="h-3.5 w-3.5" />
               <ShinyText
-                text="Réflexion..."
+                text={chatMode === 'question' ? 'Analyse...' : chatMode === 'libre' ? 'Création...' : 'Modification...'}
                 className="text-xs font-medium"
                 color="#a78bfa"
                 shineColor="#e0e7ff"
@@ -292,21 +642,55 @@ export function AiChatSidebar({
         )}
       </div>
 
-      {/* Input */}
+      {/* ─── Input ──────────────────────────────────────────────── */}
       <div className="border-t border-border px-3 py-3">
-        <div className="flex items-center gap-2">
-          <input
+        {/* Quick mode switcher pills */}
+        <div className="flex items-center gap-1 mb-2">
+          {CHAT_MODES.map((m) => {
+            const MIcon = MODE_ICONS[m.id]
+            return (
+              <button
+                key={m.id}
+                onClick={() => setChatMode(m.id)}
+                className={cn(
+                  'flex items-center gap-1 px-2 py-1 rounded-full text-[9px] font-medium transition-all',
+                  chatMode === m.id
+                    ? cn(
+                        'border',
+                        m.id === 'edition' && 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+                        m.id === 'question' && 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+                        m.id === 'libre' && 'bg-purple-500/10 text-purple-400 border-purple-500/20',
+                      )
+                    : 'text-muted-foreground/60 hover:text-muted-foreground border border-transparent'
+                )}
+              >
+                <MIcon className="h-2.5 w-2.5" />
+                {m.label}
+              </button>
+            )
+          })}
+        </div>
+
+        <div className="flex items-end gap-2">
+          <textarea
+            ref={inputRef}
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            placeholder="Modifier le document..."
+            placeholder={currentMode.placeholder}
             disabled={loading}
-            className="flex-1 bg-muted/30 rounded-lg px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground/60 border border-border focus:outline-none focus:ring-1 focus:ring-primary/30 disabled:opacity-50"
+            rows={1}
+            className="flex-1 bg-muted/30 rounded-lg px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground/60 border border-border focus:outline-none focus:ring-1 focus:ring-primary/30 disabled:opacity-50 resize-none min-h-[36px] max-h-[100px]"
           />
           <button
             onClick={handleSend}
             disabled={!input.trim() || loading}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className={cn(
+              'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed',
+              chatMode === 'edition' && 'bg-blue-500 text-white hover:bg-blue-600',
+              chatMode === 'question' && 'bg-amber-500 text-white hover:bg-amber-600',
+              chatMode === 'libre' && 'bg-purple-500 text-white hover:bg-purple-600',
+            )}
           >
             <Send className="h-3.5 w-3.5" />
           </button>
