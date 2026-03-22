@@ -12,9 +12,11 @@ import crypto from 'node:crypto'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import encryptionService from '#services/encryption/encryption_service'
 import keyStore from '#services/crypto/key_store'
+import UserTransformer from '#transformers/user_transformer'
 
 export default class Login {
-  async handle({ request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { request, response } = ctx
     const { email, password, code, turnstileToken } = request.only([
       'email',
       'password',
@@ -30,10 +32,41 @@ export default class Login {
       return response.forbidden({ message: 'Captcha verification failed' })
     }
 
-    const user = await User.findBy('email', email)
+    // Timing-safe credential verification: User.verifyCredentials performs a fake
+    // hash comparison when the user doesn't exist, ensuring identical response time
+    // regardless of whether the email exists in the database.
+    let user: User
+    try {
+      user = await User.verifyCredentials(email, password)
+    } catch {
+      // In the error path (timing no longer matters), look up the user to
+      // increment failed attempts and check lockout.
+      const existingUser = await User.findBy('email', email)
+      if (existingUser) {
+        existingUser.failedLoginAttempts += 1
+        if (existingUser.failedLoginAttempts >= 5) {
+          existingUser.lockedUntil = DateTime.now().plus({ minutes: 15 })
+        }
+        await existingUser.save()
 
-    if (!user || user.status !== 'active') {
-      await this.recordLoginAttempt(request, null, 'failed', 'Invalid credentials')
+        if (existingUser.lockedUntil && existingUser.lockedUntil > DateTime.now()) {
+          await this.recordLoginAttempt(request, existingUser.id, 'blocked', 'Account locked')
+          return response.tooManyRequests({
+            message: 'Account temporarily locked due to too many failed attempts',
+            lockedUntil: existingUser.lockedUntil.toISO(),
+          })
+        }
+
+        await this.recordLoginAttempt(request, existingUser.id, 'failed', 'Invalid credentials')
+      } else {
+        await this.recordLoginAttempt(request, null, 'failed', 'Invalid credentials')
+      }
+      return response.unauthorized({ message: 'Invalid email or password' })
+    }
+
+    // Credentials valid — now check account status and lockout
+    if (user.status !== 'active') {
+      await this.recordLoginAttempt(request, user.id, 'failed', 'Inactive account')
       return response.unauthorized({ message: 'Invalid email or password' })
     }
 
@@ -43,20 +76,6 @@ export default class Login {
         message: 'Account temporarily locked due to too many failed attempts',
         lockedUntil: user.lockedUntil.toISO(),
       })
-    }
-
-    const passwordValid = await User.verifyCredentials(email, password)
-      .then(() => true)
-      .catch(() => false)
-
-    if (!passwordValid) {
-      user.failedLoginAttempts += 1
-      if (user.failedLoginAttempts >= 5) {
-        user.lockedUntil = DateTime.now().plus({ minutes: 15 })
-      }
-      await user.save()
-      await this.recordLoginAttempt(request, user.id, 'failed', 'Invalid password')
-      return response.unauthorized({ message: 'Invalid email or password' })
     }
 
     if (!user.emailVerified) {
@@ -179,17 +198,7 @@ export default class Login {
 
       return response.ok({
         message: 'Login successful',
-        user: {
-          id: user.id,
-          fullName: user.fullName,
-          email: user.email,
-          emailVerified: user.emailVerified,
-          twoFactorEnabled: user.twoFactorEnabled,
-          avatarUrl: user.avatarUrl,
-          onboardingCompleted: user.onboardingCompleted,
-          currentTeamId: user.currentTeamId,
-          cryptoResetNeeded: user.cryptoResetNeeded || false,
-        },
+        user: await ctx.serialize.withoutWrapping(UserTransformer.transform(user)),
         token: token.value!.release(),
         vaultKey: sessionKey.toString('hex'),
       })
@@ -197,17 +206,7 @@ export default class Login {
 
     return response.ok({
       message: 'Login successful',
-      user: {
-        id: user.id,
-        fullName: user.fullName,
-        email: user.email,
-        emailVerified: user.emailVerified,
-        twoFactorEnabled: user.twoFactorEnabled,
-        avatarUrl: user.avatarUrl,
-        onboardingCompleted: user.onboardingCompleted,
-        currentTeamId: user.currentTeamId,
-        cryptoResetNeeded: user.cryptoResetNeeded || false,
-      },
+      user: await ctx.serialize.withoutWrapping(UserTransformer.transform(user)),
       token: token.value!.release(),
     })
   }
