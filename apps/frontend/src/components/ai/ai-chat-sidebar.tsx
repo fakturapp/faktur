@@ -917,7 +917,7 @@ export function AiChatSidebar({
 
           {/* Send button */}
           <button
-            onClick={handleSend}
+            onClick={() => handleSend()}
             disabled={!input.trim() || loading}
             className={cn(
               'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed',
