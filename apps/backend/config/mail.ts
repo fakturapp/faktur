@@ -11,12 +11,12 @@ const mailConfig = defineConfig({
 
   mailers: {
     resend: transports.resend({
-      key: env.get('RESEND_API_KEY') || '',
+      key: env.get('RESEND_API_KEY', ''),
     }),
 
     smtp: transports.smtp({
       host: env.get('SMTP_HOST', 'localhost'),
-      port: env.get('SMTP_PORT', '587'),
+      port: Number(env.get('SMTP_PORT', '587')),
     }),
   },
 })
