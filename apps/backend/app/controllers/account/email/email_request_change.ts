@@ -2,8 +2,9 @@ import type { HttpContext } from '@adonisjs/core/http'
 import vine from '@vinejs/vine'
 import crypto from 'node:crypto'
 import { DateTime } from 'luxon'
+import mail from '@adonisjs/mail/services/main'
 import User from '#models/account/user'
-import emailService from '#services/email/email_service'
+import SecurityCodeNotification from '#mails/security_code_notification'
 
 const validator = vine.compile(
   vine.object({
@@ -38,7 +39,7 @@ export default class EmailRequestChange {
     await user.save()
 
     // Send code to the NEW email
-    await emailService.sendSecurityCodeEmail(newEmail, code, user.fullName || undefined)
+    await mail.send(new SecurityCodeNotification(newEmail, code, user.fullName || undefined))
 
     return response.ok({ message: 'Code de vérification envoyé à la nouvelle adresse' })
   }

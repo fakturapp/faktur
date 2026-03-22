@@ -2,7 +2,8 @@ import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import crypto from 'node:crypto'
 import vine from '@vinejs/vine'
-import EmailService from '#services/email/email_service'
+import mail from '@adonisjs/mail/services/main'
+import SecurityCodeNotification from '#mails/security_code_notification'
 import TwoFactorService from '#services/auth/two_factor_service'
 
 const verifyCodeValidator = vine.compile(
@@ -33,7 +34,7 @@ export default class SecurityVerify {
     user.securityCodeExpiresAt = DateTime.now().plus({ minutes: 5 })
     await user.save()
 
-    EmailService.sendSecurityCodeEmail(user.email, code, user.fullName ?? undefined).catch(() => {})
+    mail.sendLater(new SecurityCodeNotification(user.email, code, user.fullName ?? undefined))
 
     return response.ok({
       message: 'Security code sent',

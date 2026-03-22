@@ -1,9 +1,10 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
+import mail from '@adonisjs/mail/services/main'
 import User from '#models/account/user'
 import { registerValidator } from '#validators/auth/auth_validators'
 import TokenService from '#services/auth/token_service'
-import EmailService from '#services/email/email_service'
+import VerifyEmailNotification from '#mails/verify_email_notification'
 import AuditLog from '#models/shared/audit_log'
 import TurnstileService from '#services/security/turnstile_service'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
@@ -48,9 +49,7 @@ export default class Signup {
       severity: 'info',
     })
 
-    EmailService.sendVerificationEmail(user.email, token, user.fullName ?? undefined).catch(
-      () => {}
-    )
+    mail.sendLater(new VerifyEmailNotification(user.email, token, user.fullName ?? undefined))
 
     return response.created({
       message: 'Registration successful. Please check your email to verify your account.',
