@@ -3,6 +3,8 @@ import limiter from '@adonisjs/limiter/services/main'
 /**
  * Pre-defined rate limiters for auth-sensitive routes.
  * Uses IP-based throttling to prevent brute-force attacks.
+ *
+ * @see https://docs.adonisjs.com/guides/rate-limiting
  */
 
 /** Login: 5 requests per 15 minutes per IP */

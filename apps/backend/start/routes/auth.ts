@@ -7,7 +7,7 @@ import {
   passwordResetLimiter,
   emailVerificationLimiter,
   twoFactorLimiter,
-} from '#middleware/security/rate_limit_middleware'
+} from '#start/limiter'
 
 const Login = () => import('#controllers/auth/session/login')
 const Logout = () => import('#controllers/auth/session/logout')
