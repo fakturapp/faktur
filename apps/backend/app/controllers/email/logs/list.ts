@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import EmailLog from '#models/email/email_log'
+import EmailLogTransformer from '#transformers/email_log_transformer'
 import { decryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 
 export default class ListEmailLogs {
@@ -33,19 +34,7 @@ export default class ListEmailLogs {
     }
 
     return response.ok({
-      emailLogs: logs.map((log) => ({
-        id: log.id,
-        documentType: log.documentType,
-        documentId: log.documentId,
-        documentNumber: log.documentNumber,
-        fromEmail: log.fromEmail,
-        toEmail: log.toEmail,
-        subject: log.subject,
-        status: log.status,
-        errorMessage: log.errorMessage,
-        emailType: log.emailType,
-        createdAt: log.createdAt.toISO(),
-      })),
+      emailLogs: await ctx.serialize.withoutWrapping(EmailLogTransformer.transform(logs)),
     })
   }
 }

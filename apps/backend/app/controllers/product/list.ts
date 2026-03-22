@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Product from '#models/product/product'
 import { decryptModelFieldsArray, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
+import ProductTransformer from '#transformers/product_transformer'
 
 export default class List {
   async handle(ctx: HttpContext) {
@@ -25,19 +26,8 @@ export default class List {
 
     decryptModelFieldsArray(products, [...ENCRYPTED_FIELDS.product], dek)
 
-    const productsList = products.map((p) => ({
-      id: p.id,
-      name: p.name,
-      description: p.description,
-      unitPrice: p.unitPrice,
-      vatRate: p.vatRate,
-      unit: p.unit,
-      saleType: p.saleType,
-      reference: p.reference,
-      isArchived: p.isArchived,
-      createdAt: p.createdAt.toISO(),
-    }))
-
-    return response.ok({ products: productsList })
+    return response.ok({
+      products: await ctx.serialize.withoutWrapping(ProductTransformer.transform(products)),
+    })
   }
 }

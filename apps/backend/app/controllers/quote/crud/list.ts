@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import Quote from '#models/quote/quote'
+import QuoteTransformer from '#transformers/quote_transformer'
 import {
   decryptModelFields,
   decryptModelFieldsArray,
@@ -56,23 +57,8 @@ export default class List {
       }
     }
 
-    const quotesList = quotes.map((q) => ({
-      id: q.id,
-      quoteNumber: q.quoteNumber,
-      status: q.status,
-      subject: q.subject,
-      issueDate: q.issueDate,
-      validityDate: q.validityDate,
-      subtotal: q.subtotal,
-      taxAmount: q.taxAmount,
-      total: q.total,
-      clientName: q.client?.displayName || null,
-      clientId: q.clientId,
-      createdAt: q.createdAt.toISO(),
-    }))
-
     return response.ok({
-      quotes: quotesList,
+      quotes: await ctx.serialize.withoutWrapping(QuoteTransformer.transform(quotes)),
       meta: {
         total: result.total,
         perPage: result.perPage,

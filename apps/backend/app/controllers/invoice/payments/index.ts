@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import InvoicePayment from '#models/invoice/invoice_payment'
 import Invoice from '#models/invoice/invoice'
+import InvoicePaymentTransformer from '#transformers/invoice_payment_transformer'
 import { decryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 
 export default class Index {
@@ -36,14 +37,7 @@ export default class Index {
     const amountDue = Number(invoice.total) - amountPaid
 
     return response.ok({
-      payments: payments.map((p) => ({
-        id: p.id,
-        amount: p.amount,
-        paymentDate: p.paymentDate,
-        paymentMethod: p.paymentMethod,
-        notes: p.notes,
-        createdAt: p.createdAt.toISO(),
-      })),
+      payments: await ctx.serialize.withoutWrapping(InvoicePaymentTransformer.transform(payments)),
       summary: {
         total: Number(invoice.total),
         amountPaid: Math.round(amountPaid * 100) / 100,

@@ -1,8 +1,10 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import EmailAccount from '#models/email/email_account'
+import EmailAccountTransformer from '#transformers/email_account_transformer'
 
 export default class List {
-  async handle({ auth, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, response } = ctx
     const user = auth.user!
     const teamId = user.currentTeamId
 
@@ -15,16 +17,10 @@ export default class List {
       .orderBy('is_default', 'desc')
       .orderBy('created_at', 'asc')
 
-    const result = accounts.map((a) => ({
-      id: a.id,
-      provider: a.provider,
-      email: a.email,
-      displayName: a.displayName,
-      isDefault: a.isDefault,
-      isActive: a.isActive,
-      createdAt: a.createdAt,
-    }))
-
-    return response.ok({ emailAccounts: result })
+    return response.ok({
+      emailAccounts: await ctx.serialize.withoutWrapping(
+        EmailAccountTransformer.transform(accounts)
+      ),
+    })
   }
 }

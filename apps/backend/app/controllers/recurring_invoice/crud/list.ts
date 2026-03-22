@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import RecurringInvoice from '#models/recurring_invoice/recurring_invoice'
+import RecurringInvoiceTransformer from '#transformers/recurring_invoice_transformer'
 import {
   decryptModelFields,
   decryptModelFieldsArray,
@@ -43,42 +44,31 @@ export default class List {
     }
 
     // Calculate template totals from lines
-    const list = recurringInvoices.map((ri) => {
-      let subtotal = 0
-      let taxAmount = 0
-      for (const line of ri.lines) {
-        const lt = line.quantity * line.unitPrice
-        subtotal += lt
-        taxAmount += lt * (line.vatRate / 100)
-      }
+    const list = await Promise.all(
+      recurringInvoices.map(async (ri) => {
+        let subtotal = 0
+        let taxAmount = 0
+        for (const line of ri.lines) {
+          const lt = line.quantity * line.unitPrice
+          subtotal += lt
+          taxAmount += lt * (line.vatRate / 100)
+        }
 
-      let discountAmount = 0
-      if (ri.globalDiscountType === 'percentage' && ri.globalDiscountValue > 0) {
-        discountAmount = subtotal * (ri.globalDiscountValue / 100)
-      } else if (ri.globalDiscountType === 'fixed' && ri.globalDiscountValue > 0) {
-        discountAmount = ri.globalDiscountValue
-      }
+        let discountAmount = 0
+        if (ri.globalDiscountType === 'percentage' && ri.globalDiscountValue > 0) {
+          discountAmount = subtotal * (ri.globalDiscountValue / 100)
+        } else if (ri.globalDiscountType === 'fixed' && ri.globalDiscountValue > 0) {
+          discountAmount = ri.globalDiscountValue
+        }
 
-      const total = subtotal + taxAmount - discountAmount
+        const total = subtotal + taxAmount - discountAmount
 
-      return {
-        id: ri.id,
-        name: ri.name,
-        frequency: ri.frequency,
-        customIntervalDays: ri.customIntervalDays,
-        startDate: ri.startDate,
-        nextExecutionDate: ri.nextExecutionDate,
-        endDate: ri.endDate,
-        isActive: ri.isActive,
-        lastGeneratedAt: ri.lastGeneratedAt?.toISO() || null,
-        generationCount: ri.generationCount,
-        clientName: ri.client?.displayName || null,
-        clientId: ri.clientId,
-        subject: ri.subject,
-        total: Math.round(total * 100) / 100,
-        createdAt: ri.createdAt.toISO(),
-      }
-    })
+        return {
+          ...(await ctx.serialize.withoutWrapping(RecurringInvoiceTransformer.transform(ri))),
+          total: Math.round(total * 100) / 100,
+        }
+      })
+    )
 
     return response.ok({ recurringInvoices: list })
   }

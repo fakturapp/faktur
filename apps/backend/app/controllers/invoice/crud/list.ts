@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import Invoice from '#models/invoice/invoice'
+import InvoiceTransformer from '#transformers/invoice_transformer'
 import {
   decryptModelFields,
   decryptModelFieldsArray,
@@ -58,24 +59,8 @@ export default class List {
       }
     }
 
-    const invoicesList = invoices.map((inv) => ({
-      id: inv.id,
-      invoiceNumber: inv.invoiceNumber,
-      status: inv.status,
-      subject: inv.subject,
-      issueDate: inv.issueDate,
-      dueDate: inv.dueDate,
-      subtotal: inv.subtotal,
-      taxAmount: inv.taxAmount,
-      total: inv.total,
-      clientName: inv.client?.displayName || null,
-      clientId: inv.clientId,
-      sourceQuoteId: inv.sourceQuoteId,
-      createdAt: inv.createdAt.toISO(),
-    }))
-
     return response.ok({
-      invoices: invoicesList,
+      invoices: await ctx.serialize.withoutWrapping(InvoiceTransformer.transform(invoices)),
       meta: {
         total: result.total,
         perPage: result.perPage,

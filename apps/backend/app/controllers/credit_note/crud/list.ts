@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import CreditNote from '#models/credit_note/credit_note'
+import CreditNoteTransformer from '#transformers/credit_note_transformer'
 import {
   decryptModelFields,
   decryptModelFieldsArray,
@@ -46,24 +47,10 @@ export default class List {
       }
     }
 
-    const creditNotesList = creditNotes.map((cn) => ({
-      id: cn.id,
-      creditNoteNumber: cn.creditNoteNumber,
-      status: cn.status,
-      subject: cn.subject,
-      reason: cn.reason,
-      issueDate: cn.issueDate,
-      subtotal: cn.subtotal,
-      taxAmount: cn.taxAmount,
-      total: cn.total,
-      clientName: cn.client?.displayName || null,
-      clientId: cn.clientId,
-      sourceInvoiceId: cn.sourceInvoiceId,
-      createdAt: cn.createdAt.toISO(),
-    }))
-
     return response.ok({
-      creditNotes: creditNotesList,
+      creditNotes: await ctx.serialize.withoutWrapping(
+        CreditNoteTransformer.transform(creditNotes)
+      ),
       meta: {
         total: result.total,
         perPage: result.perPage,

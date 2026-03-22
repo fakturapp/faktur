@@ -1,8 +1,10 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Team from '#models/team/team'
+import TeamTransformer from '#transformers/team_transformer'
 
 export default class Show {
-  async handle({ auth, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, response } = ctx
     const user = auth.user!
 
     if (!user.currentTeamId) {
@@ -18,34 +20,7 @@ export default class Show {
       .firstOrFail()
 
     return response.ok({
-      team: {
-        id: team.id,
-        name: team.name,
-        iconUrl: team.iconUrl,
-        ownerId: team.ownerId,
-        members: team.members.map((m) => {
-          const hasUser = !!m.userId
-
-          return {
-            id: m.id,
-            userId: m.userId,
-            role: m.role,
-            status: m.status,
-            invitedEmail: m.invitedEmail,
-            joinedAt: m.joinedAt,
-            invitedAt: m.invitedAt,
-            user: hasUser
-              ? {
-                  id: m.user?.id,
-                  fullName: m.user?.fullName,
-                  email: m.user?.email,
-                  avatarUrl: m.user?.avatarUrl,
-                }
-              : null,
-          }
-        }),
-        hasCompany: !!team.company,
-      },
+      team: await ctx.serialize.withoutWrapping(TeamTransformer.transform(team)),
     })
   }
 }

@@ -1,8 +1,10 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import AuthProvider from '#models/account/auth_provider'
+import AuthProviderTransformer from '#transformers/auth_provider_transformer'
 
 export default class ListProviders {
-  async handle({ auth, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, response } = ctx
     const user = auth.user!
 
     const providers = await AuthProvider.query()
@@ -10,14 +12,7 @@ export default class ListProviders {
       .orderBy('createdAt', 'asc')
 
     return response.ok({
-      providers: providers.map((p) => ({
-        id: p.id,
-        provider: p.provider,
-        email: p.email,
-        displayName: p.displayName,
-        avatarUrl: p.avatarUrl,
-        createdAt: p.createdAt,
-      })),
+      providers: await ctx.serialize.withoutWrapping(AuthProviderTransformer.transform(providers)),
     })
   }
 }

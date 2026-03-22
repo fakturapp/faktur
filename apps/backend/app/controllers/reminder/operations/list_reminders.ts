@@ -1,8 +1,10 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import PaymentReminder from '#models/reminder/payment_reminder'
+import PaymentReminderTransformer from '#transformers/payment_reminder_transformer'
 
 export default class ListReminders {
-  async handle({ auth, params, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, params, response } = ctx
     const user = auth.user!
     const teamId = user.currentTeamId
 
@@ -16,14 +18,9 @@ export default class ListReminders {
       .orderBy('sent_at', 'desc')
 
     return response.ok({
-      reminders: reminders.map((r) => ({
-        id: r.id,
-        type: r.type,
-        status: r.status,
-        toEmail: r.toEmail,
-        errorMessage: r.errorMessage,
-        sentAt: r.sentAt.toISO(),
-      })),
+      reminders: await ctx.serialize.withoutWrapping(
+        PaymentReminderTransformer.transform(reminders)
+      ),
     })
   }
 }

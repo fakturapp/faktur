@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import CreditNote from '#models/credit_note/credit_note'
 import Invoice from '#models/invoice/invoice'
+import CreditNoteTransformer from '#transformers/credit_note_transformer'
 import {
   decryptModelFields,
   decryptModelFieldsArray,
@@ -46,65 +47,8 @@ export default class Show {
 
     return response.ok({
       creditNote: {
-        id: creditNote.id,
-        creditNoteNumber: creditNote.creditNoteNumber,
-        status: creditNote.status,
-        reason: creditNote.reason,
-        subject: creditNote.subject,
-        issueDate: creditNote.issueDate,
-        billingType: creditNote.billingType,
-        accentColor: creditNote.accentColor,
-        logoUrl: creditNote.logoUrl,
-        language: creditNote.language,
-        notes: creditNote.notes,
-        acceptanceConditions: creditNote.acceptanceConditions,
-        signatureField: creditNote.signatureField,
-        documentTitle: creditNote.documentTitle,
-        freeField: creditNote.freeField,
-        globalDiscountType: creditNote.globalDiscountType,
-        globalDiscountValue: creditNote.globalDiscountValue,
-        deliveryAddress: creditNote.deliveryAddress,
-        clientSiren: creditNote.clientSiren,
-        clientVatNumber: creditNote.clientVatNumber,
-        subtotal: creditNote.subtotal,
-        taxAmount: creditNote.taxAmount,
-        total: creditNote.total,
-        sourceInvoiceId: creditNote.sourceInvoiceId,
+        ...(await ctx.serialize.withoutWrapping(CreditNoteTransformer.transform(creditNote))),
         sourceInvoice,
-        comment: creditNote.comment,
-        vatExemptReason: creditNote.vatExemptReason,
-        clientId: creditNote.clientId,
-        client: creditNote.client
-          ? {
-              id: creditNote.client.id,
-              type: creditNote.client.type,
-              displayName: creditNote.client.displayName,
-              companyName: creditNote.client.companyName,
-              firstName: creditNote.client.firstName,
-              lastName: creditNote.client.lastName,
-              email: creditNote.client.email,
-              phone: creditNote.client.phone,
-              address: creditNote.client.address,
-              addressComplement: creditNote.client.addressComplement,
-              postalCode: creditNote.client.postalCode,
-              city: creditNote.client.city,
-              country: creditNote.client.country,
-              siren: creditNote.client.siren,
-              vatNumber: creditNote.client.vatNumber,
-            }
-          : null,
-        lines: creditNote.lines.map((l) => ({
-          id: l.id,
-          position: l.position,
-          description: l.description,
-          saleType: l.saleType,
-          quantity: l.quantity,
-          unit: l.unit,
-          unitPrice: l.unitPrice,
-          vatRate: l.vatRate,
-          total: l.total,
-        })),
-        createdAt: creditNote.createdAt.toISO(),
       },
     })
   }

@@ -10,6 +10,7 @@ import GoogleAuthService from '#services/auth/google_auth_service'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import keyStore from '#services/crypto/key_store'
 import securityConfig from '#config/security'
+import UserTransformer from '#transformers/user_transformer'
 
 const googleRegisterValidator = vine.compile(
   vine.object({
@@ -21,7 +22,8 @@ const googleRegisterValidator = vine.compile(
 )
 
 export default class GoogleRegister {
-  async handle({ request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { request, response } = ctx
     const data = await request.validateUsing(googleRegisterValidator)
 
     let profile
@@ -109,17 +111,7 @@ export default class GoogleRegister {
 
     return response.created({
       message: 'Registration successful',
-      user: {
-        id: user.id,
-        fullName: user.fullName,
-        email: user.email,
-        avatarUrl: user.avatarUrl,
-        emailVerified: user.emailVerified,
-        twoFactorEnabled: user.twoFactorEnabled,
-        onboardingCompleted: user.onboardingCompleted,
-        currentTeamId: user.currentTeamId,
-        cryptoResetNeeded: user.cryptoResetNeeded || false,
-      },
+      user: await ctx.serialize.withoutWrapping(UserTransformer.transform(user)),
       token: token.value!.release(),
     })
   }

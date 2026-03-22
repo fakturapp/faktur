@@ -7,9 +7,11 @@ import UserRegistered from '#events/user_registered'
 import AuditLog from '#models/shared/audit_log'
 import TurnstileService from '#services/security/turnstile_service'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
+import UserTransformer from '#transformers/user_transformer'
 
 export default class Signup {
-  async handle({ request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { request, response } = ctx
     const data = await request.validateUsing(registerValidator)
 
     // Verify Turnstile captcha
@@ -55,12 +57,7 @@ export default class Signup {
 
     return response.created({
       message: 'Registration successful. Please check your email to verify your account.',
-      user: {
-        id: user.id,
-        fullName: user.fullName,
-        email: user.email,
-        emailVerified: user.emailVerified,
-      },
+      user: await ctx.serialize.withoutWrapping(UserTransformer.transform(user)),
     })
   }
 }

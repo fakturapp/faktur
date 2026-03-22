@@ -2,6 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import Client from '#models/client/client'
 import ClientContact from '#models/client/client_contact'
 import { decryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
+import ClientContactTransformer from '#transformers/client_contact_transformer'
 
 export default class Index {
   async handle(ctx: HttpContext) {
@@ -34,18 +35,7 @@ export default class Index {
     }
 
     return response.ok({
-      contacts: contacts.map((c) => ({
-        id: c.id,
-        firstName: c.firstName,
-        lastName: c.lastName,
-        email: c.email,
-        phone: c.phone,
-        role: c.role,
-        notes: c.notes,
-        isPrimary: c.isPrimary,
-        includeInEmails: c.includeInEmails,
-        createdAt: c.createdAt.toISO(),
-      })),
+      contacts: await ctx.serialize.withoutWrapping(ClientContactTransformer.transform(contacts)),
     })
   }
 }

@@ -1,8 +1,10 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import TeamMember from '#models/team/team_member'
+import TeamMemberTransformer from '#transformers/team_member_transformer'
 
 export default class Members {
-  async handle({ auth, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, response } = ctx
     const user = auth.user!
 
     if (!user.currentTeamId) {
@@ -12,23 +14,7 @@ export default class Members {
     const members = await TeamMember.query().where('teamId', user.currentTeamId).preload('user')
 
     return response.ok({
-      members: members.map((m) => ({
-        id: m.id,
-        userId: m.userId,
-        role: m.role,
-        status: m.status,
-        invitedEmail: m.invitedEmail,
-        joinedAt: m.joinedAt,
-        invitedAt: m.invitedAt,
-        user: m.userId
-          ? {
-              id: m.user?.id,
-              fullName: m.user?.fullName,
-              email: m.user?.email,
-              avatarUrl: m.user?.avatarUrl,
-            }
-          : null,
-      })),
+      members: await ctx.serialize.withoutWrapping(TeamMemberTransformer.transform(members)),
     })
   }
 }

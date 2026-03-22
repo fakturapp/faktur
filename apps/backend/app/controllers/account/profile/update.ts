@@ -1,8 +1,10 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { updateProfileValidator } from '#validators/account_validator'
+import UserTransformer from '#transformers/user_transformer'
 
 export default class Update {
-  async handle({ auth, request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, request, response } = ctx
     const user = auth.user!
     const payload = await request.validateUsing(updateProfileValidator)
 
@@ -13,12 +15,7 @@ export default class Update {
 
     return response.ok({
       message: 'Profile updated successfully',
-      user: {
-        id: user.id,
-        fullName: user.fullName,
-        email: user.email,
-        avatarUrl: user.avatarUrl,
-      },
+      user: await ctx.serialize.withoutWrapping(UserTransformer.transform(user)),
     })
   }
 }

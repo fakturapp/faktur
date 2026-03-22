@@ -5,9 +5,11 @@ import AuditLog from '#models/shared/audit_log'
 import LoginHistory from '#models/account/login_history'
 import TwoFactorService from '#services/auth/two_factor_service'
 import { twoFactorVerifyValidator } from '#validators/auth/auth_validators'
+import UserTransformer from '#transformers/user_transformer'
 
 export default class Verify {
-  async handle({ request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { request, response } = ctx
     const data = await request.validateUsing(twoFactorVerifyValidator)
 
     const user = await User.find(data.userId)
@@ -76,17 +78,7 @@ export default class Verify {
 
     return response.ok({
       message: 'Login successful',
-      user: {
-        id: user.id,
-        fullName: user.fullName,
-        email: user.email,
-        emailVerified: user.emailVerified,
-        twoFactorEnabled: user.twoFactorEnabled,
-        avatarUrl: user.avatarUrl,
-        onboardingCompleted: user.onboardingCompleted,
-        currentTeamId: user.currentTeamId,
-        cryptoResetNeeded: user.cryptoResetNeeded || false,
-      },
+      user: await ctx.serialize.withoutWrapping(UserTransformer.transform(user)),
       token: token.value!.release(),
     })
   }

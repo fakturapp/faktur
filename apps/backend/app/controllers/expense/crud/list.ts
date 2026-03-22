@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Expense from '#models/expense/expense'
+import ExpenseTransformer from '#transformers/expense_transformer'
 import { decryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 
 export default class List {
@@ -58,24 +59,7 @@ export default class List {
     const totalVat = items.reduce((sum, e) => sum + Number(e.vatAmount), 0)
 
     return response.ok({
-      expenses: items.map((e) => ({
-        id: e.id,
-        description: e.description,
-        amount: e.amount,
-        vatAmount: e.vatAmount,
-        vatRate: e.vatRate,
-        currency: e.currency,
-        expenseDate: e.expenseDate,
-        paymentMethod: e.paymentMethod,
-        supplier: e.supplier,
-        notes: e.notes,
-        receiptUrl: e.receiptUrl,
-        isDeductible: e.isDeductible,
-        categoryId: e.categoryId,
-        categoryName: e.category?.name || null,
-        categoryColor: e.category?.color || null,
-        createdAt: e.createdAt.toISO(),
-      })),
+      expenses: await ctx.serialize.withoutWrapping(ExpenseTransformer.transform(items)),
       meta: {
         total: expenses.total,
         perPage: expenses.perPage,

@@ -5,9 +5,11 @@ import TeamMember from '#models/team/team_member'
 import keyStore from '#services/crypto/key_store'
 import encryptionService from '#services/encryption/encryption_service'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
+import UserTransformer from '#transformers/user_transformer'
 
 export default class Me {
-  async handle({ auth, request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, request, response } = ctx
     const user = auth.user!
 
     const googleProvider = await AuthProvider.query()
@@ -38,17 +40,7 @@ export default class Me {
 
     return response.ok({
       user: {
-        id: user.id,
-        fullName: user.fullName,
-        email: user.email,
-        avatarUrl: user.avatarUrl,
-        emailVerified: user.emailVerified,
-        twoFactorEnabled: user.twoFactorEnabled,
-        onboardingCompleted: user.onboardingCompleted,
-        currentTeamId: user.currentTeamId,
-        lastLoginAt: user.lastLoginAt,
-        createdAt: user.createdAt,
-        cryptoResetNeeded: user.cryptoResetNeeded || false,
+        ...(await ctx.serialize.withoutWrapping(UserTransformer.transform(user))),
         hasGoogleProvider: !!googleProvider,
         vaultLocked,
       },

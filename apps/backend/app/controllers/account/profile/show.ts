@@ -1,22 +1,13 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import UserTransformer from '#transformers/user_transformer'
 
 export default class Show {
-  async handle({ auth, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, response } = ctx
     const user = auth.user!
 
     return response.ok({
-      user: {
-        id: user.id,
-        fullName: user.fullName,
-        email: user.email,
-        avatarUrl: user.avatarUrl,
-        emailVerified: user.emailVerified,
-        twoFactorEnabled: user.twoFactorEnabled,
-        onboardingCompleted: user.onboardingCompleted,
-        currentTeamId: user.currentTeamId,
-        lastLoginAt: user.lastLoginAt,
-        createdAt: user.createdAt,
-      },
+      user: await ctx.serialize.withoutWrapping(UserTransformer.transform(user)),
     })
   }
 }

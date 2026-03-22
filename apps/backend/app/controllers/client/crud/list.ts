@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Client from '#models/client/client'
 import { decryptModelFieldsArray, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
+import ClientTransformer from '#transformers/client_transformer'
 
 export default class List {
   async handle(ctx: HttpContext) {
@@ -19,27 +20,8 @@ export default class List {
 
     decryptModelFieldsArray(clients, [...ENCRYPTED_FIELDS.client], dek)
 
-    const clientsList = clients.map((c) => ({
-      id: c.id,
-      type: c.type,
-      displayName: c.displayName,
-      companyName: c.companyName,
-      firstName: c.firstName,
-      lastName: c.lastName,
-      email: c.email,
-      phone: c.phone,
-      address: c.address,
-      addressComplement: c.addressComplement,
-      postalCode: c.postalCode,
-      city: c.city,
-      country: c.country,
-      siren: c.siren,
-      vatNumber: c.vatNumber,
-      invoiceCount: 0,
-      totalRevenue: 0,
-      createdAt: c.createdAt.toISO(),
-    }))
-
-    return response.ok({ clients: clientsList })
+    return response.ok({
+      clients: await ctx.serialize.withoutWrapping(ClientTransformer.transform(clients)),
+    })
   }
 }
