@@ -34,8 +34,8 @@ const statusMap: Record<string, { label: string; variant: 'default' | 'success' 
   pending: { label: 'En attente', variant: 'warning' },
 }
 
-function formatCurrency(cents: number) {
-  return (cents / 100).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
+function formatCurrency(amount: number) {
+  return amount.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
 }
 
 export function RecentActivity({ items }: { items: RecentItem[] }) {

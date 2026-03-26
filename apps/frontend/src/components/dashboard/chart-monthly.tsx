@@ -15,7 +15,7 @@ interface ChartMonthlyProps {
 
 export function ChartMonthly({ title, description, data, dataKey, color, thresholds }: ChartMonthlyProps) {
   const formatCurrency = (value: number) => {
-    return (value / 100).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
+    return value.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
   }
 
   return (

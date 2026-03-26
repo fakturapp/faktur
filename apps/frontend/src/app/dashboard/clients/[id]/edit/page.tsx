@@ -232,8 +232,8 @@ export default function ClientEditPage() {
     )
   }
 
-  function formatCurrency(cents: number) {
-    return (cents / 100).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
+  function formatCurrency(amount: number) {
+    return amount.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
   }
 
   return (

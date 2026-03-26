@@ -242,7 +242,7 @@ export function ClientEditPanel({ open, clientId, onClose, onUpdated, onDeleted 
                 </div>
                 <div className="flex items-center gap-2 px-4 py-3">
                   <span className="text-xs font-medium text-foreground">
-                    {(client.totalRevenue / 100).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
+                    {client.totalRevenue.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
                   </span>
                 </div>
               </div>

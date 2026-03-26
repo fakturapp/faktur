@@ -33,7 +33,7 @@ export function ChartRevenue({ data }: ChartRevenueProps) {
   }, [data, timeRange])
 
   const formatCurrency = (value: number) => {
-    return (value / 100).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
+    return value.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
   }
 
   return (

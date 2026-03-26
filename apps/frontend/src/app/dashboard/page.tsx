@@ -52,8 +52,8 @@ interface MicroDataPoint {
   thresholdGoods: number
 }
 
-function formatCurrency(cents: number) {
-  return (cents / 100).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
+function formatCurrency(amount: number) {
+  return amount.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
 }
 
 const STORAGE_KEY = 'zenvoice_active_charts'
@@ -310,8 +310,8 @@ export default function DashboardPage() {
                   dataKey="cumulative"
                   color="var(--color-chart-5)"
                   thresholds={[
-                    { value: 7770000, label: 'Seuil services', color: '#f59e0b' },
-                    { value: 18870000, label: 'Seuil marchandises', color: '#ef4444' },
+                    { value: 77700, label: 'Seuil services', color: '#f59e0b' },
+                    { value: 188700, label: 'Seuil marchandises', color: '#ef4444' },
                   ]}
                 />
               )}

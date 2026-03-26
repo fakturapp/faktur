@@ -227,24 +227,24 @@ export interface Registry {
     methods: ["PUT"]
     pattern: '/api/v1/account/profile'
     types: {
-      body: {}
+      body: ExtractBody<InferInput<(typeof import('#validators/account_validator').updateProfileValidator)>>
       paramsTuple: []
       params: {}
-      query: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/account_validator').updateProfileValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/account/profile/update').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/profile/update').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/profile/update').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'password_change': {
     methods: ["PUT"]
     pattern: '/api/v1/account/password'
     types: {
-      body: {}
+      body: ExtractBody<InferInput<(typeof import('#validators/account_validator').changePasswordValidator)>>
       paramsTuple: []
       params: {}
-      query: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/account_validator').changePasswordValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/account/security/password').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/security/password').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/security/password').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'upload_avatar': {
@@ -287,12 +287,12 @@ export interface Registry {
     methods: ["DELETE"]
     pattern: '/api/v1/account'
     types: {
-      body: {}
+      body: ExtractBody<InferInput<(typeof import('#validators/account_validator').deleteAccountValidator)>>
       paramsTuple: []
       params: {}
-      query: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/account_validator').deleteAccountValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/account/profile/delete').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/profile/delete').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/profile/delete').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'two_factor_setup': {
@@ -347,24 +347,24 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/api/v1/account/security/verify'
     types: {
-      body: {}
+      body: ExtractBody<InferInput<(typeof import('#validators/account_validator').securityVerifyValidator)>>
       paramsTuple: []
       params: {}
-      query: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/account_validator').securityVerifyValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/account/security/security_verify').default['verify']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/security/security_verify').default['verify']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/security/security_verify').default['verify']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'email_request_change': {
     methods: ["POST"]
     pattern: '/api/v1/account/email/request-change'
     types: {
-      body: {}
+      body: ExtractBody<InferInput<(typeof import('#validators/account_validator').emailChangeValidator)>>
       paramsTuple: []
       params: {}
-      query: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/account_validator').emailChangeValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/account/email/email_request_change').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/email/email_request_change').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/email/email_request_change').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'email_confirm_change': {
@@ -707,12 +707,12 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/api/v1/team/invite'
     types: {
-      body: {}
+      body: ExtractBody<InferInput<(typeof import('#validators/team_validator').inviteValidator)>>
       paramsTuple: []
       params: {}
-      query: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/team_validator').inviteValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/team/invitations/invite').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/team/invitations/invite').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/team/invitations/invite').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'accept_invite': {
@@ -1523,48 +1523,48 @@ export interface Registry {
     methods: ["POST"]
     pattern: '/api/v1/email/resend/configure'
     types: {
-      body: {}
+      body: ExtractBody<InferInput<(typeof import('#validators/email_validator').configureResendValidator)>>
       paramsTuple: []
       params: {}
-      query: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/email_validator').configureResendValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/email/resend/configure').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/email/resend/configure').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/email/resend/configure').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'configure_smtp': {
     methods: ["POST"]
     pattern: '/api/v1/email/smtp/configure'
     types: {
-      body: {}
+      body: ExtractBody<InferInput<(typeof import('#validators/email_validator').configureSmtpValidator)>>
       paramsTuple: []
       params: {}
-      query: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/email_validator').configureSmtpValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/email/smtp/configure').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/email/smtp/configure').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/email/smtp/configure').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'send_email': {
     methods: ["POST"]
     pattern: '/api/v1/email/send'
     types: {
-      body: {}
+      body: ExtractBody<InferInput<(typeof import('#validators/email_validator').sendEmailValidator)>>
       paramsTuple: []
       params: {}
-      query: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/email_validator').sendEmailValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/email/send/send_email').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/email/send/send_email').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/email/send/send_email').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'send_test_email': {
     methods: ["POST"]
     pattern: '/api/v1/email/test'
     types: {
-      body: {}
+      body: ExtractBody<InferInput<(typeof import('#validators/email_validator').testEmailValidator)>>
       paramsTuple: []
       params: {}
-      query: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/email_validator').testEmailValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/email/send/send_test_email').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/email/send/send_test_email').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/email/send/send_test_email').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'email_template_list': {
@@ -1583,12 +1583,12 @@ export interface Registry {
     methods: ["PUT"]
     pattern: '/api/v1/email/templates'
     types: {
-      body: {}
+      body: ExtractBody<InferInput<(typeof import('#validators/email_validator').updateTemplateValidator)>>
       paramsTuple: []
       params: {}
-      query: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/email_validator').updateTemplateValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/email/templates/update').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/email/templates/update').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/email/templates/update').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'list_email_logs': {

@@ -262,7 +262,7 @@ export default function ClientsPage() {
               <div className="text-right shrink-0">
                 {client.totalRevenue > 0 && (
                   <p className="text-sm font-medium text-foreground">
-                    {(client.totalRevenue / 100).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
+                    {client.totalRevenue.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
                   </p>
                 )}
                 <p className="text-xs text-muted-foreground">
