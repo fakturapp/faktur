@@ -52,9 +52,9 @@ export default class ConfigureResend {
     }
 
     // Check if any email account exists for this team (to set default)
-    const existingCount = await EmailAccount.query().where('team_id', teamId).count('* as total')
+    const existingCount = await EmailAccount.query().where('team_id', teamId).count('* as cnt')
 
-    const isFirst = Number(existingCount[0].$extras.total) === 0
+    const isFirst = Number(existingCount[0].$extras.cnt) === 0
 
     const account = await EmailAccount.create({
       teamId,

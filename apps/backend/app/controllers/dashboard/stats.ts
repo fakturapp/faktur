@@ -47,8 +47,8 @@ export default class Stats {
         .where('team_id', teamId)
         .whereNotIn('status', ['draft', 'cancelled'])
         .where('issue_date', '>=', startOfMonth)
-        .sum('total as total')
-        .then((r) => Number(r[0].$extras.total) || 0),
+        .sum('total as totalSum')
+        .then((r) => Number(r[0].$extras.totalSum) || 0),
 
       // Total invoiced previous month
       Invoice.query()
@@ -56,15 +56,15 @@ export default class Stats {
         .whereNotIn('status', ['draft', 'cancelled'])
         .where('issue_date', '>=', startOfPrevMonth)
         .where('issue_date', '<=', endOfPrevMonth)
-        .sum('total as total')
-        .then((r) => Number(r[0].$extras.total) || 0),
+        .sum('total as totalSum')
+        .then((r) => Number(r[0].$extras.totalSum) || 0),
 
       // Outstanding (sent + overdue)
       Invoice.query()
         .where('team_id', teamId)
         .whereIn('status', ['sent', 'overdue'])
-        .sum('total as total')
-        .then((r) => Number(r[0].$extras.total) || 0),
+        .sum('total as totalSum')
+        .then((r) => Number(r[0].$extras.totalSum) || 0),
 
       // Total collected this month
       Invoice.query()
@@ -77,8 +77,8 @@ export default class Stats {
             sub.whereNull('paid_date').where('issue_date', '>=', startOfMonth)
           })
         })
-        .sum('total as total')
-        .then((r) => Number(r[0].$extras.total) || 0),
+        .sum('total as totalSum')
+        .then((r) => Number(r[0].$extras.totalSum) || 0),
 
       // Total collected previous month
       Invoice.query()
@@ -97,16 +97,16 @@ export default class Stats {
               .where('issue_date', '<=', endOfPrevMonth)
           })
         })
-        .sum('total as total')
-        .then((r) => Number(r[0].$extras.total) || 0),
+        .sum('total as totalSum')
+        .then((r) => Number(r[0].$extras.totalSum) || 0),
 
       // Total quoted this month (non-draft)
       Quote.query()
         .where('team_id', teamId)
         .whereNot('status', 'draft')
         .where('issue_date', '>=', startOfMonth)
-        .sum('total as total')
-        .then((r) => Number(r[0].$extras.total) || 0),
+        .sum('total as totalSum')
+        .then((r) => Number(r[0].$extras.totalSum) || 0),
 
       // Total quoted previous month
       Quote.query()
@@ -114,16 +114,16 @@ export default class Stats {
         .whereNot('status', 'draft')
         .where('issue_date', '>=', startOfPrevMonth)
         .where('issue_date', '<=', endOfPrevMonth)
-        .sum('total as total')
-        .then((r) => Number(r[0].$extras.total) || 0),
+        .sum('total as totalSum')
+        .then((r) => Number(r[0].$extras.totalSum) || 0),
 
       // Total accepted this month
       Quote.query()
         .where('team_id', teamId)
         .where('status', 'accepted')
         .where('issue_date', '>=', startOfMonth)
-        .sum('total as total')
-        .then((r) => Number(r[0].$extras.total) || 0),
+        .sum('total as totalSum')
+        .then((r) => Number(r[0].$extras.totalSum) || 0),
     ])
 
     function calcTrend(current: number, previous: number) {

@@ -38,45 +38,45 @@ export default class DashboardSummary {
         .where('team_id', teamId)
         .whereNotIn('status', ['draft', 'cancelled'])
         .where('issue_date', '>=', startOfMonth)
-        .sum('total as total')
-        .then((r) => Number(r[0].$extras.total) || 0),
+        .sum('total as totalSum')
+        .then((r) => Number(r[0].$extras.totalSum) || 0),
       Invoice.query()
         .where('team_id', teamId)
         .whereNotIn('status', ['draft', 'cancelled'])
         .where('issue_date', '>=', startOfPrevMonth)
         .where('issue_date', '<=', endOfPrevMonth)
-        .sum('total as total')
-        .then((r) => Number(r[0].$extras.total) || 0),
+        .sum('total as totalSum')
+        .then((r) => Number(r[0].$extras.totalSum) || 0),
       Invoice.query()
         .where('team_id', teamId)
         .where('status', 'paid')
         .whereNotNull('paid_date')
         .where('paid_date', '>=', startOfMonth)
-        .sum('total as total')
-        .then((r) => Number(r[0].$extras.total) || 0),
+        .sum('total as totalSum')
+        .then((r) => Number(r[0].$extras.totalSum) || 0),
       Invoice.query()
         .where('team_id', teamId)
         .where('status', 'paid')
         .whereNotNull('paid_date')
         .where('paid_date', '>=', startOfPrevMonth)
         .where('paid_date', '<=', endOfPrevMonth)
-        .sum('total as total')
-        .then((r) => Number(r[0].$extras.total) || 0),
+        .sum('total as totalSum')
+        .then((r) => Number(r[0].$extras.totalSum) || 0),
       Invoice.query()
         .where('team_id', teamId)
         .whereIn('status', ['overdue'])
-        .count('* as count')
-        .then((r) => Number(r[0].$extras.count) || 0),
+        .count('* as cnt')
+        .then((r) => Number(r[0].$extras.cnt) || 0),
       Invoice.query()
         .where('team_id', teamId)
         .whereIn('status', ['overdue'])
-        .sum('total as total')
-        .then((r) => Number(r[0].$extras.total) || 0),
+        .sum('total as totalSum')
+        .then((r) => Number(r[0].$extras.totalSum) || 0),
       Expense.query()
         .where('team_id', teamId)
         .where('expense_date', '>=', startOfMonth)
-        .sum('amount as total')
-        .then((r) => Number(r[0].$extras.total) || 0),
+        .sum('amount as amountSum')
+        .then((r) => Number(r[0].$extras.amountSum) || 0),
     ])
 
     const systemPrompt = `Tu es un assistant financier pour un logiciel de facturation français. On te donne les métriques du mois en cours. Génère un résumé en 2-3 phrases naturelles, concises et utiles. Utilise le tutoiement. Formate les montants en euros (ex: 1 250 €). Si des factures sont en retard, mentionne-le. Compare avec le mois précédent si pertinent. Réponds UNIQUEMENT avec le résumé, sans guillemets.`

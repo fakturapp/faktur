@@ -47,8 +47,8 @@ export default class GmailCallback {
         // Check if this is the first email account (make it default)
         const accountCount = await EmailAccount.query()
           .where('team_id', state.teamId)
-          .count('* as total')
-        const isFirst = Number(accountCount[0].$extras.total) === 0
+          .count('* as cnt')
+        const isFirst = Number(accountCount[0].$extras.cnt) === 0
 
         await EmailAccount.create({
           teamId: state.teamId,

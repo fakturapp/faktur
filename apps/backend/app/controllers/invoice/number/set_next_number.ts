@@ -12,9 +12,9 @@ export default class SetNextNumber {
     }
 
     // Only allow setting next number if no invoices exist yet
-    const result = await Invoice.query().where('team_id', teamId).count('* as total').first()
+    const result = await Invoice.query().where('team_id', teamId).count('* as cnt').first()
 
-    const count = Number(result?.$extras.total ?? 0)
+    const count = Number(result?.$extras.cnt ?? 0)
     if (count > 0) {
       return response.badRequest({ message: 'Cannot set starting number after documents exist' })
     }

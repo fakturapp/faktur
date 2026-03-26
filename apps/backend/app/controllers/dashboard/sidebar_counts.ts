@@ -14,17 +14,17 @@ export default class SidebarCounts {
       Quote.query()
         .where('teamId', user.currentTeamId)
         .where('status', 'draft')
-        .count('* as total')
+        .count('* as cnt')
         .first(),
       Invoice.query()
         .where('teamId', user.currentTeamId)
         .where('status', 'draft')
-        .count('* as total')
+        .count('* as cnt')
         .first(),
     ])
 
-    const quoteDrafts = Number(quoteResult?.$extras.total ?? 0)
-    const invoiceDrafts = Number(invoiceResult?.$extras.total ?? 0)
+    const quoteDrafts = Number(quoteResult?.$extras.cnt ?? 0)
+    const invoiceDrafts = Number(invoiceResult?.$extras.cnt ?? 0)
 
     return response.ok({ quoteDrafts, invoiceDrafts })
   }

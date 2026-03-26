@@ -243,9 +243,9 @@ export default class BankAccounts {
     // Block deletion if referenced by invoices
     const referencedCount = await Invoice.query()
       .where('bank_account_id', account.id)
-      .count('* as total')
+      .count('* as cnt')
 
-    const count = Number(referencedCount[0].$extras.total)
+    const count = Number(referencedCount[0].$extras.cnt)
     if (count > 0) {
       return response.conflict({
         message: `Ce compte bancaire est utilisé par ${count} facture(s) et ne peut pas être supprimé.`,
