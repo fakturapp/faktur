@@ -101,16 +101,54 @@ function esc(str: string | null | undefined): string {
 /** Escape HTML then convert markdown formatting → HTML tags + newlines → <br> */
 function formatText(str: string | null | undefined): string {
   if (!str) return ''
-  let html = esc(str)
-  // Bold: **text**
-  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-  // Underline: __text__ (before italic)
-  html = html.replace(/__(.+?)__/g, '<u>$1</u>')
-  // Italic: *text*
-  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>')
-  // Newlines
-  html = html.replace(/\n/g, '<br>')
-  return html
+
+  const lines = esc(str).split('\n')
+  const parts: string[] = []
+  let inList = false
+
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i]
+    // Inline formatting
+    line = line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    line = line.replace(/__(.+?)__/g, '<u>$1</u>')
+    line = line.replace(/\*(.+?)\*/g, '<em>$1</em>')
+    line = line.replace(/~~(.+?)~~/g, '<s>$1</s>')
+    line = line.replace(/\{color:([^}]+)\}(.+?)\{\/color\}/g, '<span style="color:$1">$2</span>')
+    line = line.replace(
+      /\{bg:([^}]+)\}(.+?)\{\/bg\}/g,
+      '<span style="background-color:$1;border-radius:2px;padding:0 2px">$2</span>'
+    )
+    line = line.replace(/\{size:sm\}(.+?)\{\/size\}/g, '<span style="font-size:0.85em">$1</span>')
+    line = line.replace(/\{size:lg\}(.+?)\{\/size\}/g, '<span style="font-size:1.3em">$1</span>')
+    line = line.replace(/\{font:([^}]+)\}(.+?)\{\/font\}/g, '<span style="font-family:$1">$2</span>')
+    line = line.replace(
+      /\[([^\]]+)\]\(([^)]+)\)/g,
+      '<a href="$2" style="color:inherit;text-decoration:underline">$1</a>'
+    )
+
+    // Heading
+    if (line.startsWith('## ')) {
+      if (inList) { parts.push('</ul>'); inList = false }
+      parts.push(`<strong style="font-size:1.3em">${line.slice(3)}</strong>`)
+      if (i < lines.length - 1) parts.push('<br>')
+      continue
+    }
+
+    // List item
+    if (line.startsWith('- ')) {
+      if (!inList) { parts.push('<ul style="margin:0;padding-left:1.2em">'); inList = true }
+      parts.push(`<li>${line.slice(2)}</li>`)
+      continue
+    }
+
+    // Normal
+    if (inList) { parts.push('</ul>'); inList = false }
+    parts.push(line)
+    if (i < lines.length - 1) parts.push('<br>')
+  }
+
+  if (inList) parts.push('</ul>')
+  return parts.join('')
 }
 
 function formatIban(iban: string): string {

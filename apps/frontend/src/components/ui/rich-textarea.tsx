@@ -3,8 +3,50 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Bold, Italic, Underline } from 'lucide-react'
+import {
+  Bold, Italic, Underline, Strikethrough,
+  Palette, Highlighter, ALargeSmall, Type,
+  Link, List, Heading2, X,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
+
+/* ═══════════════════════════════════════════════════════════
+   Color helpers
+   ═══════════════════════════════════════════════════════════ */
+
+function rgbToHex(rgb: string): string {
+  const m = rgb.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/)
+  if (!m) return rgb
+  return '#' + [m[1], m[2], m[3]].map(n => parseInt(n).toString(16).padStart(2, '0')).join('')
+}
+
+function normalizeColor(c: string): string {
+  c = c.trim()
+  if (c.startsWith('rgb')) return rgbToHex(c)
+  return c
+}
+
+const TEXT_COLORS = [
+  '#000000', '#374151', '#6b7280', '#ef4444', '#f97316',
+  '#eab308', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899',
+]
+
+const HIGHLIGHT_COLORS = [
+  '#fef08a', '#bbf7d0', '#bfdbfe', '#fbcfe8', '#e9d5ff', '#fed7aa', '#fecaca',
+]
+
+const FONTS = [
+  { label: 'Default', value: 'inherit' },
+  { label: 'Serif', value: 'Georgia' },
+  { label: 'Sans', value: 'Arial' },
+  { label: 'Mono', value: 'Courier New' },
+]
+
+const SIZES = [
+  { label: 'Petit', value: '2' },
+  { label: 'Normal', value: '3' },
+  { label: 'Grand', value: '5' },
+]
 
 /* ═══════════════════════════════════════════════════════════
    Markdown ↔ HTML conversion
@@ -18,51 +60,179 @@ function escHtml(str: string): string {
     .replace(/"/g, '&quot;')
 }
 
+/** Apply inline markdown formatting to an already-escaped HTML string */
+function applyInlineFormat(h: string): string {
+  // Bold: **text**
+  h = h.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+  // Underline: __text__ (before italic)
+  h = h.replace(/__(.+?)__/g, '<u>$1</u>')
+  // Italic: *text*
+  h = h.replace(/\*(.+?)\*/g, '<em>$1</em>')
+  // Strikethrough: ~~text~~
+  h = h.replace(/~~(.+?)~~/g, '<s>$1</s>')
+  // Color: {color:#hex}text{/color}
+  h = h.replace(/\{color:([^}]+)\}(.+?)\{\/color\}/g, '<span style="color:$1">$2</span>')
+  // Highlight: {bg:#hex}text{/bg}
+  h = h.replace(/\{bg:([^}]+)\}(.+?)\{\/bg\}/g, '<span style="background-color:$1;border-radius:2px;padding:0 1px">$2</span>')
+  // Size small: {size:sm}text{/size}
+  h = h.replace(/\{size:sm\}(.+?)\{\/size\}/g, '<span style="font-size:0.85em">$1</span>')
+  // Size large: {size:lg}text{/size}
+  h = h.replace(/\{size:lg\}(.+?)\{\/size\}/g, '<span style="font-size:1.3em">$1</span>')
+  // Font: {font:name}text{/font}
+  h = h.replace(/\{font:([^}]+)\}(.+?)\{\/font\}/g, '<span style="font-family:$1">$2</span>')
+  // Link: [text](url)
+  h = h.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" style="color:inherit;text-decoration:underline">$1</a>')
+  return h
+}
+
 /** Convert markdown string → HTML for contentEditable display */
 export function mdToHtml(md: string): string {
   if (!md) return ''
-  let html = escHtml(md)
-  // Bold: **text**
-  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-  // Underline: __text__  (must come before italic single _ check)
-  html = html.replace(/__(.+?)__/g, '<u>$1</u>')
-  // Italic: *text*
-  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>')
-  // Newlines
-  html = html.replace(/\n/g, '<br>')
-  return html
+
+  const lines = md.split('\n')
+  const parts: string[] = []
+  let inList = false
+
+  for (let i = 0; i < lines.length; i++) {
+    let line = escHtml(lines[i])
+    line = applyInlineFormat(line)
+
+    // Heading
+    if (line.startsWith('## ')) {
+      if (inList) { parts.push('</ul>'); inList = false }
+      parts.push(`<h2 style="font-size:1.3em;font-weight:700;margin:2px 0">${line.slice(3)}</h2>`)
+      continue
+    }
+
+    // List item
+    if (line.startsWith('- ')) {
+      if (!inList) { parts.push('<ul style="margin:0;padding-left:1.2em">'); inList = true }
+      parts.push(`<li>${line.slice(2)}</li>`)
+      continue
+    }
+
+    // Normal line
+    if (inList) { parts.push('</ul>'); inList = false }
+    parts.push(line)
+    if (i < lines.length - 1) parts.push('<br>')
+  }
+
+  if (inList) parts.push('</ul>')
+  return parts.join('')
 }
 
 /** Convert HTML from contentEditable → markdown string */
 export function htmlToMd(html: string): string {
   if (!html) return ''
   let md = html
-  // Handle Chrome's div-wrapped lines (Enter key creates <div> blocks)
+
+  // ── Block elements ──
+
+  // Lists: <ul><li>...</li></ul> → "- ...\n"
+  md = md.replace(/<ul[^>]*>([\s\S]*?)<\/ul>/gi, (_, content) => {
+    return content.replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, '- $1\n').trimEnd()
+  })
+
+  // Headings: <h1-6>...</h1-6> → "## ..."
+  md = md.replace(/<h[1-6][^>]*>([\s\S]*?)<\/h[1-6]>/gi, '## $1')
+
+  // Links: <a href="url">text</a> → [text](url)
+  md = md.replace(/<a\s[^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi, '[$2]($1)')
+
+  // Chrome div-wrapped lines
   md = md.replace(/<\/div>\s*<div>/gi, '\n')
   md = md.replace(/<div>/gi, '\n')
   md = md.replace(/<\/div>/gi, '')
-  // Handle <p> wrappers
+  // Paragraph wrappers
   md = md.replace(/<\/p>\s*<p>/gi, '\n')
   md = md.replace(/<p>/gi, '')
   md = md.replace(/<\/p>/gi, '')
-  // Normalize self-closing br
+  // Line breaks
   md = md.replace(/<br\s*\/?>/gi, '\n')
-  // Convert formatting tags to markdown
+
+  // ── Inline formatting ──
+
   md = md.replace(/<strong>([\s\S]*?)<\/strong>/gi, '**$1**')
   md = md.replace(/<b>([\s\S]*?)<\/b>/gi, '**$1**')
   md = md.replace(/<u>([\s\S]*?)<\/u>/gi, '__$1__')
   md = md.replace(/<em>([\s\S]*?)<\/em>/gi, '*$1*')
   md = md.replace(/<i>([\s\S]*?)<\/i>/gi, '*$1*')
-  // Strip any remaining HTML tags (spans, etc.)
+  md = md.replace(/<s>([\s\S]*?)<\/s>/gi, '~~$1~~')
+  md = md.replace(/<del>([\s\S]*?)<\/del>/gi, '~~$1~~')
+  md = md.replace(/<strike>([\s\S]*?)<\/strike>/gi, '~~$1~~')
+
+  // ── Styled elements (iterative: innermost first) ──
+  let prev = ''
+  while (prev !== md) {
+    prev = md
+
+    // <font> tags (color, size, face)
+    md = md.replace(/<font\s+([^>]*)>((?:(?!<font)[\s\S])*?)<\/font>/gi, (_, attrs, content) => {
+      let r = content
+      const cm = attrs.match(/color="([^"]*)"/)
+      const sm = attrs.match(/size="([^"]*)"/)
+      const fm = attrs.match(/face="([^"]*)"/)
+      if (cm) {
+        const c = normalizeColor(cm[1])
+        if (c && c !== '#000000') r = `{color:${c}}${r}{/color}`
+      }
+      if (sm) {
+        const s = parseInt(sm[1])
+        if (s <= 2) r = `{size:sm}${r}{/size}`
+        else if (s >= 4) r = `{size:lg}${r}{/size}`
+      }
+      if (fm) {
+        const f = fm[1].trim()
+        if (f && f !== 'inherit' && f !== '') r = `{font:${f}}${r}{/font}`
+      }
+      return r
+    })
+
+    // <span style="..."> tags
+    md = md.replace(/<span\s+style="([^"]*)">((?:(?!<span)[\s\S])*?)<\/span>/gi, (_, style, content) => {
+      let r = content
+      const cm = style.match(/(?:^|;\s*)color:\s*([^;]+)/)
+      const bm = style.match(/background-color:\s*([^;]+)/)
+      const szm = style.match(/font-size:\s*([^;]+)/)
+      const fm = style.match(/font-family:\s*([^;]+)/)
+      if (cm) {
+        const c = normalizeColor(cm[1].trim())
+        if (c) r = `{color:${c}}${r}{/color}`
+      }
+      if (bm) {
+        const b = normalizeColor(bm[1].trim())
+        if (b && b !== 'transparent') r = `{bg:${b}}${r}{/bg}`
+      }
+      if (szm) {
+        const raw = szm[1].trim()
+        const px = parseFloat(raw)
+        if (raw.includes('0.85') || raw.includes('small') || (raw.endsWith('px') && px < 12)) {
+          r = `{size:sm}${r}{/size}`
+        } else if (raw.includes('1.3') || raw.includes('large') || (raw.endsWith('px') && px > 14)) {
+          r = `{size:lg}${r}{/size}`
+        }
+      }
+      if (fm) {
+        const f = fm[1].trim().replace(/['"]/g, '').split(',')[0].trim()
+        if (f && f !== 'inherit') r = `{font:${f}}${r}{/font}`
+      }
+      return r
+    })
+  }
+
+  // ── Cleanup ──
+
+  // Strip remaining tags
   md = md.replace(/<[^>]+>/g, '')
-  // Decode HTML entities
+  // Decode entities
   md = md.replace(/&amp;/g, '&')
   md = md.replace(/&lt;/g, '<')
   md = md.replace(/&gt;/g, '>')
   md = md.replace(/&quot;/g, '"')
   md = md.replace(/&nbsp;/g, ' ')
-  // Clean up leading newline that Chrome sometimes adds
+  // Trim leading newline Chrome sometimes adds
   if (md.startsWith('\n')) md = md.slice(1)
+
   return md
 }
 
@@ -77,20 +247,59 @@ interface ToolbarState {
   bold: boolean
   italic: boolean
   underline: boolean
+  strikethrough: boolean
+  color: string
+  bgColor: string
+  inList: boolean
+  inHeading: boolean
 }
+
+type Panel = 'color' | 'highlight' | 'size' | 'font' | null
 
 function FloatingToolbar({
   state,
+  singleLine,
   onFormat,
+  onColor,
+  onHighlight,
+  onSize,
+  onFont,
+  onLink,
+  onList,
+  onHeading,
 }: {
   state: ToolbarState
-  onFormat: (cmd: 'bold' | 'italic' | 'underline') => void
+  singleLine: boolean
+  onFormat: (cmd: 'bold' | 'italic' | 'underline' | 'strikeThrough') => void
+  onColor: (color: string) => void
+  onHighlight: (color: string) => void
+  onSize: (size: string) => void
+  onFont: (font: string) => void
+  onLink: () => void
+  onList: () => void
+  onHeading: () => void
 }) {
-  const buttons: { cmd: 'bold' | 'italic' | 'underline'; Icon: typeof Bold; active: boolean }[] = [
-    { cmd: 'bold', Icon: Bold, active: state.bold },
-    { cmd: 'italic', Icon: Italic, active: state.italic },
-    { cmd: 'underline', Icon: Underline, active: state.underline },
-  ]
+  const [panel, setPanel] = useState<Panel>(null)
+
+  // Close panel when toolbar hides
+  useEffect(() => {
+    if (!state.visible) setPanel(null)
+  }, [state.visible])
+
+  const Btn = ({ active, onClick, children, title }: { active?: boolean; onClick: () => void; children: React.ReactNode; title?: string }) => (
+    <button
+      title={title}
+      onMouseDown={(e) => { e.preventDefault(); onClick() }}
+      className={cn(
+        'flex items-center justify-center h-7 w-7 rounded-md transition-colors',
+        active ? 'bg-indigo-500/20 text-indigo-400' : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+      )}
+    >
+      {children}
+    </button>
+  )
+
+  const Sep = () => <div className="w-px h-4 bg-border/60 mx-0.5" />
 
   return createPortal(
     <AnimatePresence>
@@ -100,27 +309,157 @@ function FloatingToolbar({
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 4, scale: 0.96 }}
           transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
-          className="fixed z-[9999] flex items-center gap-0.5 rounded-lg border border-border/80 bg-card p-1 shadow-xl shadow-black/10 backdrop-blur-xl"
+          className="fixed z-[9999] flex flex-col rounded-lg border border-border/80 bg-card shadow-xl shadow-black/10 backdrop-blur-xl"
           style={{ top: state.y, left: state.x }}
           onMouseDown={(e) => e.preventDefault()}
         >
-          {buttons.map(({ cmd, Icon, active }) => (
-            <button
-              key={cmd}
-              onMouseDown={(e) => {
-                e.preventDefault()
-                onFormat(cmd)
-              }}
-              className={cn(
-                'flex items-center justify-center h-7 w-7 rounded-md transition-colors',
-                active
-                  ? 'bg-indigo-500/20 text-indigo-400'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-              )}
-            >
-              <Icon className="h-3.5 w-3.5" />
-            </button>
-          ))}
+          {/* ── Main buttons row ── */}
+          <div className="flex items-center gap-0.5 p-1">
+            {/* Text style */}
+            <Btn active={state.bold} onClick={() => onFormat('bold')} title="Gras"><Bold className="h-3.5 w-3.5" /></Btn>
+            <Btn active={state.italic} onClick={() => onFormat('italic')} title="Italique"><Italic className="h-3.5 w-3.5" /></Btn>
+            <Btn active={state.underline} onClick={() => onFormat('underline')} title="Souligne"><Underline className="h-3.5 w-3.5" /></Btn>
+            <Btn active={state.strikethrough} onClick={() => onFormat('strikeThrough')} title="Barre"><Strikethrough className="h-3.5 w-3.5" /></Btn>
+
+            <Sep />
+
+            {/* Color */}
+            <Btn active={panel === 'color'} onClick={() => setPanel(panel === 'color' ? null : 'color')} title="Couleur du texte">
+              <div className="flex flex-col items-center gap-0.5">
+                <Palette className="h-3 w-3" />
+                <div className="w-3 h-0.5 rounded-full" style={{ backgroundColor: state.color || '#000' }} />
+              </div>
+            </Btn>
+            <Btn active={panel === 'highlight'} onClick={() => setPanel(panel === 'highlight' ? null : 'highlight')} title="Surlignage">
+              <Highlighter className="h-3.5 w-3.5" />
+            </Btn>
+
+            <Sep />
+
+            {/* Typography */}
+            <Btn active={panel === 'size'} onClick={() => setPanel(panel === 'size' ? null : 'size')} title="Taille">
+              <ALargeSmall className="h-3.5 w-3.5" />
+            </Btn>
+            <Btn active={panel === 'font'} onClick={() => setPanel(panel === 'font' ? null : 'font')} title="Police">
+              <Type className="h-3.5 w-3.5" />
+            </Btn>
+
+            <Sep />
+
+            {/* Structure */}
+            <Btn onClick={onLink} title="Lien"><Link className="h-3.5 w-3.5" /></Btn>
+            {!singleLine && (
+              <>
+                <Btn active={state.inList} onClick={onList} title="Liste"><List className="h-3.5 w-3.5" /></Btn>
+                <Btn active={state.inHeading} onClick={onHeading} title="Titre"><Heading2 className="h-3.5 w-3.5" /></Btn>
+              </>
+            )}
+          </div>
+
+          {/* ── Sub-panels ── */}
+          <AnimatePresence>
+            {panel === 'color' && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.12 }}
+                className="overflow-hidden border-t border-border/60"
+              >
+                <div className="flex items-center gap-1 p-1.5">
+                  {/* Reset */}
+                  <button
+                    onMouseDown={(e) => { e.preventDefault(); onColor(''); setPanel(null) }}
+                    className="h-5 w-5 rounded border border-border/80 flex items-center justify-center text-muted-foreground hover:bg-muted"
+                    title="Par defaut"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                  {TEXT_COLORS.map(c => (
+                    <button
+                      key={c}
+                      onMouseDown={(e) => { e.preventDefault(); onColor(c); setPanel(null) }}
+                      className="h-5 w-5 rounded-full border border-black/10 hover:scale-125 transition-transform"
+                      style={{ backgroundColor: c }}
+                    />
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {panel === 'highlight' && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.12 }}
+                className="overflow-hidden border-t border-border/60"
+              >
+                <div className="flex items-center gap-1 p-1.5">
+                  <button
+                    onMouseDown={(e) => { e.preventDefault(); onHighlight(''); setPanel(null) }}
+                    className="h-5 w-5 rounded border border-border/80 flex items-center justify-center text-muted-foreground hover:bg-muted"
+                    title="Supprimer"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                  {HIGHLIGHT_COLORS.map(c => (
+                    <button
+                      key={c}
+                      onMouseDown={(e) => { e.preventDefault(); onHighlight(c); setPanel(null) }}
+                      className="h-5 w-5 rounded border border-black/10 hover:scale-125 transition-transform"
+                      style={{ backgroundColor: c }}
+                    />
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {panel === 'size' && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.12 }}
+                className="overflow-hidden border-t border-border/60"
+              >
+                <div className="flex items-center gap-0.5 p-1">
+                  {SIZES.map(s => (
+                    <button
+                      key={s.value}
+                      onMouseDown={(e) => { e.preventDefault(); onSize(s.value); setPanel(null) }}
+                      className="px-2.5 py-1 text-[11px] rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {panel === 'font' && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.12 }}
+                className="overflow-hidden border-t border-border/60"
+              >
+                <div className="flex flex-col p-1">
+                  {FONTS.map(f => (
+                    <button
+                      key={f.value}
+                      onMouseDown={(e) => { e.preventDefault(); onFont(f.value); setPanel(null) }}
+                      className="px-2.5 py-1.5 text-[11px] rounded-md text-left text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                      style={{ fontFamily: f.value === 'inherit' ? undefined : f.value }}
+                    >
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
       )}
     </AnimatePresence>,
@@ -139,7 +478,6 @@ interface RichTextareaProps {
   className?: string
   style?: React.CSSProperties
   rows?: number
-  /** Single-line mode: prevent Enter from creating newlines */
   singleLine?: boolean
 }
 
@@ -156,24 +494,19 @@ export function RichTextarea({
   const lastValueRef = useRef(value)
   const isComposingRef = useRef(false)
   const [toolbar, setToolbar] = useState<ToolbarState>({
-    visible: false,
-    x: 0,
-    y: 0,
-    bold: false,
-    italic: false,
-    underline: false,
+    visible: false, x: 0, y: 0,
+    bold: false, italic: false, underline: false, strikethrough: false,
+    color: '', bgColor: '', inList: false, inHeading: false,
   })
 
-  // Sync external value → editor HTML (only when value changes externally)
+  // Sync external value → editor HTML
   useEffect(() => {
     if (!editorRef.current) return
     const currentMd = htmlToMd(editorRef.current.innerHTML)
-    // Normalize comparison: trim trailing newlines
-    const normalizedValue = (value || '').replace(/\n+$/, '')
-    const normalizedCurrent = currentMd.replace(/\n+$/, '')
-    if (normalizedValue !== normalizedCurrent) {
-      const html = mdToHtml(value)
-      editorRef.current.innerHTML = html
+    const nv = (value || '').replace(/\n+$/, '')
+    const nc = currentMd.replace(/\n+$/, '')
+    if (nv !== nc) {
+      editorRef.current.innerHTML = mdToHtml(value)
       lastValueRef.current = value
     }
   }, [value])
@@ -190,33 +523,37 @@ export function RichTextarea({
   const updateToolbar = useCallback(() => {
     const sel = window.getSelection()
     if (!sel || sel.isCollapsed || !editorRef.current?.contains(sel.anchorNode)) {
-      setToolbar((prev) => (prev.visible ? { ...prev, visible: false } : prev))
+      setToolbar(prev => prev.visible ? { ...prev, visible: false } : prev)
       return
     }
-
     const range = sel.getRangeAt(0)
     const rect = range.getBoundingClientRect()
     if (rect.width === 0) {
-      setToolbar((prev) => (prev.visible ? { ...prev, visible: false } : prev))
+      setToolbar(prev => prev.visible ? { ...prev, visible: false } : prev)
       return
     }
 
-    // Position above selection, centered
-    const toolbarW = 100
-    const x = Math.max(8, rect.left + rect.width / 2 - toolbarW / 2)
-    const y = rect.top + window.scrollY - 40
+    // Position above selection
+    const tw = singleLine ? 320 : 370
+    const x = Math.max(8, Math.min(rect.left + rect.width / 2 - tw / 2, window.innerWidth - tw - 8))
+    const y = rect.top + window.scrollY - 44
+
+    let fmtBlock = ''
+    try { fmtBlock = document.queryCommandValue('formatBlock') } catch {}
 
     setToolbar({
-      visible: true,
-      x,
-      y,
+      visible: true, x, y,
       bold: document.queryCommandState('bold'),
       italic: document.queryCommandState('italic'),
       underline: document.queryCommandState('underline'),
+      strikethrough: document.queryCommandState('strikeThrough'),
+      color: normalizeColor(document.queryCommandValue('foreColor') || ''),
+      bgColor: normalizeColor(document.queryCommandValue('hiliteColor') || ''),
+      inList: document.queryCommandState('insertUnorderedList'),
+      inHeading: /^h[1-6]$/i.test(fmtBlock),
     })
-  }, [])
+  }, [singleLine])
 
-  // Listen for selection changes
   useEffect(() => {
     const handler = () => {
       if (editorRef.current?.contains(document.activeElement) || editorRef.current === document.activeElement) {
@@ -227,45 +564,105 @@ export function RichTextarea({
     return () => document.removeEventListener('selectionchange', handler)
   }, [updateToolbar])
 
-  // Hide toolbar on blur (with small delay so toolbar button clicks register)
   const handleBlur = useCallback(() => {
     setTimeout(() => {
       if (!editorRef.current?.contains(document.activeElement)) {
-        setToolbar((prev) => (prev.visible ? { ...prev, visible: false } : prev))
+        setToolbar(prev => prev.visible ? { ...prev, visible: false } : prev)
       }
-    }, 150)
+    }, 200)
   }, [])
 
-  const handleFormat = useCallback(
-    (cmd: 'bold' | 'italic' | 'underline') => {
-      editorRef.current?.focus()
-      document.execCommand(cmd, false)
-      emitChange()
-      setTimeout(updateToolbar, 10)
-    },
-    [emitChange, updateToolbar]
-  )
+  const handleFormat = useCallback((cmd: 'bold' | 'italic' | 'underline' | 'strikeThrough') => {
+    editorRef.current?.focus()
+    document.execCommand(cmd, false)
+    emitChange()
+    setTimeout(updateToolbar, 10)
+  }, [emitChange, updateToolbar])
 
-  // Prevent paste from adding rich HTML from external sources
-  const handlePaste = useCallback(
-    (e: React.ClipboardEvent) => {
-      e.preventDefault()
-      const text = e.clipboardData.getData('text/plain')
-      const cleaned = singleLine ? text.replace(/[\n\r]/g, ' ') : text
-      document.execCommand('insertText', false, cleaned)
-      emitChange()
-    },
-    [emitChange, singleLine]
-  )
+  const handleColor = useCallback((color: string) => {
+    editorRef.current?.focus()
+    if (color) {
+      document.execCommand('foreColor', false, color)
+    } else {
+      document.execCommand('removeFormat', false) // reset
+    }
+    emitChange()
+    setTimeout(updateToolbar, 10)
+  }, [emitChange, updateToolbar])
 
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (singleLine && e.key === 'Enter') {
-        e.preventDefault()
+  const handleHighlight = useCallback((color: string) => {
+    editorRef.current?.focus()
+    if (color) {
+      document.execCommand('hiliteColor', false, color)
+    } else {
+      document.execCommand('hiliteColor', false, 'transparent')
+    }
+    emitChange()
+    setTimeout(updateToolbar, 10)
+  }, [emitChange, updateToolbar])
+
+  const handleSize = useCallback((size: string) => {
+    editorRef.current?.focus()
+    document.execCommand('fontSize', false, size)
+    emitChange()
+    setTimeout(updateToolbar, 10)
+  }, [emitChange, updateToolbar])
+
+  const handleFont = useCallback((font: string) => {
+    editorRef.current?.focus()
+    document.execCommand('fontName', false, font)
+    emitChange()
+    setTimeout(updateToolbar, 10)
+  }, [emitChange, updateToolbar])
+
+  const handleLink = useCallback(() => {
+    editorRef.current?.focus()
+    // Check if already in link
+    let inLink = false
+    const sel = window.getSelection()
+    if (sel?.anchorNode) {
+      let node: Node | null = sel.anchorNode
+      while (node && node !== editorRef.current) {
+        if ((node as Element).tagName === 'A') { inLink = true; break }
+        node = node.parentNode
       }
-    },
-    [singleLine]
-  )
+    }
+    if (inLink) {
+      document.execCommand('unlink', false)
+    } else {
+      const url = window.prompt('URL du lien :')
+      if (url) document.execCommand('createLink', false, url)
+    }
+    emitChange()
+    setTimeout(updateToolbar, 10)
+  }, [emitChange, updateToolbar])
+
+  const handleList = useCallback(() => {
+    editorRef.current?.focus()
+    document.execCommand('insertUnorderedList', false)
+    emitChange()
+    setTimeout(updateToolbar, 10)
+  }, [emitChange, updateToolbar])
+
+  const handleHeading = useCallback(() => {
+    editorRef.current?.focus()
+    let fmtBlock = ''
+    try { fmtBlock = document.queryCommandValue('formatBlock') } catch {}
+    document.execCommand('formatBlock', false, /^h[1-6]$/i.test(fmtBlock) ? 'DIV' : 'H2')
+    emitChange()
+    setTimeout(updateToolbar, 10)
+  }, [emitChange, updateToolbar])
+
+  const handlePaste = useCallback((e: React.ClipboardEvent) => {
+    e.preventDefault()
+    const text = e.clipboardData.getData('text/plain')
+    document.execCommand('insertText', false, singleLine ? text.replace(/[\n\r]/g, ' ') : text)
+    emitChange()
+  }, [emitChange, singleLine])
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (singleLine && e.key === 'Enter') e.preventDefault()
+  }, [singleLine])
 
   const minHeight = singleLine ? undefined : `${Math.max(rows * 20, 24)}px`
 
@@ -297,7 +694,18 @@ export function RichTextarea({
           ...style,
         }}
       />
-      <FloatingToolbar state={toolbar} onFormat={handleFormat} />
+      <FloatingToolbar
+        state={toolbar}
+        singleLine={singleLine}
+        onFormat={handleFormat}
+        onColor={handleColor}
+        onHighlight={handleHighlight}
+        onSize={handleSize}
+        onFont={handleFont}
+        onLink={handleLink}
+        onList={handleList}
+        onHeading={handleHeading}
+      />
     </div>
   )
 }
