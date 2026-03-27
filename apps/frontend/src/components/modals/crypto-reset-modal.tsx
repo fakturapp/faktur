@@ -5,6 +5,11 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { api } from '@/lib/api'
 import { Shield, AlertTriangle, Trash2, KeyRound, Loader2, CheckCircle2, Lock, Key } from 'lucide-react'
 
+function formatRecoveryKeyInput(value: string): string {
+  const raw = value.replace(/[^0-9a-fA-F]/g, '').toUpperCase().slice(0, 32)
+  return raw.match(/.{1,4}/g)?.join('-') ?? ''
+}
+
 interface CryptoResetModalProps {
   open: boolean
   onRecovered: () => void
@@ -297,10 +302,11 @@ export function CryptoResetModal({ open, onRecovered, onWiped }: CryptoResetModa
                             <input
                               type="text"
                               value={recoveryKey}
-                              onChange={(e) => setRecoveryKey(e.target.value)}
+                              onChange={(e) => setRecoveryKey(formatRecoveryKeyInput(e.target.value))}
                               onKeyDown={(e) => e.key === 'Enter' && handleRecoverWithKey()}
+                              maxLength={39}
                               placeholder="XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX"
-                              className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 font-mono"
+                              className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 font-mono tracking-wider"
                               autoFocus
                             />
                           </div>

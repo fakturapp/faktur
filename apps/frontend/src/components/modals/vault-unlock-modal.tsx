@@ -11,6 +11,11 @@ import { api, onVaultLocked } from '@/lib/api'
 
 type UnlockMode = 'password' | 'recoveryKey'
 
+function formatRecoveryKeyInput(value: string): string {
+  const raw = value.replace(/[^0-9a-fA-F]/g, '').toUpperCase().slice(0, 32)
+  return raw.match(/.{1,4}/g)?.join('-') ?? ''
+}
+
 export function VaultUnlockModal({ forceOpen = false }: { forceOpen?: boolean }) {
   const [open, setOpen] = useState(false)
   const [mode, setMode] = useState<UnlockMode>('password')
@@ -151,10 +156,11 @@ export function VaultUnlockModal({ forceOpen = false }: { forceOpen?: boolean })
               id="vaultRecoveryKey"
               type="text"
               value={recoveryKey}
-              onChange={(e) => setRecoveryKey(e.target.value)}
+              onChange={(e) => setRecoveryKey(formatRecoveryKeyInput(e.target.value))}
+              maxLength={39}
               required
               autoFocus
-              className="font-mono text-sm"
+              className="font-mono text-sm tracking-wider"
               placeholder="XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX"
             />
             <p className="text-xs text-muted-foreground mt-1">
