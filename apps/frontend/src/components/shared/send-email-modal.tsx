@@ -10,6 +10,7 @@ import { useEmail } from '@/lib/email-context'
 import { api } from '@/lib/api'
 import { Send, Paperclip, ChevronDown, Plus, X, Trash2, CheckCircle2 } from 'lucide-react'
 import { AiGenerateButton } from '@/components/ai/ai-generate-button'
+import { useTrackFeature } from '@/hooks/use-analytics'
 
 interface Attachment {
   id: string
@@ -50,6 +51,7 @@ export function SendEmailModal({
   const [subject, setSubject] = useState('')
   const [body, setBody] = useState('')
   const [sending, setSending] = useState(false)
+  const trackFeature = useTrackFeature()
   const [isDirty, setIsDirty] = useState(false)
   const [attachments, setAttachments] = useState<Attachment[]>([])
 
@@ -163,6 +165,7 @@ export function SendEmailModal({
       return
     }
 
+    trackFeature('email.send')
     toast('Email envoyé avec succès', 'success')
     onSent?.()
     onClose()

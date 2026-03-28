@@ -18,6 +18,7 @@ import { AiChatSidebar } from '@/components/ai/ai-chat-sidebar'
 import { AiSheetOverlay } from '@/components/ai/ai-sheet-overlay'
 import { Dialog, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
+import { useTrackFeature } from '@/hooks/use-analytics'
 import { FirstDocumentBanner } from '@/components/shared/first-document-banner'
 import { ProductCatalogModal, type CatalogProduct } from '@/components/products/product-catalog-modal'
 
@@ -76,6 +77,7 @@ function saveOptionsToStorage(opts: Record<string, any>) {
 export default function NewQuotePage() {
   const router = useRouter()
   const { toast } = useToast()
+  const trackFeature = useTrackFeature()
   const { settings: invoiceSettings, companyLogoUrl, loading: settingsLoading, refreshSettings } = useInvoiceSettings()
 
   const [loading, setLoading] = useState(true)
@@ -361,6 +363,7 @@ export default function NewQuotePage() {
       toast(error, 'error')
     } else {
       setIsDirty(false)
+      trackFeature('quote.create')
       toast('Devis créé', 'success')
       router.push('/dashboard/quotes')
     }

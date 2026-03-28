@@ -14,6 +14,7 @@ import { api } from '@/lib/api'
 import { A4Sheet, type DocumentLine, type ClientInfo, type CompanyInfo } from '@/components/shared/a4-sheet'
 import { SendEmailModal } from '@/components/shared/send-email-modal'
 import { EmailHistoryModal } from '@/components/shared/email-history-modal'
+import { useTrackFeature } from '@/hooks/use-analytics'
 import { useEmail } from '@/lib/email-context'
 import {
   X,
@@ -87,6 +88,7 @@ const noop = () => {}
 export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDelete }: InvoiceDetailOverlayProps) {
   const router = useRouter()
   const { toast } = useToast()
+  const trackFeature = useTrackFeature()
   const { settings: invoiceSettings, companyLogoUrl } = useInvoiceSettings()
   const [loading, setLoading] = useState(true)
   const [invoice, setInvoice] = useState<InvoiceDetail | null>(null)
@@ -234,6 +236,7 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
     setCreatingCreditNote(false)
     if (error) { toast(error, 'error'); return }
     if (data?.creditNote) {
+      trackFeature('credit_note.create')
       toast(`Avoir ${data.creditNote.creditNoteNumber} créé`, 'success')
       onClose()
       router.push(`/dashboard/credit-notes/${data.creditNote.id}/edit`)
@@ -263,6 +266,7 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
     a.download = filename || 'facture.pdf'
     a.click()
     URL.revokeObjectURL(url)
+    trackFeature('invoice.export_pdf')
   }
 
   async function handlePrint() {

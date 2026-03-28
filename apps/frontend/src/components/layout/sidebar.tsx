@@ -46,6 +46,7 @@ import {
   Bug,
   ShieldCheck,
   ArrowLeft,
+  BarChart3,
 } from 'lucide-react'
 
 interface TeamListItem {
@@ -392,6 +393,10 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
               />
               <NavLink
                 item={{ href: '/dashboard/admin/bugs', label: 'Rapports de bugs', icon: Bug }}
+                pathname={pathname}
+              />
+              <NavLink
+                item={{ href: '/dashboard/admin/analytics', label: 'Analytiques', icon: BarChart3 }}
                 pathname={pathname}
               />
             </nav>

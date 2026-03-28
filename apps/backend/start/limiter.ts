@@ -64,6 +64,17 @@ export const twoFactorLimiter = limiter.define('2fa', (ctx) => {
     })
 })
 
+/** Analytics ingestion: 30 requests per minute per IP */
+export const analyticsLimiter = limiter.define('analytics', (ctx) => {
+  return limiter
+    .allowRequests(30)
+    .every('1 minute')
+    .usingKey(ctx.request.ip())
+    .limitExceeded((error) => {
+      error.setMessage('Trop de requêtes analytics. Réessayez plus tard.')
+    })
+})
+
 /** Global API: 1000 requests per hour per IP */
 export const apiLimiter = limiter.define('api', (ctx) => {
   return limiter

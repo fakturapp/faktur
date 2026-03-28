@@ -6,6 +6,7 @@ import { Sparkles, Loader2 } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { cn } from '@/lib/utils'
+import { useTrackFeature } from '@/hooks/use-analytics'
 
 interface AiGenerateButtonProps {
   type: 'email_subject' | 'email_body' | 'invoice_subject' | 'invoice_notes' | 'invoice_line_description' | 'acceptance_conditions' | 'free_text'
@@ -28,6 +29,7 @@ export function AiGenerateButton({
 }: AiGenerateButtonProps) {
   const { settings } = useInvoiceSettings()
   const [loading, setLoading] = useState(false)
+  const trackFeature = useTrackFeature()
 
   if (!settings.aiEnabled) return null
 
@@ -41,6 +43,7 @@ export function AiGenerateButton({
       })
 
       if (data?.text && !error) {
+        trackFeature('ai.generate', { type })
         onGenerated(data.text)
       }
     } catch {

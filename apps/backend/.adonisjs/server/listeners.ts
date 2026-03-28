@@ -6,6 +6,7 @@
 export const listeners = {
   SendEmailChangeCode: () => import('#listeners/send_email_change_code'),
   SendPasswordResetEmail: () => import('#listeners/send_password_reset_email'),
+  SendRecoveryKeyEmail: () => import('#listeners/send_recovery_key_email'),
   SendSecurityCodeEmail: () => import('#listeners/send_security_code_email'),
   SendTeamInviteEmail: () => import('#listeners/send_team_invite_email'),
   SendTwoFactorEnabledEmail: () => import('#listeners/send_two_factor_enabled_email'),

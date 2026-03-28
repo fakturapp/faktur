@@ -187,6 +187,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/auth/security/crypto_wipe').default['handle']>>>
     }
   }
+  'setup_recovery_key': {
+    methods: ["POST"]
+    pattern: '/api/v1/auth/crypto/setup-recovery-key'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/auth/security/setup_recovery_key').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/auth/security/setup_recovery_key').default['handle']>>>
+    }
+  }
   'vault_unlock': {
     methods: ["POST"]
     pattern: '/api/v1/auth/vault/unlock'
@@ -2129,6 +2141,78 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/ai/check_providers').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ai/check_providers').default['handle']>>>
+    }
+  }
+  'create_feedback': {
+    methods: ["POST"]
+    pattern: '/api/v1/feedback'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/feedback/create').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/feedback/create').default['handle']>>>
+    }
+  }
+  'my_feedback': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/feedback/mine'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/feedback/mine').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/feedback/mine').default['handle']>>>
+    }
+  }
+  'create_bug_report': {
+    methods: ["POST"]
+    pattern: '/api/v1/bug-report'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/bug_report/create').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/bug_report/create').default['handle']>>>
+    }
+  }
+  'admin_feedbacks': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/admin/feedbacks'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/feedbacks').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/feedbacks').default['handle']>>>
+    }
+  }
+  'admin_bug_reports.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/admin/bug-reports'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/bug_reports').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/bug_reports').default['index']>>>
+    }
+  }
+  'admin_bug_reports.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/admin/bug-reports/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/bug_reports').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/bug_reports').default['update']>>>
     }
   }
 }

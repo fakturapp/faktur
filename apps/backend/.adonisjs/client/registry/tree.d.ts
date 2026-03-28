@@ -17,6 +17,7 @@ export interface ApiDefinition {
   me: typeof routes['me']
   cryptoRecover: typeof routes['crypto_recover']
   cryptoWipe: typeof routes['crypto_wipe']
+  setupRecoveryKey: typeof routes['setup_recovery_key']
   vaultUnlock: typeof routes['vault_unlock']
   serveAvatar: typeof routes['serve_avatar']
   profileShow: typeof routes['profile_show']
@@ -186,4 +187,12 @@ export interface ApiDefinition {
   generateDocument: typeof routes['generate_document']
   chatDocument: typeof routes['chat_document']
   checkProviders: typeof routes['check_providers']
+  createFeedback: typeof routes['create_feedback']
+  myFeedback: typeof routes['my_feedback']
+  createBugReport: typeof routes['create_bug_report']
+  adminFeedbacks: typeof routes['admin_feedbacks']
+  adminBugReports: {
+    index: typeof routes['admin_bug_reports.index']
+    update: typeof routes['admin_bug_reports.update']
+  }
 }

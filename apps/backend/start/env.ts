@@ -36,6 +36,9 @@ export default await Env.create(new URL('../', import.meta.url), {
   // Encryption (for 2FA secrets, recovery codes)
   ENCRYPTION_KEY: Env.schema.string.optional(),
 
+  // Analytics encryption (falls back to ENCRYPTION_KEY)
+  ANALYTICS_ENCRYPTION_KEY: Env.schema.string.optional(),
+
   // Email (Resend)
   RESEND_API_KEY: Env.schema.string.optional(),
 

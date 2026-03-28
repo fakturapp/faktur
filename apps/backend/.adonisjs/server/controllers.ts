@@ -33,6 +33,18 @@ export const controllers = {
       Setup: () => import('#controllers/account/two_factor/setup'),
     },
   },
+  admin: {
+    BugReports: () => import('#controllers/admin/bug_reports'),
+    Feedbacks: () => import('#controllers/admin/feedbacks'),
+    analytics: {
+      Overview: () => import('#controllers/admin/analytics/overview'),
+      Pages: () => import('#controllers/admin/analytics/pages'),
+      Features: () => import('#controllers/admin/analytics/features'),
+      Errors: () => import('#controllers/admin/analytics/errors'),
+      Performance: () => import('#controllers/admin/analytics/performance'),
+      Users: () => import('#controllers/admin/analytics/users'),
+    },
+  },
   ai: {
     ChatDocument: () => import('#controllers/ai/chat_document'),
     CheckProviders: () => import('#controllers/ai/check_providers'),
@@ -63,6 +75,7 @@ export const controllers = {
         Request: () => import('#controllers/auth/security/password_reset/request'),
         Reset: () => import('#controllers/auth/security/password_reset/reset'),
       },
+      SetupRecoveryKey: () => import('#controllers/auth/security/setup_recovery_key'),
       twoFactor: {
         Verify: () => import('#controllers/auth/security/two_factor/verify'),
       },
@@ -75,6 +88,9 @@ export const controllers = {
     vault: {
       Unlock: () => import('#controllers/auth/vault/unlock'),
     },
+  },
+  bugReport: {
+    Create: () => import('#controllers/bug_report/create'),
   },
   client: {
     contacts: {
@@ -183,6 +199,10 @@ export const controllers = {
   },
   export: {
     FecExport: () => import('#controllers/export/fec_export'),
+  },
+  feedback: {
+    Create: () => import('#controllers/feedback/create'),
+    Mine: () => import('#controllers/feedback/mine'),
   },
   invoice: {
     crud: {
@@ -316,5 +336,9 @@ export const controllers = {
       TransferOwnership: () => import('#controllers/team/members/transfer_ownership'),
       UpdateRole: () => import('#controllers/team/members/update_role'),
     },
+  },
+  analytics: {
+    Ingest: () => import('#controllers/analytics/ingest'),
+    Consent: () => import('#controllers/analytics/consent'),
   },
 }

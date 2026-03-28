@@ -10,6 +10,7 @@ import { Switch } from '@/components/ui/switch'
 import { Spinner } from '@/components/ui/spinner'
 import { PhoneInput } from '@/components/ui/phone-input'
 import { api } from '@/lib/api'
+import { useTrackFeature } from '@/hooks/use-analytics'
 import {
   X,
   Building2,
@@ -91,6 +92,7 @@ const slideVariants = {
 }
 
 export function ClientCreatePanel({ open, onClose, onCreated }: ClientCreatePanelProps) {
+  const trackFeature = useTrackFeature()
   const [step, setStep] = useState(1)
   const [dir, setDir] = useState(1)
   const [form, setForm] = useState<ClientForm>(initialForm)
@@ -189,6 +191,7 @@ export function ClientCreatePanel({ open, onClose, onCreated }: ClientCreatePane
       return
     }
 
+    trackFeature('client.create')
     handleClose()
     onCreated()
   }

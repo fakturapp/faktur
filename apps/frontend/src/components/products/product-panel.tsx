@@ -11,6 +11,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/toast'
 import { api } from '@/lib/api'
 import { X, Package } from 'lucide-react'
+import { useTrackFeature } from '@/hooks/use-analytics'
 import type { ProductListItem } from '@/app/dashboard/products/page'
 
 interface ProductPanelProps {
@@ -28,6 +29,7 @@ const slideVariants = {
 
 export function ProductPanel({ open, product, onClose, onSaved }: ProductPanelProps) {
   const { toast } = useToast()
+  const trackFeature = useTrackFeature()
   const [saving, setSaving] = useState(false)
 
   const [name, setName] = useState('')
@@ -91,6 +93,7 @@ export function ProductPanel({ open, product, onClose, onSaved }: ProductPanelPr
         toast(error, 'error')
         return
       }
+      trackFeature('product.create')
       toast('Produit créé')
     }
 

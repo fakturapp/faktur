@@ -18,6 +18,9 @@ import { EmailProvider } from '@/lib/email-context'
 import { ArrowRightLeft, LogOut } from 'lucide-react'
 import { FeedbackModal } from '@/components/modals/feedback-modal'
 import { BugReportModal } from '@/components/modals/bug-report-modal'
+import { usePageView } from '@/hooks/use-page-view'
+import { initWebVitals } from '@/lib/web-vitals'
+import { useAnalyticsContext } from '@/lib/analytics'
 
 interface TeamListItem {
   id: string
@@ -32,6 +35,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { user, loading, logout, refreshUser } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
+  const { trackPerformance } = useAnalyticsContext()
+  usePageView()
+
+  useEffect(() => {
+    initWebVitals(trackPerformance)
+  }, [trackPerformance])
   const [isPopup, setIsPopup] = useState(false)
   const [teams, setTeams] = useState<TeamListItem[]>([])
   const [teamsLoaded, setTeamsLoaded] = useState(false)

@@ -96,6 +96,12 @@ const routes = {
     tokens: [{"old":"/api/v1/auth/crypto/wipe","type":0,"val":"api","end":""},{"old":"/api/v1/auth/crypto/wipe","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/crypto/wipe","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/crypto/wipe","type":0,"val":"crypto","end":""},{"old":"/api/v1/auth/crypto/wipe","type":0,"val":"wipe","end":""}],
     types: placeholder as Registry['crypto_wipe']['types'],
   },
+  'setup_recovery_key': {
+    methods: ["POST"],
+    pattern: '/api/v1/auth/crypto/setup-recovery-key',
+    tokens: [{"old":"/api/v1/auth/crypto/setup-recovery-key","type":0,"val":"api","end":""},{"old":"/api/v1/auth/crypto/setup-recovery-key","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/crypto/setup-recovery-key","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/crypto/setup-recovery-key","type":0,"val":"crypto","end":""},{"old":"/api/v1/auth/crypto/setup-recovery-key","type":0,"val":"setup-recovery-key","end":""}],
+    types: placeholder as Registry['setup_recovery_key']['types'],
+  },
   'vault_unlock': {
     methods: ["POST"],
     pattern: '/api/v1/auth/vault/unlock',
@@ -1067,6 +1073,42 @@ const routes = {
     pattern: '/api/v1/ai/providers',
     tokens: [{"old":"/api/v1/ai/providers","type":0,"val":"api","end":""},{"old":"/api/v1/ai/providers","type":0,"val":"v1","end":""},{"old":"/api/v1/ai/providers","type":0,"val":"ai","end":""},{"old":"/api/v1/ai/providers","type":0,"val":"providers","end":""}],
     types: placeholder as Registry['check_providers']['types'],
+  },
+  'create_feedback': {
+    methods: ["POST"],
+    pattern: '/api/v1/feedback',
+    tokens: [{"old":"/api/v1/feedback","type":0,"val":"api","end":""},{"old":"/api/v1/feedback","type":0,"val":"v1","end":""},{"old":"/api/v1/feedback","type":0,"val":"feedback","end":""}],
+    types: placeholder as Registry['create_feedback']['types'],
+  },
+  'my_feedback': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/feedback/mine',
+    tokens: [{"old":"/api/v1/feedback/mine","type":0,"val":"api","end":""},{"old":"/api/v1/feedback/mine","type":0,"val":"v1","end":""},{"old":"/api/v1/feedback/mine","type":0,"val":"feedback","end":""},{"old":"/api/v1/feedback/mine","type":0,"val":"mine","end":""}],
+    types: placeholder as Registry['my_feedback']['types'],
+  },
+  'create_bug_report': {
+    methods: ["POST"],
+    pattern: '/api/v1/bug-report',
+    tokens: [{"old":"/api/v1/bug-report","type":0,"val":"api","end":""},{"old":"/api/v1/bug-report","type":0,"val":"v1","end":""},{"old":"/api/v1/bug-report","type":0,"val":"bug-report","end":""}],
+    types: placeholder as Registry['create_bug_report']['types'],
+  },
+  'admin_feedbacks': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/admin/feedbacks',
+    tokens: [{"old":"/api/v1/admin/feedbacks","type":0,"val":"api","end":""},{"old":"/api/v1/admin/feedbacks","type":0,"val":"v1","end":""},{"old":"/api/v1/admin/feedbacks","type":0,"val":"admin","end":""},{"old":"/api/v1/admin/feedbacks","type":0,"val":"feedbacks","end":""}],
+    types: placeholder as Registry['admin_feedbacks']['types'],
+  },
+  'admin_bug_reports.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/admin/bug-reports',
+    tokens: [{"old":"/api/v1/admin/bug-reports","type":0,"val":"api","end":""},{"old":"/api/v1/admin/bug-reports","type":0,"val":"v1","end":""},{"old":"/api/v1/admin/bug-reports","type":0,"val":"admin","end":""},{"old":"/api/v1/admin/bug-reports","type":0,"val":"bug-reports","end":""}],
+    types: placeholder as Registry['admin_bug_reports.index']['types'],
+  },
+  'admin_bug_reports.update': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/admin/bug-reports/:id',
+    tokens: [{"old":"/api/v1/admin/bug-reports/:id","type":0,"val":"api","end":""},{"old":"/api/v1/admin/bug-reports/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/admin/bug-reports/:id","type":0,"val":"admin","end":""},{"old":"/api/v1/admin/bug-reports/:id","type":0,"val":"bug-reports","end":""},{"old":"/api/v1/admin/bug-reports/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['admin_bug_reports.update']['types'],
   },
 } as const satisfies Record<string, AdonisEndpoint>
 
