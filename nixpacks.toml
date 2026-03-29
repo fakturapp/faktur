@@ -6,7 +6,7 @@ aptPkgs = ["libnss3", "libgbm1", "libasound2t64", "libpangocairo-1.0-0", "libgtk
 
 [phases.build]
 cmds = [
-  "npx turbo run build --force",
+  "npx turbo run build",
   "cp apps/backend/.env apps/backend/build/.env 2>/dev/null || true",
   "cd apps/backend/build && npm install --omit=dev"
 ]
