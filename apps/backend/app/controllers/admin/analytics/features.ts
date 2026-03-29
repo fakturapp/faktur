@@ -26,14 +26,10 @@ export default class AnalyticsFeatures {
         previousCount > 0 ? Math.round(((currentCount - previousCount) / previousCount) * 100) : null
 
       return {
-        eventName: row.event_name,
+        name: row.event_name,
         count: currentCount,
         uniqueUsers: Number(row.unique_users),
-        trend: {
-          previousCount,
-          currentCount,
-          trendPercentage,
-        },
+        trend: trendPercentage ?? 0,
       }
     })
 

@@ -23,10 +23,10 @@ export default class AnalyticsPages {
       .orderBy('views', 'desc')
 
     const pages = rows.map((row) => ({
-      pagePath: row.page_path,
+      path: row.page_path,
       views: Number(row.views),
       uniqueVisitors: Number(row.unique_visitors),
-      avgDuration: row.avg_duration ? Math.round(Number(row.avg_duration)) : null,
+      avgDuration: row.avg_duration ? Math.round(Number(row.avg_duration)) : 0,
     }))
 
     return response.ok({ pages })

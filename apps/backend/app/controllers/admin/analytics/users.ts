@@ -23,13 +23,16 @@ export default class AnalyticsUsers {
       this.getAuthVsAnonymous(startDate),
     ])
 
+    // Convert device object to array of { name, count }
+    const deviceArray = Object.entries(deviceBreakdown).map(([name, count]) => ({ name, count }))
+
     return response.ok({
       activeUsersOverTime,
-      deviceBreakdown,
-      browserBreakdown,
-      osBreakdown,
-      countryBreakdown,
-      authVsAnonymous,
+      deviceBreakdown: deviceArray,
+      topBrowsers: browserBreakdown.map((b: any) => ({ name: b.browser, count: b.count })),
+      topOS: osBreakdown.map((o: any) => ({ name: o.os, count: o.count })),
+      topCountries: countryBreakdown.map((c: any) => ({ name: c.country, count: c.count })),
+      authBreakdown: authVsAnonymous,
     })
   }
 

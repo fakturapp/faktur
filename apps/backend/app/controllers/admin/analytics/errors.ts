@@ -78,9 +78,11 @@ export default class AnalyticsErrors {
     }
 
     // Remove encrypted fields from output
-    const output = result.map(({ errorMessageFullEncrypted, stackTraceEncrypted, ...rest }) => ({
+    const output = result.map(({ errorMessageFullEncrypted, stackTraceEncrypted, ids, latestTimestamp, ...rest }, index) => ({
       ...rest,
-      ...(rest === result[0]
+      id: ids[0],
+      timestamp: latestTimestamp,
+      ...(index === 0
         ? {
             errorMessageFull: (rest as any).errorMessageFull || null,
             stackTrace: (rest as any).stackTrace || null,

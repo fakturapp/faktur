@@ -8,36 +8,44 @@ export default class AnalyticsPerformance {
     const startDate = this.getStartDate(period)
     const metricNames = ['LCP', 'FID', 'CLS', 'INP', 'FCP', 'TTFB']
 
-    const [p75Results, distributionResults, byPage, byDevice] = await Promise.all([
+    const [p75Results, distributionResults, slowestPages, deviceRows] = await Promise.all([
       this.getP75(startDate, metricNames),
       this.getDistribution(startDate, metricNames),
-      this.getByPage(startDate),
-      this.getByDevice(startDate),
+      this.getSlowestPages(startDate),
+      this.getDeviceBreakdown(startDate),
     ])
 
-    const metrics: Record<
-      string,
-      { p75: number | null; distribution: { good: number; needsImprovement: number; poor: number } }
-    > = {}
+    // Build webVitals array
+    const webVitals = metricNames
+      .map((name) => {
+        const p75Row = p75Results.find((r: any) => r.metric_name === name)
+        const distRows = distributionResults.filter((r: any) => r.metric_name === name)
 
-    for (const name of metricNames) {
-      const p75Row = p75Results.find((r: any) => r.metric_name === name)
-      const distRow = distributionResults.filter((r: any) => r.metric_name === name)
+        const distribution = { good: 0, needsImprovement: 0, poor: 0 }
+        for (const d of distRows) {
+          if (d.rating === 'good') distribution.good = Number(d.count)
+          else if (d.rating === 'needs-improvement') distribution.needsImprovement = Number(d.count)
+          else if (d.rating === 'poor') distribution.poor = Number(d.count)
+        }
 
-      const distribution = { good: 0, needsImprovement: 0, poor: 0 }
-      for (const d of distRow) {
-        if (d.rating === 'good') distribution.good = Number(d.count)
-        else if (d.rating === 'needs-improvement') distribution.needsImprovement = Number(d.count)
-        else if (d.rating === 'poor') distribution.poor = Number(d.count)
-      }
+        const value = p75Row ? Number(p75Row.p75) : null
+        if (value === null && distribution.good === 0 && distribution.needsImprovement === 0 && distribution.poor === 0) {
+          return null
+        }
 
-      metrics[name] = {
-        p75: p75Row ? Number(p75Row.p75) : null,
-        distribution,
-      }
-    }
+        return { name, value: value ?? 0, distribution }
+      })
+      .filter(Boolean)
 
-    return response.ok({ metrics, byPage, byDevice })
+    // Build deviceBreakdown with percentages
+    const totalDeviceCount = deviceRows.reduce((sum: number, r: any) => sum + Number(r.count), 0)
+    const deviceBreakdown = deviceRows.map((row: any) => ({
+      device: row.device_type || 'unknown',
+      count: Number(row.count),
+      percentage: totalDeviceCount > 0 ? Math.round((Number(row.count) / totalDeviceCount) * 100 * 10) / 10 : 0,
+    }))
+
+    return response.ok({ webVitals, slowestPages, deviceBreakdown })
   }
 
   private async getP75(startDate: DateTime, metricNames: string[]) {
@@ -69,39 +77,37 @@ export default class AnalyticsPerformance {
     return result.rows
   }
 
-  private async getByPage(startDate: DateTime) {
-    const rows = await db
-      .from('analytics_performance')
-      .where('timestamp', '>=', startDate.toSQL()!)
-      .where('metric_name', 'LCP')
-      .select('page_path')
-      .avg('metric_value as avg_lcp')
-      .count('* as count')
-      .groupBy('page_path')
-      .orderBy('avg_lcp', 'desc')
-      .limit(5)
-
-    return rows.map((row) => ({
-      pagePath: row.page_path,
-      avgLcp: Math.round(Number(row.avg_lcp)),
-      count: Number(row.count),
+  private async getSlowestPages(startDate: DateTime) {
+    const result = await db.rawQuery(
+      `SELECT
+        page_path,
+        AVG(CASE WHEN metric_name = 'LCP' THEN metric_value END) AS lcp,
+        AVG(CASE WHEN metric_name = 'FCP' THEN metric_value END) AS fcp,
+        AVG(CASE WHEN metric_name = 'CLS' THEN metric_value END) AS cls
+      FROM analytics_performance
+      WHERE timestamp >= ?
+        AND metric_name IN ('LCP', 'FCP', 'CLS')
+      GROUP BY page_path
+      ORDER BY lcp DESC NULLS LAST
+      LIMIT 5`,
+      [startDate.toSQL()!]
+    )
+    return result.rows.map((row: any) => ({
+      path: row.page_path,
+      lcp: row.lcp ? Math.round(Number(row.lcp)) : 0,
+      fcp: row.fcp ? Math.round(Number(row.fcp)) : 0,
+      cls: row.cls ? Number(row.cls) : 0,
     }))
   }
 
-  private async getByDevice(startDate: DateTime) {
-    const rows = await db
+  private async getDeviceBreakdown(startDate: DateTime) {
+    return db
       .from('analytics_performance')
       .where('timestamp', '>=', startDate.toSQL()!)
       .select('device_type')
-      .avg('metric_value as avg_value')
       .count('* as count')
       .groupBy('device_type')
-
-    return rows.map((row) => ({
-      deviceType: row.device_type || 'unknown',
-      avgValue: Math.round(Number(row.avg_value)),
-      count: Number(row.count),
-    }))
+      .orderBy('count', 'desc')
   }
 
   private getStartDate(period: string): DateTime {
