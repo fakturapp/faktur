@@ -1,9 +1,8 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import app from '@adonisjs/core/services/app'
 import { randomUUID } from 'node:crypto'
-import { existsSync, mkdirSync } from 'node:fs'
-import { join } from 'node:path'
+import { readFile } from 'node:fs/promises'
 import InvoiceSetting from '#models/team/invoice_setting'
+import r2StorageService from '#services/storage/r2_storage_service'
 
 export default class InvoiceLogoUpload {
   async handle({ auth, request, response }: HttpContext) {
@@ -26,15 +25,15 @@ export default class InvoiceLogoUpload {
       return response.badRequest({ message: logo.errors[0]?.message || 'Fichier invalide' })
     }
 
-    const uploadsDir = join(app.tmpPath(), 'uploads', 'invoice-logos')
-    if (!existsSync(uploadsDir)) {
-      mkdirSync(uploadsDir, { recursive: true })
+    if (!logo.tmpPath) {
+      return response.badRequest({ message: 'Fichier temporaire introuvable' })
     }
 
     const fileName = `${user.currentTeamId}-${randomUUID()}.${logo.extname}`
-    await logo.move(uploadsDir, { name: fileName, overwrite: true })
+    const buffer = await readFile(logo.tmpPath)
+    const contentType = logo.headers?.['content-type'] || 'image/png'
 
-    const logoUrl = `/invoice-logos/${fileName}`
+    const logoUrl = await r2StorageService.upload('invoice-logos', fileName, buffer, contentType)
 
     let settings = await InvoiceSetting.findBy('teamId', user.currentTeamId)
 

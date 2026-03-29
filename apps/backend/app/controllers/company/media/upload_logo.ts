@@ -1,9 +1,8 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import app from '@adonisjs/core/services/app'
 import { randomUUID } from 'node:crypto'
-import { existsSync, mkdirSync } from 'node:fs'
-import { join } from 'node:path'
+import { readFile } from 'node:fs/promises'
 import Company from '#models/team/company'
+import r2StorageService from '#services/storage/r2_storage_service'
 
 export default class UploadLogo {
   async handle({ auth, request, response }: HttpContext) {
@@ -31,15 +30,15 @@ export default class UploadLogo {
       return response.badRequest({ message: logo.errors[0]?.message || 'Fichier invalide' })
     }
 
-    const uploadsDir = join(app.tmpPath(), 'uploads', 'company-logos')
-    if (!existsSync(uploadsDir)) {
-      mkdirSync(uploadsDir, { recursive: true })
+    if (!logo.tmpPath) {
+      return response.badRequest({ message: 'Fichier temporaire introuvable' })
     }
 
     const fileName = `${user.currentTeamId}-${randomUUID()}.${logo.extname}`
-    await logo.move(uploadsDir, { name: fileName, overwrite: true })
+    const buffer = await readFile(logo.tmpPath)
+    const contentType = logo.headers?.['content-type'] || 'image/png'
 
-    const logoUrl = `/company-logos/${fileName}`
+    const logoUrl = await r2StorageService.upload('company-logos', fileName, buffer, contentType)
     company.logoUrl = logoUrl
     await company.save()
 

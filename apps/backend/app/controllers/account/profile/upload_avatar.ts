@@ -1,8 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import app from '@adonisjs/core/services/app'
 import { randomUUID } from 'node:crypto'
-import { existsSync, mkdirSync } from 'node:fs'
-import { join } from 'node:path'
+import { readFile } from 'node:fs/promises'
+import r2StorageService from '#services/storage/r2_storage_service'
 
 export default class UploadAvatar {
   async handle({ auth, request, response }: HttpContext) {
@@ -21,15 +20,15 @@ export default class UploadAvatar {
       return response.badRequest({ message: avatar.errors[0]?.message || 'Fichier invalide' })
     }
 
-    const uploadsDir = join(app.tmpPath(), 'uploads', 'avatars')
-    if (!existsSync(uploadsDir)) {
-      mkdirSync(uploadsDir, { recursive: true })
+    if (!avatar.tmpPath) {
+      return response.badRequest({ message: 'Fichier temporaire introuvable' })
     }
 
     const fileName = `${user.id}-${randomUUID()}.${avatar.extname}`
-    await avatar.move(uploadsDir, { name: fileName, overwrite: true })
+    const buffer = await readFile(avatar.tmpPath)
+    const contentType = avatar.headers?.['content-type'] || 'image/png'
 
-    const avatarUrl = `/avatars/${fileName}`
+    const avatarUrl = await r2StorageService.upload('avatars', fileName, buffer, contentType)
     user.avatarUrl = avatarUrl
     await user.save()
 

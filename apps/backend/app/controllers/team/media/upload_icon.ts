@@ -1,9 +1,8 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import app from '@adonisjs/core/services/app'
 import { randomUUID } from 'node:crypto'
-import { existsSync, mkdirSync } from 'node:fs'
-import { join } from 'node:path'
+import { readFile } from 'node:fs/promises'
 import Team from '#models/team/team'
+import r2StorageService from '#services/storage/r2_storage_service'
 
 export default class UploadIcon {
   async handle({ auth, request, response }: HttpContext) {
@@ -43,15 +42,15 @@ export default class UploadIcon {
       return response.badRequest({ message: icon.errors[0]?.message || 'Fichier invalide' })
     }
 
-    const uploadsDir = join(app.tmpPath(), 'uploads', 'team-icons')
-    if (!existsSync(uploadsDir)) {
-      mkdirSync(uploadsDir, { recursive: true })
+    if (!icon.tmpPath) {
+      return response.badRequest({ message: 'Fichier temporaire introuvable' })
     }
 
     const fileName = `${team.id}-${randomUUID()}.${icon.extname}`
-    await icon.move(uploadsDir, { name: fileName, overwrite: true })
+    const buffer = await readFile(icon.tmpPath)
+    const contentType = icon.headers?.['content-type'] || 'image/png'
 
-    team.iconUrl = `/team-icons/${fileName}`
+    team.iconUrl = await r2StorageService.upload('team-icons', fileName, buffer, contentType)
     await team.save()
 
     return response.ok({
