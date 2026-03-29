@@ -42,7 +42,8 @@ router
 router.get(API_PREFIX + '/', async () => {
   return {
     name: 'Faktur API',
-    version: '1.2.7',
+    version: '1.2.8',
+    prefix: API_PREFIX || '(none)',
     status: 'healthy',
   }
 })
@@ -50,3 +51,6 @@ router.get(API_PREFIX + '/', async () => {
 router.get(API_PREFIX + '/health', async () => {
   return { status: 'ok' }
 })
+
+// Startup diagnostic — visible in Dokploy container logs
+console.log(`[faktur] v1.2.8 routes loaded | API_PREFIX=${JSON.stringify(API_PREFIX)}`)
