@@ -40,7 +40,7 @@ export default class Me {
     }
 
     const adminEmails = (env.get('ADMIN_EMAILS') || '')
-      .split(',')
+      .split(/[,;]/)
       .map((e) => e.trim().toLowerCase())
       .filter(Boolean)
     const isAdmin = adminEmails.includes(user.email.toLowerCase())
