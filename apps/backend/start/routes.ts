@@ -1,4 +1,5 @@
 import router from '@adonisjs/core/services/router'
+import { middleware } from '#start/kernel'
 import { API_PREFIX } from '#start/routes/_prefix'
 
 import '#start/routes/auth'
@@ -21,9 +22,22 @@ import '#start/routes/expense'
 import '#start/routes/tax'
 import '#start/routes/export'
 import '#start/routes/ai'
-import '#start/routes/feedback'
 import '#start/routes/admin'
 import '#start/routes/analytics'
+
+// Feedback & bug report routes (inline to avoid import issues)
+const CreateFeedback = () => import('#controllers/feedback/create')
+const MyFeedback = () => import('#controllers/feedback/mine')
+const CreateBugReport = () => import('#controllers/bug_report/create')
+
+router
+  .group(() => {
+    router.post('/feedback', [CreateFeedback, 'handle'])
+    router.get('/feedback/mine', [MyFeedback, 'handle'])
+    router.post('/bug-report', [CreateBugReport, 'handle'])
+  })
+  .use(middleware.auth())
+  .prefix(API_PREFIX)
 
 router.get(API_PREFIX + '/', async () => {
   return {
@@ -35,19 +49,4 @@ router.get(API_PREFIX + '/', async () => {
 
 router.get(API_PREFIX + '/health', async () => {
   return { status: 'ok' }
-})
-
-// Diagnostic endpoint — remove after debugging
-router.get('/debug/routes', async () => {
-  const routes = router.toJSON()
-  const allRoutes = Object.values(routes)
-    .flat()
-    .map((r: any) => ({ method: r.methods?.join(',') || r.method, pattern: r.pattern }))
-  return {
-    prefix: API_PREFIX,
-    totalRoutes: allRoutes.length,
-    feedbackRoutes: allRoutes.filter((r: any) => r.pattern?.includes('feedback')),
-    analyticsRoutes: allRoutes.filter((r: any) => r.pattern?.includes('analytics')),
-    allPatterns: allRoutes.map((r: any) => `${r.method} ${r.pattern}`),
-  }
 })
