@@ -5,8 +5,8 @@ const mailConfig = defineConfig({
   default: 'resend',
 
   from: {
-    address: 'noreply@authguard.net',
-    name: 'Faktur',
+    address: env.get('MAIL_FROM_ADDRESS', 'noreply@authguard.net'),
+    name: env.get('MAIL_FROM_NAME', 'Faktur'),
   },
 
   mailers: {

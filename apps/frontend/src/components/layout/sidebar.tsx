@@ -7,7 +7,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Avatar } from '@/components/ui/avatar'
-import { Dropdown, DropdownItem, DropdownLabel, DropdownSeparator } from '@/components/ui/dropdown'
+import { Dropdown, DropdownItem, DropdownLabel, DropdownSeparator, DropdownSub } from '@/components/ui/dropdown'
 import { useTheme } from '@/lib/theme'
 import { CreateInvoiceModal } from '@/components/invoices/create-invoice-modal'
 import {
@@ -653,51 +653,32 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
 
           <DropdownSeparator />
 
-          <DropdownItem onClick={() => onOpenFeedback?.()}>
-            <Star className="h-4 w-4" /> Laisser un avis
-          </DropdownItem>
-          <DropdownItem onClick={() => onOpenBugReport?.()}>
-            <Bug className="h-4 w-4" /> Signaler un bug
-          </DropdownItem>
-
-          <DropdownSeparator />
-
-          <Link href="/dashboard/about">
-            <DropdownItem>
-              <Info className="h-4 w-4" /> A propos
+          <DropdownSub
+            trigger={
+              <>
+                <Info className="h-4 w-4" />
+                <span className="flex-1 text-left">Aide & informations</span>
+              </>
+            }
+          >
+            <DropdownItem onClick={() => onOpenFeedback?.()}>
+              <Star className="h-4 w-4" /> Laisser un avis
             </DropdownItem>
-          </Link>
-          <Link href="/legal" target="_blank">
-            <DropdownItem>
-              <Scale className="h-4 w-4" /> Informations legales
+            <DropdownItem onClick={() => onOpenBugReport?.()}>
+              <Bug className="h-4 w-4" /> Signaler un bug
             </DropdownItem>
-          </Link>
-
-          <div className="px-3 py-2">
-            <p className="text-xs font-medium text-muted-foreground mb-2">Theme</p>
-            <div className="flex gap-1 rounded-lg bg-muted p-1">
-              {([
-                { value: 'light' as const, icon: Sun, label: 'Clair' },
-                { value: 'dark' as const, icon: Moon, label: 'Sombre' },
-                { value: 'system' as const, icon: Monitor, label: 'Systeme' },
-              ]).map(({ value, icon: Icon, label }) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); setTheme(value) }}
-                  className={cn(
-                    'flex-1 flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium transition-colors',
-                    theme === value
-                      ? 'bg-background text-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground'
-                  )}
-                >
-                  <Icon className="h-3.5 w-3.5" />
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
+            <DropdownSeparator />
+            <Link href="/dashboard/about">
+              <DropdownItem>
+                <Info className="h-4 w-4" /> A propos
+              </DropdownItem>
+            </Link>
+            <Link href="/legal" target="_blank">
+              <DropdownItem>
+                <Scale className="h-4 w-4" /> Info legales
+              </DropdownItem>
+            </Link>
+          </DropdownSub>
 
           <DropdownSeparator />
 

@@ -2,8 +2,6 @@ import { BaseMail } from '@adonisjs/mail'
 import { ctaButton, infoBox, linkFallback, wrapHtml } from './helpers/email_template.js'
 
 export default class TeamInviteNotification extends BaseMail {
-  from = { address: 'noreply@authguard.net', name: 'Faktur' }
-
   constructor(
     email: string,
     private inviterName: string,

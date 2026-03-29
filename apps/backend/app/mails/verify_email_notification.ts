@@ -8,7 +8,6 @@ import {
 } from './helpers/email_template.js'
 
 export default class VerifyEmailNotification extends BaseMail {
-  from = { address: 'noreply@authguard.net', name: 'Faktur' }
   subject = 'Vérifiez votre email - Faktur'
 
   constructor(

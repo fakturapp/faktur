@@ -2,7 +2,6 @@ import { BaseMail } from '@adonisjs/mail'
 import { infoBox, wrapHtml } from './helpers/email_template.js'
 
 export default class TwoFactorEnabledNotification extends BaseMail {
-  from = { address: 'noreply@authguard.net', name: 'Faktur' }
   subject = '2FA activée - Faktur'
 
   constructor(

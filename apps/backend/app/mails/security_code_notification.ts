@@ -2,7 +2,6 @@ import { BaseMail } from '@adonisjs/mail'
 import { validityTag, wrapHtml } from './helpers/email_template.js'
 
 export default class SecurityCodeNotification extends BaseMail {
-  from = { address: 'noreply@authguard.net', name: 'Faktur' }
   subject = 'Code de vérification - Faktur'
 
   constructor(

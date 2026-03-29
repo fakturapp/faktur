@@ -3,7 +3,6 @@ import { infoBox, wrapHtml } from './helpers/email_template.js'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 
 export default class RecoveryKeyNotification extends BaseMail {
-  from = { address: 'noreply@authguard.net', name: 'Faktur' }
   subject = 'Votre clef de secours - Faktur'
 
   constructor(

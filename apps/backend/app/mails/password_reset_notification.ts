@@ -9,7 +9,6 @@ import {
 } from './helpers/email_template.js'
 
 export default class PasswordResetNotification extends BaseMail {
-  from = { address: 'noreply@authguard.net', name: 'Faktur' }
   subject = 'Réinitialisation du mot de passe - Faktur'
 
   constructor(

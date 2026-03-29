@@ -5,6 +5,7 @@ import { useEffect, useRef, useLayoutEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
+import { ChevronRight } from 'lucide-react'
 
 interface DropdownProps {
   trigger: React.ReactNode
@@ -75,12 +76,12 @@ export function Dropdown({ trigger, children, align = 'right', position = 'below
       {open && (
         <motion.div
           ref={popupRef}
-          initial={{ opacity: 0, y: position === 'above' ? 6 : -6, scale: 0.96 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: position === 'above' ? 6 : -6, scale: 0.96 }}
-          transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 0, y: position === 'above' ? 4 : -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: position === 'above' ? 4 : -4 }}
+          transition={{ duration: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
           className={cn(
-            'fixed z-[9999] min-w-[220px] rounded-xl border border-border/80 bg-card p-1.5 shadow-xl shadow-black/10 backdrop-blur-xl',
+            'fixed z-[9999] min-w-[220px] rounded-xl border border-border/80 bg-card p-1.5 shadow-xl shadow-black/10',
             className
           )}
           style={{
@@ -102,6 +103,99 @@ export function Dropdown({ trigger, children, align = 'right', position = 'below
         {trigger}
       </div>
       {typeof document !== 'undefined' && createPortal(popup, document.body)}
+    </div>
+  )
+}
+
+/* ── Sub-menu (hover flyout) ── */
+
+interface DropdownSubProps {
+  trigger: React.ReactNode
+  children: React.ReactNode
+  className?: string
+}
+
+export function DropdownSub({ trigger, children, className }: DropdownSubProps) {
+  const [open, setOpen] = useState(false)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const flyoutRef = useRef<HTMLDivElement>(null)
+  const [flyoutStyle, setFlyoutStyle] = useState<React.CSSProperties>({})
+
+  function handleEnter() {
+    clearTimeout(timeoutRef.current)
+    setOpen(true)
+  }
+
+  function handleLeave() {
+    timeoutRef.current = setTimeout(() => setOpen(false), 150)
+  }
+
+  useEffect(() => {
+    return () => clearTimeout(timeoutRef.current)
+  }, [])
+
+  // Position flyout to avoid viewport overflow
+  useLayoutEffect(() => {
+    if (!open || !containerRef.current || !flyoutRef.current) return
+    const triggerRect = containerRef.current.getBoundingClientRect()
+    const flyoutRect = flyoutRef.current.getBoundingClientRect()
+    const style: React.CSSProperties = {}
+
+    // Horizontal: prefer right, fall back to left
+    if (triggerRect.right + flyoutRect.width + 8 > window.innerWidth) {
+      style.right = '100%'
+      style.left = 'auto'
+      style.marginRight = 6
+    }
+
+    // Vertical: clamp so it doesn't overflow bottom
+    if (triggerRect.top + flyoutRect.height > window.innerHeight - 8) {
+      style.top = 'auto'
+      style.bottom = 0
+    }
+
+    setFlyoutStyle(style)
+  }, [open])
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative"
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+    >
+      <button
+        type="button"
+        className={cn(
+          'flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+          'text-foreground/90 hover:bg-muted hover:text-foreground',
+          open && 'bg-muted text-foreground'
+        )}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {trigger}
+        <ChevronRight className="h-3.5 w-3.5 ml-auto text-muted-foreground" />
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            ref={flyoutRef}
+            initial={{ opacity: 0, x: -4 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -4 }}
+            transition={{ duration: 0.12, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className={cn(
+              'absolute left-full top-0 ml-1.5 min-w-[200px] rounded-xl border border-border/80 bg-card p-1.5 shadow-xl shadow-black/10',
+              className
+            )}
+            style={flyoutStyle}
+          >
+            {children}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
