@@ -80,6 +80,7 @@ export default class Update {
       total: Math.round(total * 100) / 100,
       vatExemptReason: payload.vatExemptReason || 'none',
       clientSnapshot: payload.clientSnapshot ? JSON.stringify(payload.clientSnapshot) : null,
+      companySnapshot: payload.companySnapshot ? JSON.stringify(payload.companySnapshot) : null,
     }
 
     encryptModelFields(quoteUpdateData, [...ENCRYPTED_FIELDS.quote], dek)

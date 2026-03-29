@@ -56,6 +56,7 @@ interface QuoteDetail {
   clientVatNumber: string | null
   clientId: string | null
   clientSnapshot?: string | null
+  companySnapshot?: string | null
   client: ClientInfo | null
   vatExemptReason?: 'none' | 'not_subject' | 'france_no_vat' | 'outside_france'
   lines: {
@@ -271,6 +272,13 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
     return quote?.client || null
   }, [quote?.clientSnapshot, quote?.client])
 
+  const effectiveCompany = useMemo(() => {
+    if (quote?.companySnapshot) {
+      try { return JSON.parse(quote.companySnapshot) as CompanyInfo } catch { return company }
+    }
+    return company
+  }, [quote?.companySnapshot, company])
+
   return (
     <AnimatePresence>
       {quoteId && (
@@ -319,7 +327,7 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
                   issueDate={quote.issueDate || ''}
                   validityDate={quote.validityDate || ''}
                   billingType={quote.billingType}
-                  company={company}
+                  company={effectiveCompany}
                   onCompanyFieldChange={noop}
                   client={effectiveClient}
                   onClientClick={noop}

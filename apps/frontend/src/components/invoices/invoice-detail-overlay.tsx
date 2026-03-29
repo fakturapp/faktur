@@ -63,6 +63,7 @@ interface InvoiceDetail {
   clientVatNumber: string | null
   clientId: string | null
   clientSnapshot?: string | null
+  companySnapshot?: string | null
   client: ClientInfo | null
   vatExemptReason?: 'none' | 'not_subject' | 'france_no_vat' | 'outside_france'
   lines: {
@@ -303,6 +304,13 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
     return invoice?.client || null
   }, [invoice?.clientSnapshot, invoice?.client])
 
+  const effectiveCompany = useMemo(() => {
+    if (invoice?.companySnapshot) {
+      try { return JSON.parse(invoice.companySnapshot) as CompanyInfo } catch { return company }
+    }
+    return company
+  }, [invoice?.companySnapshot, company])
+
   return (
     <AnimatePresence>
       {invoiceId && (
@@ -351,7 +359,7 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                   issueDate={invoice.issueDate || ''}
                   validityDate={invoice.dueDate || ''}
                   billingType={invoice.billingType}
-                  company={company}
+                  company={effectiveCompany}
                   onCompanyFieldChange={noop}
                   client={effectiveClient}
                   onClientClick={noop}

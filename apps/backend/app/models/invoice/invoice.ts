@@ -108,6 +108,9 @@ export default class Invoice extends BaseModel {
   declare clientSnapshot: string | null
 
   @column()
+  declare companySnapshot: string | null
+
+  @column()
   declare operationCategory: 'service' | 'goods' | 'mixed' | null
 
   @column.dateTime({ autoCreate: true })

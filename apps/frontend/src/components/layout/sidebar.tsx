@@ -579,6 +579,8 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
         <Dropdown
           align="left"
           position="above"
+          sideOffset={4}
+          alignOffset={8}
           className="min-w-[260px]"
           trigger={
             <div className="flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-sidebar-accent/50 transition-all duration-300 ease-in-out w-full">

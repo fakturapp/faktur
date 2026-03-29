@@ -383,6 +383,7 @@ export default function NewInvoicePage() {
       bankAccountId: bankAccountId || undefined,
       vatExemptReason: options.vatExemptReason,
       clientSnapshot: selectedClient ? {
+        id: selectedClient.id,
         type: selectedClient.type,
         displayName: selectedClient.displayName,
         companyName: selectedClient.companyName,
@@ -397,6 +398,18 @@ export default function NewInvoicePage() {
         country: selectedClient.country,
         siren: selectedClient.siren,
         vatNumber: selectedClient.vatNumber,
+      } : undefined,
+      companySnapshot: company ? {
+        legalName: company.legalName,
+        addressLine1: company.addressLine1,
+        addressLine2: company.addressLine2,
+        postalCode: company.postalCode,
+        city: company.city,
+        country: company.country,
+        phone: company.phone,
+        email: company.email,
+        siren: company.siren,
+        vatNumber: company.vatNumber,
       } : undefined,
       lines: lines
         .filter((l) => l.description.trim())

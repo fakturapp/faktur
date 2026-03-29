@@ -34,6 +34,7 @@ export default class QuoteTransformer extends BaseTransformer<Quote> {
         'vatExemptReason',
         'clientId',
         'clientSnapshot',
+        'companySnapshot',
         'createdAt',
       ]),
       clientName: this.resource.client?.displayName || null,

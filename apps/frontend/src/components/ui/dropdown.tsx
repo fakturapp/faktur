@@ -11,10 +11,12 @@ interface DropdownProps {
   children: React.ReactNode
   align?: 'left' | 'right'
   position?: 'below' | 'above'
+  sideOffset?: number
+  alignOffset?: number
   className?: string
 }
 
-export function Dropdown({ trigger, children, align = 'right', position = 'below', className }: DropdownProps) {
+export function Dropdown({ trigger, children, align = 'right', position = 'below', sideOffset = 0, alignOffset = 0, className }: DropdownProps) {
   const [open, setOpen] = React.useState(false)
   const triggerRef = useRef<HTMLDivElement>(null)
   const popupRef = useRef<HTMLDivElement>(null)
@@ -50,23 +52,23 @@ export function Dropdown({ trigger, children, align = 'right', position = 'below
     let left: number
 
     if (position === 'above') {
-      top = rect.top - 8
+      top = rect.top - 8 - sideOffset
     } else {
-      top = rect.bottom + 8
+      top = rect.bottom + 8 + sideOffset
     }
 
     if (align === 'right') {
-      left = rect.right - popupW
+      left = rect.right - popupW + alignOffset
       if (left < 8) left = 8
     } else {
-      left = rect.left
+      left = rect.left + alignOffset
       if (left + popupW > window.innerWidth - 8) {
         left = window.innerWidth - popupW - 8
       }
     }
 
     setPos({ top, left })
-  }, [open, align, position])
+  }, [open, align, position, sideOffset, alignOffset])
 
   const popup = (
     <AnimatePresence>

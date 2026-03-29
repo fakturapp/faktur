@@ -45,6 +45,24 @@ export const createInvoiceValidator = vine.compile(
         vatNumber: vine.string().trim().maxLength(30).optional().nullable(),
       })
       .optional(),
+    companySnapshot: vine
+      .object({
+        legalName: vine.string().trim().maxLength(255).optional().nullable(),
+        tradeName: vine.string().trim().maxLength(255).optional().nullable(),
+        siren: vine.string().trim().maxLength(20).optional().nullable(),
+        siret: vine.string().trim().maxLength(20).optional().nullable(),
+        vatNumber: vine.string().trim().maxLength(30).optional().nullable(),
+        legalForm: vine.string().trim().maxLength(100).optional().nullable(),
+        addressLine1: vine.string().trim().maxLength(500).optional().nullable(),
+        addressLine2: vine.string().trim().maxLength(500).optional().nullable(),
+        city: vine.string().trim().maxLength(100).optional().nullable(),
+        postalCode: vine.string().trim().maxLength(20).optional().nullable(),
+        country: vine.string().trim().maxLength(100).optional().nullable(),
+        phone: vine.string().trim().maxLength(30).optional().nullable(),
+        email: vine.string().trim().maxLength(255).optional().nullable(),
+        website: vine.string().trim().maxLength(255).optional().nullable(),
+      })
+      .optional(),
     vatExemptReason: vine
       .enum(['none', 'not_subject', 'france_no_vat', 'outside_france'])
       .optional(),

@@ -90,6 +90,9 @@ export default class Quote extends BaseModel {
   @column()
   declare clientSnapshot: string | null
 
+  @column()
+  declare companySnapshot: string | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
