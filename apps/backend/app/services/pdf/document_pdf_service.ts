@@ -16,15 +16,25 @@ import {
 import { renderQuoteHtml } from '#services/pdf/html_renderer'
 import { generatePdf } from '#services/pdf/pdf_generator'
 
-function resolveLogoToBase64(logoUrl: string | null): string | null {
+async function resolveLogoToBase64(logoUrl: string | null): Promise<string | null> {
   if (!logoUrl) return null
-  if (
-    logoUrl.startsWith('data:') ||
-    logoUrl.startsWith('http://') ||
-    logoUrl.startsWith('https://')
-  ) {
-    return logoUrl
+  if (logoUrl.startsWith('data:')) return logoUrl
+
+  if (logoUrl.startsWith('http://') || logoUrl.startsWith('https://')) {
+    try {
+      const res = await fetch(logoUrl)
+      if (!res.ok) return null
+      const arrayBuf = await res.arrayBuffer()
+      const buffer = Buffer.from(arrayBuf)
+      const contentType = res.headers.get('content-type') || 'image/png'
+      const base64 = buffer.toString('base64')
+      return `data:${contentType};base64,${base64}`
+    } catch {
+      return null
+    }
   }
+
+  // Legacy: local filesystem paths
   const match = logoUrl.match(/^\/(invoice-logos|company-logos)\/(.+)$/)
   if (!match) return null
   const filePath = join(app.tmpPath(), 'uploads', match[1], match[2])
@@ -141,7 +151,7 @@ export async function generateInvoicePdf(
   const logoSource = invoiceSettings?.logoSource || 'custom'
   const rawLogoUrl =
     logoSource === 'company' ? company?.logoUrl || null : invoiceSettings?.logoUrl || null
-  const resolvedLogoUrl = resolveLogoToBase64(rawLogoUrl)
+  const resolvedLogoUrl = await resolveLogoToBase64(rawLogoUrl)
 
   const quoteData = {
     quoteNumber: invoice.invoiceNumber,
@@ -270,7 +280,7 @@ export async function generateQuotePdf(
   const logoSource = invoiceSettings?.logoSource || 'custom'
   const rawLogoUrl =
     logoSource === 'company' ? company?.logoUrl || null : invoiceSettings?.logoUrl || null
-  const resolvedLogoUrl = resolveLogoToBase64(rawLogoUrl)
+  const resolvedLogoUrl = await resolveLogoToBase64(rawLogoUrl)
 
   const quoteData = {
     quoteNumber: quote.quoteNumber,
@@ -372,7 +382,7 @@ export async function generateCreditNotePdf(
   const logoSource = invoiceSettings?.logoSource || 'custom'
   const rawLogoUrl =
     logoSource === 'company' ? company?.logoUrl || null : invoiceSettings?.logoUrl || null
-  const resolvedLogoUrl = resolveLogoToBase64(rawLogoUrl)
+  const resolvedLogoUrl = await resolveLogoToBase64(rawLogoUrl)
 
   const quoteData = {
     quoteNumber: creditNote.creditNoteNumber,
