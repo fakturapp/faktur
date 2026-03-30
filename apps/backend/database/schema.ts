@@ -1280,7 +1280,7 @@ export class TeamSchema extends BaseModel {
 }
 
 export class UserSchema extends BaseModel {
-  static $columns = ['avatarUrl', 'createdAt', 'cryptoResetNeeded', 'currentTeamId', 'email', 'emailVerificationSentAt', 'emailVerificationToken', 'emailVerified', 'failedLoginAttempts', 'fullName', 'hasRecoveryKey', 'id', 'keyVersion', 'lastLoginAt', 'lockedUntil', 'oldSaltKdf', 'onboardingCompleted', 'password', 'passwordResetExpiresAt', 'passwordResetToken', 'pendingEmail', 'recoveryCodesEncrypted', 'recoveryKeyHash', 'saltKdf', 'securityCode', 'securityCodeExpiresAt', 'status', 'twoFactorEnabled', 'twoFactorSecretEncrypted', 'updatedAt'] as const
+  static $columns = ['avatarUrl', 'createdAt', 'cryptoResetNeeded', 'currentTeamId', 'deletionCode', 'deletionCodeExpiresAt', 'deletionStartedAt', 'deletionStep', 'deletionToken', 'email', 'emailVerificationSentAt', 'emailVerificationToken', 'emailVerified', 'failedLoginAttempts', 'fullName', 'hasRecoveryKey', 'id', 'keyVersion', 'lastLoginAt', 'lockedUntil', 'oldSaltKdf', 'onboardingCompleted', 'password', 'passwordResetExpiresAt', 'passwordResetToken', 'pendingEmail', 'recoveryCodesEncrypted', 'recoveryKeyHash', 'saltKdf', 'securityCode', 'securityCodeExpiresAt', 'status', 'twoFactorEnabled', 'twoFactorSecretEncrypted', 'updatedAt'] as const
   $columns = UserSchema.$columns
   @column()
   declare avatarUrl: string | null
@@ -1290,6 +1290,16 @@ export class UserSchema extends BaseModel {
   declare cryptoResetNeeded: boolean
   @column()
   declare currentTeamId: string | null
+  @column()
+  declare deletionCode: string | null
+  @column.dateTime()
+  declare deletionCodeExpiresAt: DateTime | null
+  @column.dateTime()
+  declare deletionStartedAt: DateTime | null
+  @column()
+  declare deletionStep: number | null
+  @column()
+  declare deletionToken: string | null
   @column()
   declare email: string
   @column.dateTime()

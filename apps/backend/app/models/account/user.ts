@@ -102,6 +102,22 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column()
   declare onboardingCompleted: boolean
 
+  // Account Deletion Flow
+  @column({ serializeAs: null })
+  declare deletionToken: string | null
+
+  @column({ serializeAs: null })
+  declare deletionStep: number
+
+  @column({ serializeAs: null })
+  declare deletionCode: string | null
+
+  @column.dateTime({ serializeAs: null })
+  declare deletionCodeExpiresAt: DateTime | null
+
+  @column.dateTime({ serializeAs: null })
+  declare deletionStartedAt: DateTime | null
+
   // Status
   @column()
   declare status: 'active' | 'suspended' | 'deleted'
