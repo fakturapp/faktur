@@ -10,10 +10,21 @@ import TeamMember from '#models/team/team_member'
 import Company from '#models/team/company'
 import InvoiceSetting from '#models/team/invoice_setting'
 import Client from '#models/client/client'
+import ClientContact from '#models/client/client_contact'
 import Invoice from '#models/invoice/invoice'
 import InvoiceLine from '#models/invoice/invoice_line'
+import InvoicePayment from '#models/invoice/invoice_payment'
 import Quote from '#models/quote/quote'
 import QuoteLine from '#models/quote/quote_line'
+import Product from '#models/product/product'
+import CreditNote from '#models/credit_note/credit_note'
+import CreditNoteLine from '#models/credit_note/credit_note_line'
+import RecurringInvoice from '#models/recurring_invoice/recurring_invoice'
+import RecurringInvoiceLine from '#models/recurring_invoice/recurring_invoice_line'
+import Expense from '#models/expense/expense'
+import ExpenseCategory from '#models/expense/expense_category'
+import EmailTemplate from '#models/email/email_template'
+import PaymentReminderSetting from '#models/reminder/payment_reminder_setting'
 import BankAccount from '#models/team/bank_account'
 import { decryptBuffer } from '#services/team/export_service'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
@@ -100,6 +111,15 @@ export default class Import {
     const quotesData = readJson('export/quotes.json') || []
     const settingsData = readJson('export/settings.json')
     const bankAccountsData = readJson('export/bank_accounts.json') || []
+    const productsData = readJson('export/products.json') || []
+    const creditNotesData = readJson('export/credit_notes.json') || []
+    const recurringInvoicesData = readJson('export/recurring_invoices.json') || []
+    const expenseCategoriesData = readJson('export/expense_categories.json') || []
+    const expensesData = readJson('export/expenses.json') || []
+    const invoicePaymentsData = readJson('export/invoice_payments.json') || []
+    const clientContactsData = readJson('export/client_contacts.json') || []
+    const emailTemplatesData = readJson('export/email_templates.json') || []
+    const paymentReminderSettingsData = readJson('export/payment_reminder_settings.json') || []
 
     if (!metadata || !teamData) {
       return response.unprocessableEntity({
@@ -170,9 +190,10 @@ export default class Import {
         }
       }
 
-      // Create invoices with lines (encrypt sensitive fields)
+      // Create invoices with lines and build ID mapping (encrypt sensitive fields)
+      const invoiceIdMap: Record<string, string> = {}
       for (const invData of invoicesData) {
-        const { lines, clientId, sourceQuoteId, ...rest } = invData
+        const { lines, clientId, sourceQuoteId, originalId, ...rest } = invData
         const invRecord: Record<string, any> = {
           teamId: newTeam.id,
           clientId: clientId ? clientIdMap[clientId] || null : null,
@@ -181,6 +202,9 @@ export default class Import {
         }
         encryptModelFields(invRecord, [...ENCRYPTED_FIELDS.invoice], teamDek)
         const newInvoice = await Invoice.create(invRecord, { client: trx })
+        if (originalId) {
+          invoiceIdMap[originalId] = newInvoice.id
+        }
 
         if (lines && lines.length > 0) {
           for (const line of lines) {
@@ -209,6 +233,117 @@ export default class Import {
             await QuoteLine.create(lineRecord, { client: trx })
           }
         }
+      }
+
+      // Create products (encrypt sensitive fields)
+      for (const prodData of productsData) {
+        const prodRecord: Record<string, any> = { teamId: newTeam.id, ...prodData }
+        encryptModelFields(prodRecord, [...ENCRYPTED_FIELDS.product], teamDek)
+        await Product.create(prodRecord, { client: trx })
+      }
+
+      // Create credit notes with lines (encrypt sensitive fields)
+      for (const cnData of creditNotesData) {
+        const { lines, clientId, sourceInvoiceId, ...rest } = cnData
+        const cnRecord: Record<string, any> = {
+          teamId: newTeam.id,
+          clientId: clientId ? clientIdMap[clientId] || null : null,
+          sourceInvoiceId: sourceInvoiceId ? invoiceIdMap[sourceInvoiceId] || null : null,
+          ...rest,
+        }
+        encryptModelFields(cnRecord, [...ENCRYPTED_FIELDS.creditNote], teamDek)
+        const newCreditNote = await CreditNote.create(cnRecord, { client: trx })
+
+        if (lines && lines.length > 0) {
+          for (const line of lines) {
+            const lineRecord: Record<string, any> = { creditNoteId: newCreditNote.id, ...line }
+            encryptModelFields(lineRecord, [...ENCRYPTED_FIELDS.creditNoteLine], teamDek)
+            await CreditNoteLine.create(lineRecord, { client: trx })
+          }
+        }
+      }
+
+      // Create recurring invoices with lines (encrypt sensitive fields)
+      for (const riData of recurringInvoicesData) {
+        const { lines, clientId, bankAccountId, ...rest } = riData
+        const riRecord: Record<string, any> = {
+          teamId: newTeam.id,
+          clientId: clientId ? clientIdMap[clientId] || null : null,
+          bankAccountId: null,
+          ...rest,
+        }
+        encryptModelFields(riRecord, [...ENCRYPTED_FIELDS.recurringInvoice], teamDek)
+        const newRecurring = await RecurringInvoice.create(riRecord, { client: trx })
+
+        if (lines && lines.length > 0) {
+          for (const line of lines) {
+            const lineRecord: Record<string, any> = {
+              recurringInvoiceId: newRecurring.id,
+              ...line,
+            }
+            encryptModelFields(lineRecord, [...ENCRYPTED_FIELDS.recurringInvoiceLine], teamDek)
+            await RecurringInvoiceLine.create(lineRecord, { client: trx })
+          }
+        }
+      }
+
+      // Create expense categories and build ID mapping
+      const expenseCategoryIdMap: Record<string, string> = {}
+      for (const ecData of expenseCategoriesData) {
+        const { originalId, ...rest } = ecData
+        const newCategory = await ExpenseCategory.create(
+          { teamId: newTeam.id, ...rest },
+          { client: trx }
+        )
+        if (originalId) {
+          expenseCategoryIdMap[originalId] = newCategory.id
+        }
+      }
+
+      // Create expenses (encrypt sensitive fields)
+      for (const expData of expensesData) {
+        const { categoryId, ...rest } = expData
+        const expRecord: Record<string, any> = {
+          teamId: newTeam.id,
+          categoryId: categoryId ? expenseCategoryIdMap[categoryId] || null : null,
+          ...rest,
+        }
+        encryptModelFields(expRecord, [...ENCRYPTED_FIELDS.expense], teamDek)
+        await Expense.create(expRecord, { client: trx })
+      }
+
+      // Create invoice payments (encrypt sensitive fields)
+      for (const ipData of invoicePaymentsData) {
+        const { invoiceId, ...rest } = ipData
+        const ipRecord: Record<string, any> = {
+          teamId: newTeam.id,
+          invoiceId: invoiceId ? invoiceIdMap[invoiceId] || null : null,
+          ...rest,
+        }
+        encryptModelFields(ipRecord, [...ENCRYPTED_FIELDS.invoicePayment], teamDek)
+        await InvoicePayment.create(ipRecord, { client: trx })
+      }
+
+      // Create client contacts (encrypt sensitive fields)
+      for (const ccData of clientContactsData) {
+        const { clientId, ...rest } = ccData
+        const ccRecord: Record<string, any> = {
+          teamId: newTeam.id,
+          clientId: clientId ? clientIdMap[clientId] || null : null,
+          ...rest,
+        }
+        encryptModelFields(ccRecord, [...ENCRYPTED_FIELDS.clientContact], teamDek)
+        await ClientContact.create(ccRecord, { client: trx })
+      }
+
+      // Create email templates (no encrypted fields)
+      for (const etData of emailTemplatesData) {
+        await EmailTemplate.create({ teamId: newTeam.id, ...etData }, { client: trx })
+      }
+
+      // Create payment reminder settings (no encrypted fields)
+      for (const prsData of paymentReminderSettingsData) {
+        await PaymentReminderSetting.create({ teamId: newTeam.id, ...prsData }, { client: trx })
       }
 
       return newTeam

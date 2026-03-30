@@ -2143,42 +2143,6 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ai/check_providers').default['handle']>>>
     }
   }
-  'create_feedback': {
-    methods: ["POST"]
-    pattern: '/api/v1/feedback'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/feedback/create').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/feedback/create').default['handle']>>>
-    }
-  }
-  'my_feedback': {
-    methods: ["GET","HEAD"]
-    pattern: '/api/v1/feedback/mine'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/feedback/mine').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/feedback/mine').default['handle']>>>
-    }
-  }
-  'create_bug_report': {
-    methods: ["POST"]
-    pattern: '/api/v1/bug-report'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/bug_report/create').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/bug_report/create').default['handle']>>>
-    }
-  }
   'admin_feedbacks': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/admin/feedbacks'
@@ -2321,6 +2285,42 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/analytics/users').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/analytics/users').default['handle']>>>
+    }
+  }
+  'create_feedback': {
+    methods: ["POST"]
+    pattern: '/api/v1/feedback'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/feedback/create').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/feedback/create').default['handle']>>>
+    }
+  }
+  'my_feedback': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/feedback/mine'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/feedback/mine').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/feedback/mine').default['handle']>>>
+    }
+  }
+  'create_bug_report': {
+    methods: ["POST"]
+    pattern: '/api/v1/bug-report'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/bug_report/create').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/bug_report/create').default['handle']>>>
     }
   }
 }

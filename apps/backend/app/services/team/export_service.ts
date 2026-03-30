@@ -6,8 +6,17 @@ import archiver from 'archiver'
 import Team from '#models/team/team'
 import Company from '#models/team/company'
 import Client from '#models/client/client'
+import ClientContact from '#models/client/client_contact'
 import Invoice from '#models/invoice/invoice'
+import InvoicePayment from '#models/invoice/invoice_payment'
 import Quote from '#models/quote/quote'
+import Product from '#models/product/product'
+import CreditNote from '#models/credit_note/credit_note'
+import RecurringInvoice from '#models/recurring_invoice/recurring_invoice'
+import Expense from '#models/expense/expense'
+import ExpenseCategory from '#models/expense/expense_category'
+import EmailTemplate from '#models/email/email_template'
+import PaymentReminderSetting from '#models/reminder/payment_reminder_setting'
 import InvoiceSetting from '#models/team/invoice_setting'
 import BankAccount from '#models/team/bank_account'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
@@ -33,6 +42,15 @@ interface ExportData {
   quotes: Record<string, unknown>[]
   settings: Record<string, unknown> | null
   bankAccounts?: Record<string, unknown>[]
+  products: Record<string, unknown>[]
+  creditNotes: Record<string, unknown>[]
+  recurringInvoices: Record<string, unknown>[]
+  expenses: Record<string, unknown>[]
+  expenseCategories: Record<string, unknown>[]
+  invoicePayments: Record<string, unknown>[]
+  clientContacts: Record<string, unknown>[]
+  emailTemplates: Record<string, unknown>[]
+  paymentReminderSettings: Record<string, unknown>[]
 }
 
 export async function collectTeamData(
@@ -100,10 +118,53 @@ export async function collectTeamData(
     })
   }
 
+  // Collect products
+  const products = await Product.query().where('teamId', teamId)
+  decryptModelFieldsArray(products, [...ENCRYPTED_FIELDS.product], dek)
+
+  // Collect credit notes with lines
+  const creditNotes = await CreditNote.query()
+    .where('teamId', teamId)
+    .preload('lines', (q) => q.orderBy('position', 'asc'))
+  for (const cn of creditNotes) {
+    decryptModelFields(cn, [...ENCRYPTED_FIELDS.creditNote], dek)
+    decryptModelFieldsArray(cn.lines, [...ENCRYPTED_FIELDS.creditNoteLine], dek)
+  }
+
+  // Collect recurring invoices with lines
+  const recurringInvoices = await RecurringInvoice.query()
+    .where('teamId', teamId)
+    .preload('lines', (q) => q.orderBy('position', 'asc'))
+  for (const ri of recurringInvoices) {
+    decryptModelFields(ri, [...ENCRYPTED_FIELDS.recurringInvoice], dek)
+    decryptModelFieldsArray(ri.lines, [...ENCRYPTED_FIELDS.recurringInvoiceLine], dek)
+  }
+
+  // Collect expense categories
+  const expenseCategories = await ExpenseCategory.query().where('teamId', teamId)
+
+  // Collect expenses
+  const expenses = await Expense.query().where('teamId', teamId)
+  decryptModelFieldsArray(expenses, [...ENCRYPTED_FIELDS.expense], dek)
+
+  // Collect invoice payments
+  const invoicePayments = await InvoicePayment.query().where('teamId', teamId)
+  decryptModelFieldsArray(invoicePayments, [...ENCRYPTED_FIELDS.invoicePayment], dek)
+
+  // Collect client contacts
+  const clientContacts = await ClientContact.query().where('teamId', teamId)
+  decryptModelFieldsArray(clientContacts, [...ENCRYPTED_FIELDS.clientContact], dek)
+
+  // Collect email templates
+  const emailTemplates = await EmailTemplate.query().where('teamId', teamId)
+
+  // Collect payment reminder settings
+  const paymentReminderSettings = await PaymentReminderSetting.query().where('teamId', teamId)
+
   return {
     metadata: {
       exportDate: new Date().toISOString(),
-      version: '1.0',
+      version: '2.0',
       teamId,
     },
     team: {
@@ -181,6 +242,7 @@ export async function collectTeamData(
       paidDate: inv.paidDate,
       sourceQuoteId: inv.sourceQuoteId,
       clientId: inv.clientId,
+      originalId: inv.id,
       lines: inv.lines.map((l) => ({
         position: l.position,
         description: l.description,
@@ -256,6 +318,148 @@ export async function collectTeamData(
         }
       : null,
     ...(bankAccountsData ? { bankAccounts: bankAccountsData } : {}),
+    products: products.map((p) => ({
+      name: p.name,
+      description: p.description,
+      unitPrice: p.unitPrice,
+      vatRate: p.vatRate,
+      unit: p.unit,
+      saleType: p.saleType,
+      reference: p.reference,
+      isArchived: p.isArchived,
+    })),
+    creditNotes: creditNotes.map((cn) => ({
+      creditNoteNumber: cn.creditNoteNumber,
+      status: cn.status,
+      reason: cn.reason,
+      subject: cn.subject,
+      issueDate: cn.issueDate,
+      billingType: cn.billingType,
+      accentColor: cn.accentColor,
+      logoUrl: cn.logoUrl,
+      language: cn.language,
+      notes: cn.notes,
+      acceptanceConditions: cn.acceptanceConditions,
+      signatureField: cn.signatureField,
+      documentTitle: cn.documentTitle,
+      freeField: cn.freeField,
+      globalDiscountType: cn.globalDiscountType,
+      globalDiscountValue: cn.globalDiscountValue,
+      deliveryAddress: cn.deliveryAddress,
+      clientSiren: cn.clientSiren,
+      clientVatNumber: cn.clientVatNumber,
+      subtotal: cn.subtotal,
+      taxAmount: cn.taxAmount,
+      total: cn.total,
+      comment: cn.comment,
+      vatExemptReason: cn.vatExemptReason,
+      operationCategory: cn.operationCategory,
+      clientId: cn.clientId,
+      sourceInvoiceId: cn.sourceInvoiceId,
+      lines: cn.lines.map((l) => ({
+        position: l.position,
+        description: l.description,
+        saleType: l.saleType,
+        quantity: l.quantity,
+        unit: l.unit,
+        unitPrice: l.unitPrice,
+        vatRate: l.vatRate,
+        total: l.total,
+      })),
+    })),
+    recurringInvoices: recurringInvoices.map((ri) => ({
+      name: ri.name,
+      frequency: ri.frequency,
+      customIntervalDays: ri.customIntervalDays,
+      startDate: ri.startDate,
+      nextExecutionDate: ri.nextExecutionDate,
+      endDate: ri.endDate,
+      isActive: ri.isActive,
+      lastGeneratedAt: ri.lastGeneratedAt,
+      generationCount: ri.generationCount,
+      subject: ri.subject,
+      billingType: ri.billingType,
+      accentColor: ri.accentColor,
+      logoUrl: ri.logoUrl,
+      language: ri.language,
+      notes: ri.notes,
+      acceptanceConditions: ri.acceptanceConditions,
+      signatureField: ri.signatureField,
+      documentTitle: ri.documentTitle,
+      freeField: ri.freeField,
+      globalDiscountType: ri.globalDiscountType,
+      globalDiscountValue: ri.globalDiscountValue,
+      deliveryAddress: ri.deliveryAddress,
+      clientSiren: ri.clientSiren,
+      clientVatNumber: ri.clientVatNumber,
+      paymentTerms: ri.paymentTerms,
+      paymentMethod: ri.paymentMethod,
+      vatExemptReason: ri.vatExemptReason,
+      operationCategory: ri.operationCategory,
+      dueDays: ri.dueDays,
+      clientId: ri.clientId,
+      lines: ri.lines.map((l) => ({
+        position: l.position,
+        description: l.description,
+        saleType: l.saleType,
+        quantity: l.quantity,
+        unit: l.unit,
+        unitPrice: l.unitPrice,
+        vatRate: l.vatRate,
+        total: l.total,
+      })),
+    })),
+    expenseCategories: expenseCategories.map((ec) => ({
+      name: ec.name,
+      color: ec.color,
+      originalId: ec.id,
+    })),
+    expenses: expenses.map((e) => ({
+      description: e.description,
+      amount: e.amount,
+      vatAmount: e.vatAmount,
+      vatRate: e.vatRate,
+      currency: e.currency,
+      expenseDate: e.expenseDate,
+      paymentMethod: e.paymentMethod,
+      supplier: e.supplier,
+      notes: e.notes,
+      receiptUrl: e.receiptUrl,
+      isDeductible: e.isDeductible,
+      categoryId: e.categoryId,
+    })),
+    invoicePayments: invoicePayments.map((ip) => ({
+      amount: ip.amount,
+      paymentDate: ip.paymentDate,
+      paymentMethod: ip.paymentMethod,
+      notes: ip.notes,
+      invoiceId: ip.invoiceId,
+    })),
+    clientContacts: clientContacts.map((cc) => ({
+      firstName: cc.firstName,
+      lastName: cc.lastName,
+      email: cc.email,
+      phone: cc.phone,
+      role: cc.role,
+      notes: cc.notes,
+      isPrimary: cc.isPrimary,
+      includeInEmails: cc.includeInEmails,
+      clientId: cc.clientId,
+    })),
+    emailTemplates: emailTemplates.map((et) => ({
+      templateType: et.templateType,
+      subject: et.subject,
+      body: et.body,
+    })),
+    paymentReminderSettings: paymentReminderSettings.map((prs) => ({
+      enabled: prs.enabled,
+      daysBeforeDue: prs.daysBeforeDue,
+      daysAfterDue: prs.daysAfterDue,
+      repeatIntervalDays: prs.repeatIntervalDays,
+      emailSubjectTemplate: prs.emailSubjectTemplate,
+      emailBodyTemplate: prs.emailBodyTemplate,
+      autoSend: prs.autoSend,
+    })),
   }
 }
 
@@ -312,6 +516,30 @@ export async function createZipBuffer(data: ExportData, logoFiles?: LogoFile[]):
         name: 'export/bank_accounts.json',
       })
     }
+
+    archive.append(JSON.stringify(data.products, null, 2), { name: 'export/products.json' })
+    archive.append(JSON.stringify(data.creditNotes, null, 2), {
+      name: 'export/credit_notes.json',
+    })
+    archive.append(JSON.stringify(data.recurringInvoices, null, 2), {
+      name: 'export/recurring_invoices.json',
+    })
+    archive.append(JSON.stringify(data.expenseCategories, null, 2), {
+      name: 'export/expense_categories.json',
+    })
+    archive.append(JSON.stringify(data.expenses, null, 2), { name: 'export/expenses.json' })
+    archive.append(JSON.stringify(data.invoicePayments, null, 2), {
+      name: 'export/invoice_payments.json',
+    })
+    archive.append(JSON.stringify(data.clientContacts, null, 2), {
+      name: 'export/client_contacts.json',
+    })
+    archive.append(JSON.stringify(data.emailTemplates, null, 2), {
+      name: 'export/email_templates.json',
+    })
+    archive.append(JSON.stringify(data.paymentReminderSettings, null, 2), {
+      name: 'export/payment_reminder_settings.json',
+    })
 
     if (logoFiles) {
       for (const file of logoFiles) {

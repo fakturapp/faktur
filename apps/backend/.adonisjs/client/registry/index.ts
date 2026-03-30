@@ -1074,24 +1074,6 @@ const routes = {
     tokens: [{"old":"/api/v1/ai/providers","type":0,"val":"api","end":""},{"old":"/api/v1/ai/providers","type":0,"val":"v1","end":""},{"old":"/api/v1/ai/providers","type":0,"val":"ai","end":""},{"old":"/api/v1/ai/providers","type":0,"val":"providers","end":""}],
     types: placeholder as Registry['check_providers']['types'],
   },
-  'create_feedback': {
-    methods: ["POST"],
-    pattern: '/api/v1/feedback',
-    tokens: [{"old":"/api/v1/feedback","type":0,"val":"api","end":""},{"old":"/api/v1/feedback","type":0,"val":"v1","end":""},{"old":"/api/v1/feedback","type":0,"val":"feedback","end":""}],
-    types: placeholder as Registry['create_feedback']['types'],
-  },
-  'my_feedback': {
-    methods: ["GET","HEAD"],
-    pattern: '/api/v1/feedback/mine',
-    tokens: [{"old":"/api/v1/feedback/mine","type":0,"val":"api","end":""},{"old":"/api/v1/feedback/mine","type":0,"val":"v1","end":""},{"old":"/api/v1/feedback/mine","type":0,"val":"feedback","end":""},{"old":"/api/v1/feedback/mine","type":0,"val":"mine","end":""}],
-    types: placeholder as Registry['my_feedback']['types'],
-  },
-  'create_bug_report': {
-    methods: ["POST"],
-    pattern: '/api/v1/bug-report',
-    tokens: [{"old":"/api/v1/bug-report","type":0,"val":"api","end":""},{"old":"/api/v1/bug-report","type":0,"val":"v1","end":""},{"old":"/api/v1/bug-report","type":0,"val":"bug-report","end":""}],
-    types: placeholder as Registry['create_bug_report']['types'],
-  },
   'admin_feedbacks': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/admin/feedbacks',
@@ -1163,6 +1145,24 @@ const routes = {
     pattern: '/api/v1/admin/analytics/users',
     tokens: [{"old":"/api/v1/admin/analytics/users","type":0,"val":"api","end":""},{"old":"/api/v1/admin/analytics/users","type":0,"val":"v1","end":""},{"old":"/api/v1/admin/analytics/users","type":0,"val":"admin","end":""},{"old":"/api/v1/admin/analytics/users","type":0,"val":"analytics","end":""},{"old":"/api/v1/admin/analytics/users","type":0,"val":"users","end":""}],
     types: placeholder as Registry['analytics_users']['types'],
+  },
+  'create_feedback': {
+    methods: ["POST"],
+    pattern: '/api/v1/feedback',
+    tokens: [{"old":"/api/v1/feedback","type":0,"val":"api","end":""},{"old":"/api/v1/feedback","type":0,"val":"v1","end":""},{"old":"/api/v1/feedback","type":0,"val":"feedback","end":""}],
+    types: placeholder as Registry['create_feedback']['types'],
+  },
+  'my_feedback': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/feedback/mine',
+    tokens: [{"old":"/api/v1/feedback/mine","type":0,"val":"api","end":""},{"old":"/api/v1/feedback/mine","type":0,"val":"v1","end":""},{"old":"/api/v1/feedback/mine","type":0,"val":"feedback","end":""},{"old":"/api/v1/feedback/mine","type":0,"val":"mine","end":""}],
+    types: placeholder as Registry['my_feedback']['types'],
+  },
+  'create_bug_report': {
+    methods: ["POST"],
+    pattern: '/api/v1/bug-report',
+    tokens: [{"old":"/api/v1/bug-report","type":0,"val":"api","end":""},{"old":"/api/v1/bug-report","type":0,"val":"v1","end":""},{"old":"/api/v1/bug-report","type":0,"val":"bug-report","end":""}],
+    types: placeholder as Registry['create_bug_report']['types'],
   },
 } as const satisfies Record<string, AdonisEndpoint>
 

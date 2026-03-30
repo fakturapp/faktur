@@ -187,9 +187,6 @@ export interface ApiDefinition {
   generateDocument: typeof routes['generate_document']
   chatDocument: typeof routes['chat_document']
   checkProviders: typeof routes['check_providers']
-  createFeedback: typeof routes['create_feedback']
-  myFeedback: typeof routes['my_feedback']
-  createBugReport: typeof routes['create_bug_report']
   adminFeedbacks: typeof routes['admin_feedbacks']
   adminBugReports: {
     index: typeof routes['admin_bug_reports.index']
@@ -205,4 +202,7 @@ export interface ApiDefinition {
   }
   analyticsPerformance: typeof routes['analytics_performance']
   analyticsUsers: typeof routes['analytics_users']
+  createFeedback: typeof routes['create_feedback']
+  myFeedback: typeof routes['my_feedback']
+  createBugReport: typeof routes['create_bug_report']
 }
