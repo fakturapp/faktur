@@ -200,7 +200,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       <div
         className={cn(
-          'relative flex min-h-0 flex-1 flex-col transition-all duration-300 ease-out overflow-hidden',
+          'relative flex min-w-0 min-h-0 flex-1 flex-col transition-all duration-300 ease-out overflow-hidden',
           'm-2 rounded-2xl liquid-content',
           switching && 'blur-sm pointer-events-none'
         )}

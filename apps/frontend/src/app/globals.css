@@ -1,29 +1,29 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-background: #ffffff;
-  --color-foreground: #0a0a0a;
+  --color-background: #faf9f7;
+  --color-foreground: #1a1a1a;
   --color-card: #ffffff;
-  --color-card-foreground: #0a0a0a;
+  --color-card-foreground: #1a1a1a;
   --color-primary: #6366f1;
   --color-primary-foreground: #ffffff;
-  --color-muted: #f5f5f7;
+  --color-muted: #f3f2ef;
   --color-muted-foreground: #6b6b6b;
-  --color-border: #e8e8e8;
-  --color-input: #e8e8e8;
+  --color-border: #e8e6e1;
+  --color-input: #e8e6e1;
   --color-ring: #6366f1;
   --color-destructive: #ef4444;
   --color-destructive-foreground: #ffffff;
   --color-success: #22c55e;
-  --color-secondary: #f5f5f7;
-  --color-secondary-foreground: #0a0a0a;
-  --color-accent: #f5f5f7;
-  --color-accent-foreground: #0a0a0a;
-  --color-sidebar: #ffffff;
-  --color-sidebar-foreground: #0a0a0a;
-  --color-sidebar-border: #e8e8e8;
-  --color-sidebar-accent: #f5f5f7;
-  --color-sidebar-accent-foreground: #0a0a0a;
+  --color-secondary: #f3f2ef;
+  --color-secondary-foreground: #1a1a1a;
+  --color-accent: #f3f2ef;
+  --color-accent-foreground: #1a1a1a;
+  --color-sidebar: #faf9f7;
+  --color-sidebar-foreground: #1a1a1a;
+  --color-sidebar-border: #e8e6e1;
+  --color-sidebar-accent: #f3f2ef;
+  --color-sidebar-accent-foreground: #1a1a1a;
   --sidebar-width: 16rem;
   --header-height: 3.5rem;
   --color-chart-1: #6366f1;
@@ -36,23 +36,23 @@
 }
 
 :root, .light {
-  --color-background: #ffffff;
-  --color-foreground: #0a0a0a;
+  --color-background: #faf9f7;
+  --color-foreground: #1a1a1a;
   --color-card: #ffffff;
-  --color-card-foreground: #0a0a0a;
-  --color-muted: #f5f5f7;
+  --color-card-foreground: #1a1a1a;
+  --color-muted: #f3f2ef;
   --color-muted-foreground: #6b6b6b;
-  --color-border: #e8e8e8;
-  --color-input: #e8e8e8;
-  --color-sidebar: #ffffff;
-  --color-sidebar-foreground: #0a0a0a;
-  --color-sidebar-border: #e8e8e8;
-  --color-sidebar-accent: #f5f5f7;
-  --color-sidebar-accent-foreground: #0a0a0a;
-  --color-secondary: #f5f5f7;
-  --color-secondary-foreground: #0a0a0a;
-  --color-accent: #f5f5f7;
-  --color-accent-foreground: #0a0a0a;
+  --color-border: #e8e6e1;
+  --color-input: #e8e6e1;
+  --color-sidebar: #faf9f7;
+  --color-sidebar-foreground: #1a1a1a;
+  --color-sidebar-border: #e8e6e1;
+  --color-sidebar-accent: #f3f2ef;
+  --color-sidebar-accent-foreground: #1a1a1a;
+  --color-secondary: #f3f2ef;
+  --color-secondary-foreground: #1a1a1a;
+  --color-accent: #f3f2ef;
+  --color-accent-foreground: #1a1a1a;
 }
 
 .dark {
@@ -212,10 +212,7 @@ body {
   background: rgba(0, 0, 0, 0.25);
 }
 
-/* Landing page smooth scroll */
-html {
-  scroll-behavior: smooth;
-}
+/* Landing page smooth scroll — handled by data-scroll-behavior attr on <html> */
 
 /* Landing page gradient glow */
 @keyframes glow-pulse {
@@ -301,8 +298,8 @@ html {
 
 /* --- Sidebar bubble (Tahoe: lighter, translucent, floats above) --- */
 .liquid-sidebar {
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 252, 0.65);
+  border: 1px solid rgba(255, 255, 252, 0.7);
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.02),
     0 4px 12px rgba(0, 0, 0, 0.03),
@@ -324,8 +321,8 @@ html {
 
 /* --- Content panel (Tahoe: darker, more opaque, recessed) --- */
 .liquid-content {
-  background: rgba(255, 255, 255, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 252, 0.85);
+  border: 1px solid rgba(255, 255, 252, 0.5);
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.02),
     0 4px 12px rgba(0, 0, 0, 0.03),
@@ -344,7 +341,7 @@ html {
 
 /* --- Toolbar (Tahoe: matches sidebar translucency) --- */
 .liquid-toolbar {
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 252, 0.5);
   box-shadow:
     inset 0 -1px 0 rgba(0, 0, 0, 0.04);
 }
