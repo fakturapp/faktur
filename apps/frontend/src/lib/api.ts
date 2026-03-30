@@ -190,15 +190,16 @@ async function postBlobRequest(
 }
 
 export const api = {
-  post: <T = unknown>(endpoint: string, body: unknown) =>
-    request<T>(endpoint, { method: 'POST', body: JSON.stringify(body) }),
-  get: <T = unknown>(endpoint: string) => request<T>(endpoint, { method: 'GET' }),
-  put: <T = unknown>(endpoint: string, body: unknown) =>
-    request<T>(endpoint, { method: 'PUT', body: JSON.stringify(body) }),
-  patch: <T = unknown>(endpoint: string, body: unknown) =>
-    request<T>(endpoint, { method: 'PATCH', body: JSON.stringify(body) }),
-  delete: <T = unknown>(endpoint: string, body?: unknown) =>
-    request<T>(endpoint, { method: 'DELETE', body: body ? JSON.stringify(body) : undefined }),
+  post: <T = unknown>(endpoint: string, body: unknown, opts?: { headers?: Record<string, string> }) =>
+    request<T>(endpoint, { method: 'POST', body: JSON.stringify(body), headers: opts?.headers }),
+  get: <T = unknown>(endpoint: string, opts?: { headers?: Record<string, string> }) =>
+    request<T>(endpoint, { method: 'GET', headers: opts?.headers }),
+  put: <T = unknown>(endpoint: string, body: unknown, opts?: { headers?: Record<string, string> }) =>
+    request<T>(endpoint, { method: 'PUT', body: JSON.stringify(body), headers: opts?.headers }),
+  patch: <T = unknown>(endpoint: string, body: unknown, opts?: { headers?: Record<string, string> }) =>
+    request<T>(endpoint, { method: 'PATCH', body: JSON.stringify(body), headers: opts?.headers }),
+  delete: <T = unknown>(endpoint: string, body?: unknown, opts?: { headers?: Record<string, string> }) =>
+    request<T>(endpoint, { method: 'DELETE', body: body ? JSON.stringify(body) : undefined, headers: opts?.headers }),
   upload: <T = unknown>(endpoint: string, formData: FormData) =>
     uploadRequest<T>(endpoint, formData),
   downloadBlob: (endpoint: string) => blobRequest(endpoint),

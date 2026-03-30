@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -37,6 +38,7 @@ interface Session {
 }
 
 export default function AccountPage() {
+  const router = useRouter()
   const { user, refreshUser, logout } = useAuth()
   const { toast } = useToast()
   const [activeTab, setActiveTab] = useState('profile')
@@ -65,7 +67,6 @@ export default function AccountPage() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [showDeletePassword, setShowDeletePassword] = useState(false)
 
   // Sessions
   const [sessions, setSessions] = useState<Session[]>([])
@@ -73,10 +74,8 @@ export default function AccountPage() {
   const [revokeConfirm, setRevokeConfirm] = useState<string | null>(null)
   const [revoking, setRevoking] = useState(false)
 
-  // Delete
-  const [deleteOpen, setDeleteOpen] = useState(false)
-  const [deletePassword, setDeletePassword] = useState('')
-  const [deleteLoading, setDeleteLoading] = useState(false)
+  // Delete redirect
+  const [deleteRedirectOpen, setDeleteRedirectOpen] = useState(false)
 
   // Export modal
   const [exportModalOpen, setExportModalOpen] = useState(false)
@@ -121,8 +120,6 @@ export default function AccountPage() {
       executeSetup2FA()
     } else if (securityAction === 'disable_2fa') {
       setDisableOpen(true)
-    } else if (securityAction === 'delete_account') {
-      setDeleteOpen(true)
     } else if (securityAction === 'link_google') {
       executeLinkGoogle()
     } else if (securityAction === 'unlink_google') {
@@ -461,16 +458,7 @@ export default function AccountPage() {
   }
 
   function handleDeleteAccount() {
-    requireSecurity('delete_account')
-  }
-
-  async function executeDeleteAccount() {
-    setDeleteLoading(true)
-    const { error } = await api.delete('/account', { password: deletePassword })
-    setDeleteLoading(false)
-    if (error) return toast(error, 'error')
-    setDeleteOpen(false)
-    logout()
+    setDeleteRedirectOpen(true)
   }
 
 
@@ -1002,35 +990,22 @@ export default function AccountPage() {
         </DialogFooter>
       </Dialog>
 
-      {/* Delete account dialog */}
-      <Dialog open={deleteOpen} onClose={() => setDeleteOpen(false)}>
+      {/* Delete account redirect dialog */}
+      <Dialog open={deleteRedirectOpen} onClose={() => setDeleteRedirectOpen(false)}>
         <DialogTitle>Supprimer votre compte</DialogTitle>
         <DialogDescription>
-          Cette action est irréversible. Toutes vos données seront perdues. Entrez votre mot de passe pour confirmer.
+          Vous allez être redirigé vers la page de suppression de compte. Ce processus comporte plusieurs étapes de vérification.
         </DialogDescription>
-        <div className="mt-4 relative">
-          <Input
-            type={showDeletePassword ? 'text' : 'password'}
-            placeholder="Votre mot de passe"
-            value={deletePassword}
-            onChange={(e) => setDeletePassword(e.target.value)}
-            className="pr-10"
-          />
-          <button type="button" onClick={() => setShowDeletePassword(!showDeletePassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors" tabIndex={-1}>
-            {showDeletePassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-          </button>
-        </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => setDeleteOpen(false)}>
+          <Button variant="outline" onClick={() => setDeleteRedirectOpen(false)}>
             Annuler
           </Button>
           <Button
             variant="outline"
             className="border-destructive/30 text-destructive hover:bg-destructive/10"
-            onClick={executeDeleteAccount}
-            disabled={deleteLoading || !deletePassword}
+            onClick={() => router.push('/dashboard/account/delete')}
           >
-            {deleteLoading ? <><Spinner /> Suppression...</> : 'Supprimer définitivement'}
+            Continuer
           </Button>
         </DialogFooter>
       </Dialog>
