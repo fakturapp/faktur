@@ -1,80 +1,78 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-background: #f0f0f0;
-  --color-foreground: #0d0c22;
+  --color-background: #f5f5f5;
+  --color-foreground: #171717;
   --color-card: #ffffff;
-  --color-card-foreground: #0d0c22;
-  --color-primary: #8B3DFF;
+  --color-card-foreground: #171717;
+  --color-primary: #6366f1;
   --color-primary-foreground: #ffffff;
-  --color-muted: #e8e6ef;
-  --color-muted-foreground: #6b6b7b;
-  --color-border: #dfdde6;
-  --color-input: #dfdde6;
-  --color-ring: #8B3DFF;
+  --color-muted: #ededed;
+  --color-muted-foreground: #737373;
+  --color-border: #e5e5e5;
+  --color-input: #e5e5e5;
+  --color-ring: #6366f1;
   --color-destructive: #ef4444;
   --color-destructive-foreground: #ffffff;
-  --color-success: #00C4CC;
-  --color-secondary: #e8e6ef;
-  --color-secondary-foreground: #0d0c22;
-  --color-accent: #e8e6ef;
-  --color-accent-foreground: #0d0c22;
+  --color-success: #22c55e;
+  --color-secondary: #ededed;
+  --color-secondary-foreground: #171717;
+  --color-accent: #ededed;
+  --color-accent-foreground: #171717;
   --color-sidebar: #ffffff;
-  --color-sidebar-foreground: #0d0c22;
-  --color-sidebar-border: #dfdde6;
-  --color-sidebar-accent: #e8e6ef;
-  --color-sidebar-accent-foreground: #0d0c22;
+  --color-sidebar-foreground: #171717;
+  --color-sidebar-border: #e5e5e5;
+  --color-sidebar-accent: #ededed;
+  --color-sidebar-accent-foreground: #171717;
   --sidebar-width: 16rem;
   --header-height: 3.5rem;
-  --color-chart-1: #8B3DFF;
-  --color-chart-2: #00C4CC;
-  --color-chart-3: #7D2AE7;
+  --color-chart-1: #6366f1;
+  --color-chart-2: #8b5cf6;
+  --color-chart-3: #a78bfa;
   --color-chart-4: #c4b5fd;
-  --color-chart-5: #6420C7;
+  --color-chart-5: #4f46e5;
   --radius: 0.75rem;
   --font-sans: 'Lexend', ui-sans-serif, system-ui, sans-serif;
 }
 
-/* ===== Light Theme ===== */
 :root, .light {
-  --color-background: #f0f0f0;
-  --color-foreground: #0d0c22;
+  --color-background: #f5f5f5;
+  --color-foreground: #171717;
   --color-card: #ffffff;
-  --color-card-foreground: #0d0c22;
-  --color-muted: #e8e6ef;
-  --color-muted-foreground: #6b6b7b;
-  --color-border: #dfdde6;
-  --color-input: #dfdde6;
+  --color-card-foreground: #171717;
+  --color-muted: #ededed;
+  --color-muted-foreground: #737373;
+  --color-border: #e5e5e5;
+  --color-input: #e5e5e5;
   --color-sidebar: #ffffff;
-  --color-sidebar-foreground: #0d0c22;
-  --color-sidebar-border: #dfdde6;
-  --color-sidebar-accent: #e8e6ef;
-  --color-sidebar-accent-foreground: #0d0c22;
-  --color-secondary: #e8e6ef;
-  --color-secondary-foreground: #0d0c22;
-  --color-accent: #e8e6ef;
-  --color-accent-foreground: #0d0c22;
+  --color-sidebar-foreground: #171717;
+  --color-sidebar-border: #e5e5e5;
+  --color-sidebar-accent: #ededed;
+  --color-sidebar-accent-foreground: #171717;
+  --color-secondary: #ededed;
+  --color-secondary-foreground: #171717;
+  --color-accent: #ededed;
+  --color-accent-foreground: #171717;
 }
 
-/* ===== Dark Theme ===== */
 .dark {
-  --color-background: #0d0c12;
-  --color-foreground: #e8e6ef;
-  --color-card: #1a1826;
-  --color-card-foreground: #e8e6ef;
-  --color-muted: #252330;
-  --color-muted-foreground: #8b8798;
-  --color-border: #2d2b38;
-  --color-input: #252330;
-  --color-sidebar: #0d0c12;
-  --color-sidebar-foreground: #e8e6ef;
-  --color-sidebar-border: rgba(255, 255, 255, 0.06);
-  --color-sidebar-accent: #1a1826;
-  --color-sidebar-accent-foreground: #e8e6ef;
-  --color-secondary: #252330;
-  --color-secondary-foreground: #e8e6ef;
-  --color-accent: #252330;
-  --color-accent-foreground: #e8e6ef;
+  --color-background: #0c0c0c;
+  --color-foreground: #ededed;
+  --color-card: #181818;
+  --color-card-foreground: #ededed;
+  --color-muted: #232323;
+  --color-muted-foreground: #a0a0a0;
+  --color-border: #2a2a2a;
+  --color-input: #232323;
+  --color-sidebar: #0c0c0c;
+  --color-sidebar-foreground: #ededed;
+  --color-sidebar-border: rgba(255, 255, 255, 0.08);
+  --color-sidebar-accent: #181818;
+  --color-sidebar-accent-foreground: #ededed;
+  --color-secondary: #232323;
+  --color-secondary-foreground: #ededed;
+  --color-accent: #232323;
+  --color-accent-foreground: #ededed;
 }
 
 * {
@@ -148,17 +146,17 @@ body {
   overflow: hidden;
   background: linear-gradient(
     90deg,
-    rgba(139, 61, 255, 0.08) 0%,
-    rgba(139, 61, 255, 0.18) 50%,
-    rgba(139, 61, 255, 0.08) 100%
+    rgba(99, 102, 241, 0.08) 0%,
+    rgba(99, 102, 241, 0.18) 50%,
+    rgba(99, 102, 241, 0.08) 100%
   ) !important;
   background-size: 200% 100% !important;
   animation: download-gradient 1.2s ease-in-out infinite !important;
-  border-color: rgba(139, 61, 255, 0.25) !important;
+  border-color: rgba(99, 102, 241, 0.25) !important;
 }
 .download-shimmer svg {
   animation: download-pulse 1.2s ease-in-out infinite;
-  color: rgb(139, 61, 255) !important;
+  color: rgb(99, 102, 241) !important;
 }
 @keyframes download-gradient {
   0% { background-position: 200% 0; }
@@ -242,15 +240,15 @@ html {
 /* Landing page grid pattern */
 .grid-pattern {
   background-image:
-    linear-gradient(rgba(139, 61, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(139, 61, 255, 0.03) 1px, transparent 1px);
+    linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
   background-size: 60px 60px;
 }
 
 .light .grid-pattern {
   background-image:
-    linear-gradient(rgba(139, 61, 255, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(139, 61, 255, 0.06) 1px, transparent 1px);
+    linear-gradient(rgba(99, 102, 241, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 102, 241, 0.06) 1px, transparent 1px);
 }
 
 /* Counter animation for stats */
@@ -269,64 +267,12 @@ html {
   animation: highlight-fade 3s ease-out forwards;
 }
 
-/* Gradient text - Canva purple→teal */
+/* Gradient text */
 .gradient-text {
-  background: linear-gradient(135deg, #8B3DFF, #7D2AE7, #00C4CC);
+  background: linear-gradient(135deg, #6366f1, #8b5cf6, #a78bfa);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-}
-
-/* ===== Canva-style Gradients ===== */
-
-/* Purple → Teal (signature Canva gradient) */
-.gradient-canva {
-  background: linear-gradient(135deg, #8B3DFF 0%, #00C4CC 100%);
-}
-
-/* Purple → Pink */
-.gradient-canva-pink {
-  background: linear-gradient(135deg, #8B3DFF 0%, #E44DFF 100%);
-}
-
-/* Deep purple → Teal (darker variant) */
-.gradient-canva-deep {
-  background: linear-gradient(135deg, #6420C7 0%, #00A3A9 100%);
-}
-
-/* Teal → Purple (reversed) */
-.gradient-canva-reverse {
-  background: linear-gradient(135deg, #00C4CC 0%, #8B3DFF 100%);
-}
-
-/* Subtle purple shimmer for backgrounds */
-.gradient-canva-subtle {
-  background: linear-gradient(135deg, rgba(139, 61, 255, 0.08) 0%, rgba(0, 196, 204, 0.06) 100%);
-}
-
-.dark .gradient-canva-subtle {
-  background: linear-gradient(135deg, rgba(139, 61, 255, 0.12) 0%, rgba(0, 196, 204, 0.08) 100%);
-}
-
-/* Gradient text variant: purple→teal */
-.gradient-text-canva {
-  background: linear-gradient(135deg, #8B3DFF, #00C4CC);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Gradient text variant: purple→pink */
-.gradient-text-canva-pink {
-  background: linear-gradient(135deg, #8B3DFF, #E44DFF);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Gradient border effect */
-.gradient-border-canva {
-  border-image: linear-gradient(135deg, #8B3DFF, #00C4CC) 1;
 }
 
 /* Navbar blur */
@@ -364,13 +310,13 @@ html {
 }
 
 .dark .liquid-sidebar {
-  background: rgba(26, 24, 38, 0.65);
-  border: 1px solid rgba(139, 61, 255, 0.06);
+  background: rgba(30, 30, 35, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow:
     0 2px 4px rgba(0, 0, 0, 0.1),
     0 8px 24px rgba(0, 0, 0, 0.2),
     0 24px 48px rgba(0, 0, 0, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
     inset 0 -1px 0 rgba(0, 0, 0, 0.1);
 }
 
@@ -384,9 +330,9 @@ html {
 }
 
 .dark .liquid-nav-active {
-  background: rgba(139, 61, 255, 0.08);
+  background: rgba(255, 255, 255, 0.08);
   box-shadow:
-    0 0.5px 0 rgba(139, 61, 255, 0.12) inset,
+    0 0.5px 0 rgba(255, 255, 255, 0.1) inset,
     0 1px 2px rgba(0, 0, 0, 0.15),
     0 2px 6px rgba(0, 0, 0, 0.1);
 }
@@ -397,7 +343,7 @@ html {
 }
 
 .dark .liquid-nav-hover:hover {
-  background: rgba(139, 61, 255, 0.04);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 /* Liquid Glass toolbar */
@@ -409,9 +355,9 @@ html {
 }
 
 .dark .liquid-toolbar {
-  background: rgba(26, 24, 38, 0.45);
+  background: rgba(30, 30, 35, 0.45);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.02),
+    0 1px 0 rgba(255, 255, 255, 0.03),
     inset 0 -1px 0 rgba(0, 0, 0, 0.1);
 }
 
@@ -426,27 +372,27 @@ html {
 }
 
 .dark .liquid-content {
-  background: rgba(26, 24, 38, 0.75);
-  border: 1px solid rgba(139, 61, 255, 0.05);
+  background: rgba(24, 24, 27, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   box-shadow:
     0 2px 4px rgba(0, 0, 0, 0.1),
     0 8px 24px rgba(0, 0, 0, 0.15),
     0 24px 48px rgba(0, 0, 0, 0.2);
 }
 
-/* Window chrome background */
+/* Window chrome background - like Finder window */
 .finder-window-bg {
   background:
-    radial-gradient(ellipse at 20% 20%, rgba(139, 61, 255, 0.03) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 80%, rgba(0, 196, 204, 0.02) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 50%, rgba(125, 42, 231, 0.01) 0%, transparent 70%);
+    radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(139, 92, 246, 0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(168, 162, 158, 0.02) 0%, transparent 70%);
 }
 
 .dark .finder-window-bg {
   background:
-    radial-gradient(ellipse at 20% 20%, rgba(139, 61, 255, 0.06) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 80%, rgba(0, 196, 204, 0.03) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 50%, rgba(13, 12, 18, 0.3) 0%, transparent 70%);
+    radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(139, 92, 246, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0.1) 0%, transparent 70%);
 }
 
 /* Separator for Liquid Glass */
@@ -455,5 +401,5 @@ html {
 }
 
 .dark .liquid-separator {
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
 }
