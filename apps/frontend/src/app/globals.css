@@ -1,29 +1,29 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-background: #f8fafc;
-  --color-foreground: #1e293b;
+  --color-background: #f5f6fa;
+  --color-foreground: #0f1729;
   --color-card: #ffffff;
-  --color-card-foreground: #1e293b;
+  --color-card-foreground: #0f1729;
   --color-primary: #6366f1;
   --color-primary-foreground: #ffffff;
-  --color-muted: #f1f5f9;
-  --color-muted-foreground: #64748b;
-  --color-border: #e2e8f0;
-  --color-input: #e2e8f0;
+  --color-muted: #eef0f6;
+  --color-muted-foreground: #5e6a82;
+  --color-border: #e0e3ed;
+  --color-input: #e0e3ed;
   --color-ring: #6366f1;
   --color-destructive: #ef4444;
   --color-destructive-foreground: #ffffff;
   --color-success: #22c55e;
-  --color-secondary: #f1f5f9;
-  --color-secondary-foreground: #1e293b;
-  --color-accent: #f1f5f9;
-  --color-accent-foreground: #1e293b;
+  --color-secondary: #eef0f6;
+  --color-secondary-foreground: #0f1729;
+  --color-accent: #eef0f6;
+  --color-accent-foreground: #0f1729;
   --color-sidebar: #ffffff;
-  --color-sidebar-foreground: #1e293b;
-  --color-sidebar-border: #e2e8f0;
-  --color-sidebar-accent: #f1f5f9;
-  --color-sidebar-accent-foreground: #1e293b;
+  --color-sidebar-foreground: #0f1729;
+  --color-sidebar-border: #e0e3ed;
+  --color-sidebar-accent: #eef0f6;
+  --color-sidebar-accent-foreground: #0f1729;
   --sidebar-width: 16rem;
   --header-height: 3.5rem;
   --color-chart-1: #6366f1;
@@ -36,43 +36,43 @@
 }
 
 :root, .light {
-  --color-background: #f8fafc;
-  --color-foreground: #1e293b;
+  --color-background: #f5f6fa;
+  --color-foreground: #0f1729;
   --color-card: #ffffff;
-  --color-card-foreground: #1e293b;
-  --color-muted: #f1f5f9;
-  --color-muted-foreground: #64748b;
-  --color-border: #e2e8f0;
-  --color-input: #e2e8f0;
+  --color-card-foreground: #0f1729;
+  --color-muted: #eef0f6;
+  --color-muted-foreground: #5e6a82;
+  --color-border: #e0e3ed;
+  --color-input: #e0e3ed;
   --color-sidebar: #ffffff;
-  --color-sidebar-foreground: #1e293b;
-  --color-sidebar-border: #e2e8f0;
-  --color-sidebar-accent: #f1f5f9;
-  --color-sidebar-accent-foreground: #1e293b;
-  --color-secondary: #f1f5f9;
-  --color-secondary-foreground: #1e293b;
-  --color-accent: #f1f5f9;
-  --color-accent-foreground: #1e293b;
+  --color-sidebar-foreground: #0f1729;
+  --color-sidebar-border: #e0e3ed;
+  --color-sidebar-accent: #eef0f6;
+  --color-sidebar-accent-foreground: #0f1729;
+  --color-secondary: #eef0f6;
+  --color-secondary-foreground: #0f1729;
+  --color-accent: #eef0f6;
+  --color-accent-foreground: #0f1729;
 }
 
 .dark {
-  --color-background: #09090b;
-  --color-foreground: #fafafa;
-  --color-card: #18181b;
-  --color-card-foreground: #fafafa;
-  --color-muted: #27272a;
-  --color-muted-foreground: #a1a1aa;
-  --color-border: #27272a;
-  --color-input: #27272a;
-  --color-sidebar: #09090b;
-  --color-sidebar-foreground: #fafafa;
-  --color-sidebar-border: rgba(255, 255, 255, 0.08);
-  --color-sidebar-accent: #18181b;
-  --color-sidebar-accent-foreground: #fafafa;
-  --color-secondary: #27272a;
-  --color-secondary-foreground: #fafafa;
-  --color-accent: #27272a;
-  --color-accent-foreground: #fafafa;
+  --color-background: #0c0d12;
+  --color-foreground: #ececf1;
+  --color-card: #15161d;
+  --color-card-foreground: #ececf1;
+  --color-muted: #1e1f28;
+  --color-muted-foreground: #8a8ca0;
+  --color-border: #1e2030;
+  --color-input: #1e2030;
+  --color-sidebar: #0c0d12;
+  --color-sidebar-foreground: #ececf1;
+  --color-sidebar-border: rgba(255, 255, 255, 0.07);
+  --color-sidebar-accent: #15161d;
+  --color-sidebar-accent-foreground: #ececf1;
+  --color-secondary: #1e1f28;
+  --color-secondary-foreground: #ececf1;
+  --color-accent: #1e1f28;
+  --color-accent-foreground: #ececf1;
 }
 
 * {
