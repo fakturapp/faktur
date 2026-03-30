@@ -1,16 +1,9 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import vine from '@vinejs/vine'
 import hash from '@adonisjs/core/services/hash'
-import db from '@adonisjs/lucid/services/db'
 import Team from '#models/team/team'
 import TeamMember from '#models/team/team_member'
-import Company from '#models/team/company'
-import InvoiceSetting from '#models/team/invoice_setting'
-import Client from '#models/client/client'
-import Invoice from '#models/invoice/invoice'
-import InvoiceLine from '#models/invoice/invoice_line'
-import Quote from '#models/quote/quote'
-import QuoteLine from '#models/quote/quote_line'
+import { deleteTeamCascade } from '#services/team/delete_team_service'
 
 const deleteTeamValidator = vine.compile(
   vine.object({
@@ -57,51 +50,8 @@ export default class Delete {
       return response.unauthorized({ message: 'Mot de passe incorrect' })
     }
 
-    // Cascade delete in transaction
-    await db.transaction(async (trx) => {
-      // Delete invoice lines (via invoices)
-      const invoiceIds = await Invoice.query({ client: trx }).where('teamId', teamId).select('id')
-      if (invoiceIds.length > 0) {
-        await InvoiceLine.query({ client: trx })
-          .whereIn(
-            'invoiceId',
-            invoiceIds.map((i) => i.id)
-          )
-          .delete()
-      }
-
-      // Delete quote lines (via quotes)
-      const quoteIds = await Quote.query({ client: trx }).where('teamId', teamId).select('id')
-      if (quoteIds.length > 0) {
-        await QuoteLine.query({ client: trx })
-          .whereIn(
-            'quoteId',
-            quoteIds.map((q) => q.id)
-          )
-          .delete()
-      }
-
-      // Delete invoices
-      await Invoice.query({ client: trx }).where('teamId', teamId).delete()
-
-      // Delete quotes
-      await Quote.query({ client: trx }).where('teamId', teamId).delete()
-
-      // Delete clients
-      await Client.query({ client: trx }).where('teamId', teamId).delete()
-
-      // Delete invoice settings
-      await InvoiceSetting.query({ client: trx }).where('teamId', teamId).delete()
-
-      // Delete company
-      await Company.query({ client: trx }).where('teamId', teamId).delete()
-
-      // Delete team members
-      await TeamMember.query({ client: trx }).where('teamId', teamId).delete()
-
-      // Delete team
-      await team.useTransaction(trx).delete()
-    })
+    // Cascade delete all team data
+    await deleteTeamCascade(teamId)
 
     // Find another team for the user, if any
     const otherMembership = await TeamMember.query()
