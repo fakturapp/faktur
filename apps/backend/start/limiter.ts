@@ -75,6 +75,28 @@ export const analyticsLimiter = limiter.define('analytics', (ctx) => {
     })
 })
 
+/** Email check (blocklist): 10 requests per 15 minutes per IP */
+export const emailCheckLimiter = limiter.define('email-check', (ctx) => {
+  return limiter
+    .allowRequests(10)
+    .every('15 minutes')
+    .usingKey(ctx.request.ip())
+    .limitExceeded((error) => {
+      error.setMessage("Trop de vérifications d'email. Réessayez plus tard.")
+    })
+})
+
+/** Email appeal: 3 requests per hour per IP */
+export const emailAppealLimiter = limiter.define('email-appeal', (ctx) => {
+  return limiter
+    .allowRequests(3)
+    .every('1 hour')
+    .usingKey(ctx.request.ip())
+    .limitExceeded((error) => {
+      error.setMessage('Trop de demandes de déblocage. Réessayez plus tard.')
+    })
+})
+
 /** Global API: 1000 requests per hour per IP */
 export const apiLimiter = limiter.define('api', (ctx) => {
   return limiter
