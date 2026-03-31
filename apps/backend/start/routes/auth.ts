@@ -7,12 +7,16 @@ import {
   passwordResetLimiter,
   emailVerificationLimiter,
   twoFactorLimiter,
+  emailCheckLimiter,
+  emailAppealLimiter,
 } from '#start/limiter'
 
 const Login = () => import('#controllers/auth/session/login')
 const Logout = () => import('#controllers/auth/session/logout')
 const Me = () => import('#controllers/auth/session/me')
 const Signup = () => import('#controllers/auth/registration/signup')
+const CheckEmail = () => import('#controllers/auth/registration/check_email')
+const EmailAppeal = () => import('#controllers/auth/registration/email_appeal')
 
 const PasswordResetRequest = () => import('#controllers/auth/security/password_reset/request')
 const PasswordReset = () => import('#controllers/auth/security/password_reset/reset')
@@ -32,6 +36,8 @@ const GoogleRegister = () => import('#controllers/auth/oauth/google_register')
 
 router
   .group(() => {
+    router.post('/check-email', [CheckEmail, 'handle']).use(emailCheckLimiter)
+    router.post('/email-appeal', [EmailAppeal, 'handle']).use(emailAppealLimiter)
     router.post('/sign-up', [Signup, 'handle']).use(registerLimiter)
     router.post('/verify-email', [VerifyEmail, 'handle']).use(emailVerificationLimiter)
     router
