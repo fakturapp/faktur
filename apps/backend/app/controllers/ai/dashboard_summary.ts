@@ -3,6 +3,8 @@ import { DateTime } from 'luxon'
 import Invoice from '#models/invoice/invoice'
 import Expense from '#models/expense/expense'
 import AiService from '#services/ai/ai_service'
+import { enforceQuota } from '#services/billing/quota_guard'
+import quotaService from '#services/billing/quota_service'
 
 export default class DashboardSummary {
   async handle(ctx: HttpContext) {
@@ -18,6 +20,9 @@ export default class DashboardSummary {
     if (!(await AiService.isEnabled(teamId))) {
       return response.forbidden({ message: 'AI is not enabled.' })
     }
+
+    const blocked = await enforceQuota(user.id, response)
+    if (blocked) return blocked
 
     const now = DateTime.now()
     const startOfMonth = now.startOf('month').toISODate()!
@@ -92,6 +97,7 @@ Dépenses ce mois: ${expensesThisMonth.toFixed(2)}€`
 
     try {
       const summary = await AiService.generate(teamId, dek, systemPrompt, metricsText, 256)
+      await quotaService.recordUsage(user.id, teamId, 'dashboard_summary', 'ai', 'default')
       return response.ok({ summary: summary.trim() })
     } catch (error: any) {
       return response.internalServerError({ message: 'AI summary failed', error: error.message })
