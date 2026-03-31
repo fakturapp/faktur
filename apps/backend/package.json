@@ -87,7 +87,8 @@
     "qrcode": "^1.5.4",
     "reflect-metadata": "^0.2.2",
     "resend": "^6.9.4",
-    "speakeasy": "^2.0.0"
+    "speakeasy": "^2.0.0",
+    "stripe": "^21.0.1"
   },
   "hotHook": {
     "boundaries": [
