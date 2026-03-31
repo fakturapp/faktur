@@ -56,6 +56,9 @@ class StripeService {
     if (!priceId) {
       throw new Error('STRIPE_AI_PRO_PRICE_ID not configured')
     }
+    if (!priceId.startsWith('price_')) {
+      throw new Error('STRIPE_AI_PRO_PRICE_ID must be a Stripe Price ID (starts with price_), not a Product ID (prod_)')
+    }
 
     const customerId = await this.getOrCreateCustomer(userId, email)
     const stripe = this.getStripe()
