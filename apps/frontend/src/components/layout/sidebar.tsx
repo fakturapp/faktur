@@ -10,6 +10,7 @@ import { Avatar } from '@/components/ui/avatar'
 import { Dropdown, DropdownItem, DropdownLabel, DropdownSeparator, DropdownSub } from '@/components/ui/dropdown'
 import { useTheme } from '@/lib/theme'
 import { CreateInvoiceModal } from '@/components/invoices/create-invoice-modal'
+import { isAiFeaturesEnabled } from '@/lib/feature-flags'
 import {
   LayoutDashboard,
   FileText,
@@ -52,6 +53,8 @@ import {
   ClipboardList,
   FileCheck,
   Sparkles,
+  Zap,
+  ToggleLeft,
 } from 'lucide-react'
 
 interface TeamListItem {
@@ -125,7 +128,7 @@ const mainNav: NavItem[] = [
   { href: '/dashboard/expenses', label: 'Depenses', icon: Wallet },
 ]
 
-const settingsNav: NavItem[] = [
+const baseSettingsNav: NavItem[] = [
   {
     href: '/dashboard/settings/company',
     label: 'Entreprise',
@@ -154,7 +157,6 @@ const settingsNav: NavItem[] = [
         label: 'E-Facturation',
         icon: FileCheck,
       },
-      { href: '/dashboard/settings/documents/invoices/ai', label: 'Faktur AI', icon: Sparkles },
     ],
   },
   {
@@ -167,6 +169,23 @@ const settingsNav: NavItem[] = [
     ],
   },
 ]
+
+const fakturAiNav: NavItem = {
+  href: '/dashboard/settings/fakturai',
+  label: 'Faktur AI',
+  icon: Sparkles,
+  children: [
+    { href: '/dashboard/settings/fakturai', label: "Vue d'ensemble", icon: Zap },
+    { href: '/dashboard/settings/fakturai/enable', label: 'Activation', icon: ToggleLeft },
+    { href: '/dashboard/settings/fakturai/edit', label: 'Configuration', icon: Settings2 },
+    { href: '/dashboard/settings/fakturai/usage', label: 'Utilisation', icon: BarChart3 },
+    { href: '/dashboard/settings/fakturai/manage', label: 'Abonnement', icon: CreditCard },
+  ],
+}
+
+const settingsNav: NavItem[] = isAiFeaturesEnabled()
+  ? [...baseSettingsNav, fakturAiNav]
+  : baseSettingsNav
 
 const SETTINGS_EXPANDED_KEY = 'zenvoice_settings_expanded'
 
