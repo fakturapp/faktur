@@ -4,6 +4,9 @@ const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333'
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  env: {
+    NEXT_PUBLIC_ENABLE_AI_FEATURES: process.env.NEXT_PUBLIC_ENABLE_AI_FEATURES || 'true',
+  },
   async rewrites() {
     return [
       {

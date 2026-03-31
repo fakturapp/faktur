@@ -86,4 +86,14 @@ export default await Env.create(new URL('../', import.meta.url), {
   R2_SECRET_ACCESS_KEY: Env.schema.string.optional(),
   R2_BUCKET_NAME: Env.schema.string.optional(),
   R2_PUBLIC_URL: Env.schema.string.optional(),
+
+  // Stripe (billing)
+  STRIPE_SECRET_KEY_DEV: Env.schema.string.optional(),
+  STRIPE_SECRET_KEY_PROD: Env.schema.string.optional(),
+  STRIPE_WEBHOOK_SECRET_DEV: Env.schema.string.optional(),
+  STRIPE_WEBHOOK_SECRET_PROD: Env.schema.string.optional(),
+  STRIPE_AI_PRO_PRICE_ID: Env.schema.string.optional(),
+
+  // Feature flags
+  ENABLE_AI_FEATURES: Env.schema.string.optional(),
 })
