@@ -7,6 +7,12 @@ import { CryptoResetModal } from '@/components/modals/crypto-reset-modal'
 import { VaultUnlockModal } from '@/components/modals/vault-unlock-modal'
 import { RecoveryKeySetupModal } from '@/components/modals/recovery-key-setup-modal'
 
+interface UserPlan {
+  name: string
+  status: string
+  expiresAt: string | null
+}
+
 interface User {
   id: string
   fullName: string | null
@@ -23,6 +29,7 @@ interface User {
   hasGoogleProvider: boolean
   vaultLocked: boolean
   isAdmin: boolean
+  plan?: UserPlan
 }
 
 interface AuthContextType {

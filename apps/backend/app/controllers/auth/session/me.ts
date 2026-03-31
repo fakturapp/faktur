@@ -6,6 +6,7 @@ import TeamMember from '#models/team/team_member'
 import keyStore from '#services/crypto/key_store'
 import encryptionService from '#services/encryption/encryption_service'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
+import quotaService from '#services/billing/quota_service'
 import UserTransformer from '#transformers/user_transformer'
 
 export default class Me {
@@ -45,12 +46,16 @@ export default class Me {
       .filter(Boolean)
     const isAdmin = adminEmails.includes(user.email.toLowerCase())
 
+    // Fetch subscription plan info
+    const plan = await quotaService.getUserPlan(user.id)
+
     return response.ok({
       user: {
         ...(await ctx.serialize.withoutWrapping(UserTransformer.transform(user))),
         hasGoogleProvider: !!googleProvider,
         vaultLocked,
         isAdmin,
+        plan,
       },
     })
   }
