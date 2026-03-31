@@ -13,7 +13,9 @@ import { Spinner } from '@/components/ui/spinner'
 import { useAuth } from '@/lib/auth'
 import { api } from '@/lib/api'
 import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile'
-import { ArrowRight, ArrowLeft, UserPlus, Check, Eye, EyeOff, Mail, Lock, User, Shield } from 'lucide-react'
+import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { Textarea } from '@/components/ui/textarea'
+import { ArrowRight, ArrowLeft, UserPlus, Check, Eye, EyeOff, Mail, Lock, User, Shield, ShieldAlert, Send, CheckCircle2 } from 'lucide-react'
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -83,6 +85,14 @@ function RegisterContent() {
     turnstileRef.current?.reset()
   }, [])
 
+  // Email blocklist
+  const [emailCheckLoading, setEmailCheckLoading] = useState(false)
+  const [blockedModalOpen, setBlockedModalOpen] = useState(false)
+  const [blockedDomain, setBlockedDomain] = useState('')
+  const [appealReason, setAppealReason] = useState('')
+  const [appealLoading, setAppealLoading] = useState(false)
+  const [appealSent, setAppealSent] = useState(false)
+
   // Google mode
   const [googleMode, setGoogleMode] = useState(false)
   const [googleProfile, setGoogleProfile] = useState<GoogleProfile | null>(null)
@@ -141,13 +151,57 @@ function RegisterContent() {
     window.location.href = data.url
   }
 
-  function handleStepEmailNext(e: React.FormEvent) {
+  async function handleStepEmailNext(e: React.FormEvent) {
     e.preventDefault()
     if (!email.trim() || !email.includes('@')) {
       setError('Veuillez saisir une adresse email valide')
       return
     }
+
+    // Check if email domain is blocked (disposable)
+    setEmailCheckLoading(true)
+    setError('')
+    const { data, error: err } = await api.post<{
+      allowed: boolean
+      reason?: string
+      domain?: string
+      message?: string
+    }>('/auth/check-email', { email })
+    setEmailCheckLoading(false)
+
+    if (err) {
+      setError(err)
+      return
+    }
+
+    if (data && !data.allowed) {
+      setBlockedDomain(data.domain || email.split('@')[1] || '')
+      setAppealSent(false)
+      setAppealReason('')
+      setBlockedModalOpen(true)
+      return
+    }
+
     goNext()
+  }
+
+  async function handleAppealSubmit() {
+    if (appealReason.trim().length < 10) {
+      setError('Veuillez expliquer votre situation (minimum 10 caractères).')
+      return
+    }
+    setAppealLoading(true)
+    setError('')
+    const { error: err } = await api.post('/auth/email-appeal', {
+      email,
+      reason: appealReason,
+    })
+    setAppealLoading(false)
+    if (err) {
+      setError(err)
+      return
+    }
+    setAppealSent(true)
   }
 
   function handleStepIdentityNext(e: React.FormEvent) {
@@ -377,8 +431,12 @@ function RegisterContent() {
                       />
                     </Field>
 
-                    <Button type="submit" className="w-full h-11 text-sm font-semibold gap-2 mt-2">
-                      Continuer <ArrowRight className="h-4 w-4" />
+                    <Button type="submit" className="w-full h-11 text-sm font-semibold gap-2 mt-2" disabled={emailCheckLoading}>
+                      {emailCheckLoading ? (
+                        <><Spinner size="sm" /> Vérification...</>
+                      ) : (
+                        <>Continuer <ArrowRight className="h-4 w-4" /></>
+                      )}
                     </Button>
                   </FieldGroup>
                 </form>
@@ -681,6 +739,91 @@ function RegisterContent() {
           </div>
         </div>
       </div>
+
+      {/* Blocked email modal */}
+      <Dialog open={blockedModalOpen} onClose={() => setBlockedModalOpen(false)}>
+        {!appealSent ? (
+          <>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-destructive/10 border border-destructive/20">
+                <ShieldAlert className="h-5 w-5 text-destructive" />
+              </div>
+              <div>
+                <DialogTitle>Email temporaire détecté</DialogTitle>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Domaine : <span className="font-mono text-foreground">{blockedDomain}</span>
+                </p>
+              </div>
+            </div>
+            <DialogDescription>
+              Les adresses email temporaires ou jetables ne sont pas acceptées sur Faktur.
+              Elles ne permettent pas de garantir la sécurité de votre compte ni de recevoir
+              vos documents importants.
+            </DialogDescription>
+            <div className="mt-4 rounded-lg bg-muted/50 border border-border p-3">
+              <p className="text-sm font-medium text-foreground mb-1">Que faire ?</p>
+              <ul className="text-xs text-muted-foreground space-y-1">
+                <li>Utilisez une adresse email permanente (Gmail, Outlook, etc.)</li>
+                <li>Si vous pensez qu&apos;il s&apos;agit d&apos;une erreur, faites une demande ci-dessous</li>
+              </ul>
+            </div>
+            <div className="mt-4 border-t border-border pt-4">
+              <p className="text-sm font-medium text-foreground mb-2">
+                Demande de déblocage
+              </p>
+              <Textarea
+                placeholder="Expliquez pourquoi cette adresse email est légitime (min. 10 caractères)..."
+                value={appealReason}
+                onChange={(e) => setAppealReason(e.target.value)}
+                className="min-h-[80px]"
+              />
+              {error && (
+                <p className="text-xs text-destructive mt-2">{error}</p>
+              )}
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => { setBlockedModalOpen(false); setError('') }}
+                className="h-9"
+              >
+                Fermer
+              </Button>
+              <Button
+                onClick={handleAppealSubmit}
+                disabled={appealLoading || appealReason.trim().length < 10}
+                className="h-9 gap-2"
+              >
+                {appealLoading ? (
+                  <><Spinner size="sm" /> Envoi...</>
+                ) : (
+                  <><Send className="h-3.5 w-3.5" /> Envoyer</>
+                )}
+              </Button>
+            </DialogFooter>
+          </>
+        ) : (
+          <div className="text-center py-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-500/10 border border-green-500/20 mx-auto mb-4">
+              <CheckCircle2 className="h-6 w-6 text-green-500" />
+            </div>
+            <DialogTitle className="text-center">Demande envoyée</DialogTitle>
+            <DialogDescription className="text-center mt-2">
+              Nous examinerons votre demande sous 48h.
+              Vous recevrez une réponse par email si votre domaine est débloqué.
+            </DialogDescription>
+            <DialogFooter className="justify-center mt-6">
+              <Button
+                variant="outline"
+                onClick={() => { setBlockedModalOpen(false); setError('') }}
+                className="h-9"
+              >
+                Compris
+              </Button>
+            </DialogFooter>
+          </div>
+        )}
+      </Dialog>
     </motion.div>
   )
 }
