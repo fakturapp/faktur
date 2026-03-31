@@ -317,7 +317,7 @@ export function AiChatSidebar({
 
     saveChatPreferences({ provider: chatProvider, model: chatModel, mode: chatMode })
 
-    const { data, error } = await api.post<{
+    const { data, error, code } = await api.post<{
       message: string
       document?: {
         subject: string
@@ -342,6 +342,15 @@ export function AiChatSidebar({
     onProcessingChange?.(false)
 
     if (error || !data) {
+      if (code === 'QUOTA_EXCEEDED') {
+        const quotaMsg = 'Quota atteint. [Passez a AI Pro](/dashboard/upgrade) pour plus de requetes.'
+        onErrorChange?.(quotaMsg)
+        setMessages((prev) => [
+          ...prev,
+          { id: nextMsgId(), role: 'assistant', content: quotaMsg, mode: chatMode, timestamp: Date.now(), isError: true },
+        ])
+        return
+      }
       const errObj = error as any
       const errMsg = errObj?.message || 'Désolé, une erreur est survenue.'
       const errDetail = errObj?.detail ? `\n\n**Détail** :\n\`\`\`\n${errObj.detail}\n\`\`\`` : ''

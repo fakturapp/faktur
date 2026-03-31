@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, Loader2 } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
+import { useToast } from '@/components/ui/toast'
 import { cn } from '@/lib/utils'
 import { useTrackFeature } from '@/hooks/use-analytics'
 
@@ -28,6 +29,7 @@ export function AiGenerateButton({
   label,
 }: AiGenerateButtonProps) {
   const { settings } = useInvoiceSettings()
+  const { toast } = useToast()
   const [loading, setLoading] = useState(false)
   const trackFeature = useTrackFeature()
 
@@ -35,19 +37,17 @@ export function AiGenerateButton({
 
   async function handleGenerate() {
     setLoading(true)
-    try {
-      const { data, error } = await api.post<{ text: string }>('/ai/generate-text', {
-        type,
-        context: context || undefined,
-        language: language || 'fr',
-      })
+    const { data, error, code } = await api.post<{ text: string }>('/ai/generate-text', {
+      type,
+      context: context || undefined,
+      language: language || 'fr',
+    })
 
-      if (data?.text && !error) {
-        trackFeature('ai.generate', { type })
-        onGenerated(data.text)
-      }
-    } catch {
-      // Silently fail — user can retry
+    if (code === 'QUOTA_EXCEEDED') {
+      toast('Quota atteint. Passez a AI Pro pour plus de requetes.', 'error')
+    } else if (data?.text && !error) {
+      trackFeature('ai.generate', { type })
+      onGenerated(data.text)
     }
     setLoading(false)
   }

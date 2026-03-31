@@ -27,7 +27,7 @@ function handleVaultOrSession(data: any, status: number): { error: string } | nu
 async function request<T = unknown>(
   endpoint: string,
   options: RequestInit = {}
-): Promise<{ data?: T; error?: string }> {
+): Promise<{ data?: T; error?: string; code?: string }> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('faktur_token') : null
   const vaultKey = typeof window !== 'undefined' ? localStorage.getItem('faktur_vault_key') : null
 
@@ -60,7 +60,7 @@ async function request<T = unknown>(
         data.message ||
         (Array.isArray(data.errors) && data.errors[0]?.message) ||
         'Something went wrong'
-      return { error: message }
+      return { error: message, code: data.code }
     }
     return { data }
   } catch {

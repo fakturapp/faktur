@@ -15,13 +15,11 @@ export function AiDashboardSummary() {
 
   async function fetchSummary() {
     setLoading(true)
-    try {
-      const { data } = await api.get<{ summary: string }>('/ai/dashboard-summary')
-      if (data?.summary) {
-        setSummary(data.summary)
-      }
-    } catch {
-      // Silently fail
+    const { data, code } = await api.get<{ summary: string }>('/ai/dashboard-summary')
+    if (code === 'QUOTA_EXCEEDED') {
+      setSummary('Quota atteint. Passez a AI Pro pour plus de requetes.')
+    } else if (data?.summary) {
+      setSummary(data.summary)
     }
     setLoading(false)
     setHasLoaded(true)

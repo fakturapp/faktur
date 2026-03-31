@@ -193,11 +193,15 @@ export function AiDocumentModal({ open, onClose, type }: AiDocumentModalProps) {
       new Promise((r) => setTimeout(r, 1500)),
     ])
 
-    const { data, error } = apiResult
+    const { data, error, code } = apiResult
     setGenerating(false)
 
     if (error || !data?.document) {
-      toast(error || 'Erreur lors de la génération', 'error')
+      if (code === 'QUOTA_EXCEEDED') {
+        toast('Quota atteint. Passez a AI Pro pour plus de requetes.', 'error')
+      } else {
+        toast(error || 'Erreur lors de la génération', 'error')
+      }
       setStep('prompt')
       return
     }
