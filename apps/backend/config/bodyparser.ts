@@ -24,6 +24,16 @@ const bodyParserConfig = defineConfig({
   },
 
   /**
+   * Config for the raw body parser. Used for Stripe webhooks
+   * that need the raw body for signature verification.
+   */
+  raw: {
+    types: ['application/json'],
+    queryString: {},
+    limit: '1mb',
+  },
+
+  /**
    * Config for the JSON parser.
    */
   json: {
