@@ -8,11 +8,22 @@ import AuditLog from '#models/shared/audit_log'
 import TurnstileService from '#services/security/turnstile_service'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import UserTransformer from '#transformers/user_transformer'
+import EmailBlocklistService from '#services/security/email_blocklist_service'
 
 export default class Signup {
   async handle(ctx: HttpContext) {
     const { request, response } = ctx
     const data = await request.validateUsing(registerValidator)
+
+    // Check disposable email blocklist
+    const emailBlocked = await EmailBlocklistService.isBlocked(data.email)
+    if (emailBlocked) {
+      return response.forbidden({
+        message:
+          'Les adresses email temporaires ne sont pas autorisées. Veuillez utiliser une adresse email permanente.',
+        code: 'DISPOSABLE_EMAIL',
+      })
+    }
 
     // Verify Turnstile captcha
     const turnstileValid = await TurnstileService.verifyToken(

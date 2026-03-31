@@ -11,6 +11,7 @@ import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service
 import keyStore from '#services/crypto/key_store'
 import securityConfig from '#config/security'
 import UserTransformer from '#transformers/user_transformer'
+import EmailBlocklistService from '#services/security/email_blocklist_service'
 
 const googleRegisterValidator = vine.compile(
   vine.object({
@@ -31,6 +32,16 @@ export default class GoogleRegister {
       profile = GoogleAuthService.decryptProfileData(data.googleData)
     } catch {
       return response.badRequest({ message: 'Invalid or expired Google data' })
+    }
+
+    // Check disposable email blocklist
+    const emailBlocked = await EmailBlocklistService.isBlocked(profile.email)
+    if (emailBlocked) {
+      return response.forbidden({
+        message:
+          'Les adresses email temporaires ne sont pas autorisées. Veuillez utiliser une adresse email permanente.',
+        code: 'DISPOSABLE_EMAIL',
+      })
     }
 
     // Check if email already taken
