@@ -52,12 +52,9 @@ class StripeService {
   }
 
   async createCheckoutSession(userId: string, email: string): Promise<string> {
-    const priceId = env.get('STRIPE_AI_PRO_PRICE_ID')
-    if (!priceId) {
-      throw new Error('STRIPE_AI_PRO_PRICE_ID not configured')
-    }
-    if (!priceId.startsWith('price_')) {
-      throw new Error('STRIPE_AI_PRO_PRICE_ID must be a Stripe Price ID (starts with price_), not a Product ID (prod_)')
+    const productId = env.get('STRIPE_AI_PRO_PRODUCT_ID')
+    if (!productId) {
+      throw new Error('STRIPE_AI_PRO_PRODUCT_ID not configured')
     }
 
     const customerId = await this.getOrCreateCustomer(userId, email)
@@ -67,7 +64,15 @@ class StripeService {
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: 'subscription',
-      line_items: [{ price: priceId, quantity: 1 }],
+      line_items: [{
+        price_data: {
+          currency: 'eur',
+          product: productId,
+          unit_amount: 499,
+          recurring: { interval: 'month' },
+        },
+        quantity: 1,
+      }],
       success_url: `${frontendUrl}/dashboard/settings/fakturai/manage?success=true`,
       cancel_url: `${frontendUrl}/dashboard/settings/fakturai/manage?canceled=true`,
       client_reference_id: userId,

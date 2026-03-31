@@ -92,7 +92,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   STRIPE_SECRET_KEY_PROD: Env.schema.string.optional(),
   STRIPE_WEBHOOK_SECRET_DEV: Env.schema.string.optional(),
   STRIPE_WEBHOOK_SECRET_PROD: Env.schema.string.optional(),
-  STRIPE_AI_PRO_PRICE_ID: Env.schema.string.optional(),
+  STRIPE_AI_PRO_PRODUCT_ID: Env.schema.string.optional(),
 
   // Feature flags
   ENABLE_AI_FEATURES: Env.schema.string.optional(),
