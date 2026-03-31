@@ -22,6 +22,7 @@ import '#start/routes/expense'
 import '#start/routes/tax'
 import '#start/routes/export'
 import '#start/routes/ai'
+import '#start/routes/billing'
 import '#start/routes/admin'
 import '#start/routes/analytics'
 
