@@ -4,6 +4,8 @@ import Invoice from '#models/invoice/invoice'
 import Client from '#models/client/client'
 import Company from '#models/team/company'
 import AiService from '#services/ai/ai_service'
+import { enforceQuota } from '#services/billing/quota_guard'
+import quotaService from '#services/billing/quota_service'
 import { decryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 
 const reminderValidator = vine.compile(
@@ -27,6 +29,9 @@ export default class GenerateReminder {
     if (!(await AiService.isEnabled(teamId))) {
       return response.forbidden({ message: 'AI is not enabled.' })
     }
+
+    const blocked = await enforceQuota(user.id, response)
+    if (blocked) return blocked
 
     const payload = await request.validateUsing(reminderValidator)
 
@@ -108,6 +113,7 @@ Ton souhaité: ${tone}`
       }
 
       const parsed = JSON.parse(jsonMatch[0])
+      await quotaService.recordUsage(user.id, teamId, 'generate_reminder', 'ai', 'default')
       return response.ok({
         subject: parsed.subject || '',
         body: parsed.body || '',

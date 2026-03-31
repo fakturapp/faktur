@@ -1,6 +1,8 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import vine from '@vinejs/vine'
 import AiService from '#services/ai/ai_service'
+import { enforceQuota } from '#services/billing/quota_guard'
+import quotaService from '#services/billing/quota_service'
 import Client from '#models/client/client'
 import Company from '#models/team/company'
 import { decryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
@@ -29,6 +31,9 @@ export default class GenerateDocument {
     if (!(await AiService.isEnabled(teamId))) {
       return response.forbidden({ message: 'AI is not enabled. Activate it in Settings > AI.' })
     }
+
+    const blocked = await enforceQuota(user.id, response)
+    if (blocked) return blocked
 
     const payload = await request.validateUsing(generateDocumentValidator)
 
@@ -180,6 +185,7 @@ EXEMPLE DE RÉPONSE VALIDE :
       document.acceptanceConditions =
         typeof document.acceptanceConditions === 'string' ? document.acceptanceConditions : ''
 
+      await quotaService.recordUsage(user.id, teamId, 'generate_document', 'ai', 'default')
       return response.ok({ document })
     } catch (error: any) {
       const msg = error.message || 'Unknown error'

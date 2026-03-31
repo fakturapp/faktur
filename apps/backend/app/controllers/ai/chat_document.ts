@@ -1,6 +1,8 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import vine from '@vinejs/vine'
 import AiService from '#services/ai/ai_service'
+import { enforceQuota } from '#services/billing/quota_guard'
+import quotaService from '#services/billing/quota_service'
 
 const chatDocumentValidator = vine.compile(
   vine.object({
@@ -206,6 +208,9 @@ export default class ChatDocument {
       return response.forbidden({ message: 'AI is not enabled. Activate it in Settings > AI.' })
     }
 
+    const blocked = await enforceQuota(user.id, response)
+    if (blocked) return blocked
+
     const payload = await request.validateUsing(chatDocumentValidator)
     const mode = payload.mode || 'edition'
     const docType = payload.type === 'invoice' ? 'facture' : 'devis'
@@ -259,6 +264,7 @@ export default class ChatDocument {
 
       // ── Question mode — just return the message ────────────────
       if (mode === 'question') {
+        await quotaService.recordUsage(user.id, teamId, 'chat_document', 'ai', 'default')
         return response.ok({
           message: parsed.message || result,
         })
@@ -310,6 +316,8 @@ export default class ChatDocument {
       }
 
       const aiMessage = parsed.message || 'Document mis à jour.'
+
+      await quotaService.recordUsage(user.id, teamId, 'chat_document', 'ai', 'default')
 
       if (mode === 'libre') {
         return response.ok({
