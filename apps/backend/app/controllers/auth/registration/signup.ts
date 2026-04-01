@@ -8,11 +8,21 @@ import AuditLog from '#models/shared/audit_log'
 import TurnstileService from '#services/security/turnstile_service'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import UserTransformer from '#transformers/user_transformer'
+import EmailBlacklistService from '#services/security/email_blacklist_service'
 
 export default class Signup {
   async handle(ctx: HttpContext) {
     const { request, response } = ctx
     const data = await request.validateUsing(registerValidator)
+
+    // Check for disposable/temporary email
+    const isDisposable = await EmailBlacklistService.isDisposableEmail(data.email)
+    if (isDisposable) {
+      return response.unprocessableEntity({
+        message: 'Les adresses email temporaires ne sont pas autorisées. Veuillez utiliser une adresse email permanente ou contacter support@fakturapp.cc pour faire whitelister votre domaine.',
+        code: 'DISPOSABLE_EMAIL',
+      })
+    }
 
     // Verify Turnstile captcha
     const turnstileValid = await TurnstileService.verifyToken(
