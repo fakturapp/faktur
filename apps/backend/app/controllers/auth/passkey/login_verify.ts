@@ -151,6 +151,7 @@ export default class LoginVerify {
         token: token.value!.release(),
       })
     } catch (err: any) {
+      console.error('[Passkey Login]', err?.message || err)
       await this.recordLoginAttempt(request, null, 'failed', 'Passkey error')
       return response.unauthorized({ message: 'Passkey authentication failed' })
     }

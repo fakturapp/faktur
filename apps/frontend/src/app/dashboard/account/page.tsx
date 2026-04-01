@@ -502,7 +502,8 @@ export default function AccountPage() {
     } catch (err: any) {
       setPasskeyAdding(false)
       if (err.name === 'NotAllowedError') return // User cancelled
-      toast('Erreur lors de l\'enregistrement de la clé d\'accès', 'error')
+      console.error('[Passkey Register]', err)
+      toast(err.message || 'Erreur lors de l\'enregistrement de la clé d\'accès', 'error')
     }
   }
 

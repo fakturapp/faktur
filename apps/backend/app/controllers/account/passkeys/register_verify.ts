@@ -56,6 +56,7 @@ export default class RegisterVerify {
         },
       })
     } catch (err: any) {
+      console.error('[Passkey Register]', err?.message || err)
       return response.badRequest({
         message: err.message || 'Registration verification failed',
       })
