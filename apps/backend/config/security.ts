@@ -42,6 +42,11 @@ const securityConfig = {
   encryption: {
     algorithm: 'aes-256-gcm' as const,
   },
+
+  webauthn: {
+    rpName: 'FakturApp',
+    timeout: 60000,
+  },
 }
 
 export default securityConfig

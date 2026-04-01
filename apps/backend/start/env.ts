@@ -78,6 +78,10 @@ export default await Env.create(new URL('../', import.meta.url), {
   // Admin (comma-separated emails)
   ADMIN_EMAILS: Env.schema.string.optional(),
 
+  // WebAuthn / Passkeys
+  WEBAUTHN_RP_ID: Env.schema.string.optional(),
+  WEBAUTHN_ORIGIN: Env.schema.string.optional(),
+
   // Cloudflare R2 (S3-compatible object storage)
   R2_ACCOUNT_ID: Env.schema.string.optional(),
   R2_ACCESS_KEY_ID: Env.schema.string.optional(),
