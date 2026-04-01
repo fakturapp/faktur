@@ -87,6 +87,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* InlineEdit fade-in after confirm */
+@keyframes fadeIn {
+  from { opacity: 0.4; }
+  to { opacity: 1; }
+}
+
 /* Spinner animations */
 @keyframes spinner-rotate {
   100% {

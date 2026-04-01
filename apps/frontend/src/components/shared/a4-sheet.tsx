@@ -104,6 +104,7 @@ function InlineEdit({
   titleText?: string
 }) {
   const [editing, setEditing] = useState(false)
+  const [justConfirmed, setJustConfirmed] = useState(false)
   const editRef = useRef<HTMLSpanElement>(null)
 
   const start = () => {
@@ -132,6 +133,8 @@ function InlineEdit({
     const text = editRef.current?.textContent || ''
     onChange(text)
     setEditing(false)
+    setJustConfirmed(true)
+    setTimeout(() => setJustConfirmed(false), 300)
   }
 
   if (preview) {
@@ -162,7 +165,7 @@ function InlineEdit({
   if (editing) {
     return (
       <span
-        className={cn('inline-flex items-baseline cursor-text', className)}
+        className={cn('relative inline cursor-text', className)}
         style={{ borderBottom: `1px dashed ${borderDashed}` }}
         onClick={(e) => {
           // Click on wrapper (hitbox) → focus at nearest edge
@@ -173,10 +176,10 @@ function InlineEdit({
           }
         }}
       >
-        {/* Left invisible hitbox */}
-        <span className="inline-block w-1 shrink-0" style={{ userSelect: 'none' }}
+        {/* Left invisible hitbox — absolute so it doesn't shift content */}
+        <span className="absolute -left-2 top-0 bottom-0 w-2" style={{ userSelect: 'none' }}
           onClick={(e) => { e.stopPropagation(); focusAt('start') }}
-        >&nbsp;</span>
+        />
         <span
           ref={editRef}
           contentEditable
@@ -202,10 +205,10 @@ function InlineEdit({
           }}
           dangerouslySetInnerHTML={{ __html: value || '' }}
         />
-        {/* Right invisible hitbox */}
-        <span className="inline-block w-1 shrink-0" style={{ userSelect: 'none' }}
+        {/* Right invisible hitbox — absolute so it doesn't shift content */}
+        <span className="absolute -right-2 top-0 bottom-0 w-2" style={{ userSelect: 'none' }}
           onClick={(e) => { e.stopPropagation(); focusAt('end') }}
-        >&nbsp;</span>
+        />
       </span>
     )
   }
@@ -215,6 +218,7 @@ function InlineEdit({
       onClick={start}
       className={cn(
         'cursor-pointer border-b border-dashed inline-block transition-colors',
+        justConfirmed && 'animate-[fadeIn_0.25s_ease-out]',
         className,
       )}
       style={{ borderBottomColor: borderDashed }}
