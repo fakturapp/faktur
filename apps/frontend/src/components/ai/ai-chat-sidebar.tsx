@@ -18,35 +18,22 @@ import {
   HelpCircle,
   Wand2,
   Check,
-  Server,
-  Key,
   ChevronRight,
   ArrowLeft,
   RotateCcw,
 } from 'lucide-react'
-import { AnthropicIcon } from '@/components/icons/anthropic-icon'
-import { GoogleIcon } from '@/components/icons/google-icon'
 import { GroqIcon } from '@/components/icons/groq-icon'
 import {
   type ChatMode,
-  type ProviderId,
-  type AiSourceMode,
   type ChatMessage,
   type ChatModification,
   type DocumentSnapshot,
   type DocumentLine,
   CHAT_MODES,
-  CHAT_PROVIDERS,
   CHAT_MODELS,
   loadChatPreferences,
   saveChatPreferences,
 } from '@/lib/ai-chat-config'
-
-const PROVIDER_ICONS: Record<ProviderId, typeof AnthropicIcon> = {
-  gemini: GoogleIcon,
-  groq: GroqIcon,
-  claude: AnthropicIcon,
-}
 
 const MODE_ICONS = {
   edition: Pencil,
@@ -140,13 +127,11 @@ export function AiChatSidebar({
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [thinkingStep, setThinkingStep] = useState(0)
-  const [chatProvider, setChatProvider] = useState<ProviderId>(settings.aiProvider)
-  const [chatModel, setChatModel] = useState(settings.aiModel)
+  const [chatModel, setChatModel] = useState(settings.aiModel || 'llama-3.3-70b-versatile')
   const [chatMode, setChatMode] = useState<ChatMode>('edition')
-  const [aiSource, setAiSource] = useState<AiSourceMode>('faktur')
   const detailLevel = 'complet' as const
   const [showSettings, setShowSettings] = useState(false)
-  const [settingsMenu, setSettingsMenu] = useState<'main' | 'source' | 'provider' | 'model' | 'mode'>('main')
+  const [settingsMenu, setSettingsMenu] = useState<'main' | 'model' | 'mode'>('main')
   const [documentHistory, setDocumentHistory] = useState<DocumentSnapshot[]>([])
   const [dropdownPos, setDropdownPos] = useState<{ bottom: number; left: number }>({ bottom: 0, left: 0 })
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -169,7 +154,6 @@ export function AiChatSidebar({
   useEffect(() => {
     const prefs = loadChatPreferences()
     if (prefs) {
-      setChatProvider(prefs.provider)
       setChatModel(prefs.model)
       setChatMode(prefs.mode)
     }
@@ -315,7 +299,7 @@ export function AiChatSidebar({
       onProcessingChange?.(true)
     }
 
-    saveChatPreferences({ provider: chatProvider, model: chatModel, mode: chatMode })
+    saveChatPreferences({ provider: 'groq', model: chatModel, mode: chatMode })
 
     const { data, error } = await api.post<{
       message: string
@@ -332,10 +316,10 @@ export function AiChatSidebar({
       clientContext: buildClientContext(),
       type: documentType,
       detailLevel,
-      provider: chatProvider,
+      provider: 'groq',
       model: chatModel,
       mode: chatMode,
-      source: aiSource,
+      source: 'faktur',
     })
 
     setLoading(false)
@@ -420,9 +404,8 @@ export function AiChatSidebar({
 
   // ─── Derived ───────────────────────────────────────────────────────
   const currentMode = CHAT_MODES.find((m) => m.id === chatMode)!
-  const currentProvider = CHAT_PROVIDERS.find((p) => p.id === chatProvider)!
-  const ProviderIcon = PROVIDER_ICONS[chatProvider]
   const CurrentModeIcon = MODE_ICONS[chatMode]
+  const currentModelName = CHAT_MODELS.groq?.find(m => m.id === chatModel)?.name || 'Raisonnement'
   const thinkingText = THINKING_STEPS[chatMode][thinkingStep] || 'Réflexion...'
   // ─── Settings dropdown rendered via portal ─────────────────────────
   const settingsDropdown = (
@@ -453,35 +436,17 @@ export function AiChatSidebar({
                   transition={{ duration: 0.12 }}
                   className="space-y-0.5"
                 >
-                  {/* Source */}
+                  {/* Model */}
                   <button
-                    onClick={() => setSettingsMenu('source')}
+                    onClick={() => setSettingsMenu('model')}
                     className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left hover:bg-muted/50 transition-all"
                   >
-                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-500/10">
-                      {aiSource === 'faktur'
-                        ? <Server className="h-3.5 w-3.5 text-indigo-400" />
-                        : <Key className="h-3.5 w-3.5 text-amber-400" />
-                      }
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-orange-500/10">
+                      <GroqIcon className="h-3.5 w-3.5 text-orange-500" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-[11px] font-medium text-foreground">Source</div>
-                      <div className="text-[9px] text-muted-foreground">{aiSource === 'faktur' ? 'Faktur AI' : 'Api Key'}</div>
-                    </div>
-                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/40 shrink-0" />
-                  </button>
-
-                  {/* Provider */}
-                  <button
-                    onClick={() => setSettingsMenu('provider')}
-                    className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left hover:bg-muted/50 transition-all"
-                  >
-                    <div className={cn('flex h-7 w-7 items-center justify-center rounded-lg', currentProvider.iconBg)}>
-                      <ProviderIcon className={cn('h-3.5 w-3.5', currentProvider.iconClass)} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-[11px] font-medium text-foreground">Provider</div>
-                      <div className="text-[9px] text-muted-foreground">{currentProvider.name} &middot; {CHAT_MODELS[chatProvider]?.find(m => m.id === chatModel)?.name || chatModel}</div>
+                      <div className="text-[11px] font-medium text-foreground">Modèle</div>
+                      <div className="text-[9px] text-muted-foreground">Groq &middot; {currentModelName}</div>
                     </div>
                     <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/40 shrink-0" />
                   </button>
@@ -508,114 +473,6 @@ export function AiChatSidebar({
                 </motion.div>
               )}
 
-              {/* Source submenu */}
-              {settingsMenu === 'source' && (
-                <motion.div
-                  key="source"
-                  initial={{ opacity: 0, x: 8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -8 }}
-                  transition={{ duration: 0.12 }}
-                  className="space-y-0.5"
-                >
-                  <button
-                    onClick={() => setSettingsMenu('main')}
-                    className="flex items-center gap-1.5 px-2 py-1 mb-1 text-[9px] font-semibold text-muted-foreground uppercase tracking-wider hover:text-foreground transition-colors"
-                  >
-                    <ArrowLeft className="h-3 w-3" />
-                    Source
-                  </button>
-                  <button
-                    onClick={() => { setAiSource('faktur'); setSettingsMenu('main') }}
-                    className={cn(
-                      'w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left transition-all',
-                      aiSource === 'faktur'
-                        ? 'bg-primary/5 border border-primary/20'
-                        : 'hover:bg-muted/50 border border-transparent'
-                    )}
-                  >
-                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-500/10">
-                      <Server className="h-3.5 w-3.5 text-indigo-400" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-[11px] font-medium text-foreground">Faktur AI</div>
-                      <div className="text-[9px] text-muted-foreground">Clé serveur intégrée</div>
-                    </div>
-                    {aiSource === 'faktur' && <Check className="h-3.5 w-3.5 text-primary shrink-0" />}
-                  </button>
-                  <button
-                    onClick={() => { setAiSource('apikey'); setSettingsMenu('main') }}
-                    className={cn(
-                      'w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left transition-all',
-                      aiSource === 'apikey'
-                        ? 'bg-primary/5 border border-primary/20'
-                        : 'hover:bg-muted/50 border border-transparent'
-                    )}
-                  >
-                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500/10">
-                      <Key className="h-3.5 w-3.5 text-amber-400" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-[11px] font-medium text-foreground">Api Key</div>
-                      <div className="text-[9px] text-muted-foreground">Votre propre clé API</div>
-                    </div>
-                    {aiSource === 'apikey' && <Check className="h-3.5 w-3.5 text-primary shrink-0" />}
-                  </button>
-                </motion.div>
-              )}
-
-              {/* Provider submenu */}
-              {settingsMenu === 'provider' && (
-                <motion.div
-                  key="provider"
-                  initial={{ opacity: 0, x: 8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -8 }}
-                  transition={{ duration: 0.12 }}
-                  className="space-y-0.5"
-                >
-                  <button
-                    onClick={() => setSettingsMenu('main')}
-                    className="flex items-center gap-1.5 px-2 py-1 mb-1 text-[9px] font-semibold text-muted-foreground uppercase tracking-wider hover:text-foreground transition-colors"
-                  >
-                    <ArrowLeft className="h-3 w-3" />
-                    Provider
-                  </button>
-                  {CHAT_PROVIDERS.map((p) => {
-                    const Icon = PROVIDER_ICONS[p.id]
-                    const isActive = chatProvider === p.id
-                    return (
-                      <button
-                        key={p.id}
-                        onClick={() => {
-                          setChatProvider(p.id)
-                          const firstModel = CHAT_MODELS[p.id]?.[0]
-                          if (firstModel) setChatModel(firstModel.id)
-                          setSettingsMenu('model')
-                        }}
-                        className={cn(
-                          'w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left transition-all',
-                          isActive
-                            ? 'bg-primary/5 border border-primary/20'
-                            : 'hover:bg-muted/50 border border-transparent'
-                        )}
-                      >
-                        <div className={cn('flex h-7 w-7 items-center justify-center rounded-lg', p.iconBg)}>
-                          <Icon className={cn('h-3.5 w-3.5', p.iconClass)} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="text-[11px] font-medium text-foreground">{p.name}</div>
-                          <div className="text-[9px] text-muted-foreground">
-                            {CHAT_MODELS[p.id]?.length} modèles
-                          </div>
-                        </div>
-                        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/40 shrink-0" />
-                      </button>
-                    )
-                  })}
-                </motion.div>
-              )}
-
               {/* Model submenu */}
               {settingsMenu === 'model' && (
                 <motion.div
@@ -627,14 +484,13 @@ export function AiChatSidebar({
                   className="space-y-0.5"
                 >
                   <button
-                    onClick={() => setSettingsMenu('provider')}
+                    onClick={() => setSettingsMenu('main')}
                     className="flex items-center gap-1.5 px-2 py-1 mb-1 text-[9px] font-semibold text-muted-foreground uppercase tracking-wider hover:text-foreground transition-colors"
                   >
                     <ArrowLeft className="h-3 w-3" />
-                    <ProviderIcon className={cn('h-2.5 w-2.5', currentProvider.iconClass)} />
-                    {currentProvider.name}
+                    Modèle
                   </button>
-                  {CHAT_MODELS[chatProvider]?.map((m) => {
+                  {CHAT_MODELS.groq?.map((m) => {
                     const isActive = chatModel === m.id
                     return (
                       <button
@@ -653,6 +509,7 @@ export function AiChatSidebar({
                       >
                         <div className="flex-1 min-w-0">
                           <div className="text-[11px] font-medium text-foreground">{m.name}</div>
+                          <div className="text-[9px] text-muted-foreground">{m.description}</div>
                         </div>
                         {isActive && <Check className="h-3.5 w-3.5 text-primary shrink-0" />}
                       </button>
