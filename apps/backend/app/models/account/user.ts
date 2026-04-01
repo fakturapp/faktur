@@ -8,6 +8,7 @@ import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
 import LoginHistory from '#models/account/login_history'
 import AuditLog from '#models/shared/audit_log'
 import AuthProvider from '#models/account/auth_provider'
+import PasskeyCredential from '#models/account/passkey_credential'
 import Team from '#models/team/team'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
@@ -143,6 +144,9 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   @hasMany(() => AuthProvider)
   declare authProviders: HasMany<typeof AuthProvider>
+
+  @hasMany(() => PasskeyCredential)
+  declare passkeyCredentials: HasMany<typeof PasskeyCredential>
 
   static accessTokens = DbAccessTokensProvider.forModel(User)
 
