@@ -4,6 +4,7 @@ import { DateTime } from 'luxon'
 import User from '#models/account/user'
 import EmailChangeRequested from '#events/email_change_requested'
 import { emailChangeValidator } from '#validators/account_validator'
+import EmailBlacklistService from '#services/security/email_blacklist_service'
 
 export default class EmailRequestChange {
   async handle({ auth, request, response }: HttpContext) {
@@ -12,6 +13,15 @@ export default class EmailRequestChange {
 
     if (newEmail.toLowerCase() === user.email.toLowerCase()) {
       return response.badRequest({ message: "Le nouvel email est identique à l'actuel" })
+    }
+
+    // Check for disposable/temporary email
+    const isDisposable = await EmailBlacklistService.isDisposableEmail(newEmail)
+    if (isDisposable) {
+      return response.unprocessableEntity({
+        message: 'Les adresses email temporaires ne sont pas autorisées. Veuillez utiliser une adresse email permanente ou contacter support@fakturapp.cc pour faire whitelister votre domaine.',
+        code: 'DISPOSABLE_EMAIL',
+      })
     }
 
     const existing = await User.findBy('email', newEmail)
