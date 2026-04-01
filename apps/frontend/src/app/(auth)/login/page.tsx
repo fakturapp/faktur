@@ -135,7 +135,8 @@ function LoginContent() {
       if (err.name === 'NotAllowedError') {
         return // User cancelled
       }
-      setError('Erreur lors de l\'authentification passkey.')
+      console.error('[Passkey]', err)
+      setError(err.message || 'Erreur lors de l\'authentification passkey.')
     }
   }
 
@@ -361,28 +362,28 @@ function LoginContent() {
               </motion.div>
 
               {/* Passkey + Mobile App buttons */}
-              <motion.div variants={fadeIn} custom={2} className="space-y-2.5">
+              <motion.div variants={fadeIn} custom={2} className="flex gap-2">
                 <button
                   type="button"
                   onClick={handlePasskeyLogin}
                   disabled={passkeyLoading}
-                  className="w-full flex items-center justify-center gap-3 h-11 rounded-lg border border-border bg-background text-sm font-medium text-foreground transition-all hover:bg-muted/50 disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-border bg-background text-xs font-medium text-foreground transition-all hover:bg-muted/50 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {passkeyLoading ? (
                     <Spinner size="sm" />
                   ) : (
-                    <KeyRound className="h-[18px] w-[18px]" />
+                    <KeyRound className="h-3.5 w-3.5" />
                   )}
-                  Se connecter avec une clé d'accès
+                  Clé d'accès
                 </button>
                 <button
                   type="button"
                   disabled
-                  className="w-full flex items-center justify-center gap-3 h-11 rounded-lg border border-border/50 bg-muted/30 text-sm font-medium text-muted-foreground cursor-not-allowed relative"
+                  className="flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-border/50 bg-muted/30 text-xs font-medium text-muted-foreground cursor-not-allowed relative"
                 >
-                  <Smartphone className="h-[18px] w-[18px]" />
-                  Se connecter avec l'app mobile
-                  <span className="absolute right-3 text-[10px] font-semibold uppercase tracking-wider bg-muted rounded-full px-2 py-0.5 text-muted-foreground">
+                  <Smartphone className="h-3.5 w-3.5" />
+                  App mobile
+                  <span className="absolute -top-2 -right-1 text-[9px] font-semibold uppercase tracking-wider bg-muted border border-border/50 rounded-full px-1.5 py-0 text-muted-foreground">
                     Bientôt
                   </span>
                 </button>
