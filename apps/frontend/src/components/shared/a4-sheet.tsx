@@ -104,16 +104,35 @@ function InlineEdit({
   titleText?: string
 }) {
   const [editing, setEditing] = useState(false)
-  const [tmp, setTmp] = useState(value)
-  const ref = useRef<HTMLInputElement & HTMLTextAreaElement>(null)
+  const editRef = useRef<HTMLSpanElement>(null)
 
   const start = () => {
     if (preview) return
-    setTmp(value)
     setEditing(true)
-    setTimeout(() => ref.current?.focus(), 10)
+    setTimeout(() => {
+      const el = editRef.current
+      if (!el) return
+      el.focus()
+      // Place cursor at end
+      const range = document.createRange()
+      const sel = window.getSelection()
+      if (el.childNodes.length > 0) {
+        range.selectNodeContents(el)
+        range.collapse(false)
+      } else {
+        range.setStart(el, 0)
+        range.collapse(true)
+      }
+      sel?.removeAllRanges()
+      sel?.addRange(range)
+    }, 10)
   }
-  const confirm = () => { onChange(tmp); setEditing(false) }
+
+  const confirm = () => {
+    const text = editRef.current?.textContent || ''
+    onChange(text)
+    setEditing(false)
+  }
 
   if (preview) {
     return (
@@ -124,32 +143,35 @@ function InlineEdit({
   }
 
   if (editing) {
-    const El = multiline ? 'textarea' : 'input'
     return (
-      <span className={cn('inline-block min-w-[30px] min-h-[16px] border-b border-dashed', className)}
-        style={{ borderBottomColor: borderDashed }}>
-        <El
-          ref={ref as any}
-          value={tmp}
-          onChange={(e: any) => setTmp(e.target.value)}
-          onBlur={confirm}
-          onKeyDown={(e: any) => {
-            if (!multiline && e.key === 'Enter') confirm()
-            if (e.key === 'Escape') setEditing(false)
-          }}
-          placeholder={placeholder || '...'}
-          className={cn(
-            'bg-transparent outline-none min-w-[100px] placeholder:italic placeholder:opacity-40',
-            multiline && 'resize-y min-h-[40px] w-full',
-            !multiline && 'w-full',
-          )}
-          style={{
-            fontSize: 'inherit', fontFamily: 'inherit', fontWeight: 'inherit',
-            color: 'inherit', border: 'none', padding: 0,
-          }}
-          rows={multiline ? 2 : undefined}
-        />
-      </span>
+      <span
+        ref={editRef}
+        contentEditable
+        suppressContentEditableWarning
+        onBlur={confirm}
+        onKeyDown={(e) => {
+          if (!multiline && e.key === 'Enter') { e.preventDefault(); confirm() }
+          if (e.key === 'Escape') { e.preventDefault(); setEditing(false) }
+        }}
+        onPaste={(e) => {
+          e.preventDefault()
+          const text = e.clipboardData.getData('text/plain')
+          document.execCommand('insertText', false, multiline ? text : text.replace(/[\n\r]/g, ' '))
+        }}
+        data-placeholder={placeholder || '...'}
+        className={cn(
+          'border-b border-dashed inline-block outline-none cursor-text',
+          '[&:empty]:before:content-[attr(data-placeholder)] [&:empty]:before:italic [&:empty]:before:opacity-40 [&:empty]:before:pointer-events-none',
+          className,
+        )}
+        style={{
+          borderBottomColor: borderDashed,
+          whiteSpace: multiline ? 'pre-wrap' : 'nowrap',
+          wordBreak: multiline ? 'break-word' : undefined,
+          minWidth: 0,
+        }}
+        dangerouslySetInnerHTML={{ __html: value || '' }}
+      />
     )
   }
 
@@ -157,7 +179,7 @@ function InlineEdit({
     <span
       onClick={start}
       className={cn(
-        'cursor-pointer border-b border-dashed inline-block min-w-[30px] min-h-[16px] transition-colors',
+        'cursor-pointer border-b border-dashed inline-block transition-colors',
         className,
       )}
       style={{ borderBottomColor: borderDashed }}
