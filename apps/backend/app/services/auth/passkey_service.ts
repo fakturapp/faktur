@@ -19,11 +19,26 @@ import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service
 
 class PasskeyService {
   private get rpID(): string {
-    return env.get('WEBAUTHN_RP_ID') || 'localhost'
+    const explicit = env.get('WEBAUTHN_RP_ID')
+    if (explicit) return explicit
+
+    // Derive from FRONTEND_URL: extract registrable domain
+    const frontendUrl = env.get('FRONTEND_URL')
+    if (frontendUrl) {
+      try {
+        const hostname = new URL(frontendUrl).hostname
+        const parts = hostname.split('.')
+        if (parts.length >= 2 && hostname !== 'localhost') {
+          return parts.slice(-2).join('.')
+        }
+        return hostname
+      } catch {}
+    }
+    return 'localhost'
   }
 
   private get origin(): string {
-    return env.get('WEBAUTHN_ORIGIN') || 'http://localhost:3000'
+    return env.get('WEBAUTHN_ORIGIN') || env.get('FRONTEND_URL') || 'http://localhost:3000'
   }
 
   private get rpName(): string {
