@@ -18,7 +18,8 @@ import { useAuth } from '@/lib/auth'
 import { useToast } from '@/components/ui/toast'
 import { api } from '@/lib/api'
 import { Spinner } from '@/components/ui/spinner'
-import { User, Shield, Monitor, Trash2, Smartphone, Copy, Check, Camera, Globe, MapPin, Download, Lock, AlertTriangle, Calendar, Link2, Unlink, Eye, EyeOff } from 'lucide-react'
+import { startRegistration } from '@simplewebauthn/browser'
+import { User, Shield, Monitor, Trash2, Smartphone, Copy, Check, Camera, Globe, MapPin, Download, Lock, AlertTriangle, Calendar, Link2, Unlink, Eye, EyeOff, Fingerprint, KeyRound, Plus, ShieldCheck } from 'lucide-react'
 
 const tabs = [
   { id: 'profile', label: 'Profil', icon: <User className="h-4 w-4" /> },
@@ -104,6 +105,15 @@ export default function AccountPage() {
   const [providersLoaded, setProvidersLoaded] = useState(false)
   const [providerLinking, setProviderLinking] = useState(false)
   const [providerUnlinking, setProviderUnlinking] = useState(false)
+
+  // Passkeys
+  const [passkeys, setPasskeys] = useState<{ id: string; friendlyName: string; backedUp: boolean; lastUsedAt: string | null; createdAt: string }[]>([])
+  const [passkeysLoaded, setPasskeysLoaded] = useState(false)
+  const [passkeyAddOpen, setPasskeyAddOpen] = useState(false)
+  const [passkeyName, setPasskeyName] = useState('')
+  const [passkeyAdding, setPasskeyAdding] = useState(false)
+  const [passkeyDeleteConfirm, setPasskeyDeleteConfirm] = useState<string | null>(null)
+  const [passkeyDeleting, setPasskeyDeleting] = useState(false)
 
   function requireSecurity(action: string) {
     setSecurityAction(action)
@@ -457,6 +467,60 @@ export default function AccountPage() {
     refreshUser()
   }
 
+  async function loadPasskeys() {
+    const { data } = await api.get<{ passkeys: typeof passkeys }>('/account/passkeys')
+    if (data?.passkeys) {
+      setPasskeys(data.passkeys)
+      setPasskeysLoaded(true)
+    }
+  }
+
+  async function handleAddPasskey() {
+    setPasskeyAdding(true)
+    try {
+      const { data: options, error: optErr } = await api.post<any>('/account/passkeys/register-options', {})
+      if (optErr || !options) {
+        setPasskeyAdding(false)
+        return toast(optErr || 'Erreur lors de la génération des options', 'error')
+      }
+
+      const credential = await startRegistration({ optionsJSON: options })
+
+      const { data, error: verifyErr } = await api.post<{ passkey: any }>('/account/passkeys/register-verify', {
+        credential,
+        friendlyName: passkeyName.trim() || 'Clé d\'accès',
+      })
+      setPasskeyAdding(false)
+
+      if (verifyErr) return toast(verifyErr, 'error')
+
+      setPasskeyAddOpen(false)
+      setPasskeyName('')
+      await loadPasskeys()
+      await refreshUser()
+      toast('Clé d\'accès enregistrée', 'success')
+    } catch (err: any) {
+      setPasskeyAdding(false)
+      if (err.name === 'NotAllowedError') return // User cancelled
+      toast('Erreur lors de l\'enregistrement de la clé d\'accès', 'error')
+    }
+  }
+
+  async function handleDeletePasskey() {
+    if (!passkeyDeleteConfirm) return
+    setPasskeyDeleting(true)
+    const { error } = await api.delete(`/account/passkeys/${passkeyDeleteConfirm}`)
+    setPasskeyDeleting(false)
+    if (error) {
+      setPasskeyDeleteConfirm(null)
+      return toast(error, 'error')
+    }
+    setPasskeys((prev) => prev.filter((p) => p.id !== passkeyDeleteConfirm))
+    setPasskeyDeleteConfirm(null)
+    await refreshUser()
+    toast('Clé d\'accès supprimée', 'success')
+  }
+
   function handleDeleteAccount() {
     setDeleteRedirectOpen(true)
   }
@@ -468,6 +532,10 @@ export default function AccountPage() {
 
   if (activeTab === 'security' && !providersLoaded) {
     loadProviders()
+  }
+
+  if (activeTab === 'security' && !passkeysLoaded) {
+    loadPasskeys()
   }
 
 
@@ -757,6 +825,78 @@ export default function AccountPage() {
                       J&apos;ai sauvegardé mes codes
                     </Button>
                   </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Passkeys */}
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                    <Fingerprint className="h-4.5 w-4.5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-foreground">Clés d'accès FakturApp</h3>
+                    <p className="text-xs text-muted-foreground">Connectez-vous avec l'empreinte digitale, le visage ou un code PIN.</p>
+                  </div>
+                </div>
+                <Button size="sm" onClick={() => setPasskeyAddOpen(true)}>
+                  <Plus className="h-3.5 w-3.5 mr-1.5" /> Ajouter
+                </Button>
+              </div>
+
+              {passkeys.length === 0 ? (
+                <div className="flex flex-col items-center text-center gap-3 py-8">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted/50">
+                    <KeyRound className="h-6 w-6 text-muted-foreground" />
+                  </div>
+                  <p className="text-sm text-muted-foreground">Aucune clé d'accès enregistrée</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {passkeys.map((passkey) => (
+                    <div
+                      key={passkey.id}
+                      className="flex items-center justify-between rounded-xl border border-border p-4"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted/50">
+                          <KeyRound className="h-5 w-5 text-muted-foreground" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium text-foreground">{passkey.friendlyName}</p>
+                            {passkey.backedUp && (
+                              <Badge variant="default" className="text-[10px]">
+                                <ShieldCheck className="h-3 w-3 mr-0.5" /> Synchronisée
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-3 mt-0.5">
+                            <p className="text-xs text-muted-foreground">
+                              Créée le {new Date(passkey.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
+                            </p>
+                            {passkey.lastUsedAt && (
+                              <p className="text-xs text-muted-foreground">
+                                Utilisée le {new Date(passkey.lastUsedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="shrink-0 border-destructive/30 text-destructive hover:bg-destructive/10"
+                        onClick={() => setPasskeyDeleteConfirm(passkey.id)}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  ))}
                 </div>
               )}
             </CardContent>
@@ -1203,6 +1343,50 @@ export default function AccountPage() {
             </Button>
           </DialogFooter>
         </form>
+      </Dialog>
+
+      {/* Add passkey dialog */}
+      <Dialog open={passkeyAddOpen} onClose={() => { setPasskeyAddOpen(false); setPasskeyName('') }}>
+        <DialogTitle>Ajouter une clé d'accès</DialogTitle>
+        <DialogDescription>
+          Donnez un nom à cette clé d'accès pour la reconnaître facilement.
+        </DialogDescription>
+        <div className="mt-4 space-y-4">
+          <Field>
+            <FieldLabel htmlFor="passkeyName">Nom de la clé</FieldLabel>
+            <Input
+              id="passkeyName"
+              value={passkeyName}
+              onChange={(e) => setPasskeyName(e.target.value)}
+              placeholder="Ex: MacBook Pro, iPhone..."
+              autoFocus
+            />
+          </Field>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setPasskeyAddOpen(false); setPasskeyName('') }} disabled={passkeyAdding}>
+              Annuler
+            </Button>
+            <Button onClick={handleAddPasskey} disabled={passkeyAdding}>
+              {passkeyAdding ? <><Spinner /> Enregistrement...</> : 'Enregistrer'}
+            </Button>
+          </DialogFooter>
+        </div>
+      </Dialog>
+
+      {/* Delete passkey dialog */}
+      <Dialog open={!!passkeyDeleteConfirm} onClose={() => setPasskeyDeleteConfirm(null)}>
+        <DialogTitle>Supprimer cette clé d'accès</DialogTitle>
+        <DialogDescription>
+          Vous ne pourrez plus vous connecter avec cette clé d'accès. Cette action est irréversible.
+        </DialogDescription>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setPasskeyDeleteConfirm(null)} disabled={passkeyDeleting}>
+            Annuler
+          </Button>
+          <Button variant="destructive" onClick={handleDeletePasskey} disabled={passkeyDeleting}>
+            {passkeyDeleting ? <Spinner size="sm" /> : 'Supprimer'}
+          </Button>
+        </DialogFooter>
       </Dialog>
 
       {/* Password change dialog */}
