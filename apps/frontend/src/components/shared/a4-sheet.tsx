@@ -90,7 +90,7 @@ function fmtDate(d: string, lang?: string) {
 
 function InlineEdit({
   value, onChange, preview = false, className, placeholder, multiline, accentColor = '#6366f1',
-  inputBg = '#ffffff', borderDashed = '#ddd', titleText,
+  inputBg: _inputBg, borderDashed = '#ddd', titleText,
 }: {
   value: string
   onChange: (v: string) => void
@@ -126,24 +126,30 @@ function InlineEdit({
   if (editing) {
     const El = multiline ? 'textarea' : 'input'
     return (
-      <El
-        ref={ref as any}
-        value={tmp}
-        onChange={(e: any) => setTmp(e.target.value)}
-        onBlur={confirm}
-        onKeyDown={(e: any) => {
-          if (!multiline && e.key === 'Enter') confirm()
-          if (e.key === 'Escape') setEditing(false)
-        }}
-        placeholder={placeholder}
-        className={cn(
-          'rounded px-1.5 py-0.5 outline-none min-w-[100px]',
-          multiline && 'resize-y min-h-[40px] w-full',
-          !multiline && 'w-full',
-        )}
-        style={{ border: `1px solid ${accentColor}`, fontSize: 'inherit', fontFamily: 'inherit', fontWeight: 'inherit', backgroundColor: inputBg }}
-        rows={multiline ? 2 : undefined}
-      />
+      <span className={cn('inline-block min-w-[30px] min-h-[16px] border-b border-dashed', className)}
+        style={{ borderBottomColor: borderDashed }}>
+        <El
+          ref={ref as any}
+          value={tmp}
+          onChange={(e: any) => setTmp(e.target.value)}
+          onBlur={confirm}
+          onKeyDown={(e: any) => {
+            if (!multiline && e.key === 'Enter') confirm()
+            if (e.key === 'Escape') setEditing(false)
+          }}
+          placeholder={placeholder || '...'}
+          className={cn(
+            'bg-transparent outline-none min-w-[100px] placeholder:italic placeholder:opacity-40',
+            multiline && 'resize-y min-h-[40px] w-full',
+            !multiline && 'w-full',
+          )}
+          style={{
+            fontSize: 'inherit', fontFamily: 'inherit', fontWeight: 'inherit',
+            color: 'inherit', border: 'none', padding: 0,
+          }}
+          rows={multiline ? 2 : undefined}
+        />
+      </span>
     )
   }
 
