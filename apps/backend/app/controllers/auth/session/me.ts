@@ -2,6 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import db from '@adonisjs/lucid/services/db'
 import env from '#start/env'
 import AuthProvider from '#models/account/auth_provider'
+import PasskeyCredential from '#models/account/passkey_credential'
 import TeamMember from '#models/team/team_member'
 import keyStore from '#services/crypto/key_store'
 import encryptionService from '#services/encryption/encryption_service'
@@ -13,10 +14,16 @@ export default class Me {
     const { auth, request, response } = ctx
     const user = auth.user!
 
-    const googleProvider = await AuthProvider.query()
-      .where('userId', user.id)
-      .where('provider', 'google')
-      .first()
+    const [googleProvider, passkeyCount] = await Promise.all([
+      AuthProvider.query()
+        .where('userId', user.id)
+        .where('provider', 'google')
+        .first(),
+      PasskeyCredential.query()
+        .where('userId', user.id)
+        .count('* as total')
+        .first(),
+    ])
 
     // Check if vault is locked (crypto enabled but DEK not in memory)
     let vaultLocked =
@@ -49,6 +56,7 @@ export default class Me {
       user: {
         ...(await ctx.serialize.withoutWrapping(UserTransformer.transform(user))),
         hasGoogleProvider: !!googleProvider,
+        hasPasskeys: Number(passkeyCount?.$extras.total || 0) > 0,
         vaultLocked,
         isAdmin,
       },
