@@ -72,9 +72,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   // Rate limiter
   LIMITER_STORE: Env.schema.enum.optional(['database', 'memory'] as const),
 
-  // AI providers
-  ANTHROPIC_API_KEY: Env.schema.string.optional(),
-  GEMINI_API_KEY: Env.schema.string.optional(),
+  // AI provider (Groq)
   GROQ_API_KEY: Env.schema.string.optional(),
 
   // Admin (comma-separated emails)

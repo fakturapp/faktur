@@ -257,7 +257,7 @@ export default function FakturAIPage() {
                     return (
                       <button key={tier.id}
                         onClick={() => {
-                          updateSettings({ aiProvider: 'groq', aiModel: tier.id, aiKeyMode: 'server' })
+                          updateSettings({ aiProvider: 'groq', aiModel: tier.id })
                           toast(`Modèle ${tier.name} sélectionné`, 'success')
                         }}
                         className={`rounded-xl border-2 p-4 text-left transition-all relative group ${
@@ -447,7 +447,7 @@ export default function FakturAIPage() {
           <DialogFooter>
             <Button variant="ghost" onClick={() => setShowAiBetaModal(false)}>Annuler</Button>
             <Button onClick={() => {
-              updateSettings({ aiEnabled: true, aiProvider: 'groq', aiKeyMode: 'server', aiModel: 'llama-3.3-70b-versatile' })
+              updateSettings({ aiEnabled: true, aiProvider: 'groq', aiModel: 'llama-3.3-70b-versatile' })
               setShowAiBetaModal(false)
               toast('Faktur AI activé', 'success')
             }}

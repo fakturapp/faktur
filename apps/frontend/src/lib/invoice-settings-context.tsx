@@ -38,14 +38,9 @@ export interface InvoiceSettings {
   invoiceFilenamePattern: string
   footerMode: 'company_info' | 'custom'
   logoBorderRadius: number
-  aiKeyMode: 'server' | 'custom'
   aiEnabled: boolean
-  aiProvider: 'claude' | 'gemini' | 'groq'
+  aiProvider: 'groq'
   aiModel: string
-  aiCustomApiKey: string | null
-  aiApiKeyClaude: string | null
-  aiApiKeyGemini: string | null
-  aiApiKeyGroq: string | null
 }
 
 interface InvoiceSettingsContextType {
@@ -86,14 +81,9 @@ const defaultSettings: InvoiceSettings = {
   invoiceFilenamePattern: 'FAC-{numéro}',
   footerMode: 'company_info',
   logoBorderRadius: 0,
-  aiKeyMode: 'server',
   aiEnabled: false,
   aiProvider: 'groq',
   aiModel: 'llama-3.3-70b-versatile',
-  aiCustomApiKey: null,
-  aiApiKeyClaude: null,
-  aiApiKeyGemini: null,
-  aiApiKeyGroq: null,
 }
 
 const InvoiceSettingsContext = createContext<InvoiceSettingsContextType>({
