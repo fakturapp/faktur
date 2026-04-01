@@ -142,36 +142,71 @@ function InlineEdit({
     )
   }
 
+  const focusAt = (position: 'start' | 'end') => {
+    const el = editRef.current
+    if (!el) return
+    el.focus()
+    const range = document.createRange()
+    const sel = window.getSelection()
+    if (el.childNodes.length > 0) {
+      range.selectNodeContents(el)
+      range.collapse(position === 'start')
+    } else {
+      range.setStart(el, 0)
+      range.collapse(true)
+    }
+    sel?.removeAllRanges()
+    sel?.addRange(range)
+  }
+
   if (editing) {
     return (
       <span
-        ref={editRef}
-        contentEditable
-        suppressContentEditableWarning
-        onBlur={confirm}
-        onKeyDown={(e) => {
-          if (!multiline && e.key === 'Enter') { e.preventDefault(); confirm() }
-          if (e.key === 'Escape') { e.preventDefault(); setEditing(false) }
+        className={cn('inline-flex items-baseline cursor-text', className)}
+        style={{ borderBottom: `1px dashed ${borderDashed}` }}
+        onClick={(e) => {
+          // Click on wrapper (hitbox) → focus at nearest edge
+          if (e.target === e.currentTarget) {
+            const rect = e.currentTarget.getBoundingClientRect()
+            const mid = rect.left + rect.width / 2
+            focusAt(e.clientX < mid ? 'start' : 'end')
+          }
         }}
-        onPaste={(e) => {
-          e.preventDefault()
-          const text = e.clipboardData.getData('text/plain')
-          document.execCommand('insertText', false, multiline ? text : text.replace(/[\n\r]/g, ' '))
-        }}
-        data-placeholder={placeholder || '...'}
-        className={cn(
-          'border-b border-dashed inline-block outline-none cursor-text',
-          '[&:empty]:before:content-[attr(data-placeholder)] [&:empty]:before:italic [&:empty]:before:opacity-40 [&:empty]:before:pointer-events-none',
-          className,
-        )}
-        style={{
-          borderBottomColor: borderDashed,
-          whiteSpace: multiline ? 'pre-wrap' : 'nowrap',
-          wordBreak: multiline ? 'break-word' : undefined,
-          minWidth: 0,
-        }}
-        dangerouslySetInnerHTML={{ __html: value || '' }}
-      />
+      >
+        {/* Left invisible hitbox */}
+        <span className="inline-block w-1 shrink-0" style={{ userSelect: 'none' }}
+          onClick={(e) => { e.stopPropagation(); focusAt('start') }}
+        >&nbsp;</span>
+        <span
+          ref={editRef}
+          contentEditable
+          suppressContentEditableWarning
+          onBlur={confirm}
+          onKeyDown={(e) => {
+            if (!multiline && e.key === 'Enter') { e.preventDefault(); confirm() }
+            if (e.key === 'Escape') { e.preventDefault(); setEditing(false) }
+          }}
+          onPaste={(e) => {
+            e.preventDefault()
+            const text = e.clipboardData.getData('text/plain')
+            document.execCommand('insertText', false, multiline ? text : text.replace(/[\n\r]/g, ' '))
+          }}
+          data-placeholder={placeholder || '...'}
+          className={cn(
+            'inline outline-none',
+            '[&:empty]:before:content-[attr(data-placeholder)] [&:empty]:before:italic [&:empty]:before:opacity-40 [&:empty]:before:pointer-events-none',
+          )}
+          style={{
+            whiteSpace: multiline ? 'pre-wrap' : 'nowrap',
+            wordBreak: multiline ? 'break-word' : undefined,
+          }}
+          dangerouslySetInnerHTML={{ __html: value || '' }}
+        />
+        {/* Right invisible hitbox */}
+        <span className="inline-block w-1 shrink-0" style={{ userSelect: 'none' }}
+          onClick={(e) => { e.stopPropagation(); focusAt('end') }}
+        >&nbsp;</span>
+      </span>
     )
   }
 
