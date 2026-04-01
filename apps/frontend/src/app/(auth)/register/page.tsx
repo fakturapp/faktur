@@ -13,7 +13,8 @@ import { Spinner } from '@/components/ui/spinner'
 import { useAuth } from '@/lib/auth'
 import { api } from '@/lib/api'
 import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile'
-import { ArrowRight, ArrowLeft, UserPlus, Check, Eye, EyeOff, Mail, Lock, User, Shield } from 'lucide-react'
+import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { ArrowRight, ArrowLeft, UserPlus, Check, Eye, EyeOff, Mail, Lock, User, Shield, AlertTriangle, MailX } from 'lucide-react'
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -83,6 +84,10 @@ function RegisterContent() {
     turnstileRef.current?.reset()
   }, [])
 
+  // Disposable email modal
+  const [showDisposableModal, setShowDisposableModal] = useState(false)
+  const [checkingEmail, setCheckingEmail] = useState(false)
+
   // Google mode
   const [googleMode, setGoogleMode] = useState(false)
   const [googleProfile, setGoogleProfile] = useState<GoogleProfile | null>(null)
@@ -141,12 +146,45 @@ function RegisterContent() {
     window.location.href = data.url
   }
 
-  function handleStepEmailNext(e: React.FormEvent) {
+  async function handleStepEmailNext(e: React.FormEvent) {
     e.preventDefault()
     if (!email.trim() || !email.includes('@')) {
       setError('Veuillez saisir une adresse email valide')
       return
     }
+
+    // Check disposable email blacklist
+    setCheckingEmail(true)
+    setError('')
+    try {
+      const domain = email.toLowerCase().split('@')[1]
+      if (domain) {
+        const res = await fetch('https://cdn.fakturapp.cc/assets/authentification/emailbacklist.json')
+        if (res.ok) {
+          const text = await res.text()
+          let domains: string[] = []
+          try {
+            domains = JSON.parse(text) as string[]
+          } catch {
+            // JSON may be malformed — extract domains with regex
+            const regex = /"([a-zA-Z0-9][a-zA-Z0-9.-]*\.[a-zA-Z]{2,})"/g
+            let match: RegExpExecArray | null
+            while ((match = regex.exec(text)) !== null) {
+              domains.push(match[1].toLowerCase())
+            }
+          }
+          const blacklist = new Set(domains.map((d) => d.toLowerCase().trim()))
+          if (blacklist.has(domain)) {
+            setCheckingEmail(false)
+            setShowDisposableModal(true)
+            return
+          }
+        }
+      }
+    } catch {
+      // Network error — don't block registration, backend will also check
+    }
+    setCheckingEmail(false)
     goNext()
   }
 
@@ -210,6 +248,11 @@ function RegisterContent() {
 
     if (err) {
       resetTurnstile()
+      // Check if error is disposable email
+      if (typeof err === 'string' && err.includes('temporaires')) {
+        setShowDisposableModal(true)
+        return
+      }
       return setError(err)
     }
     router.push(`/verify-email?email=${encodeURIComponent(email)}`)
@@ -377,8 +420,12 @@ function RegisterContent() {
                       />
                     </Field>
 
-                    <Button type="submit" className="w-full h-11 text-sm font-semibold gap-2 mt-2">
-                      Continuer <ArrowRight className="h-4 w-4" />
+                    <Button type="submit" className="w-full h-11 text-sm font-semibold gap-2 mt-2" disabled={checkingEmail}>
+                      {checkingEmail ? (
+                        <><Spinner size="sm" /> Vérification...</>
+                      ) : (
+                        <>Continuer <ArrowRight className="h-4 w-4" /></>
+                      )}
                     </Button>
                   </FieldGroup>
                 </form>
@@ -681,6 +728,51 @@ function RegisterContent() {
           </div>
         </div>
       </div>
+
+      {/* Disposable email modal */}
+      <Dialog open={showDisposableModal} onClose={() => setShowDisposableModal(false)}>
+        <div className="p-6 max-w-md">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-destructive/10">
+              <MailX className="h-6 w-6 text-destructive" />
+            </div>
+            <div>
+              <DialogTitle>Email temporaire détecté</DialogTitle>
+              <DialogDescription>Ce type d&apos;adresse n&apos;est pas autorisé</DialogDescription>
+            </div>
+          </div>
+
+          <div className="space-y-3 mb-6">
+            <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4">
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+                <p className="text-sm text-foreground leading-relaxed">
+                  Les adresses email temporaires ou jetables ne sont pas autorisées sur Faktur. Veuillez utiliser une adresse email permanente (Gmail, Outlook, votre domaine professionnel, etc.).
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-border bg-muted/30 p-4">
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Si vous pensez que votre adresse est légitime, contactez notre support pour faire whitelister votre domaine :
+              </p>
+              <a
+                href="mailto:support@fakturapp.cc"
+                className="inline-flex items-center gap-2 mt-2 px-3 py-2 rounded-lg bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors"
+              >
+                <Mail className="h-4 w-4" />
+                support@fakturapp.cc
+              </a>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button onClick={() => setShowDisposableModal(false)} className="w-full">
+              Compris, je vais changer d&apos;email
+            </Button>
+          </DialogFooter>
+        </div>
+      </Dialog>
     </motion.div>
   )
 }
