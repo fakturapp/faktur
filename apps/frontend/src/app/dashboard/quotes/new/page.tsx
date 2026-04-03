@@ -79,7 +79,7 @@ export default function NewQuotePage() {
   const router = useRouter()
   const { toast } = useToast()
   const trackFeature = useTrackFeature()
-  const { settings: invoiceSettings, companyLogoUrl, loading: settingsLoading, refreshSettings } = useInvoiceSettings()
+  const { settings: invoiceSettings, companyLogoUrl, loading: settingsLoading, refreshSettings, updateSettings, uploadLogo } = useInvoiceSettings()
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -133,6 +133,7 @@ export default function NewQuotePage() {
   const [notes, setNotes] = useState('')
   const [isDirty, setIsDirty] = useState(false)
   const [validationErrors, setValidationErrors] = useState<string[]>([])
+  const [localLogoUrl, setLocalLogoUrl] = useState<string | null | undefined>(undefined)
   const { showModal, confirmNavigation, cancelNavigation, requestNavigation } = useUnsavedChanges(isDirty)
 
   // Initialize
@@ -270,6 +271,32 @@ export default function NewQuotePage() {
     setCompany((prev) => prev ? { ...prev, [field]: value } : prev)
     setIsDirty(true)
   }, [])
+
+  const effectiveLogoUrl = localLogoUrl !== undefined
+    ? localLogoUrl
+    : (invoiceSettings.logoSource === 'company' ? companyLogoUrl : invoiceSettings.logoUrl) || companyLogoUrl
+
+  const handleLogoChange = useCallback((url: string | null, saveToSettings: boolean) => {
+    setLocalLogoUrl(url)
+    if (saveToSettings) {
+      if (url === null) updateSettings({ logoUrl: null, logoSource: 'custom' })
+      else if (url === companyLogoUrl) updateSettings({ logoSource: 'company' })
+      else updateSettings({ logoUrl: url, logoSource: 'custom' })
+    }
+    setIsDirty(true)
+  }, [companyLogoUrl, updateSettings])
+
+  const handleLogoUpload = useCallback((file: File, saveToSettings: boolean) => {
+    const reader = new FileReader()
+    reader.onload = () => setLocalLogoUrl(reader.result as string)
+    reader.readAsDataURL(file)
+    if (saveToSettings) { uploadLogo(file); updateSettings({ logoSource: 'custom' }) }
+    setIsDirty(true)
+  }, [uploadLogo, updateSettings])
+
+  const handleLogoBorderRadiusChange = useCallback((radius: number) => {
+    updateSettings({ logoBorderRadius: radius })
+  }, [updateSettings])
 
   // Calculations
   const { subtotal, taxAmount, discountAmount, total, tvaBreakdown } = useMemo(() => {
@@ -597,7 +624,7 @@ export default function NewQuotePage() {
           />
           <A4Sheet
             mode={mode}
-            logoUrl={invoiceSettings.logoSource === 'company' ? companyLogoUrl : invoiceSettings.logoUrl}
+            logoUrl={effectiveLogoUrl}
             accentColor={accentColor}
             documentTitle={options.documentTitle}
             quoteNumber={quoteNumber}
@@ -655,6 +682,11 @@ export default function NewQuotePage() {
             onDeliveryAddressChange={(v) => handleOptionsChange({ deliveryAddress: v })}
             onIssueDateChange={(d) => handleOptionsChange({ issueDate: d })}
             onValidityDateChange={(d) => handleOptionsChange({ validityDate: d })}
+            logoBorderRadius={invoiceSettings.logoBorderRadius}
+            companyLogoUrl={companyLogoUrl}
+            onLogoChange={handleLogoChange}
+            onLogoBorderRadiusChange={handleLogoBorderRadiusChange}
+            onLogoUpload={handleLogoUpload}
           />
           </div>
           </div>
