@@ -16,6 +16,7 @@ import { Save, ArrowLeft, Eye, Pencil, SlidersHorizontal, X, FileText } from 'lu
 import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
 import { ProductCatalogModal, type CatalogProduct } from '@/components/products/product-catalog-modal'
+import { CollaborationToolbar } from '@/components/collaboration/collaboration-toolbar'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -397,6 +398,11 @@ function EditCreditNoteContent() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <CollaborationToolbar
+            documentType="credit_note"
+            documentId={creditNoteId}
+            className="flex items-center gap-2"
+          />
           <div className="flex rounded-lg border border-border overflow-hidden">
             <button onClick={() => setMode('edit')} className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium transition-all ${mode === 'edit' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}>
               <Pencil className="h-3 w-3" /> Edition

@@ -19,6 +19,7 @@ import { Tabs } from '@/components/ui/tabs'
 import { AiChatSidebar } from '@/components/ai/ai-chat-sidebar'
 import { AiSheetOverlay } from '@/components/ai/ai-sheet-overlay'
 import { DocumentZoom, loadDocumentZoom } from '@/components/shared/document-zoom'
+import { CollaborationToolbar } from '@/components/collaboration/collaboration-toolbar'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -503,6 +504,11 @@ function EditQuoteContent() {
 
         {/* Mode toggle + Download */}
         <div className="flex items-center gap-3">
+          <CollaborationToolbar
+            documentType="quote"
+            documentId={quoteId}
+            className="flex items-center gap-2"
+          />
           <DocumentZoom value={docZoom} onChange={setDocZoom} />
           <Button variant="outline" size="sm" onClick={handleDownloadPdf} disabled={downloading}>
             {downloading ? <Spinner className="h-3.5 w-3.5 mr-1.5" /> : <Download className="h-3.5 w-3.5 mr-1.5" />}
