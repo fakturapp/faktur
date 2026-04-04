@@ -30,7 +30,7 @@ export default class DocumentAccessService {
   /**
    * Check if a user is the owner (team member) of the document's team.
    */
-  async isDocumentOwner(documentType: DocumentType, documentId: string, teamId: string, userId: string): Promise<boolean> {
+  async isDocumentOwner(documentType: DocumentType, documentId: string, teamId: string, _userId: string): Promise<boolean> {
     const document = await this.getDocument(documentType, documentId, teamId)
     if (!document) return false
     // The document belongs to the team, and the user is in this team context
@@ -45,7 +45,7 @@ export default class DocumentAccessService {
     documentType: DocumentType,
     documentId: string,
     teamId: string,
-    userId: string
+    _userId: string
   ): Promise<{ permission: SharePermission; isOwner: boolean } | null> {
     // Check if user is a team member (they always have full access)
     const document = await this.getDocument(documentType, documentId, teamId)

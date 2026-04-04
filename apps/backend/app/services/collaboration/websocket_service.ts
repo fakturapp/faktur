@@ -3,7 +3,6 @@ import type { Server as HttpServer } from 'node:http'
 import { Secret } from '@adonisjs/core/helpers'
 import env from '#start/env'
 import User from '#models/account/user'
-import DocumentShare from '#models/collaboration/document_share'
 import type { SharePermission } from '#models/collaboration/document_share'
 
 // ── Types ─────────────────────────────────────────────────────────────────

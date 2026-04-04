@@ -75,7 +75,7 @@ const permissionIcons: Record<Permission, typeof Eye> = {
 // ── Component ─────────────────────────────────────────────────────────────
 
 export function ShareModal({ open, onClose, documentType, documentId }: ShareModalProps) {
-  const { addToast } = useToast()
+  const { toast } = useToast()
 
   // State
   const [shares, setShares] = useState<ShareEntry[]>([])
@@ -118,12 +118,12 @@ export function ShareModal({ open, onClose, documentType, documentId }: ShareMod
       permission: linkPermission,
     })
     if (error) {
-      addToast(error, 'error')
+      toast(error, 'error')
       return
     }
     if (data) {
       setLinks((prev) => [data.data, ...prev])
-      addToast('Lien de partage cree', 'success')
+      toast('Lien de partage cree', 'success')
     }
   }
 
@@ -131,14 +131,14 @@ export function ShareModal({ open, onClose, documentType, documentId }: ShareMod
     const url = `${FRONTEND_URL}/share/${token}`
     await navigator.clipboard.writeText(url)
     setCopied(true)
-    addToast('Lien copie dans le presse-papiers', 'success')
+    toast('Lien copie dans le presse-papiers', 'success')
     setTimeout(() => setCopied(false), 2000)
   }
 
   const deleteShareLink = async (linkId: string) => {
     await api.delete(`/collaboration/share-links/${linkId}`)
     setLinks((prev) => prev.filter((l) => l.id !== linkId))
-    addToast('Lien desactive', 'success')
+    toast('Lien desactive', 'success')
   }
 
   // ── Invite by email ─────────────────────────────────────────────────
@@ -155,11 +155,11 @@ export function ShareModal({ open, onClose, documentType, documentId }: ShareMod
     })
 
     if (error) {
-      addToast(error, 'error')
+      toast(error, 'error')
     } else if (data) {
       setShares((prev) => [data.data, ...prev])
       setInviteEmail('')
-      addToast('Invitation envoyee', 'success')
+      toast('Invitation envoyee', 'success')
     }
     setInviting(false)
   }
@@ -169,7 +169,7 @@ export function ShareModal({ open, onClose, documentType, documentId }: ShareMod
   const updatePermission = async (shareId: string, permission: Permission) => {
     const { error } = await api.patch(`/collaboration/shares/${shareId}`, { permission })
     if (error) {
-      addToast(error, 'error')
+      toast(error, 'error')
       return
     }
     setShares((prev) =>
@@ -182,11 +182,11 @@ export function ShareModal({ open, onClose, documentType, documentId }: ShareMod
   const revokeAccess = async (shareId: string) => {
     const { error } = await api.delete(`/collaboration/shares/${shareId}`)
     if (error) {
-      addToast(error, 'error')
+      toast(error, 'error')
       return
     }
     setShares((prev) => prev.filter((s) => s.id !== shareId))
-    addToast('Acces revoque', 'success')
+    toast('Acces revoque', 'success')
   }
 
   // ── Render ──────────────────────────────────────────────────────────
