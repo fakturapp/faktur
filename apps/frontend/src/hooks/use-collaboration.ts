@@ -172,6 +172,10 @@ export function useCollaboration({
       })
     })
 
+    socket.on('permission-changed', (data: { permission: 'viewer' | 'editor' }) => {
+      setMyPermission(data.permission)
+    })
+
     socket.on('access-revoked', () => {
       onAccessRevokedRef.current?.()
     })
@@ -198,7 +202,12 @@ export function useCollaboration({
     }
   }, [documentType, documentId, enabled])
 
+  // Throttle cursor moves to ~30fps to avoid flooding
+  const lastCursorSend = useRef(0)
   const sendCursorMove = useCallback((x: number, y: number, fieldId?: string) => {
+    const now = Date.now()
+    if (now - lastCursorSend.current < 33) return // ~30fps
+    lastCursorSend.current = now
     socketRef.current?.emit('cursor-move', { x, y, fieldId })
   }, [])
 
