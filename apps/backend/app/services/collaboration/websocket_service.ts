@@ -1,6 +1,7 @@
 import { Server as SocketServer, type Socket } from 'socket.io'
 import type { Server as HttpServer } from 'node:http'
 import { Secret } from '@adonisjs/core/helpers'
+import env from '#start/env'
 import User from '#models/account/user'
 import DocumentShare from '#models/collaboration/document_share'
 import type { SharePermission } from '#models/collaboration/document_share'
@@ -72,7 +73,7 @@ export function getSocketServer(): SocketServer | null {
 export function initWebSocket(httpServer: HttpServer) {
   io = new SocketServer(httpServer, {
     cors: {
-      origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+      origin: env.get('FRONTEND_URL', 'http://localhost:3000'),
       methods: ['GET', 'POST'],
       credentials: true,
     },
