@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import DocumentShare from '#models/collaboration/document_share'
+import { disconnectUserFromDocument } from '#services/collaboration/websocket_service'
 
 export default class Revoke {
   async handle(ctx: HttpContext) {
@@ -25,6 +26,15 @@ export default class Revoke {
 
     share.status = 'revoked'
     await share.save()
+
+    // Immediately disconnect the user from the WebSocket room
+    if (share.sharedWithUserId) {
+      await disconnectUserFromDocument(
+        share.documentType,
+        share.documentId,
+        share.sharedWithUserId
+      )
+    }
 
     return response.ok({
       message: 'Access revoked',

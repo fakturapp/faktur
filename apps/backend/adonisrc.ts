@@ -72,6 +72,7 @@ export default defineConfig({
     () => import('#start/validator'),
     () => import('#start/events'),
     () => import('#start/limiter'),
+    () => import('#start/ws'),
   ],
 
   /*
