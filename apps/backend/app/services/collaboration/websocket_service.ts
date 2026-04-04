@@ -131,6 +131,18 @@ export function initWebSocket(httpServer: HttpServer) {
       documentId: string
     }) => {
       const { documentType, documentId } = data
+
+      // Validate input
+      const validTypes = ['invoice', 'quote', 'credit_note']
+      if (!documentType || !validTypes.includes(documentType)) {
+        socket.emit('error', { message: 'Invalid document type' })
+        return
+      }
+      if (!documentId || typeof documentId !== 'string' || documentId.length > 100) {
+        socket.emit('error', { message: 'Invalid document ID' })
+        return
+      }
+
       const roomKey = getRoomKey(documentType, documentId)
 
       // Check access: team member or shared user
@@ -217,12 +229,13 @@ export function initWebSocket(httpServer: HttpServer) {
     socket.on('cursor-move', (data: { x: number; y: number; fieldId?: string }) => {
       const roomKey = (socket as any).currentRoom
       if (!roomKey) return
+      if (typeof data?.x !== 'number' || typeof data?.y !== 'number') return
 
       socket.to(roomKey).emit('cursor-moved', {
         userId,
-        x: data.x,
-        y: data.y,
-        fieldId: data.fieldId,
+        x: Math.round(data.x),
+        y: Math.round(data.y),
+        fieldId: typeof data.fieldId === 'string' ? data.fieldId.slice(0, 100) : undefined,
       })
     })
 
@@ -231,6 +244,7 @@ export function initWebSocket(httpServer: HttpServer) {
     socket.on('document-change', (data: { path: string; value: any }) => {
       const roomKey = (socket as any).currentRoom
       if (!roomKey) return
+      if (typeof data?.path !== 'string' || data.path.length > 200) return
 
       // Check editor permission
       const room = rooms.get(roomKey)
