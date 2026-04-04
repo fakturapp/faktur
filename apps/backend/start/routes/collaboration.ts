@@ -21,7 +21,7 @@ const CheckAccess = () => import('#controllers/collaboration/access/check_access
 
 // ── Authenticated routes (require team context) ──────────────────────────
 
-router
+const collabGroup = router
   .group(() => {
     // Document shares (invite by email)
     router.get('/shares/:documentType/:documentId', [ShareList, 'handle'])
@@ -38,14 +38,15 @@ router
     // Access check
     router.get('/access/:documentType/:documentId', [CheckAccess, 'handle'])
   })
-  .prefix(API_PREFIX + '/collaboration')
+  .prefix('/collaboration')
   .use(middleware.auth())
+if (API_PREFIX) collabGroup.prefix(API_PREFIX)
 
 // ── Share link validation (auth only, no vault needed) ───────────────────
 
-router
+const validateGroup = router
   .group(() => {
     router.get('/share/validate/:token', [ValidateLink, 'handle']).use(shareLinkValidationLimiter)
   })
-  .prefix(API_PREFIX)
   .use(middleware.auth())
+if (API_PREFIX) validateGroup.prefix(API_PREFIX)
