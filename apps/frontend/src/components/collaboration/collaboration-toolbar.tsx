@@ -112,13 +112,12 @@ export function CollaborationEditor({
   const myPermission = collab?.myPermission
   const sendCursorMove = collab?.sendCursorMove
 
-  // Send cursor as percentage (0-1) of container dimensions
-  const handleMouseMove = useCallback(
-    (e: React.MouseEvent) => {
+  // Send cursor as percentage (0-1) of container dimensions (like Liveblocks)
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent) => {
       if (!editorRef.current || !isConnected || !sendCursorMove) return
       const rect = editorRef.current.getBoundingClientRect()
       if (rect.width === 0 || rect.height === 0) return
-      // Normalize to 0-1 range
       const xPct = (e.clientX - rect.left) / rect.width
       const yPct = (e.clientY - rect.top) / rect.height
       sendCursorMove(xPct, yPct)
@@ -126,12 +125,18 @@ export function CollaborationEditor({
     [editorRef, isConnected, sendCursorMove]
   )
 
+  // Hide cursor when pointer leaves (like Liveblocks handlePointerLeave)
+  const handlePointerLeave = useCallback(() => {
+    sendCursorMove?.(-1, -1) // Out-of-bounds = hidden
+  }, [sendCursorMove])
+
   const isReadOnly = myPermission === 'viewer'
 
   return (
     <div
       className="relative"
-      onMouseMove={handleMouseMove}
+      onPointerMove={handlePointerMove}
+      onPointerLeave={handlePointerLeave}
       ref={editorRef as React.RefObject<HTMLDivElement>}
     >
       {/* Live cursors from other users */}

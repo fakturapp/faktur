@@ -15,15 +15,16 @@ export function isApplyingRemote() {
 }
 
 /**
- * Broadcasts a value change to collaborators whenever it changes.
+ * Broadcasts a value change to collaborators immediately on every change.
  * Uses JSON.stringify for deep comparison (works with objects/arrays).
  * Skips initial render and remote-originated changes to prevent echo loops.
+ *
+ * NO DEBOUNCE — every keystroke syncs in real-time like Liveblocks/Figma.
  */
 export function useBroadcast(path: string, value: any) {
   const collab = useCollaborationContext()
   const prevJsonRef = useRef<string>('')
   const initializedRef = useRef(false)
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     const json = typeof value === 'string' ? value : JSON.stringify(value)
@@ -42,14 +43,7 @@ export function useBroadcast(path: string, value: any) {
     // Skip if this change originated from a remote user
     if (_isApplyingRemote) return
 
-    // Debounce: wait 50ms before broadcasting to batch rapid changes
-    if (timerRef.current) clearTimeout(timerRef.current)
-    timerRef.current = setTimeout(() => {
-      collab?.sendDocumentChange?.(path, value)
-    }, 50)
-
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current)
-    }
+    // Broadcast immediately — no debounce
+    collab?.sendDocumentChange?.(path, value)
   }, [value, path, collab])
 }
