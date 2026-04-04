@@ -1,6 +1,7 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
 import { API_PREFIX } from '#start/routes/_prefix'
+import { collaborationShareLimiter, shareLinkValidationLimiter } from '#start/limiter'
 
 // Share controllers
 const ShareList = () => import('#controllers/collaboration/shares/list')
@@ -24,13 +25,13 @@ router
   .group(() => {
     // Document shares (invite by email)
     router.get('/shares/:documentType/:documentId', [ShareList, 'handle'])
-    router.post('/shares', [ShareCreate, 'handle'])
+    router.post('/shares', [ShareCreate, 'handle']).use(collaborationShareLimiter)
     router.patch('/shares/:shareId', [ShareUpdate, 'handle'])
     router.delete('/shares/:shareId', [ShareRevoke, 'handle'])
 
     // Share links
     router.get('/share-links/:documentType/:documentId', [LinkList, 'handle'])
-    router.post('/share-links', [LinkCreate, 'handle'])
+    router.post('/share-links', [LinkCreate, 'handle']).use(collaborationShareLimiter)
     router.patch('/share-links/:linkId', [LinkUpdate, 'handle'])
     router.delete('/share-links/:linkId', [LinkDestroy, 'handle'])
 
@@ -44,7 +45,7 @@ router
 
 router
   .group(() => {
-    router.get('/share/validate/:token', [ValidateLink, 'handle'])
+    router.get('/share/validate/:token', [ValidateLink, 'handle']).use(shareLinkValidationLimiter)
   })
   .prefix(API_PREFIX)
   .use(middleware.auth())

@@ -86,6 +86,28 @@ export const passkeyLimiter = limiter.define('passkey', (ctx) => {
     })
 })
 
+/** Collaboration share creation: 20 requests per hour per IP */
+export const collaborationShareLimiter = limiter.define('collaboration-share', (ctx) => {
+  return limiter
+    .allowRequests(20)
+    .every('1 hour')
+    .usingKey(ctx.request.ip())
+    .limitExceeded((error) => {
+      error.setMessage('Trop de partages. Réessayez plus tard.')
+    })
+})
+
+/** Share link validation: 30 requests per 15 minutes per IP */
+export const shareLinkValidationLimiter = limiter.define('share-link-validation', (ctx) => {
+  return limiter
+    .allowRequests(30)
+    .every('15 minutes')
+    .usingKey(ctx.request.ip())
+    .limitExceeded((error) => {
+      error.setMessage('Trop de tentatives. Réessayez plus tard.')
+    })
+})
+
 /** Global API: 1000 requests per hour per IP */
 export const apiLimiter = limiter.define('api', (ctx) => {
   return limiter
