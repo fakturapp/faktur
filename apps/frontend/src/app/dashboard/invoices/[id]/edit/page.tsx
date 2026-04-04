@@ -23,6 +23,7 @@ import { DocumentZoom, loadDocumentZoom } from '@/components/shared/document-zoo
 import { CollaborationToolbar, CollaborationReadOnlyBanner, CollaborationEditor } from '@/components/collaboration/collaboration-toolbar'
 import { CollaborationProvider } from '@/components/collaboration/collaboration-provider'
 import { SyncBroadcaster } from '@/components/collaboration/sync-broadcaster'
+import { setApplyingRemote } from '@/components/collaboration/use-broadcast'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -534,18 +535,24 @@ function EditInvoiceContent() {
       documentId={invoiceId}
       enabled={!!invoiceId}
       onDocumentChange={(change) => {
-        // Apply remote changes to local state
-        if (change.path === 'notes') setNotes(change.value)
-        else if (change.path === 'accentColor') setAccentColor(change.value)
-        else if (change.path === 'paymentMethod') setPaymentMethod(change.value)
-        else if (change.path === 'bankAccountId') setBankAccountId(change.value)
-        else if (change.path === 'lines') setLines(change.value)
-        else if (change.path === 'invoiceNumber') setInvoiceNumber(change.value)
-        else if (change.path.startsWith('options.')) {
-          const key = change.path.replace('options.', '')
-          setOptions((prev) => ({ ...prev, [key]: change.value }))
-        } else if (change.path === 'client') {
-          setSelectedClient(change.value)
+        // Mark as remote to prevent re-broadcasting (echo loop)
+        setApplyingRemote(true)
+        try {
+          if (change.path === 'notes') setNotes(change.value)
+          else if (change.path === 'accentColor') setAccentColor(change.value)
+          else if (change.path === 'paymentMethod') setPaymentMethod(change.value)
+          else if (change.path === 'bankAccountId') setBankAccountId(change.value)
+          else if (change.path === 'lines') setLines(change.value)
+          else if (change.path === 'invoiceNumber') setInvoiceNumber(change.value)
+          else if (change.path.startsWith('options.')) {
+            const key = change.path.replace('options.', '')
+            setOptions((prev) => ({ ...prev, [key]: change.value }))
+          } else if (change.path === 'client') {
+            setSelectedClient(change.value)
+          }
+        } finally {
+          // Reset after microtask so React state updates complete first
+          queueMicrotask(() => setApplyingRemote(false))
         }
       }}
       onDocumentSaved={() => {

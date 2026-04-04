@@ -19,6 +19,7 @@ import { ProductCatalogModal, type CatalogProduct } from '@/components/products/
 import { CollaborationToolbar, CollaborationReadOnlyBanner, CollaborationEditor } from '@/components/collaboration/collaboration-toolbar'
 import { CollaborationProvider } from '@/components/collaboration/collaboration-provider'
 import { SyncBroadcaster } from '@/components/collaboration/sync-broadcaster'
+import { setApplyingRemote } from '@/components/collaboration/use-broadcast'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -391,14 +392,19 @@ function EditCreditNoteContent() {
       documentId={creditNoteId}
       enabled={!!creditNoteId}
       onDocumentChange={(change) => {
-        if (change.path === 'notes') setNotes(change.value)
-        else if (change.path === 'accentColor') setAccentColor(change.value)
-        else if (change.path === 'lines') setLines(change.value)
-        else if (change.path === 'invoiceNumber') setCreditNoteNumber(change.value)
-        else if (change.path === 'client') setSelectedClient(change.value)
-        else if (change.path.startsWith('options.')) {
-          const key = change.path.replace('options.', '')
-          setOptions((prev) => ({ ...prev, [key]: change.value }))
+        setApplyingRemote(true)
+        try {
+          if (change.path === 'notes') setNotes(change.value)
+          else if (change.path === 'accentColor') setAccentColor(change.value)
+          else if (change.path === 'lines') setLines(change.value)
+          else if (change.path === 'invoiceNumber') setCreditNoteNumber(change.value)
+          else if (change.path === 'client') setSelectedClient(change.value)
+          else if (change.path.startsWith('options.')) {
+            const key = change.path.replace('options.', '')
+            setOptions((prev) => ({ ...prev, [key]: change.value }))
+          }
+        } finally {
+          queueMicrotask(() => setApplyingRemote(false))
         }
       }}
       onDocumentSaved={() => {

@@ -5,3 +5,6 @@ export { CollaborationToolbar, CollaborationEditor, CollaborationReadOnlyBanner 
 export { CollaborationProvider, useCollaborationContext } from './collaboration-provider'
 export { ReadOnlyBanner } from './read-only-banner'
 export { CollaborativeField } from './field-indicator'
+export { SyncBroadcaster } from './sync-broadcaster'
+export { useBroadcast, setApplyingRemote } from './use-broadcast'
+export { TypingIndicator, CollaborativeFieldWrapper } from './typing-indicator'
