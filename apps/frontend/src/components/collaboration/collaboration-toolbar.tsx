@@ -35,18 +35,19 @@ export function CollaborationToolbar({
 
   const collaborators = collab?.collaborators ?? []
   const isConnected = collab?.isConnected ?? false
+  const isOwner = collab?.isOwner ?? false
   const myPermission = collab?.myPermission
 
   return (
     <>
       <div className={className}>
-        {/* Connection indicator */}
-        {documentId && (
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground mr-1" title={isConnected ? 'Connecte en temps reel' : 'Deconnecte'}>
+        {/* Connection indicator — only show when there are other collaborators */}
+        {documentId && collaborators.length > 0 && (
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground mr-1" title={isConnected ? 'Connecte en temps reel' : 'Reconnexion...'}>
             {isConnected ? (
               <Wifi className="h-3 w-3 text-green-500" />
             ) : (
-              <WifiOff className="h-3 w-3 text-destructive" />
+              <WifiOff className="h-3 w-3 text-amber-500 animate-pulse" />
             )}
           </div>
         )}
@@ -54,8 +55,8 @@ export function CollaborationToolbar({
         {/* Presence avatars */}
         <PresenceBar collaborators={collaborators} />
 
-        {/* Share button — only owners can share */}
-        {documentId && myPermission === 'editor' && (
+        {/* Share button — only team owners/editors can share */}
+        {documentId && isOwner && (
           <Button
             variant="outline"
             size="sm"
