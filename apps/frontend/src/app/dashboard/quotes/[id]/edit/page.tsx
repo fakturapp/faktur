@@ -508,7 +508,7 @@ function EditQuoteContent() {
             setOptions((prev) => ({ ...prev, [key]: change.value }))
           }
         } finally {
-          queueMicrotask(() => setApplyingRemote(false))
+          requestAnimationFrame(() => setApplyingRemote(false))
         }
       }}
       onDocumentSaved={() => {
@@ -586,7 +586,6 @@ function EditQuoteContent() {
       <div className="flex flex-col xl:flex-row gap-5">
         {/* A4 Sheet */}
         <motion.div variants={fadeUp} custom={1} className="flex-1 min-w-0 order-1">
-          <CollaborationEditor editorRef={editorAreaRef}>
           <div className="rounded-xl relative">
           {/* Toggle options + AI button */}
           <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
@@ -603,6 +602,7 @@ function EditQuoteContent() {
               <SlidersHorizontal className="h-4 w-4" />
             </button>
           </div>
+          <CollaborationEditor editorRef={editorAreaRef}>
           <div className="relative" style={{ transform: `scale(${docZoom / 100})`, transformOrigin: 'top center', transition: 'transform 0.15s ease' }}>
           <AiSheetOverlay open={aiProcessing} />
           <A4Sheet
@@ -672,8 +672,8 @@ function EditQuoteContent() {
             onLogoUpload={handleLogoUpload}
           />
           </div>
-          </div>
           </CollaborationEditor>
+          </div>
         </motion.div>
 
         {/* Right Sidebar */}

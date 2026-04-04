@@ -535,7 +535,6 @@ function EditInvoiceContent() {
       documentId={invoiceId}
       enabled={!!invoiceId}
       onDocumentChange={(change) => {
-        // Mark as remote to prevent re-broadcasting (echo loop)
         setApplyingRemote(true)
         try {
           if (change.path === 'notes') setNotes(change.value)
@@ -551,8 +550,7 @@ function EditInvoiceContent() {
             setSelectedClient(change.value)
           }
         } finally {
-          // Reset after microtask so React state updates complete first
-          queueMicrotask(() => setApplyingRemote(false))
+          requestAnimationFrame(() => setApplyingRemote(false))
         }
       }}
       onDocumentSaved={() => {
@@ -640,7 +638,6 @@ function EditInvoiceContent() {
       {/* Main content */}
       <div className="flex flex-col xl:flex-row gap-5">
         <motion.div variants={fadeUp} custom={1} className="flex-1 min-w-0 order-1">
-          <CollaborationEditor editorRef={editorAreaRef}>
           <div className="rounded-xl relative">
             <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
               {invoiceSettings.aiEnabled && (
@@ -652,6 +649,7 @@ function EditInvoiceContent() {
                 <SlidersHorizontal className="h-4 w-4" />
               </button>
             </div>
+            <CollaborationEditor editorRef={editorAreaRef}>
             <div className="relative" style={{ transform: `scale(${docZoom / 100})`, transformOrigin: 'top center', transition: 'transform 0.15s ease' }}>
             <AiSheetOverlay open={aiProcessing} />
             <A4Sheet
@@ -724,8 +722,8 @@ function EditInvoiceContent() {
               onLogoUpload={handleLogoUpload}
             />
             </div>
+            </CollaborationEditor>
           </div>
-          </CollaborationEditor>
         </motion.div>
 
         <AnimatePresence>

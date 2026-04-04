@@ -404,7 +404,7 @@ function EditCreditNoteContent() {
             setOptions((prev) => ({ ...prev, [key]: change.value }))
           }
         } finally {
-          queueMicrotask(() => setApplyingRemote(false))
+          requestAnimationFrame(() => setApplyingRemote(false))
         }
       }}
       onDocumentSaved={() => {
