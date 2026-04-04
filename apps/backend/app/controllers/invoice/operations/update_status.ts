@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import Invoice from '#models/invoice/invoice'
+import { broadcastDocumentSaved } from '#services/collaboration/websocket_service'
 
 export default class UpdateStatus {
   async handle({ auth, params, request, response }: HttpContext) {
@@ -37,6 +38,7 @@ export default class UpdateStatus {
     }
 
     await invoice.save()
+    broadcastDocumentSaved('invoice', invoice.id, user.id)
 
     return response.ok({
       invoice: { id: invoice.id, status: invoice.status, paidDate: invoice.paidDate },
