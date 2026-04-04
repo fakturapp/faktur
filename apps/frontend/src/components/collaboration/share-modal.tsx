@@ -201,12 +201,19 @@ export function ShareModal({ open, onClose, documentType, documentId }: ShareMod
 
   return (
     <Dialog open={open} onClose={onClose} className="max-w-lg">
-      <DialogTitle className="flex items-center gap-2">
-        <Users className="h-5 w-5 text-primary" />
-        Partager
-      </DialogTitle>
+      <div className="flex items-center justify-between">
+        <DialogTitle className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+            <Users className="h-4 w-4 text-primary" />
+          </div>
+          Partager ce document
+        </DialogTitle>
+        <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-lg hover:bg-muted/50">
+          <X className="h-4 w-4" />
+        </button>
+      </div>
 
-      <div className="mt-4 space-y-5">
+      <div className="mt-5 space-y-5">
         {/* ── Invite by email ──────────────────────────────────────── */}
         <div>
           <label className="mb-1.5 block text-xs font-medium text-muted-foreground uppercase tracking-wide">
@@ -408,9 +415,17 @@ export function ShareModal({ open, onClose, documentType, documentId }: ShareMod
 
         {/* ── Empty state ──────────────────────────────────────────── */}
         {shares.length === 0 && !loading && (
-          <p className="text-center text-sm text-muted-foreground py-2">
-            Aucun collaborateur pour le moment
-          </p>
+          <div className="text-center py-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50 mx-auto mb-2">
+              <UserPlus className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Aucun collaborateur pour le moment
+            </p>
+            <p className="text-xs text-muted-foreground/60 mt-0.5">
+              Invitez quelqu&apos;un par email ou generez un lien
+            </p>
+          </div>
         )}
       </div>
     </Dialog>
