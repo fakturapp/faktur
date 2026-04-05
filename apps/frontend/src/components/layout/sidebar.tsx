@@ -9,7 +9,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Avatar } from '@/components/ui/avatar'
 import { Dropdown, DropdownItem, DropdownLabel, DropdownSeparator, DropdownSub } from '@/components/ui/dropdown'
 import { useTheme } from '@/lib/theme'
-import { CreateInvoiceModal } from '@/components/invoices/create-invoice-modal'
 import {
   LayoutDashboard,
   FileText,
@@ -309,7 +308,6 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
   const pathname = usePathname()
   const router = useRouter()
   const { theme, setTheme } = useTheme()
-  const [invoiceModalOpen, setInvoiceModalOpen] = useState(false)
 
   const isAdminMode = pathname.startsWith('/dashboard/admin')
   const isSettingsMode = pathname.startsWith('/dashboard/settings')
@@ -397,94 +395,14 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             exit={{ opacity: 0, x: 20 }}
             transition={{ duration: 0.25, ease: 'easeInOut' }}
           >
-            {/* Team header */}
+            {/* Faktur logo header */}
             <div className="px-3 pt-3 pb-1">
-              {teamsLoaded ? (
-                <Dropdown
-                  align="left"
-                  trigger={
-                    <div className="flex items-center gap-2.5 rounded-lg px-2 py-2 liquid-nav-hover transition-all duration-200 w-full">
-                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary font-semibold text-[11px] overflow-hidden">
-                        {currentTeam?.iconUrl ? (
-                          <img
-                            src={currentTeam.iconUrl}
-                            alt={currentTeam.name}
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          currentTeam?.name.charAt(0).toUpperCase() || 'T'
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0 text-left">
-                        <p className="text-[13px] font-semibold text-foreground leading-tight truncate">
-                          {currentTeam?.name || 'Équipe'}
-                        </p>
-                        {currentTeam?.role && (
-                          <p className="text-[11px] text-muted-foreground flex items-center gap-1">
-                            {roleIcons[currentTeam.role]}
-                            {roleLabels[currentTeam.role]}
-                          </p>
-                        )}
-                      </div>
-                      <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0" />
-                    </div>
-                  }
-                  className="min-w-[230px]"
-                >
-                  <DropdownLabel>Vos équipes</DropdownLabel>
-
-                  {teams.map((team) => (
-                    <DropdownItem
-                      key={team.id}
-                      onClick={() => {
-                        if (!team.isCurrent) onSwitchTeam(team.id)
-                      }}
-                    >
-                      <div className="flex items-center justify-between w-full">
-                        <div className="flex items-center gap-2.5">
-                          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted text-xs font-semibold text-foreground overflow-hidden">
-                            {team.iconUrl ? (
-                              <img
-                                src={team.iconUrl}
-                                alt={team.name}
-                                className="h-full w-full object-cover"
-                              />
-                            ) : (
-                              team.name.charAt(0).toUpperCase()
-                            )}
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-foreground leading-tight">
-                              {team.name}
-                            </p>
-                            <p className="text-xs text-muted-foreground flex items-center gap-1">
-                              {roleIcons[team.role]}
-                              {roleLabels[team.role]}
-                            </p>
-                          </div>
-                        </div>
-                        {team.isCurrent && <Check className="h-4 w-4 text-primary shrink-0" />}
-                      </div>
-                    </DropdownItem>
-                  ))}
-
-                  <DropdownSeparator />
-
-                  <Link href="/dashboard/team/create">
-                    <DropdownItem>
-                      <Plus className="h-4 w-4" /> Créer une équipe
-                    </DropdownItem>
-                  </Link>
-                </Dropdown>
-              ) : (
-                <div className="flex items-center gap-2.5 px-2 py-2">
-                  <div className="h-7 w-7 rounded-lg skeleton-shimmer" />
-                  <div className="flex-1 space-y-1.5">
-                    <div className="h-3 w-24 rounded skeleton-shimmer" />
-                    <div className="h-2 w-16 rounded skeleton-shimmer" />
-                  </div>
+              <div className="flex items-center gap-2.5 px-2 py-2">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary text-white font-bold text-[11px]">
+                  F
                 </div>
-              )}
+                <p className="text-[14px] font-bold text-foreground tracking-tight">Faktur</p>
+              </div>
             </div>
           </motion.div>
         )}
@@ -603,26 +521,32 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
                 trigger={
                   <div className="flex items-center justify-center gap-2 rounded-lg px-2.5 py-2 text-[13px] font-semibold liquid-nav-hover transition-all group cursor-pointer">
                     <CirclePlus className="h-3.5 w-3.5 text-primary" />
-                    <span className="text-primary">Créer</span>
+                    <span className="text-primary">Cr\u00e9er</span>
                   </div>
                 }
-                className="min-w-[200px]"
+                className="min-w-[220px]"
               >
-                <DropdownItem onClick={() => setInvoiceModalOpen(true)}>
-                  <FileText className="h-4 w-4 text-primary" />
-                  <span>Facture</span>
-                </DropdownItem>
+                <DropdownSub
+                  trigger={
+                    <>
+                      <FileText className="h-4 w-4 text-primary" />
+                      <span className="flex-1 text-left">Facture</span>
+                    </>
+                  }
+                >
+                  <DropdownItem onClick={() => router.push('/dashboard/invoices/new')}>
+                    <FileText className="h-4 w-4" /> Facture vierge
+                  </DropdownItem>
+                  <DropdownItem onClick={() => router.push('/dashboard/quotes?convert=1')}>
+                    <Receipt className="h-4 w-4" /> Convertir un devis
+                  </DropdownItem>
+                </DropdownSub>
                 <DropdownItem onClick={() => router.push('/dashboard/quotes/new')}>
                   <Receipt className="h-4 w-4 text-orange-500" />
                   <span>Devis</span>
                 </DropdownItem>
               </Dropdown>
             </div>
-
-            <CreateInvoiceModal
-              open={invoiceModalOpen}
-              onClose={() => setInvoiceModalOpen(false)}
-            />
 
             {/* Navigation */}
             <nav className="flex-1 overflow-y-auto px-3 py-1 space-y-0.5">
@@ -717,6 +641,46 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
               </DropdownItem>
             </Link>
           )}
+
+          <DropdownSeparator />
+
+          {/* Team switcher */}
+          <DropdownSub
+            trigger={
+              <>
+                <UsersRound className="h-4 w-4" />
+                <span className="flex-1 text-left">{currentTeam?.name || '\u00c9quipe'}</span>
+              </>
+            }
+          >
+            <DropdownLabel>Vos \u00e9quipes</DropdownLabel>
+            {teams.map((team) => (
+              <DropdownItem
+                key={team.id}
+                onClick={() => { if (!team.isCurrent) onSwitchTeam(team.id) }}
+              >
+                <div className="flex items-center justify-between w-full">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-muted text-[10px] font-semibold text-foreground overflow-hidden">
+                      {team.iconUrl ? (
+                        <img src={team.iconUrl} alt={team.name} className="h-full w-full object-cover" />
+                      ) : (
+                        team.name.charAt(0).toUpperCase()
+                      )}
+                    </div>
+                    <span className="text-sm">{team.name}</span>
+                  </div>
+                  {team.isCurrent && <Check className="h-3.5 w-3.5 text-primary shrink-0" />}
+                </div>
+              </DropdownItem>
+            ))}
+            <DropdownSeparator />
+            <Link href="/dashboard/team/create">
+              <DropdownItem>
+                <Plus className="h-4 w-4" /> Nouvelle \u00e9quipe
+              </DropdownItem>
+            </Link>
+          </DropdownSub>
 
           <DropdownSeparator />
 
