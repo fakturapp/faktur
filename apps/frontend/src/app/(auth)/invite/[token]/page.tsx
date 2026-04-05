@@ -69,7 +69,8 @@ export default function InvitePage() {
     }
 
     setAccepted(true)
-    setTimeout(() => router.push('/dashboard'), 2000)
+    // Hard reload to clear old team cache and switch context
+    setTimeout(() => { window.location.href = '/dashboard' }, 1500)
   }
 
   if (loading) {

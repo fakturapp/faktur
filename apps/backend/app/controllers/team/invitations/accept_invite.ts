@@ -67,11 +67,9 @@ export default class AcceptInvite {
     invitation.encryptedTeamDek = encryptedTeamDek
     await invitation.save()
 
-    // Set as current team if user has no current team
-    if (!user.currentTeamId) {
-      user.currentTeamId = invitation.teamId
-      await user.save()
-    }
+    // Auto-switch to the joined team
+    user.currentTeamId = invitation.teamId
+    await user.save()
 
     const team = await Team.findOrFail(invitation.teamId)
 
