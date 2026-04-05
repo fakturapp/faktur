@@ -161,15 +161,11 @@ export default class LoginVerify {
         user: await ctx.serialize.withoutWrapping(UserTransformer.transform(user)),
         token: token.value!.release(),
       })
-    } catch (err: any) {
-      const errMsg = err?.message || String(err)
-      console.error('[Passkey Login] Error:', errMsg)
-      console.error('[Passkey Login] Stack:', err?.stack)
-      await this.recordLoginAttempt(request, null, 'failed', errMsg.slice(0, 200))
+    } catch {
+      await this.recordLoginAttempt(request, null, 'failed', 'Passkey error')
       return response.unauthorized({
-        message: 'Passkey authentication failed',
+        message: 'L\'authentification par cl\u00e9 d\'acc\u00e8s a \u00e9chou\u00e9. Veuillez r\u00e9essayer.',
         code: 'PASSKEY_VERIFY_FAILED',
-        detail: process.env.NODE_ENV !== 'production' ? errMsg : undefined,
       })
     }
   }

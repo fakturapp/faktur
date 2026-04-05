@@ -192,13 +192,21 @@ class PasskeyService {
   }> {
     const credentialIdB64 = response.id
 
-    const credential = await PasskeyCredential.query()
+    // Try exact match first, then fallback with rawId
+    let credential = await PasskeyCredential.query()
       .where('credentialId', credentialIdB64)
       .preload('user')
       .first()
 
+    // Fallback: try matching with rawId (base64url encoded)
+    if (!credential && response.rawId) {
+      credential = await PasskeyCredential.query()
+        .where('credentialId', response.rawId)
+        .preload('user')
+        .first()
+    }
+
     if (!credential) {
-      console.warn('[Passkey] Credential not found:', credentialIdB64)
       return { verified: false, credential: null, error: 'credential_not_found' }
     }
 
@@ -211,7 +219,6 @@ class PasskeyService {
       .limit(5)
 
     if (challengeRecords.length === 0) {
-      console.warn('[Passkey] No valid challenge found (all expired)')
       return { verified: false, credential: null, error: 'challenge_expired' }
     }
 
@@ -252,7 +259,6 @@ class PasskeyService {
     }
 
     if (!verification || !verification.verified) {
-      console.warn('[Passkey] Verification failed. Last error:', lastError, 'Origin:', this.origin, 'RPID:', this.rpID)
       return { verified: false, credential: null, error: lastError || 'verification_failed' }
     }
 
