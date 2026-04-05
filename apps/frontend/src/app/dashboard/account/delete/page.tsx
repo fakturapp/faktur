@@ -60,6 +60,7 @@ export default function DeleteAccountPage() {
   const [showDeleteTeamPassword, setShowDeleteTeamPassword] = useState(false)
   const [transferDialog, setTransferDialog] = useState<TeamInfo | null>(null)
   const [transferTarget, setTransferTarget] = useState('')
+  const [leaveConfirm, setLeaveConfirm] = useState<TeamInfo | null>(null)
 
   // Step 3: Name
   const [nameInput, setNameInput] = useState('')
@@ -426,7 +427,7 @@ export default function DeleteAccountPage() {
                               onClick={() => openTransferDialog(team)}
                               disabled={loading}
                             >
-                              <UserCheck className="h-3.5 w-3.5 mr-1" /> Transférer
+                              <UserCheck className="h-3.5 w-3.5 mr-1" /> Transférer & Quitté
                             </Button>
                           )}
                         </>
@@ -434,7 +435,7 @@ export default function DeleteAccountPage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleLeaveTeam(team)}
+                          onClick={() => setLeaveConfirm(team)}
                           disabled={loading}
                         >
                           <LogOut className="h-3.5 w-3.5 mr-1" /> Quitter
@@ -696,6 +697,30 @@ export default function DeleteAccountPage() {
         </DialogFooter>
       </Dialog>
 
+      {/* Leave team confirmation dialog */}
+      <Dialog open={!!leaveConfirm} onClose={() => setLeaveConfirm(null)} className="max-w-sm">
+        <DialogTitle>Quitter &laquo; {leaveConfirm?.name} &raquo; ?</DialogTitle>
+        <DialogDescription>
+          Vous perdrez l&apos;acc&egrave;s &agrave; toutes les donn&eacute;es de cette &eacute;quipe. Cette action est irr&eacute;versible.
+        </DialogDescription>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setLeaveConfirm(null)} disabled={loading}>
+            Annuler
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={async () => {
+              if (!leaveConfirm) return
+              await handleLeaveTeam(leaveConfirm)
+              setLeaveConfirm(null)
+            }}
+            disabled={loading}
+          >
+            {loading ? <><Spinner /> En cours...</> : <><LogOut className="h-3.5 w-3.5 mr-1" /> Quitter</>}
+          </Button>
+        </DialogFooter>
+      </Dialog>
+
       {/* Transfer ownership dialog */}
       <Dialog open={!!transferDialog} onClose={() => setTransferDialog(null)}>
         <DialogTitle>Transférer &laquo; {transferDialog?.name} &raquo;</DialogTitle>
@@ -729,7 +754,7 @@ export default function DeleteAccountPage() {
             onClick={handleTransferTeam}
             disabled={loading || !transferTarget}
           >
-            {loading ? <><Spinner /> Transfert...</> : 'Transférer'}
+            {loading ? <><Spinner /> Transfert...</> : 'Transférer & Quitter'}
           </Button>
         </DialogFooter>
       </Dialog>
