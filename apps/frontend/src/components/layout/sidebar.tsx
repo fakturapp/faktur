@@ -52,6 +52,8 @@ import {
   ClipboardList,
   FileCheck,
   Sparkles,
+  Download,
+  Trash2,
 } from 'lucide-react'
 
 interface TeamListItem {
@@ -167,6 +169,21 @@ const settingsNav: NavItem[] = [
       { href: '/dashboard/settings/reminders', label: 'Relances', icon: Bell },
     ],
   },
+]
+
+const accountNav: NavItem[] = [
+  {
+    href: '/dashboard/account',
+    label: 'Profil',
+    icon: User,
+    children: [
+      { href: '/dashboard/account', label: 'Informations', icon: User },
+      { href: '/dashboard/account/security', label: 'S\u00e9curit\u00e9', icon: Shield },
+    ],
+  },
+  { href: '/dashboard/account/sessions', label: 'Sessions', icon: Monitor },
+  { href: '/dashboard/account/export', label: 'Exportation', icon: Download },
+  { href: '/dashboard/account/delete', label: 'Supprimer le compte', icon: Trash2 },
 ]
 
 const SETTINGS_EXPANDED_KEY = 'zenvoice_settings_expanded'
@@ -296,7 +313,8 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
 
   const isAdminMode = pathname.startsWith('/dashboard/admin')
   const isSettingsMode = pathname.startsWith('/dashboard/settings')
-  const sidebarMode = isAdminMode ? 'admin' : isSettingsMode ? 'settings' : 'main'
+  const isAccountMode = pathname.startsWith('/dashboard/account')
+  const sidebarMode = isAdminMode ? 'admin' : isSettingsMode ? 'settings' : isAccountMode ? 'account' : 'main'
 
   const initials = user.fullName
     ? user.fullName.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
@@ -328,6 +346,28 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
                 <p className="text-[13px] font-semibold text-foreground leading-tight">
                   Administration
                 </p>
+              </div>
+            </div>
+          </motion.div>
+        ) : sidebarMode === 'account' ? (
+          <motion.div
+            key="account-header"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.25, ease: 'easeInOut' }}
+            className="px-3 pt-3 pb-1"
+          >
+            <div className="flex items-center gap-2.5 px-2 py-2 rounded-lg liquid-nav-active">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary/15 text-primary text-[11px] font-bold overflow-hidden">
+                {user.avatarUrl ? (
+                  <img src={user.avatarUrl} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  initials
+                )}
+              </div>
+              <div className="flex-1 min-w-0 text-left">
+                <p className="text-[13px] font-semibold text-foreground leading-tight">Mon compte</p>
               </div>
             </div>
           </motion.div>
@@ -491,6 +531,33 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
                 item={{ href: '/dashboard/admin/analytics', label: 'Analytiques', icon: BarChart3 }}
                 pathname={pathname}
               />
+            </nav>
+          </motion.div>
+        ) : sidebarMode === 'account' ? (
+          <motion.div
+            key="account-nav"
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -30 }}
+            transition={{ duration: 0.25, ease: 'easeInOut' }}
+            className="flex flex-1 flex-col overflow-hidden"
+          >
+            {/* Back to dashboard */}
+            <div className="px-3 pt-2 pb-1">
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[13px] font-medium text-muted-foreground liquid-nav-hover hover:text-foreground transition-all"
+              >
+                <ArrowLeft className="h-3.5 w-3.5" />
+                Retour au dashboard
+              </Link>
+            </div>
+
+            {/* Account navigation */}
+            <nav className="flex-1 overflow-y-auto px-3 py-1 space-y-0.5">
+              {accountNav.map((item) => (
+                <NavLink key={item.href} item={item} pathname={pathname} persistKey="account" />
+              ))}
             </nav>
           </motion.div>
         ) : sidebarMode === 'settings' ? (
