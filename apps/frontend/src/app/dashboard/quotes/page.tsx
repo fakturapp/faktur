@@ -31,6 +31,7 @@ import { Dropdown, DropdownItem } from '@/components/ui/dropdown'
 import { QuoteDetailOverlay } from '@/components/quotes/quote-detail-overlay'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { AiDocumentModal } from '@/components/ai/ai-document-modal'
+import { useActiveEditors, ActiveEditorsBadge } from '@/components/collaboration/active-editors-badge'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -67,6 +68,7 @@ export default function QuotesPage() {
   const router = useRouter()
   const { toast } = useToast()
   const { settings } = useInvoiceSettings()
+  const activeEditors = useActiveEditors('quote')
   const [aiModalOpen, setAiModalOpen] = useState(false)
   const [loading, setLoading] = useState(true)
   const [quotes, setQuotes] = useState<QuoteListItem[]>([])
@@ -395,6 +397,13 @@ export default function QuotesPage() {
                         </p>
                         <p className="text-xs text-muted-foreground">TTC</p>
                       </div>
+
+                      {/* Active editors */}
+                      <ActiveEditorsBadge
+                        documentId={quote.id}
+                        documentType="quote"
+                        editors={activeEditors}
+                      />
 
                       {/* PDF download */}
                       <button

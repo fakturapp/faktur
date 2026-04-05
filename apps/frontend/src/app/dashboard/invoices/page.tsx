@@ -30,6 +30,7 @@ import { CreateInvoiceModal } from '@/components/invoices/create-invoice-modal'
 import { InvoiceDetailOverlay } from '@/components/invoices/invoice-detail-overlay'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { AiDocumentModal } from '@/components/ai/ai-document-modal'
+import { useActiveEditors, ActiveEditorsBadge } from '@/components/collaboration/active-editors-badge'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -66,6 +67,7 @@ interface PaginationMeta {
 export default function InvoicesPage() {
   const { toast } = useToast()
   const { settings } = useInvoiceSettings()
+  const activeEditors = useActiveEditors('invoice')
   const [aiModalOpen, setAiModalOpen] = useState(false)
   const [loading, setLoading] = useState(true)
   const [invoices, setInvoices] = useState<InvoiceListItem[]>([])
@@ -398,6 +400,13 @@ export default function InvoicesPage() {
                         </p>
                         <p className="text-xs text-muted-foreground">TTC</p>
                       </div>
+
+                      {/* Active editors */}
+                      <ActiveEditorsBadge
+                        documentId={invoice.id}
+                        documentType="invoice"
+                        editors={activeEditors}
+                      />
 
                       {/* PDF download */}
                       <button

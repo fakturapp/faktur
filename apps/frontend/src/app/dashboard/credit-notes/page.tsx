@@ -20,6 +20,7 @@ import {
   CalendarDays,
 } from 'lucide-react'
 import { CreditNoteDetailOverlay } from '@/components/credit-notes/credit-note-detail-overlay'
+import { useActiveEditors, ActiveEditorsBadge } from '@/components/collaboration/active-editors-badge'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -56,6 +57,7 @@ interface PaginationMeta {
 export default function CreditNotesPage() {
   const router = useRouter()
   const { toast } = useToast()
+  const activeEditors = useActiveEditors('credit_note')
   const [loading, setLoading] = useState(true)
   const [creditNotes, setCreditNotes] = useState<CreditNoteListItem[]>([])
   const [search, setSearch] = useState('')
@@ -278,6 +280,13 @@ export default function CreditNotesPage() {
                         </p>
                         <p className="text-xs text-muted-foreground">TTC</p>
                       </div>
+
+                      {/* Active editors */}
+                      <ActiveEditorsBadge
+                        documentId={cn.id}
+                        documentType="credit_note"
+                        editors={activeEditors}
+                      />
 
                       <ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors shrink-0" />
                     </div>

@@ -58,6 +58,28 @@ function getOrCreateRoom(roomKey: string): RoomPresence {
   return rooms.get(roomKey)!
 }
 
+/**
+ * Returns a map of documentId → list of active editors for a given type + team.
+ */
+export function getActiveEditors(documentType: string, teamId: string): Record<string, { userId: string; fullName: string | null; email: string; avatarUrl: string | null; color: string }[]> {
+  const result: Record<string, any[]> = {}
+  for (const [roomKey, room] of rooms) {
+    const [type, docId] = roomKey.split(':')
+    if (type !== documentType) continue
+    // Only include rooms where at least one collaborator belongs to this team
+    const collabs = Array.from(room.collaborators.values())
+    if (collabs.length === 0) continue
+    result[docId] = collabs.map(({ socketId: _, ...c }) => ({
+      userId: c.userId,
+      fullName: c.fullName,
+      email: c.email,
+      avatarUrl: c.avatarUrl,
+      color: c.color,
+    }))
+  }
+  return result
+}
+
 // ── Singleton ─────────────────────────────────────────────────────────────
 
 let io: SocketServer | null = null

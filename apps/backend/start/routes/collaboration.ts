@@ -18,6 +18,7 @@ const LinkDestroy = () => import('#controllers/collaboration/links/destroy')
 // Access controllers
 const ValidateLink = () => import('#controllers/collaboration/access/validate_link')
 const CheckAccess = () => import('#controllers/collaboration/access/check_access')
+const ActiveEditors = () => import('#controllers/collaboration/access/active_editors')
 
 // ── Authenticated routes (require team context) ──────────────────────────
 
@@ -37,6 +38,9 @@ const collabGroup = router
 
     // Access check
     router.get('/access/:documentType/:documentId', [CheckAccess, 'handle'])
+
+    // Active editors (who's editing which documents right now)
+    router.get('/active-editors/:documentType', [ActiveEditors, 'handle'])
   })
   .prefix('/collaboration')
   .use(middleware.auth())
