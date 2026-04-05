@@ -97,10 +97,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     const { error } = await api.post('/team/switch', { teamId: switchConfirm.id })
     if (!error) {
-      await refreshUser()
-      const { data } = await api.get<{ teams: TeamListItem[] }>('/team/all')
-      if (data?.teams) setTeams(data.teams)
-      router.refresh()
+      // Clear all cached data from the previous team
+      try {
+        const keys = Object.keys(localStorage)
+        for (const key of keys) {
+          if (key.startsWith('faktur_invoice') || key.startsWith('faktur_quote') || key.startsWith('faktur_credit')) {
+            localStorage.removeItem(key)
+          }
+        }
+      } catch {}
+      // Hard reload to reset all contexts and cached state
+      window.location.href = '/dashboard'
+      return
     }
 
     setSwitching(false)
