@@ -169,12 +169,12 @@ class PasskeyService {
       timeout: this.timeout,
     })
 
-    // Store challenge in DB
+    // Store challenge in DB (5 minute expiry for slow biometric prompts)
     await PasskeyChallenge.create({
       userId: null,
       challenge: options.challenge,
       type: 'authentication',
-      expiresAt: DateTime.now().plus({ seconds: 60 }),
+      expiresAt: DateTime.now().plus({ minutes: 5 }),
     })
 
     return options
@@ -192,18 +192,28 @@ class PasskeyService {
   }> {
     const credentialIdB64 = response.id
 
-    // Try exact match first, then fallback with rawId
-    let credential = await PasskeyCredential.query()
-      .where('credentialId', credentialIdB64)
-      .preload('user')
-      .first()
+    // Try multiple encoding variants to find the credential
+    const candidates = [credentialIdB64]
+    if (response.rawId && response.rawId !== credentialIdB64) {
+      candidates.push(response.rawId)
+    }
+    // Also try re-encoding: decode base64url then re-encode (normalizes padding)
+    try {
+      const decoded = Buffer.from(credentialIdB64, 'base64url')
+      const reencoded = decoded.toString('base64url')
+      if (reencoded !== credentialIdB64) candidates.push(reencoded)
+      // Also try standard base64
+      const b64std = decoded.toString('base64')
+      if (b64std !== credentialIdB64) candidates.push(b64std)
+    } catch {}
 
-    // Fallback: try matching with rawId (base64url encoded)
-    if (!credential && response.rawId) {
+    let credential: PasskeyCredential | null = null
+    for (const candidateId of candidates) {
       credential = await PasskeyCredential.query()
-        .where('credentialId', response.rawId)
+        .where('credentialId', candidateId)
         .preload('user')
         .first()
+      if (credential) break
     }
 
     if (!credential) {
