@@ -21,6 +21,7 @@ const AcceptInvite = () => import('#controllers/team/invitations/accept_invite')
 const RevokeInvite = () => import('#controllers/team/invitations/revoke_invite')
 const UploadIcon = () => import('#controllers/team/media/upload_icon')
 const ServeIcon = () => import('#controllers/team/media/serve_icon')
+const SearchUsers = () => import('#controllers/team/members/search_users')
 
 // Public route - serve team icons
 router.get(API_PREFIX + '/team-icons/:filename', [ServeIcon, 'handle'])
@@ -38,6 +39,7 @@ router
     router.post('/export', [TeamExport, 'handle'])
     router.post('/import', [TeamImport, 'handle'])
     router.get('/members', [TeamMembers, 'handle'])
+    router.get('/search-users', [SearchUsers, 'handle'])
     router.post('/invite', [TeamInvite, 'handle'])
     router.post('/invite/accept', [AcceptInvite, 'handle'])
     router.delete('/invite/:id', [RevokeInvite, 'handle'])

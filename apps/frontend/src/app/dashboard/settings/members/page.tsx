@@ -104,6 +104,11 @@ export default function TeamPage() {
   const [inviteResult, setInviteResult] = useState<{ url: string; token: string } | null>(null)
   const [copied, setCopied] = useState(false)
 
+  // User search for invite
+  const [searchResults, setSearchResults] = useState<{ id: string; email: string; fullName: string | null; avatarUrl: string | null }[]>([])
+  const [searchTimeout, setSearchTimeout] = useState<ReturnType<typeof setTimeout> | null>(null)
+  const [showSuggestions, setShowSuggestions] = useState(false)
+
   // Role change
   const [roleDialogOpen, setRoleDialogOpen] = useState(false)
   const [roleTarget, setRoleTarget] = useState<TeamMember | null>(null)
@@ -652,14 +657,63 @@ export default function TeamPage() {
             <form onSubmit={handleInvite} className="mt-4 space-y-4">
               <Field>
                 <FieldLabel htmlFor="inviteEmail">Adresse email</FieldLabel>
-                <Input
-                  id="inviteEmail"
-                  type="email"
-                  placeholder="collaborateur@example.com"
-                  value={inviteEmail}
-                  onChange={(e) => setInviteEmail(e.target.value)}
-                  required
-                />
+                <div className="relative">
+                  <Input
+                    id="inviteEmail"
+                    type="email"
+                    placeholder="collaborateur@example.com"
+                    value={inviteEmail}
+                    onChange={(e) => {
+                      const val = e.target.value
+                      setInviteEmail(val)
+                      // Search users as they type
+                      if (searchTimeout) clearTimeout(searchTimeout)
+                      if (val.length >= 2) {
+                        setSearchTimeout(setTimeout(async () => {
+                          const { data } = await api.get<{ users: typeof searchResults }>(`/team/search-users?q=${encodeURIComponent(val)}`)
+                          if (data?.users) { setSearchResults(data.users); setShowSuggestions(true) }
+                        }, 300))
+                      } else {
+                        setSearchResults([])
+                        setShowSuggestions(false)
+                      }
+                    }}
+                    onFocus={() => { if (searchResults.length > 0) setShowSuggestions(true) }}
+                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                    required
+                    autoComplete="off"
+                  />
+                  {/* Autocomplete dropdown */}
+                  {showSuggestions && searchResults.length > 0 && (
+                    <div className="absolute z-50 top-full left-0 right-0 mt-1 rounded-xl border border-border bg-card shadow-xl overflow-hidden">
+                      {searchResults.map((u) => (
+                        <button
+                          key={u.id}
+                          type="button"
+                          className="flex items-center gap-3 w-full px-3 py-2.5 hover:bg-muted/50 transition-colors text-left"
+                          onMouseDown={(e) => {
+                            e.preventDefault()
+                            setInviteEmail(u.email)
+                            setShowSuggestions(false)
+                            setSearchResults([])
+                          }}
+                        >
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary overflow-hidden">
+                            {u.avatarUrl ? (
+                              <img src={u.avatarUrl} alt="" className="h-full w-full object-cover" />
+                            ) : (
+                              (u.fullName || u.email).slice(0, 2).toUpperCase()
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-foreground truncate">{u.fullName || u.email}</p>
+                            <p className="text-xs text-muted-foreground truncate">{u.email}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </Field>
 
               <Field>
