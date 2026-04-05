@@ -39,7 +39,7 @@ export function CollaborationToolbar({
       <div className={className}>
         {/* Connection indicator */}
         {documentId && collaborators.length > 0 && (
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground mr-1" title={isConnected ? 'Connecte en temps reel' : 'Reconnexion...'}>
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground mr-1" title={isConnected ? 'Connect\u00e9 en temps r\u00e9el' : 'Reconnexion...'}>
             {isConnected ? (
               <Wifi className="h-3 w-3 text-green-500" />
             ) : (
@@ -143,7 +143,7 @@ export function CollaborationEditor({
       )}
 
       {isReadOnly && (
-        <div className="absolute inset-0 z-30 cursor-not-allowed" title="Lecture seule - vous ne pouvez pas modifier ce document">
+        <div className="absolute inset-0 z-30 cursor-not-allowed" title="Lecture seule \u2014 vous ne pouvez pas modifier ce document">
           <div className="pointer-events-none">{children}</div>
         </div>
       )}

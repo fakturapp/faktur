@@ -409,10 +409,10 @@ function EditCreditNoteContent() {
         }
       }}
       onDocumentSaved={() => {
-        toast('Le document a ete mis a jour par un collaborateur', 'info')
+        toast('Le document a \u00e9t\u00e9 mis \u00e0 jour par un collaborateur', 'info')
       }}
       onAccessRevoked={() => {
-        toast('Votre acces a ce document a ete revoque', 'error')
+        toast('Votre acc\u00e8s \u00e0 ce document a \u00e9t\u00e9 r\u00e9voqu\u00e9', 'error')
         router.push('/dashboard')
       }}
     >

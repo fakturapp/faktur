@@ -11,7 +11,7 @@ export function ReadOnlyBanner() {
       className="flex items-center justify-center gap-2 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-2 text-sm text-amber-600 dark:text-amber-400"
     >
       <Eye className="h-4 w-4" />
-      <span>Lecture seule — vous pouvez consulter ce document mais pas le modifier</span>
+      <span>Lecture seule &mdash; vous pouvez consulter ce document mais pas le modifier</span>
     </motion.div>
   )
 }

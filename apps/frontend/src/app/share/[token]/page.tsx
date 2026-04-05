@@ -69,7 +69,7 @@ export default function ShareLinkPage() {
           className="text-center"
         >
           <Spinner className="h-8 w-8 mx-auto mb-4" />
-          <p className="text-sm text-muted-foreground">Verification de l&apos;acces...</p>
+          <p className="text-sm text-muted-foreground">V\u00e9rification de l&apos;acc\u00e8s...</p>
         </motion.div>
       </div>
     )
@@ -88,7 +88,7 @@ export default function ShareLinkPage() {
           </div>
           <h2 className="text-xl font-bold text-foreground mb-2">Connexion requise</h2>
           <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-            Vous devez etre connecte pour acceder a ce document partage.
+            Vous devez \u00eatre connect\u00e9 pour acc\u00e9der \u00e0 ce document partag\u00e9.
           </p>
           <Button onClick={() => router.push('/login')} className="gap-2">
             <LogIn className="h-4 w-4" /> Se connecter
@@ -108,9 +108,9 @@ export default function ShareLinkPage() {
         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-destructive/10 mx-auto mb-5">
           <ShieldAlert className="h-7 w-7 text-destructive" />
         </div>
-        <h2 className="text-xl font-bold text-foreground mb-2">Acces refuse</h2>
+        <h2 className="text-xl font-bold text-foreground mb-2">Acc\u00e8s refus\u00e9</h2>
         <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-          {errorMessage || "Ce lien de partage est invalide ou a ete desactive."}
+          {errorMessage || "Ce lien de partage est invalide ou a \u00e9t\u00e9 d\u00e9sactiv\u00e9."}
         </p>
         <Button variant="outline" onClick={() => router.push('/dashboard')}>
           Retour au tableau de bord
