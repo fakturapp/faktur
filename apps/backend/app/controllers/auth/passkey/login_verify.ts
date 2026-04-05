@@ -22,13 +22,21 @@ export default class LoginVerify {
     }
 
     try {
-      const { verified, credential: passkeyCredential } =
+      const { verified, credential: passkeyCredential, error: verifyError } =
         await passkeyService.verifyAuthentication(credential)
 
       if (!verified || !passkeyCredential) {
-        await this.recordLoginAttempt(request, null, 'failed', 'Invalid passkey verification')
+        const reason = verifyError || 'unknown'
+        await this.recordLoginAttempt(request, null, 'failed', `Passkey: ${reason}`)
+
+        const messages: Record<string, string> = {
+          credential_not_found: 'Cl\u00e9 d\'acc\u00e8s introuvable. Elle a peut-\u00eatre \u00e9t\u00e9 supprim\u00e9e.',
+          challenge_expired: 'Le d\u00e9lai d\'authentification a expir\u00e9. Veuillez r\u00e9essayer.',
+          verification_failed: 'La v\u00e9rification a \u00e9chou\u00e9. Veuillez r\u00e9essayer.',
+        }
+
         return response.unauthorized({
-          message: 'L\'authentification par cl\u00e9 d\'acc\u00e8s a \u00e9chou\u00e9. Le d\u00e9lai a peut-\u00eatre expir\u00e9, veuillez r\u00e9essayer.',
+          message: messages[reason] || 'L\'authentification par cl\u00e9 d\'acc\u00e8s a \u00e9chou\u00e9. Veuillez r\u00e9essayer.',
           code: 'PASSKEY_INVALID',
         })
       }

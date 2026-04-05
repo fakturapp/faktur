@@ -188,6 +188,7 @@ class PasskeyService {
   ): Promise<{
     verified: boolean
     credential: PasskeyCredential | null
+    error?: string
   }> {
     const credentialIdB64 = response.id
 
@@ -197,42 +198,62 @@ class PasskeyService {
       .first()
 
     if (!credential) {
-      return { verified: false, credential: null }
+      console.warn('[Passkey] Credential not found:', credentialIdB64)
+      return { verified: false, credential: null, error: 'credential_not_found' }
     }
 
-    // Find a valid challenge
-    const challengeRecord = await PasskeyChallenge.query()
+    // Find a valid challenge — get ALL recent authentication challenges
+    // and try each one (handles race conditions with multiple tabs)
+    const challengeRecords = await PasskeyChallenge.query()
       .where('type', 'authentication')
       .where('expiresAt', '>', DateTime.now().toSQL()!)
       .orderBy('createdAt', 'desc')
-      .first()
+      .limit(5)
 
-    if (!challengeRecord) {
-      return { verified: false, credential: null }
+    if (challengeRecords.length === 0) {
+      console.warn('[Passkey] No valid challenge found (all expired)')
+      return { verified: false, credential: null, error: 'challenge_expired' }
     }
 
-    let verification: VerifiedAuthenticationResponse
-    try {
-      verification = await verifyAuthenticationResponse({
-        response,
-        expectedChallenge: challengeRecord.challenge,
-        expectedOrigin: this.origin,
-        expectedRPID: this.rpID,
-        credential: {
-          id: credential.credentialId,
-          publicKey: Buffer.from(credential.publicKey, 'base64url'),
-          counter: credential.counter,
-          transports: credential.transports
-            ? (JSON.parse(credential.transports) as AuthenticatorTransportFuture[])
-            : undefined,
-        },
-      })
-    } finally {
-      await challengeRecord.delete()
+    // Try each challenge until one works
+    let challengeRecord: PasskeyChallenge | null = null
+
+    let verification: VerifiedAuthenticationResponse | null = null
+    let lastError: string | null = null
+
+    for (const challenge of challengeRecords) {
+      try {
+        verification = await verifyAuthenticationResponse({
+          response,
+          expectedChallenge: challenge.challenge,
+          expectedOrigin: this.origin,
+          expectedRPID: this.rpID,
+          credential: {
+            id: credential.credentialId,
+            publicKey: Buffer.from(credential.publicKey, 'base64url'),
+            counter: credential.counter,
+            transports: credential.transports
+              ? (JSON.parse(credential.transports) as AuthenticatorTransportFuture[])
+              : undefined,
+          },
+        })
+        challengeRecord = challenge
+        break // Found the right challenge
+      } catch (err: any) {
+        lastError = err?.message || String(err)
+        // Wrong challenge, try next one
+        continue
+      }
     }
 
-    if (!verification.verified) {
-      return { verified: false, credential: null }
+    // Clean up the used challenge (and any others that were tried)
+    for (const ch of challengeRecords) {
+      await ch.delete().catch(() => {})
+    }
+
+    if (!verification || !verification.verified) {
+      console.warn('[Passkey] Verification failed. Last error:', lastError, 'Origin:', this.origin, 'RPID:', this.rpID)
+      return { verified: false, credential: null, error: lastError || 'verification_failed' }
     }
 
     // Update counter (clone detection)
