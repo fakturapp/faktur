@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Avatar } from '@/components/ui/avatar'
 import { Dropdown, DropdownItem, DropdownLabel, DropdownSeparator, DropdownSub } from '@/components/ui/dropdown'
+import { CreateInvoiceModal } from '@/components/invoices/create-invoice-modal'
 import { useTheme } from '@/lib/theme'
 import {
   LayoutDashboard,
@@ -310,6 +311,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
   const pathname = usePathname()
   const router = useRouter()
   const { theme, setTheme } = useTheme()
+  const [convertModalOpen, setConvertModalOpen] = useState(false)
 
   const isAdminMode = pathname.startsWith('/dashboard/admin')
   const isSettingsMode = pathname.startsWith('/dashboard/settings')
@@ -537,7 +539,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
                   <DropdownItem onClick={() => router.push('/dashboard/invoices/new')}>
                     <FilePlus className="h-4 w-4 text-primary" /> Facture vierge
                   </DropdownItem>
-                  <DropdownItem onClick={() => router.push('/dashboard/invoices?convert=1')}>
+                  <DropdownItem onClick={() => setConvertModalOpen(true)}>
                     <RefreshCw className="h-4 w-4 text-emerald-500" /> Convertir un devis
                   </DropdownItem>
                 </DropdownSub>
@@ -724,6 +726,11 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
           </DropdownItem>
         </Dropdown>
       </div>
+
+      <CreateInvoiceModal
+        open={convertModalOpen}
+        onClose={() => setConvertModalOpen(false)}
+      />
     </aside>
   )
 }

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { motion, type Variants } from 'framer-motion'
 import { CreateInvoiceModal } from '@/components/invoices/create-invoice-modal'
 import { Input } from '@/components/ui/input'
@@ -68,18 +68,9 @@ interface PaginationMeta {
 
 export default function InvoicesPage() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const { toast } = useToast()
   const { settings } = useInvoiceSettings()
-  const [convertModalOpen, setConvertModalOpen] = useState(false)
-
-  // Auto-open convert modal from ?convert=1 query param
-  useEffect(() => {
-    if (searchParams.get('convert') === '1') {
-      setConvertModalOpen(true)
-      window.history.replaceState({}, '', '/dashboard/invoices')
-    }
-  }, [searchParams])
+  const [convertOpen, setConvertOpen] = useState(false)
   const activeEditors = useActiveEditors('invoice')
   const [aiModalOpen, setAiModalOpen] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -223,7 +214,7 @@ export default function InvoicesPage() {
             <FilePlus className="h-4 w-4 text-primary" />
             Facture vierge
           </DropdownItem>
-          <DropdownItem onClick={() => setConvertModalOpen(true)}>
+          <DropdownItem onClick={() => setConvertOpen(true)}>
             <RefreshCw className="h-4 w-4 text-emerald-500" />
             Convertir un devis
           </DropdownItem>
@@ -457,8 +448,8 @@ export default function InvoicesPage() {
       />
 
       <CreateInvoiceModal
-        open={convertModalOpen}
-        onClose={() => setConvertModalOpen(false)}
+        open={convertOpen}
+        onClose={() => setConvertOpen(false)}
       />
     </motion.div>
   )
