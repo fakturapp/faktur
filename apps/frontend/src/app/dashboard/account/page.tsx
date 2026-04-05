@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -40,9 +40,21 @@ interface Session {
 
 export default function AccountPage() {
   const router = useRouter()
+  const pathname = usePathname()
   const { user, refreshUser, logout } = useAuth()
   const { toast } = useToast()
-  const [activeTab, setActiveTab] = useState('profile')
+
+  // Determine active section from URL
+  const activeTab = pathname.endsWith('/security') ? 'security'
+    : pathname.endsWith('/sessions') ? 'sessions'
+    : pathname.endsWith('/export') ? 'export'
+    : 'profile'
+
+  const setActiveTab = (tab: string) => {
+    if (tab === 'profile') router.push('/dashboard/account')
+    else router.push(`/dashboard/account/${tab}`)
+  }
+
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Profile
@@ -569,60 +581,48 @@ export default function AccountPage() {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6 px-4 lg:px-6 py-4 md:py-6"
     >
-      {/* Page header with user info */}
-      <Card className="overflow-hidden">
-        <CardContent className="px-6 py-6">
-          <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4">
-            <div className="relative group">
-              <Avatar
-                src={user?.avatarUrl}
-                alt={user?.fullName || ''}
-                fallback={initials}
-                size="lg"
-                className="h-20 w-20 text-lg ring-4 ring-card"
-              />
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/jpeg,image/png,image/gif,image/webp"
-                className="hidden"
-                onChange={handleAvatarUpload}
-              />
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={avatarUploading}
-                className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-              >
-                {avatarUploading ? (
-                  <Spinner size="sm" className="text-white" />
-                ) : (
-                  <Camera className="h-5 w-5 text-white" />
-                )}
-              </button>
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-xl font-bold text-foreground">{user?.fullName || 'Utilisateur'}</h1>
-                {user?.twoFactorEnabled && (
-                  <Badge variant="success" className="text-xs">
-                    <Shield className="h-3 w-3 mr-1" /> 2FA
-                  </Badge>
-                )}
-              </div>
-              <p className="text-sm text-muted-foreground">{user?.email}</p>
-              {user?.createdAt && (
-                <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
-                  <Calendar className="h-3 w-3" />
-                  Membre depuis {new Date(user.createdAt).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
-                </p>
-              )}
-            </div>
+      {/* Page header */}
+      <div className="flex items-center gap-4">
+        <div className="relative group">
+          <Avatar
+            src={user?.avatarUrl}
+            alt={user?.fullName || ''}
+            fallback={initials}
+            size="lg"
+            className="h-14 w-14 text-base ring-2 ring-card"
+          />
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/gif,image/webp"
+            className="hidden"
+            onChange={handleAvatarUpload}
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={avatarUploading}
+            className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+          >
+            {avatarUploading ? (
+              <Spinner size="sm" className="text-white" />
+            ) : (
+              <Camera className="h-4 w-4 text-white" />
+            )}
+          </button>
+        </div>
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-bold text-foreground">{user?.fullName || 'Utilisateur'}</h1>
+            {user?.twoFactorEnabled && (
+              <Badge variant="success" className="text-xs">
+                <Shield className="h-3 w-3 mr-1" /> 2FA
+              </Badge>
+            )}
           </div>
-        </CardContent>
-      </Card>
-
-      <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
+          <p className="text-sm text-muted-foreground">{user?.email}</p>
+        </div>
+      </div>
 
       {/* Profile tab */}
       {activeTab === 'profile' && (
