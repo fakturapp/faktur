@@ -26,8 +26,11 @@ export default class LoginVerify {
         await passkeyService.verifyAuthentication(credential)
 
       if (!verified || !passkeyCredential) {
-        await this.recordLoginAttempt(request, null, 'failed', 'Invalid passkey')
-        return response.unauthorized({ message: 'Passkey authentication failed' })
+        await this.recordLoginAttempt(request, null, 'failed', 'Invalid passkey verification')
+        return response.unauthorized({
+          message: 'L\'authentification par cl\u00e9 d\'acc\u00e8s a \u00e9chou\u00e9. Le d\u00e9lai a peut-\u00eatre expir\u00e9, veuillez r\u00e9essayer.',
+          code: 'PASSKEY_INVALID',
+        })
       }
 
       const user = passkeyCredential.user
@@ -151,9 +154,15 @@ export default class LoginVerify {
         token: token.value!.release(),
       })
     } catch (err: any) {
-      console.error('[Passkey Login]', err?.message || err)
-      await this.recordLoginAttempt(request, null, 'failed', 'Passkey error')
-      return response.unauthorized({ message: 'Passkey authentication failed' })
+      const errMsg = err?.message || String(err)
+      console.error('[Passkey Login] Error:', errMsg)
+      console.error('[Passkey Login] Stack:', err?.stack)
+      await this.recordLoginAttempt(request, null, 'failed', errMsg.slice(0, 200))
+      return response.unauthorized({
+        message: 'Passkey authentication failed',
+        code: 'PASSKEY_VERIFY_FAILED',
+        detail: process.env.NODE_ENV !== 'production' ? errMsg : undefined,
+      })
     }
   }
 
