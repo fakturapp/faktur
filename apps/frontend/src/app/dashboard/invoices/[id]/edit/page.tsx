@@ -24,7 +24,6 @@ import { CollaborationToolbar, CollaborationReadOnlyBanner, CollaborationEditor 
 import { CollaborationProvider } from '@/components/collaboration/collaboration-provider'
 import { SyncBroadcaster } from '@/components/collaboration/sync-broadcaster'
 import { setApplyingRemote } from '@/components/collaboration/use-broadcast'
-import { useAuth } from '@/lib/auth'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -49,9 +48,9 @@ function EditInvoiceContent() {
   const searchParams = useSearchParams()
   const invoiceId = params.id as string
   const router = useRouter()
-  const { user: authUser } = useAuth()
   const { toast } = useToast()
   const { settings: invoiceSettings, companyLogoUrl, loading: settingsLoading, refreshSettings, updateSettings, uploadLogo } = useInvoiceSettings()
+  const collabEnabled = invoiceSettings.collaborationEnabled
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -535,7 +534,7 @@ function EditInvoiceContent() {
     <CollaborationProvider
       documentType="invoice"
       documentId={invoiceId}
-      enabled={!!invoiceId}
+      enabled={!!invoiceId && collabEnabled}
       onDocumentChange={(change) => {
         setApplyingRemote(true)
         try {
@@ -564,9 +563,9 @@ function EditInvoiceContent() {
       }}
     >
     <motion.div initial="hidden" animate="visible" className="space-y-5 px-4 lg:px-6 py-4 md:py-5">
-      {/* Collaboration sync */}
-      <CollaborationReadOnlyBanner />
-      <SyncBroadcaster
+      {/* Collaboration sync (only when enabled) */}
+      {collabEnabled && <CollaborationReadOnlyBanner />}
+      {collabEnabled && <SyncBroadcaster
         notes={notes}
         accentColor={accentColor}
         lines={lines}
@@ -575,7 +574,7 @@ function EditInvoiceContent() {
         selectedClient={selectedClient}
         paymentMethod={paymentMethod}
         bankAccountId={bankAccountId}
-      />
+      />}
 
       {/* Header */}
       <motion.div variants={fadeUp} custom={0} className="flex items-center justify-between">
@@ -591,12 +590,12 @@ function EditInvoiceContent() {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <CollaborationToolbar
+          {collabEnabled && <CollaborationToolbar
             documentType="invoice"
             documentId={invoiceId}
-            isAdmin={authUser?.isAdmin}
+
             className="flex items-center gap-2"
-          />
+          />}
           <DocumentZoom value={docZoom} onChange={setDocZoom} />
           <Button variant="outline" size="sm" onClick={handleDownloadPdf} disabled={downloading}>
             {downloading ? <Spinner className="h-3.5 w-3.5 mr-1.5" /> : <Download className="h-3.5 w-3.5 mr-1.5" />}

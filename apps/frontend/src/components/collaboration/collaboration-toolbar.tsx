@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
-import { useToast } from '@/components/ui/toast'
 import { ShareModal } from '@/components/collaboration/share-modal'
 import { PresenceBar } from '@/components/collaboration/presence-bar'
 import { LiveCursors } from '@/components/collaboration/live-cursors'
@@ -17,34 +16,23 @@ type DocumentType = 'invoice' | 'quote' | 'credit_note'
 interface CollaborationToolbarProps {
   documentType: DocumentType
   documentId: string | null
-  isAdmin?: boolean
   className?: string
 }
 
 /**
  * Drop-in toolbar component for the editor header.
- * Collaboration features are restricted to admins (beta).
+ * Only rendered when collaborationEnabled is true.
  */
 export function CollaborationToolbar({
   documentType,
   documentId,
-  isAdmin = false,
   className,
 }: CollaborationToolbarProps) {
   const [shareOpen, setShareOpen] = useState(false)
-  const { toast } = useToast()
   const collab = useCollaborationContext()
 
   const collaborators = collab?.collaborators ?? []
   const isConnected = collab?.isConnected ?? false
-
-  const handleShareClick = () => {
-    if (!isAdmin) {
-      toast('Cette fonctionnalite est reservee aux administrateurs', 'error')
-      return
-    }
-    setShareOpen(true)
-  }
 
   return (
     <>
@@ -68,7 +56,7 @@ export function CollaborationToolbar({
           <Button
             variant="outline"
             size="sm"
-            onClick={handleShareClick}
+            onClick={() => setShareOpen(true)}
             className="gap-1.5 relative"
           >
             <Share2 className="h-3.5 w-3.5" />
@@ -81,8 +69,8 @@ export function CollaborationToolbar({
         )}
       </div>
 
-      {/* Share modal — only opens for admins */}
-      {documentId && isAdmin && (
+      {/* Share modal */}
+      {documentId && (
         <ShareModal
           open={shareOpen}
           onClose={() => setShareOpen(false)}

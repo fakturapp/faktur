@@ -20,7 +20,6 @@ import { CollaborationToolbar, CollaborationReadOnlyBanner, CollaborationEditor 
 import { CollaborationProvider } from '@/components/collaboration/collaboration-provider'
 import { SyncBroadcaster } from '@/components/collaboration/sync-broadcaster'
 import { setApplyingRemote } from '@/components/collaboration/use-broadcast'
-import { useAuth } from '@/lib/auth'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -38,10 +37,10 @@ function EditCreditNoteContent() {
   const params = useParams()
   const searchParams = useSearchParams()
   const creditNoteId = params.id as string
-  const { user: authUser } = useAuth()
   const router = useRouter()
   const { toast } = useToast()
   const { settings: invoiceSettings, companyLogoUrl, loading: settingsLoading, refreshSettings, updateSettings, uploadLogo } = useInvoiceSettings()
+  const collabEnabled = invoiceSettings.collaborationEnabled
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -392,7 +391,7 @@ function EditCreditNoteContent() {
     <CollaborationProvider
       documentType="credit_note"
       documentId={creditNoteId}
-      enabled={!!creditNoteId}
+      enabled={!!creditNoteId && collabEnabled}
       onDocumentChange={(change) => {
         setApplyingRemote(true)
         try {
@@ -418,15 +417,15 @@ function EditCreditNoteContent() {
       }}
     >
     <motion.div initial="hidden" animate="visible" className="space-y-5 px-4 lg:px-6 py-4 md:py-5">
-      <CollaborationReadOnlyBanner />
-      <SyncBroadcaster
+      {collabEnabled && <CollaborationReadOnlyBanner />}
+      {collabEnabled && <SyncBroadcaster
         notes={notes}
         accentColor={accentColor}
         lines={lines}
         options={options}
         documentNumber={creditNoteNumber}
         selectedClient={selectedClient}
-      />
+      />}
 
       {/* Header */}
       <motion.div variants={fadeUp} custom={0} className="flex items-center justify-between">
@@ -442,12 +441,12 @@ function EditCreditNoteContent() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <CollaborationToolbar
+          {collabEnabled && <CollaborationToolbar
             documentType="credit_note"
             documentId={creditNoteId}
-            isAdmin={authUser?.isAdmin}
+
             className="flex items-center gap-2"
-          />
+          />}
           <div className="flex rounded-lg border border-border overflow-hidden">
             <button onClick={() => setMode('edit')} className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium transition-all ${mode === 'edit' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}>
               <Pencil className="h-3 w-3" /> Edition

@@ -23,7 +23,6 @@ import { CollaborationToolbar, CollaborationReadOnlyBanner, CollaborationEditor 
 import { CollaborationProvider } from '@/components/collaboration/collaboration-provider'
 import { SyncBroadcaster } from '@/components/collaboration/sync-broadcaster'
 import { setApplyingRemote } from '@/components/collaboration/use-broadcast'
-import { useAuth } from '@/lib/auth'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -48,9 +47,9 @@ function EditQuoteContent() {
   const params = useParams()
   const searchParams = useSearchParams()
   const quoteId = params.id as string
-  const { user: authUser } = useAuth()
   const { toast } = useToast()
   const { settings: invoiceSettings, companyLogoUrl, loading: settingsLoading, refreshSettings, updateSettings, uploadLogo } = useInvoiceSettings()
+  const collabEnabled = invoiceSettings.collaborationEnabled
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -496,7 +495,7 @@ function EditQuoteContent() {
     <CollaborationProvider
       documentType="quote"
       documentId={quoteId}
-      enabled={!!quoteId}
+      enabled={!!quoteId && collabEnabled}
       onDocumentChange={(change) => {
         setApplyingRemote(true)
         try {
@@ -522,15 +521,15 @@ function EditQuoteContent() {
       }}
     >
     <motion.div initial="hidden" animate="visible" className="space-y-5 px-4 lg:px-6 py-4 md:py-5">
-      <CollaborationReadOnlyBanner />
-      <SyncBroadcaster
+      {collabEnabled && <CollaborationReadOnlyBanner />}
+      {collabEnabled && <SyncBroadcaster
         notes={notes}
         accentColor={accentColor}
         lines={lines}
         options={options}
         documentNumber={quoteNumber}
         selectedClient={selectedClient}
-      />
+      />}
 
       {/* ── Header ── */}
       <motion.div variants={fadeUp} custom={0} className="flex items-center justify-between">
@@ -548,12 +547,12 @@ function EditQuoteContent() {
 
         {/* Mode toggle + Download */}
         <div className="flex items-center gap-3">
-          <CollaborationToolbar
+          {collabEnabled && <CollaborationToolbar
             documentType="quote"
             documentId={quoteId}
-            isAdmin={authUser?.isAdmin}
+
             className="flex items-center gap-2"
-          />
+          />}
           <DocumentZoom value={docZoom} onChange={setDocZoom} />
           <Button variant="outline" size="sm" onClick={handleDownloadPdf} disabled={downloading}>
             {downloading ? <Spinner className="h-3.5 w-3.5 mr-1.5" /> : <Download className="h-3.5 w-3.5 mr-1.5" />}

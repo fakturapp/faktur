@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { api } from '@/lib/api'
 import { useRouter } from 'next/navigation'
+import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 
 type DocumentType = 'invoice' | 'quote' | 'credit_note'
 
@@ -33,21 +34,25 @@ function getInitials(name: string | null, email: string): string {
 // ── Hook to fetch active editors ──────────────────────────────────────────
 
 export function useActiveEditors(documentType: DocumentType) {
+  const { settings } = useInvoiceSettings()
   const [editors, setEditors] = useState<Record<string, EditorInfo[]>>({})
 
+  const enabled = settings.collaborationEnabled
+
   const refresh = useCallback(async () => {
+    if (!enabled) return
     const { data } = await api.get<{ data: Record<string, EditorInfo[]> }>(
       `/collaboration/active-editors/${documentType}`
     )
     if (data?.data) setEditors(data.data)
-  }, [documentType])
+  }, [documentType, enabled])
 
   useEffect(() => {
+    if (!enabled) { setEditors({}); return }
     refresh()
-    // Poll every 8 seconds
     const interval = setInterval(refresh, 8000)
     return () => clearInterval(interval)
-  }, [refresh])
+  }, [refresh, enabled])
 
   return editors
 }
