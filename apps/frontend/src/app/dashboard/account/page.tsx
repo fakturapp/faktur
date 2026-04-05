@@ -581,49 +581,6 @@ export default function AccountPage() {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6 px-4 lg:px-6 py-4 md:py-6"
     >
-      {/* Page header */}
-      <div className="flex items-center gap-4">
-        <div className="relative group">
-          <Avatar
-            src={user?.avatarUrl}
-            alt={user?.fullName || ''}
-            fallback={initials}
-            size="lg"
-            className="h-14 w-14 text-base ring-2 ring-card"
-          />
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/jpeg,image/png,image/gif,image/webp"
-            className="hidden"
-            onChange={handleAvatarUpload}
-          />
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={avatarUploading}
-            className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-          >
-            {avatarUploading ? (
-              <Spinner size="sm" className="text-white" />
-            ) : (
-              <Camera className="h-4 w-4 text-white" />
-            )}
-          </button>
-        </div>
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-foreground">{user?.fullName || 'Utilisateur'}</h1>
-            {user?.twoFactorEnabled && (
-              <Badge variant="success" className="text-xs">
-                <Shield className="h-3 w-3 mr-1" /> 2FA
-              </Badge>
-            )}
-          </div>
-          <p className="text-sm text-muted-foreground">{user?.email}</p>
-        </div>
-      </div>
-
       {/* Profile tab */}
       {activeTab === 'profile' && (
         <div className="space-y-6">
