@@ -1,66 +1,68 @@
 'use client'
 
-import dynamic from 'next/dynamic'
-
-const DarkVeil = dynamic(() => import('@/components/ui/dark-veil'), { ssr: false })
+import { useState, useEffect } from 'react'
 
 export default function CheckoutLayout({ children }: { children: React.ReactNode }) {
+  const [dark, setDark] = useState(true)
+
+  useEffect(() => {
+    const saved = localStorage.getItem('checkout_theme')
+    if (saved === 'light') setDark(false)
+  }, [])
+
+  function toggleTheme() {
+    const next = !dark
+    setDark(next)
+    localStorage.setItem('checkout_theme', next ? 'dark' : 'light')
+  }
+
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#0a0a0f]">
-      {/* Shader background with fallback gradient */}
-      <div className="fixed inset-0 z-0" style={{ width: '100vw', height: '100vh' }}>
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-950/60 via-[#0a0a0f] to-violet-950/40" />
-        <div className="absolute inset-0">
-          <DarkVeil
-            speed={0.25}
-            hueShift={220}
-            noiseIntensity={0.015}
-            scanlineIntensity={0}
-            warpAmount={0.2}
-            resolutionScale={0.4}
-          />
-        </div>
-        <div className="absolute inset-0 bg-black/30" />
-      </div>
+    <div className={`min-h-screen flex flex-col transition-colors duration-300 ${dark ? 'dark bg-zinc-950 text-white' : 'bg-[#fafafa] text-zinc-900'}`}>
+      {/* Header */}
+      <header className={`flex items-center justify-between px-6 py-5 border-b ${dark ? 'border-white/[0.06]' : 'border-zinc-200'}`}>
+        <span className={`text-lg font-bold tracking-tight ${dark ? 'text-white' : 'text-zinc-900'}`}>
+          Faktur
+        </span>
 
-      {/* Content */}
-      <div className="relative z-10 min-h-screen flex flex-col">
-        {/* Header */}
-        <header className="flex items-center justify-center py-8">
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-600/20">
-              <svg className="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                <path d="M14 2v6h6" />
-                <path d="M8 13h8" />
-                <path d="M8 17h8" />
-              </svg>
-            </div>
-            <span className="text-lg font-bold tracking-tight text-white">Faktur</span>
-          </div>
-        </header>
+        {/* Theme toggle */}
+        <button
+          onClick={toggleTheme}
+          className={`h-8 w-8 rounded-lg flex items-center justify-center transition-colors ${dark ? 'hover:bg-white/[0.06] text-white/40 hover:text-white/70' : 'hover:bg-zinc-100 text-zinc-400 hover:text-zinc-600'}`}
+          title={dark ? 'Thème clair' : 'Thème sombre'}
+        >
+          {dark ? (
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+            </svg>
+          ) : (
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+          )}
+        </button>
+      </header>
 
-        {/* Main */}
-        <main className="flex-1 flex items-start justify-center px-4 pb-8">
+      {/* Main */}
+      <main className="flex-1 flex items-start justify-center px-4 py-10">
+        <div className="w-full max-w-[440px]">
           {children}
-        </main>
+        </div>
+      </main>
 
-        {/* Footer */}
-        <footer className="py-5 text-center">
-          <p className="text-[11px] text-white/20">
-            Propulsé par{' '}
-            <a
-              href="https://fakturapp.cc"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-indigo-400/60 hover:text-indigo-400 transition-colors font-medium"
-            >
-              Faktur
-            </a>
-            {' '}— Facturation simple et sécurisée
-          </p>
-        </footer>
-      </div>
+      {/* Footer */}
+      <footer className={`py-5 text-center border-t ${dark ? 'border-white/[0.04]' : 'border-zinc-100'}`}>
+        <p className={`text-[11px] ${dark ? 'text-white/20' : 'text-zinc-400'}`}>
+          Propulsé par{' '}
+          <a
+            href="https://fakturapp.cc"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-indigo-500 hover:text-indigo-400 transition-colors font-medium"
+          >
+            Faktur
+          </a>
+        </p>
+      </footer>
     </div>
   )
 }
