@@ -64,7 +64,7 @@ export default function AboutPage() {
               <p className="text-sm text-muted-foreground mt-1">
                 Logiciel de facturation gratuit avec chiffrement zero-access.
               </p>
-              <Badge variant="muted" className="mt-3">v0.14.6</Badge>
+              <Badge variant="muted" className="mt-3">v0.15.9</Badge>
             </div>
           </div>
         </CardContent>
