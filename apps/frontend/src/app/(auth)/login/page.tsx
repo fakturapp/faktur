@@ -15,7 +15,6 @@ import { Spinner } from '@/components/ui/spinner'
 import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile'
 import { startAuthentication } from '@simplewebauthn/browser'
 import { LogOut, LayoutDashboard, ArrowRight, Shield, Eye, EyeOff, KeyRound, Smartphone } from 'lucide-react'
-import { ShinyText } from '@/components/ui/shiny-text'
 
 const fadeIn = {
   hidden: { opacity: 0, y: 12 },
@@ -205,16 +204,9 @@ function LoginContent() {
       <motion.div initial="hidden" animate="visible" className="w-full max-w-sm mx-auto">
         <div className="space-y-6">
           <motion.div variants={fadeIn} custom={0} className="flex flex-col items-center gap-5 text-center">
-            <div className="flex items-center gap-3 mb-1">
+            <div className="flex items-center gap-2.5 mb-1">
               <img src="/logo.svg" alt="Faktur" className="h-10 w-10" />
-              <ShinyText
-                text="Faktur"
-                className="text-2xl font-bold"
-                speed={3}
-                color="#a1a1aa"
-                shineColor="#6366f1"
-                spread={120}
-              />
+              <span className="text-2xl font-bold text-foreground font-lexend tracking-tight">Faktur</span>
             </div>
             <Avatar
               src={user.avatarUrl}
