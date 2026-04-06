@@ -48,6 +48,8 @@ interface InvoiceSettingsContextType {
   settings: InvoiceSettings
   companyLogoUrl: string | null
   loading: boolean
+  saving: boolean
+  saveError: string | null
   updateSettings: (partial: Partial<InvoiceSettings>) => void
   uploadLogo: (file: File) => Promise<void>
   refreshCompanyLogo: () => Promise<void>
@@ -92,6 +94,8 @@ const InvoiceSettingsContext = createContext<InvoiceSettingsContextType>({
   settings: defaultSettings,
   companyLogoUrl: null,
   loading: true,
+  saving: false,
+  saveError: null,
   updateSettings: () => {},
   uploadLogo: async () => {},
   refreshCompanyLogo: async () => {},
@@ -106,6 +110,8 @@ export function InvoiceSettingsProvider({ children }: { children: React.ReactNod
   const [settings, setSettings] = useState<InvoiceSettings>(defaultSettings)
   const [companyLogoUrl, setCompanyLogoUrl] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const settingsRef = useRef(settings)
 
@@ -128,7 +134,11 @@ export function InvoiceSettingsProvider({ children }: { children: React.ReactNod
   }, [loadSettings])
 
   const saveSettings = useCallback(async (toSave: InvoiceSettings) => {
-    await api.put('/settings/invoices', toSave)
+    setSaving(true)
+    setSaveError(null)
+    const { error } = await api.put('/settings/invoices', toSave)
+    setSaving(false)
+    if (error) setSaveError(error)
   }, [])
 
   const updateSettings = useCallback(
@@ -176,7 +186,7 @@ export function InvoiceSettingsProvider({ children }: { children: React.ReactNod
   }, [saveSettings])
 
   return (
-    <InvoiceSettingsContext.Provider value={{ settings, companyLogoUrl, loading, updateSettings, uploadLogo, refreshCompanyLogo, refreshSettings: loadSettings }}>
+    <InvoiceSettingsContext.Provider value={{ settings, companyLogoUrl, loading, saving, saveError, updateSettings, uploadLogo, refreshCompanyLogo, refreshSettings: loadSettings }}>
       {children}
     </InvoiceSettingsContext.Provider>
   )
