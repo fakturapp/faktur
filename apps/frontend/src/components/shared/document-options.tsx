@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import {
   Check, Zap, ClipboardList, ChevronDown, ChevronRight, Building2, UserRound,
-  Palette, Pen, Info, Landmark, Banknote, MoreHorizontal, Shield,
+  Palette, Pen, Info, Landmark, Banknote, CreditCard, MoreHorizontal, Shield,
 } from 'lucide-react'
 import { Tooltip } from '@/components/ui/tooltip'
 import { AiGenerateButton } from '@/components/ai/ai-generate-button'
@@ -389,6 +389,7 @@ export function DocumentOptionsPanel({
               <div className="flex gap-1">
                 {[
                   { id: 'bank_transfer', label: 'Virement', icon: Landmark },
+                  { id: 'stripe', label: 'Carte', icon: CreditCard },
                   { id: 'cash', label: 'Espèces', icon: Banknote },
                   { id: 'other', label: 'Autre', icon: MoreHorizontal },
                 ].map((t) => (

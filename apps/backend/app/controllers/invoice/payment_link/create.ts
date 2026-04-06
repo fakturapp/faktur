@@ -35,11 +35,14 @@ export default class Create {
     // Check no active link already exists
     const existingLink = await PaymentLink.query()
       .where('invoice_id', invoice.id)
-      .where('is_active', true)
       .first()
 
     if (existingLink) {
-      return response.conflict({ message: 'A payment link already exists for this invoice' })
+      if (existingLink.isActive) {
+        return response.conflict({ message: 'A payment link already exists for this invoice' })
+      }
+      // Delete old inactive link to allow creating a new one (UNIQUE constraint)
+      await existingLink.delete()
     }
 
     const payload = await request.validateUsing(createPaymentLinkValidator)

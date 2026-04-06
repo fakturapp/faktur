@@ -1603,7 +1603,7 @@ export function A4Sheet({
                   </div>
                   <div className="text-[11px] leading-[1.7]" style={{ color: T.text }}>
                     <div className="font-semibold">
-                      {paymentMethod === 'bank_transfer' ? (lang === 'en' ? 'Bank transfer' : 'Virement') : paymentMethod === 'cash' ? (lang === 'en' ? 'Cash' : 'Espèces') : (paymentMethod === 'other' && customPaymentMethod ? customPaymentMethod : (lang === 'en' ? 'Other' : 'Autre'))}
+                      {paymentMethod === 'bank_transfer' ? (lang === 'en' ? 'Bank transfer' : 'Virement') : paymentMethod === 'stripe' ? (lang === 'en' ? 'Credit card (Stripe)' : 'Carte bancaire (Stripe)') : paymentMethod === 'cash' ? (lang === 'en' ? 'Cash' : 'Espèces') : (paymentMethod === 'other' && customPaymentMethod ? customPaymentMethod : (lang === 'en' ? 'Other' : 'Autre'))}
                     </div>
                     {paymentMethod === 'bank_transfer' && bankAccountInfo && (bankAccountInfo.iban || bankAccountInfo.bic || bankAccountInfo.bankName) && (
                       <div className="mt-1">
