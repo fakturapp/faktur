@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect, use } from 'react'
+import { useState, useEffect, useCallback, use } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import confetti from 'canvas-confetti'
 import {
   Banknote,
   Lock,
@@ -74,6 +75,17 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
   const [copied, setCopied] = useState(false)
   const [downloading, setDownloading] = useState(false)
 
+  const fireConfetti = useCallback(() => {
+    const duration = 2000
+    const end = Date.now() + duration
+    const frame = () => {
+      confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0, y: 0.6 }, colors: ['#6366f1', '#818cf8', '#a78bfa', '#4ade80', '#fbbf24'] })
+      confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1, y: 0.6 }, colors: ['#6366f1', '#818cf8', '#a78bfa', '#4ade80', '#fbbf24'] })
+      if (Date.now() < end) requestAnimationFrame(frame)
+    }
+    frame()
+  }, [])
+
   useEffect(() => {
     async function load() {
       try {
@@ -95,7 +107,7 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
         const data: CheckoutData = await res.json()
         setCheckoutData(data)
 
-        if (data.status === 'confirmed') setState('confirmed')
+        if (data.status === 'confirmed') { setState('confirmed'); setTimeout(fireConfetti, 300) }
         else if (data.status === 'paid_pending') setState('paid_pending')
         else if (data.isPasswordProtected) setState('password')
         else setState('payment_method')
@@ -169,6 +181,7 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
       if (res.status === 409) { setState('paid_pending'); setLoading(false); return }
       if (!res.ok) { setErrorMessage('Une erreur est survenue'); setState('error'); setLoading(false); return }
       setState('paid_pending')
+      fireConfetti()
     } catch {
       setErrorMessage('Erreur de connexion')
       setState('error')

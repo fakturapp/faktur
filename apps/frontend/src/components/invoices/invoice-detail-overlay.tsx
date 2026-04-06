@@ -523,13 +523,18 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                   <div className="px-5 pt-4 pb-2 relative group/edit">
                     <Button
                       className="w-full h-11 text-sm font-semibold gap-2"
-                      disabled={invoice.status === 'paid' || invoice.status === 'paid_unconfirmed'}
+                      disabled={invoice.status === 'paid' || invoice.status === 'paid_unconfirmed' || !!paymentLinkInfo?.isActive}
                       onClick={() => { onClose(); router.push(`/dashboard/invoices/${invoice.id}/edit`) }}
                     >
                       <Pencil className="h-4 w-4" />
                       Modifier la facture
                     </Button>
-                    {(invoice.status === 'paid' || invoice.status === 'paid_unconfirmed') && (
+                    {paymentLinkInfo?.isActive && (
+                      <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 translate-y-1 group-hover/edit:opacity-100 group-hover/edit:translate-y-0 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-xl bg-foreground text-background text-xs shadow-lg">
+                        Supprimez le lien de paiement pour modifier la facture
+                      </div>
+                    )}
+                    {!paymentLinkInfo?.isActive && (invoice.status === 'paid' || invoice.status === 'paid_unconfirmed') && (
                       <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 translate-y-1 group-hover/edit:opacity-100 group-hover/edit:translate-y-0 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-xl bg-foreground text-background text-xs shadow-lg">
                         Changez le statut pour pouvoir modifier la facture
                       </div>
@@ -752,6 +757,7 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
             invoiceNumber={invoice.invoiceNumber}
             invoicePaymentMethod={invoice.paymentMethod}
             invoiceDueDate={invoice.dueDate}
+            hasBankAccount={!!invoice.bankAccountId}
             onCreated={(link) => {
               setPaymentLinkInfo({
                 id: link.id,
