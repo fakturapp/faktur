@@ -26,14 +26,25 @@ export default class CheckoutDownloadPdf {
       return response.gone({ message: 'Payment link has expired' })
     }
 
-    // Redirect to R2 URL if available
+    const filename = `${paymentLink.invoiceNumber}.pdf`
+
+    // Proxy from R2 URL (avoids CORS issues with CDN direct redirect)
     if (paymentLink.pdfStorageKey) {
-      return response.redirect(paymentLink.pdfStorageKey)
+      try {
+        const r2Response = await fetch(paymentLink.pdfStorageKey)
+        if (r2Response.ok) {
+          const buffer = Buffer.from(await r2Response.arrayBuffer())
+          response.header('Content-Type', 'application/pdf')
+          response.header('Content-Disposition', `attachment; filename="${filename}"`)
+          return response.send(buffer)
+        }
+      } catch {
+        // Fall through to other options
+      }
     }
 
     // Fallback: serve from DB blob
     if (paymentLink.pdfData) {
-      const filename = `${paymentLink.invoiceNumber}.pdf`
       response.header('Content-Type', 'application/pdf')
       response.header('Content-Disposition', `attachment; filename="${filename}"`)
       return response.send(paymentLink.pdfData)
