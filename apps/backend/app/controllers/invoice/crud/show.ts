@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import Invoice from '#models/invoice/invoice'
+import PaymentLink from '#models/invoice/payment_link'
 import Quote from '#models/quote/quote'
 import InvoiceTransformer from '#transformers/invoice_transformer'
 import {
@@ -51,6 +52,13 @@ export default class Show {
       decryptModelFields(invoice.client, [...ENCRYPTED_FIELDS.client], dek)
     }
 
+    // Load payment link info
+    const paymentLink = await PaymentLink.query()
+      .where('invoice_id', invoice.id)
+      .where('team_id', teamId)
+      .orderBy('created_at', 'desc')
+      .first()
+
     let sourceQuote: { id: string; quoteNumber: string } | null = null
     if (invoice.sourceQuoteId) {
       const quote = await Quote.find(invoice.sourceQuoteId)
@@ -63,6 +71,17 @@ export default class Show {
       invoice: {
         ...(await ctx.serialize.withoutWrapping(InvoiceTransformer.transform(invoice))),
         sourceQuote,
+        paymentLink: paymentLink
+          ? {
+              id: paymentLink.id,
+              isActive: paymentLink.isActive,
+              isExpired: paymentLink.isExpired,
+              isPasswordProtected: !!paymentLink.passwordHash,
+              paidAt: paymentLink.paidAt?.toISO() || null,
+              confirmedAt: paymentLink.confirmedAt?.toISO() || null,
+              expiresAt: paymentLink.expiresAt?.toISO() || null,
+            }
+          : null,
       },
     })
   }

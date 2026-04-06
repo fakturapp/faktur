@@ -59,8 +59,16 @@ export default class List {
       }
     }
 
+    const transformed = await ctx.serialize.withoutWrapping(InvoiceTransformer.transform(invoices))
+    const invoiceList = (Array.isArray(transformed) ? transformed : [transformed]).map(
+      (inv: any) => ({
+        ...inv,
+        needsAction: inv.status === 'paid_unconfirmed' || inv.status === 'overdue',
+      })
+    )
+
     return response.ok({
-      invoices: await ctx.serialize.withoutWrapping(InvoiceTransformer.transform(invoices)),
+      invoices: invoiceList,
       meta: {
         total: result.total,
         perPage: result.perPage,
