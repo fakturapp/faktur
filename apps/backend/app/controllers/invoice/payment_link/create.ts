@@ -43,11 +43,6 @@ export default class Create {
 
     const payload = await request.validateUsing(createPaymentLinkValidator)
 
-    // Validate payment method
-    if (payload.paymentMethod === 'cash') {
-      return response.badRequest({ message: 'Cannot create a payment link with cash payment method' })
-    }
-
     // Get bank account info if showing IBAN
     let encryptedIban: string | null = null
     let encryptedBic: string | null = null
