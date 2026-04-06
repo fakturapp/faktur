@@ -32,9 +32,11 @@ interface StatusDropdownProps {
   endpoint: 'quotes' | 'invoices' | 'credit-notes'
   onStatusChange: (id: string, newStatus: string) => void
   fullWidth?: boolean
+  /** Statuses that are display-only and cannot be selected manually */
+  readOnlyStatuses?: string[]
 }
 
-export function StatusDropdown({ id, currentStatus, options, endpoint, onStatusChange, fullWidth }: StatusDropdownProps) {
+export function StatusDropdown({ id, currentStatus, options, endpoint, onStatusChange, fullWidth, readOnlyStatuses = [] }: StatusDropdownProps) {
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
   const current = options.find((o) => o.value === currentStatus) || options[0]
@@ -75,16 +77,18 @@ export function StatusDropdown({ id, currentStatus, options, endpoint, onStatusC
         }
         className="min-w-[180px]"
       >
-        {options.map((opt) => (
-          <DropdownItem
-            key={opt.value}
-            onClick={() => handleChange(opt.value)}
-            className={opt.value === currentStatus ? 'opacity-50' : ''}
-          >
-            {opt.icon}
-            <span>{opt.label}</span>
-          </DropdownItem>
-        ))}
+        {options
+          .filter((opt) => !readOnlyStatuses.includes(opt.value))
+          .map((opt) => (
+            <DropdownItem
+              key={opt.value}
+              onClick={() => handleChange(opt.value)}
+              className={opt.value === currentStatus ? 'opacity-50' : ''}
+            >
+              {opt.icon}
+              <span>{opt.label}</span>
+            </DropdownItem>
+          ))}
       </Dropdown>
     </div>
   )
@@ -102,6 +106,7 @@ export const invoiceStatusOptions: StatusOption[] = [
   { value: 'draft', label: 'Brouillon', color: 'text-muted-foreground', bgColor: 'bg-muted-foreground/10', icon: <FileEdit className="h-3.5 w-3.5" /> },
   { value: 'sent', label: 'Envoyée', color: 'text-blue-400', bgColor: 'bg-blue-400/10', icon: <Send className="h-3.5 w-3.5" /> },
   { value: 'paid', label: 'Payée', color: 'text-green-400', bgColor: 'bg-green-400/10', icon: <CreditCard className="h-3.5 w-3.5" /> },
+  { value: 'paid_unconfirmed', label: 'Paiement non confirmé', color: 'text-amber-400', bgColor: 'bg-amber-400/10', icon: <Clock className="h-3.5 w-3.5" /> },
   { value: 'overdue', label: 'En retard', color: 'text-red-400', bgColor: 'bg-red-400/10', icon: <AlertTriangle className="h-3.5 w-3.5" /> },
   { value: 'cancelled', label: 'Annulée', color: 'text-orange-400', bgColor: 'bg-orange-400/10', icon: <Ban className="h-3.5 w-3.5" /> },
 ]
