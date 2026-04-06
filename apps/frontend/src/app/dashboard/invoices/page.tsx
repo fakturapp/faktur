@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { motion, type Variants } from 'framer-motion'
 import { CreateInvoiceModal } from '@/components/invoices/create-invoice-modal'
 import { Input } from '@/components/ui/input'
@@ -69,6 +69,7 @@ interface PaginationMeta {
 
 export default function InvoicesPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { toast } = useToast()
   const { settings } = useInvoiceSettings()
   const [convertOpen, setConvertOpen] = useState(false)
@@ -82,7 +83,9 @@ export default function InvoicesPage() {
   const [page, setPage] = useState(1)
   const [meta, setMeta] = useState<PaginationMeta | null>(null)
   const [downloadingId, setDownloadingId] = useState<string | null>(null)
-  const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null)
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(
+    () => searchParams.get('open')
+  )
   const [monthlyStats, setMonthlyStats] = useState<{ totalInvoiced: number; totalCollected: number; trend: number } | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
