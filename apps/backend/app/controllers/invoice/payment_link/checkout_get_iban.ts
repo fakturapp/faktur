@@ -78,7 +78,15 @@ export default class CheckoutGetIban {
         bic = encryptionService.decrypt(paymentLink.encryptedBic)
       }
       if (paymentLink.encryptedBankName) {
-        bankName = encryptionService.decrypt(paymentLink.encryptedBankName)
+        const raw = encryptionService.decrypt(paymentLink.encryptedBankName)
+        // Fix double-encoded UTF-8 (latin1 → utf8 corruption)
+        try {
+          bankName = Buffer.from(raw, 'latin1').toString('utf8')
+          // If the result looks worse (contains replacement chars), use the original
+          if (bankName.includes('\ufffd')) bankName = raw
+        } catch {
+          bankName = raw
+        }
       }
     } catch {
       return response.internalServerError({ message: 'Failed to decrypt payment information' })
@@ -87,6 +95,7 @@ export default class CheckoutGetIban {
     // Format IBAN for display (groups of 4)
     const formattedIban = iban ? iban.replace(/(.{4})/g, '$1 ').trim() : null
 
+    response.header('Content-Type', 'application/json; charset=utf-8')
     return response.ok({
       iban: formattedIban,
       ibanRaw: iban,

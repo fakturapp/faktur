@@ -81,6 +81,7 @@ export default class CheckoutShow {
       return response.gone({ message: 'Payment link is no longer active' })
     }
 
+    response.header('Content-Type', 'application/json; charset=utf-8')
     return response.ok({
       status: 'active',
       invoiceNumber: paymentLink.invoiceNumber,
