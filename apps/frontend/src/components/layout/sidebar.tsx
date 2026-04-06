@@ -10,6 +10,7 @@ import { Avatar } from '@/components/ui/avatar'
 import { Dropdown, DropdownItem, DropdownLabel, DropdownSeparator, DropdownSub } from '@/components/ui/dropdown'
 import { CreateInvoiceModal } from '@/components/invoices/create-invoice-modal'
 import { useTheme } from '@/lib/theme'
+import { APP_VERSION } from '@/lib/version'
 import {
   LayoutDashboard,
   FileText,
@@ -403,9 +404,14 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             <div className="px-4 pt-4 pb-3">
               <div className="flex items-center justify-center gap-3">
                 <img src="/logo.svg" alt="Faktur" className="h-10 w-10 shrink-0 drop-shadow-sm" />
-                <span style={{ fontFamily: "'Lexend', sans-serif", letterSpacing: '-0.03em' }} className="text-[20px] font-semibold text-foreground">
-                  Faktur
-                </span>
+                <div className="flex flex-col">
+                  <span className="text-[18px] font-semibold text-foreground font-lexend tracking-tight">
+                    Faktur
+                  </span>
+                  <span className="text-[9px] text-muted-foreground/50 font-medium -mt-0.5">
+                    v{APP_VERSION}
+                  </span>
+                </div>
               </div>
             </div>
           </motion.div>
