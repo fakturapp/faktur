@@ -15,6 +15,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile'
 import { startAuthentication } from '@simplewebauthn/browser'
 import { LogOut, LayoutDashboard, ArrowRight, Shield, Eye, EyeOff, KeyRound, Smartphone } from 'lucide-react'
+import { ShinyText } from '@/components/ui/shiny-text'
 
 const fadeIn = {
   hidden: { opacity: 0, y: 12 },
@@ -203,7 +204,18 @@ function LoginContent() {
     return (
       <motion.div initial="hidden" animate="visible" className="w-full max-w-sm mx-auto">
         <div className="space-y-6">
-          <motion.div variants={fadeIn} custom={0} className="flex flex-col items-center gap-4 text-center">
+          <motion.div variants={fadeIn} custom={0} className="flex flex-col items-center gap-5 text-center">
+            <div className="flex items-center gap-3 mb-1">
+              <img src="/logo.svg" alt="Faktur" className="h-10 w-10" />
+              <ShinyText
+                text="Faktur"
+                className="text-2xl font-bold"
+                speed={3}
+                color="#a1a1aa"
+                shineColor="#6366f1"
+                spread={120}
+              />
+            </div>
             <Avatar
               src={user.avatarUrl}
               alt={user.fullName || user.email}
@@ -211,14 +223,11 @@ function LoginContent() {
               size="lg"
             />
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Bon retour</h1>
+              <h1 className="text-xl font-bold text-foreground">Bon retour, {user.fullName?.split(' ')[0] || 'vous'} !</h1>
               <p className="text-muted-foreground text-sm mt-1">
-                Vous êtes connecté en tant que
+                Connect&eacute; en tant que <span className="font-medium text-foreground">{user.fullName || user.email}</span>
               </p>
-              <p className="font-medium text-foreground mt-0.5">
-                {user.fullName || user.email}
-              </p>
-              <p className="text-xs text-muted-foreground">{user.email}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{user.email}</p>
             </div>
           </motion.div>
 
@@ -326,11 +335,24 @@ function LoginContent() {
           >
             <div className="space-y-8">
               {/* Header */}
-              <motion.div variants={fadeIn} custom={0} className="text-center space-y-2">
-                <h1 className="text-2xl font-bold text-foreground">Bon retour</h1>
-                <p className="text-sm text-muted-foreground">
-                  Connectez-vous à votre compte Faktur
-                </p>
+              <motion.div variants={fadeIn} custom={0} className="flex flex-col items-center text-center space-y-3">
+                <div className="flex items-center gap-3 mb-1">
+                  <img src="/logo.svg" alt="Faktur" className="h-10 w-10" />
+                  <ShinyText
+                    text="Faktur"
+                    className="text-2xl font-bold"
+                    speed={3}
+                    color="#a1a1aa"
+                    shineColor="#6366f1"
+                    spread={120}
+                  />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-foreground">Bon retour</h1>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Connectez-vous &agrave; votre compte
+                  </p>
+                </div>
               </motion.div>
 
               {/* Google OAuth */}
