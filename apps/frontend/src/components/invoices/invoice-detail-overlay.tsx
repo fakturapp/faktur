@@ -16,6 +16,10 @@ import { SendEmailModal } from '@/components/shared/send-email-modal'
 import { EmailHistoryModal } from '@/components/shared/email-history-modal'
 import { useTrackFeature } from '@/hooks/use-analytics'
 import { useEmail } from '@/lib/email-context'
+import { PaymentLinkModal } from '@/components/invoices/payment-link-modal'
+import { PaymentLinkCard } from '@/components/invoices/payment-link-card'
+import { ConfirmPaymentModal } from '@/components/invoices/confirm-payment-modal'
+import { MarkPaidInfoModal } from '@/components/invoices/mark-paid-info-modal'
 import {
   X,
   Send,
@@ -29,12 +33,13 @@ import {
   MessageSquare,
   History,
   FileMinus2,
+  Link2,
 } from 'lucide-react'
 
 interface InvoiceDetail {
   id: string
   invoiceNumber: string
-  status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled'
+  status: 'draft' | 'sent' | 'paid' | 'paid_unconfirmed' | 'overdue' | 'cancelled'
   subject: string | null
   issueDate: string
   dueDate: string | null
@@ -107,6 +112,19 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
   const [emailModalOpen, setEmailModalOpen] = useState(false)
   const [emailModalMode, setEmailModalMode] = useState<'send' | 'reminder'>('send')
   const [emailHistoryOpen, setEmailHistoryOpen] = useState(false)
+  const [paymentLinkModalOpen, setPaymentLinkModalOpen] = useState(false)
+  const [confirmPaymentModalOpen, setConfirmPaymentModalOpen] = useState(false)
+  const [markPaidInfoModalOpen, setMarkPaidInfoModalOpen] = useState(false)
+  const [paymentLinkInfo, setPaymentLinkInfo] = useState<{
+    id: string
+    isActive: boolean
+    isExpired: boolean
+    isPasswordProtected: boolean
+    paidAt: string | null
+    confirmedAt: string | null
+    expiresAt: string | null
+  } | null>(null)
+  const [paymentLinkUrl, setPaymentLinkUrl] = useState<string | null>(null)
   const { hasEmailConfigured } = useEmail()
   const commentTimeout = useRef<ReturnType<typeof setTimeout>>(undefined)
 
@@ -117,12 +135,18 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
     setBankAccountInfo(null)
 
     Promise.all([
-      api.get<{ invoice: InvoiceDetail }>(`/invoices/${invoiceId}`),
+      api.get<{ invoice: InvoiceDetail & { paymentLink?: any } }>(`/invoices/${invoiceId}`),
       api.get<{ company: CompanyInfo }>('/company'),
     ]).then(async ([invRes, compRes]) => {
       if (invRes.data?.invoice) {
         setInvoice(invRes.data.invoice)
         setComment(invRes.data.invoice.comment || '')
+        // Load payment link info
+        if (invRes.data.invoice.paymentLink) {
+          setPaymentLinkInfo(invRes.data.invoice.paymentLink)
+        } else {
+          setPaymentLinkInfo(null)
+        }
         // Fetch bank account info if invoice has a linked bank account
         if (invRes.data.invoice.bankAccountId) {
           const { data: bankData } = await api.get<{ bankAccount: { bankName: string | null; iban: string | null; bic: string | null } }>(`/company/bank-accounts/${invRes.data.invoice.bankAccountId}`)
@@ -199,8 +223,52 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
   }, [invoiceId])
 
   function handleStatusUpdate(id: string, newStatus: string) {
+    if (newStatus === 'paid' && invoice?.status !== 'paid_unconfirmed') {
+      // Show mark-paid info modal when manually setting to paid
+      setMarkPaidInfoModalOpen(true)
+      return
+    }
     if (invoice) setInvoice({ ...invoice, status: newStatus as InvoiceDetail['status'] })
     onStatusChange(id, newStatus)
+  }
+
+  async function handleMarkPaidSubmit(data: { paymentDate?: string; paymentMethod?: string; notes?: string }) {
+    if (!invoice) return
+    const { error } = await api.patch(`/invoices/${invoice.id}/status`, {
+      status: 'paid',
+      paidDate: data.paymentDate,
+      paymentMethod: data.paymentMethod,
+      notes: data.notes,
+    })
+    if (error) { toast(error, 'error'); return }
+    setInvoice({ ...invoice, status: 'paid' })
+    onStatusChange(invoice.id, 'paid')
+    setMarkPaidInfoModalOpen(false)
+  }
+
+  function handleMarkPaidSkip() {
+    if (!invoice) return
+    api.patch(`/invoices/${invoice.id}/status`, { status: 'paid' })
+    setInvoice({ ...invoice, status: 'paid' })
+    onStatusChange(invoice.id, 'paid')
+    setMarkPaidInfoModalOpen(false)
+  }
+
+  function handlePaymentConfirmed() {
+    if (!invoice) return
+    setInvoice({ ...invoice, status: 'paid' })
+    setPaymentLinkInfo(null)
+    onStatusChange(invoice.id, 'paid')
+  }
+
+  async function handlePaymentLinkDeleted() {
+    setPaymentLinkInfo(null)
+    setPaymentLinkUrl(null)
+    // Re-fetch to get latest state
+    const { data } = await api.get<{ paymentLink: any }>(`/invoices/${invoiceId}/payment-link`)
+    if (data?.paymentLink) {
+      setPaymentLinkInfo(data.paymentLink)
+    }
   }
 
   function handleSendEmail() {
@@ -455,13 +523,13 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                   <div className="px-5 pt-4 pb-2 relative group/edit">
                     <Button
                       className="w-full h-11 text-sm font-semibold gap-2"
-                      disabled={invoice.status === 'paid'}
+                      disabled={invoice.status === 'paid' || invoice.status === 'paid_unconfirmed'}
                       onClick={() => { onClose(); router.push(`/dashboard/invoices/${invoice.id}/edit`) }}
                     >
                       <Pencil className="h-4 w-4" />
                       Modifier la facture
                     </Button>
-                    {invoice.status === 'paid' && (
+                    {(invoice.status === 'paid' || invoice.status === 'paid_unconfirmed') && (
                       <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 translate-y-1 group-hover/edit:opacity-100 group-hover/edit:translate-y-0 transition-all duration-200 pointer-events-none z-20 whitespace-nowrap px-3 py-1.5 rounded-xl bg-foreground text-background text-xs shadow-lg">
                         Changez le statut pour pouvoir modifier la facture
                       </div>
@@ -477,6 +545,7 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                       endpoint="invoices"
                       onStatusChange={handleStatusUpdate}
                       fullWidth
+                      readOnlyStatuses={['paid_unconfirmed']}
                     />
                   </div>
 
@@ -589,6 +658,28 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                     </Dropdown>
                   </div>
 
+                  {/* Payment link section */}
+                  <PaymentLinkCard
+                    invoiceId={invoice.id}
+                    invoiceStatus={invoice.status}
+                    paymentLink={paymentLinkInfo}
+                    linkUrl={paymentLinkUrl}
+                    onDeleted={handlePaymentLinkDeleted}
+                    onConfirmClick={() => setConfirmPaymentModalOpen(true)}
+                  />
+
+                  {/* Payment link button - show when no active link and not paid */}
+                  {!paymentLinkInfo?.isActive && invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
+                    <div className="px-5 py-3 border-b border-border">
+                      <button
+                        onClick={() => setPaymentLinkModalOpen(true)}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted/50 transition-colors"
+                      >
+                        <Link2 className="h-4 w-4" /> Lien de paiement
+                      </button>
+                    </div>
+                  )}
+
                   {/* Comment */}
                   <div className="px-5 py-4">
                     <div className="flex items-center gap-2 mb-2">
@@ -651,6 +742,49 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
             documentNumber={invoice.invoiceNumber}
           />
         )}
+
+        {/* Payment link modal */}
+        {invoice && (
+          <PaymentLinkModal
+            open={paymentLinkModalOpen}
+            onClose={() => setPaymentLinkModalOpen(false)}
+            invoiceId={invoice.id}
+            invoiceNumber={invoice.invoiceNumber}
+            invoicePaymentMethod={invoice.paymentMethod}
+            invoiceDueDate={invoice.dueDate}
+            onCreated={(link) => {
+              setPaymentLinkInfo({
+                id: link.id,
+                isActive: true,
+                isExpired: false,
+                isPasswordProtected: false,
+                paidAt: null,
+                confirmedAt: null,
+                expiresAt: link.expiresAt,
+              })
+              setPaymentLinkUrl(link.url)
+            }}
+          />
+        )}
+
+        {/* Confirm payment modal */}
+        {invoice && (
+          <ConfirmPaymentModal
+            open={confirmPaymentModalOpen}
+            onClose={() => setConfirmPaymentModalOpen(false)}
+            invoiceId={invoice.id}
+            invoiceNumber={invoice.invoiceNumber}
+            onConfirmed={handlePaymentConfirmed}
+          />
+        )}
+
+        {/* Mark paid info modal */}
+        <MarkPaidInfoModal
+          open={markPaidInfoModalOpen}
+          onClose={() => setMarkPaidInfoModalOpen(false)}
+          onSubmit={handleMarkPaidSubmit}
+          onSkip={handleMarkPaidSkip}
+        />
       </motion.div>
       )}
     </AnimatePresence>
