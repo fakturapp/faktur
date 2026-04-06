@@ -44,7 +44,7 @@ if (API_PREFIX) feedbackGroup.prefix(API_PREFIX)
 router.get(API_PREFIX + '/', async () => {
   return {
     name: 'Faktur API',
-    version: '1.5.6',
+    version: '1.7.9',
     prefix: API_PREFIX || '/',
     status: 'healthy',
   }
