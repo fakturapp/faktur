@@ -20,6 +20,33 @@ export default class CheckoutShow {
       return response.notFound({ message: 'Payment link not found' })
     }
 
+    // Mask client email for display (d****@o**.fr)
+    let maskedEmail: string | null = null
+    if (paymentLink.clientEmail) {
+      try {
+        const email = encryptionService.decrypt(paymentLink.clientEmail)
+        const [local, domain] = email.split('@')
+        if (local && domain) {
+          const maskedLocal = local[0] + '****'
+          const domParts = domain.split('.')
+          const maskedDomain = domParts[0][0] + '**' + (domParts.length > 1 ? '.' + domParts.slice(1).join('.') : '')
+          maskedEmail = `${maskedLocal}@${maskedDomain}`
+        }
+      } catch {
+        // ignore
+      }
+    }
+
+    // Decrypt company name
+    let companyName: string | null = null
+    if (paymentLink.companyName) {
+      try {
+        companyName = encryptionService.decrypt(paymentLink.companyName)
+      } catch {
+        // ignore
+      }
+    }
+
     // Check if already confirmed
     if (paymentLink.confirmedAt) {
       return response.ok({
@@ -27,6 +54,8 @@ export default class CheckoutShow {
         invoiceNumber: paymentLink.invoiceNumber,
         amount: paymentLink.amount,
         currency: paymentLink.currency,
+        companyName,
+        maskedEmail,
       })
     }
 
@@ -37,6 +66,8 @@ export default class CheckoutShow {
         invoiceNumber: paymentLink.invoiceNumber,
         amount: paymentLink.amount,
         currency: paymentLink.currency,
+        companyName,
+        maskedEmail,
       })
     }
 
@@ -50,16 +81,6 @@ export default class CheckoutShow {
       return response.gone({ message: 'Payment link is no longer active' })
     }
 
-    // Decrypt company name (app-level encrypted)
-    let companyName: string | null = null
-    if (paymentLink.companyName) {
-      try {
-        companyName = encryptionService.decrypt(paymentLink.companyName)
-      } catch {
-        // ignore
-      }
-    }
-
     return response.ok({
       status: 'active',
       invoiceNumber: paymentLink.invoiceNumber,
@@ -69,6 +90,7 @@ export default class CheckoutShow {
       isPasswordProtected: !!paymentLink.passwordHash,
       showIban: paymentLink.showIban,
       companyName,
+      maskedEmail,
       hasPdf: !!(paymentLink.pdfStorageKey || paymentLink.pdfData),
     })
   }
