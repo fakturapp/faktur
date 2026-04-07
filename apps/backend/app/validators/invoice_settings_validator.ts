@@ -31,7 +31,7 @@ export const updateInvoiceSettingsValidator = vine.compile(
     defaultFreeField: vine.string().trim().maxLength(2000).optional().nullable(),
     defaultShowNotes: looseBool.clone(),
     defaultVatExempt: looseBool.clone(),
-    defaultFooterText: vine.string().trim().maxLength(50).optional().nullable(),
+    defaultFooterText: vine.string().trim().maxLength(1000).optional().nullable(),
     defaultShowDeliveryAddress: looseBool.clone(),
     defaultLanguage: vine.string().trim().maxLength(5).optional(),
     quoteFilenamePattern: vine.string().trim().maxLength(255).optional(),
