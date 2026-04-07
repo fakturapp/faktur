@@ -33,8 +33,14 @@ const OAUTH_ERRORS: Record<string, string> = {
   account_inactive: 'Ce compte est désactivé.',
 }
 
-function getPostLoginRedirect(onboardingCompleted: boolean): string {
+function getPostLoginRedirect(onboardingCompleted: boolean, explicitRedirect?: string | null): string {
   if (!onboardingCompleted) return '/onboarding/team'
+  // Explicit ?redirect= query string param (used by the OAuth consent
+  // screen to bounce the user back after they sign in). Only allow
+  // same-origin / relative paths to defeat open-redirect attacks.
+  if (explicitRedirect && explicitRedirect.startsWith('/')) {
+    return explicitRedirect
+  }
   const shareRedirect = typeof window !== 'undefined' ? sessionStorage.getItem('faktur_share_redirect') : null
   if (shareRedirect) {
     sessionStorage.removeItem('faktur_share_redirect')
@@ -81,7 +87,7 @@ function LoginContent() {
           return
         }
         login(token, data.user)
-        router.push(getPostLoginRedirect(data.user.onboardingCompleted))
+        router.push(getPostLoginRedirect(data.user.onboardingCompleted, searchParams.get('redirect')))
       })
     } else if (oauthError) {
       window.history.replaceState({}, '', '/login')
@@ -130,7 +136,7 @@ function LoginContent() {
 
       if (data?.token && data?.user) {
         login(data.token, data.user, data.vaultKey)
-        router.push(getPostLoginRedirect(data.user.onboardingCompleted))
+        router.push(getPostLoginRedirect(data.user.onboardingCompleted, searchParams.get('redirect')))
       }
     } catch (err: any) {
       setPasskeyLoading(false)
@@ -156,7 +162,7 @@ function LoginContent() {
       if (err) return setError(err)
       if (data?.token) {
         login(data.token, data.user)
-        router.push(getPostLoginRedirect(data.user.onboardingCompleted))
+        router.push(getPostLoginRedirect(data.user.onboardingCompleted, searchParams.get('redirect')))
       }
       return
     }

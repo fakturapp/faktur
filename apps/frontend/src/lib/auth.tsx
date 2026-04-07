@@ -46,7 +46,20 @@ export function useAuth() {
   return useContext(AuthContext)
 }
 
-const publicPaths = ['/login', '/register', '/forgot-password', '/reset-password', '/verify-email', '/2fa', '/invite', '/legal', '/oauth', '/share', '/checkout']
+const publicPaths = [
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/reset-password',
+  '/verify-email',
+  '/2fa',
+  '/invite',
+  '/legal',
+  '/oauth/google',
+  '/oauth/error',
+  '/share',
+  '/checkout',
+]
 
 // Short-form checkout URL served by the dedicated checkout subdomain, e.g.
 // https://checkout.example.com/<token>/pay — the middleware rewrites these
@@ -90,7 +103,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (loading) return
 
     if (!user && !isPublicPath) {
-      router.replace('/login')
+      // Preserve the current URL (pathname + query) as a ?redirect=
+      // param so the login page can bounce us back after auth. Only
+      // relative paths go through so an attacker can't smuggle in an
+      // off-site redirect via a crafted link.
+      let target = '/login'
+      if (typeof window !== 'undefined') {
+        const current = window.location.pathname + window.location.search
+        if (current && current !== '/' && !current.startsWith('/login')) {
+          target = `/login?redirect=${encodeURIComponent(current)}`
+        }
+      }
+      router.replace(target)
       return
     }
 
