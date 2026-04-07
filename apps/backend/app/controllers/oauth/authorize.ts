@@ -3,6 +3,7 @@ import OauthApp from '#models/oauth/oauth_app'
 import OauthAuthorization from '#models/oauth/oauth_authorization'
 import oauthCodeService from '#services/oauth/oauth_code_service'
 import oauthWebhookService from '#services/oauth/oauth_webhook_service'
+import keyStoreWarmer from '#services/crypto/key_store_warmer'
 import { authorizeRequestValidator, consentSubmitValidator } from '#validators/oauth_validator'
 import { OAUTH_ERRORS } from '#services/oauth/oauth_constants'
 import { DateTime } from 'luxon'
@@ -116,6 +117,13 @@ export default class Authorize {
    * POST /oauth/authorize/consent
    * Final step of the consent screen — either mint a code or return a
    * deny redirect URL.
+   *
+   * Side effect: if the browser sent an `X-Vault-Key` header (the
+   * sessionKey wrapping the user's KEK), we warm the in-memory key
+   * store so the desktop app can immediately get a decrypted vault
+   * when it calls /oauth/exchange-session moments later. This is
+   * what makes 'connecter via Faktur Desktop' result in a fully
+   * decrypted session without ever asking for a password.
    */
   async consent({ auth, request, response }: HttpContext) {
     const user = auth.user
@@ -124,6 +132,20 @@ export default class Authorize {
         error: OAUTH_ERRORS.access_denied,
         error_description: 'User must be authenticated',
       })
+    }
+
+    // Best-effort warm-up of the server-side keyStore. Failures are
+    // silently ignored — the desktop will just end up with
+    // vaultLocked=true if the browser didn't have a warm vault.
+    const vaultKeyHeader = request.header('x-vault-key') || request.header('X-Vault-Key')
+    const currentTokenId = (user as any).currentAccessToken?.identifier
+    if (vaultKeyHeader && currentTokenId) {
+      await keyStoreWarmer.warmFromRequest(
+        user.id,
+        user.currentTeamId ?? null,
+        String(currentTokenId),
+        String(vaultKeyHeader)
+      )
     }
 
     const payload = await request.validateUsing(consentSubmitValidator)
