@@ -1,7 +1,7 @@
 import vine from '@vinejs/vine'
 
 const eventSchema = vine.object({
-  eventType: vine.enum(['page_view', 'feature_use', 'click', 'custom']),
+  eventType: vine.string().trim().maxLength(50),
   eventName: vine.string().trim().maxLength(100),
   pagePath: vine.string().trim().maxLength(255).optional(),
   pagePathFull: vine.string().trim().maxLength(2000).optional(),
@@ -11,7 +11,7 @@ const eventSchema = vine.object({
 })
 
 const errorSchema = vine.object({
-  errorType: vine.enum(['js_error', 'unhandled_rejection', 'api_error']),
+  errorType: vine.string().trim().maxLength(50),
   errorMessage: vine.string().trim().maxLength(255),
   errorMessageFull: vine.string().trim().maxLength(5000).optional(),
   stackTrace: vine.string().trim().maxLength(10000).optional(),
@@ -20,9 +20,9 @@ const errorSchema = vine.object({
 })
 
 const performanceSchema = vine.object({
-  metricName: vine.enum(['LCP', 'FID', 'CLS', 'INP', 'FCP', 'TTFB']),
+  metricName: vine.string().trim().maxLength(30),
   metricValue: vine.number().min(0),
-  rating: vine.enum(['good', 'needs-improvement', 'poor']),
+  rating: vine.string().trim().maxLength(30),
   pagePath: vine.string().trim().maxLength(255).optional(),
   connectionType: vine.string().trim().maxLength(20).optional(),
   timestamp: vine.string().trim(),
@@ -46,7 +46,7 @@ export const consentValidator = vine.compile(
   vine.object({
     consentAnalytics: vine.boolean(),
     consentEssential: vine.boolean(),
-    action: vine.enum(['accept_all', 'reject_analytics', 'update']),
+    action: vine.string().trim().maxLength(50),
     visitorId: vine.string().trim().maxLength(64),
   })
 )

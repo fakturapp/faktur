@@ -10,7 +10,7 @@ export const emailChangeValidator = vine.compile(
 export const securityVerifyValidator = vine.compile(
   vine.object({
     code: vine.string().trim(),
-    method: vine.enum(['email', 'totp', 'recovery']).optional(),
+    method: vine.string().trim().maxLength(30).optional(),
   })
 )
 
@@ -47,7 +47,7 @@ export const deletionConfirmValidator = vine.compile(
 export const deletionResolveTeamValidator = vine.compile(
   vine.object({
     teamId: vine.string().uuid(),
-    action: vine.enum(['delete', 'transfer', 'leave']),
+    action: vine.string().trim().maxLength(30),
     password: vine.string().optional(),
     transferToUserId: vine.string().uuid().optional(),
   })

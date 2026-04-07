@@ -7,7 +7,7 @@ export const createProductValidator = vine.compile(
     unitPrice: vine.number().min(0),
     vatRate: vine.string().trim().maxLength(10).optional(),
     unit: vine.string().trim().maxLength(50).optional(),
-    saleType: vine.enum(['service', 'product']).optional(),
+    saleType: vine.string().trim().maxLength(30).optional(),
     reference: vine.string().trim().maxLength(100).optional(),
   })
 )
@@ -19,7 +19,7 @@ export const updateProductValidator = vine.compile(
     unitPrice: vine.number().min(0).optional(),
     vatRate: vine.string().trim().maxLength(10).optional(),
     unit: vine.string().trim().maxLength(50).optional().nullable(),
-    saleType: vine.enum(['service', 'product']).optional().nullable(),
+    saleType: vine.string().trim().maxLength(30).optional().nullable(),
     reference: vine.string().trim().maxLength(100).optional().nullable(),
     isArchived: vine.boolean().optional(),
   })

@@ -9,14 +9,14 @@ const looseBool = vine.any().optional().transform((v) => {
 
 export const updateInvoiceSettingsValidator = vine.compile(
   vine.object({
-    billingType: vine.enum(['quick', 'detailed']).optional(),
+    billingType: vine.string().trim().maxLength(30).optional(),
     accentColor: vine
       .string()
       .trim()
       .regex(/^#[0-9a-fA-F]{6}$/)
       .optional(),
     paymentMethods: vine.array(vine.string().trim().maxLength(50)).optional(),
-    logoSource: vine.enum(['custom', 'company']).optional(),
+    logoSource: vine.string().trim().maxLength(30).optional(),
     customPaymentMethod: vine.string().trim().maxLength(255).optional(),
     template: vine.string().trim().maxLength(30).optional(),
     darkMode: looseBool.clone(),
@@ -40,7 +40,7 @@ export const updateInvoiceSettingsValidator = vine.compile(
     logoBorderRadius: vine.number().min(0).max(50).optional(),
     collaborationEnabled: looseBool.clone(),
     aiEnabled: looseBool.clone(),
-    aiProvider: vine.enum(['groq']).optional(),
+    aiProvider: vine.string().trim().maxLength(30).optional(),
     aiModel: vine.string().trim().maxLength(100).optional(),
   })
 )

@@ -2,13 +2,13 @@ import vine from '@vinejs/vine'
 
 export const sendEmailValidator = vine.compile(
   vine.object({
-    documentType: vine.enum(['invoice', 'quote', 'credit_note']),
+    documentType: vine.string().trim().maxLength(30),
     documentId: vine.string().trim(),
     emailAccountId: vine.string().trim(),
     to: vine.string().trim().email(),
     subject: vine.string().trim().minLength(1).maxLength(500),
     body: vine.string().trim().minLength(1),
-    emailType: vine.enum(['send', 'reminder']).optional(),
+    emailType: vine.string().trim().maxLength(30).optional(),
   })
 )
 
@@ -39,7 +39,7 @@ export const configureSmtpValidator = vine.compile(
 
 export const updateTemplateValidator = vine.compile(
   vine.object({
-    templateType: vine.enum(['invoice_send', 'quote_send', 'credit_note_send']),
+    templateType: vine.string().trim().maxLength(50),
     subject: vine.string().trim().maxLength(500),
     body: vine.string().trim().maxLength(5000),
   })
