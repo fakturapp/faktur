@@ -37,6 +37,10 @@ const PasskeyRegisterVerify = () => import('#controllers/account/passkeys/regist
 const PasskeyList = () => import('#controllers/account/passkeys/list')
 const PasskeyDelete = () => import('#controllers/account/passkeys/delete')
 
+const ListUserOauthApps = () => import('#controllers/account/oauth_apps/list')
+const RevokeUserOauthApp = () => import('#controllers/account/oauth_apps/revoke_app')
+const RevokeUserOauthSession = () => import('#controllers/account/oauth_apps/revoke_session')
+
 // Public routes
 router.get(API_PREFIX + '/avatars/:filename', [ServeAvatar, 'handle'])
 
@@ -79,6 +83,11 @@ router
     router.post('/passkeys/register-verify', [PasskeyRegisterVerify, 'handle'])
     router.get('/passkeys', [PasskeyList, 'handle'])
     router.delete('/passkeys/:id', [PasskeyDelete, 'handle'])
+
+    // Connected OAuth applications (user-facing, not admin)
+    router.get('/oauth-apps', [ListUserOauthApps, 'handle'])
+    router.post('/oauth-apps/:authorizationId/revoke', [RevokeUserOauthApp, 'handle'])
+    router.post('/oauth-apps/sessions/:tokenId/revoke', [RevokeUserOauthSession, 'handle'])
   })
   .prefix(API_PREFIX + '/account')
   .use(middleware.auth())

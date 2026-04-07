@@ -61,6 +61,8 @@ const AVAILABLE_SCOPES = [
   { id: 'offline_access', label: 'Accès hors-ligne', description: 'Refresh tokens' },
 ]
 
+const ALL_SCOPE_IDS = AVAILABLE_SCOPES.map((s) => s.id)
+
 const AVAILABLE_EVENTS = [
   'session.revoked',
   'token.issued',
@@ -658,6 +660,7 @@ function CreateAppModal({
     websiteUrl: '',
     redirectUris: 'http://127.0.0.1/callback',
     scopes: ['profile', 'invoices:read', 'offline_access'] as string[],
+    allScopes: false,
     kind: 'desktop' as 'desktop' | 'web' | 'cli',
     webhookUrl: '',
     webhookEvents: [] as string[],
@@ -671,6 +674,7 @@ function CreateAppModal({
       websiteUrl: '',
       redirectUris: 'http://127.0.0.1/callback',
       scopes: ['profile', 'invoices:read', 'offline_access'],
+      allScopes: false,
       kind: 'desktop',
       webhookUrl: '',
       webhookEvents: [],
@@ -707,7 +711,8 @@ function CreateAppModal({
       toast('Au moins un redirect URI est requis', 'error')
       return
     }
-    if (form.scopes.length === 0) {
+    const scopes = form.allScopes ? ALL_SCOPE_IDS : form.scopes
+    if (scopes.length === 0) {
       toast('Au moins un scope est requis', 'error')
       return
     }
@@ -718,7 +723,7 @@ function CreateAppModal({
       description: form.description.trim() || null,
       websiteUrl: form.websiteUrl.trim() || null,
       redirectUris: redirects,
-      scopes: form.scopes,
+      scopes,
       kind: form.kind,
       isFirstParty: form.isFirstParty,
     }
@@ -836,13 +841,46 @@ function CreateAppModal({
           <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">
             Scopes *
           </label>
-          <div className="space-y-1">
+
+          {/* All scopes toggle — equivalent to a full login */}
+          <button
+            onClick={() => setForm({ ...form, allScopes: !form.allScopes })}
+            className={cn(
+              'w-full flex items-start gap-3 rounded-lg border-2 p-3 transition-all text-left mb-2',
+              form.allScopes
+                ? 'border-amber-500/60 bg-amber-500/5'
+                : 'border-border bg-card hover:bg-muted/40'
+            )}
+          >
+            <div
+              className={cn(
+                'h-5 w-5 shrink-0 rounded border-2 flex items-center justify-center mt-0.5 transition-colors',
+                form.allScopes ? 'bg-amber-500 border-amber-500' : 'border-muted-foreground/40'
+              )}
+            >
+              {form.allScopes && <Check className="h-3 w-3 text-white" />}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-semibold text-foreground flex items-center gap-2">
+                Tous les scopes (accès complet)
+                <Badge variant="warning" className="text-[9px]">RECOMMANDÉ DESKTOP</Badge>
+              </p>
+              <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug">
+                L&apos;application aura les mêmes droits qu&apos;un login classique au compte.
+                Idéal pour un client de bureau officiel qui sert de coque au dashboard.
+              </p>
+            </div>
+          </button>
+
+          {/* Fine-grained scope list, greyed out when allScopes is on */}
+          <div className={cn('space-y-1 transition-opacity', form.allScopes && 'opacity-40 pointer-events-none')}>
             {AVAILABLE_SCOPES.map((scope) => {
-              const selected = form.scopes.includes(scope.id)
+              const selected = form.allScopes || form.scopes.includes(scope.id)
               return (
                 <button
                   key={scope.id}
                   onClick={() => toggleScope(scope.id)}
+                  disabled={form.allScopes}
                   className={cn(
                     'w-full flex items-start gap-3 rounded-lg border p-2.5 transition-all text-left',
                     selected

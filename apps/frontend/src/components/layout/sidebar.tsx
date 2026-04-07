@@ -185,6 +185,7 @@ const accountNav: NavItem[] = [
     ],
   },
   { href: '/dashboard/account/sessions', label: 'Sessions', icon: Monitor },
+  { href: '/dashboard/account/oauth', label: 'Applications connectées', icon: ShieldCheck },
   { href: '/dashboard/account/export', label: 'Exportation', icon: Download },
   { href: '/dashboard/account/delete', label: 'Supprimer le compte', icon: Trash2 },
 ]
