@@ -114,14 +114,14 @@ function StepBar({ current }: { current: number }) {
     <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-center gap-2 mb-6">
       {steps.map((label, i) => (
         <div key={label} className="flex items-center gap-2">
-          {i > 0 && <div className={`h-px w-6 sm:w-10 transition-colors duration-500 ${i <= current ? 'bg-indigo-500' : 'bg-zinc-200 dark:bg-white/10'}`} />}
+          {i > 0 && <div className={`h-px w-6 sm:w-10 transition-colors duration-500 ${i <= current ? 'bg-primary' : 'bg-border'}`} />}
           <div className="flex items-center gap-1.5">
             <div className={`flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold transition-all duration-500 ${
-              i < current ? 'bg-emerald-500/20 text-emerald-400' : i === current ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30' : 'bg-zinc-100 text-zinc-400 dark:bg-white/5 dark:text-white/30'
+              i < current ? 'bg-emerald-500/15 text-emerald-500' : i === current ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' : 'bg-muted text-muted-foreground'
             }`}>
               {i < current ? <IconCheck className="h-3 w-3" /> : i + 1}
             </div>
-            <span className={`text-[11px] font-medium hidden sm:inline transition-colors duration-500 ${i === current ? 'text-zinc-900 dark:text-white' : 'text-zinc-400 dark:text-white/30'}`}>{label}</span>
+            <span className={`text-[11px] font-medium hidden sm:inline transition-colors duration-500 ${i === current ? 'text-foreground' : 'text-muted-foreground/70'}`}>{label}</span>
           </div>
         </div>
       ))}
@@ -224,8 +224,8 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
   function DlBtn() {
     if (!d?.hasPdf) return null
     return (
-      <button onClick={dl} disabled={dling} className="w-full flex items-center justify-center gap-2.5 h-11 rounded-xl border border-white/[0.06] bg-white/[0.03] text-sm text-white/50 hover:text-white/80 hover:bg-white/[0.06] hover:border-white/[0.1] transition-all disabled:opacity-50">
-        {dling ? <Spinner className="text-white/70" /> : <IconDownload className="h-4 w-4" />}
+      <button onClick={dl} disabled={dling} className="w-full flex items-center justify-center gap-2.5 h-11 rounded-xl border border-border bg-muted/40 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all disabled:opacity-50">
+        {dling ? <Spinner className="text-muted-foreground" /> : <IconDownload className="h-4 w-4" />}
         {dling ? 'Téléchargement...' : 'Télécharger la facture'}
       </button>
     )
@@ -240,54 +240,54 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
         {/* Loading */}
         {step === 'loading' && (
           <motion.div key="l" {...slide} className="flex flex-col items-center py-28">
-            <Spinner size="lg" className="text-indigo-400" />
-            <p className="mt-5 text-sm text-zinc-400 dark:text-zinc-400 dark:text-white/40 font-medium">Chargement du paiement...</p>
+            <Spinner size="lg" className="text-primary" />
+            <p className="mt-5 text-sm text-muted-foreground font-medium">Chargement du paiement...</p>
           </motion.div>
         )}
 
         {/* Error */}
         {step === 'error' && (
-          <motion.div key="e" {...slide} className="rounded-2xl border border-zinc-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.03] backdrop-blur-2xl p-8 shadow-xl dark:shadow-2xl">
+          <motion.div key="e" {...slide} className="rounded-2xl border border-border bg-card p-8 shadow-sm">
             <div className="flex flex-col items-center text-center">
               <div className="h-16 w-16 rounded-2xl bg-red-500/10 flex items-center justify-center mb-5">
                 <IconAlert className="h-8 w-8 text-red-400" />
               </div>
-              <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">Lien introuvable</h2>
-              <p className="text-sm text-zinc-500 dark:text-white/50 leading-relaxed">{err}</p>
+              <h2 className="text-lg font-semibold text-foreground mb-2">Lien introuvable</h2>
+              <p className="text-sm text-muted-foreground leading-relaxed">{err}</p>
             </div>
           </motion.div>
         )}
 
         {/* Expired */}
         {step === 'expired' && (
-          <motion.div key="x" {...slide} className="rounded-2xl border border-zinc-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.03] backdrop-blur-2xl p-8 shadow-xl dark:shadow-2xl">
+          <motion.div key="x" {...slide} className="rounded-2xl border border-border bg-card p-8 shadow-sm">
             <div className="flex flex-col items-center text-center">
               <div className="h-16 w-16 rounded-2xl bg-amber-500/10 flex items-center justify-center mb-5">
                 <IconClock className="h-8 w-8 text-amber-400" />
               </div>
-              <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">Lien expiré</h2>
-              <p className="text-sm text-zinc-500 dark:text-white/50 leading-relaxed">Ce lien de paiement a expiré. Contactez l&apos;émetteur de la facture pour obtenir un nouveau lien.</p>
+              <h2 className="text-lg font-semibold text-foreground mb-2">Lien expiré</h2>
+              <p className="text-sm text-muted-foreground leading-relaxed">Ce lien de paiement a expiré. Contactez l&apos;émetteur de la facture pour obtenir un nouveau lien.</p>
             </div>
           </motion.div>
         )}
 
         {/* Password */}
         {step === 'password' && (
-          <motion.div key="p" {...slide} className="rounded-2xl border border-zinc-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.03] backdrop-blur-2xl p-8 shadow-xl dark:shadow-2xl">
+          <motion.div key="p" {...slide} className="rounded-2xl border border-border bg-card p-8 shadow-sm">
             <div className="flex flex-col items-center text-center mb-7">
-              <div className="h-16 w-16 rounded-2xl bg-indigo-500/10 flex items-center justify-center mb-5">
-                <IconLock className="h-8 w-8 text-indigo-400" />
+              <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-5">
+                <IconLock className="h-8 w-8 text-primary" />
               </div>
-              <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">Accès protégé</h2>
-              <p className="text-sm text-zinc-500 dark:text-white/50 mt-1.5">Ce lien est protégé. Entrez le mot de passe communiqué par l&apos;émetteur.</p>
+              <h2 className="text-lg font-semibold text-foreground">Accès protégé</h2>
+              <p className="text-sm text-muted-foreground mt-1.5">Ce lien est protégé. Entrez le mot de passe communiqué par l&apos;émetteur.</p>
             </div>
             <div className="space-y-3">
               <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && submitPw()} placeholder="Mot de passe" autoFocus
-                className="w-full h-12 rounded-xl border border-zinc-300 dark:border-white/[0.08] bg-zinc-50 dark:bg-white/[0.04] px-4 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-white/25 outline-none focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/10 transition-all" />
+                className="w-full h-12 rounded-xl border border-border bg-muted/50 px-4 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/15 transition-all" />
               {pwErr && <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="text-sm text-red-400 flex items-center gap-1.5"><IconAlert className="h-3.5 w-3.5" /> {pwErr}</motion.p>}
               <button onClick={submitPw} disabled={busy || !pw}
-                className="w-full h-12 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold transition-all disabled:opacity-40 shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2">
-                {busy ? <Spinner className="text-white" /> : 'Accéder'}
+                className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-semibold transition-all disabled:opacity-40 shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+                {busy ? <Spinner className="text-primary-foreground" /> : 'Accéder'}
               </button>
             </div>
           </motion.div>
@@ -295,55 +295,55 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
 
         {/* Method */}
         {step === 'method' && d && (
-          <motion.div key="m" {...slide} className="rounded-2xl border border-zinc-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.03] backdrop-blur-2xl p-8 shadow-xl dark:shadow-2xl">
+          <motion.div key="m" {...slide} className="rounded-2xl border border-border bg-card p-8 shadow-sm">
             <div className="text-center mb-8">
-              {d.companyName && <p className="text-[11px] font-semibold text-zinc-400 dark:text-white/30 uppercase tracking-[0.15em] mb-3">{d.companyName}</p>}
+              {d.companyName && <p className="text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-[0.15em] mb-3">{d.companyName}</p>}
               <motion.p initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.1, type: 'spring', bounce: 0.3 }}
-                className="text-4xl font-bold text-zinc-900 dark:text-white tracking-tight">{amt}</motion.p>
-              <p className="text-sm text-zinc-400 dark:text-white/40 mt-2">Facture {d.invoiceNumber}</p>
+                className="text-4xl font-bold text-foreground tracking-tight">{amt}</motion.p>
+              <p className="text-sm text-muted-foreground mt-2">Facture {d.invoiceNumber}</p>
             </div>
 
-            <p className="text-[10px] font-bold text-zinc-400 dark:text-white/25 uppercase tracking-[0.2em] mb-3">Mode de paiement</p>
+            <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em] mb-3">Mode de paiement</p>
 
             <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }} onClick={pickBank} disabled={busy}
-              className="w-full flex items-center gap-4 p-4 rounded-xl border border-zinc-200 dark:border-white/[0.06] bg-zinc-50 dark:bg-white/[0.03] hover:bg-indigo-50 dark:hover:bg-indigo-500/5 hover:border-indigo-300 dark:hover:border-indigo-500/20 transition-all text-left group mb-2.5">
-              <div className="h-11 w-11 rounded-xl bg-indigo-500/10 flex items-center justify-center shrink-0 group-hover:bg-indigo-500/15 transition-colors">
-                <IconBank className="h-5 w-5 text-indigo-400" />
+              className="w-full flex items-center gap-4 p-4 rounded-xl border border-border bg-muted/40 hover:bg-primary/5 hover:border-primary/30 transition-all text-left group mb-2.5">
+              <div className="h-11 w-11 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/15 transition-colors">
+                <IconBank className="h-5 w-5 text-primary" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-semibold text-zinc-900 dark:text-white">Virement bancaire</p>
-                <p className="text-[11px] text-zinc-400 dark:text-white/35 mt-0.5">Coordonnées bancaires fournies</p>
+                <p className="text-sm font-semibold text-foreground">Virement bancaire</p>
+                <p className="text-[11px] text-muted-foreground/80 mt-0.5">Coordonnées bancaires fournies</p>
               </div>
-              {busy ? <Spinner className="text-indigo-400" /> : (
-                <svg className="h-4 w-4 text-zinc-300 dark:text-white/20 group-hover:text-zinc-500 dark:group-hover:text-white/40 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6"/></svg>
+              {busy ? <Spinner className="text-primary" /> : (
+                <svg className="h-4 w-4 text-muted-foreground/50 group-group-hover:text-muted-foreground transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6"/></svg>
               )}
             </motion.button>
 
             {d.hasStripe ? (
               <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }} onClick={() => setStep('stripe')}
-                className="w-full flex items-center gap-4 p-4 rounded-xl border border-zinc-200 dark:border-white/[0.06] bg-zinc-50 dark:bg-white/[0.03] hover:bg-indigo-50 dark:hover:bg-indigo-500/5 hover:border-indigo-300 dark:hover:border-indigo-500/20 transition-all text-left group mb-6">
+                className="w-full flex items-center gap-4 p-4 rounded-xl border border-border bg-muted/40 hover:bg-primary/5 hover:border-primary/30 transition-all text-left group mb-6">
                 <div className="h-11 w-11 rounded-xl bg-violet-500/10 flex items-center justify-center shrink-0 group-hover:bg-violet-500/15 transition-colors">
                   <svg className="h-5 w-5 text-violet-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-zinc-900 dark:text-white">Carte bancaire</p>
-                  <p className="text-[11px] text-zinc-400 dark:text-white/35 mt-0.5">Paiement sécurisé par Stripe</p>
+                  <p className="text-sm font-semibold text-foreground">Carte bancaire</p>
+                  <p className="text-[11px] text-muted-foreground/80 mt-0.5">Paiement sécurisé par Stripe</p>
                 </div>
-                <svg className="h-4 w-4 text-zinc-300 dark:text-white/20 group-hover:text-zinc-500 dark:group-hover:text-white/40 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6"/></svg>
+                <svg className="h-4 w-4 text-muted-foreground/50 group-group-hover:text-muted-foreground transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6"/></svg>
               </motion.button>
             ) : (
-              <div className="flex items-center gap-4 p-4 rounded-xl border border-zinc-100 dark:border-white/[0.04] opacity-25 cursor-not-allowed mb-6">
-                <div className="h-11 w-11 rounded-xl bg-zinc-100 dark:bg-white/[0.04] flex items-center justify-center shrink-0">
-                  <svg className="h-5 w-5 text-zinc-400 dark:text-white/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+              <div className="flex items-center gap-4 p-4 rounded-xl border border-border/50 opacity-25 cursor-not-allowed mb-6">
+                <div className="h-11 w-11 rounded-xl bg-muted/50 flex items-center justify-center shrink-0">
+                  <svg className="h-5 w-5 text-muted-foreground/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
                 </div>
-                <div className="flex-1"><p className="text-sm text-zinc-400 dark:text-white/40">Carte bancaire</p><p className="text-[11px] text-zinc-300 dark:text-white/20">Non disponible</p></div>
-                <IconLock className="h-3.5 w-3.5 text-zinc-300 dark:text-white/15" />
+                <div className="flex-1"><p className="text-sm text-muted-foreground">Carte bancaire</p><p className="text-[11px] text-muted-foreground/50">Non disponible</p></div>
+                <IconLock className="h-3.5 w-3.5 text-muted-foreground/40" />
               </div>
             )}
 
             <DlBtn />
 
-            <div className="mt-6 flex items-center justify-center gap-2 text-zinc-400 dark:text-white/20">
+            <div className="mt-6 flex items-center justify-center gap-2 text-muted-foreground/50">
               <IconShield className="h-3.5 w-3.5" /><span className="text-[11px] font-medium">Paiement sécurisé — données chiffrées</span>
             </div>
           </motion.div>
@@ -351,51 +351,51 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
 
         {/* IBAN */}
         {step === 'iban' && d && (
-          <motion.div key="i" {...slide} className="rounded-2xl border border-zinc-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.03] backdrop-blur-2xl p-8 shadow-xl dark:shadow-2xl">
+          <motion.div key="i" {...slide} className="rounded-2xl border border-border bg-card p-8 shadow-sm">
             <div className="text-center mb-6">
-              <div className="h-12 w-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center mx-auto mb-4"><IconBank className="h-6 w-6 text-indigo-400" /></div>
-              <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">Virement bancaire</h2>
-              <p className="text-2xl font-bold text-zinc-900 dark:text-white mt-1">{amt}</p>
-              <p className="text-sm text-zinc-400 dark:text-white/40 mt-0.5">Facture {d.invoiceNumber}</p>
+              <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4"><IconBank className="h-6 w-6 text-primary" /></div>
+              <h2 className="text-lg font-semibold text-foreground">Virement bancaire</h2>
+              <p className="text-2xl font-bold text-foreground mt-1">{amt}</p>
+              <p className="text-sm text-muted-foreground mt-0.5">Facture {d.invoiceNumber}</p>
             </div>
 
             {ib?.iban ? (
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="space-y-4">
-                <div className="rounded-xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.06] p-5">
+                <div className="rounded-xl bg-muted/40 border border-border p-5">
                   <div className="flex items-center gap-2 mb-4">
-                    <svg className="h-4 w-4 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                    <span className="text-[10px] font-bold text-zinc-400 dark:text-white/25 uppercase tracking-[0.2em]">Coordonnées bancaires</span>
+                    <svg className="h-4 w-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em]">Coordonnées bancaires</span>
                   </div>
-                  {ib.bankName && <div className="mb-4"><p className="text-[10px] text-zinc-400 dark:text-white/20 uppercase tracking-wider mb-1">Banque</p><p className="text-sm font-medium text-zinc-900 dark:text-white">{ib.bankName}</p></div>}
+                  {ib.bankName && <div className="mb-4"><p className="text-[10px] text-muted-foreground/50 uppercase tracking-wider mb-1">Banque</p><p className="text-sm font-medium text-foreground">{ib.bankName}</p></div>}
                   <div className="mb-4">
-                    <p className="text-[10px] text-zinc-400 dark:text-white/20 uppercase tracking-wider mb-1">IBAN</p>
+                    <p className="text-[10px] text-muted-foreground/50 uppercase tracking-wider mb-1">IBAN</p>
                     <div className="flex items-center gap-2">
-                      <p className="text-[15px] font-mono font-semibold text-zinc-900 dark:text-white tracking-[0.15em] break-all leading-relaxed">{ib.iban}</p>
+                      <p className="text-[15px] font-mono font-semibold text-foreground tracking-[0.15em] break-all leading-relaxed">{ib.iban}</p>
                       <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={cp}
-                        className="shrink-0 h-8 w-8 rounded-lg flex items-center justify-center text-zinc-400 dark:text-white/30 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-all" title="Copier">
+                        className="shrink-0 h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground/70 hover:text-foreground hover:bg-muted/60 transition-all" title="Copier">
                         {copied ? <IconCheck className="h-4 w-4 text-emerald-400" /> : <IconCopy className="h-4 w-4" />}
                       </motion.button>
                     </div>
                   </div>
-                  {ib.bic && <div><p className="text-[10px] text-zinc-400 dark:text-white/20 uppercase tracking-wider mb-1">BIC</p><p className="text-sm font-mono font-medium text-zinc-900 dark:text-white tracking-wider">{ib.bic}</p></div>}
+                  {ib.bic && <div><p className="text-[10px] text-muted-foreground/50 uppercase tracking-wider mb-1">BIC</p><p className="text-sm font-mono font-medium text-foreground tracking-wider">{ib.bic}</p></div>}
                 </div>
-                <div className="rounded-xl bg-indigo-500/5 border border-indigo-500/10 p-3.5">
-                  <p className="text-xs text-indigo-300/70 leading-relaxed">Indiquez <strong className="text-indigo-200">{d.invoiceNumber}</strong> en référence du virement.</p>
+                <div className="rounded-xl bg-primary/5 border border-primary/20 p-3.5">
+                  <p className="text-xs text-primary leading-relaxed">Indiquez <strong className="text-primary">{d.invoiceNumber}</strong> en référence du virement.</p>
                 </div>
               </motion.div>
             ) : (
-              <div className="rounded-xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.06] p-5 text-center">
-                <p className="text-sm text-zinc-400 dark:text-white/40">Contactez l&apos;émetteur pour les coordonnées bancaires.</p>
+              <div className="rounded-xl bg-muted/40 border border-border p-5 text-center">
+                <p className="text-sm text-muted-foreground">Contactez l&apos;émetteur pour les coordonnées bancaires.</p>
               </div>
             )}
 
             <div className="flex gap-3 mt-6">
               <motion.button whileTap={{ scale: 0.97 }} onClick={() => setStep('method')}
-                className="flex-1 h-11 rounded-xl border border-zinc-200 dark:border-white/[0.06] text-sm font-medium text-zinc-500 dark:text-white/50 hover:text-zinc-900 dark:hover:text-white hover:border-zinc-400 dark:hover:border-white/[0.1] transition-all flex items-center justify-center gap-2">
+                className="flex-1 h-11 rounded-xl border border-border text-sm font-medium text-muted-foreground hover:text-foreground hover:border-border transition-all flex items-center justify-center gap-2">
                 <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6"/></svg> Retour
               </motion.button>
               <motion.button whileTap={{ scale: 0.97 }} onClick={() => setStep('confirm')}
-                className="flex-1 h-11 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-sm font-semibold text-white transition-all shadow-lg shadow-indigo-600/20">
+                className="flex-1 h-11 rounded-xl bg-primary hover:bg-primary/90 text-sm font-semibold text-primary-foreground transition-all shadow-lg shadow-primary/20">
                 J&apos;ai payé
               </motion.button>
             </div>
@@ -405,7 +405,7 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
 
         {/* Stripe */}
         {step === 'stripe' && d && (
-          <motion.div key="s" {...slide} className="rounded-2xl border border-zinc-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.03] backdrop-blur-2xl p-8 shadow-xl dark:shadow-2xl">
+          <motion.div key="s" {...slide} className="rounded-2xl border border-border bg-card p-8 shadow-sm">
             <StripePaymentForm
               token={token}
               amount={amt}
@@ -414,7 +414,7 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
               onError={() => {}}
             />
             <motion.button whileTap={{ scale: 0.97 }} onClick={() => setStep('method')}
-              className="w-full mt-4 h-10 rounded-xl border border-zinc-200 dark:border-white/[0.06] text-sm font-medium text-zinc-500 dark:text-white/50 hover:text-zinc-900 dark:hover:text-white transition-all flex items-center justify-center gap-2">
+              className="w-full mt-4 h-10 rounded-xl border border-border text-sm font-medium text-muted-foreground hover:text-foreground transition-all flex items-center justify-center gap-2">
               <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6"/></svg> Retour
             </motion.button>
           </motion.div>
@@ -422,22 +422,22 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
 
         {/* Confirm */}
         {step === 'confirm' && (
-          <motion.div key="c" {...slide} className="rounded-2xl border border-zinc-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.03] backdrop-blur-2xl p-8 shadow-xl dark:shadow-2xl">
+          <motion.div key="c" {...slide} className="rounded-2xl border border-border bg-card p-8 shadow-sm">
             <div className="flex flex-col items-center text-center mb-6">
               <div className="h-16 w-16 rounded-2xl bg-amber-500/10 flex items-center justify-center mb-5"><IconAlert className="h-8 w-8 text-amber-400" /></div>
-              <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">Confirmer le paiement</h2>
+              <h2 className="text-lg font-semibold text-foreground">Confirmer le paiement</h2>
             </div>
             <div className="rounded-xl bg-amber-500/5 border border-amber-500/10 p-4 mb-6">
-              <p className="text-xs text-amber-200/60 leading-relaxed text-center">
+              <p className="text-xs text-amber-700 dark:text-amber-300 leading-relaxed text-center">
                 En confirmant, vous ne pourrez plus revenir en arrière ni consulter les informations bancaires. L&apos;émetteur de la facture sera notifié.
               </p>
             </div>
             <div className="flex gap-3">
               <motion.button whileTap={{ scale: 0.97 }} onClick={() => setStep('iban')}
-                className="flex-1 h-11 rounded-xl border border-zinc-200 dark:border-white/[0.06] text-sm font-medium text-zinc-500 dark:text-white/50 hover:text-zinc-900 dark:hover:text-white transition-all">Annuler</motion.button>
+                className="flex-1 h-11 rounded-xl border border-border text-sm font-medium text-muted-foreground hover:text-foreground transition-all">Annuler</motion.button>
               <motion.button whileTap={{ scale: 0.97 }} onClick={pay} disabled={busy}
-                className="flex-1 h-11 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-sm font-semibold text-white transition-all disabled:opacity-40 shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2">
-                {busy ? <Spinner className="text-white" /> : 'Confirmer'}
+                className="flex-1 h-11 rounded-xl bg-primary hover:bg-primary/90 text-sm font-semibold text-primary-foreground transition-all disabled:opacity-40 shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+                {busy ? <Spinner className="text-primary-foreground" /> : 'Confirmer'}
               </motion.button>
             </div>
           </motion.div>
@@ -445,22 +445,22 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
 
         {/* Pending */}
         {step === 'pending' && d && (
-          <motion.div key="w" {...slide} className="rounded-2xl border border-zinc-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.03] backdrop-blur-2xl p-8 shadow-xl dark:shadow-2xl">
+          <motion.div key="w" {...slide} className="rounded-2xl border border-border bg-card p-8 shadow-sm">
             <div className="flex flex-col items-center text-center">
               <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', bounce: 0.5 }}
-                className="h-16 w-16 rounded-2xl bg-indigo-500/10 flex items-center justify-center mb-5"><IconClock className="h-8 w-8 text-indigo-400" /></motion.div>
-              <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">Paiement envoyé</h2>
-              <p className="text-sm text-zinc-500 dark:text-white/50 leading-relaxed mb-2">
-                Facture <strong className="text-zinc-900 dark:text-white">{d.invoiceNumber}</strong> le paiement a été signalé et est en attente de confirmation par l&apos;émetteur.
+                className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-5"><IconClock className="h-8 w-8 text-primary" /></motion.div>
+              <h2 className="text-lg font-semibold text-foreground mb-2">Paiement envoyé</h2>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-2">
+                Facture <strong className="text-foreground">{d.invoiceNumber}</strong> le paiement a été signalé et est en attente de confirmation par l&apos;émetteur.
               </p>
               {d.maskedEmail && (
-                <div className="flex items-center gap-2 text-zinc-400 dark:text-white/30 mb-6">
+                <div className="flex items-center gap-2 text-muted-foreground/70 mb-6">
                   <IconMail className="h-3.5 w-3.5" />
-                  <p className="text-xs">Vous serez informé par mail à <span className="text-zinc-700 dark:text-white/50 font-mono">{d.maskedEmail}</span></p>
+                  <p className="text-xs">Vous serez informé par mail à <span className="text-foreground/70 font-mono">{d.maskedEmail}</span></p>
                 </div>
               )}
               <DlBtn />
-              <div className="flex items-center gap-2 text-zinc-400 dark:text-white/20 mt-4">
+              <div className="flex items-center gap-2 text-muted-foreground/50 mt-4">
                 <IconClock className="h-3 w-3" />
                 <p className="text-[10px]">Ce lien s&apos;autodétruira dans 5 minutes</p>
               </div>
@@ -470,21 +470,21 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
 
         {/* Done */}
         {step === 'done' && d && (
-          <motion.div key="d" {...slide} className="rounded-2xl border border-emerald-500/10 bg-white/[0.03] backdrop-blur-2xl p-8 shadow-2xl">
+          <motion.div key="d" {...slide} className="rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 via-card to-card p-8 shadow-sm">
             <div className="flex flex-col items-center text-center">
               <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', bounce: 0.5, delay: 0.1 }}
                 className="h-16 w-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-5"><IconCheck className="h-8 w-8 text-emerald-400" /></motion.div>
-              <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">Paiement confirmé</h2>
-              <p className="text-sm text-zinc-500 dark:text-white/50 leading-relaxed mb-2">
-                Le paiement de la facture <strong className="text-zinc-900 dark:text-white">{d.invoiceNumber}</strong> a été confirmé par l&apos;émetteur. Tout est en ordre.
+              <h2 className="text-lg font-semibold text-foreground mb-2">Paiement confirmé</h2>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-2">
+                Le paiement de la facture <strong className="text-foreground">{d.invoiceNumber}</strong> a été confirmé par l&apos;émetteur. Tout est en ordre.
               </p>
               {d.maskedEmail && (
-                <div className="flex items-center gap-2 text-zinc-400 dark:text-white/30">
+                <div className="flex items-center gap-2 text-muted-foreground/70">
                   <IconMail className="h-3.5 w-3.5" />
-                  <p className="text-xs">Une confirmation a été envoyée à <span className="text-zinc-700 dark:text-white/50 font-mono">{d.maskedEmail}</span></p>
+                  <p className="text-xs">Une confirmation a été envoyée à <span className="text-foreground/70 font-mono">{d.maskedEmail}</span></p>
                 </div>
               )}
-              <div className="flex items-center gap-2 text-zinc-400 dark:text-white/20 mt-4">
+              <div className="flex items-center gap-2 text-muted-foreground/50 mt-4">
                 <IconClock className="h-3 w-3" />
                 <p className="text-[10px]">Ce lien s&apos;autodétruira dans 5 minutes</p>
               </div>

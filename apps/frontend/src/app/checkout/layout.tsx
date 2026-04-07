@@ -2,28 +2,29 @@
 
 export default function CheckoutLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="dark min-h-screen flex flex-col bg-zinc-950 text-white">
+    <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
-      <header className="py-6 text-center">
-        <span className="text-lg font-bold tracking-tight text-white">Faktur</span>
+      <header className="py-6 px-6 flex items-center justify-center">
+        <div className="flex items-center gap-2.5">
+          <img src="/logo.svg" alt="Faktur" className="h-8 w-8 drop-shadow-sm" />
+          <span className="text-lg font-semibold tracking-tight text-foreground font-lexend">Faktur</span>
+        </div>
       </header>
 
       {/* Main */}
-      <main className="flex-1 flex items-start justify-center px-4">
-        <div className="w-full max-w-[440px]">
-          {children}
-        </div>
+      <main className="flex-1 flex items-start justify-center px-4 pb-10">
+        <div className="w-full max-w-[480px]">{children}</div>
       </main>
 
       {/* Footer */}
-      <footer className="py-5 text-center">
-        <p className="text-[11px] text-white/20">
+      <footer className="py-6 text-center border-t border-border/50">
+        <p className="text-[11px] text-muted-foreground">
           Propulsé par{' '}
           <a
             href="https://fakturapp.cc"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-indigo-400/60 hover:text-indigo-400 transition-colors font-medium"
+            className="text-primary hover:underline font-medium transition-colors"
           >
             Faktur
           </a>
