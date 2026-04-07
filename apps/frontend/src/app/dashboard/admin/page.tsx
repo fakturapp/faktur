@@ -7,7 +7,7 @@ import { motion } from 'framer-motion'
 import { api } from '@/lib/api'
 import { Spinner } from '@/components/ui/spinner'
 import { cn } from '@/lib/utils'
-import { Star, Bug, MessageSquare } from 'lucide-react'
+import { Star, Bug, MessageSquare, ShieldCheck } from 'lucide-react'
 
 interface FeedbackItem {
   id: string
@@ -31,6 +31,7 @@ export default function AdminOverviewPage() {
   const router = useRouter()
   const [feedbacks, setFeedbacks] = useState<FeedbackItem[]>([])
   const [bugReports, setBugReports] = useState<BugReportItem[]>([])
+  const [oauthStats, setOauthStats] = useState<{ apps: number; sessions: number } | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -41,9 +42,16 @@ export default function AdminOverviewPage() {
     Promise.all([
       api.get<{ feedbacks: FeedbackItem[] }>('/admin/feedbacks'),
       api.get<{ bugReports: BugReportItem[] }>('/admin/bug-reports'),
-    ]).then(([fb, br]) => {
+      api.get<{ apps: Array<{ isActive: boolean; activeSessions: number }> }>('/admin/oauth-apps'),
+    ]).then(([fb, br, oa]) => {
       if (fb.data?.feedbacks) setFeedbacks(fb.data.feedbacks)
       if (br.data?.bugReports) setBugReports(br.data.bugReports)
+      if (oa.data?.apps) {
+        setOauthStats({
+          apps: oa.data.apps.filter((a) => a.isActive).length,
+          sessions: oa.data.apps.reduce((sum, a) => sum + (a.activeSessions || 0), 0),
+        })
+      }
       setLoading(false)
     })
   }, [user, router])
@@ -70,7 +78,7 @@ export default function AdminOverviewPage() {
       ) : (
         <>
           {/* Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -121,6 +129,29 @@ export default function AdminOverviewPage() {
                 <div>
                   <p className="text-2xl font-bold text-foreground">{openBugs}</p>
                   <p className="text-xs text-muted-foreground">Bugs ouverts</p>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              className="rounded-xl border border-border bg-card p-5 cursor-pointer hover:border-indigo-500/30 transition-colors"
+              onClick={() => router.push('/dashboard/admin/oauth-apps')}
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-indigo-500/10">
+                  <ShieldCheck className="h-5 w-5 text-indigo-500" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-foreground">
+                    {oauthStats?.apps ?? 0}
+                    {oauthStats && oauthStats.sessions > 0 && (
+                      <span className="text-sm text-muted-foreground font-medium"> · {oauthStats.sessions} session{oauthStats.sessions !== 1 ? 's' : ''}</span>
+                    )}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Applications OAuth</p>
                 </div>
               </div>
             </motion.div>

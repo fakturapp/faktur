@@ -525,6 +525,11 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
                 pathname={pathname}
                 collapsed={collapsed}
               />
+              <NavLink
+                item={{ href: '/dashboard/admin/oauth-apps', label: 'Applications OAuth', icon: ShieldCheck }}
+                pathname={pathname}
+                collapsed={collapsed}
+              />
             </nav>
           </motion.div>
         ) : sidebarMode === 'account' ? (
