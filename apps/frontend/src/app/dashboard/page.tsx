@@ -600,16 +600,16 @@ function ThisYearBlock({
   )
 }
 
-function ShortcutsBlock({ t }: { t: (key: string) => string }) {
+function ShortcutsBlock() {
   const shortcuts = [
-    { href: '/dashboard/clients', icon: Users, label: t('nav.clients') || 'Clients' },
-    { href: '/dashboard/products', icon: Files, label: t('nav.products') || 'Produits' },
-    { href: '/dashboard/recurring-invoices', icon: Clock, label: t('nav.recurring') || 'Récurrences' },
-    { href: '/dashboard/expenses', icon: Wallet, label: t('nav.expenses') || 'Dépenses' },
+    { href: '/dashboard/clients', icon: Users, label: 'Clients' },
+    { href: '/dashboard/products', icon: Files, label: 'Produits' },
+    { href: '/dashboard/recurring-invoices', icon: Clock, label: 'Récurrences' },
+    { href: '/dashboard/expenses', icon: Wallet, label: 'Dépenses' },
   ]
   return (
     <div className="h-full p-5 flex flex-col">
-      <h3 className="text-sm font-semibold text-foreground mb-3">{t('dashboard.shortcuts') || 'Raccourcis'}</h3>
+      <h3 className="text-sm font-semibold text-foreground mb-3">Raccourcis</h3>
       <div className="grid grid-cols-4 gap-2 flex-1">
         {shortcuts.map((s) => {
           const Icon = s.icon
@@ -983,7 +983,7 @@ export default function DashboardPage() {
           <ThisYearBlock value={thisYear.value} count={thisYear.count} locale={locale} t={t} />
         )
       case 'shortcuts':
-        return <ShortcutsBlock t={t} />
+        return <ShortcutsBlock />
       case 'chart-revenue':
         return (
           <div className="p-1 h-full">
