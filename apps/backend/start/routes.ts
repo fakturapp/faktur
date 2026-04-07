@@ -27,6 +27,7 @@ import '#start/routes/analytics'
 import '#start/routes/collaboration'
 import '#start/routes/payment_link'
 import '#start/routes/webhook'
+import '#start/routes/oauth'
 
 // Feedback & bug report routes (inline to avoid import issues)
 const CreateFeedback = () => import('#controllers/feedback/create')
