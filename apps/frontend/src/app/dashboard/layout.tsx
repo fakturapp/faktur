@@ -116,9 +116,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (loading) {
     return (
-      <div className="flex h-screen overflow-hidden finder-window-bg bg-background">
-        {/* Skeleton sidebar bubble */}
-        <div className="w-(--sidebar-width) shrink-0 m-2 mr-0 rounded-2xl liquid-glass liquid-sidebar flex flex-col overflow-hidden" style={{ height: 'calc(100vh - 16px)' }}>
+      <div className="relative h-screen overflow-hidden bg-background">
+        {/* Skeleton sidebar — overlay, flush left, large right rounding */}
+        <div className="fixed left-0 top-0 z-40 w-(--sidebar-width) h-screen rounded-r-[2rem] bg-sidebar border-r border-sidebar-border shadow-2xl flex flex-col overflow-hidden">
           <div className="px-3 pt-3 pb-2">
             <div className="flex items-center gap-2.5 px-2 py-2">
               <Skeleton className="h-7 w-7 rounded-lg" />
@@ -128,7 +128,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </div>
             </div>
           </div>
-          <div className="mx-3 h-px liquid-separator" />
+          <div className="mx-3 h-px bg-border" />
           <div className="flex-1 px-3 py-2 space-y-1">
             {[...Array(5)].map((_, i) => (
               <Skeleton key={i} className="h-8 w-full rounded-lg" />
@@ -138,7 +138,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Skeleton key={i} className="h-8 w-full rounded-lg" />
             ))}
           </div>
-          <div className="mx-3 h-px liquid-separator" />
+          <div className="mx-3 h-px bg-border" />
           <div className="p-2.5">
             <div className="flex items-center gap-2.5 px-2">
               <Skeleton className="h-7 w-7 rounded-full" />
@@ -149,9 +149,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
           </div>
         </div>
-        {/* Skeleton content area */}
-        <div className="flex-1 flex flex-col overflow-hidden m-2 rounded-2xl liquid-content">
-          <div className="h-(--header-height) shrink-0 liquid-glass-toolbar liquid-toolbar rounded-t-2xl" />
+        {/* Skeleton content area — full page underneath */}
+        <div className="h-screen flex flex-col overflow-hidden bg-background pl-(--sidebar-width)">
+          <div className="h-(--header-height) shrink-0 border-b border-border" />
           <div className="flex-1 p-6 space-y-6">
             <div className="grid gap-4 grid-cols-4">
               {[...Array(4)].map((_, i) => (
@@ -187,7 +187,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <InvoiceSettingsProvider>
     <EmailProvider>
-    <div className="flex h-screen overflow-hidden finder-window-bg bg-background">
+    <div className="relative h-screen overflow-hidden bg-background">
       <Sidebar
         teams={teams}
         currentTeam={currentTeam}
@@ -208,8 +208,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       <div
         className={cn(
-          'relative flex min-w-0 min-h-0 flex-1 flex-col transition-all duration-300 ease-out overflow-hidden',
-          'm-2 rounded-2xl liquid-content',
+          'relative flex min-w-0 min-h-0 h-screen flex-col transition-[padding] duration-300 ease-out overflow-hidden bg-background',
+          sidebarCollapsed ? 'pl-16' : 'pl-(--sidebar-width)',
           switching && 'blur-sm pointer-events-none'
         )}
       >

@@ -65,7 +65,7 @@ export function SiteHeader({ onToggleSidebar }: SiteHeaderProps) {
   }, '/dashboard')
 
   return (
-    <header className="relative flex h-(--header-height) shrink-0 items-center gap-2 liquid-glass-toolbar liquid-toolbar rounded-t-2xl transition-[width,height] ease-linear">
+    <header className="relative flex h-(--header-height) shrink-0 items-center gap-2 bg-background border-b border-border transition-[width,height] ease-linear">
       <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
         {onToggleSidebar && (
           <button

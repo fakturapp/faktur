@@ -233,8 +233,8 @@ function NavLink({ item, pathname, badges, persistKey }: { item: NavItem; pathna
         className={cn(
           'flex items-center gap-2.5 rounded-lg px-2.5 py-[7px] text-[13px] font-medium transition-all duration-200 relative',
           isActive
-            ? 'liquid-nav-active text-foreground'
-            : 'text-muted-foreground liquid-nav-hover hover:text-foreground'
+            ? 'bg-muted/60 dark:bg-white/[0.06] shadow-sm text-foreground'
+            : 'text-muted-foreground hover:bg-muted/40 dark:hover:bg-white/[0.04] hover:text-foreground'
         )}
       >
         <item.icon className={cn('h-[15px] w-[15px] shrink-0', isActive ? 'text-primary' : 'opacity-70')} />
@@ -250,8 +250,8 @@ function NavLink({ item, pathname, badges, persistKey }: { item: NavItem; pathna
         className={cn(
           'flex w-full items-center gap-2.5 rounded-lg px-2.5 py-[7px] text-[13px] font-medium transition-all duration-200 relative',
           isActive
-            ? 'liquid-nav-active text-foreground'
-            : 'text-muted-foreground liquid-nav-hover hover:text-foreground'
+            ? 'bg-muted/60 dark:bg-white/[0.06] shadow-sm text-foreground'
+            : 'text-muted-foreground hover:bg-muted/40 dark:hover:bg-white/[0.04] hover:text-foreground'
         )}
       >
         <item.icon className={cn('h-[15px] w-[15px] shrink-0', isActive ? 'text-primary' : 'opacity-70')} />
@@ -284,8 +284,8 @@ function NavLink({ item, pathname, badges, persistKey }: { item: NavItem; pathna
                     className={cn(
                       'flex items-center justify-between rounded-md px-2.5 py-[5px] text-[12px] transition-all duration-200',
                       childActive
-                        ? 'liquid-nav-active text-foreground font-medium'
-                        : 'text-muted-foreground liquid-nav-hover hover:text-foreground'
+                        ? 'bg-muted/60 dark:bg-white/[0.06] shadow-sm text-foreground font-medium'
+                        : 'text-muted-foreground hover:bg-muted/40 dark:hover:bg-white/[0.04] hover:text-foreground'
                     )}
                   >
                     <span className="flex items-center gap-2">
@@ -326,10 +326,9 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
   return (
     <aside
       className={cn(
-        'flex shrink-0 flex-col liquid-glass liquid-sidebar rounded-2xl transition-all duration-300 ease-out overflow-hidden',
-        collapsed ? 'w-0 opacity-0 p-0 m-0' : 'w-(--sidebar-width) m-2 mr-0 opacity-100'
+        'group/sidebar fixed left-0 top-0 z-40 flex h-screen flex-col bg-sidebar border-r border-sidebar-border rounded-r-[2rem] shadow-2xl overflow-hidden transition-[width] duration-300 ease-out',
+        collapsed ? 'w-16 hover:w-(--sidebar-width)' : 'w-(--sidebar-width)'
       )}
-      style={{ height: collapsed ? 0 : 'calc(100vh - 16px)' }}
     >
       <AnimatePresence mode="wait">
         {sidebarMode === 'admin' ? (
@@ -341,7 +340,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             transition={{ duration: 0.25, ease: 'easeInOut' }}
             className="px-3 pt-3 pb-1"
           >
-            <div className="flex items-center gap-2.5 px-2 py-2 rounded-lg liquid-nav-active">
+            <div className="flex items-center gap-2.5 px-2 py-2 rounded-lg bg-muted/60 dark:bg-white/[0.06] shadow-sm">
               <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-indigo-500/15 text-indigo-400">
                 <ShieldCheck className="h-3.5 w-3.5" />
               </div>
@@ -361,7 +360,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             transition={{ duration: 0.25, ease: 'easeInOut' }}
             className="px-3 pt-3 pb-1"
           >
-            <div className="flex items-center gap-2.5 px-2 py-2 rounded-lg liquid-nav-active">
+            <div className="flex items-center gap-2.5 px-2 py-2 rounded-lg bg-muted/60 dark:bg-white/[0.06] shadow-sm">
               <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary/15 text-primary text-[11px] font-bold overflow-hidden">
                 {user.avatarUrl ? (
                   <img src={user.avatarUrl} alt="" className="h-full w-full object-cover" />
@@ -383,7 +382,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             transition={{ duration: 0.25, ease: 'easeInOut' }}
             className="px-3 pt-3 pb-1"
           >
-            <div className="flex items-center gap-2.5 px-2 py-2 rounded-lg liquid-nav-active">
+            <div className="flex items-center gap-2.5 px-2 py-2 rounded-lg bg-muted/60 dark:bg-white/[0.06] shadow-sm">
               <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary/15 text-primary">
                 <Settings className="h-3.5 w-3.5" />
               </div>
@@ -401,10 +400,10 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             transition={{ duration: 0.25, ease: 'easeInOut' }}
           >
             {/* Faktur logo header */}
-            <div className="px-4 pt-4 pb-3">
-              <div className="flex items-center justify-center gap-2.5">
+            <div className="px-3 pt-4 pb-3">
+              <div className="flex items-center gap-2.5">
                 <img src="/logo.svg" alt="Faktur" className="h-10 w-10 shrink-0 drop-shadow-sm" />
-                <div className="flex flex-col items-start">
+                <div className="flex flex-col items-start min-w-0">
                   <span className="text-[18px] font-semibold text-foreground font-lexend tracking-tight leading-tight">
                     Faktur
                   </span>
@@ -418,7 +417,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
         )}
       </AnimatePresence>
 
-      <div className="mx-3 h-px liquid-separator" />
+      <div className="mx-3 h-px bg-border" />
 
       <AnimatePresence mode="wait">
         {sidebarMode === 'admin' ? (
@@ -434,7 +433,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             <div className="px-3 pt-2 pb-1">
               <Link
                 href="/dashboard"
-                className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[13px] font-medium text-muted-foreground liquid-nav-hover hover:text-foreground transition-all"
+                className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[13px] font-medium text-muted-foreground hover:bg-muted/40 dark:hover:bg-white/[0.04] hover:text-foreground transition-all"
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
                 Retour au dashboard
@@ -474,7 +473,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             <div className="px-3 pt-2 pb-1">
               <Link
                 href="/dashboard"
-                className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[13px] font-medium text-muted-foreground liquid-nav-hover hover:text-foreground transition-all"
+                className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[13px] font-medium text-muted-foreground hover:bg-muted/40 dark:hover:bg-white/[0.04] hover:text-foreground transition-all"
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
                 Retour au dashboard
@@ -501,7 +500,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             <div className="px-3 pt-2 pb-1">
               <Link
                 href="/dashboard"
-                className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[13px] font-medium text-muted-foreground liquid-nav-hover hover:text-foreground transition-all"
+                className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[13px] font-medium text-muted-foreground hover:bg-muted/40 dark:hover:bg-white/[0.04] hover:text-foreground transition-all"
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
                 Retour au dashboard
@@ -529,7 +528,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
               <Dropdown
                 align="left"
                 trigger={
-                  <div className="flex items-center justify-center gap-2 rounded-lg px-2.5 py-2 text-[13px] font-semibold liquid-nav-hover transition-all group cursor-pointer">
+                  <div className="flex items-center justify-center gap-2 rounded-lg px-2.5 py-2 text-[13px] font-semibold hover:bg-muted/40 dark:hover:bg-white/[0.04] transition-all group cursor-pointer">
                     <CirclePlus className="h-3.5 w-3.5 text-primary" />
                     <span className="text-primary">Créer</span>
                   </div>
@@ -563,7 +562,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
               {mainNav.map((item) => (
                 <NavLink key={item.href} item={item} pathname={pathname} badges={badges} />
               ))}
-              <div className="mx-2 my-2 h-px liquid-separator" />
+              <div className="mx-2 my-2 h-px bg-border" />
               <NavLink
                 item={{ href: '/dashboard/settings', label: 'Paramètres', icon: Settings }}
                 pathname={pathname}
@@ -573,7 +572,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
         )}
       </AnimatePresence>
 
-      <div className="mx-3 h-px liquid-separator" />
+      <div className="mx-3 h-px bg-border" />
 
       {/* User section */}
       <div className="p-2.5">
@@ -584,7 +583,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
           alignOffset={8}
           className="min-w-[260px]"
           trigger={
-            <div className="flex items-center gap-2.5 rounded-lg px-2 py-2 liquid-nav-hover transition-all duration-200 w-full">
+            <div className="flex items-center gap-2.5 rounded-lg px-2 py-2 hover:bg-muted/40 dark:hover:bg-white/[0.04] transition-all duration-200 w-full">
               <Avatar
                 src={user.avatarUrl}
                 alt={user.fullName || user.email}
