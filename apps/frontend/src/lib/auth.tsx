@@ -67,6 +67,43 @@ const publicPaths = [
 // URL, so we must recognise the short form as public here as well.
 const SHORT_CHECKOUT_PATH = /^\/[a-zA-Z0-9_-]{16,}\/pay\/?$/
 
+/**
+ * Faktur Desktop drops a session payload in the URL hash fragment on
+ * boot: `#faktur_desktop_session=<base64url-json>`. We consume it
+ * synchronously BEFORE the refreshUser() fetch so AuthProvider sees
+ * the token on its first pass and never tries to redirect to /login.
+ */
+function consumeDesktopSessionHash(): void {
+  if (typeof window === 'undefined') return
+  const hash = window.location.hash
+  if (!hash || !hash.includes('faktur_desktop_session=')) return
+
+  try {
+    const match = hash.match(/faktur_desktop_session=([^&]+)/)
+    if (!match) return
+    const payload = JSON.parse(atob(match[1].replace(/-/g, '+').replace(/_/g, '/')))
+    if (payload.t) localStorage.setItem('faktur_token', payload.t)
+    if (payload.v) localStorage.setItem('faktur_vault_key', payload.v)
+    if (payload.s) localStorage.setItem('faktur_source', String(payload.s))
+    if (payload.l) {
+      localStorage.setItem('faktur_vault_locked', '1')
+    } else {
+      localStorage.removeItem('faktur_vault_locked')
+    }
+    // Wipe the fragment from the URL so nothing gets logged or shared.
+    const clean = window.location.pathname + window.location.search
+    window.history.replaceState({}, '', clean)
+  } catch (err) {
+    console.error('[auth] failed to consume desktop session hash:', err)
+  }
+}
+
+// Eager consume on module load so it runs before the React tree
+// mounts. This is safe because it only touches localStorage.
+if (typeof window !== 'undefined') {
+  consumeDesktopSessionHash()
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
@@ -78,6 +115,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     SHORT_CHECKOUT_PATH.test(pathname)
 
   const refreshUser = useCallback(async () => {
+    // Defensive re-consume in case this hook runs before the
+    // module-level call (hot reload, edge cases).
+    consumeDesktopSessionHash()
+
     const token = localStorage.getItem('faktur_token')
     if (!token) {
       setUser(null)
