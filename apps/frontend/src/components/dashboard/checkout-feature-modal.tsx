@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Dialog, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { useTranslation } from '@/lib/i18n'
 import {
   Link2,
   Globe,
@@ -15,7 +14,6 @@ import {
   Check,
   Copy,
   Eye,
-  Zap,
   ChevronRight,
 } from 'lucide-react'
 
@@ -28,7 +26,7 @@ interface CheckoutFeatureModalProps {
 
 /* ─────────────── Step 1: announcement ─────────────── */
 
-function StepAnnouncement({ onNext, onClose, t }: { onNext: () => void; onClose: () => void; t: (k: string) => string }) {
+function StepAnnouncement({ onNext, onClose }: { onNext: () => void; onClose: () => void }) {
   return (
     <motion.div
       key="announce"
@@ -39,15 +37,11 @@ function StepAnnouncement({ onNext, onClose, t }: { onNext: () => void; onClose:
     >
       {/* Hero */}
       <div className="relative -mx-6 -mt-6 mb-5 px-6 pt-8 pb-6 bg-gradient-to-br from-primary/15 via-primary/5 to-transparent border-b border-border">
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 text-primary px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider border border-primary/20 mb-3">
-          <Zap className="h-3 w-3" />
-          {t('feature.checkout.badge') || 'Nouveau'}
-        </div>
         <DialogTitle className="text-xl md:text-2xl tracking-tight">
-          {t('feature.checkout.title') || 'Liens de paiement instantanés'}
+          Liens de paiement instantanés
         </DialogTitle>
         <p className="mt-2 text-sm text-muted-foreground">
-          {t('feature.checkout.subtitle') || 'Envoyez à vos clients un lien de paiement sécurisé, sur un sous-domaine dédié.'}
+          Envoyez à vos clients un lien de paiement sécurisé, sur un sous-domaine dédié.
         </p>
 
         {/* URL preview */}
@@ -68,30 +62,30 @@ function StepAnnouncement({ onNext, onClose, t }: { onNext: () => void; onClose:
         <Feature
           icon={Link2}
           iconClass="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
-          title={t('feature.checkout.bullets.shortUrl.title') || 'URLs propres et courtes'}
-          body={t('feature.checkout.bullets.shortUrl.body') || "Terminé les URLs à rallonge. Un sous-domaine dédié checkout.fakturapp.cc + un token, c'est tout."}
+          title="URLs propres et courtes"
+          body="Terminé les URLs à rallonge. Un sous-domaine dédié checkout.fakturapp.cc + un token, c'est tout."
         />
         <Feature
           icon={CreditCard}
           iconClass="bg-violet-500/10 text-violet-600 dark:text-violet-400"
-          title={t('feature.checkout.bullets.stripe.title') || 'Paiement Stripe intégré'}
-          body={t('feature.checkout.bullets.stripe.body') || 'Carte bancaire, Apple Pay, Google Pay. Le client paie en quelques secondes, vous êtes notifié en temps réel.'}
+          title="Paiement Stripe intégré"
+          body="Carte bancaire, Apple Pay, Google Pay. Le client paie en quelques secondes, vous êtes notifié en temps réel."
         />
         <Feature
           icon={Shield}
           iconClass="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-          title={t('feature.checkout.bullets.security.title') || 'Sécurité par défaut'}
-          body={t('feature.checkout.bullets.security.body') || 'Expiration automatique, protection par mot de passe optionnelle, suppression après paiement confirmé.'}
+          title="Sécurité par défaut"
+          body="Expiration automatique, protection par mot de passe optionnelle, suppression après paiement confirmé."
         />
       </div>
 
       {/* Footer */}
       <div className="mt-6 flex items-center justify-between gap-3">
         <Button variant="ghost" size="sm" onClick={onClose}>
-          {t('feature.checkout.later') || 'Plus tard'}
+          Plus tard
         </Button>
         <Button size="sm" onClick={onNext}>
-          {t('feature.checkout.howItWorks') || 'Comment ça marche'}
+          Comment ça marche
           <ChevronRight className="h-3.5 w-3.5 ml-1" />
         </Button>
       </div>
@@ -125,27 +119,27 @@ function Feature({
 
 /* ─────────────── Step 2: how it works ─────────────── */
 
-function StepHowItWorks({ onBack, onClose, t }: { onBack: () => void; onClose: () => void; t: (k: string) => string }) {
+function StepHowItWorks({ onBack, onClose }: { onBack: () => void; onClose: () => void }) {
   const steps = [
     {
       icon: CreditCard,
-      title: t('feature.checkout.steps.1.title') || '1. Créez votre facture',
-      body: t('feature.checkout.steps.1.body') || "Depuis l'éditeur, cliquez sur 'Générer un lien de paiement'. Choisissez la méthode (virement ou carte via Stripe) et l'expiration.",
+      title: '1. Créez votre facture',
+      body: "Depuis l'éditeur, cliquez sur 'Générer un lien de paiement'. Choisissez la méthode (virement ou carte via Stripe) et l'expiration.",
     },
     {
       icon: Copy,
-      title: t('feature.checkout.steps.2.title') || '2. Partagez le lien',
-      body: t('feature.checkout.steps.2.body') || 'Copiez le lien court checkout.fakturapp.cc/<token>/pay, envoyez-le par email, SMS, WhatsApp — au client ou à son service compta.',
+      title: '2. Partagez le lien',
+      body: 'Copiez le lien court checkout.fakturapp.cc/<token>/pay, envoyez-le par email, SMS, WhatsApp — au client ou à son service compta.',
     },
     {
       icon: Eye,
-      title: t('feature.checkout.steps.3.title') || '3. Suivez le paiement',
-      body: t('feature.checkout.steps.3.body') || "Quand le client paie, la facture passe automatiquement en 'Payée', un webhook Stripe confirme la transaction, vous recevez une notification.",
+      title: '3. Suivez le paiement',
+      body: "Quand le client paie, la facture passe automatiquement en 'Payée', un webhook Stripe confirme la transaction, vous recevez une notification.",
     },
     {
       icon: Check,
-      title: t('feature.checkout.steps.4.title') || '4. C\'est fait',
-      body: t('feature.checkout.steps.4.body') || 'Le lien est automatiquement désactivé 5 minutes après la confirmation. Aucune trace restante, aucun risque de double paiement.',
+      title: "4. C'est fait",
+      body: 'Le lien est automatiquement désactivé 5 minutes après la confirmation. Aucune trace restante, aucun risque de double paiement.',
     },
   ]
 
@@ -158,11 +152,9 @@ function StepHowItWorks({ onBack, onClose, t }: { onBack: () => void; onClose: (
       transition={{ duration: 0.25 }}
     >
       <div className="-mx-6 -mt-6 mb-5 px-6 pt-6 pb-4 border-b border-border">
-        <DialogTitle className="text-lg">
-          {t('feature.checkout.howTitle') || 'Comment ça marche'}
-        </DialogTitle>
+        <DialogTitle className="text-lg">Comment ça marche</DialogTitle>
         <p className="mt-1 text-sm text-muted-foreground">
-          {t('feature.checkout.howSubtitle') || '4 étapes, du clic à la confirmation du paiement.'}
+          4 étapes, du clic à la confirmation du paiement.
         </p>
       </div>
 
@@ -191,10 +183,10 @@ function StepHowItWorks({ onBack, onClose, t }: { onBack: () => void; onClose: (
       <div className="mt-6 flex items-center justify-between gap-3">
         <Button variant="ghost" size="sm" onClick={onBack}>
           <ArrowLeft className="h-3.5 w-3.5 mr-1" />
-          {t('feature.checkout.back') || 'Retour'}
+          Retour
         </Button>
         <Button size="sm" onClick={onClose}>
-          {t('feature.checkout.gotIt') || "C'est noté"}
+          C'est noté
           <ArrowRight className="h-3.5 w-3.5 ml-1" />
         </Button>
       </div>
@@ -205,7 +197,6 @@ function StepHowItWorks({ onBack, onClose, t }: { onBack: () => void; onClose: (
 /* ─────────────── Modal shell ─────────────── */
 
 export function CheckoutFeatureModal({ open, onClose }: CheckoutFeatureModalProps) {
-  const { t } = useTranslation()
   const [step, setStep] = useState<'announce' | 'how'>('announce')
 
   function handleClose() {
@@ -220,9 +211,9 @@ export function CheckoutFeatureModal({ open, onClose }: CheckoutFeatureModalProp
     <Dialog open={open} onClose={handleClose} className="max-w-lg">
       <AnimatePresence mode="wait">
         {step === 'announce' ? (
-          <StepAnnouncement onNext={() => setStep('how')} onClose={handleClose} t={t} />
+          <StepAnnouncement onNext={() => setStep('how')} onClose={handleClose} />
         ) : (
-          <StepHowItWorks onBack={() => setStep('announce')} onClose={handleClose} t={t} />
+          <StepHowItWorks onBack={() => setStep('announce')} onClose={handleClose} />
         )}
       </AnimatePresence>
     </Dialog>
