@@ -202,6 +202,24 @@
     "resetLayout": "Réinitialiser la disposition",
     "addChart": "Ajouter un graphique",
     "remove": "Retirer",
+    "customize": "Personnaliser",
+    "done": "Terminer",
+    "editHint": "Glissez-déposez les cartes pour réorganiser votre tableau de bord.",
+    "shortcuts": "Raccourcis",
+    "drafts": {
+      "title": "Brouillons",
+      "invoices": "fact.",
+      "quotes": "devis"
+    },
+    "overdue": {
+      "title": "En retard",
+      "toRecover": "à récupérer",
+      "allClear": "Tout est en règle"
+    },
+    "thisYear": {
+      "title": "Cette année",
+      "invoices": "facture(s) émise(s)"
+    },
     "charts": {
       "revenue": "Chiffre d'affaires HT",
       "revenueDesc": "CA hors taxes facturé par mois (12 mois)",

@@ -202,6 +202,24 @@
     "resetLayout": "Reset layout",
     "addChart": "Add chart",
     "remove": "Remove",
+    "customize": "Customize",
+    "done": "Done",
+    "editHint": "Drag and drop cards to reorganise your dashboard.",
+    "shortcuts": "Shortcuts",
+    "drafts": {
+      "title": "Drafts",
+      "invoices": "inv.",
+      "quotes": "quotes"
+    },
+    "overdue": {
+      "title": "Overdue",
+      "toRecover": "to collect",
+      "allClear": "All clear"
+    },
+    "thisYear": {
+      "title": "This year",
+      "invoices": "invoice(s) issued"
+    },
     "charts": {
       "revenue": "Net revenue",
       "revenueDesc": "Net revenue invoiced per month (12 months)",

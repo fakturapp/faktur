@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '@/lib/auth'
 import { useTranslation } from '@/lib/i18n'
+import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { ChartRevenue } from '@/components/dashboard/chart-revenue'
 import { AddChartSidebar, type ChartKey } from '@/components/dashboard/add-chart-sidebar'
 import { ChartMonthly } from '@/components/dashboard/chart-monthly'
@@ -27,6 +28,13 @@ import {
   Receipt,
   Clock,
   Sparkles,
+  Pencil,
+  Check,
+  Users,
+  AlertTriangle,
+  Files,
+  Zap,
+  Calendar,
 } from 'lucide-react'
 import { AiDashboardSummary } from '@/components/ai/ai-dashboard-summary'
 
@@ -71,7 +79,7 @@ interface MicroDataPoint {
 }
 
 const CHARTS_KEY = 'zenvoice_active_charts'
-const LAYOUT_KEY = 'zenvoice_dashboard_layout_v1'
+const LAYOUT_KEY = 'zenvoice_dashboard_layout_v2'
 
 type BlockId =
   | 'welcome'
@@ -80,6 +88,11 @@ type BlockId =
   | 'stat-outstanding'
   | 'stat-collected'
   | 'latest-invoice'
+  | 'quick-actions'
+  | 'drafts'
+  | 'overdue'
+  | 'this-year'
+  | 'shortcuts'
   | 'chart-revenue'
   | 'recent-activity'
   | `chart-${ChartKey}`
@@ -90,9 +103,14 @@ const DEFAULT_LAYOUT: BlockId[] = [
   'stat-outstanding',
   'stat-collected',
   'latest-invoice',
+  'quick-actions',
+  'drafts',
+  'overdue',
+  'this-year',
   'ai-summary',
   'chart-revenue',
   'recent-activity',
+  'shortcuts',
 ]
 
 // Each block declares its footprint in the 4-column grid. `span` is the
@@ -104,6 +122,11 @@ const BLOCK_SPAN: Record<string, { span: 1 | 2 | 3 | 4; rowSpan: 1 | 2 }> = {
   'stat-outstanding': { span: 1, rowSpan: 1 },
   'stat-collected': { span: 1, rowSpan: 1 },
   'latest-invoice': { span: 1, rowSpan: 1 },
+  'quick-actions': { span: 2, rowSpan: 1 },
+  'drafts': { span: 1, rowSpan: 1 },
+  'overdue': { span: 1, rowSpan: 1 },
+  'this-year': { span: 2, rowSpan: 1 },
+  'shortcuts': { span: 2, rowSpan: 1 },
   'chart-revenue': { span: 2, rowSpan: 2 },
   'recent-activity': { span: 2, rowSpan: 2 },
 }
@@ -128,7 +151,10 @@ function loadLayout(): BlockId[] {
     if (!saved) return DEFAULT_LAYOUT
     const parsed = JSON.parse(saved) as BlockId[]
     if (!Array.isArray(parsed) || parsed.length === 0) return DEFAULT_LAYOUT
-    return parsed
+    // Append any new default blocks the user doesn't have yet (keeps their
+    // custom order while surfacing freshly-shipped cards).
+    const missing = DEFAULT_LAYOUT.filter((id) => !parsed.includes(id))
+    return missing.length > 0 ? [...parsed, ...missing] : parsed
   } catch {
     return DEFAULT_LAYOUT
   }
@@ -178,6 +204,7 @@ function formatDate(dateStr: string, locale: string) {
 
 interface BentoBlockProps {
   id: BlockId
+  editMode: boolean
   onDragStart: (id: BlockId) => void
   onDragOver: (id: BlockId) => void
   onDrop: () => void
@@ -190,6 +217,7 @@ interface BentoBlockProps {
 
 function BentoBlock({
   id,
+  editMode,
   onDragStart,
   onDragOver,
   onDrop,
@@ -210,34 +238,51 @@ function BentoBlock({
       className={cn('relative', spanClass(id), className)}
     >
       <div
-        draggable
-        onDragStart={(e) => {
-          e.dataTransfer.effectAllowed = 'move'
-          e.dataTransfer.setData('text/plain', id)
-          onDragStart(id)
-        }}
-        onDragOver={(e) => {
-          e.preventDefault()
-          e.dataTransfer.dropEffect = 'move'
-          onDragOver(id)
-        }}
-        onDrop={(e) => {
-          e.preventDefault()
-          onDrop()
-        }}
-        onDragEnd={() => onDragEnd()}
+        draggable={editMode}
+        onDragStart={
+          editMode
+            ? (e) => {
+                e.dataTransfer.effectAllowed = 'move'
+                e.dataTransfer.setData('text/plain', id)
+                onDragStart(id)
+              }
+            : undefined
+        }
+        onDragOver={
+          editMode
+            ? (e) => {
+                e.preventDefault()
+                e.dataTransfer.dropEffect = 'move'
+                onDragOver(id)
+              }
+            : undefined
+        }
+        onDrop={
+          editMode
+            ? (e) => {
+                e.preventDefault()
+                onDrop()
+              }
+            : undefined
+        }
+        onDragEnd={editMode ? () => onDragEnd() : undefined}
         className={cn(
-          'group/block relative w-full h-full rounded-2xl border border-border bg-card shadow-sm overflow-hidden transition-all cursor-grab active:cursor-grabbing',
+          'group/block relative w-full h-full rounded-2xl border bg-card shadow-sm overflow-hidden transition-all',
+          editMode
+            ? 'border-dashed border-primary/40 cursor-grab active:cursor-grabbing hover:border-primary/70 hover:shadow-md'
+            : 'border-border',
           isDragging && 'opacity-40 scale-[0.98]',
           isDragOver && 'ring-2 ring-primary/60 ring-offset-2 ring-offset-background'
         )}
       >
-        {/* Drag handle — visible on hover */}
-        <div className="absolute top-2 right-2 z-10 opacity-0 group-hover/block:opacity-100 transition-opacity pointer-events-none">
-          <div className="flex items-center justify-center h-6 w-6 rounded-md bg-background/80 backdrop-blur-sm border border-border/50 text-muted-foreground">
-            <GripVertical className="h-3.5 w-3.5" />
+        {/* Drag handle — visible only in edit mode */}
+        {editMode && (
+          <div className="absolute top-2 right-2 z-10 pointer-events-none">
+            <div className="flex items-center justify-center h-6 w-6 rounded-md bg-background/90 backdrop-blur-sm border border-border/50 text-primary shadow-sm">
+              <GripVertical className="h-3.5 w-3.5" />
+            </div>
           </div>
-        </div>
+        )}
         {children}
       </div>
     </motion.div>
@@ -392,6 +437,197 @@ function statusVariant(status: string): 'default' | 'success' | 'warning' | 'des
   }
 }
 
+function QuickActionsBlock({ t }: { t: (key: string) => string }) {
+  const actions = [
+    {
+      href: '/dashboard/invoices/new',
+      icon: FileText,
+      label: t('dashboard.quickActions.newInvoice') || 'Nouvelle facture',
+      color: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400',
+    },
+    {
+      href: '/dashboard/quotes/new',
+      icon: Receipt,
+      label: t('dashboard.quickActions.newQuote') || 'Nouveau devis',
+      color: 'bg-orange-500/10 text-orange-600 dark:text-orange-400',
+    },
+    {
+      href: '/dashboard/clients',
+      icon: Users,
+      label: t('dashboard.quickActions.newClient') || 'Nouveau client',
+      color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+    },
+  ]
+  return (
+    <div className="h-full p-5 flex flex-col">
+      <div className="flex items-center gap-2 mb-4">
+        <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/10 text-primary">
+          <Zap className="h-3.5 w-3.5" />
+        </div>
+        <h3 className="text-sm font-semibold text-foreground">{t('dashboard.quickActions.title') || 'Actions rapides'}</h3>
+      </div>
+      <div className="grid grid-cols-3 gap-2 flex-1">
+        {actions.map((action) => {
+          const Icon = action.icon
+          return (
+            <Link
+              key={action.href}
+              href={action.href}
+              className="flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-background hover:bg-muted/50 hover:border-primary/40 transition-all p-3 group/action"
+            >
+              <div className={cn('flex h-9 w-9 items-center justify-center rounded-lg transition-transform group-hover/action:scale-110', action.color)}>
+                <Icon className="h-4 w-4" />
+              </div>
+              <span className="text-[11px] font-medium text-center text-foreground leading-tight">{action.label}</span>
+            </Link>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function DraftsBlock({
+  invoiceDrafts,
+  quoteDrafts,
+  t,
+}: {
+  invoiceDrafts: number
+  quoteDrafts: number
+  t: (key: string) => string
+}) {
+  const total = invoiceDrafts + quoteDrafts
+  return (
+    <Link href="/dashboard/invoices/drafts" className="relative h-full p-5 flex flex-col group/drafts bg-gradient-to-br from-slate-500/10 via-slate-500/5 to-transparent">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+          {t('dashboard.drafts.title') || 'Brouillons'}
+        </span>
+        <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover/drafts:opacity-100 transition-opacity" />
+      </div>
+      <div className="text-3xl font-bold tabular-nums text-foreground leading-none">{total}</div>
+      <div className="mt-auto pt-3 flex items-center gap-3 text-[11px] text-muted-foreground">
+        <span className="flex items-center gap-1">
+          <FileText className="h-3 w-3" /> {invoiceDrafts} {t('dashboard.drafts.invoices') || 'fact.'}
+        </span>
+        <span className="flex items-center gap-1">
+          <Receipt className="h-3 w-3" /> {quoteDrafts} {t('dashboard.drafts.quotes') || 'devis'}
+        </span>
+      </div>
+      <div className="absolute -right-4 -bottom-4 h-20 w-20 rounded-2xl bg-slate-500/10 text-slate-500 ring-1 ring-slate-500/20 flex items-center justify-center opacity-20 rotate-12">
+        <Files className="h-10 w-10" />
+      </div>
+    </Link>
+  )
+}
+
+function OverdueBlock({
+  count,
+  amount,
+  locale,
+  t,
+}: {
+  count: number
+  amount: number
+  locale: string
+  t: (key: string) => string
+}) {
+  const hasOverdue = count > 0
+  return (
+    <Link
+      href="/dashboard/invoices"
+      className={cn(
+        'relative h-full p-5 flex flex-col group/overdue bg-gradient-to-br',
+        hasOverdue
+          ? 'from-red-500/15 via-red-500/5 to-transparent dark:from-red-500/20'
+          : 'from-emerald-500/10 via-emerald-500/5 to-transparent dark:from-emerald-500/15'
+      )}
+    >
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+          {t('dashboard.overdue.title') || 'En retard'}
+        </span>
+        <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover/overdue:opacity-100 transition-opacity" />
+      </div>
+      <div className={cn('text-3xl font-bold tabular-nums leading-none', hasOverdue ? 'text-red-500' : 'text-emerald-500')}>{count}</div>
+      <div className="mt-auto pt-3 text-[11px] text-muted-foreground">
+        {hasOverdue
+          ? `${formatCurrency(amount, locale)} ${t('dashboard.overdue.toRecover') || 'à récupérer'}`
+          : t('dashboard.overdue.allClear') || 'Tout est en règle'}
+      </div>
+      <div className={cn(
+        'absolute -right-4 -bottom-4 h-20 w-20 rounded-2xl ring-1 flex items-center justify-center opacity-20 rotate-12',
+        hasOverdue ? 'bg-red-500/10 text-red-500 ring-red-500/20' : 'bg-emerald-500/10 text-emerald-500 ring-emerald-500/20'
+      )}>
+        <AlertTriangle className="h-10 w-10" />
+      </div>
+    </Link>
+  )
+}
+
+function ThisYearBlock({
+  value,
+  count,
+  locale,
+  t,
+}: {
+  value: number
+  count: number
+  locale: string
+  t: (key: string) => string
+}) {
+  return (
+    <div className="relative h-full p-5 flex flex-col bg-gradient-to-br from-primary/10 via-primary/5 to-transparent">
+      <div className="flex items-center gap-2 mb-3">
+        <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/10 text-primary">
+          <Calendar className="h-3.5 w-3.5" />
+        </div>
+        <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+          {t('dashboard.thisYear.title') || "Cette année"}
+        </span>
+      </div>
+      <div className="flex items-end justify-between gap-4">
+        <div>
+          <div className="text-3xl font-bold tabular-nums text-foreground leading-tight">{formatCurrency(value, locale)}</div>
+          <div className="text-[11px] text-muted-foreground mt-1">
+            {count} {t('dashboard.thisYear.invoices') || 'facture(s) émise(s)'}
+          </div>
+        </div>
+        <div className="text-[10px] text-muted-foreground/70 uppercase tracking-wider">{new Date().getFullYear()}</div>
+      </div>
+    </div>
+  )
+}
+
+function ShortcutsBlock({ t }: { t: (key: string) => string }) {
+  const shortcuts = [
+    { href: '/dashboard/clients', icon: Users, label: t('nav.clients') || 'Clients' },
+    { href: '/dashboard/products', icon: Files, label: t('nav.products') || 'Produits' },
+    { href: '/dashboard/recurring-invoices', icon: Clock, label: t('nav.recurring') || 'Récurrences' },
+    { href: '/dashboard/expenses', icon: Wallet, label: t('nav.expenses') || 'Dépenses' },
+  ]
+  return (
+    <div className="h-full p-5 flex flex-col">
+      <h3 className="text-sm font-semibold text-foreground mb-3">{t('dashboard.shortcuts') || 'Raccourcis'}</h3>
+      <div className="grid grid-cols-4 gap-2 flex-1">
+        {shortcuts.map((s) => {
+          const Icon = s.icon
+          return (
+            <Link
+              key={s.href}
+              href={s.href}
+              className="flex flex-col items-center justify-center gap-1.5 rounded-xl border border-border bg-background hover:bg-muted/50 hover:border-primary/40 transition-all p-2 group/sc"
+            >
+              <Icon className="h-4 w-4 text-muted-foreground group-hover/sc:text-primary transition-colors" />
+              <span className="text-[10px] font-medium text-foreground leading-tight text-center">{s.label}</span>
+            </Link>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 function RecentActivityBlock({
   items,
   locale,
@@ -451,6 +687,8 @@ function RecentActivityBlock({
 export default function DashboardPage() {
   const { user } = useAuth()
   const { t, locale } = useTranslation()
+  const { settings } = useInvoiceSettings()
+  const aiEnabled = settings.aiEnabled
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [recent, setRecent] = useState<RecentItem[]>([])
   const [chartData, setChartData] = useState<RevenueDataPoint[]>([])
@@ -458,6 +696,8 @@ export default function DashboardPage() {
   const [addChartOpen, setAddChartOpen] = useState(false)
   const [activeCharts, setActiveCharts] = useState<ChartKey[]>(loadActiveCharts)
   const [layout, setLayout] = useState<BlockId[]>(loadLayout)
+  const [editMode, setEditMode] = useState(false)
+  const [sidebarCounts, setSidebarCounts] = useState<{ invoiceDrafts: number; quoteDrafts: number }>({ invoiceDrafts: 0, quoteDrafts: 0 })
 
   // Drag-and-drop state
   const [draggingId, setDraggingId] = useState<BlockId | null>(null)
@@ -471,6 +711,9 @@ export default function DashboardPage() {
 
   useEffect(() => {
     loadDashboard()
+    api.get<{ invoiceDrafts: number; quoteDrafts: number }>('/dashboard/sidebar-counts').then(({ data }) => {
+      if (data) setSidebarCounts(data)
+    })
   }, [])
 
   // Ensure dynamic chart blocks appear in the layout when toggled on
@@ -596,11 +839,35 @@ export default function DashboardPage() {
     saveLayout(DEFAULT_LAYOUT)
   }, [])
 
-  /* ─── Latest invoice ─── */
+  /* ─── Derived data ─── */
 
   const latestInvoice = useMemo(() => {
     return recent.find((r) => r.type === 'invoice') || null
   }, [recent])
+
+  const overdue = useMemo(() => {
+    const overdueItems = recent.filter((r) => r.type === 'invoice' && r.status === 'overdue')
+    const totalAmount = overdueItems.reduce((sum, r) => sum + Number(r.amount || 0), 0)
+    return { count: overdueItems.length, amount: totalAmount }
+  }, [recent])
+
+  const thisYear = useMemo(() => {
+    const year = new Date().getFullYear()
+    const items = recent.filter(
+      (r) => r.type === 'invoice' && new Date(r.date).getFullYear() === year
+    )
+    const total = items.reduce((sum, r) => sum + Number(r.amount || 0), 0)
+    return { value: total, count: items.length }
+  }, [recent])
+
+  /* ─── Layout filtering (AI disabled → remove ai-summary) ─── */
+
+  const visibleLayout = useMemo(() => {
+    return layout.filter((id) => {
+      if (id === 'ai-summary' && !aiEnabled) return false
+      return true
+    })
+  }, [layout, aiEnabled])
 
   /* ─── Loading skeleton ─── */
 
@@ -685,6 +952,26 @@ export default function DashboardPage() {
         )
       case 'latest-invoice':
         return <LatestInvoiceBlock item={latestInvoice} locale={locale} t={t} />
+      case 'quick-actions':
+        return <QuickActionsBlock t={t} />
+      case 'drafts':
+        return (
+          <DraftsBlock
+            invoiceDrafts={sidebarCounts.invoiceDrafts}
+            quoteDrafts={sidebarCounts.quoteDrafts}
+            t={t}
+          />
+        )
+      case 'overdue':
+        return (
+          <OverdueBlock count={overdue.count} amount={overdue.amount} locale={locale} t={t} />
+        )
+      case 'this-year':
+        return (
+          <ThisYearBlock value={thisYear.value} count={thisYear.count} locale={locale} t={t} />
+        )
+      case 'shortcuts':
+        return <ShortcutsBlock t={t} />
       case 'chart-revenue':
         return (
           <div className="p-1 h-full">
@@ -749,14 +1036,16 @@ export default function DashboardPage() {
     <div className="px-4 lg:px-6 py-4 md:py-6 space-y-4">
       {/* Action bar */}
       <div className="flex items-center justify-end gap-2">
-        <button
-          onClick={handleResetLayout}
-          className="flex items-center gap-1.5 h-8 px-3 rounded-lg border border-border bg-card hover:bg-muted/50 text-[12px] text-muted-foreground hover:text-foreground transition-colors"
-          title={t('dashboard.resetLayout') || 'Réinitialiser la disposition'}
-        >
-          <RotateCcw className="h-3.5 w-3.5" />
-          <span className="hidden md:inline">{t('dashboard.resetLayout') || 'Réinitialiser'}</span>
-        </button>
+        {editMode && (
+          <button
+            onClick={handleResetLayout}
+            className="flex items-center gap-1.5 h-8 px-3 rounded-lg border border-border bg-card hover:bg-muted/50 text-[12px] text-muted-foreground hover:text-foreground transition-colors"
+            title={t('dashboard.resetLayout') || 'Réinitialiser la disposition'}
+          >
+            <RotateCcw className="h-3.5 w-3.5" />
+            <span className="hidden md:inline">{t('dashboard.resetLayout') || 'Réinitialiser'}</span>
+          </button>
+        )}
         <button
           onClick={() => setAddChartOpen(true)}
           className="flex items-center gap-1.5 h-8 px-3 rounded-lg border border-border bg-card hover:bg-muted/50 text-[12px] text-muted-foreground hover:text-foreground transition-colors"
@@ -764,17 +1053,48 @@ export default function DashboardPage() {
           <Plus className="h-3.5 w-3.5" />
           <span className="hidden md:inline">{t('dashboard.addChart') || 'Ajouter un graphique'}</span>
         </button>
+        <button
+          onClick={() => setEditMode((v) => !v)}
+          className={cn(
+            'flex items-center gap-1.5 h-8 px-3 rounded-lg border text-[12px] transition-all',
+            editMode
+              ? 'border-primary bg-primary text-primary-foreground hover:bg-primary/90'
+              : 'border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted/50'
+          )}
+          title={editMode ? (t('dashboard.done') || 'Terminer') : (t('dashboard.customize') || 'Personnaliser')}
+        >
+          {editMode ? <Check className="h-3.5 w-3.5" /> : <Pencil className="h-3.5 w-3.5" />}
+          <span className="hidden md:inline">
+            {editMode ? (t('dashboard.done') || 'Terminer') : (t('dashboard.customize') || 'Personnaliser')}
+          </span>
+        </button>
       </div>
+
+      {/* Edit mode banner */}
+      <AnimatePresence>
+        {editMode && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            className="flex items-center gap-2 rounded-xl border border-primary/30 bg-primary/5 px-4 py-2 text-[12px] text-primary"
+          >
+            <Sparkles className="h-3.5 w-3.5 shrink-0" />
+            <span>{t('dashboard.editHint') || "Glissez-déposez les cartes pour réorganiser votre tableau de bord."}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Bento grid */}
       <div
         className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 auto-rows-[minmax(160px,auto)] gap-4"
       >
         <AnimatePresence mode="popLayout">
-          {layout.map((id) => (
+          {visibleLayout.map((id) => (
             <BentoBlock
               key={id}
               id={id}
+              editMode={editMode}
               onDragStart={handleDragStart}
               onDragOver={handleDragOver}
               onDrop={handleDrop}
