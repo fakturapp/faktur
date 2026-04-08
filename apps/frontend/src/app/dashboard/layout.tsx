@@ -15,9 +15,10 @@ import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import { InvoiceSettingsProvider } from '@/lib/invoice-settings-context'
 import { EmailProvider } from '@/lib/email-context'
-import { ArrowRightLeft, LogOut } from 'lucide-react'
+import { ArrowRightLeft, LogOut, Check } from 'lucide-react'
 import { FeedbackModal } from '@/components/modals/feedback-modal'
 import { BugReportModal } from '@/components/modals/bug-report-modal'
+import { isFakturDesktop } from '@/lib/is-desktop'
 import { usePageView } from '@/hooks/use-page-view'
 import { initWebVitals } from '@/lib/web-vitals'
 import { useAnalyticsContext } from '@/lib/analytics'
@@ -50,8 +51,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [sidebarBadges, setSidebarBadges] = useState<Record<string, number>>({})
   const [logoutConfirm, setLogoutConfirm] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
+  const [logoutWipeAll, setLogoutWipeAll] = useState(false)
+  const [isDesktopRuntime, setIsDesktopRuntime] = useState(false)
   const [feedbackOpen, setFeedbackOpen] = useState(false)
   const [bugReportOpen, setBugReportOpen] = useState(false)
+
+  useEffect(() => {
+    setIsDesktopRuntime(isFakturDesktop())
+  }, [])
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -85,9 +92,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   async function confirmLogout() {
+    const wipeAll = logoutWipeAll
     setLogoutConfirm(false)
     setLoggingOut(true)
-    await logout()
+    await logout({ wipeAll })
+    setLogoutWipeAll(false)
+  }
+
+  function openLogoutConfirm() {
+    setLogoutWipeAll(false)
+    setLogoutConfirm(true)
   }
 
   async function confirmSwitchTeam() {
@@ -198,7 +212,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           email: user.email,
           avatarUrl: user.avatarUrl,
         }}
-        onLogout={() => setLogoutConfirm(true)}
+        onLogout={openLogoutConfirm}
         collapsed={sidebarCollapsed}
         badges={sidebarBadges}
         isAdmin={user.isAdmin}
@@ -263,26 +277,76 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </DialogFooter>
       </Dialog>
 
-      {/* Logout confirmation */}
+      {/* ---------- Logout confirmation ---------- */}
       <Dialog open={logoutConfirm} onClose={() => setLogoutConfirm(false)}>
         <div className="flex items-center gap-3 mb-4">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-destructive/10">
             <LogOut className="h-5 w-5 text-destructive" />
           </div>
           <div>
-            <DialogTitle>Se deconnecter</DialogTitle>
+            <DialogTitle>Se déconnecter</DialogTitle>
             <DialogDescription className="mt-0">
-              Vous allez etre deconnecte de votre compte
+              Vous allez être déconnecté de votre compte
             </DialogDescription>
           </div>
         </div>
+
+        {isDesktopRuntime && (
+          <div className="mb-4 mt-2">
+            <label
+              htmlFor="logout-wipe-all"
+              className="group flex cursor-pointer items-start gap-3 rounded-xl border border-border bg-muted/30 p-3.5 transition-colors hover:bg-muted/50"
+            >
+              <input
+                id="logout-wipe-all"
+                type="checkbox"
+                checked={logoutWipeAll}
+                onChange={(e) => setLogoutWipeAll(e.target.checked)}
+                className="sr-only"
+              />
+              <span
+                className={cn(
+                  'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-all duration-200',
+                  logoutWipeAll
+                    ? 'border-destructive bg-destructive shadow-[0_0_0_4px_rgba(239,68,68,0.12)]'
+                    : 'border-border bg-transparent group-hover:border-destructive/50'
+                )}
+              >
+                <AnimatePresence>
+                  {logoutWipeAll && (
+                    <motion.span
+                      key="check"
+                      initial={{ scale: 0, rotate: -45, opacity: 0 }}
+                      animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      transition={{ type: 'spring', stiffness: 380, damping: 22 }}
+                      className="flex"
+                    >
+                      <Check className="h-3 w-3 text-white" strokeWidth={3.5} />
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </span>
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-semibold text-foreground leading-tight">
+                  Effacer aussi mes données locales
+                </p>
+                <p className="text-[11px] text-muted-foreground mt-1 leading-snug">
+                  Cookies, thème, langue, préférences et historiques navigateur
+                  seront supprimés. Sinon, seules les clés d&apos;authentification
+                  (jetons, sessions, refresh) sont effacées.
+                </p>
+              </div>
+            </label>
+          </div>
+        )}
 
         <DialogFooter>
           <Button variant="outline" onClick={() => setLogoutConfirm(false)}>
             Annuler
           </Button>
           <Button variant="destructive" onClick={confirmLogout}>
-            Se deconnecter
+            Se déconnecter
           </Button>
         </DialogFooter>
       </Dialog>
