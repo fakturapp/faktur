@@ -14,7 +14,7 @@ import mail from '@adonisjs/mail/services/main'
 
 export default class StripeWebhook {
   async handle({ request, response }: HttpContext) {
-    const rawBody = request.raw() || ''
+    const rawBody: unknown = request.raw() || ''
     const signature = request.header('stripe-signature')
 
     if (!signature) {
@@ -24,7 +24,15 @@ export default class StripeWebhook {
     // Parse the event JSON to get metadata for team lookup
     let eventJson: any
     try {
-      eventJson = JSON.parse(typeof rawBody === 'string' ? rawBody : rawBody.toString())
+      let bodyAsString: string
+      if (typeof rawBody === 'string') {
+        bodyAsString = rawBody
+      } else if (rawBody && typeof (rawBody as any).toString === 'function') {
+        bodyAsString = (rawBody as { toString: () => string }).toString()
+      } else {
+        bodyAsString = String(rawBody)
+      }
+      eventJson = JSON.parse(bodyAsString)
     } catch {
       return response.badRequest({ message: 'Invalid JSON body' })
     }
@@ -54,7 +62,7 @@ export default class StripeWebhook {
     // Verify signature
     let event: any
     try {
-      event = stripeService.constructWebhookEvent(rawBody, signature, webhookSecret)
+      event = stripeService.constructWebhookEvent(rawBody as string | Buffer, signature, webhookSecret)
     } catch {
       return response.badRequest({ message: 'Invalid signature' })
     }
