@@ -18,6 +18,7 @@ import {
   Globe,
   Terminal,
   Lock,
+  KeyRound,
   User,
   FileText,
   Users,
@@ -113,6 +114,14 @@ function AuthorizeContent() {
   const submitDecision = useCallback(
     async (decision: 'allow' | 'deny') => {
       if (!data) return
+      // Refuse to proceed if the vault is still locked. The global
+      // VaultUnlockModal in AuthProvider handles the password prompt
+      // and reloads the page on success.
+      if (user?.vaultLocked) {
+        setErrorMsg('Vous devez déverrouiller votre coffre-fort avant de pouvoir autoriser une application.')
+        setState('error')
+        return
+      }
       setState(decision === 'allow' ? 'approving' : 'denying')
 
       const { data: resp, error } = await api.post<{ redirect: string }>(
@@ -143,8 +152,45 @@ function AuthorizeContent() {
   )
 
   useEffect(() => {
-    if (data?.autoApprove && state === 'ready') submitDecision('allow')
-  }, [data, state, submitDecision])
+    if (data?.autoApprove && state === 'ready' && !user?.vaultLocked) submitDecision('allow')
+  }, [data, state, submitDecision, user?.vaultLocked])
+
+  // ---------- Vault locked blocker ----------
+  // When the session is authenticated but the vault key is missing
+  // (post server restart, cookie-only resume, etc.) we freeze the
+  // consent screen and let the global VaultUnlockModal handle the
+  // password prompt. The modal reloads on success which re-renders
+  // this page with user.vaultLocked === false.
+  if (user && user.vaultLocked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.25 }}
+          className="w-full max-w-sm"
+        >
+          <div className="rounded-2xl border border-amber-500/20 bg-card p-6 text-center">
+            <div className="h-12 w-12 rounded-full bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
+              <Lock className="h-6 w-6 text-amber-500" />
+            </div>
+            <h2 className="text-base font-semibold text-foreground mb-1">
+              Coffre-fort verrouillé
+            </h2>
+            <p className="text-sm text-muted-foreground mb-5 leading-relaxed">
+              Vous devez déverrouiller votre coffre-fort avant de pouvoir
+              autoriser cette application. Saisissez votre mot de passe
+              dans la fenêtre qui vient de s&apos;ouvrir pour continuer.
+            </p>
+            <Button className="w-full" disabled>
+              <KeyRound className="h-4 w-4 mr-2" />
+              En attente du déverrouillage…
+            </Button>
+          </div>
+        </motion.div>
+      </div>
+    )
+  }
 
   if (authLoading || !user || state === 'loading') {
     return (
