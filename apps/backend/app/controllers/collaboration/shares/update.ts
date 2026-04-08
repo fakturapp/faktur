@@ -29,7 +29,6 @@ export default class Update {
     share.permission = payload.permission
     await share.save()
 
-    // Notify connected collaborator of permission change via WebSocket
     if (share.sharedWithUserId) {
       const io = getSocketServer()
       if (io) {

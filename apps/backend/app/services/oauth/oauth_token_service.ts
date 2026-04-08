@@ -26,11 +26,6 @@ export interface IssuedToken {
 }
 
 class OauthTokenService {
-  /**
-   * Creates a fresh (access, refresh) pair. Both are 64-char hex strings
-   * hashed before insertion — the raw values leave the server exactly
-   * once in the JSON response of the /token endpoint.
-   */
   async issue(input: IssueTokenInput): Promise<IssuedToken> {
     const rawAccessToken = oauthCrypto.generateToken(32)
     const rawRefreshToken = oauthCrypto.generateToken(32)
@@ -65,12 +60,6 @@ class OauthTokenService {
     }
   }
 
-  /**
-   * Rotates an active token: the old row is revoked and a fresh
-   * (access, refresh) pair is issued. Refresh-token rotation is
-   * mandatory per current OAuth security guidelines — reusing the
-   * same refresh token forever is a replay vector.
-   */
   async rotate(current: OauthToken, ip: string | null, userAgent: string | null): Promise<IssuedToken> {
     current.revokedAt = DateTime.now()
     current.revokedReason = 'rotated'
@@ -88,10 +77,6 @@ class OauthTokenService {
     })
   }
 
-  /**
-   * Looks up an access token by raw value. Returns the record only if
-   * it's still valid (not expired, not revoked).
-   */
   async findActiveByAccessToken(rawAccessToken: string): Promise<OauthToken | null> {
     const hash = oauthCrypto.hash(rawAccessToken)
     const token = await OauthToken.query().where('access_token_hash', hash).first()
@@ -99,11 +84,6 @@ class OauthTokenService {
     return token
   }
 
-  /**
-   * Looks up a refresh token by raw value. Returns the record only if
-   * the refresh grant is still valid (refresh_expires_at in the future,
-   * not revoked).
-   */
   async findActiveByRefreshToken(rawRefreshToken: string): Promise<OauthToken | null> {
     const hash = oauthCrypto.hash(rawRefreshToken)
     const token = await OauthToken.query().where('refresh_token_hash', hash).first()
@@ -111,10 +91,6 @@ class OauthTokenService {
     return token
   }
 
-  /**
-   * Revokes a single token and sets a reason string that surfaces in
-   * the admin UI and the webhook payload.
-   */
   async revoke(token: OauthToken, reason: string): Promise<void> {
     if (token.revokedAt) return
     token.revokedAt = DateTime.now()
@@ -122,11 +98,6 @@ class OauthTokenService {
     await token.save()
   }
 
-  /**
-   * Revokes every active token for a given (user, app) pair — used
-   * when the user clicks 'Déconnecter cette application' in the
-   * authorized apps screen.
-   */
   async revokeAllForUserApp(userId: string, oauthAppId: string, reason: string): Promise<number> {
     const tokens = await OauthToken.query()
       .where('user_id', userId)
@@ -140,11 +111,6 @@ class OauthTokenService {
     return count
   }
 
-  /**
-   * Updates last_used_at + last_ip for an active token. Called from
-   * the auth middleware on every authenticated request — kept cheap
-   * so it doesn't slow the hot path down.
-   */
   async touch(token: OauthToken, ip: string | null, userAgent: string | null): Promise<void> {
     token.lastUsedAt = DateTime.now()
     if (ip) token.lastIp = ip

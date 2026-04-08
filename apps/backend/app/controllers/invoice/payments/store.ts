@@ -48,7 +48,6 @@ export default class Store {
 
     const payment = await InvoicePayment.create(paymentData)
 
-    // Recalculate invoice status
     const allPayments = await InvoicePayment.query()
       .where('invoice_id', params.invoiceId)
       .where('team_id', teamId)

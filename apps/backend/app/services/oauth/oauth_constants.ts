@@ -1,8 +1,3 @@
-/**
- * Centralised OAuth2 constants — lifetimes, scopes, error codes — kept
- * in one place so the admin panel, the authorize controller and the
- * desktop client all read the same source of truth.
- */
 
 export const OAUTH_CODE_TTL_MINUTES = 10
 export const OAUTH_ACCESS_TOKEN_TTL_HOURS = 1
@@ -69,7 +64,6 @@ export const OAUTH_WEBHOOK_EVENTS = [
 
 export type OauthWebhookEvent = (typeof OAUTH_WEBHOOK_EVENTS)[number]
 
-/** Standard OAuth2 error codes — keep ids from RFC 6749 §5.2 + extensions. */
 export const OAUTH_ERRORS = {
   invalid_request: 'invalid_request',
   invalid_client: 'invalid_client',

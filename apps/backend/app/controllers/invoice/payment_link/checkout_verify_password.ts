@@ -29,7 +29,6 @@ export default class CheckoutVerifyPassword {
       return response.badRequest({ message: 'Password is required' })
     }
 
-    // Decrypt the stored password hash (app-level encryption)
     let storedHash: string
     try {
       storedHash = encryptionService.decrypt(paymentLink.passwordHash)
@@ -37,17 +36,15 @@ export default class CheckoutVerifyPassword {
       return response.internalServerError({ message: 'Internal error' })
     }
 
-    // Hash the provided password and compare
     const providedHash = encryptionService.hash(password)
 
     if (!encryptionService.timingSafeEqual(providedHash, storedHash)) {
       return response.unauthorized({ message: 'Incorrect password' })
     }
 
-    // Generate a session token (HMAC-signed, 30min TTL)
     const sessionData = {
       tokenHash,
-      exp: Date.now() + 30 * 60 * 1000, // 30 minutes
+      exp: Date.now() + 30 * 60 * 1000,
     }
     const sessionPayload = Buffer.from(JSON.stringify(sessionData)).toString('base64url')
     const hmac = crypto

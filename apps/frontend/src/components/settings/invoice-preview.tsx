@@ -30,7 +30,7 @@ export function InvoicePreview() {
                 border: settings.darkMode ? '1px solid #3f3f46' : '1px solid #e5e7eb',
               }}>
               <div className="h-full flex flex-col p-5 relative">
-                {/* Banner header */}
+                {}
                 {currentTemplate.layout === 'banner' && (
                   <div className="rounded-lg px-4 py-3 mb-4 -mx-2 -mt-2" style={{ backgroundColor: settings.accentColor }}>
                     <div className="flex justify-between items-center">

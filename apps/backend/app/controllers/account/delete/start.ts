@@ -6,7 +6,6 @@ export default class Start {
   async handle({ auth, response }: HttpContext) {
     const user = auth.user!
 
-    // Generate a unique deletion token
     const token = crypto.randomBytes(32).toString('hex')
 
     user.deletionToken = token

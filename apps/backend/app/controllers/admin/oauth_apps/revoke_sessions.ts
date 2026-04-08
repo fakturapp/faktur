@@ -5,12 +5,6 @@ import oauthTokenService from '#services/oauth/oauth_token_service'
 import oauthWebhookService from '#services/oauth/oauth_webhook_service'
 import { DateTime } from 'luxon'
 
-/**
- * Admin — revokes every active token for an OAuth app. This is the
- * 'nuke all sessions' button in the admin panel. Every revocation
- * emits a session.revoked webhook so subscribing apps can
- * immediately kick out their connected users.
- */
 export default class RevokeOauthAppSessions {
   async handle({ params, response }: HttpContext) {
     const app = await OauthApp.find(params.id)

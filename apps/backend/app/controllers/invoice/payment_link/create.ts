@@ -32,7 +32,6 @@ export default class Create {
       return response.notFound({ message: 'Invoice not found' })
     }
 
-    // Check no active link already exists
     const existingLink = await PaymentLink.query()
       .where('invoice_id', invoice.id)
       .first()
@@ -41,13 +40,11 @@ export default class Create {
       if (existingLink.isActive) {
         return response.conflict({ message: 'A payment link already exists for this invoice' })
       }
-      // Delete old inactive link to allow creating a new one (UNIQUE constraint)
       await existingLink.delete()
     }
 
     const payload = await request.validateUsing(createPaymentLinkValidator)
 
-    // Get bank account info if showing IBAN
     let encryptedIban: string | null = null
     let encryptedBic: string | null = null
     let encryptedBankName: string | null = null
@@ -61,10 +58,8 @@ export default class Create {
         .first()
 
       if (bankAccount) {
-        // Decrypt IBAN/BIC with DEK (zero-access)
         decryptModelFields(bankAccount, [...ENCRYPTED_FIELDS.bankAccount], dek)
 
-        // Re-encrypt with app-level EncryptionService for public access
         if (bankAccount.iban) {
           encryptedIban = encryptionService.encrypt(bankAccount.iban)
         }
@@ -77,18 +72,15 @@ export default class Create {
       }
     }
 
-    // Generate secure token
     const rawToken = encryptionService.generateSecureToken(64)
     const tokenHash = encryptionService.hash(rawToken)
 
-    // Hash and encrypt password if provided
     let passwordHash: string | null = null
     if (payload.password) {
       const pwHash = encryptionService.hash(payload.password)
       passwordHash = encryptionService.encrypt(pwHash)
     }
 
-    // Calculate expiration
     let expiresAt: DateTime | null = null
     const expirationType = payload.expirationType || null
 
@@ -100,7 +92,6 @@ export default class Create {
       expiresAt = DateTime.now().plus({ days: payload.expirationDays }).endOf('day')
     }
 
-    // Get client info and company name for snapshot
     let clientEmail: string | null = null
     let clientName: string | null = null
     let companyName: string | null = null
@@ -111,18 +102,15 @@ export default class Create {
       clientName = invoice.client.displayName || null
     }
 
-    // Get company name from companySnapshot
     if (invoice.companySnapshot) {
       decryptModelFields(invoice, ['companySnapshot'] as any, dek)
       try {
         const snap = JSON.parse(invoice.companySnapshot!)
         companyName = snap.legalName || snap.companyName || null
       } catch {
-        // ignore parse errors
       }
     }
 
-    // App-level encrypt client email for use in public checkout notifications
     let appEncryptedClientEmail: string | null = null
     let appEncryptedClientName: string | null = null
     if (clientEmail) {
@@ -132,13 +120,11 @@ export default class Create {
       appEncryptedClientName = encryptionService.encrypt(clientName)
     }
 
-    // Also app-level encrypt company name for public display
     let appEncryptedCompanyName: string | null = null
     if (companyName) {
       appEncryptedCompanyName = encryptionService.encrypt(companyName)
     }
 
-    // Build payment link data
     const linkData: Record<string, any> = {
       teamId,
       invoiceId: invoice.id,
@@ -162,28 +148,23 @@ export default class Create {
       companyName: appEncryptedCompanyName,
     }
 
-    // If Stripe payment method, snapshot Stripe keys from InvoiceSetting
     if (payload.paymentMethod === 'stripe') {
       const invoiceSettings = await InvoiceSetting.query().where('team_id', teamId).first()
       if (!invoiceSettings?.stripePublishableKey || !invoiceSettings?.stripeSecretKey) {
         return response.badRequest({ message: 'Stripe is not configured. Set up your Stripe keys in settings.' })
       }
 
-      // Decrypt Stripe keys with DEK
       decryptModelFields(invoiceSettings, [...ENCRYPTED_FIELDS.invoiceSetting], dek)
 
-      // Re-encrypt with app-level encryption for public checkout access
       linkData.encryptedStripePublishableKey = encryptionService.encrypt(invoiceSettings.stripePublishableKey!)
       linkData.encryptedStripeSecretKey = encryptionService.encrypt(invoiceSettings.stripeSecretKey!)
       linkData.showIban = false
     }
 
-    // Encrypt DEK-based fields
     encryptModelFields(linkData, [...ENCRYPTED_FIELDS.paymentLink], dek)
 
     const paymentLink = await PaymentLink.create(linkData)
 
-    // Generate and upload PDF to R2 if includePdf is enabled (default: true)
     const includePdf = payload.includePdf !== false
     if (includePdf) {
       try {

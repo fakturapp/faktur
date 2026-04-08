@@ -1,6 +1,3 @@
-// ---------- Faktur Desktop detection ----------
-// Triple check: preload bridge (most reliable), UA stamp, and localStorage
-// flag set by the shell bootstrap script.
 
 export interface FakturDesktopCertificationStatus {
   certified: boolean
@@ -52,7 +49,6 @@ export function isFakturDesktop(): boolean {
   try {
     if (window.localStorage?.getItem('faktur_source') === 'desktop') return true
   } catch {
-    /* ignore */
   }
 
   return false

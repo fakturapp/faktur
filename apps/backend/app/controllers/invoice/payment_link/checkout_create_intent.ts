@@ -31,7 +31,6 @@ export default class CheckoutCreateIntent {
       return response.badRequest({ message: 'Stripe is not configured for this payment link' })
     }
 
-    // Decrypt app-level encrypted Stripe keys
     let secretKey: string
     let publishableKey: string
     try {
@@ -41,7 +40,6 @@ export default class CheckoutCreateIntent {
       return response.internalServerError({ message: 'Failed to decrypt Stripe keys' })
     }
 
-    // Reuse existing PaymentIntent if one exists and is still valid
     if (paymentLink.stripePaymentIntentId) {
       try {
         const stripe = stripeService.getClient(secretKey)
@@ -53,11 +51,9 @@ export default class CheckoutCreateIntent {
           })
         }
       } catch {
-        // PI not found or invalid, create a new one
       }
     }
 
-    // Create new PaymentIntent
     try {
       const pi = await stripeService.createPaymentIntent(secretKey, {
         amount: Number(paymentLink.amount),

@@ -45,13 +45,11 @@ export function EmailProvider({ children }: { children: React.ReactNode }) {
         setAccounts(data.emailAccounts)
         retryCount.current = 0
       } else if (error && retryCount.current < 2) {
-        // Retry once after a short delay (covers race with auth)
         retryCount.current++
         setTimeout(() => loadAccounts(), 1500)
         return
       }
     } catch {
-      // silently fail
     }
     setLoading(false)
   }, [])

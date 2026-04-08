@@ -41,7 +41,6 @@ const ListUserOauthApps = () => import('#controllers/account/oauth_apps/list')
 const RevokeUserOauthApp = () => import('#controllers/account/oauth_apps/revoke_app')
 const RevokeUserOauthSession = () => import('#controllers/account/oauth_apps/revoke_session')
 
-// Public routes
 router.get(API_PREFIX + '/avatars/:filename', [ServeAvatar, 'handle'])
 
 router
@@ -54,7 +53,6 @@ router
     router.delete('/sessions/:id', [SessionRevoke, 'handle'])
     router.delete('/', [AccountDelete, 'handle'])
 
-    // Account deletion flow
     router.post('/delete/start', [DeletionStart, 'handle'])
     router.get('/delete/teams', [DeletionTeams, 'handle'])
     router.post('/delete/resolve-team', [DeletionResolveTeam, 'handle'])
@@ -78,13 +76,11 @@ router
     router.post('/providers/link', [LinkProvider, 'handle'])
     router.post('/providers/unlink', [UnlinkProvider, 'handle'])
 
-    // Passkeys
     router.post('/passkeys/register-options', [PasskeyRegisterOptions, 'handle'])
     router.post('/passkeys/register-verify', [PasskeyRegisterVerify, 'handle'])
     router.get('/passkeys', [PasskeyList, 'handle'])
     router.delete('/passkeys/:id', [PasskeyDelete, 'handle'])
 
-    // Connected OAuth applications (user-facing, not admin)
     router.get('/oauth-apps', [ListUserOauthApps, 'handle'])
     router.post('/oauth-apps/:authorizationId/revoke', [RevokeUserOauthApp, 'handle'])
     router.post('/oauth-apps/sessions/:tokenId/revoke', [RevokeUserOauthSession, 'handle'])

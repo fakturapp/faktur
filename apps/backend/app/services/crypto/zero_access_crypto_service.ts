@@ -7,15 +7,11 @@ class ZeroAccessCryptoService {
   private keyLength = 32
   private formatVersion = 'v1'
 
-  /**
-   * Derive a KEK (Key Encryption Key) from user password + salt using Argon2id.
-   * The KEK is NEVER stored — only derived in memory when the user provides their password.
-   */
   async deriveKEK(password: string, salt: Buffer): Promise<Buffer> {
     const kek = await argon2.hash(password, {
       type: argon2.argon2id,
       salt,
-      memoryCost: 65536, // 64 MB
+      memoryCost: 65536,
       timeCost: 3,
       parallelism: 4,
       hashLength: this.keyLength,
@@ -24,24 +20,14 @@ class ZeroAccessCryptoService {
     return Buffer.from(kek)
   }
 
-  /**
-   * Generate a random salt for KDF (32 bytes).
-   */
   generateSalt(): Buffer {
     return crypto.randomBytes(this.keyLength)
   }
 
-  /**
-   * Generate a random DEK (Data Encryption Key) — 32 bytes.
-   */
   generateDEK(): Buffer {
     return crypto.randomBytes(this.keyLength)
   }
 
-  /**
-   * Encrypt a DEK with a KEK using AES-256-GCM.
-   * Returns hex string: iv:tag:ciphertext
-   */
   encryptDEK(dek: Buffer, kek: Buffer): string {
     const iv = crypto.randomBytes(this.ivLength)
     const cipher = crypto.createCipheriv(this.algorithm, kek, iv)

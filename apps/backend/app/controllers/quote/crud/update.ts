@@ -25,7 +25,6 @@ export default class Update {
 
     const payload = await request.validateUsing(createQuoteValidator)
 
-    // Calculate totals from lines
     let subtotal = 0
     let taxAmount = 0
     const linesData = payload.lines.map((line, index) => {
@@ -45,7 +44,6 @@ export default class Update {
       }
     })
 
-    // Apply global discount
     let discountAmount = 0
     const discountType = payload.globalDiscountType || 'none'
     const discountValue = payload.globalDiscountValue || 0
@@ -91,7 +89,6 @@ export default class Update {
       quote.merge(quoteUpdateData)
       await quote.save()
 
-      // Delete existing lines and recreate
       await QuoteLine.query({ client: trx }).where('quote_id', quote.id).delete()
 
       for (const lineData of linesData) {

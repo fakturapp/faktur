@@ -7,14 +7,12 @@ import {
   checkoutMarkPaidLimiter,
 } from '#start/limiter'
 
-// Authenticated controllers (John's management)
 const PaymentLinkCreate = () => import('#controllers/invoice/payment_link/create')
 const PaymentLinkShow = () => import('#controllers/invoice/payment_link/show')
 const PaymentLinkDelete = () => import('#controllers/invoice/payment_link/delete')
 const PaymentLinkConfirm = () => import('#controllers/invoice/payment_link/confirm_payment')
 const PaymentLinkSendEmail = () => import('#controllers/invoice/payment_link/send_link_email')
 
-// Public controllers (Abel's checkout)
 const CheckoutShow = () => import('#controllers/invoice/payment_link/checkout_show')
 const CheckoutVerifyPassword = () =>
   import('#controllers/invoice/payment_link/checkout_verify_password')
@@ -25,7 +23,6 @@ const CheckoutDownloadPdf = () =>
 const CheckoutCreateIntent = () =>
   import('#controllers/invoice/payment_link/checkout_create_intent')
 
-// ── Authenticated routes (John manages payment links) ──────────────────
 
 const paymentLinkGroup = router
   .group(() => {
@@ -40,7 +37,6 @@ const paymentLinkGroup = router
   .use(middleware.vault())
 if (API_PREFIX) paymentLinkGroup.prefix(API_PREFIX)
 
-// ── Public checkout routes (Abel pays) ─────────────────────────────────
 
 const checkoutGroup = router
   .group(() => {

@@ -28,7 +28,6 @@ export default class RegisterVerify {
         return response.badRequest({ message: 'Passkey verification failed' })
       }
 
-      // Encrypt KEK with passkey-derived key if user has crypto enabled
       const kek = keyStore.getKEK(user.id)
       if (kek) {
         credential.encryptedKek = passkeyService.encryptKekForPasskey(kek, credential.credentialId)

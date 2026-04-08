@@ -2,9 +2,6 @@
 
 import { cn } from '@/lib/utils'
 
-// ---------- Twitter-style blue verified badge ----------
-// Single-source SVG used by the OAuth consent screen and by the
-// sidebar's Faktur Desktop certification indicator.
 
 interface Props {
   className?: string

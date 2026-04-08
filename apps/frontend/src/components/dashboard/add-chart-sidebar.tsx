@@ -28,7 +28,6 @@ export function AddChartSidebar({ open, onClose, onAddChart, activeCharts }: Add
   async function handleAdd(key: ChartKey) {
     if (activeCharts.includes(key) || loadingKey) return
     setLoadingKey(key)
-    // Brief delay for visual feedback
     await new Promise((r) => setTimeout(r, 600))
     onAddChart(key)
     setLoadingKey(null)
@@ -38,7 +37,7 @@ export function AddChartSidebar({ open, onClose, onAddChart, activeCharts }: Add
     <AnimatePresence>
       {open && (
         <>
-          {/* Backdrop */}
+          {}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -48,7 +47,7 @@ export function AddChartSidebar({ open, onClose, onAddChart, activeCharts }: Add
             onClick={onClose}
           />
 
-          {/* Panel */}
+          {}
           <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
@@ -56,7 +55,7 @@ export function AddChartSidebar({ open, onClose, onAddChart, activeCharts }: Add
             transition={{ duration: 0.25, ease: 'easeOut' }}
             className="fixed top-2 right-2 bottom-2 z-50 w-[380px] max-w-[90vw] bg-card border border-border shadow-2xl flex flex-col rounded-2xl overflow-hidden"
           >
-            {/* Header */}
+            {}
             <div className="flex items-center justify-between px-5 py-4 border-b border-border">
               <h3 className="text-lg font-bold text-foreground">Nouveau graphique</h3>
               <button
@@ -68,7 +67,7 @@ export function AddChartSidebar({ open, onClose, onAddChart, activeCharts }: Add
             </div>
 
             <div className="flex-1 overflow-auto p-5 space-y-6">
-              {/* Custom chart */}
+              {}
               <div className="rounded-xl border border-border bg-muted/30 p-4 space-y-3">
                 <div className="flex items-center gap-2">
                   <h4 className="text-sm font-semibold text-foreground">Graphique personnalise</h4>
@@ -83,7 +82,7 @@ export function AddChartSidebar({ open, onClose, onAddChart, activeCharts }: Add
                 </Button>
               </div>
 
-              {/* Predefined charts */}
+              {}
               <div className="space-y-3">
                 <h4 className="text-sm font-semibold text-foreground">Graphiques predefinis</h4>
                 <div className="space-y-2">

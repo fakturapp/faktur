@@ -22,7 +22,6 @@ export default class Delete {
     const wasDefault = account.isDefault
     await account.delete()
 
-    // If the deleted account was default, promote the next one
     if (wasDefault) {
       const nextAccount = await EmailAccount.query()
         .where('team_id', teamId)

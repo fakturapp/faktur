@@ -15,7 +15,6 @@ export default class ConfigureResend {
 
     const payload = await request.validateUsing(configureResendValidator)
 
-    // Validate the API key
     const isValid = await ResendUserService.validateApiKey(payload.apiKey)
     if (!isValid) {
       return response.badRequest({
@@ -23,10 +22,8 @@ export default class ConfigureResend {
       })
     }
 
-    // Encrypt the API key before storage
     const encryptedApiKey = EncryptionService.encrypt(payload.apiKey)
 
-    // Upsert: update if a Resend account already exists for this team+email
     const existing = await EmailAccount.query()
       .where('team_id', teamId)
       .where('provider', 'resend')
@@ -51,7 +48,6 @@ export default class ConfigureResend {
       })
     }
 
-    // Check if any email account exists for this team (to set default)
     const existingCount = await EmailAccount.query().where('team_id', teamId).count('* as cnt')
 
     const isFirst = Number(existingCount[0].$extras.cnt) === 0

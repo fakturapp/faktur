@@ -21,7 +21,6 @@ export default class TransferOwnership {
 
     const payload = await request.validateUsing(transferValidator)
 
-    // Verify password
     const isValid = await hash.verify(user.password, payload.password)
     if (!isValid) {
       return response.unauthorized({ message: 'Mot de passe incorrect' })
@@ -50,14 +49,12 @@ export default class TransferOwnership {
       return response.badRequest({ message: 'Cannot transfer ownership to yourself' })
     }
 
-    // Transfer: promote target to super_admin, demote self to admin
     targetMember.role = 'super_admin'
     await targetMember.save()
 
     currentMember.role = 'admin'
     await currentMember.save()
 
-    // Update team ownerId
     const team = await Team.findOrFail(user.currentTeamId)
     team.ownerId = targetMember.userId
     await team.save()

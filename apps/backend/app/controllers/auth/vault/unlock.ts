@@ -27,7 +27,6 @@ export default class VaultUnlock {
     let kek: Buffer
 
     if (recoveryKey) {
-      // Recovery key flow: derive recovery KEK and decrypt DEK from recovery column
       const normalizedKey = recoveryKey.replace(/-/g, '').toUpperCase()
       const recoveryKEK = zeroAccessCryptoService.deriveRecoveryKEK(normalizedKey)
 
@@ -47,7 +46,6 @@ export default class VaultUnlock {
             teamMember.encryptedTeamDekRecovery,
             recoveryKEK
           )
-          // We don't have the password KEK, so store a dummy KEK — vault is unlocked via recovery
           kek = recoveryKEK
           keyStore.storeKeys(user.id, kek, user.currentTeamId, teamDek)
         } catch {
@@ -58,7 +56,6 @@ export default class VaultUnlock {
         keyStore.storeKeys(user.id, kek, '', Buffer.alloc(0))
       }
     } else {
-      // Password flow (existing behavior)
       const passwordValid = await User.verifyCredentials(user.email, password!)
         .then(() => true)
         .catch(() => false)
@@ -92,7 +89,6 @@ export default class VaultUnlock {
       }
     }
 
-    // Dual-key split: encrypt KEK with sessionKey (client) then ENCRYPTION_KEY (server)
     const tokenId = user.currentAccessToken.identifier
     const sessionKey = crypto.randomBytes(32)
     const layer1 = encryptionService.encryptWithCustomKey(kek.toString('hex'), sessionKey)

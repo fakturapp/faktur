@@ -20,7 +20,7 @@ export function AiSheetOverlay({ open, error, onRetry, onDismissError }: AiSheet
   return (
     <>
       <AnimatePresence>
-        {/* Loading state */}
+        {}
         {open && (
           <motion.div
             key="loading"
@@ -33,7 +33,7 @@ export function AiSheetOverlay({ open, error, onRetry, onDismissError }: AiSheet
             <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" />
 
             <div className="relative flex flex-col items-center">
-              {/* Galaxy AI animation */}
+              {}
               <div className="relative h-24 w-24 mb-5">
                 <motion.div
                   className="absolute -inset-4 rounded-full blur-2xl"

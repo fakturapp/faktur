@@ -12,7 +12,6 @@ export default class Teams {
     const error = validateDeletionSession(user, token)
     if (error) return response.badRequest({ message: error })
 
-    // Get all teams the user is a member of
     const memberships = await TeamMember.query()
       .where('userId', user.id)
       .where('status', 'active')
@@ -33,7 +32,6 @@ export default class Teams {
         .where('teamId', team.id)
         .where('status', 'active')
 
-      // Build member list for owner teams (needed for transfer)
       const members: { userId: string; displayName: string; email: string; role: string }[] = []
       if (membership.role === 'super_admin') {
         for (const m of teamMembers) {

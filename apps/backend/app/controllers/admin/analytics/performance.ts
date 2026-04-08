@@ -15,7 +15,6 @@ export default class AnalyticsPerformance {
       this.getDeviceBreakdown(startDate),
     ])
 
-    // Build webVitals array
     const webVitals = metricNames
       .map((name) => {
         const p75Row = p75Results.find((r: any) => r.metric_name === name)
@@ -37,7 +36,6 @@ export default class AnalyticsPerformance {
       })
       .filter(Boolean)
 
-    // Build deviceBreakdown with percentages
     const totalDeviceCount = deviceRows.reduce((sum: number, r: any) => sum + Number(r.count), 0)
     const deviceBreakdown = deviceRows.map((row: any) => ({
       device: row.device_type || 'unknown',

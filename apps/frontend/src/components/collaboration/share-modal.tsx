@@ -13,7 +13,6 @@ import {
   ChevronDown, Shield, Eye, Pencil, Trash2, Users
 } from 'lucide-react'
 
-// ── Types ─────────────────────────────────────────────────────────────────
 
 type DocumentType = 'invoice' | 'quote' | 'credit_note'
 type Permission = 'viewer' | 'editor'
@@ -55,7 +54,6 @@ interface ShareModalProps {
 
 const FRONTEND_URL = typeof window !== 'undefined' ? window.location.origin : ''
 
-// ── Helpers ───────────────────────────────────────────────────────────────
 
 function getInitials(name: string | null, email: string): string {
   if (name) {

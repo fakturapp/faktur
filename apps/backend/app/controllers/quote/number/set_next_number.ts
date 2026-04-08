@@ -11,7 +11,6 @@ export default class SetNextNumber {
       return response.badRequest({ message: 'No team selected' })
     }
 
-    // Only allow setting next number if no quotes exist yet
     const result = await Quote.query().where('team_id', teamId).count('* as cnt').first()
 
     const count = Number(result?.$extras.cnt ?? 0)

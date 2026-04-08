@@ -77,7 +77,7 @@ export default function AdminOverviewPage() {
         </div>
       ) : (
         <>
-          {/* Stats */}
+          {}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -157,7 +157,7 @@ export default function AdminOverviewPage() {
             </motion.div>
           </div>
 
-          {/* Recent feedbacks */}
+          {}
           <div>
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-sm font-semibold text-foreground">Derniers avis</h2>
@@ -208,7 +208,7 @@ export default function AdminOverviewPage() {
             )}
           </div>
 
-          {/* Recent bugs */}
+          {}
           <div>
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-sm font-semibold text-foreground">Derniers bugs</h2>

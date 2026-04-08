@@ -28,7 +28,6 @@ export default function ShareLinkPage() {
     async function validate() {
       const authToken = localStorage.getItem('faktur_token')
       if (!authToken) {
-        // Store the share URL so we can redirect after login
         sessionStorage.setItem('faktur_share_redirect', `/share/${token}`)
         setStatus('unauthenticated')
         return

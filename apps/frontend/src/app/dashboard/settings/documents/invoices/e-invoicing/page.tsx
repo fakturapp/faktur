@@ -29,7 +29,6 @@ export default function EInvoicingPage() {
   const [showEInvoicingModal, setShowEInvoicingModal] = useState(false)
   const [showBetaWarningModal, setShowBetaWarningModal] = useState(false)
 
-  /* ── Loading skeleton ── */
   if (loading) {
     return (
       <div className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
@@ -79,16 +78,16 @@ export default function EInvoicingPage() {
   return (
     <>
       <div className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
-        {/* Header */}
+        {}
         <div className="space-y-1">
           <h1 className="text-xl font-bold text-foreground tracking-tight">E-Facturation</h1>
           <p className="text-sm text-muted-foreground">Reforme 2026 — Factur-X, PDP et e-reporting</p>
         </div>
 
-        {/* Main Card */}
+        {}
         <Card className="border-border/50">
           <CardContent className="p-6">
-            {/* Card header */}
+            {}
             <div className="flex items-center gap-3 mb-4">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
                 <FileCheck className="h-4.5 w-4.5 text-primary" />
@@ -99,7 +98,7 @@ export default function EInvoicingPage() {
               </div>
             </div>
 
-            {/* Info banner */}
+            {}
             <div className="flex items-start gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 mb-4">
               <Info className="h-4 w-4 text-primary shrink-0 mt-0.5" />
               <p className="text-xs text-foreground leading-relaxed">
@@ -107,7 +106,7 @@ export default function EInvoicingPage() {
               </p>
             </div>
 
-            {/* Toggle activation */}
+            {}
             <div className="flex items-center justify-between rounded-xl border-2 border-border p-4 mb-4">
               <div className="flex items-center gap-3">
                 <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${settings.eInvoicingEnabled ? 'bg-primary/10' : 'bg-muted'}`}>

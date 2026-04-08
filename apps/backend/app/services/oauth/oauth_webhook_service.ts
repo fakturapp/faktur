@@ -8,20 +8,10 @@ import encryptionService from '#services/encryption/encryption_service'
 import type { OauthWebhookEvent } from '#services/oauth/oauth_constants'
 import logger from '@adonisjs/core/services/logger'
 
-/**
- * Dispatches signed webhook events to OAuth apps that have subscribed to
- * them. Every delivery row is persisted with its encrypted payload so we
- * can retry failures and surface a full delivery log in the admin panel.
- */
 class OauthWebhookService {
   private static RETRY_BACKOFF_SECONDS = [30, 120, 600, 3600, 10_800]
   private static MAX_ATTEMPTS = 5
 
-  /**
-   * Fan-out helper — enqueues a webhook delivery for a single app.
-   * Short-circuits silently if the app is not subscribed to the event
-   * or if no webhook URL is configured.
-   */
   async enqueue(app: OauthApp, event: OauthWebhookEvent, payload: Record<string, unknown>): Promise<void> {
     if (!app.subscribesTo(event)) return
     if (!app.webhookUrl) return
@@ -50,18 +40,11 @@ class OauthWebhookService {
       nextAttemptAt: DateTime.now(),
     })
 
-    // Fire-and-forget the first attempt. Later retries are picked up by
-    // the worker loop. We do NOT await this to keep request latency low.
     this.attemptDelivery(eventId).catch((err) => {
       logger.error({ err, eventId }, 'webhook: attempt dispatch failed')
     })
   }
 
-  /**
-   * Actual HTTP POST to the subscriber. Signs the raw JSON payload with
-   * the webhook secret (HMAC-SHA256) and sends it with the Faktur
-   * signature headers. Updates the delivery row based on the response.
-   */
   async attemptDelivery(eventId: string): Promise<void> {
     const delivery = await OauthWebhookDelivery.query().where('event_id', eventId).first()
     if (!delivery) return

@@ -59,7 +59,6 @@ export default function OnboardingPersonalizationPage() {
       const { data } = await api.upload<{ logoUrl: string }>('/settings/invoices/logo', formData)
       if (data?.logoUrl) setLogoUrl(data.logoUrl)
     } catch {
-      // Erreur silencieuse pendant l'onboarding
     }
     setUploading(false)
   }
@@ -99,7 +98,7 @@ export default function OnboardingPersonalizationPage() {
             </div>
           </motion.div>
 
-          {/* Upload du logo */}
+          {}
           <motion.div variants={fadeUp} custom={1} className="mb-6">
             <h2 className="text-sm font-semibold text-foreground mb-3">Logo de vos documents</h2>
             <div className="flex items-center gap-4">
@@ -128,7 +127,7 @@ export default function OnboardingPersonalizationPage() {
             </div>
           </motion.div>
 
-          {/* Modèle de document */}
+          {}
           <motion.div variants={fadeUp} custom={2} className="mb-6">
             <h2 className="text-sm font-semibold text-foreground mb-3">Modèle de document</h2>
             <div className="grid grid-cols-3 gap-3">
@@ -145,7 +144,7 @@ export default function OnboardingPersonalizationPage() {
             </div>
           </motion.div>
 
-          {/* Couleur d'accent */}
+          {}
           <motion.div variants={fadeUp} custom={3} className="mb-6">
             <h2 className="text-sm font-semibold text-foreground mb-3">Couleur d&apos;accent</h2>
             <div className="flex flex-wrap gap-2.5">

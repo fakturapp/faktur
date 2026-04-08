@@ -26,7 +26,6 @@ export default class ConvertInvoice {
       return response.notFound({ message: 'Invoice not found' })
     }
 
-    // Generate next credit note number
     const currentYear = new Date().getFullYear().toString()
     const prefix = `AV-${currentYear}-`
 

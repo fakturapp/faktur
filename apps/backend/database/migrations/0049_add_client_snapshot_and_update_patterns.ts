@@ -10,7 +10,6 @@ export default class extends BaseSchema {
       table.text('client_snapshot').nullable()
     })
 
-    // Update invoice filename patterns from FAC to FAK
     this.defer(async (db) => {
       await db
         .from('invoice_settings')

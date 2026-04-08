@@ -19,17 +19,14 @@ export default class Create {
 
     const payload = await request.validateUsing(createQuoteValidator)
 
-    // Check for custom starting number
     const settings = await InvoiceSetting.query().where('team_id', teamId).first()
     let quoteNumber: string
 
     if (settings?.nextQuoteNumber) {
       quoteNumber = settings.nextQuoteNumber
-      // Clear the custom starting number after first use
       settings.nextQuoteNumber = null
       await settings.save()
     } else {
-      // Generate next quote number from pattern
       const pattern = settings?.quoteFilenamePattern || 'DEV-{annee}-{numero}'
       const currentYear = new Date().getFullYear().toString()
       const prefix = pattern.replace('{annee}', currentYear).replace('{numero}', '')

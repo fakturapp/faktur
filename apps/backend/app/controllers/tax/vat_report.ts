@@ -19,28 +19,24 @@ export default class VatReport {
       return response.badRequest({ message: 'startDate and endDate are required' })
     }
 
-    // Fetch invoices (non-draft, non-cancelled) in period
     const invoices = await Invoice.query()
       .where('team_id', teamId)
       .whereNotIn('status', ['draft', 'cancelled'])
       .where('issue_date', '>=', startDate)
       .where('issue_date', '<=', endDate)
 
-    // Fetch credit notes in period
     const creditNotes = await CreditNote.query()
       .where('team_id', teamId)
       .whereNotIn('status', ['draft', 'cancelled'])
       .where('issue_date', '>=', startDate)
       .where('issue_date', '<=', endDate)
 
-    // Fetch deductible expenses in period
     const expenses = await Expense.query()
       .where('team_id', teamId)
       .where('is_deductible', true)
       .where('expense_date', '>=', startDate)
       .where('expense_date', '<=', endDate)
 
-    // --- Collected VAT (TVA collectée) from invoices ---
     const vatCollectedByRate: Record<string, { base: number; vat: number }> = {}
     let totalBaseCollected = 0
     let totalVatCollected = 0
@@ -51,7 +47,6 @@ export default class VatReport {
       totalBaseCollected += base
       totalVatCollected += vat
 
-      // Group by effective VAT rate
       const effectiveRate = base > 0 ? Math.round((vat / base) * 10000) / 100 : 0
       const rateKey = effectiveRate.toFixed(1)
       if (!vatCollectedByRate[rateKey]) vatCollectedByRate[rateKey] = { base: 0, vat: 0 }
@@ -59,7 +54,6 @@ export default class VatReport {
       vatCollectedByRate[rateKey].vat += vat
     }
 
-    // --- Credit note adjustments (reduce collected VAT) ---
     let totalCreditNoteBase = 0
     let totalCreditNoteVat = 0
 
@@ -70,7 +64,6 @@ export default class VatReport {
       totalCreditNoteVat += vat
     }
 
-    // --- Deductible VAT (TVA déductible) from expenses ---
     const vatDeductibleByRate: Record<string, { base: number; vat: number }> = {}
     let totalBaseDeductible = 0
     let totalVatDeductible = 0
@@ -88,10 +81,8 @@ export default class VatReport {
       vatDeductibleByRate[rateKey].vat += vat
     }
 
-    // Net collected after credit notes
     const netVatCollected = totalVatCollected - totalCreditNoteVat
 
-    // VAT balance (positive = owed to state, negative = credit)
     const vatBalance = netVatCollected - totalVatDeductible
 
     const round2 = (n: number) => Math.round(n * 100) / 100

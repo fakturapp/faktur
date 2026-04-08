@@ -60,7 +60,6 @@ export default class Create {
 
     const client = await Client.create(clientData)
 
-    // Decrypt after create so displayName returns plaintext
     decryptModelFields(client, [...ENCRYPTED_FIELDS.client], dek)
 
     return response.created({

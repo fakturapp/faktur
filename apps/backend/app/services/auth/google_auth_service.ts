@@ -8,7 +8,7 @@ const AUTH_SCOPES = [
   'https://www.googleapis.com/auth/userinfo.profile',
 ]
 
-const PROFILE_TTL_MS = 5 * 60 * 1000 // 5 minutes
+const PROFILE_TTL_MS = 5 * 60 * 1000
 
 function getOAuth2Client() {
   return new google.auth.OAuth2(

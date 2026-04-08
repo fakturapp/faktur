@@ -33,12 +33,10 @@ export function VaultUnlockModal({ forceOpen = false }: { forceOpen?: boolean })
     setIsDesktop(isFakturDesktop())
   }, [])
 
-  // Proactive trigger from auth provider (vaultLocked in /auth/me)
   useEffect(() => {
     if (forceOpen) setOpen(true)
   }, [forceOpen])
 
-  // Reactive trigger from 423 API responses
   useEffect(() => {
     return onVaultLocked(() => {
       setOpen(true)
@@ -86,10 +84,6 @@ export function VaultUnlockModal({ forceOpen = false }: { forceOpen?: boolean })
 
   if (!open) return null
 
-  // Desktop-specific flow — the password field doesn't exist here so
-  // we can't unlock in-place. Instead, offer to open the browser where
-  // the user can unlock the vault, OR disconnect the desktop shell
-  // entirely and go through a fresh OAuth flow.
   if (isDesktop) {
     return (
       <Dialog open={open} onClose={() => {}}>

@@ -43,7 +43,6 @@ export default function AccountPage() {
   const { user, refreshUser, logout } = useAuth()
   const { toast } = useToast()
 
-  // Determine active section from URL
   const activeTab = pathname.endsWith('/security') ? 'security'
     : pathname.endsWith('/sessions') ? 'sessions'
     : pathname.endsWith('/export') ? 'export'
@@ -389,7 +388,7 @@ export default function AccountPage() {
               )
             }
           }
-        } catch { /* ignore */ }
+        } catch { }
       }
     }
   }

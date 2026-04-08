@@ -22,7 +22,6 @@ router
     router.put('/:id', [ClientUpdate, 'handle'])
     router.delete('/:id', [ClientDelete, 'handle'])
 
-    // Client contacts
     router.get('/:clientId/contacts', [ClientContactIndex, 'handle'])
     router.post('/:clientId/contacts', [ClientContactStore, 'handle'])
     router.put('/:clientId/contacts/:id', [ClientContactUpdate, 'handle'])

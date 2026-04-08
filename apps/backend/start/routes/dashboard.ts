@@ -13,13 +13,11 @@ router
     router.get('/stats', [DashboardStats, 'handle']).as('dashboard.stats')
     router.get('/sidebar-counts', [SidebarCounts, 'handle']).as('dashboard.sidebarCounts')
 
-    // Chart endpoints
     router.get('/charts', [DashboardCharts, 'handle']).as('dashboard.charts')
     router.get('/charts/revenue', [DashboardCharts, 'revenue']).as('dashboard.charts.revenue')
     router.get('/charts/collected', [DashboardCharts, 'collected']).as('dashboard.charts.collected')
     router.get('/charts/micro-thresholds', [DashboardCharts, 'micro']).as('dashboard.charts.micro')
 
-    // Cash flow forecast
     router.get('/cash-flow', [CashFlow, 'handle']).as('dashboard.cashFlow')
   })
   .prefix(API_PREFIX + '/dashboard')

@@ -3,7 +3,6 @@
 import { useEffect, useRef, useCallback, useState } from 'react'
 import type { CollaboratorInfo, CursorPosition } from '@/hooks/use-collaboration'
 
-// ── Spring physics (copied from Liveblocks) ───────────────────────────────
 
 const STIFFNESS = 320
 const DAMPING = 32
@@ -19,7 +18,6 @@ interface SpringState {
   active: boolean
 }
 
-// ── Shared RAF loop (single requestAnimationFrame for all springs) ────────
 
 const springs = new Map<string, { state: SpringState; el: HTMLElement }>()
 let rafId: number | null = null
@@ -41,7 +39,6 @@ function tick(currentTime: number) {
     state.x += state.vx * dt
     state.y += state.vy * dt
 
-    // GPU-accelerated transform
     el.style.transform = `translate3d(${state.x}px, ${state.y}px, 0)`
     el.style.display = ''
 

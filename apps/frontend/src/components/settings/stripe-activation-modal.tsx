@@ -69,7 +69,7 @@ export function StripeActivationModal({ open, onClose, onActivated, webhookUrl }
       </DialogDescription>
 
       <div className="mt-5 space-y-4">
-        {/* Webhook URL instructions */}
+        {}
         <div className="rounded-xl bg-primary/5 border border-primary/15 p-4">
           <p className="text-xs font-semibold text-foreground mb-2">1. Configurez le webhook dans votre Dashboard Stripe</p>
           <p className="text-xs text-muted-foreground mb-2">
@@ -88,7 +88,7 @@ export function StripeActivationModal({ open, onClose, onActivated, webhookUrl }
           </p>
         </div>
 
-        {/* Publishable Key */}
+        {}
         <div>
           <label className="text-sm font-medium text-foreground mb-1.5 block">
             2. Clé publique (Publishable Key)
@@ -104,7 +104,7 @@ export function StripeActivationModal({ open, onClose, onActivated, webhookUrl }
           )}
         </div>
 
-        {/* Secret Key */}
+        {}
         <div>
           <label className="text-sm font-medium text-foreground mb-1.5 block">
             3. Clé secrète (Secret Key)

@@ -40,12 +40,10 @@ export default class List {
 
     const expenses = await query.paginate(page, perPage)
 
-    // Decrypt fields
     for (const expense of expenses) {
       decryptModelFields(expense, [...ENCRYPTED_FIELDS.expense], dek)
     }
 
-    // Filter by search after decryption (encrypted fields can't be searched in DB)
     let items = expenses.all()
     if (search) {
       const s = search.toLowerCase()
@@ -54,7 +52,6 @@ export default class List {
       )
     }
 
-    // Calculate totals
     const totalAmount = items.reduce((sum, e) => sum + Number(e.amount), 0)
     const totalVat = items.reduce((sum, e) => sum + Number(e.vatAmount), 0)
 

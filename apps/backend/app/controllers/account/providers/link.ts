@@ -6,7 +6,6 @@ export default class LinkProvider {
   async handle({ auth, response }: HttpContext) {
     const user = auth.user!
 
-    // Uses the same OAuth callback as login, but with intent='link'
     const state = EncryptionService.encrypt(
       JSON.stringify({ intent: 'link', userId: user.id, ts: Date.now() })
     )

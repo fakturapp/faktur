@@ -22,7 +22,6 @@ export function storeAiDocument(data: AiDocumentData): void {
   try {
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data))
   } catch {
-    /* ignore */
   }
 }
 
@@ -39,6 +38,5 @@ export function clearAiDocument(): void {
   try {
     sessionStorage.removeItem(STORAGE_KEY)
   } catch {
-    /* ignore */
   }
 }

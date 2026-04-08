@@ -19,7 +19,6 @@ export default class CheckoutGetIban {
       return response.notFound({ message: 'Payment link not found or expired' })
     }
 
-    // If already paid, IBAN should not be accessible
     if (paymentLink.paidAt) {
       return response.forbidden({ message: 'Payment already marked as sent, IBAN is no longer accessible' })
     }
@@ -28,7 +27,6 @@ export default class CheckoutGetIban {
       return response.forbidden({ message: 'IBAN display is disabled for this link' })
     }
 
-    // Verify session token if password-protected
     if (paymentLink.passwordHash) {
       const sessionToken = request.header('X-Checkout-Session')
 
@@ -41,7 +39,6 @@ export default class CheckoutGetIban {
         return response.unauthorized({ message: 'Invalid session token' })
       }
 
-      // Verify HMAC
       const expectedHmac = crypto
         .createHmac('sha256', encryptionService.hash('session-key'))
         .update(payload)
@@ -51,7 +48,6 @@ export default class CheckoutGetIban {
         return response.unauthorized({ message: 'Invalid session token' })
       }
 
-      // Check expiry and token match
       try {
         const data = JSON.parse(Buffer.from(payload, 'base64url').toString())
         if (data.exp < Date.now()) {
@@ -65,7 +61,6 @@ export default class CheckoutGetIban {
       }
     }
 
-    // Decrypt IBAN (app-level encryption)
     let iban: string | null = null
     let bic: string | null = null
     let bankName: string | null = null
@@ -79,10 +74,8 @@ export default class CheckoutGetIban {
       }
       if (paymentLink.encryptedBankName) {
         const raw = encryptionService.decrypt(paymentLink.encryptedBankName)
-        // Fix double-encoded UTF-8 (latin1 → utf8 corruption)
         try {
           bankName = Buffer.from(raw, 'latin1').toString('utf8')
-          // If the result looks worse (contains replacement chars), use the original
           if (bankName.includes('\ufffd')) bankName = raw
         } catch {
           bankName = raw
@@ -92,7 +85,6 @@ export default class CheckoutGetIban {
       return response.internalServerError({ message: 'Failed to decrypt payment information' })
     }
 
-    // Format IBAN for display (groups of 4)
     const formattedIban = iban ? iban.replace(/(.{4})/g, '$1 ').trim() : null
 
     response.header('Content-Type', 'application/json; charset=utf-8')

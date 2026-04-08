@@ -2,7 +2,6 @@ import { BaseSchema } from '@adonisjs/lucid/schema'
 
 export default class extends BaseSchema {
   async up() {
-    // Team-level reminder configuration
     this.schema.createTable('payment_reminder_settings', (table) => {
       table.uuid('id').primary().defaultTo(this.raw('gen_random_uuid()'))
 
@@ -16,19 +15,15 @@ export default class extends BaseSchema {
 
       table.boolean('enabled').notNullable().defaultTo(false)
 
-      // Reminder schedule: days before/after due date
-      table.integer('days_before_due').nullable() // e.g. 3 = reminder 3 days before
-      table.integer('days_after_due').nullable() // e.g. 7 = reminder 7 days after
-      table.integer('repeat_interval_days').nullable() // e.g. 7 = repeat every 7 days after first overdue reminder
+      table.integer('days_before_due').nullable()
+      table.integer('days_after_due').nullable()
+      table.integer('repeat_interval_days').nullable()
 
-      // Email template
       table.text('email_subject_template').nullable()
       table.text('email_body_template').nullable()
 
-      // Auto-send or manual only
       table.boolean('auto_send').notNullable().defaultTo(false)
 
-      // Default email account to use
       table
         .uuid('email_account_id')
         .nullable()
@@ -40,7 +35,6 @@ export default class extends BaseSchema {
       table.timestamp('updated_at').nullable()
     })
 
-    // Track individual reminders sent
     this.schema.createTable('payment_reminders', (table) => {
       table.uuid('id').primary().defaultTo(this.raw('gen_random_uuid()'))
 
@@ -53,8 +47,8 @@ export default class extends BaseSchema {
         .inTable('invoices')
         .onDelete('CASCADE')
 
-      table.string('type', 20).notNullable() // 'before_due' | 'after_due' | 'manual'
-      table.string('status', 20).notNullable().defaultTo('sent') // 'sent' | 'error'
+      table.string('type', 20).notNullable()
+      table.string('status', 20).notNullable().defaultTo('sent')
       table.string('to_email', 255).nullable()
       table.text('error_message').nullable()
 

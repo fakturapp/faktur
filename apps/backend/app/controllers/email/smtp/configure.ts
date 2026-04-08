@@ -15,7 +15,6 @@ export default class ConfigureSmtp {
 
     const payload = await request.validateUsing(configureSmtpValidator)
 
-    // Validate SMTP connection
     const isValid = await SmtpService.validateConnection({
       host: payload.host,
       port: payload.port,
@@ -29,11 +28,9 @@ export default class ConfigureSmtp {
       })
     }
 
-    // Encrypt credentials
     const encryptedUsername = EncryptionService.encrypt(payload.username)
     const encryptedPassword = EncryptionService.encrypt(payload.password)
 
-    // Upsert
     const existing = await EmailAccount.query()
       .where('team_id', teamId)
       .where('provider', 'smtp')
@@ -61,7 +58,6 @@ export default class ConfigureSmtp {
       })
     }
 
-    // Check if first account
     const existingCount = await EmailAccount.query().where('team_id', teamId).count('* as cnt')
 
     const isFirst = Number(existingCount[0].$extras.cnt) === 0

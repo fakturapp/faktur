@@ -24,7 +24,6 @@ export default class StripeSettingsShow {
 
     if (!hasKeys) return response.ok({ isConfigured: false })
 
-    // Decrypt to show masked versions
     decryptModelFields(settings, [...ENCRYPTED_FIELDS.invoiceSetting], dek)
 
     const appUrl = env.get('APP_URL') || 'http://localhost:3333'

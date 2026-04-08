@@ -19,7 +19,6 @@ export default class SetDefault {
       return response.notFound({ message: 'Email account not found' })
     }
 
-    // Unset other defaults
     await EmailAccount.query()
       .where('team_id', teamId)
       .where('is_default', true)

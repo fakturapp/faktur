@@ -31,7 +31,6 @@ export default class Update {
     company.merge(data as Partial<typeof company>)
     await company.save()
 
-    // Decrypt for the response
     decryptModelFields(company, [...ENCRYPTED_FIELDS.company], dek)
 
     return response.ok({

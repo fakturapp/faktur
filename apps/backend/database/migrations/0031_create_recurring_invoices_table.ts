@@ -16,7 +16,6 @@ export default class extends BaseSchema {
       table.timestamp('last_generated_at').nullable()
       table.integer('generation_count').notNullable().defaultTo(0)
 
-      // Invoice template fields
       table.text('subject').nullable()
       table.string('billing_type', 20).notNullable().defaultTo('detailed')
       table.string('accent_color', 7).notNullable().defaultTo('#6366f1')

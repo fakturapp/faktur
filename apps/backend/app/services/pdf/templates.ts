@@ -21,10 +21,6 @@ export interface TemplateConfig {
   font?: string
 }
 
-/**
- * Template definitions synced with frontend (apps/frontend/src/lib/invoice-templates.ts).
- * Keep these in sync — any change here must be reflected there and vice versa.
- */
 const TEMPLATES: Record<string, TemplateConfig> = {
   classique: {
     id: 'classique',

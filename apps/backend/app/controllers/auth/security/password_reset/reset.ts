@@ -29,13 +29,11 @@ export default class Reset {
       return response.badRequest({ message: 'Reset token has expired' })
     }
 
-    // Save old salt so we can re-derive old KEK if user provides old password later
     const hadEncryptedData = !!user.saltKdf
     if (hadEncryptedData) {
       user.oldSaltKdf = user.saltKdf
     }
 
-    // Generate new crypto keys for the new password
     const newSalt = zeroAccessCryptoService.generateSalt()
     const newSaltHex = newSalt.toString('hex')
 
@@ -46,7 +44,6 @@ export default class Reset {
     user.lockedUntil = null
     user.saltKdf = newSaltHex
 
-    // Mark that crypto migration is needed if user had encrypted data
     if (hadEncryptedData) {
       user.cryptoResetNeeded = true
     }

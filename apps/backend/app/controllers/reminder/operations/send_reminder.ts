@@ -112,7 +112,6 @@ export default class SendReminder {
         ? applyTemplate(settings.emailBodyTemplate, templateVars)
         : defaultBody)
 
-    // Generate PDF
     let pdfBuffer: Buffer
     let filename: string
     try {
@@ -125,7 +124,6 @@ export default class SendReminder {
 
     const attachments = [{ filename, content: pdfBuffer, mimeType: 'application/pdf' }]
 
-    // Send via provider
     let sendError: string | null = null
     try {
       if (emailAccount.provider === 'gmail') {
@@ -177,7 +175,6 @@ export default class SendReminder {
       sendError = err instanceof Error ? err.message : 'Unknown error'
     }
 
-    // Log email
     const logData: Record<string, any> = {
       teamId,
       documentType: 'invoice',
@@ -194,7 +191,6 @@ export default class SendReminder {
     encryptModelFields(logData, [...ENCRYPTED_FIELDS.emailLog], dek)
     await EmailLog.create(logData)
 
-    // Track reminder
     await PaymentReminder.create({
       teamId,
       invoiceId: invoice.id,

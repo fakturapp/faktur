@@ -2,10 +2,6 @@ import type { HttpContext } from '@adonisjs/core/http'
 import OauthApp from '#models/oauth/oauth_app'
 import oauthAppService from '#services/oauth/oauth_app_service'
 
-/**
- * Admin — rotate the client_secret and/or webhook secret of an OAuth
- * app. The raw new values are returned ONCE in the response.
- */
 export default class RotateOauthAppSecrets {
   async handle({ params, request, response }: HttpContext) {
     const app = await OauthApp.find(params.id)

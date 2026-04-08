@@ -29,7 +29,6 @@ export default class SendEmail {
 
     const payload = await request.validateUsing(sendEmailValidator)
 
-    // Verify email account ownership
     const emailAccount = await EmailAccount.query()
       .where('id', payload.emailAccountId)
       .where('team_id', teamId)
@@ -43,7 +42,6 @@ export default class SendEmail {
       return response.badRequest({ message: 'Provider non supporté' })
     }
 
-    // Generate PDF
     let pdfBuffer: Buffer
     let filename: string
     try {
@@ -64,7 +62,6 @@ export default class SendEmail {
       return response.notFound({ message: 'Document not found' })
     }
 
-    // For Gmail: get valid access token (refresh if needed)
     let accessToken: string | undefined
     if (emailAccount.provider === 'gmail') {
       try {
@@ -79,7 +76,6 @@ export default class SendEmail {
       }
     }
 
-    // Resolve document number for logging
     let documentNumber = ''
     if (payload.documentType === 'invoice') {
       const inv = await Invoice.query()
@@ -98,7 +94,6 @@ export default class SendEmail {
       documentNumber = q?.quoteNumber || payload.documentId
     }
 
-    // Collect all attachments: auto-generated PDF + user-uploaded files
     const allAttachments: { filename: string; content: Buffer; mimeType: string }[] = [
       { filename, content: pdfBuffer, mimeType: 'application/pdf' },
     ]
@@ -115,7 +110,6 @@ export default class SendEmail {
       }
     }
 
-    // Send email via the appropriate provider
     try {
       if (emailAccount.provider === 'gmail') {
         await GmailOAuthService.sendEmail({
@@ -163,7 +157,6 @@ export default class SendEmail {
         })
       }
     } catch (err) {
-      // Log the failed email (encrypt sensitive fields)
       const failedLogData: Record<string, any> = {
         teamId,
         documentType: payload.documentType,
@@ -185,7 +178,6 @@ export default class SendEmail {
       })
     }
 
-    // Log the successful email (encrypt sensitive fields)
     const successLogData: Record<string, any> = {
       teamId,
       documentType: payload.documentType,
@@ -201,7 +193,6 @@ export default class SendEmail {
     encryptModelFields(successLogData, [...ENCRYPTED_FIELDS.emailLog], dek)
     await EmailLog.create(successLogData)
 
-    // Update document status to 'sent' if currently 'draft'
     if (payload.documentType === 'invoice') {
       const invoice = await Invoice.query()
         .where('id', payload.documentId)

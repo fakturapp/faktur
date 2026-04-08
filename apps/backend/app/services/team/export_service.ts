@@ -87,7 +87,6 @@ export async function collectTeamData(
 
   const settings = await InvoiceSetting.query().where('teamId', teamId).first()
 
-  // Collect bank accounts if requested, decrypting with zero-access DEK
   let bankAccountsData: Record<string, unknown>[] | undefined
   if (options?.includeBankAccounts) {
     const bankAccounts = await BankAccount.query().where('teamId', teamId)
@@ -118,11 +117,9 @@ export async function collectTeamData(
     })
   }
 
-  // Collect products
   const products = await Product.query().where('teamId', teamId)
   decryptModelFieldsArray(products, [...ENCRYPTED_FIELDS.product], dek)
 
-  // Collect credit notes with lines
   const creditNotes = await CreditNote.query()
     .where('teamId', teamId)
     .preload('lines', (q) => q.orderBy('position', 'asc'))
@@ -131,7 +128,6 @@ export async function collectTeamData(
     decryptModelFieldsArray(cn.lines, [...ENCRYPTED_FIELDS.creditNoteLine], dek)
   }
 
-  // Collect recurring invoices with lines
   const recurringInvoices = await RecurringInvoice.query()
     .where('teamId', teamId)
     .preload('lines', (q) => q.orderBy('position', 'asc'))
@@ -140,25 +136,19 @@ export async function collectTeamData(
     decryptModelFieldsArray(ri.lines, [...ENCRYPTED_FIELDS.recurringInvoiceLine], dek)
   }
 
-  // Collect expense categories
   const expenseCategories = await ExpenseCategory.query().where('teamId', teamId)
 
-  // Collect expenses
   const expenses = await Expense.query().where('teamId', teamId)
   decryptModelFieldsArray(expenses, [...ENCRYPTED_FIELDS.expense], dek)
 
-  // Collect invoice payments
   const invoicePayments = await InvoicePayment.query().where('teamId', teamId)
   decryptModelFieldsArray(invoicePayments, [...ENCRYPTED_FIELDS.invoicePayment], dek)
 
-  // Collect client contacts
   const clientContacts = await ClientContact.query().where('teamId', teamId)
   decryptModelFieldsArray(clientContacts, [...ENCRYPTED_FIELDS.clientContact], dek)
 
-  // Collect email templates
   const emailTemplates = await EmailTemplate.query().where('teamId', teamId)
 
-  // Collect payment reminder settings
   const paymentReminderSettings = await PaymentReminderSetting.query().where('teamId', teamId)
 
   return {
@@ -474,7 +464,6 @@ export function collectLogoFiles(data: ExportData): LogoFile[] {
 
   function tryAdd(urlField: string | null | undefined) {
     if (!urlField) return
-    // URL is like /team-icons/filename.png
     const match = urlField.match(/^\/(team-icons|company-logos|invoice-logos)\/(.+)$/)
     if (!match) return
     const [, dir, filename] = match

@@ -26,14 +26,12 @@ export default class AcceptInvite {
       return response.notFound({ message: 'Invalid or expired invitation' })
     }
 
-    // Check email match
     if (invitation.invitedEmail && invitation.invitedEmail !== user.email) {
       return response.forbidden({
         message: 'This invitation was sent to a different email address',
       })
     }
 
-    // Check if user already a member of this team
     const existingMember = await TeamMember.query()
       .where('teamId', invitation.teamId)
       .where('userId', user.id)
@@ -45,7 +43,6 @@ export default class AcceptInvite {
       return response.conflict({ message: 'You are already a member of this team' })
     }
 
-    // Decrypt team DEK from invite and re-encrypt with user's KEK
     let encryptedTeamDek: string | null = null
     const kek = keyStore.getKEK(user.id)
 
@@ -54,11 +51,9 @@ export default class AcceptInvite {
       const teamDek = zeroAccessCryptoService.decryptDEK(invitation.encryptedInviteDek, inviteKey)
       encryptedTeamDek = zeroAccessCryptoService.encryptDEK(teamDek, kek)
 
-      // Cache the DEK in memory
       keyStore.storeDEK(user.id, invitation.teamId, teamDek)
     }
 
-    // Accept invitation
     invitation.userId = user.id
     invitation.status = 'active'
     invitation.joinedAt = DateTime.now()
@@ -67,7 +62,6 @@ export default class AcceptInvite {
     invitation.encryptedTeamDek = encryptedTeamDek
     await invitation.save()
 
-    // Auto-switch to the joined team
     user.currentTeamId = invitation.teamId
     await user.save()
 

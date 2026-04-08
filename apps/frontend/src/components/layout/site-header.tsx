@@ -44,7 +44,6 @@ export function SiteHeader({ onToggleSidebar }: SiteHeaderProps) {
   const [settingsSearchOpen, setSettingsSearchOpen] = useState(false)
   const isSettings = pathname.startsWith('/dashboard/settings')
 
-  // Ctrl+K shortcut for settings search
   React.useEffect(() => {
     if (!isSettings) return
     function handleKeyDown(e: KeyboardEvent) {
@@ -78,7 +77,7 @@ export function SiteHeader({ onToggleSidebar }: SiteHeaderProps) {
         <Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4 opacity-30" />
         <h1 className="text-[13px] font-medium text-muted-foreground">{routeTitles[title] || 'Dashboard'}</h1>
 
-        {/* Settings search bar - absolutely centered in navbar */}
+        {}
         {isSettings && (
           <>
             <div className="absolute left-1/2 -translate-x-1/2">

@@ -17,7 +17,6 @@ export default class UploadIcon {
       return response.notFound({ message: 'Team not found' })
     }
 
-    // Check if using company logo
     const useCompanyLogo = request.input('useCompanyLogo')
     if (useCompanyLogo) {
       const company = await team.related('company').query().first()

@@ -16,7 +16,6 @@ export default class InvoiceSettingsShow {
     let settings = await InvoiceSetting.findBy('teamId', user.currentTeamId)
 
     if (!settings) {
-      // Return defaults if no settings exist yet
       return response.ok({
         companyLogoUrl,
         settings: {

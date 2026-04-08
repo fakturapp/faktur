@@ -59,12 +59,6 @@ function RegisterContent() {
   const searchParams = useSearchParams()
   const { login, user, loading: authLoading } = useAuth()
 
-  // ---------- Already logged-in short-circuit ----------
-  // If the user already has a session and landed on /register via the
-  // Faktur Desktop "Créer un compte" shortcut (or any OAuth consent
-  // bounce), jump straight to the ?redirect= target (usually
-  // /oauth/authorize?…). If no redirect param is present, fall back to
-  // the dashboard as the default post-auth landing.
   useEffect(() => {
     if (authLoading) return
     if (!user) return
@@ -78,11 +72,9 @@ function RegisterContent() {
     }
   }, [user, authLoading, searchParams, router])
 
-  // Step
   const [step, setStep] = useState(0)
   const [direction, setDirection] = useState(1)
 
-  // Fields
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -92,7 +84,6 @@ function RegisterContent() {
   const [showPassword, setShowPassword] = useState(false)
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false)
 
-  // State
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
@@ -103,16 +94,13 @@ function RegisterContent() {
     turnstileRef.current?.reset()
   }, [])
 
-  // Disposable email modal
   const [showDisposableModal, setShowDisposableModal] = useState(false)
   const [checkingEmail, setCheckingEmail] = useState(false)
 
-  // Google mode
   const [googleMode, setGoogleMode] = useState(false)
   const [googleProfile, setGoogleProfile] = useState<GoogleProfile | null>(null)
   const [googleData, setGoogleData] = useState<string | null>(null)
 
-  // Password strength
   const passwordStrength = getPasswordStrength(password)
 
   useEffect(() => {
@@ -129,10 +117,9 @@ function RegisterContent() {
       setGoogleMode(true)
       setFullName(data.fullName || '')
       setEmail(data.email)
-      // Skip to password step directly
       setStep(2)
     })
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [])
 
   function goNext() {
     setDirection(1)
@@ -172,7 +159,6 @@ function RegisterContent() {
       return
     }
 
-    // Check disposable email blacklist
     setCheckingEmail(true)
     setError('')
     try {
@@ -185,7 +171,6 @@ function RegisterContent() {
           try {
             domains = JSON.parse(text) as string[]
           } catch {
-            // JSON may be malformed — extract domains with regex
             const regex = /"([a-zA-Z0-9][a-zA-Z0-9.-]*\.[a-zA-Z]{2,})"/g
             let match: RegExpExecArray | null
             while ((match = regex.exec(text)) !== null) {
@@ -201,7 +186,6 @@ function RegisterContent() {
         }
       }
     } catch {
-      // Network error — don't block registration, backend will also check
     }
     setCheckingEmail(false)
     goNext()
@@ -239,12 +223,6 @@ function RegisterContent() {
 
     setLoading(true)
 
-    // ---------- Honor ?redirect= from the OAuth consent flow ----------
-    // When the desktop client (or any OAuth caller) bounces an
-    // unauthenticated user through /login → /register, we want the
-    // newly-registered user to land on the OAuth authorize page
-    // instead of the onboarding wizard. Onboarding still kicks in
-    // automatically AFTER consent, inside the dashboard layout.
     const rawRedirect = searchParams.get('redirect')
     const safeRedirect =
       rawRedirect && rawRedirect.startsWith('/') ? rawRedirect : null
@@ -284,8 +262,6 @@ function RegisterContent() {
       return setError(err)
     }
 
-    // Forward redirect through verify-email so the user lands back
-    // on the OAuth authorize page after confirming their email.
     const verifyUrl = safeRedirect
       ? `/verify-email?email=${encodeURIComponent(email)}&redirect=${encodeURIComponent(safeRedirect)}`
       : `/verify-email?email=${encodeURIComponent(email)}`

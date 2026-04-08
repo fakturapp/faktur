@@ -23,7 +23,6 @@ export default class AnalyticsUsers {
       this.getAuthVsAnonymous(startDate),
     ])
 
-    // Convert device object to array of { name, count }
     const deviceArray = Object.entries(deviceBreakdown).map(([name, count]) => ({ name, count }))
 
     return response.ok({

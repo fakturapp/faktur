@@ -47,22 +47,18 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       let value = getNestedValue(translations[locale], key)
 
       if (!value) {
-        // Fallback to French
         value = getNestedValue(translations.fr, key)
       }
 
       if (!value) {
-        // Return key as fallback
         return key
       }
 
-      // Handle pluralization: "1 client | 2 clients" with {count}
       if (value.includes(' | ') && params?.count !== undefined) {
         const [singular, plural] = value.split(' | ')
         value = Number(params.count) <= 1 ? singular : plural
       }
 
-      // Replace {param} placeholders
       if (params) {
         for (const [paramKey, paramValue] of Object.entries(params)) {
           value = value.replace(new RegExp(`\\{${paramKey}\\}`, 'g'), String(paramValue))

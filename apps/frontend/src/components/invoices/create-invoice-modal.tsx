@@ -65,7 +65,6 @@ export function CreateInvoiceModal({ open, onClose }: CreateInvoiceModalProps) {
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [convertingId, setConvertingId] = useState<string | null>(null)
 
-  // Restore filters from localStorage
   const [statusFilter, setStatusFilter] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem('faktur_convert_filters')

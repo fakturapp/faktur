@@ -30,7 +30,6 @@ export default class DashboardSummary {
     const startOfPrevMonth = now.minus({ months: 1 }).startOf('month').toISODate()!
     const endOfPrevMonth = now.startOf('month').minus({ days: 1 }).toISODate()!
 
-    // Gather key metrics
     const [
       invoicedThisMonth,
       invoicedLastMonth,

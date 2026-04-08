@@ -17,7 +17,7 @@ function getDaysInMonth(year: number, month: number) {
 
 function getFirstDayOfWeek(year: number, month: number) {
   const day = new Date(year, month, 1).getDay()
-  return day === 0 ? 6 : day - 1 // Monday = 0
+  return day === 0 ? 6 : day - 1
 }
 
 function toDateStr(y: number, m: number, d: number) {

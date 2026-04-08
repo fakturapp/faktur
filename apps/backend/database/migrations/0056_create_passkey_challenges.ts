@@ -8,7 +8,7 @@ export default class extends BaseSchema {
       table.uuid('id').primary().defaultTo(this.db.rawQuery('gen_random_uuid()').knexQuery)
       table.uuid('user_id').nullable().references('id').inTable('users').onDelete('CASCADE')
       table.text('challenge').notNullable()
-      table.string('type', 20).notNullable() // 'registration' | 'authentication'
+      table.string('type', 20).notNullable()
       table.timestamp('expires_at').notNullable()
       table.timestamp('created_at').notNullable().defaultTo(this.now())
     })

@@ -73,7 +73,7 @@ function saveOptionsToStorage(opts: Record<string, any>) {
       footerMode: opts.footerMode,
     }
     localStorage.setItem(QUOTE_OPTIONS_KEY, JSON.stringify(toSave))
-  } catch { /* ignore */ }
+  } catch { }
 }
 
 export default function NewQuotePage() {
@@ -138,7 +138,6 @@ export default function NewQuotePage() {
   const [localLogoUrl, setLocalLogoUrl] = useState<string | null | undefined>(undefined)
   const { showModal, confirmNavigation, cancelNavigation, requestNavigation } = useUnsavedChanges(isDirty)
 
-  // Initialize
   useEffect(() => {
     async function init() {
       const [numberRes, companyRes] = await Promise.all([
@@ -153,7 +152,6 @@ export default function NewQuotePage() {
     init()
   }, [])
 
-  // Sync from settings + localStorage
   useEffect(() => {
     if (!settingsLoading) {
       const saved = loadSavedOptions()
@@ -179,7 +177,6 @@ export default function NewQuotePage() {
     }
   }, [settingsLoading, invoiceSettings])
 
-  // Load AI-generated document from sessionStorage
   useEffect(() => {
     if (loading || settingsLoading) return
     const aiDoc = retrieveAiDocument()

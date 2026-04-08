@@ -28,7 +28,6 @@ export default function OnboardingTeamPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  // If user already has a team (coming from dashboard create), skip to recovery-key or company
   useEffect(() => {
     if (user?.currentTeamId) {
       const hasKey = sessionStorage.getItem('zenvoice_recovery_key')

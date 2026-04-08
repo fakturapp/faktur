@@ -23,15 +23,15 @@ export default function InvoiceDefaultsPage() {
   if (loading) {
     return (
       <div className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
-        {/* Header */}
+        {}
         <div className="space-y-2">
           <Skeleton className="h-7 w-40" />
           <Skeleton className="h-4 w-72" />
         </div>
-        {/* Two-column layout */}
+        {}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           <div className="space-y-6">
-            {/* Card 1 skeleton */}
+            {}
             <div className="rounded-xl border border-border/50 p-6">
               <div className="flex items-center gap-3 mb-4">
                 <Skeleton className="h-9 w-9 rounded-lg" />
@@ -59,7 +59,7 @@ export default function InvoiceDefaultsPage() {
                 ))}
               </div>
             </div>
-            {/* Card 2 skeleton */}
+            {}
             <div className="rounded-xl border border-border/50 p-6">
               <div className="flex items-center gap-3 mb-4">
                 <Skeleton className="h-9 w-9 rounded-lg" />
@@ -81,7 +81,7 @@ export default function InvoiceDefaultsPage() {
               </div>
             </div>
           </div>
-          {/* Preview skeleton */}
+          {}
           <div className="rounded-xl border border-border/50 overflow-hidden">
             <div className="px-5 py-3.5 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -101,18 +101,16 @@ export default function InvoiceDefaultsPage() {
 
   return (
     <motion.div initial="hidden" animate="visible" className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
-      {/* Header */}
+      {}
       <motion.div variants={fadeUp} custom={0}>
         <h1 className="text-2xl font-bold text-foreground">Valeurs par d&eacute;faut</h1>
         <p className="text-muted-foreground mt-1">Pr&eacute;-remplissage automatique de vos documents</p>
       </motion.div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        {/* Settings Column */}
+        {}
         <div className="space-y-6">
-          {/* ═══════════════════════════════════════
-               Card 1: Valeurs par défaut des devis
-             ═══════════════════════════════════════ */}
+          {}
           <motion.div variants={fadeUp} custom={1}>
             <Card className="overflow-hidden border-border/50">
               <CardContent className="p-6">
@@ -127,7 +125,7 @@ export default function InvoiceDefaultsPage() {
                 </div>
 
                 <div className="space-y-4">
-                  {/* Default Subject */}
+                  {}
                   <div>
                     <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">Objet par d&eacute;faut</label>
                     <Input
@@ -138,7 +136,7 @@ export default function InvoiceDefaultsPage() {
                     />
                   </div>
 
-                  {/* Default Acceptance Conditions */}
+                  {}
                   <div>
                     <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">Conditions d&apos;acceptation</label>
                     <textarea
@@ -150,7 +148,7 @@ export default function InvoiceDefaultsPage() {
                     />
                   </div>
 
-                  {/* Default Free Field */}
+                  {}
                   <div>
                     <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">Champ libre</label>
                     <textarea
@@ -162,7 +160,7 @@ export default function InvoiceDefaultsPage() {
                     />
                   </div>
 
-                  {/* Footer Mode */}
+                  {}
                   <div>
                     <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">Pied de page du document</label>
                     <div className="space-y-2">

@@ -23,19 +23,16 @@ export default class Create {
       return response.notFound({ message: 'Document not found' })
     }
 
-    // Cannot share with yourself
     if (payload.email === user.email) {
       return response.badRequest({ message: 'You cannot share a document with yourself' })
     }
 
-    // Check if user exists and is a team member
     const targetUser = await User.findBy('email', payload.email)
 
     let sharedWithUserId: string | null = null
     let status: 'active' | 'pending' = 'pending'
 
     if (targetUser) {
-      // Check if target is a member of the same team
       const teamMember = await TeamMember.query()
         .where('team_id', teamId)
         .where('user_id', targetUser.id)
@@ -48,7 +45,6 @@ export default class Create {
       }
     }
 
-    // Check for existing active share
     if (sharedWithUserId) {
       const existingShare = await DocumentShare.query()
         .where('document_type', payload.documentType)

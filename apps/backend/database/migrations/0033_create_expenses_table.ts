@@ -8,7 +8,7 @@ export default class extends BaseSchema {
       table.uuid('team_id').notNullable().references('id').inTable('teams').onDelete('CASCADE')
 
       table.string('name', 100).notNullable()
-      table.string('color', 7).nullable() // hex color
+      table.string('color', 7).nullable()
 
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at').nullable()
@@ -33,7 +33,7 @@ export default class extends BaseSchema {
       table.decimal('vat_amount', 12, 2).notNullable().defaultTo(0)
       table.decimal('vat_rate', 5, 2).notNullable().defaultTo(0)
       table.string('currency', 3).notNullable().defaultTo('EUR')
-      table.string('expense_date', 10).notNullable() // YYYY-MM-DD
+      table.string('expense_date', 10).notNullable()
       table.string('payment_method', 50).nullable()
       table.string('supplier', 255).nullable()
       table.text('notes').nullable()

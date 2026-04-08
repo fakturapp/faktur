@@ -50,7 +50,7 @@ export default function AboutPage() {
       animate="visible"
       className="max-w-2xl mx-auto px-4 lg:px-6 py-6 md:py-8 space-y-8"
     >
-      {/* ---------- Hero ---------- */}
+      {}
       <motion.div variants={fadeUp} custom={0} className="flex flex-col items-center text-center gap-5 py-4">
         <Image src="/logo.svg" alt="Faktur" width={72} height={72} className="h-[72px] w-auto drop-shadow-lg" />
         <div>
@@ -75,7 +75,7 @@ export default function AboutPage() {
         </div>
       </motion.div>
 
-      {/* ---------- Faktur Desktop info card ---------- */}
+      {}
       {desktop.is && (
         <motion.div variants={fadeUp} custom={1}>
           <div className="rounded-xl border border-primary/20 bg-primary/5 p-5">
@@ -114,7 +114,7 @@ export default function AboutPage() {
 
       <Separator />
 
-      {/* Cr&eacute;ateur */}
+      {}
       <motion.div variants={fadeUp} custom={1}>
         <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">&Eacute;quipe</h2>
         <div className="flex items-center gap-4">
@@ -132,7 +132,7 @@ export default function AboutPage() {
 
       <Separator />
 
-      {/* S&eacute;curit&eacute; */}
+      {}
       <motion.div variants={fadeUp} custom={2}>
         <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">S&eacute;curit&eacute;</h2>
         <div className="space-y-3">
@@ -160,7 +160,7 @@ export default function AboutPage() {
 
       <Separator />
 
-      {/* Fonctionnalit&eacute;s */}
+      {}
       <motion.div variants={fadeUp} custom={3}>
         <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Fonctionnalit&eacute;s</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
@@ -192,7 +192,7 @@ export default function AboutPage() {
 
       <Separator />
 
-      {/* Stack */}
+      {}
       <motion.div variants={fadeUp} custom={4}>
         <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Stack technique</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -215,7 +215,7 @@ export default function AboutPage() {
 
       <Separator />
 
-      {/* Liens */}
+      {}
       <motion.div variants={fadeUp} custom={5}>
         <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Liens</h2>
         <div className="grid grid-cols-2 gap-3">
@@ -242,7 +242,7 @@ export default function AboutPage() {
 
       <Separator />
 
-      {/* L&eacute;gal */}
+      {}
       <motion.div variants={fadeUp} custom={6}>
         <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Informations l&eacute;gales</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -265,7 +265,7 @@ export default function AboutPage() {
         </div>
       </motion.div>
 
-      {/* Footer */}
+      {}
       <motion.div variants={fadeUp} custom={7} className="text-center pb-4 pt-2">
         <p className="text-[11px] text-muted-foreground/50 flex items-center justify-center gap-1">
           Fait avec <Heart className="h-3 w-3 text-red-400" /> par danbenba &mdash; 2025-2026

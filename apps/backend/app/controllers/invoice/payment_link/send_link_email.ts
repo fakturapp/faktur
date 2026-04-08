@@ -42,7 +42,6 @@ export default class SendLinkEmail {
       return response.notFound({ message: 'No active payment link found' })
     }
 
-    // Decrypt client to get email
     if (invoice.client) {
       decryptModelFields(invoice.client, [...ENCRYPTED_FIELDS.client], dek)
     }
@@ -52,7 +51,6 @@ export default class SendLinkEmail {
       return response.badRequest({ message: 'Client has no email address' })
     }
 
-    // Get the team's default email account
     const emailAccount = await EmailAccount.query()
       .where('team_id', teamId)
       .where('is_default', true)
@@ -63,17 +61,14 @@ export default class SendLinkEmail {
       return response.badRequest({ message: 'No email account configured' })
     }
 
-    // Decrypt email account credentials
     decryptModelFields(emailAccount, ['accessToken', 'refreshToken', 'smtpHost', 'smtpUsername', 'smtpPassword'] as any, dek)
 
-    // Build checkout URL
     const token = request.input('token')
     if (!token) {
       return response.badRequest({ message: 'Token is required to build the payment link URL' })
     }
     const paymentUrl = buildCheckoutUrl(token)
 
-    // Generate PDF
     let pdfBuffer: Buffer | null = null
     let pdfFilename = `${invoice.invoiceNumber}.pdf`
     try {

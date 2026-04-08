@@ -88,7 +88,7 @@ export default function ClientsPage() {
 
   return (
     <motion.div initial="hidden" animate="visible" className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
-      {/* Header */}
+      {}
       <motion.div variants={fadeUp} custom={0} className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Clients</h1>
@@ -103,7 +103,7 @@ export default function ClientsPage() {
         </Link>
       </motion.div>
 
-      {/* Stats */}
+      {}
       <motion.div variants={fadeUp} custom={1} className="grid grid-cols-1 gap-4 @xl/main:grid-cols-3">
         <div className="rounded-xl border border-border bg-card/50 p-4">
           <div className="flex items-center gap-3">
@@ -140,7 +140,7 @@ export default function ClientsPage() {
         </div>
       </motion.div>
 
-      {/* Search + filter */}
+      {}
       <motion.div variants={fadeUp} custom={2} className="flex items-center gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

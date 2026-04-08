@@ -5,7 +5,6 @@ import { io, type Socket } from 'socket.io-client'
 
 const WS_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333'
 
-// ── Types ─────────────────────────────────────────────────────────────────
 
 export interface CollaboratorInfo {
   userId: string
@@ -48,7 +47,7 @@ export interface UseCollaborationOptions {
 export interface UseCollaborationReturn {
   collaborators: CollaboratorInfo[]
   cursors: Map<string, CursorPosition>
-  focusedFields: Map<string, string> // fieldId → userId
+  focusedFields: Map<string, string>
   myPermission: 'viewer' | 'editor' | null
   isOwner: boolean
   isConnected: boolean
@@ -76,7 +75,6 @@ export function useCollaboration({
   const [isConnected, setIsConnected] = useState(false)
   const [myColor, setMyColor] = useState<string | null>(null)
 
-  // Store latest callbacks in refs to avoid reconnecting on every render
   const onDocumentChangeRef = useRef(onDocumentChange)
   onDocumentChangeRef.current = onDocumentChange
   const onDocumentSavedRef = useRef(onDocumentSaved)

@@ -9,7 +9,6 @@ const BankAccounts = () => import('#controllers/company/finance/bank_accounts')
 const UploadLogo = () => import('#controllers/company/media/upload_logo')
 const ServeLogo = () => import('#controllers/company/media/serve_logo')
 
-// Public route - serve company logos
 router.get(API_PREFIX + '/company-logos/:filename', [ServeLogo, 'handle'])
 
 router
@@ -19,7 +18,6 @@ router
     router.put('/bank', [CompanyBank, 'handle'])
     router.post('/logo', [UploadLogo, 'handle'])
 
-    // Bank accounts CRUD
     router.get('/bank-accounts', [BankAccounts, 'index'])
     router.get('/bank-accounts/:id', [BankAccounts, 'show'])
     router.post('/bank-accounts', [BankAccounts, 'store'])

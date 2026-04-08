@@ -12,7 +12,6 @@ export default class Create {
 
     const existing = await Feedback.query().where('userId', user.id).first()
     if (existing) {
-      // Update existing feedback
       existing.rating = Math.round(rating)
       existing.comment = comment?.trim() || null
       await existing.save()

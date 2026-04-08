@@ -38,7 +38,6 @@ export default class SuggestInvoiceLines {
 
     const payload = await request.validateUsing(suggestValidator)
 
-    // Fetch last 5 invoices for this client
     const pastInvoices = await Invoice.query()
       .where('team_id', teamId)
       .where('client_id', payload.clientId)
@@ -47,7 +46,6 @@ export default class SuggestInvoiceLines {
       .limit(5)
       .preload('lines')
 
-    // Decrypt and build history context
     const historyLines: string[] = []
     for (const inv of pastInvoices) {
       decryptModelFields(inv, [...ENCRYPTED_FIELDS.invoice], dek)

@@ -9,11 +9,9 @@ const ListReminders = () => import('#controllers/reminder/operations/list_remind
 
 router
   .group(() => {
-    // Reminder settings
     router.get('/settings', [ReminderSettingsGet, 'handle'])
     router.put('/settings', [ReminderSettingsUpdate, 'handle'])
 
-    // Invoice-specific reminders
     router.post('/invoices/:id/send', [SendReminder, 'handle'])
     router.get('/invoices/:id', [ListReminders, 'handle'])
   })

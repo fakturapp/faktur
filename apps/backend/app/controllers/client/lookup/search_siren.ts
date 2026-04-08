@@ -9,7 +9,6 @@ export default class SearchSiren {
     }
 
     try {
-      // Use the free French government API (entreprise.data.gouv.fr)
       const searchUrl = `https://recherche-entreprises.api.gouv.fr/search?q=${encodeURIComponent(query)}&page=1&per_page=10`
 
       const res = await fetch(searchUrl)

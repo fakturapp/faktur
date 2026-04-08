@@ -1,10 +1,6 @@
 import type { OcrProvider, OcrReceiptResult } from '#services/ocr/ocr_provider'
 import env from '#start/env'
 
-/**
- * Mindee OCR provider for production receipt parsing.
- * Uses Mindee Expense Receipts API v5.
- */
 export default class MindeeOcrProvider implements OcrProvider {
   private apiKey: string
 

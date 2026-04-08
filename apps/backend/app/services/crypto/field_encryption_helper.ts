@@ -1,9 +1,5 @@
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 
-/**
- * Encrypt specified fields on a model instance before saving.
- * Skips null/undefined values.
- */
 export function encryptModelFields<T extends Record<string, any>>(
   model: T,
   fields: (keyof T & string)[],
@@ -17,10 +13,6 @@ export function encryptModelFields<T extends Record<string, any>>(
   }
 }
 
-/**
- * Decrypt specified fields on a model instance after loading.
- * Skips null/undefined values and values that are not encrypted (no "v1:" prefix).
- */
 export function decryptModelFields<T extends Record<string, any>>(
   model: T,
   fields: (keyof T & string)[],
@@ -39,9 +31,6 @@ export function decryptModelFields<T extends Record<string, any>>(
   }
 }
 
-/**
- * Decrypt fields on an array of model instances.
- */
 export function decryptModelFieldsArray<T extends Record<string, any>>(
   models: T[],
   fields: (keyof T & string)[],
@@ -52,7 +41,6 @@ export function decryptModelFieldsArray<T extends Record<string, any>>(
   }
 }
 
-/** Fields to encrypt per model */
 export const ENCRYPTED_FIELDS = {
   client: [
     'companyName',

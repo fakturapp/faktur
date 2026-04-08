@@ -13,10 +13,6 @@ interface SyncBroadcasterProps {
   bankAccountId?: string
 }
 
-/**
- * Invisible component that broadcasts local state changes to collaborators.
- * Must be rendered inside a CollaborationProvider.
- */
 export function SyncBroadcaster({
   notes,
   accentColor,
@@ -35,7 +31,6 @@ export function SyncBroadcaster({
   if (paymentMethod !== undefined) useBroadcast('paymentMethod', paymentMethod)
   if (bankAccountId !== undefined) useBroadcast('bankAccountId', bankAccountId)
 
-  // Broadcast individual option changes
   useBroadcast('options.subject', options.subject)
   useBroadcast('options.issueDate', options.issueDate)
   useBroadcast('options.validityDate', options.validityDate)

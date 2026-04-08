@@ -32,7 +32,6 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column()
   declare avatarUrl: string | null
 
-  // Email Verification
   @column()
   declare emailVerified: boolean
 
@@ -42,7 +41,6 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column.dateTime()
   declare emailVerificationSentAt: DateTime | null
 
-  // 2FA
   @column()
   declare twoFactorEnabled: boolean
 
@@ -52,7 +50,6 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column({ serializeAs: null })
   declare recoveryCodesEncrypted: string | null
 
-  // Security
   @column({ serializeAs: null })
   declare passwordResetToken: string | null
 
@@ -65,18 +62,15 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column.dateTime()
   declare lockedUntil: DateTime | null
 
-  // Pending email change
   @column({ serializeAs: null })
   declare pendingEmail: string | null
 
-  // Security Verification
   @column({ serializeAs: null })
   declare securityCode: string | null
 
   @column.dateTime()
   declare securityCodeExpiresAt: DateTime | null
 
-  // Zero-Access Crypto
   @column({ serializeAs: null })
   declare saltKdf: string | null
 
@@ -89,21 +83,18 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column({ serializeAs: null })
   declare oldSaltKdf: string | null
 
-  // Recovery Key
   @column()
   declare hasRecoveryKey: boolean
 
   @column({ serializeAs: null })
   declare recoveryKeyHash: string | null
 
-  // Team & Onboarding
   @column()
   declare currentTeamId: string | null
 
   @column()
   declare onboardingCompleted: boolean
 
-  // Account Deletion Flow
   @column({ serializeAs: null })
   declare deletionToken: string | null
 
@@ -119,7 +110,6 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column.dateTime({ serializeAs: null })
   declare deletionStartedAt: DateTime | null
 
-  // Status
   @column()
   declare status: 'active' | 'suspended' | 'deleted'
 
@@ -132,7 +122,6 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 
-  // Relations
   @belongsTo(() => Team, { foreignKey: 'currentTeamId' })
   declare currentTeam: BelongsTo<typeof Team>
 

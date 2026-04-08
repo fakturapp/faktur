@@ -1,6 +1,5 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333'
 
-// Global vault lock event — listened by VaultUnlockModal
 let vaultLockListeners: (() => void)[] = []
 export function onVaultLocked(cb: () => void) {
   vaultLockListeners.push(cb)

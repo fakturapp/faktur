@@ -6,13 +6,9 @@ import TwoFactorService from '#services/auth/two_factor_service'
 import { securityVerifyValidator } from '#validators/account_validator'
 
 export default class SecurityVerify {
-  /**
-   * Send a security verification code by email
-   */
   async sendCode({ auth, response }: HttpContext) {
     const user = auth.user!
 
-    // Rate limit: don't resend if code was sent less than 60 seconds ago
     if (
       user.securityCodeExpiresAt &&
       user.securityCodeExpiresAt.minus({ minutes: 4 }) > DateTime.now()
@@ -34,9 +30,6 @@ export default class SecurityVerify {
     })
   }
 
-  /**
-   * Verify a security code (email code, TOTP, or recovery code)
-   */
   async verify({ auth, request, response }: HttpContext) {
     const user = auth.user!
     const payload = await request.validateUsing(securityVerifyValidator)
@@ -68,14 +61,12 @@ export default class SecurityVerify {
         return response.unauthorized({ message: 'Invalid recovery code' })
       }
 
-      // Save remaining codes
       user.recoveryCodesEncrypted = TwoFactorService.encryptRecoveryCodes(result.remainingCodes)
       await user.save()
 
       return response.ok({ verified: true })
     }
 
-    // Default: email code
     if (!user.securityCode || !user.securityCodeExpiresAt) {
       return response.badRequest({ message: 'No security code was sent' })
     }
@@ -91,7 +82,6 @@ export default class SecurityVerify {
       return response.unauthorized({ message: 'Invalid security code' })
     }
 
-    // Clear the code after successful verification
     user.securityCode = null
     user.securityCodeExpiresAt = null
     await user.save()

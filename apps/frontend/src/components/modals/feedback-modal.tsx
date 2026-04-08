@@ -106,7 +106,7 @@ export function FeedbackModal({ open, onClose }: FeedbackModalProps) {
             </div>
 
             <div className="space-y-4">
-              {/* Star rating */}
+              {}
               <div className="flex items-center justify-center gap-2 py-2">
                 {[1, 2, 3, 4, 5].map((value) => (
                   <button
@@ -129,7 +129,7 @@ export function FeedbackModal({ open, onClose }: FeedbackModalProps) {
                 ))}
               </div>
 
-              {/* Comment */}
+              {}
               <Textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}

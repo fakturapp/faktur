@@ -31,7 +31,6 @@ export default class Stats {
     const startOfPrevMonth = now.minus({ months: 1 }).startOf('month').toISODate()!
     const endOfPrevMonth = now.startOf('month').minus({ days: 1 }).toISODate()!
 
-    // --- Stats ---
     const [
       totalInvoicedCurrent,
       totalInvoicedPrev,
@@ -42,7 +41,6 @@ export default class Stats {
       totalQuotedPrev,
       totalAcceptedCurrent,
     ] = await Promise.all([
-      // Total invoiced this month
       Invoice.query()
         .where('team_id', teamId)
         .whereNotIn('status', ['draft', 'cancelled'])
@@ -50,7 +48,6 @@ export default class Stats {
         .sum('total as totalSum')
         .then((r) => Number(r[0].$extras.totalSum) || 0),
 
-      // Total invoiced previous month
       Invoice.query()
         .where('team_id', teamId)
         .whereNotIn('status', ['draft', 'cancelled'])
@@ -59,14 +56,12 @@ export default class Stats {
         .sum('total as totalSum')
         .then((r) => Number(r[0].$extras.totalSum) || 0),
 
-      // Outstanding (sent + overdue)
       Invoice.query()
         .where('team_id', teamId)
         .whereIn('status', ['sent', 'overdue'])
         .sum('total as totalSum')
         .then((r) => Number(r[0].$extras.totalSum) || 0),
 
-      // Total collected this month
       Invoice.query()
         .where('team_id', teamId)
         .where('status', 'paid')
@@ -80,7 +75,6 @@ export default class Stats {
         .sum('total as totalSum')
         .then((r) => Number(r[0].$extras.totalSum) || 0),
 
-      // Total collected previous month
       Invoice.query()
         .where('team_id', teamId)
         .where('status', 'paid')
@@ -100,7 +94,6 @@ export default class Stats {
         .sum('total as totalSum')
         .then((r) => Number(r[0].$extras.totalSum) || 0),
 
-      // Total quoted this month (non-draft)
       Quote.query()
         .where('team_id', teamId)
         .whereNot('status', 'draft')
@@ -108,7 +101,6 @@ export default class Stats {
         .sum('total as totalSum')
         .then((r) => Number(r[0].$extras.totalSum) || 0),
 
-      // Total quoted previous month
       Quote.query()
         .where('team_id', teamId)
         .whereNot('status', 'draft')
@@ -117,7 +109,6 @@ export default class Stats {
         .sum('total as totalSum')
         .then((r) => Number(r[0].$extras.totalSum) || 0),
 
-      // Total accepted this month
       Quote.query()
         .where('team_id', teamId)
         .where('status', 'accepted')
@@ -131,7 +122,6 @@ export default class Stats {
       return Math.round(((current - previous) / previous) * 100)
     }
 
-    // --- Chart data (last 90 days) ---
     const ninetyDaysAgo = now.minus({ days: 90 }).toISODate()!
 
     const [invoiceRows, quoteRows] = await Promise.all([
@@ -180,7 +170,6 @@ export default class Stats {
       })
     }
 
-    // --- Recent items ---
     const [recentInvoices, recentQuotes] = await Promise.all([
       Invoice.query()
         .where('team_id', teamId)
@@ -195,7 +184,6 @@ export default class Stats {
         .limit(10),
     ])
 
-    // Decrypt client fields for display names
     for (const inv of recentInvoices) {
       if (inv.client) {
         decryptModelFields(inv.client, [...ENCRYPTED_FIELDS.client], dek)

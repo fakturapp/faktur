@@ -66,10 +66,8 @@ export default class Import {
 
     const decryptionPassword = request.input('decryptionPassword')
 
-    // Read file buffer
     let buffer: Buffer<ArrayBuffer> = Buffer.from(readFileSync(file.tmpPath!))
 
-    // Check if encrypted (.fpdata)
     const magic = buffer.subarray(0, 7).toString()
     if (magic === 'FPDATA1') {
       if (!decryptionPassword) {
@@ -84,7 +82,6 @@ export default class Import {
       }
     }
 
-    // Parse ZIP
     let zip: AdmZip
     try {
       zip = new AdmZip(buffer)
@@ -92,7 +89,6 @@ export default class Import {
       return response.unprocessableEntity({ message: 'Fichier ZIP invalide' })
     }
 
-    // Extract JSON files
     function readJson(path: string): any {
       const entry = zip.getEntry(path)
       if (!entry) return null
@@ -127,19 +123,15 @@ export default class Import {
       })
     }
 
-    // Generate a new team DEK for the imported team
     const teamDek = zeroAccessCryptoService.generateDEK()
     const encryptedTeamDek = zeroAccessCryptoService.encryptDEK(teamDek, kek)
 
-    // Create team with all data in a transaction
     const team = await db.transaction(async (trx) => {
-      // Create team
       const newTeam = await Team.create(
         { name: teamName, iconUrl: teamData.iconUrl || null, ownerId: user.id },
         { client: trx }
       )
 
-      // Create team member (owner) with encrypted DEK
       await TeamMember.create(
         {
           teamId: newTeam.id,
@@ -152,19 +144,16 @@ export default class Import {
         { client: trx }
       )
 
-      // Create company (encrypt sensitive fields)
       if (companyData) {
         const cData: Record<string, any> = { teamId: newTeam.id, ...companyData }
         encryptModelFields(cData, [...ENCRYPTED_FIELDS.company], teamDek)
         await Company.create(cData, { client: trx })
       }
 
-      // Create invoice settings (no encrypted fields)
       if (settingsData) {
         await InvoiceSetting.create({ teamId: newTeam.id, ...settingsData }, { client: trx })
       }
 
-      // Create bank accounts (encrypt iban/bic)
       for (const baData of bankAccountsData) {
         const baRecord: Record<string, any> = {
           teamId: newTeam.id,
@@ -178,7 +167,6 @@ export default class Import {
         await BankAccount.create(baRecord, { client: trx })
       }
 
-      // Create clients and build ID mapping (encrypt sensitive fields)
       const clientIdMap: Record<string, string> = {}
       for (const clientData2 of clientsData) {
         const { originalId, ...rest } = clientData2
@@ -190,7 +178,6 @@ export default class Import {
         }
       }
 
-      // Create invoices with lines and build ID mapping (encrypt sensitive fields)
       const invoiceIdMap: Record<string, string> = {}
       for (const invData of invoicesData) {
         const { lines, clientId, sourceQuoteId, originalId, ...rest } = invData
@@ -215,7 +202,6 @@ export default class Import {
         }
       }
 
-      // Create quotes with lines (encrypt sensitive fields)
       for (const qData of quotesData) {
         const { lines, clientId, ...rest } = qData
         const qRecord: Record<string, any> = {
@@ -235,14 +221,12 @@ export default class Import {
         }
       }
 
-      // Create products (encrypt sensitive fields)
       for (const prodData of productsData) {
         const prodRecord: Record<string, any> = { teamId: newTeam.id, ...prodData }
         encryptModelFields(prodRecord, [...ENCRYPTED_FIELDS.product], teamDek)
         await Product.create(prodRecord, { client: trx })
       }
 
-      // Create credit notes with lines (encrypt sensitive fields)
       for (const cnData of creditNotesData) {
         const { lines, clientId, sourceInvoiceId, ...rest } = cnData
         const cnRecord: Record<string, any> = {
@@ -263,7 +247,6 @@ export default class Import {
         }
       }
 
-      // Create recurring invoices with lines (encrypt sensitive fields)
       for (const riData of recurringInvoicesData) {
         const { lines, clientId, bankAccountId, ...rest } = riData
         const riRecord: Record<string, any> = {
@@ -287,7 +270,6 @@ export default class Import {
         }
       }
 
-      // Create expense categories and build ID mapping
       const expenseCategoryIdMap: Record<string, string> = {}
       for (const ecData of expenseCategoriesData) {
         const { originalId, ...rest } = ecData
@@ -300,7 +282,6 @@ export default class Import {
         }
       }
 
-      // Create expenses (encrypt sensitive fields)
       for (const expData of expensesData) {
         const { categoryId, ...rest } = expData
         const expRecord: Record<string, any> = {
@@ -312,7 +293,6 @@ export default class Import {
         await Expense.create(expRecord, { client: trx })
       }
 
-      // Create invoice payments (encrypt sensitive fields)
       for (const ipData of invoicePaymentsData) {
         const { invoiceId, ...rest } = ipData
         const ipRecord: Record<string, any> = {
@@ -324,7 +304,6 @@ export default class Import {
         await InvoicePayment.create(ipRecord, { client: trx })
       }
 
-      // Create client contacts (encrypt sensitive fields)
       for (const ccData of clientContactsData) {
         const { clientId, ...rest } = ccData
         const ccRecord: Record<string, any> = {
@@ -336,12 +315,10 @@ export default class Import {
         await ClientContact.create(ccRecord, { client: trx })
       }
 
-      // Create email templates (no encrypted fields)
       for (const etData of emailTemplatesData) {
         await EmailTemplate.create({ teamId: newTeam.id, ...etData }, { client: trx })
       }
 
-      // Create payment reminder settings (no encrypted fields)
       for (const prsData of paymentReminderSettingsData) {
         await PaymentReminderSetting.create({ teamId: newTeam.id, ...prsData }, { client: trx })
       }
@@ -349,10 +326,8 @@ export default class Import {
       return newTeam
     })
 
-    // Store the new team DEK in memory
     keyStore.storeDEK(user.id, team.id, teamDek)
 
-    // Restore logo assets from ZIP
     const uploadsBase = join(app.tmpPath(), 'uploads')
     const assetDirs = ['team-icons', 'company-logos', 'invoice-logos'] as const
 

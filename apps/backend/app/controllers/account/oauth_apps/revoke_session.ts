@@ -4,13 +4,6 @@ import OauthApp from '#models/oauth/oauth_app'
 import oauthTokenService from '#services/oauth/oauth_token_service'
 import oauthWebhookService from '#services/oauth/oauth_webhook_service'
 
-/**
- * POST /api/v1/account/oauth-apps/sessions/:tokenId/revoke
- *
- * Revokes a single active session the current user owns. The caller
- * is the end user, not the admin, so we verify ownership before
- * touching anything.
- */
 export default class RevokeUserOauthSession {
   async handle({ auth, params, request, response }: HttpContext) {
     const user = auth.user!

@@ -1,9 +1,5 @@
 import type { OcrProvider, OcrReceiptResult } from '#services/ocr/ocr_provider'
 
-/**
- * Mock OCR provider for development/testing.
- * Returns plausible random data.
- */
 export default class MockOcrProvider implements OcrProvider {
   async parseReceipt(_fileBuffer: Buffer, _mimeType: string): Promise<OcrReceiptResult> {
     const suppliers = [

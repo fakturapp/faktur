@@ -7,16 +7,16 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().defaultTo(this.raw('gen_random_uuid()'))
       table.uuid('team_id').notNullable().references('id').inTable('teams').onDelete('CASCADE')
-      table.string('document_type', 20).notNullable() // 'invoice' | 'quote'
+      table.string('document_type', 20).notNullable()
       table.uuid('document_id').notNullable()
       table.string('document_number', 100).notNullable()
       table.string('from_email', 255).notNullable()
       table.string('to_email', 255).notNullable()
       table.string('subject', 500).notNullable()
       table.text('body').notNullable()
-      table.string('status', 20).notNullable().defaultTo('sent') // 'draft' | 'sent' | 'error'
+      table.string('status', 20).notNullable().defaultTo('sent')
       table.text('error_message').nullable()
-      table.string('email_type', 20).notNullable().defaultTo('send') // 'send' | 'reminder'
+      table.string('email_type', 20).notNullable().defaultTo('send')
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at').nullable()
 

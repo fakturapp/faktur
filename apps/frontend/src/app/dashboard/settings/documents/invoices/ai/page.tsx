@@ -28,7 +28,6 @@ import {
   BarChart3,
 } from 'lucide-react'
 
-/* ─── Model tiers ─────────────────────────────────────────────── */
 const MODEL_TIERS = [
   {
     id: 'llama-3.1-8b-instant',
@@ -62,7 +61,6 @@ const MODEL_TIERS = [
   },
 ]
 
-/* ─── Chat modes ──────────────────────────────────────────────── */
 const CHAT_MODES = [
   {
     id: 'edition' as const,
@@ -90,7 +88,6 @@ const CHAT_MODES = [
   },
 ]
 
-/* ─── Local storage helpers for default mode ──────────────────── */
 
 function getDefaultMode(): string {
   if (typeof window === 'undefined') return 'edition'
@@ -113,7 +110,6 @@ function saveDefaultMode(mode: string) {
   } catch {}
 }
 
-/* ─── Quota types & helpers ──────────────────────────────────── */
 
 interface QuotaBucket {
   used: number

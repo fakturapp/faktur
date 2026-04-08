@@ -37,7 +37,6 @@ router
     router.put('/:id', [InvoiceUpdate, 'handle'])
     router.delete('/:id', [InvoiceDelete, 'handle'])
 
-    // Payments (partial payments / installments)
     router.get('/:invoiceId/payments', [InvoicePaymentIndex, 'handle'])
     router.post('/:invoiceId/payments', [InvoicePaymentStore, 'handle'])
     router.delete('/:invoiceId/payments/:id', [InvoicePaymentDestroy, 'handle'])

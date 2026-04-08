@@ -2,11 +2,6 @@ import type { HttpContext } from '@adonisjs/core/http'
 import oauthAppService from '#services/oauth/oauth_app_service'
 import { createOauthAppValidator } from '#validators/oauth_validator'
 
-/**
- * Admin — create an OAuth app. Returns the raw client_secret and
- * webhook_secret ONCE — the admin has to copy them immediately.
- * Only the hashes land in the DB.
- */
 export default class CreateOauthApp {
   async handle({ auth, request, response }: HttpContext) {
     const user = auth.user!

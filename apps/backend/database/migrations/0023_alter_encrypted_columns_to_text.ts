@@ -2,7 +2,6 @@ import { BaseSchema } from '@adonisjs/lucid/schema'
 
 export default class extends BaseSchema {
   async up() {
-    // Clients - all encrypted fields must be text to hold "v1:iv:tag:ciphertext"
     this.schema.alterTable('clients', (table) => {
       table.text('company_name').alter()
       table.text('first_name').alter()
@@ -11,54 +10,38 @@ export default class extends BaseSchema {
       table.text('phone').alter()
       table.text('address').alter()
       table.text('address_complement').alter()
-      // notes is already text
-      table.text('siren').alter() // was varchar(9)
-      table.text('siret').alter() // was varchar(14)
+      table.text('siren').alter()
+      table.text('siret').alter()
       table.text('vat_number').alter()
     })
 
-    // Invoices - encrypted fields
     this.schema.alterTable('invoices', (table) => {
       table.text('subject').alter()
-      // notes is already text
-      // acceptance_conditions is already text
       table.text('document_title').alter()
-      // free_field is already text
-      // delivery_address is already text
-      table.text('client_siren').alter() // was varchar(20)
-      table.text('client_vat_number').alter() // was varchar(30)
-      // comment is already text
+      table.text('client_siren').alter()
+      table.text('client_vat_number').alter()
       table.text('payment_terms').alter()
     })
 
-    // Invoice lines - encrypted fields
     this.schema.alterTable('invoice_lines', (table) => {
       table.text('description').alter()
       table.text('sale_type').alter()
-      table.text('unit').alter() // was varchar(20)
+      table.text('unit').alter()
     })
 
-    // Quotes - encrypted fields
     this.schema.alterTable('quotes', (table) => {
       table.text('subject').alter()
-      // notes is already text
-      // acceptance_conditions is already text
       table.text('document_title').alter()
-      // free_field is already text
-      // delivery_address is already text
-      table.text('client_siren').alter() // was varchar(20)
-      table.text('client_vat_number').alter() // was varchar(30)
-      // comment is already text
+      table.text('client_siren').alter()
+      table.text('client_vat_number').alter()
     })
 
-    // Quote lines - encrypted fields
     this.schema.alterTable('quote_lines', (table) => {
       table.text('description').alter()
       table.text('sale_type').alter()
-      table.text('unit').alter() // was varchar(20)
+      table.text('unit').alter()
     })
 
-    // Companies - encrypted fields
     this.schema.alterTable('companies', (table) => {
       table.text('phone').alter()
       table.text('email').alter()
@@ -68,12 +51,9 @@ export default class extends BaseSchema {
       table.text('payment_conditions').alter()
     })
 
-    // Bank accounts - iban and bic are already text, no changes needed
   }
 
   async down() {
-    // Reverting to original types would truncate encrypted data
-    // Only revert if you're sure data is decrypted first
     this.schema.alterTable('clients', (table) => {
       table.string('company_name', 255).alter()
       table.string('first_name', 255).alter()

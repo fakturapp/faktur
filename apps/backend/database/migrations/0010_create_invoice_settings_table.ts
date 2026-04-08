@@ -14,7 +14,6 @@ export default class extends BaseSchema {
         .inTable('teams')
         .onDelete('CASCADE')
 
-      // Display
       table.string('billing_type', 20).notNullable().defaultTo('quick')
       table.string('accent_color', 7).notNullable().defaultTo('#6366f1')
       table.string('logo_url', 500).nullable()
@@ -24,17 +23,14 @@ export default class extends BaseSchema {
       table.string('logo_source', 20).defaultTo('custom')
       table.string('footer_mode', 30).defaultTo('vat_exempt')
 
-      // Payment
       table.jsonb('payment_methods').notNullable().defaultTo('["bank_transfer"]')
       table.string('custom_payment_method', 255).nullable()
 
-      // E-invoicing
       table.boolean('e_invoicing_enabled').defaultTo(false)
       table.string('pdp_provider', 50).nullable()
       table.text('pdp_api_key').nullable()
       table.boolean('pdp_sandbox').defaultTo(true)
 
-      // Defaults
       table.text('default_subject').nullable()
       table.text('default_acceptance_conditions').nullable()
       table.boolean('default_signature_field').defaultTo(false)
@@ -45,11 +41,9 @@ export default class extends BaseSchema {
       table.boolean('default_show_delivery_address').defaultTo(false)
       table.string('default_language', 5).defaultTo('fr')
 
-      // Filename patterns
       table.string('quote_filename_pattern', 255).defaultTo('DEV-{numero}')
       table.string('invoice_filename_pattern', 255).defaultTo('FAC-{numero}')
 
-      // Auto-numbering
       table.string('next_invoice_number', 50).nullable()
       table.string('next_quote_number', 50).nullable()
 

@@ -7,9 +7,6 @@ import oauthWebhookService from '#services/oauth/oauth_webhook_service'
 import { tokenRequestValidator } from '#validators/oauth_validator'
 import { OAUTH_ERRORS } from '#services/oauth/oauth_constants'
 
-// ---------- OAuth2 token endpoint (RFC 6749 + RFC 7636) ----------
-// Public clients (desktop, cli) authenticate via PKCE only; confidential
-// clients (web) additionally require a client_secret.
 export default class Token {
   async handle({ request, response }: HttpContext) {
     const payload = await request.validateUsing(tokenRequestValidator)
@@ -38,7 +35,6 @@ export default class Token {
     })
   }
 
-  // ---------- authorization_code grant ----------
   private async handleAuthorizationCode(
     payload: any,
     app: any,
@@ -74,9 +70,6 @@ export default class Token {
       })
     }
 
-    // ---------- PKCE enforcement ----------
-    // Required for all public clients; required whenever the authorize
-    // call specified a challenge (regardless of client kind).
     const isPublic = oauthAppService.isPublicClient(app)
     if (isPublic && !code.codeChallenge) {
       return response.badRequest({
@@ -136,7 +129,6 @@ export default class Token {
     })
   }
 
-  // ---------- refresh_token grant ----------
   private async handleRefreshToken(payload: any, app: any, request: any, response: any) {
     if (!payload.refresh_token) {
       return response.badRequest({

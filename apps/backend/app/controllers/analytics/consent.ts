@@ -12,7 +12,6 @@ export default class AnalyticsConsent {
       await auth.use('api').check()
       userId = auth.use('api').user?.id || null
     } catch {
-      // Not authenticated
     }
 
     const ip = request.ip()

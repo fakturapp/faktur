@@ -152,7 +152,7 @@ export default function OnboardingBillingPage() {
             </motion.div>
           )}
 
-          {/* Type de facturation */}
+          {}
           <motion.div variants={fadeUp} custom={1} className="mb-6">
             <h2 className="text-sm font-semibold text-foreground mb-3">Type de facturation</h2>
             <div className="grid grid-cols-2 gap-3">

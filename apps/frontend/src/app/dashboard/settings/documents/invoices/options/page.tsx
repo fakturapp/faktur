@@ -28,15 +28,15 @@ export default function InvoiceOptionsPage() {
   if (loading) {
     return (
       <div className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
-        {/* Header */}
+        {}
         <div className="space-y-2">
           <Skeleton className="h-7 w-32" />
           <Skeleton className="h-4 w-64" />
         </div>
-        {/* Two-column layout */}
+        {}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           <div className="space-y-6">
-            {/* Billing type card */}
+            {}
             <div className="rounded-xl border border-border/50 p-6">
               <div className="flex items-center gap-3 mb-4">
                 <Skeleton className="h-9 w-9 rounded-lg" />
@@ -50,7 +50,7 @@ export default function InvoiceOptionsPage() {
                 <Skeleton className="h-28 rounded-xl" />
               </div>
             </div>
-            {/* Payment methods card */}
+            {}
             <div className="rounded-xl border border-border/50 p-6">
               <div className="flex items-center gap-3 mb-4">
                 <Skeleton className="h-9 w-9 rounded-lg" />
@@ -66,7 +66,7 @@ export default function InvoiceOptionsPage() {
               </div>
             </div>
           </div>
-          {/* Preview */}
+          {}
           <div className="rounded-xl border border-border/50 overflow-hidden">
             <div className="px-5 py-3.5 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -86,16 +86,16 @@ export default function InvoiceOptionsPage() {
 
   return (
     <motion.div initial="hidden" animate="visible" className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
-      {/* Header */}
+      {}
       <motion.div variants={fadeUp} custom={0}>
         <h1 className="text-2xl font-bold text-foreground">Options</h1>
         <p className="text-muted-foreground mt-1">Type de facturation et moyens de paiement</p>
       </motion.div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        {/* Settings Column */}
+        {}
         <div className="space-y-6">
-          {/* Billing Type */}
+          {}
           <motion.div variants={fadeUp} custom={1}>
             <Card className="overflow-hidden border-border/50">
               <CardContent className="p-6">

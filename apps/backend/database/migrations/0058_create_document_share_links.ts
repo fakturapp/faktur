@@ -8,7 +8,6 @@ export default class extends BaseSchema {
       table.uuid('id').primary().defaultTo(this.db.rawQuery('gen_random_uuid()').knexQuery)
       table.uuid('team_id').notNullable().references('id').inTable('teams').onDelete('CASCADE')
 
-      // Polymorphic document reference (reuse the enum from migration 0057)
       table
         .enum('document_type', ['invoice', 'quote', 'credit_note'], {
           useNative: true,
@@ -18,10 +17,8 @@ export default class extends BaseSchema {
         .notNullable()
       table.uuid('document_id').notNullable()
 
-      // Secure token for the shareable link
       table.string('token', 64).notNullable().unique()
 
-      // Permission level (reuse the enum from migration 0057)
       table
         .enum('permission', ['viewer', 'editor'], {
           useNative: true,
@@ -31,7 +28,6 @@ export default class extends BaseSchema {
         .notNullable()
         .defaultTo('viewer')
 
-      // Who created this link
       table.uuid('created_by_user_id').notNullable().references('id').inTable('users').onDelete('CASCADE')
 
       table.boolean('is_active').notNullable().defaultTo(true)
@@ -41,7 +37,6 @@ export default class extends BaseSchema {
       table.timestamp('updated_at').notNullable().defaultTo(this.now())
     })
 
-    // Indexes
     this.schema.raw(
       'CREATE INDEX idx_document_share_links_token ON document_share_links (token)'
     )

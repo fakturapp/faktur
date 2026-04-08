@@ -79,15 +79,15 @@ export default function InvoiceAppearancePage() {
   if (loading) {
     return (
       <div className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
-        {/* Header */}
+        {}
         <div className="space-y-2">
           <Skeleton className="h-7 w-32" />
           <Skeleton className="h-4 w-64" />
         </div>
-        {/* Two-column layout */}
+        {}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           <div className="space-y-6">
-            {/* Template card */}
+            {}
             <div className="rounded-xl border border-border/50 p-6">
               <div className="flex items-center gap-3 mb-4">
                 <Skeleton className="h-9 w-9 rounded-lg" />
@@ -105,7 +105,7 @@ export default function InvoiceAppearancePage() {
                 <Skeleton className="h-5 w-5 rounded" />
               </div>
             </div>
-            {/* Logo card */}
+            {}
             <div className="rounded-xl border border-border/50 p-6">
               <div className="flex items-center gap-3 mb-4">
                 <Skeleton className="h-9 w-9 rounded-lg" />
@@ -122,7 +122,7 @@ export default function InvoiceAppearancePage() {
                 </div>
               </div>
             </div>
-            {/* Color card */}
+            {}
             <div className="rounded-xl border border-border/50 p-6">
               <div className="flex items-center gap-3 mb-4">
                 <Skeleton className="h-9 w-9 rounded-lg" />
@@ -138,7 +138,7 @@ export default function InvoiceAppearancePage() {
               </div>
             </div>
           </div>
-          {/* Preview */}
+          {}
           <div className="rounded-xl border border-border/50 overflow-hidden">
             <div className="px-5 py-3.5 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -158,16 +158,16 @@ export default function InvoiceAppearancePage() {
 
   return (
     <motion.div initial="hidden" animate="visible" className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
-      {/* Header */}
+      {}
       <motion.div variants={fadeUp} custom={0}>
         <h1 className="text-2xl font-bold text-foreground">Apparence</h1>
         <p className="text-muted-foreground mt-1">Personnalisez l&apos;apparence de vos factures et devis</p>
       </motion.div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        {/* Settings Column */}
+        {}
         <div className="space-y-6">
-          {/* Template Selector */}
+          {}
           <motion.div variants={fadeUp} custom={1}>
             <Card className="overflow-hidden border-border/50">
               <CardContent className="p-6">

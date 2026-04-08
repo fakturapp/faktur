@@ -1,12 +1,3 @@
-/**
- * PDP (Plateforme de Dematerialisation Partenaire) Integration Service
- *
- * Provides a unified interface for communicating with B2Brouter PDP.
- * B2Brouter is the only supported PDP provider (free tier available).
- *
- * When no API key is configured, all operations run in sandbox mode
- * with simulated responses — no errors, no cost.
- */
 
 export interface PdpConfig {
   provider: 'b2brouter' | 'sandbox'
@@ -36,10 +27,6 @@ export interface PdpValidationResult {
   warnings: string[]
 }
 
-/**
- * Build a PdpConfig from InvoiceSetting fields.
- * Falls back to sandbox if no API key is provided.
- */
 export function buildPdpConfig(settings: {
   pdpProvider?: string | null
   pdpApiKey?: string | null
@@ -55,10 +42,6 @@ export function buildPdpConfig(settings: {
   }
 }
 
-/**
- * Validate PDP connection credentials.
- * In sandbox mode, always returns success.
- */
 export async function validatePdpConnection(
   config: PdpConfig
 ): Promise<{ connected: boolean; message: string }> {
@@ -73,10 +56,6 @@ export async function validatePdpConnection(
   return await validateB2BRouter(config)
 }
 
-/**
- * Submit an e-invoice via PDP.
- * In sandbox mode, returns a simulated success response.
- */
 export async function submitInvoice(
   config: PdpConfig,
   xml: string,

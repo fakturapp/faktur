@@ -18,7 +18,6 @@ export default class extends BaseSchema {
       table.timestamp('updated_at').nullable()
     })
 
-    // Partial unique: one user per team (only when user_id is set)
     this.schema.raw(`
       CREATE UNIQUE INDEX team_members_team_user_unique
       ON team_members (team_id, user_id)

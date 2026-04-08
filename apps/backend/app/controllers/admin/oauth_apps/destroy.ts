@@ -8,8 +8,6 @@ export default class DestroyOauthApp {
       return response.notFound({ message: 'OAuth app not found' })
     }
 
-    // Hard delete cascades through tokens, codes, authorizations and
-    // webhook deliveries thanks to ON DELETE CASCADE at the SQL level.
     await app.delete()
 
     return response.ok({ message: 'OAuth app deleted' })

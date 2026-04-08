@@ -25,7 +25,6 @@ export default class Update {
 
     const payload = await request.validateUsing(createInvoiceValidator)
 
-    // Calculate totals from lines
     let subtotal = 0
     let taxAmount = 0
     const linesData = payload.lines.map((line, index) => {
@@ -45,7 +44,6 @@ export default class Update {
       }
     })
 
-    // Apply global discount
     let discountAmount = 0
     const discountType = payload.globalDiscountType || 'none'
     const discountValue = payload.globalDiscountValue || 0
@@ -57,7 +55,6 @@ export default class Update {
 
     const total = subtotal + taxAmount - discountAmount
 
-    // Encrypt invoice fields
     const invoiceUpdateData: Record<string, any> = {
       clientId: payload.clientId || null,
       subject: payload.subject || null,
@@ -95,7 +92,6 @@ export default class Update {
       invoice.merge(invoiceUpdateData)
       await invoice.save()
 
-      // Delete existing lines and recreate
       await InvoiceLine.query({ client: trx }).where('invoice_id', invoice.id).delete()
 
       for (const lineData of linesData) {
@@ -109,7 +105,6 @@ export default class Update {
       }
     })
 
-    // Notify collaborators that the document was saved
     broadcastDocumentSaved('invoice', invoice.id, user.id)
 
     return response.ok({

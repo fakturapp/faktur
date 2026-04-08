@@ -18,7 +18,6 @@ export function SaveBar({ hasChanges, saving, error, onSave, onReset }: SaveBarP
   const barRef = useRef<HTMLDivElement>(null)
   const [navWarning, setNavWarning] = useState(false)
 
-  // Shake on error
   useEffect(() => {
     if (error && barRef.current) {
       barRef.current.classList.add('animate-shake')
@@ -26,15 +25,12 @@ export function SaveBar({ hasChanges, saving, error, onSave, onReset }: SaveBarP
     }
   }, [error])
 
-  // Shake + red warning when trying to navigate away
   useEffect(() => {
     if (!hasChanges) return
 
-    // Browser close/refresh
     const beforeUnload = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = '' }
     window.addEventListener('beforeunload', beforeUnload)
 
-    // Client-side link clicks — block and shake
     const handleClick = (e: MouseEvent) => {
       const anchor = (e.target as HTMLElement).closest('a[href]')
       if (!anchor) return
@@ -44,7 +40,6 @@ export function SaveBar({ hasChanges, saving, error, onSave, onReset }: SaveBarP
 
       e.preventDefault()
       e.stopPropagation()
-      // Trigger red shake warning
       setNavWarning(true)
       barRef.current?.classList.add('animate-shake')
       setTimeout(() => {
@@ -54,7 +49,6 @@ export function SaveBar({ hasChanges, saving, error, onSave, onReset }: SaveBarP
     }
     document.addEventListener('click', handleClick, true)
 
-    // Browser back/forward
     window.history.pushState({ __unsaved: true }, '')
     const handlePop = () => {
       window.history.pushState({ __unsaved: true }, '')
@@ -74,7 +68,6 @@ export function SaveBar({ hasChanges, saving, error, onSave, onReset }: SaveBarP
     }
   }, [hasChanges])
 
-  // Ctrl+S
   useEffect(() => {
     if (!hasChanges) return
     const handler = (e: KeyboardEvent) => {

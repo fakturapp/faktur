@@ -32,7 +32,6 @@ interface StatusDropdownProps {
   endpoint: 'quotes' | 'invoices' | 'credit-notes'
   onStatusChange: (id: string, newStatus: string) => void
   fullWidth?: boolean
-  /** Statuses that are display-only and cannot be selected manually */
   readOnlyStatuses?: string[]
 }
 

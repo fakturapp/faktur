@@ -1,11 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
 
-/**
- * Adds additional security headers beyond what @adonisjs/shield provides.
- * Covers: Referrer-Policy, Permissions-Policy, X-DNS-Prefetch-Control,
- * X-Download-Options, X-Permitted-Cross-Domain-Policies, Cross-Origin policies.
- */
 export default class HelmetMiddleware {
   async handle(ctx: HttpContext, next: NextFn) {
     ctx.response.header('Referrer-Policy', 'strict-origin-when-cross-origin')

@@ -15,7 +15,6 @@ export default class EmailRequestChange {
       return response.badRequest({ message: "Le nouvel email est identique à l'actuel" })
     }
 
-    // Check for disposable/temporary email
     const isDisposable = await EmailBlacklistService.isDisposableEmail(newEmail)
     if (isDisposable) {
       return response.unprocessableEntity({
@@ -29,7 +28,6 @@ export default class EmailRequestChange {
       return response.conflict({ message: 'Cet email est déjà utilisé par un autre compte' })
     }
 
-    // Rate limit: reuse securityCodeExpiresAt check
     if (
       user.securityCodeExpiresAt &&
       user.securityCodeExpiresAt > DateTime.now().minus({ minutes: 4 })
@@ -44,7 +42,6 @@ export default class EmailRequestChange {
     user.securityCodeExpiresAt = DateTime.now().plus({ minutes: 5 })
     await user.save()
 
-    // Send code to the NEW email
     await EmailChangeRequested.dispatch(newEmail, code, user.fullName || undefined)
 
     return response.ok({ message: 'Code de vérification envoyé à la nouvelle adresse' })

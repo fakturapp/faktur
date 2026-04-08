@@ -23,7 +23,6 @@ export default class Bank {
 
     const payload = await request.validateUsing(updateBankValidator)
 
-    // Update deprecated Company fields for backward compatibility
     if (payload.iban !== undefined)
       company.iban = payload.iban ? zeroAccessCryptoService.encryptField(payload.iban, dek) : null
     if (payload.bic !== undefined)
@@ -35,7 +34,6 @@ export default class Bank {
 
     await company.save()
 
-    // Also sync to BankAccount: create or update the default bank account
     if (payload.iban || payload.bic || payload.bankName) {
       let defaultAccount = await BankAccount.query()
         .where('team_id', user.currentTeamId)
@@ -52,7 +50,6 @@ export default class Bank {
       }
 
       encryptModelFields(bankData, [...ENCRYPTED_FIELDS.bankAccount], dek)
-      // bankName on BankAccount is not in ENCRYPTED_FIELDS.bankAccount, encrypt manually
       if (
         bankData.bankName &&
         typeof bankData.bankName === 'string' &&

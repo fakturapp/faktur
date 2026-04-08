@@ -23,7 +23,6 @@ export default class Destroy {
 
     await payment.delete()
 
-    // Recalculate invoice status
     const invoice = await Invoice.query()
       .where('id', params.invoiceId)
       .where('team_id', teamId)

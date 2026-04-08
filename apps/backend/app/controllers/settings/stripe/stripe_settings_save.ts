@@ -16,7 +16,6 @@ export default class StripeSettingsSave {
 
     const payload = await request.validateUsing(saveStripeSettingsValidator)
 
-    // Validate keys with Stripe API
     const validation = await stripeService.validateKeys(payload.publishableKey, payload.secretKey)
     if (!validation.valid) {
       return response.badRequest({ message: validation.error })
@@ -24,24 +23,20 @@ export default class StripeSettingsSave {
 
     const settings = await InvoiceSetting.query().where('team_id', teamId).firstOrFail()
 
-    // Prepare data for DEK encryption
     const data: Record<string, any> = {
       stripePublishableKey: payload.publishableKey,
       stripeSecretKey: payload.secretKey,
       stripeWebhookSecret: payload.webhookSecret,
     }
 
-    // Encrypt with DEK for settings storage
     encryptModelFields(data, ['stripePublishableKey', 'stripeSecretKey', 'stripeWebhookSecret'] as any, dek)
 
     settings.stripePublishableKey = data.stripePublishableKey
     settings.stripeSecretKey = data.stripeSecretKey
     settings.stripeWebhookSecret = data.stripeWebhookSecret
 
-    // Also store webhook secret with app-level encryption for webhook handler (no DEK available)
     settings.stripeWebhookSecretApp = encryptionService.encrypt(payload.webhookSecret)
 
-    // Add 'stripe' to payment methods if not present
     if (!settings.paymentMethods.includes('stripe')) {
       settings.paymentMethods = [...settings.paymentMethods, 'stripe']
     }

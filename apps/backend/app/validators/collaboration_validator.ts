@@ -1,6 +1,5 @@
 import vine from '@vinejs/vine'
 
-// ---------- Document share validators ----------
 const DOCUMENT_TYPES = ['invoice', 'quote', 'credit_note'] as const
 const SHARE_PERMISSIONS = ['viewer', 'editor'] as const
 const SHARE_VISIBILITIES = ['team', 'anyone'] as const

@@ -39,7 +39,6 @@ export default class Update {
 
     const payload = await request.validateUsing(updateContactValidator)
 
-    // If marking as primary, unset other primary contacts
     if (payload.isPrimary) {
       await ClientContact.query()
         .where('client_id', params.clientId)

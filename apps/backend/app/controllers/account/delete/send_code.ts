@@ -13,7 +13,6 @@ export default class SendCode {
     const error = validateDeletionSession(user, token, 3)
     if (error) return response.badRequest({ message: error })
 
-    // Rate limit: block if code was sent less than 60 seconds ago
     if (
       user.deletionCodeExpiresAt &&
       DateTime.now().diff(user.deletionCodeExpiresAt.minus({ minutes: 5 }), 'seconds').seconds < 60

@@ -50,7 +50,6 @@ export default class Generate {
       return response.notFound({ message: 'Recurring invoice not found' })
     }
 
-    // Generate invoice number
     const settings = await InvoiceSetting.query().where('team_id', teamId).first()
     let invoiceNumber: string
 

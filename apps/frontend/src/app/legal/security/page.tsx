@@ -16,7 +16,7 @@ export default function SecurityPolicyPage() {
         </div>
       </div>
 
-      {/* Résumé */}
+      {}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {[
           { icon: Lock, title: 'Chiffrement AES-256-GCM', desc: 'Toutes les données sensibles sont chiffrées individuellement' },

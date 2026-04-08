@@ -8,10 +8,6 @@ interface FieldIndicatorProps {
   className?: string
 }
 
-/**
- * Wraps a form field to show a colored border when another collaborator
- * is editing the same field. Also broadcasts focus/blur events.
- */
 export function CollaborativeField({ fieldId, children, className }: FieldIndicatorProps) {
   const collab = useCollaborationContext()
 
@@ -20,7 +16,6 @@ export function CollaborativeField({ fieldId, children, className }: FieldIndica
   const sendFieldFocus = collab?.sendFieldFocus
   const sendFieldBlur = collab?.sendFieldBlur
 
-  // Check if another user is focused on this field
   const focusedUserId = focusedFields.get(fieldId)
   const focusedCollab = focusedUserId
     ? collaborators.find((c) => c.userId === focusedUserId)

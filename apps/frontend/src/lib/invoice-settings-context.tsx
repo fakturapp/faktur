@@ -3,7 +3,6 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react'
 import { api } from '@/lib/api'
 
-/** Resolve logo URL - add cache buster to prevent stale logos */
 function resolveLogoUrl(url: string | null): string | null {
   if (!url) return null
   const sep = url.includes('?') ? '&' : '?'

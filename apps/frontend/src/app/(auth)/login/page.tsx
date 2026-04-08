@@ -36,9 +36,6 @@ const OAUTH_ERRORS: Record<string, string> = {
 
 function getPostLoginRedirect(onboardingCompleted: boolean, explicitRedirect?: string | null): string {
   if (!onboardingCompleted) return '/onboarding/team'
-  // Explicit ?redirect= query string param (used by the OAuth consent
-  // screen to bounce the user back after they sign in). Only allow
-  // same-origin / relative paths to defeat open-redirect attacks.
   if (explicitRedirect && explicitRedirect.startsWith('/')) {
     return explicitRedirect
   }
@@ -72,22 +69,16 @@ function LoginContent() {
     turnstileRef.current?.reset()
   }, [])
 
-  // Detect Faktur Desktop runtime on mount — the shell_window injects
-  // both a user-agent suffix and a localStorage flag before the first
-  // React render, so this is reliable.
   useEffect(() => {
     setIsDesktop(isFakturDesktop())
   }, [])
 
-  // Handle ?token= from Google OAuth callback
   useEffect(() => {
     const token = searchParams.get('token')
     const oauthError = searchParams.get('error')
 
     if (token) {
-      // Remove token from URL immediately
       window.history.replaceState({}, '', '/login')
-      // Fetch user with the token
       localStorage.setItem('faktur_token', token)
       api.get<{ user: any }>('/auth/me').then(({ data, error: err }) => {
         if (err || !data?.user) {
@@ -102,7 +93,7 @@ function LoginContent() {
       window.history.replaceState({}, '', '/login')
       setError(OAUTH_ERRORS[oauthError] || 'Une erreur est survenue.')
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [])
 
   async function handleGoogleLogin() {
     setError('')

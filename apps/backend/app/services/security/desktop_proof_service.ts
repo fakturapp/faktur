@@ -1,22 +1,10 @@
 import crypto from 'node:crypto'
 import env from '#start/env'
 
-// ---------- Desktop cryptographic proof verifier ----------
-// Mirrors faktur-desktop/src/security/desktop_proof.js. The desktop
-// binary HMAC-signs `${nonce}:${ts}:${client_id}` with a shared key.
-// The backend verifies:
-//   - HMAC signature (constant-time compare)
-//   - ts freshness (±5 min)
-//   - nonce replay (in-memory LRU set)
-//
-// This is NOT a perfect defense — an attacker that unpacks the asar can
-// extract the key. It raises the bar against trivial User-Agent spoofing
-// and lets the backend reliably distinguish desktop from web.
 
 const PROOF_TTL_MS = 5 * 60 * 1000
 const NONCE_CACHE_MAX = 10_000
 
-// ---------- Replay protection ----------
 const usedNonces = new Map<string, number>()
 
 function rememberNonce(nonce: string, ts: number) {
@@ -36,7 +24,6 @@ export interface DesktopProof {
   clientId: string
 }
 
-// ---------- Verification ----------
 export function verifyDesktopProof(proof: DesktopProof | null): boolean {
   if (!proof) return false
   const { signature, nonce, ts, clientId } = proof

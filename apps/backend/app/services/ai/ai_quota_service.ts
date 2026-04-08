@@ -19,13 +19,9 @@ export interface QuotaStatus {
 }
 
 export default class AiQuotaService {
-  /**
-   * Check if the team can make another AI request.
-   */
   static async checkQuota(teamId: string): Promise<QuotaStatus> {
     const now = DateTime.now()
 
-    // Hourly window: count requests in the last 60 minutes
     const hourAgo = now.minus({ hours: 1 })
     const hourlyUsed = await AiUsageLog.query()
       .where('teamId', teamId)
@@ -33,7 +29,6 @@ export default class AiQuotaService {
       .count('* as total')
       .first()
 
-    // Weekly window: from Monday 00:00 of current week
     const weekStart = now.startOf('week')
     const weeklyUsed = await AiUsageLog.query()
       .where('teamId', teamId)
@@ -44,7 +39,6 @@ export default class AiQuotaService {
     const hourlyCount = Number((hourlyUsed as any)?.$extras?.total || 0)
     const weeklyCount = Number((weeklyUsed as any)?.$extras?.total || 0)
 
-    // Find the oldest request in the hourly window to determine when the quota resets
     let hourlyResetsAt = now.plus({ hours: 1 })
     if (hourlyCount >= HOURLY_LIMIT) {
       const oldest = await AiUsageLog.query()
@@ -57,7 +51,6 @@ export default class AiQuotaService {
       }
     }
 
-    // Weekly resets at next Monday 00:00
     const weeklyResetsAt = weekStart.plus({ weeks: 1 })
 
     return {
@@ -75,9 +68,6 @@ export default class AiQuotaService {
     }
   }
 
-  /**
-   * Record an AI request for quota tracking.
-   */
   static async recordUsage(teamId: string, userId: string, model: string, endpoint: string) {
     await AiUsageLog.create({ teamId, userId, model, endpoint })
   }

@@ -22,7 +22,6 @@ class PasskeyService {
     const explicit = env.get('WEBAUTHN_RP_ID')
     if (explicit) return explicit
 
-    // Derive from FRONTEND_URL: extract registrable domain
     const frontendUrl = env.get('FRONTEND_URL')
     if (frontendUrl) {
       try {
@@ -49,9 +48,6 @@ class PasskeyService {
     return securityConfig.webauthn.timeout
   }
 
-  /**
-   * Generate registration options for a user (authenticated).
-   */
   async generateRegistrationOptions(userId: string, email: string) {
     const existingCredentials = await PasskeyCredential.query().where('userId', userId)
 
@@ -76,7 +72,6 @@ class PasskeyService {
       timeout: this.timeout,
     })
 
-    // Store challenge in DB with 60s TTL
     await PasskeyChallenge.create({
       userId,
       challenge: options.challenge,
@@ -87,9 +82,6 @@ class PasskeyService {
     return options
   }
 
-  /**
-   * Verify registration response and store the credential.
-   */
   async verifyRegistration(
     userId: string,
     response: RegistrationResponseJSON,
@@ -115,7 +107,6 @@ class PasskeyService {
         expectedRPID: this.rpID,
       })
     } finally {
-      // Always delete the challenge after use
       await challengeRecord.delete()
     }
 
@@ -140,13 +131,9 @@ class PasskeyService {
     return { credential: passkey, verified: true }
   }
 
-  /**
-   * Generate authentication options (public — no user required).
-   */
   async generateAuthenticationOptions(email?: string) {
     let allowCredentials: { id: string; type: 'public-key'; transports?: AuthenticatorTransportFuture[] }[] | undefined
 
-    // If email provided, limit to that user's credentials
     if (email) {
       const { default: User } = await import('#models/account/user')
       const user = await User.findBy('email', email)
@@ -169,7 +156,6 @@ class PasskeyService {
       timeout: this.timeout,
     })
 
-    // Store challenge in DB (5 minute expiry for slow biometric prompts)
     await PasskeyChallenge.create({
       userId: null,
       challenge: options.challenge,
@@ -180,9 +166,6 @@ class PasskeyService {
     return options
   }
 
-  /**
-   * Verify authentication response and return the credential + user.
-   */
   async verifyAuthentication(
     response: AuthenticationResponseJSON
   ): Promise<{
@@ -192,17 +175,14 @@ class PasskeyService {
   }> {
     const credentialIdB64 = response.id
 
-    // Try multiple encoding variants to find the credential
     const candidates = [credentialIdB64]
     if (response.rawId && response.rawId !== credentialIdB64) {
       candidates.push(response.rawId)
     }
-    // Also try re-encoding: decode base64url then re-encode (normalizes padding)
     try {
       const decoded = Buffer.from(credentialIdB64, 'base64url')
       const reencoded = decoded.toString('base64url')
       if (reencoded !== credentialIdB64) candidates.push(reencoded)
-      // Also try standard base64
       const b64std = decoded.toString('base64')
       if (b64std !== credentialIdB64) candidates.push(b64std)
     } catch {}
@@ -220,8 +200,6 @@ class PasskeyService {
       return { verified: false, credential: null, error: 'credential_not_found' }
     }
 
-    // Find a valid challenge — get ALL recent authentication challenges
-    // and try each one (handles race conditions with multiple tabs)
     const challengeRecords = await PasskeyChallenge.query()
       .where('type', 'authentication')
       .where('expiresAt', '>', DateTime.now().toSQL()!)
@@ -232,7 +210,6 @@ class PasskeyService {
       return { verified: false, credential: null, error: 'challenge_expired' }
     }
 
-    // Try each challenge until one works
     let verification: VerifiedAuthenticationResponse | null = null
     let lastError: string | null = null
 
@@ -252,15 +229,13 @@ class PasskeyService {
               : undefined,
           },
         })
-        break // Found the right challenge
+        break
       } catch (err: any) {
         lastError = err?.message || String(err)
-        // Wrong challenge, try next one
         continue
       }
     }
 
-    // Clean up the used challenge (and any others that were tried)
     for (const ch of challengeRecords) {
       await ch.delete().catch(() => {})
     }
@@ -269,7 +244,6 @@ class PasskeyService {
       return { verified: false, credential: null, error: lastError || 'verification_failed' }
     }
 
-    // Update counter (clone detection)
     credential.counter = verification.authenticationInfo.newCounter
     credential.lastUsedAt = DateTime.now()
     await credential.save()
@@ -277,10 +251,6 @@ class PasskeyService {
     return { verified: true, credential }
   }
 
-  /**
-   * Derive a passkey key from credential ID using HKDF.
-   * Used to encrypt/decrypt the KEK for passkey-based login.
-   */
   derivePasskeyKey(credentialId: string): Buffer {
     const ikm = Buffer.from(credentialId, 'base64url')
     return Buffer.from(
@@ -288,25 +258,16 @@ class PasskeyService {
     )
   }
 
-  /**
-   * Encrypt KEK with passkey-derived key.
-   */
   encryptKekForPasskey(kek: Buffer, credentialId: string): string {
     const passkeyKey = this.derivePasskeyKey(credentialId)
     return zeroAccessCryptoService.encryptDEK(kek, passkeyKey)
   }
 
-  /**
-   * Decrypt KEK with passkey-derived key.
-   */
   decryptKekFromPasskey(encryptedKek: string, credentialId: string): Buffer {
     const passkeyKey = this.derivePasskeyKey(credentialId)
     return zeroAccessCryptoService.decryptDEK(encryptedKek, passkeyKey)
   }
 
-  /**
-   * Cleanup expired challenges.
-   */
   async cleanupExpiredChallenges() {
     await PasskeyChallenge.query()
       .where('expiresAt', '<', DateTime.now().toSQL()!)

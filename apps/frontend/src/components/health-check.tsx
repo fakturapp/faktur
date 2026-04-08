@@ -38,10 +38,6 @@ export function HealthCheckProvider({ children }: { children: React.ReactNode })
     }
   }, [])
 
-  // Check on mount + route changes. Skip on public checkout pages: those
-  // run on a dedicated subdomain where the API origin may differ and CORS
-  // preflight for /health is not guaranteed — we don't want a false-positive
-  // "Services indisponibles" modal blocking a legitimate customer.
   useEffect(() => {
     const isCheckoutPath =
       pathname.startsWith('/checkout') ||
@@ -73,7 +69,7 @@ export function HealthCheckProvider({ children }: { children: React.ReactNode })
     <>
       {children}
 
-      {/* Main error modal */}
+      {}
       <AnimatePresence>
         {showError && !showConfirm && (
           <div className="fixed inset-0 z-[200] flex items-center justify-center">
@@ -90,9 +86,9 @@ export function HealthCheckProvider({ children }: { children: React.ReactNode })
               transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
               className="relative z-10 w-full max-w-lg mx-4 overflow-hidden rounded-2xl border border-red-500/20 bg-card shadow-2xl"
             >
-              {/* Header */}
+              {}
               <div className="relative from-red-500/10 via-orange-500/5 to-transparent px-6 pt-8 pb-6">
-                {/* Animated pulse ring */}
+                {}
                 <div className="mx-auto mb-5 relative w-16 h-16">
                   <motion.div
                     animate={{ scale: [1, 1.4, 1], opacity: [0.3, 0, 0.3] }}
@@ -119,7 +115,7 @@ export function HealthCheckProvider({ children }: { children: React.ReactNode })
                 </p>
               </div>
 
-              {/* Details section */}
+              {}
               <div className="px-6 pb-2">
                 <div className="rounded-xl border border-border bg-muted/30 p-4">
                   <div className="flex items-center gap-2 mb-3">
@@ -147,7 +143,7 @@ export function HealthCheckProvider({ children }: { children: React.ReactNode })
                 </div>
               </div>
 
-              {/* Actions */}
+              {}
               <div className="flex gap-3 px-6 py-5">
                 <Button
                   variant="outline"
@@ -190,7 +186,7 @@ export function HealthCheckProvider({ children }: { children: React.ReactNode })
         )}
       </AnimatePresence>
 
-      {/* Confirmation modal */}
+      {}
       <AnimatePresence>
         {showConfirm && (
           <div className="fixed inset-0 z-[210] flex items-center justify-center">

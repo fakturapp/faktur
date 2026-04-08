@@ -45,17 +45,14 @@ export default class ConfirmPayment {
 
     const payload = await request.validateUsing(confirmPaymentValidator)
 
-    // Update invoice status to paid
     invoice.status = 'paid'
     invoice.paidDate = payload.paymentDate || DateTime.now().toFormat('yyyy-MM-dd')
     await invoice.save()
 
-    // Update payment link
     paymentLink.confirmedAt = DateTime.now()
     paymentLink.confirmedByUserId = user.id
     paymentLink.isActive = false
 
-    // Store confirmation details
     const confirmData: Record<string, any> = {
       confirmationDate: payload.paymentDate || null,
       confirmationNotes: payload.notes || null,
@@ -64,16 +61,13 @@ export default class ConfirmPayment {
     paymentLink.confirmationDate = confirmData.confirmationDate
     paymentLink.confirmationNotes = confirmData.confirmationNotes
 
-    // Delete PDF from R2
     if (paymentLink.pdfStorageKey) {
       try {
         await r2StorageService.delete(paymentLink.pdfStorageKey)
       } catch {
-        // Non-blocking
       }
     }
 
-    // Wipe IBAN data
     paymentLink.encryptedIban = null
     paymentLink.encryptedBic = null
     paymentLink.encryptedBankName = null
@@ -82,18 +76,15 @@ export default class ConfirmPayment {
 
     await paymentLink.save()
 
-    // Schedule auto-deletion of payment link in 5 minutes
     const linkId = paymentLink.id
     setTimeout(async () => {
       try {
         const link = await PaymentLink.find(linkId)
         if (link) await link.delete()
-      } catch { /* */ }
+      } catch { }
     }, 5 * 60 * 1000)
 
-    // Notify client if requested
     if (payload.notifyClient && paymentLink.clientEmail) {
-      // clientEmail is app-level encrypted, decrypt with EncryptionService
       try {
         const clientEmail = encryptionService.decrypt(paymentLink.clientEmail)
         let clientName: string | undefined
@@ -101,14 +92,12 @@ export default class ConfirmPayment {
           try {
             clientName = encryptionService.decrypt(paymentLink.clientName)
           } catch {
-            // ignore
           }
         }
         await mail.send(
           new PaymentConfirmedNotification(clientEmail, paymentLink.invoiceNumber, clientName)
         )
       } catch {
-        // Email failure should not block confirmation
       }
     }
 

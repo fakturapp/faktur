@@ -28,7 +28,6 @@ export default class Update {
 
     const payload = await request.validateUsing(createCreditNoteValidator)
 
-    // Calculate totals from lines
     let subtotal = 0
     let taxAmount = 0
     const linesData = payload.lines.map((line, index) => {
@@ -48,7 +47,6 @@ export default class Update {
       }
     })
 
-    // Apply global discount
     let discountAmount = 0
     const discountType = payload.globalDiscountType || 'none'
     const discountValue = payload.globalDiscountValue || 0

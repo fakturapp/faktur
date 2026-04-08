@@ -26,7 +26,6 @@ export default class Confirm {
       return response.unprocessableEntity({ message: 'Tapez "supprimer" pour confirmer' })
     }
 
-    // Safety check: ensure no owned teams remain
     const ownedTeams = await TeamMember.query()
       .where('userId', user.id)
       .where('role', 'super_admin')
@@ -38,21 +37,16 @@ export default class Confirm {
       })
     }
 
-    // Save email and name before deletion
     const email = user.email
     const name = user.fullName || undefined
 
-    // Clear crypto keys
     keyStore.clear(user.id)
 
-    // Remove circular FK reference
     user.currentTeamId = null
     await user.save()
 
-    // Hard delete user — CASCADE handles: auth_access_tokens, login_histories, auth_providers, team_members
     await user.delete()
 
-    // Send confirmation email
     await mail.sendLater(new AccountDeletedNotification(email, name))
 
     return response.ok({ message: 'Compte supprimé définitivement' })

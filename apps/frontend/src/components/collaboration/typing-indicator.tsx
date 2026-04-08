@@ -5,17 +5,10 @@ import { useCollaborationContext } from '@/components/collaboration/collaboratio
 import type { CollaboratorInfo } from '@/hooks/use-collaboration'
 
 interface TypingIndicatorProps {
-  /** The field ID to check for active typing */
   fieldId: string
   className?: string
 }
 
-/**
- * Shows a colored caret + name label when another user is focused
- * on the same field. Place this next to input/textarea elements.
- *
- * Usage: <TypingIndicator fieldId="notes" />
- */
 export function TypingIndicator({ fieldId, className }: TypingIndicatorProps) {
   const collab = useCollaborationContext()
   if (!collab) return null
@@ -36,7 +29,7 @@ export function TypingIndicator({ fieldId, className }: TypingIndicatorProps) {
         className={className}
       >
         <div className="flex items-center gap-1.5">
-          {/* Blinking colored caret */}
+          {}
           <div
             className="w-0.5 h-4 rounded-full animate-pulse"
             style={{ backgroundColor: collab_.color }}
@@ -53,11 +46,6 @@ export function TypingIndicator({ fieldId, className }: TypingIndicatorProps) {
   )
 }
 
-/**
- * Wraps a form field to show colored border + typing indicator
- * when another collaborator is focused on it.
- * Also broadcasts focus/blur events to other users.
- */
 export function CollaborativeFieldWrapper({
   fieldId,
   children,

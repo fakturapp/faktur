@@ -95,10 +95,8 @@ export default class GmailOAuthService {
     const now = new Date()
     const expiresAt = account.tokenExpiresAt?.toJSDate()
 
-    // Refresh if expires within 5 minutes
     if (expiresAt && expiresAt.getTime() - now.getTime() < 5 * 60 * 1000) {
       const refreshed = await this.refreshAccessToken(account.refreshToken)
-      // Return the raw decrypted token for immediate use
       return EncryptionService.decrypt(refreshed.accessToken)
     }
 

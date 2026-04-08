@@ -33,13 +33,11 @@ export default class GoogleRegister {
       return response.badRequest({ message: 'Invalid or expired Google data' })
     }
 
-    // Check if email already taken
     const existingUser = await User.findBy('email', profile.email)
     if (existingUser) {
       return response.conflict({ message: 'An account with this email already exists' })
     }
 
-    // Check if Google account already linked
     const existingProvider = await AuthProvider.query()
       .where('provider', 'google')
       .where('providerUserId', profile.sub)
@@ -104,7 +102,6 @@ export default class GoogleRegister {
       severity: 'info',
     })
 
-    // Derive KEK from password (password was provided, so crypto works normally)
     const salt = Buffer.from(user.saltKdf!, 'hex')
     const kek = await zeroAccessCryptoService.deriveKEK(data.password, salt)
     keyStore.storeKeys(user.id, kek, '', Buffer.alloc(0))

@@ -25,12 +25,9 @@ export default class Me {
         .first(),
     ])
 
-    // Check if vault is locked (crypto enabled but DEK not in memory)
     let vaultLocked =
       user.saltKdf && user.currentTeamId ? !keyStore.isUnlocked(user.id, user.currentTeamId) : false
 
-    // Auto-recovery: if vault appears locked but client has the session key,
-    // try to recover from DB without forcing the user to re-enter password
     if (vaultLocked && user.currentTeamId) {
       const sessionKeyHex = request.header('X-Vault-Key')
       if (sessionKeyHex) {

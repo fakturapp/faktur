@@ -4,14 +4,12 @@ import encryptionService from '#services/encryption/encryption_service'
 
 export default class CheckoutShow {
   async handle({ params, response }: HttpContext) {
-    // Hash the incoming token to find the payment link
     const tokenHash = encryptionService.hash(params.token)
 
     const paymentLink = await PaymentLink.query()
       .where('token_hash', tokenHash)
       .first()
 
-    // Security headers
     response.header('X-Robots-Tag', 'noindex, nofollow')
     response.header('Cache-Control', 'no-store, no-cache, must-revalidate')
     response.header('X-Frame-Options', 'DENY')
@@ -20,7 +18,6 @@ export default class CheckoutShow {
       return response.notFound({ message: 'Payment link not found' })
     }
 
-    // Mask client email for display (d****@o**.fr)
     let maskedEmail: string | null = null
     if (paymentLink.clientEmail) {
       try {

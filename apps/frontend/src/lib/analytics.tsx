@@ -108,7 +108,6 @@ export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
 
     const body = JSON.stringify(payload)
 
-    // Use sendBeacon for reliability on page unload, fetch otherwise
     if (document.visibilityState === 'hidden') {
       navigator.sendBeacon(`${API_URL}/analytics/ingest`, new Blob([body], { type: 'application/json' }))
       isFlushing.current = false

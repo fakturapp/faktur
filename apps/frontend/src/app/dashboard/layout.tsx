@@ -112,7 +112,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     const { error } = await api.post('/team/switch', { teamId: switchConfirm.id })
     if (!error) {
-      // Clear all cached data from the previous team
       try {
         const keys = Object.keys(localStorage)
         for (const key of keys) {
@@ -121,7 +120,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           }
         }
       } catch {}
-      // Hard reload to reset all contexts and cached state
       window.location.href = '/dashboard'
       return
     }
@@ -132,7 +130,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (loading) {
     return (
       <div className="relative h-screen overflow-hidden bg-background">
-        {/* Skeleton sidebar — overlay, flush left, large right rounding */}
+        {}
         <div className="fixed left-0 top-0 z-40 w-(--sidebar-width) h-screen rounded-r-[2rem] bg-sidebar border-r border-sidebar-border shadow-2xl flex flex-col overflow-hidden">
           <div className="px-3 pt-3 pb-2">
             <div className="flex items-center gap-2.5 px-2 py-2">
@@ -164,7 +162,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
           </div>
         </div>
-        {/* Skeleton content area — full page underneath */}
+        {}
         <div className="h-screen flex flex-col overflow-hidden bg-background pl-(--sidebar-width)">
           <div className="h-(--header-height) shrink-0 border-b border-border" />
           <div className="flex-1 p-6 space-y-6">
@@ -182,7 +180,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (!user) return null
 
-  // Popup mode: minimal layout without sidebar/header (used for client creation popup)
   if (isPopup) {
     return (
       <InvoiceSettingsProvider>
@@ -241,7 +238,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </main>
       </div>
 
-      {/* Team switch confirmation */}
+      {}
       <Dialog open={!!switchConfirm} onClose={() => setSwitchConfirm(null)}>
         <div className="flex items-center gap-3 mb-4">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
@@ -281,7 +278,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </DialogFooter>
       </Dialog>
 
-      {/* ---------- Logout confirmation ---------- */}
+      {}
       <Dialog open={logoutConfirm} onClose={() => setLogoutConfirm(false)}>
         <div className="flex items-center gap-3 mb-4">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-destructive/10">
@@ -355,7 +352,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </DialogFooter>
       </Dialog>
 
-      {/* Switching overlay */}
+      {}
       <AnimatePresence>
         {(switching || loggingOut) && (
           <motion.div

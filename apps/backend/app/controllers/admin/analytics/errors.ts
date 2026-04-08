@@ -60,7 +60,6 @@ export default class AnalyticsErrors {
       (a, b) => b.occurrenceCount - a.occurrenceCount
     )
 
-    // Decrypt details for the top error entry
     if (result.length > 0) {
       const top = result[0]
       try {
@@ -73,11 +72,9 @@ export default class AnalyticsErrors {
           ;(top as any).stackTrace = analyticsEncryption.decrypt(top.stackTraceEncrypted)
         }
       } catch {
-        // Decryption failed — leave encrypted fields as-is
       }
     }
 
-    // Remove encrypted fields from output
     const output = result.map(({ errorMessageFullEncrypted, stackTraceEncrypted, ids, latestTimestamp, ...rest }, index) => ({
       ...rest,
       id: ids[0],

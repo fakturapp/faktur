@@ -105,7 +105,6 @@ function EditQuoteContent() {
   const [validationErrors, setValidationErrors] = useState<string[]>([])
   const { showModal, confirmNavigation, cancelNavigation, requestNavigation } = useUnsavedChanges(isDirty)
 
-  // Load quote and company
   useEffect(() => {
     async function init() {
       const [quoteRes, companyRes] = await Promise.all([

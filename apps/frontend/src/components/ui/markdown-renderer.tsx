@@ -104,7 +104,6 @@ export function MarkdownRenderer({ content, className, compact = false }: Markdo
   )
 }
 
-// Color-coded badge for compliance indicators
 interface ComplianceBadgeProps {
   type: 'success' | 'warning' | 'error' | 'info'
   children: React.ReactNode
@@ -125,7 +124,6 @@ export function ComplianceBadge({ type, children }: ComplianceBadgeProps) {
   )
 }
 
-// Highlighted modification block (for Libre mode)
 interface ModificationBlockProps {
   content: string
   onAccept?: () => void

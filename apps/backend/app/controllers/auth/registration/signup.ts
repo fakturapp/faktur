@@ -15,7 +15,6 @@ export default class Signup {
     const { request, response } = ctx
     const data = await request.validateUsing(registerValidator)
 
-    // Check for disposable/temporary email
     const isDisposable = await EmailBlacklistService.isDisposableEmail(data.email)
     if (isDisposable) {
       return response.unprocessableEntity({
@@ -24,7 +23,6 @@ export default class Signup {
       })
     }
 
-    // Verify Turnstile captcha
     const turnstileValid = await TurnstileService.verifyToken(
       data.turnstileToken || '',
       request.ip()

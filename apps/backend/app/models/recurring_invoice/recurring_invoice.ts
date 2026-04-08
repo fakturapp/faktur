@@ -45,7 +45,6 @@ export default class RecurringInvoice extends BaseModel {
   @column()
   declare generationCount: number
 
-  // Invoice template fields
   @column()
   declare subject: string | null
 

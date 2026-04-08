@@ -17,7 +17,6 @@ export default class CheckoutDownloadPdf {
       return response.notFound({ message: 'Payment link not found' })
     }
 
-    // Check if link is active or was paid (allow download even after payment)
     if (!paymentLink.isActive && !paymentLink.paidAt) {
       return response.gone({ message: 'Payment link is no longer active' })
     }

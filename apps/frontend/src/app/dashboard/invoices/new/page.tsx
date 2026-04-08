@@ -74,7 +74,7 @@ function saveOptionsToStorage(opts: Record<string, any>) {
       paymentMethod: opts.paymentMethod,
     }
     localStorage.setItem(INVOICE_OPTIONS_KEY, JSON.stringify(toSave))
-  } catch { /* ignore */ }
+  } catch { }
 }
 
 export default function NewInvoicePage() {

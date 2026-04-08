@@ -42,26 +42,22 @@ function EmailSettingsContent() {
   const searchParams = useSearchParams()
   const { accounts, loading, refreshAccounts } = useEmail()
 
-  // Account actions
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [settingDefaultId, setSettingDefaultId] = useState<string | null>(null)
   const [sendingTestId, setSendingTestId] = useState<string | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<EmailAccountItem | null>(null)
 
-  // Add provider dialog
   const [dialogOpen, setDialogOpen] = useState(false)
   const [dialogStep, setDialogStep] = useState<DialogStep>('choose')
   const [selectedProvider, setSelectedProvider] = useState<ProviderType | null>(null)
   const [configError, setConfigError] = useState('')
   const [connecting, setConnecting] = useState(false)
 
-  // Resend fields
   const [resendApiKey, setResendApiKey] = useState('')
   const [resendFromEmail, setResendFromEmail] = useState('')
   const [resendDisplayName, setResendDisplayName] = useState('')
   const [showResendKey, setShowResendKey] = useState(false)
 
-  // SMTP fields
   const [smtpHost, setSmtpHost] = useState('')
   const [smtpPort, setSmtpPort] = useState('587')
   const [smtpUsername, setSmtpUsername] = useState('')
@@ -70,19 +66,15 @@ function EmailSettingsContent() {
   const [smtpDisplayName, setSmtpDisplayName] = useState('')
   const [showSmtpPassword, setShowSmtpPassword] = useState(false)
 
-  // Validation
   const [touched, setTouched] = useState<Record<string, boolean>>({})
 
-  // Success state
   const [newAccountId, setNewAccountId] = useState<string | null>(null)
   const [newAccountEmail, setNewAccountEmail] = useState('')
   const [sendingTest, setSendingTest] = useState(false)
   const [testSent, setTestSent] = useState(false)
 
-  // Action menus
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
 
-  // Email templates
   type TemplateType = 'invoice_send' | 'quote_send' | 'credit_note_send'
   const [templates, setTemplates] = useState<Record<TemplateType, { subject: string; body: string }>>({
     invoice_send: { subject: '', body: '' },
@@ -110,7 +102,6 @@ function EmailSettingsContent() {
     }
   }, [searchParams, toast, refreshAccounts])
 
-  // Close menus on click outside
   useEffect(() => {
     if (!openMenuId) return
     function handleClick() { setOpenMenuId(null) }
@@ -118,7 +109,6 @@ function EmailSettingsContent() {
     return () => window.removeEventListener('click', handleClick)
   }, [openMenuId])
 
-  // Load email templates
   useEffect(() => {
     async function loadTemplates() {
       const { data } = await api.get<{ templates: Record<TemplateType, { subject: string; body: string }> }>('/email/templates')
@@ -128,7 +118,6 @@ function EmailSettingsContent() {
       }
     }
     loadTemplates()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function handleSaveTemplate(type: TemplateType) {

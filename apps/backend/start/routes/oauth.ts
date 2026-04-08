@@ -9,22 +9,13 @@ const ExchangeSession = () => import('#controllers/oauth/exchange_session')
 
 router
   .group(() => {
-    // GET /api/v1/oauth/authorize — consent screen metadata.
-    // Requires the user to be signed into the dashboard (otherwise the
-    // front-end bounces them to /login first and comes back here).
     router.get('/authorize', [Authorize, 'show']).use(middleware.auth())
     router.post('/authorize/consent', [Authorize, 'consent']).use(middleware.auth())
 
-    // POST /api/v1/oauth/token — public, authenticated via client_id +
-    // client_secret in the body.
     router.post('/token', [Token, 'handle'])
 
-    // POST /api/v1/oauth/revoke — RFC 7009.
     router.post('/revoke', [Revoke, 'handle'])
 
-    // POST /api/v1/oauth/exchange-session — desktop-only helper that
-    // trades an OAuth access_token for a dashboard session token so
-    // the embedded browser window can boot without a re-login.
     router.post('/exchange-session', [ExchangeSession, 'handle'])
   })
   .prefix(API_PREFIX + '/oauth')

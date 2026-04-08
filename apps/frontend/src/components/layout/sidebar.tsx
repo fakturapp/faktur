@@ -201,10 +201,6 @@ const accountNav: NavItem[] = [
 
 const SETTINGS_EXPANDED_KEY = 'zenvoice_settings_expanded'
 
-// Fade + slide animation played when a label, chevron or anything else
-// renders alongside an already-animating width transition on the aside.
-// Small delay lets the sidebar start expanding first so the text "slots in"
-// instead of fighting the container for space.
 const labelFade = {
   initial: { opacity: 0, x: -8 },
   animate: { opacity: 1, x: 0 },
@@ -246,9 +242,6 @@ function NavLink({ item, pathname, badges, persistKey, collapsed }: { item: NavI
     }
   }
 
-  // Row layout swaps entirely between collapsed (centered bigger icon, no
-  // label) and expanded (left-aligned icon + label). This is a real
-  // structural change driven by React state, not a CSS opacity fade.
   const rowClass = cn(
     'flex items-center rounded-lg transition-all duration-200 relative',
     collapsed ? 'justify-center h-10 w-10 mx-auto' : 'justify-start gap-2.5 px-2.5 py-[7px] w-full',
@@ -348,7 +341,6 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
   const [convertModalOpen, setConvertModalOpen] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
 
-  // Desktop detection + attestation (hydrated client-side)
   const [desktop, setDesktop] = useState<{ is: boolean; version: string | null }>({
     is: false,
     version: null,
@@ -370,10 +362,6 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
   const brandVersion = desktop.is && desktop.version ? desktop.version : APP_VERSION
   const isCertifiedOfficial = desktop.is && certification?.certified === true
 
-  // Effective collapsed state: the user manually collapsed the sidebar AND
-  // they are not currently hovering it. On hover, we temporarily switch
-  // back to the full layout via React (not CSS) so that everything — icon
-  // sizes, conditional labels, justify rules — can change as one unit.
   const collapsed = collapsedProp && !isHovered
 
   const isAdminMode = pathname.startsWith('/dashboard/admin')
@@ -484,7 +472,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             exit={{ opacity: 0, x: 20 }}
             transition={{ duration: 0.25, ease: 'easeInOut' }}
           >
-            {/* ---------- Brand header ---------- */}
+            {}
             <div className="px-3 pt-4 pb-3">
               <div className="flex items-center justify-center gap-2.5">
                 <img src="/logo.svg" alt={brandName} className="h-10 w-10 shrink-0 drop-shadow-sm" />
@@ -508,7 +496,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
               </div>
             </div>
 
-            {/* ---------- Faktur Desktop update notification ---------- */}
+            {}
             {desktop.is && <DesktopUpdateCard collapsed={collapsed} />}
           </motion.div>
         )}
@@ -526,7 +514,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             transition={{ duration: 0.25, ease: 'easeInOut' }}
             className="flex flex-1 flex-col overflow-hidden"
           >
-            {/* Back to dashboard */}
+            {}
             <div className="px-3 pt-2 pb-1">
               <Link
                 href="/dashboard"
@@ -544,7 +532,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
               </Link>
             </div>
 
-            {/* Admin navigation */}
+            {}
             <nav className={cn('flex-1 overflow-y-auto overflow-x-hidden px-3 py-1 space-y-0.5', collapsed && 'scrollbar-hidden')}>
               <NavLink
                 item={{ href: '/dashboard/admin', label: "Vue d'ensemble", icon: LayoutDashboard }}
@@ -582,7 +570,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             transition={{ duration: 0.25, ease: 'easeInOut' }}
             className="flex flex-1 flex-col overflow-hidden"
           >
-            {/* Back to dashboard */}
+            {}
             <div className="px-3 pt-2 pb-1">
               <Link
                 href="/dashboard"
@@ -600,7 +588,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
               </Link>
             </div>
 
-            {/* Account navigation */}
+            {}
             <nav className={cn('flex-1 overflow-y-auto overflow-x-hidden px-3 py-1 space-y-0.5', collapsed && 'scrollbar-hidden')}>
               {accountNav.map((item) => (
                 <NavLink key={item.href} item={item} pathname={pathname} persistKey="account" collapsed={collapsed} />
@@ -616,7 +604,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             transition={{ duration: 0.25, ease: 'easeInOut' }}
             className="flex flex-1 flex-col overflow-hidden"
           >
-            {/* Back to dashboard */}
+            {}
             <div className="px-3 pt-2 pb-1">
               <Link
                 href="/dashboard"
@@ -634,7 +622,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
               </Link>
             </div>
 
-            {/* Settings navigation */}
+            {}
             <nav className={cn('flex-1 overflow-y-auto overflow-x-hidden px-3 py-1 space-y-0.5', collapsed && 'scrollbar-hidden')}>
               {settingsNav.map((item) => (
                 <NavLink key={item.href} item={item} pathname={pathname} persistKey="settings" collapsed={collapsed} />
@@ -650,7 +638,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             transition={{ duration: 0.25, ease: 'easeInOut' }}
             className="flex flex-1 flex-col overflow-hidden"
           >
-            {/* Quick create */}
+            {}
             <div className="px-3 pt-2 pb-1">
               <Dropdown
                 align="left"
@@ -693,7 +681,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
               </Dropdown>
             </div>
 
-            {/* Navigation */}
+            {}
             <nav className={cn('flex-1 overflow-y-auto overflow-x-hidden px-3 py-1 space-y-0.5', collapsed && 'scrollbar-hidden')}>
               {mainNav.map((item) => (
                 <NavLink key={item.href} item={item} pathname={pathname} badges={badges} collapsed={collapsed} />
@@ -711,7 +699,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
 
       <div className="mx-3 h-px bg-border" />
 
-      {/* User section */}
+      {}
       <div className="p-2.5">
         <Dropdown
           align="left"
@@ -802,7 +790,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
 
           <DropdownSeparator />
 
-          {/* Team switcher */}
+          {}
           <DropdownSub
             trigger={
               <>

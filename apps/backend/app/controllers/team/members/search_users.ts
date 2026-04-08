@@ -16,7 +16,6 @@ export default class SearchUsers {
       return response.ok({ users: [] })
     }
 
-    // Get current team member user IDs to exclude them
     const existingMembers = await TeamMember.query()
       .where('teamId', teamId)
       .whereIn('status', ['active', 'pending'])
@@ -29,7 +28,6 @@ export default class SearchUsers {
       .map((m) => m.invitedEmail?.toLowerCase())
       .filter(Boolean) as string[]
 
-    // Search users by email or fullName
     const results = await User.query()
       .where((builder) => {
         builder

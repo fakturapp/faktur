@@ -21,7 +21,6 @@ export default class SetupRecoveryKey {
       return response.badRequest({ message: 'Recovery key already set up' })
     }
 
-    // Verify password
     const passwordValid = await User.verifyCredentials(user.email, password)
       .then(() => true)
       .catch(() => false)
@@ -30,7 +29,6 @@ export default class SetupRecoveryKey {
       return response.unauthorized({ message: 'Mot de passe incorrect' })
     }
 
-    // Get KEK from memory or derive it
     let kek = keyStore.getKEK(user.id)
     if (!kek) {
       if (!user.saltKdf) {
@@ -39,11 +37,9 @@ export default class SetupRecoveryKey {
       kek = await zeroAccessCryptoService.deriveKEK(password, Buffer.from(user.saltKdf, 'hex'))
     }
 
-    // Generate recovery key and derive recovery KEK
     const recoveryKey = zeroAccessCryptoService.generateRecoveryKey()
     const recoveryKEK = zeroAccessCryptoService.deriveRecoveryKEK(recoveryKey)
 
-    // Encrypt all team DEKs with recovery KEK
     const memberships = await TeamMember.query()
       .where('userId', user.id)
       .where('status', 'active')
@@ -55,12 +51,10 @@ export default class SetupRecoveryKey {
       await membership.save()
     }
 
-    // Save hash and flag
     user.recoveryKeyHash = zeroAccessCryptoService.hashRecoveryKey(recoveryKey)
     user.hasRecoveryKey = true
     await user.save()
 
-    // Send email with recovery key
     RecoveryKeyGenerated.dispatch(user.email, recoveryKey, user.fullName ?? undefined)
 
     const formatted = zeroAccessCryptoService.formatRecoveryKey(recoveryKey)

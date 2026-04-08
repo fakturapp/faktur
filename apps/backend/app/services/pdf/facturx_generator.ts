@@ -1,14 +1,3 @@
-/**
- * Factur-X / ZUGFeRD XML generator
- *
- * Generates CII (Cross Industry Invoice) XML conforming to Factur-X EN16931 profile.
- * This profile is required for the French e-invoicing reform (September 2026).
- * The XML is embedded into the PDF as an attachment to create a Factur-X document.
- *
- * Reference: https://fnfe-mpe.org/factur-x/
- * Format: UN/CEFACT Cross-Industry Invoice (CII) D16B
- * Profile: urn:factur-x.eu:1p0:en16931
- */
 
 interface FacturXSeller {
   name: string
@@ -58,7 +47,6 @@ export interface FacturXDocument {
   vatBreakdown: { rate: number; base: number; amount: number }[]
   notes?: string | null
   language?: string
-  /** Operation category for French e-invoicing reform */
   operationCategory?: 'service' | 'goods' | 'mixed' | null
 }
 
@@ -80,7 +68,6 @@ function formatAmount(amount: number): string {
 }
 
 function getDocumentTypeCode(type: 'quote' | 'invoice'): string {
-  // UNTDID 1001: 380 = Commercial Invoice, 325 = Pro Forma Invoice (used for quotes)
   return type === 'invoice' ? '380' : '325'
 }
 
@@ -96,9 +83,6 @@ function getCountryCode(country?: string | null): string {
   return 'FR'
 }
 
-/**
- * Map operation category to BuyerReference value for French e-invoicing reform.
- */
 function getOperationCategoryCode(category?: 'service' | 'goods' | 'mixed' | null): string | null {
   switch (category) {
     case 'service':
@@ -112,10 +96,6 @@ function getOperationCategoryCode(category?: 'service' | 'goods' | 'mixed' | nul
   }
 }
 
-/**
- * Generate Factur-X CII XML (EN16931 profile).
- * Conforms to the French e-invoicing reform requirements.
- */
 export function generateFacturXXml(doc: FacturXDocument): string {
   const typeCode = getDocumentTypeCode(doc.documentType)
   const sellerCountry = getCountryCode(doc.seller.country)

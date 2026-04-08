@@ -28,7 +28,6 @@ export default class ConvertQuote {
       return response.notFound({ message: 'Quote not found' })
     }
 
-    // Check for custom starting number
     const settings = await InvoiceSetting.query().where('team_id', teamId).first()
     let invoiceNumber: string
 

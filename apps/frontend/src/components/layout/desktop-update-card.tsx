@@ -9,13 +9,6 @@ import {
 } from '@/lib/is-desktop'
 import { cn } from '@/lib/utils'
 
-// ---------- Desktop update card ----------
-// Rendered inside the sidebar when running in Faktur Desktop and a new
-// release is available on GitHub. The card surfaces the remote version,
-// reads `window.fakturDesktop.getPendingUpdate` on mount, subscribes to
-// `onUpdateAvailable` events, and triggers `beginUpdate` which swaps the
-// shell window for the progress window, downloads the installer and
-// relaunches the app.
 
 interface Props {
   collapsed?: boolean

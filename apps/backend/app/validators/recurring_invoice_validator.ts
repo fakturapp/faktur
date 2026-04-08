@@ -10,7 +10,6 @@ export const createRecurringInvoiceValidator = vine.compile(
     endDate: vine.string().trim().optional(),
     dueDays: vine.number().min(0).optional(),
 
-    // Invoice template
     subject: vine.string().trim().maxLength(255).optional(),
     billingType: vine.string().trim().maxLength(30),
     accentColor: vine

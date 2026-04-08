@@ -37,7 +37,6 @@ export default class EInvoicingSubmit {
       return response.notFound({ message: 'Document non trouve' })
     }
 
-    // Decrypt fields for XML generation
     decryptModelFields(quote, [...ENCRYPTED_FIELDS.quote], dek)
     decryptModelFieldsArray(quote.lines, [...ENCRYPTED_FIELDS.quoteLine], dek)
     if (quote.client) {
@@ -49,7 +48,6 @@ export default class EInvoicingSubmit {
       decryptModelFields(company, [...ENCRYPTED_FIELDS.company], dek)
     }
 
-    // Build Factur-X XML
     const quoteData = {
       quoteNumber: quote.quoteNumber,
       subject: quote.subject,
@@ -106,10 +104,8 @@ export default class EInvoicingSubmit {
     const facturxDoc = buildFacturXFromQuote(quoteData, linesData, clientData, companyData)
     const xml = generateFacturXXml(facturxDoc)
 
-    // Decrypt pdpApiKey before building config
     decryptModelFields(invoiceSettings, [...ENCRYPTED_FIELDS.invoiceSetting], dek)
 
-    // Validate XML
     const pdpConfig = buildPdpConfig(invoiceSettings)
 
     const validation = await validateXml(pdpConfig, xml)
@@ -121,7 +117,6 @@ export default class EInvoicingSubmit {
       })
     }
 
-    // Submit to PDP
     const result = await submitInvoice(pdpConfig, xml, {
       documentNumber: quote.quoteNumber,
       documentType: 'quote',

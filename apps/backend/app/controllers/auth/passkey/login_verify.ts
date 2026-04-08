@@ -194,7 +194,6 @@ export default class LoginVerify {
           }
         }
       } catch {
-        // Silently fail
       }
     }
 

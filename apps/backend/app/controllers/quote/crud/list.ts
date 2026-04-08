@@ -19,7 +19,6 @@ export default class List {
       return response.badRequest({ message: 'No team selected' })
     }
 
-    // Auto-transition sent → expired when validity date has passed
     await Quote.query()
       .where('teamId', teamId)
       .where('status', 'sent')
@@ -40,7 +39,6 @@ export default class List {
       query.where('status', status)
     }
 
-    // Search on quote_number (clear) only — subject is encrypted
     const search = request.input('search', '')
     if (search) {
       query.whereILike('quote_number', `%${search}%`)

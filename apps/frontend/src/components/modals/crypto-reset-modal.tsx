@@ -44,7 +44,7 @@ export function CryptoResetModal({ open, onRecovered, onWiped }: CryptoResetModa
   const [recoveryKey, setRecoveryKey] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [wipeStep, setWipeStep] = useState(0) // 0=warning, 1=confirm, 2=SUPPRIMER, 3=password
+  const [wipeStep, setWipeStep] = useState(0)
   const [wipeConfirmText, setWipeConfirmText] = useState('')
   const [wipePassword, setWipePassword] = useState('')
   const [wiped, setWiped] = useState(false)
@@ -98,7 +98,6 @@ export function CryptoResetModal({ open, onRecovered, onWiped }: CryptoResetModa
     if (apiError) {
       setError(apiError)
     } else {
-      // Trigger destruction animation
       setWiped(true)
       setTimeout(() => {
         onWiped()

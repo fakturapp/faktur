@@ -31,7 +31,6 @@ export default class VerifyCode {
       return response.unprocessableEntity({ message: 'Code incorrect' })
     }
 
-    // Clear code and advance step
     user.deletionCode = null
     user.deletionCodeExpiresAt = null
     user.deletionStep = 4

@@ -18,7 +18,6 @@ export default class Create {
 
     const payload = await request.validateUsing(createCreditNoteValidator)
 
-    // Generate next credit note number: AV-{year}-{number}
     const currentYear = new Date().getFullYear().toString()
     const prefix = `AV-${currentYear}-`
 

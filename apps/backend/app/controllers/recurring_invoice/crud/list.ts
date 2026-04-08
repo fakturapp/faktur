@@ -43,7 +43,6 @@ export default class List {
       decryptModelFieldsArray(ri.lines, [...ENCRYPTED_FIELDS.recurringInvoiceLine], dek)
     }
 
-    // Calculate template totals from lines
     const list = await Promise.all(
       recurringInvoices.map(async (ri) => {
         let subtotal = 0

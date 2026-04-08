@@ -32,7 +32,6 @@ export default class Show {
       return response.notFound({ message: 'Invoice not found' })
     }
 
-    // Auto-transition sent → overdue when due date has passed
     if (invoice.status === 'sent' && invoice.dueDate) {
       const today = DateTime.now().toSQLDate()!
       if (invoice.dueDate < today) {
@@ -41,18 +40,14 @@ export default class Show {
       }
     }
 
-    // Decrypt invoice fields
     decryptModelFields(invoice, [...ENCRYPTED_FIELDS.invoice], dek)
 
-    // Decrypt lines
     decryptModelFieldsArray(invoice.lines, [...ENCRYPTED_FIELDS.invoiceLine], dek)
 
-    // Decrypt client
     if (invoice.client) {
       decryptModelFields(invoice.client, [...ENCRYPTED_FIELDS.client], dek)
     }
 
-    // Load payment link info
     const paymentLink = await PaymentLink.query()
       .where('invoice_id', invoice.id)
       .where('team_id', teamId)

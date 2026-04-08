@@ -34,7 +34,6 @@ export default class CreateTeam {
     const teamDek = zeroAccessCryptoService.generateDEK()
     const encryptedTeamDek = zeroAccessCryptoService.encryptDEK(teamDek, kek)
 
-    // Generate recovery key and encrypt DEK with recovery KEK
     const recoveryKey = zeroAccessCryptoService.generateRecoveryKey()
     const recoveryKEK = zeroAccessCryptoService.deriveRecoveryKEK(recoveryKey)
     const encryptedTeamDekRecovery = zeroAccessCryptoService.encryptDEK(teamDek, recoveryKEK)
@@ -52,13 +51,11 @@ export default class CreateTeam {
 
     keyStore.storeDEK(user.id, team.id, teamDek)
 
-    // Save recovery key hash and flag
     user.recoveryKeyHash = zeroAccessCryptoService.hashRecoveryKey(recoveryKey)
     user.hasRecoveryKey = true
     user.currentTeamId = team.id
     await user.save()
 
-    // Send recovery key by email
     RecoveryKeyGenerated.dispatch(user.email, recoveryKey, user.fullName ?? undefined)
 
     const formatted = zeroAccessCryptoService.formatRecoveryKey(recoveryKey)

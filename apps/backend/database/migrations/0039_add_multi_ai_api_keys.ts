@@ -10,7 +10,6 @@ export default class extends BaseSchema {
       table.text('ai_api_key_groq').nullable().after('ai_api_key_gemini')
     })
 
-    // Migrate existing custom keys to provider-specific columns
     this.defer(async (db) => {
       await db.rawQuery(`
         UPDATE invoice_settings SET ai_api_key_claude = ai_custom_api_key

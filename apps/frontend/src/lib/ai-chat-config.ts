@@ -1,6 +1,5 @@
 import type { ComponentType } from 'react'
 
-// ─── Chat Modes ─────────────────────────────────────────────────────────
 
 export type ChatMode = 'edition' | 'question' | 'libre'
 
@@ -40,7 +39,6 @@ export const CHAT_MODES: ChatModeConfig[] = [
   },
 ]
 
-// ─── Providers & Models ──────────────────────────────────────────────────
 
 export type ProviderId = 'groq'
 
@@ -70,7 +68,6 @@ export const CHAT_MODELS: Record<ProviderId, ModelConfig[]> = {
   ],
 }
 
-// ─── AI Source Mode ──────────────────────────────────────────────────────
 
 export type AiSourceMode = 'faktur' | 'apikey'
 
@@ -80,7 +77,6 @@ export interface AiSourceConfig {
   description: string
 }
 
-// ─── Chat Messages ───────────────────────────────────────────────────────
 
 export interface ChatModification {
   id: string
@@ -114,7 +110,6 @@ export interface DocumentSnapshot {
   acceptanceConditions: string
 }
 
-// ─── Storage Key ─────────────────────────────────────────────────────────
 
 export const AI_CHAT_PREF_KEY = 'faktur_ai_chat_pref'
 

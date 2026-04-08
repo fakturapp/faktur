@@ -2,10 +2,6 @@ import { Resend } from 'resend'
 import EncryptionService from '#services/encryption/encryption_service'
 
 export default class ResendUserService {
-  /**
-   * Validate a Resend API key by attempting to list domains.
-   * Returns true if the key is valid.
-   */
   static async validateApiKey(apiKey: string): Promise<boolean> {
     try {
       const resend = new Resend(apiKey)
@@ -16,9 +12,6 @@ export default class ResendUserService {
     }
   }
 
-  /**
-   * Send an email using a user-provided Resend API key.
-   */
   static async sendEmail(params: {
     encryptedApiKey: string
     from: string

@@ -3,7 +3,6 @@ import oauthCrypto from '#services/oauth/oauth_crypto_service'
 import encryptionService from '#services/encryption/encryption_service'
 import { DateTime } from 'luxon'
 
-// ---------- Types ----------
 export interface CreateOauthAppInput {
   name: string
   description?: string | null
@@ -24,11 +23,9 @@ export interface CreatedOauthApp {
   webhookSecret: string | null
 }
 
-// ---------- Public clients (PKCE only, no secret enforcement) ----------
 const PUBLIC_CLIENT_KINDS = new Set(['desktop', 'cli'])
 
 class OauthAppService {
-  // ---------- Create ----------
   async create(input: CreateOauthAppInput): Promise<CreatedOauthApp> {
     const clientId = oauthCrypto.generateToken(16)
     const clientSecret = oauthCrypto.generateClientSecret()
@@ -62,7 +59,6 @@ class OauthAppService {
     return { app, clientSecret, webhookSecret }
   }
 
-  // ---------- Secret rotation ----------
   async rotateClientSecret(app: OauthApp): Promise<string> {
     const newSecret = oauthCrypto.generateClientSecret()
     app.clientSecretHash = oauthCrypto.hash(newSecret)
@@ -89,15 +85,10 @@ class OauthAppService {
     }
   }
 
-  // ---------- Public client helper ----------
   isPublicClient(app: OauthApp): boolean {
     return PUBLIC_CLIENT_KINDS.has(app.kind)
   }
 
-  // ---------- Authentication ----------
-  // Public clients (desktop/cli) skip the client_secret check and rely
-  // exclusively on PKCE. Confidential clients (web) still require the
-  // secret to be presented and timing-safe verified.
   async authenticateClient(
     clientId: string,
     clientSecret: string | null | undefined
@@ -120,7 +111,6 @@ class OauthAppService {
     return app
   }
 
-  // ---------- Soft delete ----------
   async deactivate(app: OauthApp): Promise<OauthApp> {
     app.isActive = false
     app.updatedAt = DateTime.now()

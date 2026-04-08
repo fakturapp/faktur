@@ -102,7 +102,6 @@ export function AiDocumentModal({ open, onClose, type }: AiDocumentModalProps) {
       setShowOptions(false)
       setAiOptions({ includeSubject: true, includeAcceptanceConditions: false, vatExempt: false, vatExemptReason: 'not_subject' })
     } else {
-      // Restore saved model preference or use settings
       const pref = loadModelPref()
       if (pref) {
         setSelectedModel(pref.model)
@@ -142,7 +141,6 @@ export function AiDocumentModal({ open, onClose, type }: AiDocumentModalProps) {
 
     saveModelPref(selectedModel)
 
-    // Build enriched prompt with options
     let enrichedPrompt = prompt.trim()
     const instructions: string[] = []
     if (billingType === 'quick') instructions.push('Génère UNE SEULE ligne avec le montant total global (facturation rapide, pas de détail)')
@@ -153,7 +151,6 @@ export function AiDocumentModal({ open, onClose, type }: AiDocumentModalProps) {
     if (aiOptions.vatExempt) instructions.push('Le client est exonéré de TVA, utilise un taux de TVA à 0% pour toutes les lignes')
     if (instructions.length > 0) enrichedPrompt += '\n\nInstructions supplémentaires:\n- ' + instructions.join('\n- ')
 
-    // Run API call + min 1s delay in parallel so animation is always visible
     const [apiResult] = await Promise.all([
       api.post<{
         document: {

@@ -11,7 +11,6 @@ const AnalyticsErrors = () => import('#controllers/admin/analytics/errors')
 const AnalyticsPerformance = () => import('#controllers/admin/analytics/performance')
 const AnalyticsUsers = () => import('#controllers/admin/analytics/users')
 
-// Public analytics routes (no auth required)
 router
   .group(() => {
     router.post('/ingest', [AnalyticsIngest, 'handle'])
@@ -19,7 +18,6 @@ router
   })
   .prefix(API_PREFIX + '/analytics')
 
-// Admin analytics routes (auth + admin required)
 router
   .group(() => {
     router.get('/overview', [AnalyticsOverview, 'handle'])

@@ -32,7 +32,6 @@ export default function PaymentPage() {
     resetPayment,
   } = useCompanySettings()
 
-  // Stripe state
   const [stripeLoading, setStripeLoading] = useState(true)
   const [stripeConfigured, setStripeConfigured] = useState(false)
   const [stripeTestMode, setStripeTestMode] = useState(false)

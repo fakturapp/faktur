@@ -24,7 +24,6 @@ export default class Pdf {
     try {
       const { pdfBuffer, filename } = await generateQuotePdf(params.id, teamId, dek)
 
-      // If e-invoicing is enabled, generate Factur-X headers
       const invoiceSettings = await InvoiceSetting.query().where('team_id', teamId).first()
       if (invoiceSettings?.eInvoicingEnabled) {
         const quote = await Quote.query()
@@ -113,9 +112,6 @@ export default class Pdf {
   }
 }
 
-/**
- * Download Factur-X XML separately for a quote
- */
 export class FacturXml {
   async handle(ctx: HttpContext) {
     const { auth, params, response } = ctx

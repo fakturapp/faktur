@@ -49,7 +49,6 @@ export default class CreateCompany {
 
     const company = await Company.create(companyData)
 
-    // Also create a BankAccount record so bank info appears in settings
     if (payload.iban || payload.bic || payload.bankName) {
       let encryptedIban: string | null = payload.iban ?? null
       let encryptedBic: string | null = payload.bic ?? null

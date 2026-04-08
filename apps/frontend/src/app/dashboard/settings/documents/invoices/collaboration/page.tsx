@@ -39,7 +39,7 @@ export default function CollaborationSettingsPage() {
       transition={{ duration: 0.3 }}
       className="space-y-8 max-w-2xl px-4 lg:px-6 py-4 md:py-6"
     >
-      {/* Header */}
+      {}
       <div className="flex items-center gap-4">
         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-500/10">
           <Users className="h-6 w-6 text-purple-500" />
@@ -58,7 +58,7 @@ export default function CollaborationSettingsPage() {
         </div>
       </div>
 
-      {/* Toggle card */}
+      {}
       <div className="rounded-2xl border border-border bg-card p-6">
         <div className="flex items-center justify-between gap-6">
           <div className="flex-1">

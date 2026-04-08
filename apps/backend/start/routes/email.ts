@@ -15,37 +15,29 @@ const ListEmailLogs = () => import('#controllers/email/logs/list')
 const EmailTemplateList = () => import('#controllers/email/templates/list')
 const EmailTemplateUpdate = () => import('#controllers/email/templates/update')
 
-// Public route - Gmail OAuth callback (no auth required, redirects to frontend)
 router.get(API_PREFIX + '/email/oauth/gmail/callback', [GmailCallback, 'handle'])
 
 router
   .group(() => {
-    // Email accounts management
     router.get('/accounts', [EmailAccountsList, 'handle'])
     router.delete('/accounts/:id', [EmailAccountsDelete, 'handle'])
     router.patch('/accounts/:id/default', [EmailAccountsSetDefault, 'handle'])
 
-    // OAuth
     router.get('/oauth/gmail/url', [GmailAuthUrl, 'handle'])
 
-    // Resend
     router.post('/resend/configure', [ConfigureResend, 'handle'])
 
-    // SMTP
     router.post('/smtp/configure', [ConfigureSmtp, 'handle'])
 
-    // Send (POST only — reject GET with 405)
     router.post('/send', [SendEmail, 'handle'])
     router.get('/send', async ({ response }) =>
       response.status(405).send({ message: 'Method not allowed. Use POST.' })
     )
     router.post('/test', [SendTestEmail, 'handle'])
 
-    // Templates
     router.get('/templates', [EmailTemplateList, 'handle'])
     router.put('/templates', [EmailTemplateUpdate, 'handle'])
 
-    // Logs
     router.get('/logs', [ListEmailLogs, 'handle'])
   })
   .prefix(API_PREFIX + '/email')

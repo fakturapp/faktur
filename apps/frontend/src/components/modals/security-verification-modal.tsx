@@ -53,7 +53,6 @@ export function SecurityVerificationModal({
     }
   }, [cooldown])
 
-  // Reset state when modal opens
   useEffect(() => {
     if (open) {
       setCodeSent(false)
@@ -146,7 +145,7 @@ export function SecurityVerificationModal({
         </div>
       </div>
 
-      {/* Method selector */}
+      {}
       {twoFactorEnabled && (
         <div className="flex gap-2 mb-4">
           <button

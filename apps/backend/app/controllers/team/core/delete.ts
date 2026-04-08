@@ -23,7 +23,6 @@ export default class Delete {
 
     const payload = await request.validateUsing(deleteTeamValidator)
 
-    // Verify user is super_admin (owner)
     const membership = await TeamMember.query()
       .where('teamId', teamId)
       .where('userId', user.id)
@@ -34,7 +33,6 @@ export default class Delete {
       return response.forbidden({ message: "Seul le propriétaire peut supprimer l'équipe" })
     }
 
-    // Verify team name matches
     const team = await Team.find(teamId)
     if (!team) {
       return response.notFound({ message: 'Team not found' })
@@ -44,16 +42,13 @@ export default class Delete {
       return response.unprocessableEntity({ message: "Le nom de l'équipe ne correspond pas" })
     }
 
-    // Verify password
     const isValid = await hash.verify(user.password, payload.password)
     if (!isValid) {
       return response.unauthorized({ message: 'Mot de passe incorrect' })
     }
 
-    // Cascade delete all team data
     await deleteTeamCascade(teamId)
 
-    // Find another team for the user, if any
     const otherMembership = await TeamMember.query()
       .where('userId', user.id)
       .where('status', 'active')

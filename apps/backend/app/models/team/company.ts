@@ -55,15 +55,12 @@ export default class Company extends BaseModel {
   @column()
   declare logoUrl: string | null
 
-  /** @deprecated Use BankAccount model instead — kept for backward compatibility */
   @column()
   declare iban: string | null
 
-  /** @deprecated Use BankAccount model instead — kept for backward compatibility */
   @column()
   declare bic: string | null
 
-  /** @deprecated Use BankAccount model instead — kept for backward compatibility */
   @column()
   declare bankName: string | null
 

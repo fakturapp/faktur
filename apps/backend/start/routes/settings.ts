@@ -10,7 +10,6 @@ const StripeSettingsShow = () => import('#controllers/settings/stripe/stripe_set
 const StripeSettingsSave = () => import('#controllers/settings/stripe/stripe_settings_save')
 const StripeSettingsDelete = () => import('#controllers/settings/stripe/stripe_settings_delete')
 
-// Public route - serve invoice logos
 router.get(API_PREFIX + '/invoice-logos/:filename', [ServeInvoiceLogo, 'handle'])
 
 router
@@ -19,7 +18,6 @@ router
     router.put('/invoices', [InvoiceSettingsUpdate, 'handle'])
     router.post('/invoices/logo', [InvoiceLogoUpload, 'handle'])
 
-    // Stripe settings
     router.get('/stripe', [StripeSettingsShow, 'handle'])
     router.put('/stripe', [StripeSettingsSave, 'handle'])
     router.delete('/stripe', [StripeSettingsDelete, 'handle'])

@@ -38,7 +38,6 @@ export default class BankAccounts {
       let iban = a.iban
       let bic = a.bic
 
-      // Decrypt with zero-access DEK
       if (iban && zeroAccessCryptoService.isEncryptedField(iban)) {
         try {
           iban = zeroAccessCryptoService.decryptField(iban, dek)
@@ -131,14 +130,12 @@ export default class BankAccounts {
 
     const payload = await request.validateUsing(createBankAccountValidator)
 
-    // Always encrypt with zero-access DEK
     let iban: string | null = payload.iban || null
     let bic: string | null = payload.bic || null
 
     if (iban) iban = zeroAccessCryptoService.encryptField(iban, dek)
     if (bic) bic = zeroAccessCryptoService.encryptField(bic, dek)
 
-    // If setting as default, unset other defaults
     if (payload.isDefault) {
       await BankAccount.query()
         .where('team_id', teamId)
@@ -194,7 +191,6 @@ export default class BankAccounts {
     if (iban) iban = zeroAccessCryptoService.encryptField(iban, dek)
     if (bic) bic = zeroAccessCryptoService.encryptField(bic, dek)
 
-    // If setting as default, unset other defaults
     if (payload.isDefault && !account.isDefault) {
       await BankAccount.query()
         .where('team_id', teamId)
@@ -240,7 +236,6 @@ export default class BankAccounts {
       return response.notFound({ message: 'Bank account not found' })
     }
 
-    // Block deletion if referenced by invoices
     const referencedCount = await Invoice.query()
       .where('bank_account_id', account.id)
       .count('* as cnt')

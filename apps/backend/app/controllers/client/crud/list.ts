@@ -14,8 +14,6 @@ export default class List {
       return response.badRequest({ message: 'No team selected' })
     }
 
-    // Search on encrypted fields is not possible server-side.
-    // Load all team clients and filter client-side after decryption.
     const clients = await Client.query().where('team_id', teamId).orderBy('created_at', 'desc')
 
     decryptModelFieldsArray(clients, [...ENCRYPTED_FIELDS.client], dek)

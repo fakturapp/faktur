@@ -81,18 +81,15 @@ export default class ResolveTeam {
         return response.notFound({ message: 'Le membre cible est introuvable dans cette équipe' })
       }
 
-      // Transfer: set target as super_admin, demote current owner to admin
       targetMember.role = 'super_admin'
       await targetMember.save()
 
       membership.role = 'admin'
       await membership.save()
 
-      // Update team owner
       team.ownerId = payload.transferToUserId
       await team.save()
 
-      // Now remove the leaving user
       await membership.delete()
 
       return response.ok({ message: 'Propriété transférée et vous avez quitté' })

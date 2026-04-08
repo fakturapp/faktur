@@ -28,7 +28,6 @@ export default class ListEmailLogs {
 
     const logs = await query.limit(50)
 
-    // Decrypt sensitive fields
     for (const log of logs) {
       decryptModelFields(log, [...ENCRYPTED_FIELDS.emailLog], dek)
     }

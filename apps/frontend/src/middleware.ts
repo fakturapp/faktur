@@ -1,21 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
-/**
- * Hostname-based routing for the dedicated checkout subdomain.
- *
- * Required env vars:
- * - NEXT_PUBLIC_CHECKOUT_URL  e.g. https://checkout.fakturapp.cc
- * - NEXT_PUBLIC_FRONTEND_URL  e.g. https://app.fakturapp.cc
- *
- * Behaviour:
- * - On the checkout host, the only valid public path is `/<token>/pay`. The
- *   request is rewritten internally to `/checkout/<token>/pay` so the existing
- *   Next.js route handles it. The legacy `/checkout/<token>/pay` URL is also
- *   accepted for backwards compatibility.
- * - Any other path on the checkout host is redirected to the dashboard host
- *   (NEXT_PUBLIC_FRONTEND_URL).
- * - Requests on other hosts are passed through untouched.
- */
 
 const TOKEN_PATH = /^\/([^/]+)\/pay\/?$/
 const LEGACY_CHECKOUT_PATH = /^\/checkout\/([^/]+)\/pay\/?$/
@@ -33,7 +17,6 @@ export function middleware(request: NextRequest) {
   const checkoutHost = getHostname(process.env.NEXT_PUBLIC_CHECKOUT_URL)
   const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_URL
 
-  // No checkout subdomain configured → nothing to do.
   if (!checkoutHost) {
     return NextResponse.next()
   }
@@ -45,7 +28,6 @@ export function middleware(request: NextRequest) {
 
   const { pathname, search } = request.nextUrl
 
-  // Allow Next.js internals & static assets even on the checkout host.
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||
@@ -60,7 +42,6 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Short form `/<token>/pay` → rewrite to the actual Next.js route.
   const shortMatch = pathname.match(TOKEN_PATH)
   if (shortMatch) {
     const url = request.nextUrl.clone()

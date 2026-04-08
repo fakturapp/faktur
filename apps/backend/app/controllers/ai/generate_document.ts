@@ -38,7 +38,6 @@ export default class GenerateDocument {
 
     const payload = await request.validateUsing(generateDocumentValidator)
 
-    // Load company info
     let companyContext = ''
     const company = await Company.findBy('teamId', teamId)
     if (company) {
@@ -52,7 +51,6 @@ export default class GenerateDocument {
         companyContext = `\nEntreprise émettrice :\n${parts.map((p) => `- ${p}`).join('\n')}`
     }
 
-    // Load client info if provided
     let clientContext = ''
     if (payload.clientId) {
       const client = await Client.query()
@@ -146,7 +144,6 @@ EXEMPLE DE RÉPONSE VALIDE :
         payload.model
       )
 
-      // Parse JSON from response — strip markdown code fences if present
       let cleaned = result.trim()
       if (cleaned.startsWith('```')) {
         cleaned = cleaned.replace(/^```(?:json)?\s*\n?/, '').replace(/\n?\s*```$/, '')
@@ -159,7 +156,6 @@ EXEMPLE DE RÉPONSE VALIDE :
 
       const document = JSON.parse(jsonMatch[0])
 
-      // Validate structure — subject can be empty string if user requested it
       if (typeof document.subject !== 'string') {
         document.subject = ''
       }
@@ -167,7 +163,6 @@ EXEMPLE DE RÉPONSE VALIDE :
         return response.badRequest({ message: 'Invalid document structure from AI' })
       }
 
-      // Sanitize lines
       document.lines = document.lines
         .filter((l: any) => l && typeof l.description === 'string')
         .map((l: any) => ({
@@ -181,7 +176,6 @@ EXEMPLE DE RÉPONSE VALIDE :
         return response.badRequest({ message: 'Invalid document structure from AI' })
       }
 
-      // Ensure notes and acceptanceConditions are strings
       document.notes = typeof document.notes === 'string' ? document.notes : ''
       document.acceptanceConditions =
         typeof document.acceptanceConditions === 'string' ? document.acceptanceConditions : ''

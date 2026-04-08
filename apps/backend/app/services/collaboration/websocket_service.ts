@@ -5,7 +5,6 @@ import env from '#start/env'
 import User from '#models/account/user'
 import type { SharePermission } from '#models/collaboration/document_share'
 
-// ── Types ─────────────────────────────────────────────────────────────────
 
 export interface CollaboratorInfo {
   userId: string
@@ -26,19 +25,17 @@ export interface CursorPosition {
 
 export interface DocumentChange {
   userId: string
-  path: string // e.g. "lines.0.description", "options.subject", "notes"
+  path: string
   value: any
   timestamp: number
 }
 
-// ── Color palette for collaborator cursors ────────────────────────────────
 
 const CURSOR_COLORS = [
   '#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4',
   '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6', '#f43f5e',
 ]
 
-// ── In-memory presence store ──────────────────────────────────────────────
 
 interface RoomPresence {
   collaborators: Map<string, CollaboratorInfo & { socketId: string }>

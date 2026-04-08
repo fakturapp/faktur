@@ -13,7 +13,6 @@ export function useUnsavedChanges(isDirty: boolean) {
     isDirtyRef.current = isDirty
   }, [isDirty])
 
-  // 1. Browser close / tab close
   useEffect(() => {
     if (!isDirty) return
     const handler = (e: BeforeUnloadEvent) => e.preventDefault()
@@ -21,7 +20,6 @@ export function useUnsavedChanges(isDirty: boolean) {
     return () => window.removeEventListener('beforeunload', handler)
   }, [isDirty])
 
-  // 2. Browser back / forward (popstate)
   useEffect(() => {
     if (!isDirty) return
     window.history.pushState({ __unsaved: true }, '')
@@ -37,7 +35,6 @@ export function useUnsavedChanges(isDirty: boolean) {
     return () => window.removeEventListener('popstate', handlePopstate)
   }, [isDirty])
 
-  // 3. Client-side link clicks (sidebar, etc.)
   useEffect(() => {
     if (!isDirty) return
 
@@ -59,7 +56,6 @@ export function useUnsavedChanges(isDirty: boolean) {
     return () => document.removeEventListener('click', handleClick, true)
   }, [isDirty])
 
-  /** Discard changes and navigate to the pending URL (or fallback). */
   const confirmNavigation = useCallback((fallbackUrl?: string) => {
     isDirtyRef.current = false
     setShowModal(false)
@@ -72,13 +68,11 @@ export function useUnsavedChanges(isDirty: boolean) {
     }
   }, [router])
 
-  /** Close the modal without navigating. */
   const cancelNavigation = useCallback(() => {
     setShowModal(false)
     pendingUrlRef.current = null
   }, [])
 
-  /** Programmatically request navigation (e.g. back arrow button). Returns true if blocked. */
   const requestNavigation = useCallback((targetUrl: string) => {
     if (isDirtyRef.current) {
       pendingUrlRef.current = targetUrl

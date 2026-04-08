@@ -41,9 +41,9 @@ export default function OnboardingLayout({ children }: { children: React.ReactNo
 
   return (
     <div className="relative h-screen overflow-hidden bg-background">
-      {/* Sidebar — same DA as the dashboard */}
+      {}
       <aside className="fixed left-0 top-0 z-40 flex h-screen w-(--sidebar-width) flex-col bg-sidebar border-r border-sidebar-border rounded-r-[2rem] shadow-2xl overflow-hidden">
-        {/* Faktur logo header */}
+        {}
         <div className="px-3 pt-4 pb-3">
           <div className="flex items-center gap-2.5">
             <img src="/logo.svg" alt="Faktur" className="h-10 w-10 shrink-0 drop-shadow-sm" />
@@ -60,7 +60,7 @@ export default function OnboardingLayout({ children }: { children: React.ReactNo
 
         <div className="mx-3 h-px bg-border" />
 
-        {/* Welcome message */}
+        {}
         <div className="px-4 pt-4 pb-3">
           <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.15em] mb-1">
             Bienvenue
@@ -73,7 +73,7 @@ export default function OnboardingLayout({ children }: { children: React.ReactNo
           </p>
         </div>
 
-        {/* Progress bar */}
+        {}
         <div className="mx-4 mb-4">
           <div className="h-1.5 rounded-full bg-muted overflow-hidden">
             <motion.div

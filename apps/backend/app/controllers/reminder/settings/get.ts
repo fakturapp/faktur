@@ -13,7 +13,6 @@ export default class Get {
     let settings = await PaymentReminderSetting.query().where('team_id', teamId).first()
 
     if (!settings) {
-      // Return defaults
       return response.ok({
         reminderSettings: {
           enabled: false,

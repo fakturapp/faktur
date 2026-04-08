@@ -2,13 +2,6 @@ import type { HttpContext } from '@adonisjs/core/http'
 import OauthAuthorization from '#models/oauth/oauth_authorization'
 import OauthToken from '#models/oauth/oauth_token'
 
-/**
- * GET /api/v1/account/oauth-apps
- *
- * Lists every OAuth application the current user has ever authorized,
- * along with the active token sessions attached to each. Powers the
- * 'Mon compte → Applications connectées' screen.
- */
 export default class ListUserOauthApps {
   async handle({ auth, response }: HttpContext) {
     const user = auth.user!
@@ -22,8 +15,6 @@ export default class ListUserOauthApps {
       return response.ok({ apps: [] })
     }
 
-    // One query to pull every active session for this user across all
-    // apps — cheaper than N+1 per authorization row.
     const tokens = await OauthToken.query()
       .where('user_id', user.id)
       .whereNull('revoked_at')

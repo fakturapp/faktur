@@ -27,7 +27,6 @@ export default class Revoke {
     share.status = 'revoked'
     await share.save()
 
-    // Immediately disconnect the user from the WebSocket room
     if (share.sharedWithUserId) {
       await disconnectUserFromDocument(
         share.documentType,

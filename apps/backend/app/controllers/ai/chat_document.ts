@@ -38,7 +38,6 @@ const chatDocumentValidator = vine.compile(
   })
 )
 
-// ─── Client context builder ──────────────────────────────────────────
 
 interface ClientCtx {
   name?: string
@@ -186,7 +185,6 @@ Règles:
 - Réponds UNIQUEMENT avec le JSON, rien d'autre`
 }
 
-// ─── Controller ───────────────────────────────────────────────────────
 
 export default class ChatDocument {
   async handle(ctx: HttpContext) {
@@ -207,7 +205,6 @@ export default class ChatDocument {
       return response.forbidden({ message: 'AI is not enabled. Activate it in Settings > AI.' })
     }
 
-    // Check quota before processing
     const quota = await AiQuotaService.checkQuota(teamId)
     if (!quota.allowed) {
       return response.tooManyRequests({
@@ -221,7 +218,6 @@ export default class ChatDocument {
     const docType = payload.type === 'invoice' ? 'facture' : 'devis'
     const currentDoc = JSON.stringify(payload.currentDocument, null, 2)
 
-    // Build mode-specific system prompt with client context
     const clientCtx = payload.clientContext as ClientCtx | undefined
     const detailLevel = payload.detailLevel
 
@@ -251,7 +247,6 @@ export default class ChatDocument {
         payload.source as 'faktur' | 'apikey' | undefined
       )
 
-      // Parse JSON from response — strip markdown code fences if present
       let cleaned = result.trim()
       if (cleaned.startsWith('```')) {
         cleaned = cleaned.replace(/^```(?:json)?\s*\n?/, '').replace(/\n?\s*```$/, '')
@@ -267,23 +262,16 @@ export default class ChatDocument {
 
       const parsed = JSON.parse(jsonMatch[0])
 
-      // Record usage after successful AI call
       await AiQuotaService.recordUsage(teamId, user.id, payload.model || 'default', 'chat-document')
 
-      // ── Question mode — just return the message ────────────────
       if (mode === 'question') {
         return response.ok({
           message: parsed.message || result,
         })
       }
 
-      // ── Extract document from various AI response shapes ───────
-      // Some models return { document: { subject, lines } }
-      // Others return { subject, lines } (flat)
-      // Others return { message, document: { subject, lines } }
       let doc = parsed.document || null
       if (!doc || !Array.isArray(doc.lines)) {
-        // Fallback: flat structure
         if (Array.isArray(parsed.lines)) {
           doc = {
             subject: parsed.subject ?? '',
@@ -301,7 +289,6 @@ export default class ChatDocument {
         })
       }
 
-      // Sanitize document fields
       doc.subject = typeof doc.subject === 'string' ? doc.subject : ''
       doc.notes = typeof doc.notes === 'string' ? doc.notes : ''
       doc.acceptanceConditions =
@@ -332,7 +319,6 @@ export default class ChatDocument {
         })
       }
 
-      // Edition mode
       return response.ok({
         message: aiMessage,
         document: doc,
@@ -340,12 +326,10 @@ export default class ChatDocument {
     } catch (error: any) {
       const msg = error.message || 'Unknown error'
 
-      // API key missing → 400
       if (msg.includes('clé API') || msg.includes('API key') || msg.includes('No API key')) {
         return response.badRequest({ message: msg })
       }
 
-      // Provider API errors → 502
       if (msg.includes('API error')) {
         return response
           .status(502)

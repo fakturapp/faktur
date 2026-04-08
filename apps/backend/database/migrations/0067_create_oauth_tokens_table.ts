@@ -7,11 +7,7 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().defaultTo(this.raw('gen_random_uuid()'))
 
-      // SHA-256 of the raw access token; the raw token is only handed to the
-      // OAuth app on /token response and never stored server-side.
       table.string('access_token_hash', 128).notNullable().unique()
-      // Same for the refresh token — separate hash column so a refresh
-      // token lookup cannot match on the access token index.
       table.string('refresh_token_hash', 128).notNullable().unique()
 
       table
@@ -27,17 +23,14 @@ export default class extends BaseSchema {
         .inTable('users')
         .onDelete('CASCADE')
 
-      // Scopes copied from the authorization code that minted this token
       table.specificType('scopes', 'text[]').notNullable()
 
-      // Device information (surfaced in the user's 'Authorized apps' screen)
       table.string('device_name', 255).nullable()
       table.string('device_platform', 50).nullable()
       table.string('device_os', 100).nullable()
       table.string('last_ip', 45).nullable()
       table.text('last_user_agent').nullable()
 
-      // Lifecycle
       table.timestamp('expires_at').notNullable()
       table.timestamp('refresh_expires_at').notNullable()
       table.timestamp('last_used_at').nullable()

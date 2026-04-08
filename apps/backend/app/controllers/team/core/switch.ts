@@ -28,7 +28,6 @@ export default class Switch {
     user.currentTeamId = payload.teamId
     await user.save()
 
-    // Load the DEK for the new team if KEK is available
     const kek = keyStore.getKEK(user.id)
     if (kek && membership.encryptedTeamDek) {
       const teamDek = zeroAccessCryptoService.decryptDEK(membership.encryptedTeamDek, kek)

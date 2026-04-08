@@ -29,21 +29,17 @@ export default class CheckoutMarkPaid {
       return response.conflict({ message: 'Payment already marked as sent' })
     }
 
-    // Mark payment as sent
     paymentLink.paidAt = DateTime.now()
     await paymentLink.save()
 
-    // Update invoice status to paid_unconfirmed
     const invoice = await Invoice.find(paymentLink.invoiceId)
     if (invoice) {
       invoice.status = 'paid_unconfirmed'
       await invoice.save()
 
-      // Broadcast for real-time update in John's dashboard
       broadcastDocumentSaved('invoice', invoice.id, 'system')
     }
 
-    // Send email to John (invoice creator)
     try {
       const creator = await User.find(paymentLink.createdByUserId)
       if (creator?.email) {

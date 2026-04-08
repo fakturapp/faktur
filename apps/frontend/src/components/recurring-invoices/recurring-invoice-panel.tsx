@@ -62,7 +62,6 @@ export function RecurringInvoicePanel({ open, editingId, onClose, onSaved }: Rec
   const [loadingDetail, setLoadingDetail] = useState(false)
   const [clients, setClients] = useState<ClientOption[]>([])
 
-  // Recurring-specific
   const [name, setName] = useState('')
   const [frequency, setFrequency] = useState('monthly')
   const [customIntervalDays, setCustomIntervalDays] = useState('')
@@ -70,16 +69,13 @@ export function RecurringInvoicePanel({ open, editingId, onClose, onSaved }: Rec
   const [endDate, setEndDate] = useState('')
   const [dueDays, setDueDays] = useState('30')
 
-  // Client
   const [clientId, setClientId] = useState('')
 
-  // Invoice template
   const [subject, setSubject] = useState('')
   const [notes, setNotes] = useState('')
   const [paymentTerms, setPaymentTerms] = useState('')
   const [paymentMethod, setPaymentMethod] = useState('')
 
-  // Lines
   const [lines, setLines] = useState<LineForm[]>([{ ...emptyLine }])
 
   const isEditing = !!editingId

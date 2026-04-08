@@ -32,7 +32,6 @@ export default class TeamMember extends BaseModel {
   @column.dateTime()
   declare joinedAt: DateTime | null
 
-  // Zero-Access Crypto
   @column({ serializeAs: null })
   declare encryptedTeamDek: string | null
 

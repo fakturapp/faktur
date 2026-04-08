@@ -24,7 +24,6 @@ interface CheckoutFeatureModalProps {
   onClose: () => void
 }
 
-/* ─────────────── Step 1: announcement ─────────────── */
 
 function StepAnnouncement({ onNext, onClose }: { onNext: () => void; onClose: () => void }) {
   return (
@@ -35,7 +34,7 @@ function StepAnnouncement({ onNext, onClose }: { onNext: () => void; onClose: ()
       exit={{ opacity: 0, x: -20 }}
       transition={{ duration: 0.25 }}
     >
-      {/* Hero */}
+      {}
       <div className="relative -mx-6 -mt-6 mb-5 px-6 pt-8 pb-6 bg-gradient-to-br from-primary/15 via-primary/5 to-transparent border-b border-border">
         <DialogTitle className="text-xl md:text-2xl tracking-tight">
           Liens de paiement instantanés
@@ -44,7 +43,7 @@ function StepAnnouncement({ onNext, onClose }: { onNext: () => void; onClose: ()
           Envoyez à vos clients un lien de paiement sécurisé, sur un sous-domaine dédié.
         </p>
 
-        {/* URL preview */}
+        {}
         <div className="mt-4 flex items-center gap-2 rounded-lg border border-border bg-card/80 backdrop-blur-sm px-3 py-2 font-mono text-[11px] text-foreground shadow-sm">
           <Globe className="h-3.5 w-3.5 text-primary shrink-0" />
           <span className="truncate">
@@ -57,7 +56,7 @@ function StepAnnouncement({ onNext, onClose }: { onNext: () => void; onClose: ()
         </div>
       </div>
 
-      {/* Feature bullets */}
+      {}
       <div className="space-y-3">
         <Feature
           icon={Link2}
@@ -79,7 +78,7 @@ function StepAnnouncement({ onNext, onClose }: { onNext: () => void; onClose: ()
         />
       </div>
 
-      {/* Footer */}
+      {}
       <div className="mt-6 flex items-center justify-between gap-3">
         <Button variant="ghost" size="sm" onClick={onClose}>
           Plus tard

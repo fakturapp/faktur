@@ -9,9 +9,7 @@ interface DialogProps {
   onClose: () => void
   children: React.ReactNode
   className?: string
-  /** When false, clicking the backdrop does NOT close the dialog. Default: true */
   dismissible?: boolean
-  /** Custom z-index class for the overlay (default: "z-50") */
   zIndex?: string
 }
 

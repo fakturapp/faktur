@@ -14,7 +14,6 @@ export default class Client extends BaseModel {
   @column()
   declare type: 'company' | 'individual'
 
-  // Company fields
   @column()
   declare companyName: string | null
 
@@ -27,14 +26,12 @@ export default class Client extends BaseModel {
   @column()
   declare vatNumber: string | null
 
-  // Individual fields
   @column()
   declare firstName: string | null
 
   @column()
   declare lastName: string | null
 
-  // Contact
   @column()
   declare email: string | null
 
@@ -44,7 +41,6 @@ export default class Client extends BaseModel {
   @column()
   declare includeInEmails: boolean
 
-  // Address
   @column()
   declare address: string | null
 
@@ -60,7 +56,6 @@ export default class Client extends BaseModel {
   @column()
   declare country: string
 
-  // Notes
   @column()
   declare notes: string | null
 

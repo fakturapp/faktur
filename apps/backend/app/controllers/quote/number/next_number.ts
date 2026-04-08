@@ -11,7 +11,6 @@ export default class NextNumber {
       return response.badRequest({ message: 'No team selected' })
     }
 
-    // Check if there's a custom starting number set
     const settings = await InvoiceSetting.query().where('team_id', teamId).first()
     if (settings?.nextQuoteNumber) {
       return response.ok({ nextNumber: settings.nextQuoteNumber })

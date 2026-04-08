@@ -74,7 +74,6 @@ export function ClientEditPanel({ open, clientId, onClose, onUpdated, onDeleted 
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [client, setClient] = useState<Client | null>(null)
 
-  // Editable form state
   const [form, setForm] = useState({
     companyName: '',
     firstName: '',

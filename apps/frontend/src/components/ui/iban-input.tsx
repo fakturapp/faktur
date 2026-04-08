@@ -15,12 +15,10 @@ interface IbanInputProps {
   disabled?: boolean
 }
 
-/** Strip everything except alphanumeric */
 function stripIban(val: string) {
   return val.replace(/[^a-zA-Z0-9]/g, '').toUpperCase()
 }
 
-/** Format IBAN with spaces every 4 chars */
 function formatIban(raw: string) {
   return raw.replace(/(.{4})/g, '$1 ').trim()
 }
@@ -31,16 +29,13 @@ const IbanInput = React.forwardRef<HTMLInputElement, IbanInputProps>(
 
     const raw = stripIban(value)
 
-    // Auto-prefix country code if user starts typing digits without it
     function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
       let stripped = stripIban(e.target.value)
 
-      // If starts with digits (no country code), prepend default
       if (stripped.length > 0 && /^\d/.test(stripped)) {
         stripped = defaultCountry + stripped
       }
 
-      // IBAN max length (34 chars raw)
       if (stripped.length > 34) {
         stripped = stripped.slice(0, 34)
       }

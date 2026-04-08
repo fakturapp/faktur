@@ -22,7 +22,6 @@ export default class Duplicate {
       return response.notFound({ message: 'Credit note not found' })
     }
 
-    // Generate next credit note number
     const currentYear = new Date().getFullYear().toString()
     const prefix = `AV-${currentYear}-`
 

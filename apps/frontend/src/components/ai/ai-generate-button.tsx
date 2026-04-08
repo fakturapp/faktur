@@ -47,7 +47,6 @@ export function AiGenerateButton({
         onGenerated(data.text)
       }
     } catch {
-      // Silently fail — user can retry
     }
     setLoading(false)
   }

@@ -55,7 +55,6 @@ export function SendEmailModal({
   const [isDirty, setIsDirty] = useState(false)
   const [attachments, setAttachments] = useState<Attachment[]>([])
 
-  // Confirmation states
   const [showSendConfirm, setShowSendConfirm] = useState(false)
   const [showCloseConfirm, setShowCloseConfirm] = useState(false)
   const [showAttachmentModal, setShowAttachmentModal] = useState<string | null>(null)
@@ -72,7 +71,6 @@ export function SendEmailModal({
     const templateType = documentType === 'invoice' ? 'invoice_send' : documentType === 'credit_note' ? 'credit_note_send' : 'quote_send'
 
     async function init() {
-      // Try to load custom template
       let tplSubject = `${docLabelCap} ${documentNumber}`
       let tplBody = `Bonjour${clientName ? ` ${clientName}` : ''},\n\nVeuillez trouver ci-joint ${documentType === 'quote' ? 'le' : documentType === 'credit_note' ? "l'avoir" : 'la'} ${docLabelCap.toLowerCase()} ${documentNumber} d'un montant de ${formattedTotal}.\n\nCordialement`
 

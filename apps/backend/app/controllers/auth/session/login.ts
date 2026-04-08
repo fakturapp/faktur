@@ -26,21 +26,15 @@ export default class Login {
 
     await request.validateUsing(loginValidator)
 
-    // Verify Turnstile captcha
     const turnstileValid = await TurnstileService.verifyToken(turnstileToken || '', request.ip())
     if (!turnstileValid) {
       return response.forbidden({ message: 'Captcha verification failed' })
     }
 
-    // Timing-safe credential verification: User.verifyCredentials performs a fake
-    // hash comparison when the user doesn't exist, ensuring identical response time
-    // regardless of whether the email exists in the database.
     let user: User
     try {
       user = await User.verifyCredentials(email, password)
     } catch {
-      // In the error path (timing no longer matters), look up the user to
-      // increment failed attempts and check lockout.
       const existingUser = await User.findBy('email', email)
       if (existingUser) {
         existingUser.failedLoginAttempts += 1
@@ -64,7 +58,6 @@ export default class Login {
       return response.unauthorized({ message: 'Invalid email or password' })
     }
 
-    // Credentials valid — now check account status and lockout
     if (user.status !== 'active') {
       await this.recordLoginAttempt(request, user.id, 'failed', 'Inactive account')
       return response.unauthorized({ message: 'Invalid email or password' })
@@ -137,7 +130,6 @@ export default class Login {
       expiresIn: '15 days',
     })
 
-    // Store IP and user agent on the token
     await db
       .from('auth_access_tokens')
       .where('id', String(token.identifier))
@@ -158,13 +150,10 @@ export default class Login {
       severity: 'info',
     })
 
-    // Zero-access crypto: derive KEK and load team DEK into memory
     if (user.saltKdf) {
       const salt = Buffer.from(user.saltKdf, 'hex')
       const kek = await zeroAccessCryptoService.deriveKEK(password, salt)
 
-      // If crypto reset is needed (password was reset without old password),
-      // the DEKs are still encrypted with the OLD KEK — skip loading them.
       if (!user.cryptoResetNeeded) {
         if (user.currentTeamId) {
           const teamMember = await TeamMember.query()
@@ -183,11 +172,9 @@ export default class Login {
           keyStore.storeKeys(user.id, kek, '', Buffer.alloc(0))
         }
       } else {
-        // Store only the KEK (new one), no DEKs yet
         keyStore.storeKeys(user.id, kek, '', Buffer.alloc(0))
       }
 
-      // Dual-key split: encrypt KEK with sessionKey (client) then ENCRYPTION_KEY (server)
       const sessionKey = crypto.randomBytes(32)
       const layer1 = encryptionService.encryptWithCustomKey(kek.toString('hex'), sessionKey)
       const layer2 = encryptionService.encrypt(layer1)

@@ -4,13 +4,11 @@ export default class extends BaseSchema {
   protected tableName = 'invoice_settings'
 
   async up() {
-    // Update column defaults
     this.schema.alterTable(this.tableName, (table) => {
       table.string('quote_filename_pattern', 255).defaultTo('DEV-{annee}-{numero}').alter()
       table.string('invoice_filename_pattern', 255).defaultTo('FAC-{annee}-{numero}').alter()
     })
 
-    // Migrate existing rows that still use the old default
     this.defer(async (db) => {
       await db
         .from(this.tableName)

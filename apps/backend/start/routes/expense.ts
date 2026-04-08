@@ -13,18 +13,15 @@ const ParseReceipt = () => import('#controllers/expense/ocr/parse_receipt')
 
 router
   .group(() => {
-    // Expenses CRUD
     router.get('/', [ExpenseList, 'handle'])
     router.post('/', [ExpenseCreate, 'handle'])
     router.put('/:id', [ExpenseUpdate, 'handle'])
     router.delete('/:id', [ExpenseDelete, 'handle'])
 
-    // Categories
     router.get('/categories', [ExpenseCategoryList, 'handle'])
     router.post('/categories', [ExpenseCategoryCreate, 'handle'])
     router.delete('/categories/:id', [ExpenseCategoryDelete, 'handle'])
 
-    // OCR receipt extraction
     router.post('/parse-receipt', [ParseReceipt, 'handle'])
   })
   .prefix(API_PREFIX + '/expenses')

@@ -14,17 +14,13 @@ export default class extends BaseSchema {
         .inTable('oauth_apps')
         .onDelete('CASCADE')
 
-      // Event identity
       table.string('event_type', 100).notNullable()
       table.string('event_id', 64).notNullable().unique()
 
-      // Target
       table.string('url', 500).notNullable()
 
-      // Signed payload (app-level encrypted at rest, HMAC on the wire)
       table.text('encrypted_payload').notNullable()
 
-      // Delivery status
       table.string('status', 20).notNullable().defaultTo('pending')
       table.integer('attempt_count').notNullable().defaultTo(0)
       table.integer('last_status_code').nullable()

@@ -110,7 +110,7 @@ export default function ReminderSettingsPage() {
 
   return (
     <motion.div initial="hidden" animate="visible" className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
-      {/* Header */}
+      {}
       <motion.div variants={fadeUp} custom={0}>
         <h1 className="text-2xl font-bold text-foreground">Relances automatiques</h1>
         <p className="text-muted-foreground mt-1">
@@ -118,7 +118,7 @@ export default function ReminderSettingsPage() {
         </p>
       </motion.div>
 
-      {/* Enable toggle */}
+      {}
       <motion.div variants={fadeUp} custom={1}>
         <Card>
           <CardContent className="p-5">
@@ -142,7 +142,7 @@ export default function ReminderSettingsPage() {
 
       {enabled && (
         <>
-          {/* Schedule */}
+          {}
           <motion.div variants={fadeUp} custom={2}>
             <Card>
               <CardContent className="p-5 space-y-4">
@@ -197,7 +197,7 @@ export default function ReminderSettingsPage() {
             </Card>
           </motion.div>
 
-          {/* Email account */}
+          {}
           <motion.div variants={fadeUp} custom={3}>
             <Card>
               <CardContent className="p-5 space-y-4">
@@ -226,7 +226,7 @@ export default function ReminderSettingsPage() {
             </Card>
           </motion.div>
 
-          {/* Email template */}
+          {}
           <motion.div variants={fadeUp} custom={4}>
             <Card>
               <CardContent className="p-5 space-y-4">
@@ -271,7 +271,7 @@ export default function ReminderSettingsPage() {
         </>
       )}
 
-      {/* Save */}
+      {}
       <motion.div variants={fadeUp} custom={5} className="flex justify-end">
         <Button onClick={handleSave} disabled={saving}>
           {saving ? (

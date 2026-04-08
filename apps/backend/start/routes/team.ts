@@ -23,7 +23,6 @@ const UploadIcon = () => import('#controllers/team/media/upload_icon')
 const ServeIcon = () => import('#controllers/team/media/serve_icon')
 const SearchUsers = () => import('#controllers/team/members/search_users')
 
-// Public route - serve team icons
 router.get(API_PREFIX + '/team-icons/:filename', [ServeIcon, 'handle'])
 
 router
@@ -51,5 +50,4 @@ router
   .use(middleware.auth())
   .use(middleware.vault())
 
-// Public route for invitation info (no auth needed to view)
 router.get(API_PREFIX + '/invite/:token', [InviteInfo, 'handle'])

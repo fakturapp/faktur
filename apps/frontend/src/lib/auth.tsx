@@ -38,10 +38,6 @@ interface AuthContextType {
   refreshUser: () => Promise<void>
 }
 
-// ---------- localStorage keys that hold auth state ----------
-// These are always wiped on logout. Anything else (theme, locale,
-// dismissed banners, layout prefs) is preserved unless `wipeAll: true`
-// is passed.
 const AUTH_LOCAL_KEYS = [
   'faktur_token',
   'faktur_vault_key',
@@ -49,10 +45,6 @@ const AUTH_LOCAL_KEYS = [
   'faktur_vault_locked',
 ] as const
 
-// ---------- Keys ALWAYS preserved, even during full wipe ----------
-// User-experience flags that should never be reset by a logout. The
-// user can still clear them manually from the browser dev tools or by
-// uninstalling the app.
 const ALWAYS_PRESERVE_KEYS = new Set<string>([
   'faktur_cookie_consent',
   'faktur_cookie_pos',
@@ -89,18 +81,8 @@ const publicPaths = [
   '/checkout',
 ]
 
-// Short-form checkout URL served by the dedicated checkout subdomain, e.g.
-// https://checkout.example.com/<token>/pay — the middleware rewrites these
-// internally to /checkout/<token>/pay but usePathname() returns the browser
-// URL, so we must recognise the short form as public here as well.
 const SHORT_CHECKOUT_PATH = /^\/[a-zA-Z0-9_-]{16,}\/pay\/?$/
 
-/**
- * Faktur Desktop drops a session payload in the URL hash fragment on
- * boot: `#faktur_desktop_session=<base64url-json>`. We consume it
- * synchronously BEFORE the refreshUser() fetch so AuthProvider sees
- * the token on its first pass and never tries to redirect to /login.
- */
 function consumeDesktopSessionHash(): void {
   if (typeof window === 'undefined') return
   const hash = window.location.hash
@@ -118,7 +100,6 @@ function consumeDesktopSessionHash(): void {
     } else {
       localStorage.removeItem('faktur_vault_locked')
     }
-    // Wipe the fragment from the URL so nothing gets logged or shared.
     const clean = window.location.pathname + window.location.search
     window.history.replaceState({}, '', clean)
   } catch (err) {
@@ -126,8 +107,6 @@ function consumeDesktopSessionHash(): void {
   }
 }
 
-// Eager consume on module load so it runs before the React tree
-// mounts. This is safe because it only touches localStorage.
 if (typeof window !== 'undefined') {
   consumeDesktopSessionHash()
 }
@@ -143,8 +122,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     SHORT_CHECKOUT_PATH.test(pathname)
 
   const refreshUser = useCallback(async () => {
-    // Defensive re-consume in case this hook runs before the
-    // module-level call (hot reload, edge cases).
     consumeDesktopSessionHash()
 
     const token = localStorage.getItem('faktur_token')
@@ -172,10 +149,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (loading) return
 
     if (!user && !isPublicPath) {
-      // Preserve the current URL (pathname + query) as a ?redirect=
-      // param so the login page can bounce us back after auth. Only
-      // relative paths go through so an attacker can't smuggle in an
-      // off-site redirect via a crafted link.
       let target = '/login'
       if (typeof window !== 'undefined') {
         const current = window.location.pathname + window.location.search

@@ -3,7 +3,7 @@
 export default function CheckoutLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      {/* Header */}
+      {}
       <header className="py-6 px-6 flex items-center justify-center">
         <div className="flex items-center gap-2.5">
           <img src="/logo.svg" alt="Faktur" className="h-8 w-8 drop-shadow-sm" />
@@ -11,12 +11,12 @@ export default function CheckoutLayout({ children }: { children: React.ReactNode
         </div>
       </header>
 
-      {/* Main */}
+      {}
       <main className="flex-1 flex items-start justify-center px-4 pb-10">
         <div className="w-full max-w-[480px]">{children}</div>
       </main>
 
-      {/* Footer */}
+      {}
       <footer className="py-6 text-center border-t border-border/50">
         <p className="text-[11px] text-muted-foreground">
           Propulsé par{' '}

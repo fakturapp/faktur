@@ -13,9 +13,6 @@ import { Tooltip } from '@/components/ui/tooltip'
 import { AiGenerateButton } from '@/components/ai/ai-generate-button'
 import type { ClientInfo } from './a4-sheet'
 
-/* ═══════════════════════════════════════════════════════════
-   Types
-   ═══════════════════════════════════════════════════════════ */
 
 export interface DocumentOptions {
   billingType: 'quick' | 'detailed'
@@ -70,9 +67,6 @@ interface DocumentOptionsProps {
   stripeConfigured?: boolean
 }
 
-/* ═══════════════════════════════════════════════════════════
-   Helpers
-   ═══════════════════════════════════════════════════════════ */
 
 const ACCENT_COLORS = [
   '#6366f1', '#3b82f6', '#8b5cf6', '#ec4899', '#ef4444',
@@ -83,9 +77,6 @@ function fmtCurrency(n: number) {
   return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(n)
 }
 
-/* ═══════════════════════════════════════════════════════════
-   CollapsibleSection — animated expand/collapse
-   ═══════════════════════════════════════════════════════════ */
 
 function CollapsibleSection({
   title, defaultOpen = false, children,
@@ -127,9 +118,6 @@ function CollapsibleSection({
   )
 }
 
-/* ═══════════════════════════════════════════════════════════
-   OptionCheckbox — toggle with nested content
-   ═══════════════════════════════════════════════════════════ */
 
 function OptionCheckbox({
   checked, onToggle, label, children,
@@ -163,9 +151,6 @@ function OptionCheckbox({
   )
 }
 
-/* ═══════════════════════════════════════════════════════════
-   DocumentOptionsPanel
-   ═══════════════════════════════════════════════════════════ */
 
 export function DocumentOptionsPanel({
   options, onChange, accentColor, onAccentColorChange,
@@ -187,12 +172,12 @@ export function DocumentOptionsPanel({
 
   return (
     <div className="space-y-3">
-      {/* ── Settings card with collapsible sections ── */}
+      {}
       <div className="rounded-xl border border-border bg-card px-4 py-1 shadow-sm">
 
-        {/* ── Document section ── */}
+        {}
         <CollapsibleSection title="Document" defaultOpen>
-          {/* Billing Type */}
+          {}
           <div className="mb-3">
             <label className="text-xs text-muted-foreground font-medium block mb-1">Type</label>
             <div className="flex gap-1">
@@ -216,7 +201,7 @@ export function DocumentOptionsPanel({
             </div>
           </div>
 
-          {/* Accent Color */}
+          {}
           <div className="mb-3">
             <label className="text-xs text-muted-foreground font-medium flex items-center gap-1.5 mb-1.5">
               <Palette className="h-3 w-3" /> Couleur

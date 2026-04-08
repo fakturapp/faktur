@@ -52,7 +52,6 @@ export default function DeleteAccountPage() {
   const [deletionToken, setDeletionToken] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  // Step 2: Teams
   const [teams, setTeams] = useState<TeamInfo[]>([])
   const [teamsLoaded, setTeamsLoaded] = useState(false)
   const [deleteTeamDialog, setDeleteTeamDialog] = useState<TeamInfo | null>(null)
@@ -62,20 +61,16 @@ export default function DeleteAccountPage() {
   const [transferTarget, setTransferTarget] = useState('')
   const [leaveConfirm, setLeaveConfirm] = useState<TeamInfo | null>(null)
 
-  // Step 3: Name
   const [nameInput, setNameInput] = useState('')
 
-  // Step 4: Email code
   const [codeSent, setCodeSent] = useState(false)
   const [codeInput, setCodeInput] = useState('')
   const [cooldown, setCooldown] = useState(0)
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  // Step 5: Password
   const [passwordInput, setPasswordInput] = useState('')
   const [showPassword, setShowPassword] = useState(false)
 
-  // Step 6: Confirm
   const [confirmText, setConfirmText] = useState('')
 
   function headers() {
@@ -107,7 +102,6 @@ export default function DeleteAccountPage() {
     setCurrentStep((s) => s + 1)
   }
 
-  // Step 1: Start deletion
   async function handleStart() {
     setLoading(true)
     const { data, error } = await api.post<{ token: string }>('/account/delete/start', {})
@@ -120,7 +114,6 @@ export default function DeleteAccountPage() {
     }
   }
 
-  // Step 2: Load teams
   async function loadTeams(token?: string) {
     const hdrs = token ? { 'x-deletion-token': token } : headers()
     const { data } = await api.get<{ teams: TeamInfo[] }>('/account/delete/teams', {
@@ -132,7 +125,6 @@ export default function DeleteAccountPage() {
     }
   }
 
-  // Step 2: Delete team
   async function handleDeleteTeam() {
     if (!deleteTeamDialog) return
     setLoading(true)
@@ -149,13 +141,11 @@ export default function DeleteAccountPage() {
     toast('Équipe supprimée', 'success')
   }
 
-  // Step 2: Open transfer dialog
   function openTransferDialog(team: TeamInfo) {
     setTransferDialog(team)
     setTransferTarget('')
   }
 
-  // Step 2: Confirm transfer
   async function handleTransferTeam() {
     if (!transferDialog || !transferTarget) return
     setLoading(true)
@@ -171,7 +161,6 @@ export default function DeleteAccountPage() {
     toast('Propriété transférée et équipe quittée', 'success')
   }
 
-  // Step 2: Leave team
   async function handleLeaveTeam(team: TeamInfo) {
     setLoading(true)
     const { error } = await api.post('/account/delete/resolve-team', {
@@ -184,13 +173,11 @@ export default function DeleteAccountPage() {
     toast("Vous avez quitté l'équipe", 'success')
   }
 
-  // Step 2: Advance when no teams left
   function handleTeamsNext() {
     if (teams.length > 0) return
     goNext()
   }
 
-  // Step 3: Verify name
   async function handleVerifyName(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
@@ -202,7 +189,6 @@ export default function DeleteAccountPage() {
     goNext()
   }
 
-  // Step 4: Send code
   async function handleSendCode() {
     setLoading(true)
     const { error } = await api.post('/account/delete/send-code', {}, {
@@ -215,7 +201,6 @@ export default function DeleteAccountPage() {
     toast('Code envoyé', 'success')
   }
 
-  // Step 4: Verify code
   async function handleVerifyCode(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
@@ -227,7 +212,6 @@ export default function DeleteAccountPage() {
     goNext()
   }
 
-  // Step 5: Verify password
   async function handleVerifyPassword(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
@@ -239,7 +223,6 @@ export default function DeleteAccountPage() {
     goNext()
   }
 
-  // Step 6: Final confirm
   async function handleFinalDelete() {
     setLoading(true)
     const { error } = await api.delete('/account/delete/confirm', {
@@ -263,7 +246,7 @@ export default function DeleteAccountPage() {
       animate={{ opacity: 1, y: 0 }}
       className="max-w-2xl mx-auto space-y-6"
     >
-      {/* Header */}
+      {}
       <div className="flex items-center gap-4">
         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-destructive/10">
           <Trash2 className="h-6 w-6 text-destructive" />
@@ -274,7 +257,7 @@ export default function DeleteAccountPage() {
         </div>
       </div>
 
-      {/* Step indicator */}
+      {}
       <div className="rounded-2xl border border-border bg-card p-4">
         <div className="flex items-center justify-between">
           <p className="text-xs font-semibold text-muted-foreground">

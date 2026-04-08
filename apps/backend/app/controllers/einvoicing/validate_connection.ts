@@ -19,7 +19,6 @@ export default class ValidateConnection {
       return response.forbidden({ message: "La facturation electronique n'est pas activee" })
     }
 
-    // Decrypt pdpApiKey before building config
     decryptModelFields(invoiceSettings, [...ENCRYPTED_FIELDS.invoiceSetting], dek)
 
     const pdpConfig = buildPdpConfig(invoiceSettings)

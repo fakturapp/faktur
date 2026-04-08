@@ -39,7 +39,6 @@ export default class Store {
 
     const payload = await request.validateUsing(storeContactValidator)
 
-    // If this contact is marked primary, unset other primary contacts
     if (payload.isPrimary) {
       await ClientContact.query()
         .where('client_id', params.clientId)

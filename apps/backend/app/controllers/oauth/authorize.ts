@@ -8,24 +8,7 @@ import { authorizeRequestValidator, consentSubmitValidator } from '#validators/o
 import { OAUTH_ERRORS } from '#services/oauth/oauth_constants'
 import { DateTime } from 'luxon'
 
-/**
- * OAuth2 authorization endpoint.
- *
- * GET /oauth/authorize - returns the consent metadata for the front-end
- * to render the consent screen. The frontend itself owns the UI — this
- * controller only validates the query string, checks the client exists,
- * and produces the data bag.
- *
- * POST /oauth/authorize/consent - records the user's decision. On
- * 'allow', mints an authorization code bound to the user + app and
- * tells the caller where to redirect. On 'deny', returns an
- * access_denied error redirect.
- */
 export default class Authorize {
-  /**
-   * GET /oauth/authorize
-   * Returns a JSON bag with the metadata the consent screen needs.
-   */
   async show({ auth, request, response }: HttpContext) {
     const user = auth.user
     if (!user) {
@@ -44,7 +27,6 @@ export default class Authorize {
       })
     }
 
-    // PKCE is mandatory for desktop clients — reject anything weaker.
     if (payload.code_challenge && payload.code_challenge_method !== 'S256') {
       return response.badRequest({
         error: OAUTH_ERRORS.invalid_request,
@@ -71,8 +53,6 @@ export default class Authorize {
       })
     }
 
-    // Scope intersection: the requested scopes must all be included in
-    // the ones the app was granted at creation time.
     const requestedScopes = this.parseScopes(payload.scope)
     const invalidScopes = requestedScopes.filter((s) => !app.scopes.includes(s))
     if (invalidScopes.length > 0) {

@@ -7,7 +7,6 @@ import analyticsEncryption from '#services/analytics/analytics_encryption_servic
 import { parseUserAgent } from '#services/analytics/user_agent_parser'
 import { getGeoFromIp } from '#services/analytics/geo_cache'
 
-/** Replace UUIDs in paths with [id] for aggregation */
 function sanitizePath(path: string): string {
   return path.replace(
     /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi,
@@ -59,7 +58,6 @@ export async function ingestAnalytics(
   const parsed = parseUserAgent(userAgent)
   const geo = await getGeoFromIp(ip)
 
-  // Find or create session
   let session = await AnalyticsSession.findBy('sessionToken', sessionToken)
 
   if (!session) {
@@ -91,7 +89,6 @@ export async function ingestAnalytics(
     })
   }
 
-  // Batch insert events
   if (payload.events?.length) {
     const eventRows = payload.events.map((e) => ({
       sessionId: session!.id,
@@ -111,12 +108,10 @@ export async function ingestAnalytics(
 
     await AnalyticsEvent.createMany(eventRows)
 
-    // Update session counters
     const pageViews = payload.events.filter((e) => e.eventType === 'page_view').length
     session.pageCount += pageViews
     session.eventCount += payload.events.length
 
-    // Update exit page
     const lastPageView = [...payload.events]
       .reverse()
       .find((e) => e.eventType === 'page_view')
@@ -125,7 +120,6 @@ export async function ingestAnalytics(
     }
   }
 
-  // Batch insert errors (with dedup by fingerprint)
   if (payload.errors?.length) {
     for (const err of payload.errors) {
       const fingerprint = analyticsEncryption.hash(

@@ -21,16 +21,13 @@ export default class Delete {
       return response.notFound({ message: 'No active payment link found' })
     }
 
-    // Delete PDF from R2 if stored
     if (paymentLink.pdfStorageKey) {
       try {
         await r2StorageService.delete(paymentLink.pdfStorageKey)
       } catch {
-        // Non-blocking
       }
     }
 
-    // Deactivate and wipe sensitive data
     paymentLink.isActive = false
     paymentLink.encryptedIban = null
     paymentLink.encryptedBic = null

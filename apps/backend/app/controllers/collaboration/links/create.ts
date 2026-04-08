@@ -22,7 +22,6 @@ export default class Create {
       return response.notFound({ message: 'Document not found' })
     }
 
-    // Generate a cryptographically secure token
     const token = randomBytes(32).toString('hex')
 
     const link = await DocumentShareLink.create({

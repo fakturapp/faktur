@@ -96,7 +96,6 @@ export default function TeamPage() {
   const [saving, setSaving] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
 
-  // Invite
   const [inviteOpen, setInviteOpen] = useState(false)
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteRole, setInviteRole] = useState<string>('member')
@@ -104,35 +103,29 @@ export default function TeamPage() {
   const [inviteResult, setInviteResult] = useState<{ url: string; token: string } | null>(null)
   const [copied, setCopied] = useState(false)
 
-  // User search for invite
   const [searchResults, setSearchResults] = useState<{ id: string; emailHint: string; fullName: string | null; avatarUrl: string | null }[]>([])
   const [searchTimeout, setSearchTimeout] = useState<ReturnType<typeof setTimeout> | null>(null)
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [selectedUser, setSelectedUser] = useState<{ id: string; emailHint: string; fullName: string | null; avatarUrl: string | null } | null>(null)
 
-  // Role change
   const [roleDialogOpen, setRoleDialogOpen] = useState(false)
   const [roleTarget, setRoleTarget] = useState<TeamMember | null>(null)
   const [newRole, setNewRole] = useState<string>('member')
   const [roleChanging, setRoleChanging] = useState(false)
 
-  // Transfer
   const [transferOpen, setTransferOpen] = useState(false)
   const [transferTarget, setTransferTarget] = useState<TeamMember | null>(null)
   const [transferring, setTransferring] = useState(false)
   const [transferPassword, setTransferPassword] = useState('')
 
-  // Remove
   const [removeOpen, setRemoveOpen] = useState(false)
   const [removeTarget, setRemoveTarget] = useState<TeamMember | null>(null)
   const [removing, setRemoving] = useState(false)
 
-  // Team logo
   const [logoOpen, setLogoOpen] = useState(false)
   const [uploadingIcon, setUploadingIcon] = useState(false)
   const iconInputRef = useRef<HTMLInputElement>(null)
 
-  // Delete team
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deleteStep, setDeleteStep] = useState(1)
   const [deleteTeamName, setDeleteTeamName] = useState('')

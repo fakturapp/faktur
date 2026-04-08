@@ -11,9 +11,6 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-/* ═══════════════════════════════════════════════════════════
-   Color helpers
-   ═══════════════════════════════════════════════════════════ */
 
 function rgbToHex(rgb: string): string {
   const m = rgb.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/)
@@ -49,9 +46,6 @@ const SIZES = [
   { label: 'Grand', value: '5' },
 ]
 
-/* ═══════════════════════════════════════════════════════════
-   Markdown ↔ HTML conversion
-   ═══════════════════════════════════════════════════════════ */
 
 function escHtml(str: string): string {
   return str
@@ -61,32 +55,20 @@ function escHtml(str: string): string {
     .replace(/"/g, '&quot;')
 }
 
-/** Apply inline markdown formatting to an already-escaped HTML string */
 function applyInlineFormat(h: string): string {
-  // Bold: **text**
   h = h.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-  // Underline: __text__ (before italic)
   h = h.replace(/__(.+?)__/g, '<u>$1</u>')
-  // Italic: *text*
   h = h.replace(/\*(.+?)\*/g, '<em>$1</em>')
-  // Strikethrough: ~~text~~
   h = h.replace(/~~(.+?)~~/g, '<s>$1</s>')
-  // Color: {color:#hex}text{/color}
   h = h.replace(/\{color:([^}]+)\}(.+?)\{\/color\}/g, '<span style="color:$1">$2</span>')
-  // Highlight: {bg:#hex}text{/bg}
   h = h.replace(/\{bg:([^}]+)\}(.+?)\{\/bg\}/g, '<span style="background-color:$1;border-radius:2px;padding:0 1px">$2</span>')
-  // Size small: {size:sm}text{/size}
   h = h.replace(/\{size:sm\}(.+?)\{\/size\}/g, '<span style="font-size:0.85em">$1</span>')
-  // Size large: {size:lg}text{/size}
   h = h.replace(/\{size:lg\}(.+?)\{\/size\}/g, '<span style="font-size:1.3em">$1</span>')
-  // Font: {font:name}text{/font}
   h = h.replace(/\{font:([^}]+)\}(.+?)\{\/font\}/g, '<span style="font-family:$1">$2</span>')
-  // Link: [text](url)
   h = h.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" style="color:inherit;text-decoration:underline">$1</a>')
   return h
 }
 
-/** Convert markdown string → HTML for contentEditable display */
 export function mdToHtml(md: string): string {
   if (!md) return ''
 
@@ -98,7 +80,6 @@ export function mdToHtml(md: string): string {
     let line = escHtml(lines[i])
     line = applyInlineFormat(line)
 
-    // Heading
     if (line.startsWith('## ')) {
       if (inList) { parts.push('</ul>'); inList = false }
       parts.push(`<h2 style="font-size:1.3em;font-weight:700;margin:2px 0">${line.slice(3)}</h2>`)

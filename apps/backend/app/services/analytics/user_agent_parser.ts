@@ -15,7 +15,6 @@ export function parseUserAgent(ua: string): ParsedUserAgent {
 
   if (!ua) return result
 
-  // Browser detection (order matters — more specific first)
   if (/Edg(?:e|A)?\/(\d+[\d.]*)/i.test(ua)) {
     result.browser = 'Edge'
     result.browserVersion = RegExp.$1
@@ -36,7 +35,6 @@ export function parseUserAgent(ua: string): ParsedUserAgent {
     result.browserVersion = RegExp.$1
   }
 
-  // OS detection
   if (/Windows NT 10/i.test(ua)) {
     result.os = 'Windows'
   } else if (/Windows/i.test(ua)) {
@@ -53,7 +51,6 @@ export function parseUserAgent(ua: string): ParsedUserAgent {
     result.os = 'ChromeOS'
   }
 
-  // Device type detection
   if (/iPad|tablet/i.test(ua)) {
     result.deviceType = 'tablet'
   } else if (/Mobile|iPhone|iPod|Android.*Mobile|webOS|BlackBerry|Opera Mini|IEMobile/i.test(ua)) {
@@ -62,7 +59,6 @@ export function parseUserAgent(ua: string): ParsedUserAgent {
     result.deviceType = 'desktop'
   }
 
-  // Truncate version to major.minor
   if (result.browserVersion) {
     const parts = result.browserVersion.split('.')
     result.browserVersion = parts.slice(0, 2).join('.')

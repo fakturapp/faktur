@@ -1,13 +1,6 @@
 import limiter from '@adonisjs/limiter/services/main'
 
-/**
- * Pre-defined rate limiters for auth-sensitive routes.
- * Uses IP-based throttling to prevent brute-force attacks.
- *
- * @see https://docs.adonisjs.com/guides/rate-limiting
- */
 
-/** Login: 5 requests per 15 minutes per IP */
 export const loginLimiter = limiter.define('login', (ctx) => {
   return limiter
     .allowRequests(5)
@@ -19,7 +12,6 @@ export const loginLimiter = limiter.define('login', (ctx) => {
     })
 })
 
-/** Registration: 3 requests per hour per IP */
 export const registerLimiter = limiter.define('register', (ctx) => {
   return limiter
     .allowRequests(3)
@@ -30,7 +22,6 @@ export const registerLimiter = limiter.define('register', (ctx) => {
     })
 })
 
-/** Password reset: 3 requests per hour per IP */
 export const passwordResetLimiter = limiter.define('password-reset', (ctx) => {
   return limiter
     .allowRequests(3)
@@ -41,7 +32,6 @@ export const passwordResetLimiter = limiter.define('password-reset', (ctx) => {
     })
 })
 
-/** Email verification: 5 requests per hour per IP */
 export const emailVerificationLimiter = limiter.define('email-verification', (ctx) => {
   return limiter
     .allowRequests(5)
@@ -52,7 +42,6 @@ export const emailVerificationLimiter = limiter.define('email-verification', (ct
     })
 })
 
-/** 2FA verification: 5 requests per 15 minutes per IP */
 export const twoFactorLimiter = limiter.define('2fa', (ctx) => {
   return limiter
     .allowRequests(5)
@@ -64,7 +53,6 @@ export const twoFactorLimiter = limiter.define('2fa', (ctx) => {
     })
 })
 
-/** Analytics ingestion: 30 requests per minute per IP */
 export const analyticsLimiter = limiter.define('analytics', (ctx) => {
   return limiter
     .allowRequests(30)
@@ -75,7 +63,6 @@ export const analyticsLimiter = limiter.define('analytics', (ctx) => {
     })
 })
 
-/** Passkey: 10 requests per 15 minutes per IP */
 export const passkeyLimiter = limiter.define('passkey', (ctx) => {
   return limiter
     .allowRequests(10)
@@ -86,7 +73,6 @@ export const passkeyLimiter = limiter.define('passkey', (ctx) => {
     })
 })
 
-/** Collaboration share creation: 20 requests per hour per IP */
 export const collaborationShareLimiter = limiter.define('collaboration-share', (ctx) => {
   return limiter
     .allowRequests(20)
@@ -97,7 +83,6 @@ export const collaborationShareLimiter = limiter.define('collaboration-share', (
     })
 })
 
-/** Share link validation: 30 requests per 15 minutes per IP */
 export const shareLinkValidationLimiter = limiter.define('share-link-validation', (ctx) => {
   return limiter
     .allowRequests(30)
@@ -108,7 +93,6 @@ export const shareLinkValidationLimiter = limiter.define('share-link-validation'
     })
 })
 
-/** Checkout page: 30 requests per 15 minutes per IP */
 export const checkoutLimiter = limiter.define('checkout', (ctx) => {
   return limiter
     .allowRequests(30)
@@ -119,7 +103,6 @@ export const checkoutLimiter = limiter.define('checkout', (ctx) => {
     })
 })
 
-/** Checkout password: 5 requests per 15 minutes per IP+token (anti-brute-force) */
 export const checkoutPasswordLimiter = limiter.define('checkout-password', (ctx) => {
   return limiter
     .allowRequests(5)

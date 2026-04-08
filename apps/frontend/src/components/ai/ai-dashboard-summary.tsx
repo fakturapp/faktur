@@ -21,7 +21,6 @@ export function AiDashboardSummary() {
         setSummary(data.summary)
       }
     } catch {
-      // Silently fail
     }
     setLoading(false)
     setHasLoaded(true)

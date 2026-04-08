@@ -9,33 +9,21 @@ interface ChatMessage {
 const DEFAULT_MODEL = 'llama-3.3-70b-versatile'
 
 export default class AiService {
-  /**
-   * Check if AI is enabled for the team.
-   */
   static async isEnabled(teamId: string): Promise<boolean> {
     const settings = await InvoiceSetting.findBy('teamId', teamId)
     return settings?.aiEnabled ?? false
   }
 
-  /**
-   * Get the Groq API key from env.
-   */
   private static getApiKey(): string | null {
     return env.get('GROQ_API_KEY', '') || null
   }
 
-  /**
-   * Resolve the model from team settings (or use override).
-   */
   private static async getModel(teamId: string, overrideModel?: string): Promise<string> {
     if (overrideModel) return overrideModel
     const settings = await InvoiceSetting.findBy('teamId', teamId)
     return settings?.aiModel || DEFAULT_MODEL
   }
 
-  /**
-   * Simple single-prompt generation via Groq.
-   */
   static async generate(
     teamId: string,
     _dek: Buffer,
@@ -56,9 +44,6 @@ export default class AiService {
     return AiService.callGroq(apiKey, model, systemPrompt, userPrompt, maxTokens)
   }
 
-  /**
-   * Chat with messages array via Groq.
-   */
   static async chat(
     teamId: string,
     _dek: Buffer,
@@ -79,7 +64,6 @@ export default class AiService {
     return AiService.chatGroq(apiKey, model, systemPrompt, messages, maxTokens)
   }
 
-  // ─── Groq (OpenAI-compatible) ──────────────────────────────
 
   private static async callGroq(
     apiKey: string,

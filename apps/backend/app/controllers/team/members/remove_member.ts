@@ -27,12 +27,10 @@ export default class RemoveMember {
       return response.notFound({ message: 'Member not found' })
     }
 
-    // Cannot remove super_admin
     if (targetMember.role === 'super_admin') {
       return response.forbidden({ message: 'Cannot remove the Super Admin' })
     }
 
-    // Admin cannot remove another admin (only super_admin can)
     if (targetMember.role === 'admin' && currentMember.role !== 'super_admin') {
       return response.forbidden({ message: 'Only the Super Admin can remove admins' })
     }

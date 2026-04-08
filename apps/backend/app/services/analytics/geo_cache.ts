@@ -10,7 +10,7 @@ interface CacheEntry {
 }
 
 const cache = new Map<string, CacheEntry>()
-const TTL_MS = 60 * 60 * 1000 // 1 hour
+const TTL_MS = 60 * 60 * 1000
 
 const UNKNOWN_GEO: GeoResult = { country: '', countryName: '', city: '' }
 
@@ -19,7 +19,6 @@ export async function getGeoFromIp(ip: string): Promise<GeoResult> {
     return UNKNOWN_GEO
   }
 
-  // Check cache
   const cached = cache.get(ip)
   if (cached && cached.expiresAt > Date.now()) {
     return cached.data

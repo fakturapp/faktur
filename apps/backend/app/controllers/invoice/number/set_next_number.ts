@@ -11,7 +11,6 @@ export default class SetNextNumber {
       return response.badRequest({ message: 'No team selected' })
     }
 
-    // Only allow setting next number if no invoices exist yet
     const result = await Invoice.query().where('team_id', teamId).count('* as cnt').first()
 
     const count = Number(result?.$extras.cnt ?? 0)

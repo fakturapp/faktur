@@ -13,7 +13,6 @@ export default class extends BaseSchema {
       table.timestamp('updated_at').nullable()
     })
 
-    // Add current_team_id FK on users now that teams table exists
     this.schema.alterTable('users', (table) => {
       table
         .uuid('current_team_id')

@@ -1,6 +1,5 @@
 import vine from '@vinejs/vine'
 
-// ---------- /oauth/authorize ----------
 export const authorizeRequestValidator = vine.compile(
   vine.object({
     client_id: vine.string().trim().maxLength(128),
@@ -13,7 +12,6 @@ export const authorizeRequestValidator = vine.compile(
   })
 )
 
-// ---------- /oauth/authorize/consent ----------
 export const consentSubmitValidator = vine.compile(
   vine.object({
     client_id: vine.string().trim().maxLength(128),
@@ -26,10 +24,6 @@ export const consentSubmitValidator = vine.compile(
   })
 )
 
-// ---------- /oauth/token (RFC 6749 + RFC 7636) ----------
-// client_secret is OPTIONAL: public clients (desktop, mobile, SPA) rely
-// on PKCE. Enforcement is decided per-client in the controller based on
-// the app kind and code_verifier presence.
 export const tokenRequestValidator = vine.compile(
   vine.object({
     grant_type: vine.string().trim().maxLength(30),
@@ -45,7 +39,6 @@ export const tokenRequestValidator = vine.compile(
   })
 )
 
-// ---------- /oauth/revoke ----------
 export const revokeRequestValidator = vine.compile(
   vine.object({
     client_id: vine.string().trim().maxLength(128),
@@ -55,7 +48,6 @@ export const revokeRequestValidator = vine.compile(
   })
 )
 
-// ---------- Admin CRUD ----------
 export const createOauthAppValidator = vine.compile(
   vine.object({
     name: vine.string().trim().minLength(1).maxLength(100),

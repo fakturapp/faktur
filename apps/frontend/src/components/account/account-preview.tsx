@@ -69,7 +69,7 @@ export function AccountPreview() {
   return (
     <div className="w-[300px] shrink-0 space-y-4">
       <div className="rounded-2xl border border-border bg-card p-5 space-y-4 sticky top-4">
-        {/* Avatar + name */}
+        {}
         <div className="flex flex-col items-center text-center">
           <div className="relative group mb-3">
             <Avatar
@@ -112,7 +112,7 @@ export function AccountPreview() {
 
         <Separator />
 
-        {/* 2FA status */}
+        {}
         <div className="space-y-2">
           <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">S&eacute;curit&eacute;</p>
           <div className="flex items-center justify-between">
@@ -126,7 +126,7 @@ export function AccountPreview() {
           </div>
         </div>
 
-        {/* Providers */}
+        {}
         {loaded && providers.length > 0 && (
           <>
             <Separator />
@@ -154,7 +154,7 @@ export function AccountPreview() {
           </>
         )}
 
-        {/* Passkeys */}
+        {}
         {loaded && passkeys.length > 0 && (
           <>
             <Separator />

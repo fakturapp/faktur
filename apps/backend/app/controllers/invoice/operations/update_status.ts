@@ -25,7 +25,6 @@ export default class UpdateStatus {
       return response.badRequest({ message: 'Invalid status' })
     }
 
-    // paid_unconfirmed can only be set through the payment link flow
     if (status === 'paid_unconfirmed') {
       return response.forbidden({ message: 'This status can only be set through the payment link flow' })
     }
@@ -51,7 +50,6 @@ export default class UpdateStatus {
     await invoice.save()
     broadcastDocumentSaved('invoice', invoice.id, user.id)
 
-    // When manually setting to 'paid', prompt frontend to show extra info modal
     const promptExtraInfo = status === 'paid'
 
     return response.ok({

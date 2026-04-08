@@ -35,14 +35,12 @@ export default class UpdateRole {
       return response.notFound({ message: 'Member not found' })
     }
 
-    // Cannot change super_admin role
     if (targetMember.role === 'super_admin') {
       return response.forbidden({
         message: 'Cannot change the Super Admin role directly. Use ownership transfer instead.',
       })
     }
 
-    // Admin cannot promote to admin (only super_admin can)
     const payload = await request.validateUsing(updateRoleValidator)
     if (payload.role === 'admin' && currentMember.role !== 'super_admin') {
       return response.forbidden({ message: 'Only the Super Admin can promote to Admin' })

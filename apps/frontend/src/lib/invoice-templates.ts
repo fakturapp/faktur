@@ -3,40 +3,29 @@ export interface TemplateConfig {
   name: string
   description: string
   layout: 'standard' | 'banner' | 'lateral'
-  // Document
   docBg: string
-  // Text
   text: string
   textMuted: string
   textFooter: string
-  // Client block
   clientBlockBg: string
   clientBlockBorder: string
   clientEmptyBg: string
   clientEmptyBorder: string
-  // Table
   rowEven: string
   rowOdd: string
   rowHover: string
   borderLight: string
-  // Totals
   totalBg: string
   totalBorder: string
-  // Footer
   footerBorder: string
-  // Inputs (edit mode)
   inputBg: string
   inputPlaceholder: string
   editBorderDashed: string
-  // Signature
   signatureBorder: string
-  // Payment badges
   paymentBadgeBg: string
   paymentBadgeBorder: string
   paymentBadgeText: string
-  // Border radius
-  borderRadius: string // e.g. '10px', '0px', '6px'
-  // Optional font override (e.g. 'Nunito')
+  borderRadius: string
   font?: string
 }
 
@@ -323,7 +312,6 @@ export const TEMPLATES: TemplateConfig[] = [
   ligne,
 ]
 
-/** Apply dark mode overlay to any template */
 export function applyDarkMode(tpl: TemplateConfig): TemplateConfig {
   return {
     ...tpl,

@@ -45,22 +45,18 @@ function OnboardingEmailContent() {
   const [accounts, setAccounts] = useState<EmailAccountItem[]>([])
   const [loadingAccounts, setLoadingAccounts] = useState(true)
 
-  // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false)
   const [dialogStep, setDialogStep] = useState<DialogStep>('choose')
   const [selectedProvider, setSelectedProvider] = useState<ProviderType | null>(null)
   const [configError, setConfigError] = useState('')
 
-  // Gmail
   const [connecting, setConnecting] = useState(false)
 
-  // Resend fields
   const [resendApiKey, setResendApiKey] = useState('')
   const [resendFromEmail, setResendFromEmail] = useState('')
   const [resendDisplayName, setResendDisplayName] = useState('')
   const [showResendKey, setShowResendKey] = useState(false)
 
-  // SMTP fields
   const [smtpHost, setSmtpHost] = useState('')
   const [smtpPort, setSmtpPort] = useState('587')
   const [smtpUsername, setSmtpUsername] = useState('')
@@ -69,15 +65,12 @@ function OnboardingEmailContent() {
   const [smtpDisplayName, setSmtpDisplayName] = useState('')
   const [showSmtpPassword, setShowSmtpPassword] = useState(false)
 
-  // Validation
   const [touched, setTouched] = useState<Record<string, boolean>>({})
 
-  // Testing / Success
   const [configuring, setConfiguring] = useState(false)
   const [newAccountId, setNewAccountId] = useState<string | null>(null)
   const [newAccountEmail, setNewAccountEmail] = useState('')
 
-  // Test email
   const [sendingTest, setSendingTest] = useState(false)
   const [testSent, setTestSent] = useState(false)
   const [sendingTestId, setSendingTestId] = useState<string | null>(null)

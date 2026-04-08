@@ -13,10 +13,6 @@ interface CollaborationProviderProps extends UseCollaborationOptions {
   children: ReactNode
 }
 
-/**
- * Provides a single shared collaboration connection to all child components.
- * Wrap the editor page content with this to avoid duplicate socket connections.
- */
 export function CollaborationProvider({
   children,
   ...options
@@ -30,10 +26,6 @@ export function CollaborationProvider({
   )
 }
 
-/**
- * Access the shared collaboration state from the provider.
- * Returns null if not inside a CollaborationProvider.
- */
 export function useCollaborationContext(): UseCollaborationReturn | null {
   return useContext(CollaborationContext)
 }

@@ -13,7 +13,6 @@ export function useSettingsHighlight(): string | null {
     const highlight = searchParams.get('highlight')
     if (highlight) {
       setQuery(highlight)
-      // Remove the query param from URL without navigation
       const params = new URLSearchParams(searchParams.toString())
       params.delete('highlight')
       const newUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname

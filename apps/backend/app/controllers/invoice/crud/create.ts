@@ -19,17 +19,14 @@ export default class Create {
 
     const payload = await request.validateUsing(createInvoiceValidator)
 
-    // Check for custom starting number
     const settings = await InvoiceSetting.query().where('team_id', teamId).first()
     let invoiceNumber: string
 
     if (settings?.nextInvoiceNumber) {
       invoiceNumber = settings.nextInvoiceNumber
-      // Clear the custom starting number after first use
       settings.nextInvoiceNumber = null
       await settings.save()
     } else {
-      // Generate next invoice number from pattern
       const pattern = settings?.invoiceFilenamePattern || 'FAK-{annee}-{numero}'
       const currentYear = new Date().getFullYear().toString()
       const prefix = pattern.replace('{annee}', currentYear).replace('{numero}', '')

@@ -15,7 +15,6 @@ export default class StripeSettingsDelete {
     settings.stripeWebhookSecret = null
     settings.stripeWebhookSecretApp = null
 
-    // Remove 'stripe' from payment methods
     settings.paymentMethods = settings.paymentMethods.filter((m) => m !== 'stripe')
 
     await settings.save()

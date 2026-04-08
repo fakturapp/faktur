@@ -116,7 +116,6 @@ function EditInvoiceContent() {
   const [validationErrors, setValidationErrors] = useState<string[]>([])
   const { showModal, confirmNavigation, cancelNavigation, requestNavigation } = useUnsavedChanges(isDirty)
 
-  // Load invoice and company
   useEffect(() => {
     async function init() {
       const [invoiceRes, companyRes, bankRes] = await Promise.all([

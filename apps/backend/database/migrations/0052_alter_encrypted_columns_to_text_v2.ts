@@ -2,12 +2,10 @@ import { BaseSchema } from '@adonisjs/lucid/schema'
 
 export default class extends BaseSchema {
   async up() {
-    // invoice_payments - payment_method is encrypted but still varchar(50)
     this.schema.alterTable('invoice_payments', (table) => {
       table.text('payment_method').alter()
     })
 
-    // client_contacts - several encrypted fields still use varchar
     this.schema.alterTable('client_contacts', (table) => {
       table.text('first_name').alter()
       table.text('last_name').alter()

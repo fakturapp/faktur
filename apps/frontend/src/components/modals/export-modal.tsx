@@ -57,7 +57,6 @@ const slideVariants = {
 export function ExportModal({ open, onClose }: ExportModalProps) {
   const { toast } = useToast()
 
-  // State
   const [step, setStep] = useState<Step>(1)
   const [direction, setDirection] = useState(1)
   const [teams, setTeams] = useState<TeamInfo[]>([])
@@ -71,7 +70,6 @@ export function ExportModal({ open, onClose }: ExportModalProps) {
   const [accountPassword, setAccountPassword] = useState('')
   const [exportStatus, setExportStatus] = useState<ExportStatus>('idle')
 
-  // Load teams when modal opens
   useEffect(() => {
     if (open) {
       setTeamsLoading(true)
@@ -88,7 +86,6 @@ export function ExportModal({ open, onClose }: ExportModalProps) {
     }
   }, [open])
 
-  // Update default filename when team changes
   useEffect(() => {
     if (selectedTeam) {
       const team = teams.find((t) => t.id === selectedTeam)

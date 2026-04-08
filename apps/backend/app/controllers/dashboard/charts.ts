@@ -2,9 +2,6 @@ import type { HttpContext } from '@adonisjs/core/http'
 import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
 
-/**
- * Available chart types that users can display on their dashboard.
- */
 const AVAILABLE_CHARTS = [
   {
     key: 'revenue',
@@ -19,19 +16,12 @@ const AVAILABLE_CHARTS = [
   },
 ]
 
-/**
- * Micro-entrepreneur thresholds (standard French thresholds).
- */
 const MICRO_THRESHOLDS = {
   services: 77700,
   goods: 188700,
 }
 
 export default class Charts {
-  /**
-   * GET /dashboard/charts
-   * Returns available chart types.
-   */
   async handle({ auth, response }: HttpContext) {
     const user = auth.user!
     const teamId = user.currentTeamId
@@ -43,11 +33,6 @@ export default class Charts {
     })
   }
 
-  /**
-   * GET /dashboard/charts/revenue
-   * CA HT over time - invoiced revenue by month (last 12 months).
-   * Excludes draft and cancelled invoices. Uses subtotal (HT = hors taxes).
-   */
   async revenue({ auth, response }: HttpContext) {
     const user = auth.user!
     const teamId = user.currentTeamId
@@ -71,7 +56,6 @@ export default class Charts {
       .groupByRaw("to_char(issue_date::date, 'YYYY-MM')")
       .orderByRaw("to_char(issue_date::date, 'YYYY-MM') asc")
 
-    // Build a full 12-month series with zeros for missing months
     const rowsByMonth: Record<string, { subtotal: number; total: number; count: number }> = {}
     for (const row of rows) {
       rowsByMonth[row.month] = {
@@ -101,11 +85,6 @@ export default class Charts {
     return response.ok({ data, period: '12m' })
   }
 
-  /**
-   * GET /dashboard/charts/collected
-   * CA encaisse over time - paid invoices by month (last 12 months).
-   * Uses paid_date when available, falls back to issue_date.
-   */
   async collected({ auth, response }: HttpContext) {
     const user = auth.user!
     const teamId = user.currentTeamId
@@ -117,7 +96,6 @@ export default class Charts {
     const now = DateTime.now()
     const twelveMonthsAgo = now.minus({ months: 11 }).startOf('month').toISODate()!
 
-    // Use COALESCE to prefer paid_date, fall back to issue_date
     const rows = await db
       .from('invoices')
       .where('team_id', teamId)
@@ -130,7 +108,6 @@ export default class Charts {
       .groupByRaw("to_char(COALESCE(paid_date, issue_date)::date, 'YYYY-MM')")
       .orderByRaw("to_char(COALESCE(paid_date, issue_date)::date, 'YYYY-MM') asc")
 
-    // Build a full 12-month series
     const rowsByMonth: Record<string, { subtotal: number; total: number; count: number }> = {}
     for (const row of rows) {
       rowsByMonth[row.month] = {
@@ -160,11 +137,6 @@ export default class Charts {
     return response.ok({ data, period: '12m' })
   }
 
-  /**
-   * GET /dashboard/charts/micro-thresholds
-   * Cumulative CA (HT) for the current fiscal year vs micro-entrepreneur thresholds.
-   * Returns monthly cumulative subtotals for the current calendar year.
-   */
   async micro({ auth, response }: HttpContext) {
     const user = auth.user!
     const teamId = user.currentTeamId

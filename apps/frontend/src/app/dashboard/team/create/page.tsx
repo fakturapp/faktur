@@ -22,11 +22,9 @@ export default function CreateTeamPage() {
 
   const [mode, setMode] = useState<'create' | 'import'>('create')
 
-  // Create
   const [name, setName] = useState('')
   const [loading, setLoading] = useState(false)
 
-  // Import
   const [importFile, setImportFile] = useState<File | null>(null)
   const [importName, setImportName] = useState('')
   const [importPassword, setImportPassword] = useState('')
@@ -48,14 +46,12 @@ export default function CreateTeamPage() {
 
     toast(`Équipe "${data?.team.name}" créée`, 'success')
     await refreshUser()
-    // Auth guard will detect onboardingCompleted=false and redirect to onboarding
   }
 
   const handleFileSelect = useCallback((file: File) => {
     setImportFile(file)
     setIsEncrypted(file.name.endsWith('.fpdata'))
 
-    // Try to pre-fill team name from filename
     const baseName = file.name.replace(/\.(zip|fpdata)$/, '').replace(/-export$/, '')
     if (baseName && !importName) {
       setImportName(baseName)
@@ -124,7 +120,7 @@ export default function CreateTeamPage() {
         </div>
       </div>
 
-      {/* Mode selector */}
+      {}
       <div className="flex gap-3">
         <button
           onClick={() => setMode('create')}

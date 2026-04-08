@@ -9,7 +9,6 @@ import { ReadOnlyBanner } from '@/components/collaboration/read-only-banner'
 import { useCollaborationContext } from '@/components/collaboration/collaboration-provider'
 import { Share2, Wifi, WifiOff, FlaskConical } from 'lucide-react'
 
-// ── Types ─────────────────────────────────────────────────────────────────
 
 type DocumentType = 'invoice' | 'quote' | 'credit_note'
 
@@ -19,10 +18,6 @@ interface CollaborationToolbarProps {
   className?: string
 }
 
-/**
- * Drop-in toolbar component for the editor header.
- * Only rendered when collaborationEnabled is true.
- */
 export function CollaborationToolbar({
   documentType,
   documentId,
@@ -37,7 +32,7 @@ export function CollaborationToolbar({
   return (
     <>
       <div className={className}>
-        {/* Connection indicator */}
+        {}
         {documentId && collaborators.length > 0 && (
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground mr-1" title={isConnected ? 'Connect\u00e9 en temps r\u00e9el' : 'Reconnexion...'}>
             {isConnected ? (
@@ -48,10 +43,10 @@ export function CollaborationToolbar({
           </div>
         )}
 
-        {/* Presence avatars */}
+        {}
         <PresenceBar collaborators={collaborators} />
 
-        {/* Share button with beta badge */}
+        {}
         {documentId && (
           <Button
             variant="outline"
@@ -69,7 +64,7 @@ export function CollaborationToolbar({
         )}
       </div>
 
-      {/* Share modal */}
+      {}
       {documentId && (
         <ShareModal
           open={shareOpen}
@@ -82,7 +77,6 @@ export function CollaborationToolbar({
   )
 }
 
-// ── Read-only banner (uses context) ───────────────────────────────────────
 
 export function CollaborationReadOnlyBanner() {
   const collab = useCollaborationContext()
@@ -90,7 +84,6 @@ export function CollaborationReadOnlyBanner() {
   return <ReadOnlyBanner />
 }
 
-// ── Collaboration wrapper for the editor area ─────────────────────────────
 
 interface CollaborationEditorProps {
   editorRef: React.RefObject<HTMLDivElement | null>

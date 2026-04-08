@@ -19,7 +19,6 @@ export default class List {
       return response.badRequest({ message: 'No team selected' })
     }
 
-    // Auto-transition sent → overdue when due date has passed
     await Invoice.query()
       .where('teamId', teamId)
       .where('status', 'sent')
@@ -40,7 +39,6 @@ export default class List {
       query.where('status', status)
     }
 
-    // Search on invoice_number (clear) only — subject is encrypted
     const search = request.input('search', '')
     if (search) {
       query.whereILike('invoice_number', `%${search}%`)

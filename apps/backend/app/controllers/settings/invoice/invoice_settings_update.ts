@@ -15,7 +15,6 @@ export default class InvoiceSettingsUpdate {
 
     const payload = await request.validateUsing(updateInvoiceSettingsValidator)
 
-    // Encrypt pdpApiKey if provided
     let pdpApiKeyToStore: string | null = null
     if (payload.pdpApiKey && payload.pdpApiKey !== '••••••••') {
       pdpApiKeyToStore = zeroAccessCryptoService.encryptField(payload.pdpApiKey, dek)

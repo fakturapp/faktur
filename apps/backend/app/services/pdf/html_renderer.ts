@@ -85,9 +85,6 @@ interface SettingsData {
   footerMode?: 'company_info' | 'vat_exempt' | 'custom'
 }
 
-/* ═══════════════════════════════════════════════════════════
-   Utility helpers
-   ═══════════════════════════════════════════════════════════ */
 
 function esc(str: string | null | undefined): string {
   if (!str) return ''
@@ -98,7 +95,6 @@ function esc(str: string | null | undefined): string {
     .replace(/"/g, '&quot;')
 }
 
-/** Escape HTML then convert markdown formatting → HTML tags + newlines → <br> */
 function formatText(str: string | null | undefined): string {
   if (!str) return ''
 
@@ -108,7 +104,6 @@ function formatText(str: string | null | undefined): string {
 
   for (let i = 0; i < lines.length; i++) {
     let line = lines[i]
-    // Inline formatting
     line = line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     line = line.replace(/__(.+?)__/g, '<u>$1</u>')
     line = line.replace(/\*(.+?)\*/g, '<em>$1</em>')
@@ -126,7 +121,6 @@ function formatText(str: string | null | undefined): string {
       '<a href="$2" style="color:inherit;text-decoration:underline">$1</a>'
     )
 
-    // Heading
     if (line.startsWith('## ')) {
       if (inList) { parts.push('</ul>'); inList = false }
       parts.push(`<strong style="font-size:1.3em">${line.slice(3)}</strong>`)

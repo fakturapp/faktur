@@ -19,9 +19,6 @@ import { DatePicker } from '@/components/ui/date-picker'
 import { getTemplate, type TemplateConfig } from '@/lib/invoice-templates'
 import { getTranslations } from '@/lib/invoice-i18n'
 
-/* ═══════════════════════════════════════════════════════════
-   Types
-   ═══════════════════════════════════════════════════════════ */
 
 export interface DocumentLine {
   id: string
@@ -65,9 +62,6 @@ export interface CompanyInfo {
   vatNumber: string | null
 }
 
-/* ═══════════════════════════════════════════════════════════
-   Helpers
-   ═══════════════════════════════════════════════════════════ */
 
 function contrastText(hex: string) {
   const r = parseInt(hex.slice(1, 3), 16)
@@ -85,9 +79,6 @@ function fmtDate(d: string, lang?: string) {
   try { return new Date(d).toLocaleDateString(lang === 'en' ? 'en-GB' : 'fr-FR') } catch { return d }
 }
 
-/* ═══════════════════════════════════════════════════════════
-   InlineEdit — click-to-edit text
-   ═══════════════════════════════════════════════════════════ */
 
 function InlineEdit({
   value, onChange, preview = false, className, placeholder, multiline, accentColor = '#6366f1',
@@ -115,7 +106,6 @@ function InlineEdit({
       const el = editRef.current
       if (!el) return
       el.focus()
-      // Place cursor at end
       const range = document.createRange()
       const sel = window.getSelection()
       if (el.childNodes.length > 0) {
@@ -375,7 +365,6 @@ export function ClientModal({
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
   }, [search, open, loadClients])
 
-  // Listen for popup close and refresh
   useEffect(() => {
     if (!open) return
     const interval = setInterval(() => {
@@ -958,7 +947,6 @@ export function A4Sheet({
     document.head.appendChild(link)
   }, [effectiveFont])
 
-  // Validation error helpers
   const hasError = (field: string) => validationErrors.includes(field)
   const errorBorder = '#ef4444'
 
@@ -972,7 +960,6 @@ export function A4Sheet({
 
   const cols = isPreview ? gridColsPreview : gridCols
 
-  /* helper to shorten InlineEdit props */
   const ie = (v: string, onChange: (s: string) => void, cls?: string, ph?: string) => (
     <InlineEdit value={v} onChange={onChange} preview={isPreview} accentColor={accentColor}
       inputBg={T.inputBg} borderDashed={T.editBorderDashed} className={cls} placeholder={ph}
@@ -981,7 +968,7 @@ export function A4Sheet({
 
   return (
     <div className="flex justify-center">
-      {/* ── A4 Container (strict ratio 210×297mm) ── */}
+      {}
       <div
         className="w-full max-w-[960px] rounded-xl relative overflow-hidden"
         style={{

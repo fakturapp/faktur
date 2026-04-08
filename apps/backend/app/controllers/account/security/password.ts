@@ -16,7 +16,6 @@ export default class Password {
       return response.unauthorized({ message: 'Current password is incorrect' })
     }
 
-    // Derive old KEK to decrypt existing DEKs
     const oldKek = user.saltKdf
       ? await zeroAccessCryptoService.deriveKEK(
           payload.currentPassword,
@@ -24,11 +23,9 @@ export default class Password {
         )
       : null
 
-    // Generate new salt and derive new KEK
     const newSalt = zeroAccessCryptoService.generateSalt()
     const newKek = await zeroAccessCryptoService.deriveKEK(payload.password, newSalt)
 
-    // Re-encrypt all team DEKs with new KEK + regenerate recovery key
     let newRecoveryKey: string | null = null
     if (oldKek) {
       const memberships = await TeamMember.query()
@@ -36,7 +33,6 @@ export default class Password {
         .where('status', 'active')
         .whereNotNull('encryptedTeamDek')
 
-      // Generate new recovery key for all memberships
       newRecoveryKey = zeroAccessCryptoService.generateRecoveryKey()
       const newRecoveryKEK = zeroAccessCryptoService.deriveRecoveryKEK(newRecoveryKey)
 
@@ -49,16 +45,13 @@ export default class Password {
         )
         await membership.save()
 
-        // Update cached DEK
         keyStore.storeDEK(user.id, membership.teamId, teamDek)
       }
     }
 
-    // Update user password and salt
     user.password = payload.password
     user.saltKdf = newSalt.toString('hex')
 
-    // Update recovery key hash
     if (newRecoveryKey) {
       user.recoveryKeyHash = zeroAccessCryptoService.hashRecoveryKey(newRecoveryKey)
       user.hasRecoveryKey = true
@@ -66,12 +59,10 @@ export default class Password {
 
     await user.save()
 
-    // Send new recovery key by email
     if (newRecoveryKey) {
       RecoveryKeyGenerated.dispatch(user.email, newRecoveryKey, user.fullName ?? undefined)
     }
 
-    // Update KEK in memory
     if (user.currentTeamId) {
       const currentDek = keyStore.getDEK(user.id, user.currentTeamId)
       if (currentDek) {

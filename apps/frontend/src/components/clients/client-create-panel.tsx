@@ -36,25 +36,20 @@ type ClientType = 'company' | 'individual'
 
 interface ClientForm {
   type: ClientType
-  // Company
   companyName: string
   siren: string
   siret: string
   vatNumber: string
-  // Individual
   firstName: string
   lastName: string
-  // Contact
   email: string
   phone: string
   includeInEmails: boolean
-  // Address
   address: string
   addressComplement: string
   postalCode: string
   city: string
   country: string
-  // Notes
   notes: string
 }
 

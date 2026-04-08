@@ -8,7 +8,6 @@ export default class extends BaseSchema {
       table.uuid('id').primary().defaultTo(this.db.rawQuery('gen_random_uuid()').knexQuery)
       table.uuid('team_id').notNullable().references('id').inTable('teams').onDelete('CASCADE')
 
-      // Polymorphic document reference
       table
         .enum('document_type', ['invoice', 'quote', 'credit_note'], {
           useNative: true,
@@ -18,14 +17,11 @@ export default class extends BaseSchema {
         .notNullable()
       table.uuid('document_id').notNullable()
 
-      // Who shared
       table.uuid('shared_by_user_id').notNullable().references('id').inTable('users').onDelete('CASCADE')
 
-      // Who it's shared with (null if pending email invite)
       table.uuid('shared_with_user_id').nullable().references('id').inTable('users').onDelete('CASCADE')
       table.string('shared_with_email', 255).nullable()
 
-      // Permission level
       table
         .enum('permission', ['viewer', 'editor'], {
           useNative: true,
@@ -35,7 +31,6 @@ export default class extends BaseSchema {
         .notNullable()
         .defaultTo('viewer')
 
-      // Status
       table
         .enum('status', ['active', 'pending', 'revoked'], {
           useNative: true,
@@ -49,7 +44,6 @@ export default class extends BaseSchema {
       table.timestamp('updated_at').notNullable().defaultTo(this.now())
     })
 
-    // Indexes
     this.schema.raw(
       'CREATE INDEX idx_document_shares_team ON document_shares (team_id)'
     )
@@ -59,7 +53,6 @@ export default class extends BaseSchema {
     this.schema.raw(
       'CREATE INDEX idx_document_shares_shared_with ON document_shares (shared_with_user_id)'
     )
-    // Prevent duplicate active shares for the same user on the same document
     this.schema.raw(
       `CREATE UNIQUE INDEX idx_document_shares_unique_active
        ON document_shares (document_type, document_id, shared_with_user_id)

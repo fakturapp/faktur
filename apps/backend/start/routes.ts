@@ -29,7 +29,6 @@ import '#start/routes/payment_link'
 import '#start/routes/webhook'
 import '#start/routes/oauth'
 
-// Feedback & bug report routes (inline to avoid import issues)
 const CreateFeedback = () => import('#controllers/feedback/create')
 const MyFeedback = () => import('#controllers/feedback/mine')
 const CreateBugReport = () => import('#controllers/bug_report/create')
@@ -56,5 +55,4 @@ router.get(API_PREFIX + '/health', async () => {
   return { status: 'ok' }
 })
 
-// Startup diagnostic — visible in Dokploy container logs
 console.log(`[faktur] v1.2.8 routes loaded | API_PREFIX=${JSON.stringify(API_PREFIX)}`)

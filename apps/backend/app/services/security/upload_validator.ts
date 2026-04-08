@@ -1,17 +1,12 @@
 import path from 'node:path'
 
-/**
- * Upload security validator.
- * Prevents path traversal, dangerous file types, and malicious filenames.
- */
 export default class UploadValidator {
   private static readonly DANGEROUS_PATTERNS = [
-    /\.\./, // Path traversal
+    /\.\./,
     /[<>:"|?*]/, // Windows reserved chars
-    // eslint-disable-next-line no-control-regex
-    /[\x00-\x1f]/, // Control characters
-    /^\.+$/, // Dot-only filenames
-    /\s{2,}/, // Multiple spaces
+    /[\x00-\x1f]/,
+    /^\.+$/,
+    /\s{2,}/,
   ]
 
   private static readonly BLOCKED_EXTENSIONS = new Set([
@@ -93,9 +88,6 @@ export default class UploadValidator {
     '.txt',
   ])
 
-  /**
-   * Validate and sanitize a filename.
-   */
   static sanitizeFilename(filename: string): string {
     for (const pattern of this.DANGEROUS_PATTERNS) {
       if (pattern.test(filename)) {

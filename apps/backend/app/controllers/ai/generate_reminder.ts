@@ -45,7 +45,6 @@ export default class GenerateReminder {
       return response.notFound({ message: 'Invoice not found' })
     }
 
-    // Get client info
     let clientName = 'Client'
     if (invoice.clientId) {
       const client = await Client.find(invoice.clientId)
@@ -55,11 +54,9 @@ export default class GenerateReminder {
       }
     }
 
-    // Get company info
     const company = await Company.findBy('teamId', teamId)
     const companyName = company?.legalName || 'Notre entreprise'
 
-    // Calculate days overdue
     const dueDate = invoice.dueDate || invoice.issueDate
     const now = new Date()
     const due = new Date(dueDate)

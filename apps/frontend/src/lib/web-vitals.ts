@@ -29,6 +29,5 @@ export function initWebVitals(trackPerformance: TrackPerformanceFn) {
     onTTFB(reportMetric)
     onINP(reportMetric)
   }).catch(() => {
-    // web-vitals not available
   })
 }

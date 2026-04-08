@@ -4,15 +4,6 @@ import Expense from '#models/expense/expense'
 import Company from '#models/team/company'
 import { decryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 
-/**
- * FEC Export (Fichier des Écritures Comptables)
- * French legal accounting export format (Article A47 A-1 du LPF)
- *
- * Tab-separated text file with required columns:
- * JournalCode|JournalLib|EcritureNum|EcritureDate|CompteNum|CompteLib|
- * CompAuxNum|CompAuxLib|PieceRef|PieceDate|EcritureLib|Debit|Credit|
- * EcrtureLet|DateLet|ValidDate|Montantdevise|Idevise
- */
 
 const FEC_HEADER = [
   'JournalCode',
@@ -65,7 +56,6 @@ export default class FecExport {
     const company = await Company.findBy('teamId', teamId)
     const siren = company?.siren || 'UNKNOWN'
 
-    // Fetch invoices
     const invoices = await Invoice.query()
       .where('team_id', teamId)
       .whereNotIn('status', ['draft', 'cancelled'])
@@ -74,14 +64,12 @@ export default class FecExport {
       .preload('client')
       .orderBy('issue_date', 'asc')
 
-    // Decrypt client fields for display names
     for (const inv of invoices) {
       if (inv.client) {
         decryptModelFields(inv.client, [...ENCRYPTED_FIELDS.client], dek)
       }
     }
 
-    // Fetch expenses
     const expenses = await Expense.query()
       .where('team_id', teamId)
       .where('expense_date', '>=', startDate)
@@ -95,7 +83,6 @@ export default class FecExport {
     const lines: string[] = [FEC_HEADER]
     let entryNum = 1
 
-    // --- Sales journal (VE) ---
     for (const inv of invoices) {
       const num = String(entryNum).padStart(6, '0')
       const date = fecDate(inv.issueDate)
@@ -105,7 +92,6 @@ export default class FecExport {
       const tva = Number(inv.taxAmount) || 0
       const ttc = Number(inv.total) || 0
 
-      // Client debit line (411xxx)
       lines.push(
         [
           'VE',

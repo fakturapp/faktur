@@ -30,7 +30,6 @@ export default class Export {
 
     const payload = await request.validateUsing(exportValidator)
 
-    // Verify user is admin or super_admin
     const membership = await TeamMember.query()
       .where('teamId', teamId)
       .where('userId', user.id)
@@ -41,13 +40,11 @@ export default class Export {
       return response.forbidden({ message: 'Permissions insuffisantes' })
     }
 
-    // Verify account password
     const isValid = await hash.verify(user.password, payload.password)
     if (!isValid) {
       return response.unauthorized({ message: 'Mot de passe incorrect' })
     }
 
-    // Collect and export data
     const data = await collectTeamData(teamId, dek, {
       includeBankAccounts: payload.includeBankAccounts ?? false,
     })

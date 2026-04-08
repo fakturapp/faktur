@@ -25,11 +25,9 @@ const CryptoWipe = () => import('#controllers/auth/security/crypto_wipe')
 const SetupRecoveryKey = () => import('#controllers/auth/security/setup_recovery_key')
 const VaultUnlock = () => import('#controllers/auth/vault/unlock')
 
-// Passkey (public)
 const PasskeyLoginOptions = () => import('#controllers/auth/passkey/login_options')
 const PasskeyLoginVerify = () => import('#controllers/auth/passkey/login_verify')
 
-// OAuth Google
 const GoogleAuthUrl = () => import('#controllers/auth/oauth/google_auth_url')
 const GoogleCallback = () => import('#controllers/auth/oauth/google_callback')
 const GoogleDecodeProfile = () => import('#controllers/auth/oauth/google_decode_profile')
@@ -46,14 +44,12 @@ router
     router.post('/login', [Login, 'handle']).use(loginLimiter)
     router.post('/login/2fa', [TwoFactorVerify, 'handle']).use(twoFactorLimiter)
 
-    // Passkey (public)
     router.post('/passkey/login-options', [PasskeyLoginOptions, 'handle']).use(passkeyLimiter)
     router.post('/passkey/login-verify', [PasskeyLoginVerify, 'handle']).use(passkeyLimiter)
 
     router.post('/password/forgot', [PasswordResetRequest, 'handle']).use(passwordResetLimiter)
     router.post('/password/reset', [PasswordReset, 'handle']).use(passwordResetLimiter)
 
-    // OAuth Google (public)
     router.get('/oauth/google/url', [GoogleAuthUrl, 'handle'])
     router.get('/oauth/google/callback', [GoogleCallback, 'handle'])
     router.post('/oauth/google/decode', [GoogleDecodeProfile, 'handle'])

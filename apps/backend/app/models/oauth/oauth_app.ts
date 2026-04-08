@@ -63,19 +63,10 @@ export default class OauthApp extends BaseModel {
   @belongsTo(() => User, { foreignKey: 'createdByUserId' })
   declare createdBy: BelongsTo<typeof User>
 
-  /**
-   * Check a raw redirect_uri against the allow-list. Comparison is exact:
-   * any trailing slash, scheme or port difference must match what the admin
-   * stored at creation time. Loopback ports for desktop clients are handled
-   * by the caller with a bespoke matcher (see OauthService).
-   */
   isRedirectUriAllowed(raw: string): boolean {
     return this.redirectUris.includes(raw)
   }
 
-  /**
-   * Returns true if this app has opted in to a specific webhook event type.
-   */
   subscribesTo(eventType: string): boolean {
     if (!this.webhookUrl) return false
     if (!this.webhookEvents || this.webhookEvents.length === 0) return false

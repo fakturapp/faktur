@@ -29,7 +29,6 @@ function VerifyEmailContent() {
   const [message, setMessage] = useState('')
   const [resendLoading, setResendLoading] = useState(false)
 
-  // If user is logged in and email is already verified
   useEffect(() => {
     if (user?.emailVerified && !token) {
       setStatus('already_verified')

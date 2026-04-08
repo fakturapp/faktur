@@ -17,7 +17,6 @@ function OAuthCallbackContent() {
       )
       window.close()
     } else {
-      // Not opened as popup — redirect to account page
       window.location.href = `/dashboard/account?${success ? 'provider_linked=true' : `error=${error || 'unknown'}`}`
     }
   }, [searchParams])

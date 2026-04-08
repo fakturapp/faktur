@@ -14,7 +14,7 @@ export default class extends BaseSchema {
         .onDelete('CASCADE')
       table.uuid('team_id').notNullable().references('id').inTable('teams').onDelete('CASCADE')
       table.decimal('amount', 12, 2).notNullable()
-      table.string('payment_date', 10).notNullable() // YYYY-MM-DD
+      table.string('payment_date', 10).notNullable()
       table.string('payment_method', 50).nullable()
       table.text('notes').nullable()
       table.timestamp('created_at').notNullable()

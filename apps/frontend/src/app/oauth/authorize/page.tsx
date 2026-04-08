@@ -2,6 +2,7 @@
 
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { api } from '@/lib/api'
 import { useAuth } from '@/lib/auth'
@@ -15,10 +16,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { cn } from '@/lib/utils'
 import {
-  ShieldCheck,
-  ShieldAlert,
   Check,
   X,
   Smartphone,
@@ -26,15 +24,10 @@ import {
   Terminal,
   Lock,
   KeyRound,
-  User,
-  FileText,
-  Users,
-  Clock,
-  MoreHorizontal,
+  ShieldAlert,
   LogOut,
 } from 'lucide-react'
 
-// ---------- Types ----------
 interface ConsentData {
   client: {
     id: string
@@ -55,32 +48,35 @@ interface ConsentData {
 
 type PageState = 'loading' | 'ready' | 'approving' | 'denying' | 'error' | 'redirecting'
 
-// ---------- Scope metadata ----------
-const SCOPE_META: Record<string, { label: string; icon: any }> = {
-  profile: { label: 'Voir votre profil', icon: User },
-  'invoices:read': { label: 'Lire vos factures', icon: FileText },
-  'invoices:write': { label: 'Créer et modifier vos factures', icon: FileText },
-  'clients:read': { label: 'Lire votre liste de clients', icon: Users },
-  'clients:write': { label: 'Créer et modifier vos clients', icon: Users },
-  'vault:unlock': { label: 'Déverrouiller votre coffre-fort', icon: Lock },
-  offline_access: { label: 'Rester connecté(e) hors ligne', icon: Clock },
-}
-
-// ---------- Things the app will NEVER be able to do ----------
-// Rendered in the "Non autorisé" section of the scopes detail modal.
-// Half of them are real defensive assertions, the other half are
-// intentionally silly Discord-style reassurances.
-const DENIED_CAPABILITIES: { label: string; playful?: boolean }[] = [
-  { label: 'Supprimer votre compte' },
-  { label: 'Lire ou changer votre mot de passe' },
-  { label: 'Accéder à vos méthodes de paiement stockées' },
-  { label: 'Voler vos cookies 🍪', playful: true },
-  { label: 'Manger votre gâteau d’anniversaire 🎂', playful: true },
-  { label: 'Regarder votre historique Netflix 📺', playful: true },
-  { label: 'Parler à votre maman 📞', playful: true },
+const GRANTED_ACCESSES = [
+  'Se connecter à votre compte',
+  'Gérer vos données',
+  'Rester connecté',
 ]
 
-// ---------- Kind icons ----------
+const PLAYFUL_DENIED = [
+  "n'aura pas le droit de manger votre gâteau d'anniversaire 🎂",
+  "n'aura pas le droit de voler vos cookies 🍪",
+  "ne pourra pas changer votre fond d'écran en photo de chat 🐱",
+  "ne pourra pas appeler votre maman 📞",
+  'ne pourra pas commander une pizza à votre place 🍕',
+  'ne pourra pas regarder votre historique Netflix 📺',
+  'ne pourra pas deviner votre mot de passe 🤫',
+  'ne pourra pas juger vos choix vestimentaires 👕',
+  "ne pourra pas chanter sous la douche avec vous 🎤",
+  'ne pourra pas arrêter le temps ⏰',
+  'ne pourra pas prédire votre avenir 🔮',
+  'ne pourra pas gagner au loto à votre place 🎰',
+  "ne pourra pas vous faire la leçon 👨‍🏫",
+  'ne pourra pas apprendre à faire du vélo 🚴',
+  'ne pourra pas compter vos moutons avant de dormir 🐑',
+  'ne pourra pas faire la grasse matinée pour vous 😴',
+  "ne pourra pas vous parler à l'envers 🙃",
+  "ne pourra pas inventer un nouveau mot pour 'fromage' 🧀",
+  'ne pourra pas voyager dans le temps ⏳',
+  'ne pourra pas téléporter votre téléphone 📱',
+]
+
 const KIND_ICONS: Record<string, any> = {
   desktop: Smartphone,
   web: Globe,
@@ -95,9 +91,13 @@ function AuthorizeContent() {
   const [state, setState] = useState<PageState>('loading')
   const [data, setData] = useState<ConsentData | null>(null)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
-  const [scopesModalOpen, setScopesModalOpen] = useState(false)
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false)
   const [switchingUser, setSwitchingUser] = useState(false)
+
+  const playfulDenied = useMemo(
+    () => PLAYFUL_DENIED[Math.floor(Math.random() * PLAYFUL_DENIED.length)],
+    []
+  )
 
   const queryString = useMemo(() => searchParams.toString(), [searchParams])
   const params = useMemo(
@@ -183,28 +183,19 @@ function AuthorizeContent() {
     if (data?.autoApprove && state === 'ready' && !user?.vaultLocked) submitDecision('allow')
   }, [data, state, submitDecision, user?.vaultLocked])
 
-  // ---------- "Ce n'est pas toi ?" logout flow ----------
-  // Clears the current session, then redirects to /login with the
-  // current authorize URL preserved as the redirect target so the
-  // new user lands back on this consent screen after signing in.
   async function handleSwitchAccount() {
     setSwitchingUser(true)
     try {
       await api.post('/auth/logout', {})
-    } catch {
-      /* best effort */
-    }
+    } catch {}
     try {
       localStorage.removeItem('faktur_token')
       localStorage.removeItem('faktur_vault_key')
-    } catch {
-      /* ignore */
-    }
+    } catch {}
     const returnTo = encodeURIComponent(`/oauth/authorize?${queryString}`)
     router.replace(`/login?redirect=${returnTo}`)
   }
 
-  // ---------- Vault locked blocker ----------
   if (user && user.vaultLocked) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-background">
@@ -212,7 +203,7 @@ function AuthorizeContent() {
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.25 }}
-          className="w-full max-w-sm"
+          className="w-[380px]"
         >
           <div className="rounded-2xl border border-amber-500/20 bg-card p-6 text-center">
             <div className="h-12 w-12 rounded-full bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
@@ -223,8 +214,7 @@ function AuthorizeContent() {
             </h2>
             <p className="text-sm text-muted-foreground mb-5 leading-relaxed">
               Vous devez déverrouiller votre coffre-fort avant de pouvoir
-              autoriser cette application. Saisissez votre mot de passe
-              dans la fenêtre qui vient de s&apos;ouvrir pour continuer.
+              autoriser cette application.
             </p>
             <Button className="w-full" disabled>
               <KeyRound className="h-4 w-4 mr-2" />
@@ -236,7 +226,6 @@ function AuthorizeContent() {
     )
   }
 
-  // ---------- Loading / error ----------
   if (authLoading || !user || state === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -251,7 +240,7 @@ function AuthorizeContent() {
         <motion.div
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-sm rounded-2xl border border-border bg-card p-8 text-center"
+          className="w-[380px] rounded-2xl border border-border bg-card p-8 text-center"
         >
           <div className="h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-4">
             <X className="h-6 w-6 text-destructive" />
@@ -271,10 +260,27 @@ function AuthorizeContent() {
   const KindIcon = KIND_ICONS[data.client.id] ?? Smartphone
   const isRedirecting =
     state === 'redirecting' || state === 'approving' || state === 'denying'
-  const scopeCount = data.scopes.length
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-background">
+      <motion.div
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="flex items-center gap-3 mb-6"
+      >
+        <Image
+          src="/logo.svg"
+          alt="Faktur"
+          width={40}
+          height={40}
+          className="h-10 w-10 drop-shadow-md"
+        />
+        <span className="text-2xl font-bold text-foreground font-lexend tracking-tight">
+          Faktur
+        </span>
+      </motion.div>
+
       <AnimatePresence mode="wait">
         <motion.div
           key="consent"
@@ -282,10 +288,9 @@ function AuthorizeContent() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -12 }}
           transition={{ duration: 0.25 }}
-          className="w-full max-w-sm"
+          className="w-[400px]"
         >
           <div className="rounded-2xl border border-border bg-card p-6">
-            {/* ---------- App header ---------- */}
             <div className="flex items-center gap-3 pb-5 border-b border-border">
               <div className="h-11 w-11 shrink-0 rounded-xl bg-muted/60 flex items-center justify-center overflow-hidden">
                 {data.client.iconUrl ? (
@@ -327,7 +332,6 @@ function AuthorizeContent() {
               </div>
             </div>
 
-            {/* ---------- Unverified-app warning ---------- */}
             {!data.client.isFirstParty && (
               <motion.div
                 initial={{ opacity: 0, y: -6 }}
@@ -342,14 +346,12 @@ function AuthorizeContent() {
                   </p>
                   <p className="text-[10px] text-muted-foreground mt-1 leading-snug">
                     N&apos;autorisez que si vous connaissez et faites
-                    confiance au développeur. Une application malveillante
-                    pourrait abuser de l&apos;accès accordé.
+                    confiance au développeur.
                   </p>
                 </div>
               </motion.div>
             )}
 
-            {/* ---------- Current user + switch account ---------- */}
             <div className="pt-4 pb-3">
               <div className="flex items-center gap-2.5">
                 <div className="h-7 w-7 shrink-0 rounded-full bg-primary/15 text-primary flex items-center justify-center text-[10px] font-bold overflow-hidden">
@@ -379,35 +381,32 @@ function AuthorizeContent() {
               </div>
             </div>
 
-            {/* ---------- Access summary ---------- */}
             <div className="py-3 border-t border-border">
-              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2.5">
                 Accès demandé
               </p>
-              <button
-                type="button"
-                onClick={() => setScopesModalOpen(true)}
-                className="flex items-center gap-3 w-full py-2 px-2.5 -mx-2.5 rounded-lg hover:bg-muted/40 transition-colors text-left group"
-              >
-                <div className="h-9 w-9 shrink-0 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <ShieldCheck className="h-4 w-4 text-primary" />
+              <div className="space-y-1.5">
+                {GRANTED_ACCESSES.map((access) => (
+                  <div
+                    key={access}
+                    className="flex items-center gap-2 text-[12px] text-foreground"
+                  >
+                    <Check className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                    <span>{access}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-3 pt-3 border-t border-border/60">
+                <div className="flex items-start gap-2 text-[11px] text-muted-foreground italic leading-snug">
+                  <X className="h-3 w-3 text-destructive/70 shrink-0 mt-0.5" />
+                  <span>
+                    En revanche, {data.client.name} {playfulDenied}
+                  </span>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[12px] font-semibold text-foreground">
-                    Accès complet au compte
-                  </p>
-                  <p className="text-[10px] text-muted-foreground">
-                    {scopeCount} autorisation{scopeCount > 1 ? 's' : ''} demandée
-                    {scopeCount > 1 ? 's' : ''} · voir le détail
-                  </p>
-                </div>
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground group-hover:bg-muted/60 group-hover:text-foreground transition-colors">
-                  <MoreHorizontal className="h-4 w-4" />
-                </div>
-              </button>
+              </div>
             </div>
 
-            {/* ---------- Actions ---------- */}
             <div className="pt-4 border-t border-border flex gap-2">
               <Button
                 variant="outline"
@@ -435,77 +434,6 @@ function AuthorizeContent() {
         </motion.div>
       </AnimatePresence>
 
-      {/* ---------- Scopes detail modal ---------- */}
-      <Dialog
-        open={scopesModalOpen}
-        onClose={() => setScopesModalOpen(false)}
-        className="max-w-md"
-      >
-        <div className="flex items-center gap-3 mb-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-            <ShieldCheck className="h-5 w-5 text-primary" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <DialogTitle>Détail des autorisations</DialogTitle>
-            <DialogDescription className="mt-0">
-              Voici exactement ce que {data.client.name} pourra — et ne pourra
-              pas — faire.
-            </DialogDescription>
-          </div>
-        </div>
-
-        {/* Granted */}
-        <div className="mt-2">
-          <p className="text-[10px] font-semibold text-emerald-500 uppercase tracking-wider mb-2">
-            Autorisé
-          </p>
-          <div className="space-y-1 rounded-xl border border-emerald-500/15 bg-emerald-500/5 p-3">
-            {data.scopes.map((scope) => {
-              const meta = SCOPE_META[scope] ?? { label: scope, icon: ShieldCheck }
-              const Icon = meta.icon
-              return (
-                <div
-                  key={scope}
-                  className="flex items-center gap-2.5 py-1 text-[12px] text-foreground"
-                >
-                  <Check className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
-                  <Icon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                  <span>{meta.label}</span>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Denied */}
-        <div className="mt-4">
-          <p className="text-[10px] font-semibold text-destructive uppercase tracking-wider mb-2">
-            Non autorisé
-          </p>
-          <div className="space-y-1 rounded-xl border border-destructive/15 bg-destructive/5 p-3 max-h-[200px] overflow-y-auto">
-            {DENIED_CAPABILITIES.map((item, i) => (
-              <div
-                key={i}
-                className={cn(
-                  'flex items-center gap-2.5 py-1 text-[12px]',
-                  item.playful ? 'text-muted-foreground italic' : 'text-foreground'
-                )}
-              >
-                <X className="h-3.5 w-3.5 text-destructive shrink-0" />
-                <span>{item.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <DialogFooter>
-          <Button className="w-full" onClick={() => setScopesModalOpen(false)}>
-            Compris
-          </Button>
-        </DialogFooter>
-      </Dialog>
-
-      {/* ---------- Switch-account confirmation modal ---------- */}
       <Dialog
         open={logoutConfirmOpen}
         onClose={() => setLogoutConfirmOpen(false)}

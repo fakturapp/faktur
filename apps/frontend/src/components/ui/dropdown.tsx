@@ -44,11 +44,10 @@ export function Dropdown({ trigger, children, align = 'right', position = 'below
     }
   }, [])
 
-  // Calculate position when open
   useLayoutEffect(() => {
     if (!open || !triggerRef.current) return
     const rect = triggerRef.current.getBoundingClientRect()
-    const popupW = 220 // min-width
+    const popupW = 220
     let top: number
     let left: number
 

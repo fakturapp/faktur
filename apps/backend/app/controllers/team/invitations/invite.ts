@@ -29,7 +29,6 @@ export default class Invite {
 
     const payload = await request.validateUsing(inviteValidator)
 
-    // Check if user already a member
     const existingUser = await User.findBy('email', payload.email)
     if (existingUser) {
       const existingMember = await TeamMember.query()
@@ -42,7 +41,6 @@ export default class Invite {
       }
     }
 
-    // Check if pending invitation exists for this email
     const existingInvite = await TeamMember.query()
       .where('teamId', user.currentTeamId)
       .where('invitedEmail', payload.email)
@@ -55,7 +53,6 @@ export default class Invite {
 
     const token = crypto.randomBytes(32).toString('hex')
 
-    // Encrypt team DEK with invite key derived from token
     const teamDek = keyStore.getDEK(user.id, user.currentTeamId)
     let encryptedInviteDek: string | null = null
     if (teamDek) {

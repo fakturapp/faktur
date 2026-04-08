@@ -20,12 +20,9 @@ export default class extends BaseSchema {
         .inTable('oauth_apps')
         .onDelete('CASCADE')
 
-      // Scopes the user has granted to this app
       table.specificType('scopes', 'text[]').notNullable()
 
-      // First approval
       table.timestamp('first_authorized_at').notNullable()
-      // Last time the user went through the consent screen
       table.timestamp('last_authorized_at').notNullable()
 
       table.timestamp('created_at').notNullable()

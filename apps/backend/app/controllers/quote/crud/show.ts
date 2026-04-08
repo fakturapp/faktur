@@ -30,7 +30,6 @@ export default class Show {
       return response.notFound({ message: 'Quote not found' })
     }
 
-    // Auto-transition sent → expired when validity date has passed
     if (quote.status === 'sent' && quote.validityDate) {
       const today = DateTime.now().toSQLDate()!
       if (quote.validityDate < today) {

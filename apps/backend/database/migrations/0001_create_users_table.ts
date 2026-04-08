@@ -11,22 +11,18 @@ export default class extends BaseSchema {
       table.string('password').notNullable()
       table.string('avatar_url', 500).nullable()
 
-      // Email verification
       table.boolean('email_verified').defaultTo(false)
       table.string('email_verification_token', 255).nullable()
       table.timestamp('email_verification_sent_at').nullable()
       table.string('pending_email', 254).nullable()
 
-      // 2FA
       table.boolean('two_factor_enabled').defaultTo(false)
       table.text('two_factor_secret_encrypted').nullable()
       table.text('recovery_codes_encrypted').nullable()
 
-      // Password reset
       table.string('password_reset_token', 255).nullable()
       table.timestamp('password_reset_expires_at').nullable()
 
-      // Security
       table.integer('failed_login_attempts').defaultTo(0)
       table.timestamp('locked_until').nullable()
       table.string('security_code').nullable()
@@ -34,7 +30,6 @@ export default class extends BaseSchema {
       table.string('status').defaultTo('active')
       table.timestamp('last_login_at').nullable()
 
-      // Onboarding
       table.boolean('onboarding_completed').notNullable().defaultTo(false)
 
       table.timestamp('created_at').notNullable()
