@@ -38,7 +38,7 @@ import {
 } from 'lucide-react'
 import { AiDashboardSummary } from '@/components/ai/ai-dashboard-summary'
 import { CheckoutFeatureModal, CHECKOUT_FEATURE_SEEN_KEY } from '@/components/dashboard/checkout-feature-modal'
-import { SplitText } from '@/components/ui/split-text'
+import TextType from '@/components/ui/text-type'
 
 function pickAdaptiveGreeting(firstName: string | undefined): string {
   const name = firstName ? `, ${firstName}` : ''
@@ -961,12 +961,17 @@ export default function DashboardPage() {
         return (
           <div className="relative h-full p-6 flex items-center bg-gradient-to-r from-primary/10 via-primary/5 to-transparent overflow-hidden">
             <div className="relative z-10">
-              <SplitText
+              <TextType
                 key={greeting}
                 text={greeting}
-                tag="h1"
-                delay={45}
-                duration={0.9}
+                as="h1"
+                typingSpeed={22}
+                initialDelay={120}
+                loop={false}
+                showCursor
+                hideCursorWhileTyping={false}
+                cursorCharacter="|"
+                cursorBlinkDuration={0.5}
                 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight"
               />
               <p className="mt-1 text-sm text-muted-foreground">
