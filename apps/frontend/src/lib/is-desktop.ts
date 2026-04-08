@@ -2,6 +2,15 @@
 // Triple check: preload bridge (most reliable), UA stamp, and localStorage
 // flag set by the shell bootstrap script.
 
+export interface FakturDesktopCertificationStatus {
+  certified: boolean
+  version?: string | null
+  issuedAt?: number | null
+  expiresAt?: number | null
+  asarSha256?: string | null
+  reason?: string | null
+}
+
 export interface FakturDesktopUpdateInfo {
   version: string
   currentVersion: string
@@ -17,6 +26,7 @@ export interface FakturDesktopBridge {
   platform?: string
   getSessionState?: () => Promise<{ state: string }>
   getAppInfo?: () => Promise<{ version: string; platform: string; isDesktop: boolean }>
+  getCertificationStatus?: () => Promise<FakturDesktopCertificationStatus>
   logout?: () => Promise<{ ok: boolean }>
   openVaultUnlock?: () => Promise<{ ok: boolean }>
   openExternal?: (url: string) => Promise<{ ok: boolean }>
