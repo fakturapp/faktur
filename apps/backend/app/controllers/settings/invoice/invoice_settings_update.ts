@@ -35,7 +35,7 @@ export default class InvoiceSettingsUpdate {
         darkMode: payload.darkMode ?? false,
         documentFont: payload.documentFont || 'Lexend',
         eInvoicingEnabled: payload.eInvoicingEnabled ?? false,
-        pdpProvider: (payload.pdpProvider || null) as 'b2brouter' | 'sandbox' | null,
+        pdpProvider: payload.pdpProvider ?? null,
         pdpApiKey: pdpApiKeyToStore,
         pdpSandbox: payload.pdpSandbox ?? true,
         defaultSubject: payload.defaultSubject || null,
@@ -68,7 +68,7 @@ export default class InvoiceSettingsUpdate {
       if (payload.eInvoicingEnabled !== undefined)
         settings.eInvoicingEnabled = payload.eInvoicingEnabled
       if (payload.pdpProvider !== undefined)
-        settings.pdpProvider = (payload.pdpProvider || null) as 'b2brouter' | 'sandbox' | null
+        settings.pdpProvider = payload.pdpProvider ?? null
       if (payload.pdpApiKey && !payload.pdpApiKey.startsWith('••••••••')) {
         settings.pdpApiKey = pdpApiKeyToStore
       }
