@@ -557,7 +557,13 @@ function LoginContent() {
                   <motion.div variants={fadeIn} custom={8}>
                     <p className="text-center text-sm text-muted-foreground">
                       Pas encore de compte ?{' '}
-                      <Link href="/register" className="text-primary font-medium hover:text-primary/80 transition-colors">
+                      <Link
+                        href={(() => {
+                          const r = searchParams.get('redirect')
+                          return r ? `/register?redirect=${encodeURIComponent(r)}` : '/register'
+                        })()}
+                        className="text-primary font-medium hover:text-primary/80 transition-colors"
+                      >
                         Créer un compte
                       </Link>
                     </p>

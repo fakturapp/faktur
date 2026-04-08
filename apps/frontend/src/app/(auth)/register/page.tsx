@@ -220,6 +220,16 @@ function RegisterContent() {
 
     setLoading(true)
 
+    // ---------- Honor ?redirect= from the OAuth consent flow ----------
+    // When the desktop client (or any OAuth caller) bounces an
+    // unauthenticated user through /login → /register, we want the
+    // newly-registered user to land on the OAuth authorize page
+    // instead of the onboarding wizard. Onboarding still kicks in
+    // automatically AFTER consent, inside the dashboard layout.
+    const rawRedirect = searchParams.get('redirect')
+    const safeRedirect =
+      rawRedirect && rawRedirect.startsWith('/') ? rawRedirect : null
+
     if (googleMode && googleData) {
       const { data, error: err } = await api.post<{ token: string; user: any }>('/auth/oauth/google/register', {
         googleData,
@@ -232,7 +242,7 @@ function RegisterContent() {
       if (err) return setError(err)
       if (data?.token && data?.user) {
         login(data.token, data.user)
-        router.push('/onboarding/team')
+        router.push(safeRedirect ?? '/onboarding/team')
       }
       return
     }
@@ -248,14 +258,19 @@ function RegisterContent() {
 
     if (err) {
       resetTurnstile()
-      // Check if error is disposable email
       if (typeof err === 'string' && err.includes('temporaires')) {
         setShowDisposableModal(true)
         return
       }
       return setError(err)
     }
-    router.push(`/verify-email?email=${encodeURIComponent(email)}`)
+
+    // Forward redirect through verify-email so the user lands back
+    // on the OAuth authorize page after confirming their email.
+    const verifyUrl = safeRedirect
+      ? `/verify-email?email=${encodeURIComponent(email)}&redirect=${encodeURIComponent(safeRedirect)}`
+      : `/verify-email?email=${encodeURIComponent(email)}`
+    router.push(verifyUrl)
   }
 
   return (
@@ -717,11 +732,17 @@ function RegisterContent() {
             )}
           </AnimatePresence>
 
-          {/* Login link */}
+          {/* ---------- Login link (preserves redirect) ---------- */}
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
               Déjà un compte ?{' '}
-              <Link href="/login" className="text-primary font-medium underline-offset-2 hover:underline">
+              <Link
+                href={(() => {
+                  const r = searchParams.get('redirect')
+                  return r ? `/login?redirect=${encodeURIComponent(r)}` : '/login'
+                })()}
+                className="text-primary font-medium underline-offset-2 hover:underline"
+              >
                 Se connecter
               </Link>
             </p>
