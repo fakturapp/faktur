@@ -7,18 +7,17 @@ import oauthWebhookService from '#services/oauth/oauth_webhook_service'
 import { tokenRequestValidator } from '#validators/oauth_validator'
 import { OAUTH_ERRORS } from '#services/oauth/oauth_constants'
 
-/**
- * OAuth2 token endpoint — exchanges authorization codes for access tokens
- * and refreshes expired access tokens via the refresh_token grant.
- *
- * Public endpoint (no session) authenticated by client_id + client_secret
- * on every call. Timing-safe for secret comparison.
- */
+// ---------- OAuth2 token endpoint (RFC 6749 + RFC 7636) ----------
+// Public clients (desktop, cli) authenticate via PKCE only; confidential
+// clients (web) additionally require a client_secret.
 export default class Token {
   async handle({ request, response }: HttpContext) {
     const payload = await request.validateUsing(tokenRequestValidator)
 
-    const app = await oauthAppService.authenticateClient(payload.client_id, payload.client_secret)
+    const app = await oauthAppService.authenticateClient(
+      payload.client_id,
+      payload.client_secret ?? null
+    )
     if (!app) {
       return response.unauthorized({
         error: OAUTH_ERRORS.invalid_client,
@@ -39,10 +38,7 @@ export default class Token {
     })
   }
 
-  /**
-   * authorization_code grant — redeem a one-time code for a fresh
-   * (access, refresh) pair.
-   */
+  // ---------- authorization_code grant ----------
   private async handleAuthorizationCode(
     payload: any,
     app: any,
@@ -64,8 +60,6 @@ export default class Token {
       })
     }
 
-    // Defeat redirect_uri swapping: the URI presented here must match
-    // exactly the one the consent screen stamped into the code record.
     if (code.redirectUri !== payload.redirect_uri) {
       return response.badRequest({
         error: OAUTH_ERRORS.invalid_grant,
@@ -80,7 +74,16 @@ export default class Token {
       })
     }
 
-    // PKCE check — required if the authorize call specified a challenge.
+    // ---------- PKCE enforcement ----------
+    // Required for all public clients; required whenever the authorize
+    // call specified a challenge (regardless of client kind).
+    const isPublic = oauthAppService.isPublicClient(app)
+    if (isPublic && !code.codeChallenge) {
+      return response.badRequest({
+        error: OAUTH_ERRORS.invalid_grant,
+        error_description: 'PKCE is required for public clients',
+      })
+    }
     if (code.codeChallenge) {
       if (!payload.code_verifier) {
         return response.badRequest({
@@ -133,10 +136,7 @@ export default class Token {
     })
   }
 
-  /**
-   * refresh_token grant — rotates the active token. The old row is
-   * revoked, a fresh (access, refresh) pair is minted.
-   */
+  // ---------- refresh_token grant ----------
   private async handleRefreshToken(payload: any, app: any, request: any, response: any) {
     if (!payload.refresh_token) {
       return response.badRequest({

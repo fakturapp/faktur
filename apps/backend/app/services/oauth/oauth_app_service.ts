@@ -3,6 +3,7 @@ import oauthCrypto from '#services/oauth/oauth_crypto_service'
 import encryptionService from '#services/encryption/encryption_service'
 import { DateTime } from 'luxon'
 
+// ---------- Types ----------
 export interface CreateOauthAppInput {
   name: string
   description?: string | null
@@ -19,19 +20,15 @@ export interface CreateOauthAppInput {
 
 export interface CreatedOauthApp {
   app: OauthApp
-  // The raw secrets exist only in this object returned to the caller;
-  // they are immediately dropped from memory by the controller after
-  // being flushed once to the admin's screen.
   clientSecret: string
   webhookSecret: string | null
 }
 
+// ---------- Public clients (PKCE only, no secret enforcement) ----------
+const PUBLIC_CLIENT_KINDS = new Set(['desktop', 'cli'])
+
 class OauthAppService {
-  /**
-   * Creates an OAuth app with freshly-generated client_id, client_secret
-   * and (optionally) webhook signing secret. The raw secrets are
-   * returned exactly once — only their hashes/ciphertexts are kept.
-   */
+  // ---------- Create ----------
   async create(input: CreateOauthAppInput): Promise<CreatedOauthApp> {
     const clientId = oauthCrypto.generateToken(16)
     const clientSecret = oauthCrypto.generateClientSecret()
@@ -65,10 +62,7 @@ class OauthAppService {
     return { app, clientSecret, webhookSecret }
   }
 
-  /**
-   * Rotates the client_secret for an app. Returns the new raw secret
-   * which the admin must copy immediately — only the hash is persisted.
-   */
+  // ---------- Secret rotation ----------
   async rotateClientSecret(app: OauthApp): Promise<string> {
     const newSecret = oauthCrypto.generateClientSecret()
     app.clientSecretHash = oauthCrypto.hash(newSecret)
@@ -76,10 +70,6 @@ class OauthAppService {
     return newSecret
   }
 
-  /**
-   * Rotates the webhook signing secret. Returns the new raw value.
-   * Throws if the app doesn't have a webhook configured.
-   */
   async rotateWebhookSecret(app: OauthApp): Promise<string> {
     if (!app.webhookUrl) {
       throw new Error('App has no webhook configured')
@@ -90,10 +80,6 @@ class OauthAppService {
     return newSecret
   }
 
-  /**
-   * Decrypts the stored webhook secret for dispatching. Used only
-   * server-side right before signing an outbound payload.
-   */
   getWebhookSecret(app: OauthApp): string | null {
     if (!app.encryptedWebhookSecret) return null
     try {
@@ -103,18 +89,30 @@ class OauthAppService {
     }
   }
 
-  /**
-   * Verifies a presented client_secret against the stored hash in constant
-   * time. Returns the app iff the credentials are valid and the app is
-   * still active.
-   */
-  async authenticateClient(clientId: string, clientSecret: string): Promise<OauthApp | null> {
+  // ---------- Public client helper ----------
+  isPublicClient(app: OauthApp): boolean {
+    return PUBLIC_CLIENT_KINDS.has(app.kind)
+  }
+
+  // ---------- Authentication ----------
+  // Public clients (desktop/cli) skip the client_secret check and rely
+  // exclusively on PKCE. Confidential clients (web) still require the
+  // secret to be presented and timing-safe verified.
+  async authenticateClient(
+    clientId: string,
+    clientSecret: string | null | undefined
+  ): Promise<OauthApp | null> {
     const app = await OauthApp.query()
       .where('client_id', clientId)
       .where('is_active', true)
       .first()
     if (!app) return null
 
+    if (this.isPublicClient(app)) {
+      return app
+    }
+
+    if (!clientSecret) return null
     const presentedHash = oauthCrypto.hash(clientSecret)
     if (!oauthCrypto.timingSafeEqual(presentedHash, app.clientSecretHash)) {
       return null
@@ -122,11 +120,7 @@ class OauthAppService {
     return app
   }
 
-  /**
-   * Soft-delete: marks the app as inactive and returns it. Existing
-   * tokens are NOT auto-revoked here so the admin can choose to revoke
-   * them separately via the UI (and emit the proper webhook).
-   */
+  // ---------- Soft delete ----------
   async deactivate(app: OauthApp): Promise<OauthApp> {
     app.isActive = false
     app.updatedAt = DateTime.now()

@@ -1,9 +1,6 @@
 import vine from '@vinejs/vine'
 
-/**
- * /oauth/authorize — query string presented by the OAuth app when it
- * opens the consent screen in the user's browser.
- */
+// ---------- /oauth/authorize ----------
 export const authorizeRequestValidator = vine.compile(
   vine.object({
     client_id: vine.string().trim().maxLength(128),
@@ -16,10 +13,7 @@ export const authorizeRequestValidator = vine.compile(
   })
 )
 
-/**
- * /oauth/authorize/consent — form submission from the consent screen.
- * decision = 'allow' | 'deny'.
- */
+// ---------- /oauth/authorize/consent ----------
 export const consentSubmitValidator = vine.compile(
   vine.object({
     client_id: vine.string().trim().maxLength(128),
@@ -32,15 +26,15 @@ export const consentSubmitValidator = vine.compile(
   })
 )
 
-/**
- * /oauth/token — RFC 6749 token endpoint body.
- * Supports authorization_code and refresh_token grants.
- */
+// ---------- /oauth/token (RFC 6749 + RFC 7636) ----------
+// client_secret is OPTIONAL: public clients (desktop, mobile, SPA) rely
+// on PKCE. Enforcement is decided per-client in the controller based on
+// the app kind and code_verifier presence.
 export const tokenRequestValidator = vine.compile(
   vine.object({
     grant_type: vine.string().trim().maxLength(30),
     client_id: vine.string().trim().maxLength(128),
-    client_secret: vine.string().trim().maxLength(200),
+    client_secret: vine.string().trim().maxLength(200).optional(),
     code: vine.string().trim().maxLength(200).optional(),
     redirect_uri: vine.string().trim().maxLength(500).optional(),
     code_verifier: vine.string().trim().maxLength(200).optional(),
@@ -51,21 +45,17 @@ export const tokenRequestValidator = vine.compile(
   })
 )
 
-/**
- * /oauth/revoke — client revokes a token it no longer needs (logout).
- */
+// ---------- /oauth/revoke ----------
 export const revokeRequestValidator = vine.compile(
   vine.object({
     client_id: vine.string().trim().maxLength(128),
-    client_secret: vine.string().trim().maxLength(200),
+    client_secret: vine.string().trim().maxLength(200).optional(),
     token: vine.string().trim().maxLength(200),
     token_type_hint: vine.string().trim().maxLength(20).optional(),
   })
 )
 
-/**
- * Admin — create/update an OAuth app.
- */
+// ---------- Admin CRUD ----------
 export const createOauthAppValidator = vine.compile(
   vine.object({
     name: vine.string().trim().minLength(1).maxLength(100),
