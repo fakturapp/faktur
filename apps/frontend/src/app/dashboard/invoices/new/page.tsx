@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/toast'
 import { Spinner } from '@/components/ui/spinner'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
+import { useCompanySettings } from '@/lib/company-settings-context'
 import { api } from '@/lib/api'
 import { A4Sheet, ClientModal, type DocumentLine, type ClientInfo, type CompanyInfo } from '@/components/shared/a4-sheet'
 import { DocumentOptionsPanel } from '@/components/shared/document-options'
@@ -81,6 +82,7 @@ export default function NewInvoicePage() {
   const { toast } = useToast()
   const trackFeature = useTrackFeature()
   const { settings: invoiceSettings, companyLogoUrl, loading: settingsLoading, refreshSettings, updateSettings, uploadLogo } = useInvoiceSettings()
+  const { paymentForm: companyPaymentForm } = useCompanySettings()
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -644,8 +646,8 @@ export default function NewInvoicePage() {
               showClientSiren={!!options.clientSiren || invoiceSettings.eInvoicingEnabled}
               clientVatNumber={options.clientVatNumber}
               showClientVatNumber={!!options.clientVatNumber || invoiceSettings.eInvoicingEnabled}
-              paymentMethods={invoiceSettings.paymentMethods}
-              customPaymentMethod={invoiceSettings.customPaymentMethod}
+              paymentMethods={companyPaymentForm.paymentMethods}
+              customPaymentMethod={companyPaymentForm.customPaymentMethod}
               bankAccountInfo={bankAccountInfo}
               paymentMethod={paymentMethod}
               subject={options.subject}
@@ -718,6 +720,8 @@ export default function NewInvoicePage() {
                     eInvoicingEnabled={invoiceSettings.eInvoicingEnabled}
                     notes={notes}
                     onNotesChange={setNotes}
+                    enabledPaymentMethods={companyPaymentForm.paymentMethods}
+                    customPaymentMethodLabel={companyPaymentForm.customPaymentMethod}
                   />
                 ) : (
                   <AiChatSidebar

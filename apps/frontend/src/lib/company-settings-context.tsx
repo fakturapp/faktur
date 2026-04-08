@@ -76,11 +76,16 @@ interface CompanySettingsContextType {
   paymentForm: PaymentForm
   bankAccounts: BankAccountItem[]
   bankLoading: boolean
+  paymentHasChanges: boolean
+  paymentSaving: boolean
+  paymentSaveError: string | null
   setCompany: (c: Company | null) => void
   setNoCompany: (v: boolean) => void
   setLogoUrl: (url: string | null) => void
   setForm: React.Dispatch<React.SetStateAction<CompanyForm>>
   setPaymentForm: React.Dispatch<React.SetStateAction<PaymentForm>>
+  savePayment: () => Promise<void>
+  resetPayment: () => void
   loadBankAccounts: () => Promise<void>
 }
 
@@ -97,8 +102,10 @@ const CompanySettingsContext = createContext<CompanySettingsContextType>({
   company: null, loading: true, noCompany: false, logoUrl: null,
   form: defaultForm, paymentForm: defaultPaymentForm,
   bankAccounts: [], bankLoading: false,
+  paymentHasChanges: false, paymentSaving: false, paymentSaveError: null,
   setCompany: () => {}, setNoCompany: () => {}, setLogoUrl: () => {},
   setForm: () => {}, setPaymentForm: () => {},
+  savePayment: async () => {}, resetPayment: () => {},
   loadBankAccounts: async () => {},
 })
 
@@ -113,8 +120,15 @@ export function CompanySettingsProvider({ children }: { children: React.ReactNod
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
   const [form, setForm] = useState<CompanyForm>(defaultForm)
   const [paymentForm, setPaymentForm] = useState<PaymentForm>(defaultPaymentForm)
+  const [savedPaymentForm, setSavedPaymentForm] = useState<PaymentForm>(defaultPaymentForm)
+  const [paymentSaving, setPaymentSaving] = useState(false)
+  const [paymentSaveError, setPaymentSaveError] = useState<string | null>(null)
+  const paymentFormRef = useRef(paymentForm)
+  paymentFormRef.current = paymentForm
   const [bankAccounts, setBankAccounts] = useState<BankAccountItem[]>([])
   const [bankLoading, setBankLoading] = useState(false)
+
+  const paymentHasChanges = JSON.stringify(paymentForm) !== JSON.stringify(savedPaymentForm)
 
   const loadBankAccounts = useCallback(async () => {
     setBankLoading(true)
@@ -144,12 +158,14 @@ export function CompanySettingsProvider({ children }: { children: React.ReactNod
           email: data.company.email || '',
           website: data.company.website || '',
         })
-        setPaymentForm({
+        const initialPaymentForm: PaymentForm = {
           paymentConditions: data.company.paymentConditions || '',
           currency: data.company.currency || 'EUR',
           paymentMethods: (data.company as any).paymentMethods || ['bank_transfer'],
           customPaymentMethod: (data.company as any).customPaymentMethod || '',
-        })
+        }
+        setPaymentForm(initialPaymentForm)
+        setSavedPaymentForm(initialPaymentForm)
       } else {
         setNoCompany(true)
       }
@@ -157,10 +173,35 @@ export function CompanySettingsProvider({ children }: { children: React.ReactNod
     })
   }, [loadBankAccounts])
 
+  const savePayment = useCallback(async () => {
+    setPaymentSaving(true)
+    setPaymentSaveError(null)
+    const next = paymentFormRef.current
+    const { error } = await api.put('/company', {
+      paymentConditions: next.paymentConditions,
+      currency: next.currency,
+      paymentMethods: next.paymentMethods,
+      customPaymentMethod: next.customPaymentMethod,
+    })
+    setPaymentSaving(false)
+    if (error) {
+      setPaymentSaveError(error)
+      return
+    }
+    setSavedPaymentForm({ ...next })
+  }, [])
+
+  const resetPayment = useCallback(() => {
+    setPaymentForm({ ...savedPaymentForm })
+    setPaymentSaveError(null)
+  }, [savedPaymentForm])
+
   return (
     <CompanySettingsContext.Provider value={{
       company, loading, noCompany, logoUrl, form, paymentForm, bankAccounts, bankLoading,
-      setCompany, setNoCompany, setLogoUrl, setForm, setPaymentForm, loadBankAccounts,
+      paymentHasChanges, paymentSaving, paymentSaveError,
+      setCompany, setNoCompany, setLogoUrl, setForm, setPaymentForm,
+      savePayment, resetPayment, loadBankAccounts,
     }}>
       {children}
     </CompanySettingsContext.Provider>

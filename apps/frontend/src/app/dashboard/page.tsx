@@ -38,6 +38,130 @@ import {
 } from 'lucide-react'
 import { AiDashboardSummary } from '@/components/ai/ai-dashboard-summary'
 import { CheckoutFeatureModal, CHECKOUT_FEATURE_SEEN_KEY } from '@/components/dashboard/checkout-feature-modal'
+import TextType from '@/components/ui/text-type'
+
+function pickAdaptiveGreeting(firstName: string | undefined): string {
+  const name = firstName ? `, ${firstName}` : ''
+  const hour = new Date().getHours()
+  let pool: string[]
+  if (hour < 5) {
+    pool = [
+      `Bonne nuit${name}`,
+      `Encore au travail${name} ?`,
+      `Vous brûlez la chandelle${name}`,
+      `Insomniaque productif${name} ?`,
+      `Il est tard${name}`,
+      `La nuit porte conseil${name}`,
+      `Petite session nocturne${name} ?`,
+      `Le monde dort, pas vous${name}`,
+      `Bonsoir noctambule${name}`,
+      `Le silence de la nuit${name}`,
+      `On finalise une facture${name} ?`,
+      `Vous êtes du genre couche-tard${name}`,
+      `Café ou thé${name} ?`,
+      `Fan des heures tranquilles${name} ?`,
+      `Personne pour vous déranger${name}`,
+      `La nuit, tout est plus calme${name}`,
+      `Encore quelques minutes${name} ?`,
+      `Ne veillez pas trop tard${name}`,
+      `Votre dashboard ne dort jamais${name}`,
+      `Prêt à boucler la journée${name} ?`,
+    ]
+  } else if (hour < 12) {
+    pool = [
+      `Bonjour${name}`,
+      `Bon retour${name}`,
+      `Content de vous revoir${name}`,
+      `Heureux de vous voir${name}`,
+      `Belle matinée${name}`,
+      `Salut${name}`,
+      `Coucou${name}`,
+      `Hello${name}`,
+      `Ravi de vous revoir${name}`,
+      `Bienvenue${name}`,
+      `Quel plaisir${name}`,
+      `Bonne journée${name}`,
+      `Prêt à attaquer la journée${name} ?`,
+      `On démarre fort${name} ?`,
+      `Première facture du jour${name} ?`,
+      `Le café est servi${name}`,
+      `Une nouvelle journée${name}`,
+      `Que la journée commence${name}`,
+      `Au boulot${name}`,
+      `Belle journée en perspective${name}`,
+    ]
+  } else if (hour < 18) {
+    pool = [
+      `Bon après-midi${name}`,
+      `Content de vous revoir${name}`,
+      `Heureux de vous voir${name}`,
+      `Bon retour${name}`,
+      `De retour${name} ?`,
+      `Pause bien méritée${name} ?`,
+      `Comment se passe la journée${name} ?`,
+      `Toujours en forme${name} ?`,
+      `On continue sur la lancée${name} ?`,
+      `Plein de motivation${name} ?`,
+      `L'après-midi est à vous${name}`,
+      `On enchaîne${name} ?`,
+      `Productif aujourd'hui${name} ?`,
+      `Une petite facture${name} ?`,
+      `Le rythme est bon${name}`,
+      `Bonne journée${name}`,
+      `Tenez bon${name}`,
+      `Gardez le cap${name}`,
+      `On avance${name} ?`,
+      `Presque l'heure du goûter${name}`,
+    ]
+  } else if (hour < 22) {
+    pool = [
+      `Bonsoir${name}`,
+      `Bon retour${name}`,
+      `Heureux de vous revoir${name}`,
+      `Belle soirée${name}`,
+      `La journée s'achève${name}`,
+      `On finit en beauté${name} ?`,
+      `Une dernière facture${name} ?`,
+      `Bonne soirée${name}`,
+      `Vous êtes courageux${name}`,
+      `Encore au taquet${name}`,
+      `On boucle la journée${name} ?`,
+      `Fin de journée bien remplie${name} ?`,
+      `Plus que quelques minutes${name} ?`,
+      `Une soirée tranquille${name} ?`,
+      `Le soleil se couche${name}`,
+      `Bilan de la journée${name} ?`,
+      `Prêt pour une dernière tâche${name} ?`,
+      `Bientôt l'heure de souffler${name}`,
+      `On termine en douceur${name}`,
+      `Une bonne journée de plus${name}`,
+    ]
+  } else {
+    pool = [
+      `Bonsoir${name}`,
+      `Vous travaillez tard${name}`,
+      `Encore là${name} ?`,
+      `Il se fait tard${name}`,
+      `Une dernière vérification${name} ?`,
+      `Pensez à vous reposer${name}`,
+      `Toujours sur le pont${name} ?`,
+      `La nuit tombe${name}`,
+      `Doucement avec les heures sup${name}`,
+      `Faktur veille avec vous${name}`,
+      `Plus que quelques clics${name} ?`,
+      `On ne lâche rien${name}`,
+      `Le calme du soir${name}`,
+      `Vous méritez du repos${name}`,
+      `Bientôt au lit${name} ?`,
+      `Une dernière facture pour la route${name} ?`,
+      `Encore un effort${name}`,
+      `Demain est un autre jour${name}`,
+      `N'oubliez pas de dormir${name}`,
+      `Bonne fin de soirée${name}`,
+    ]
+  }
+  return pool[Math.floor(Math.random() * pool.length)] + ' !'
+}
 
 interface DashboardStats {
   totalInvoiced: { value: number; trend: number; previousValue: number }
@@ -700,6 +824,11 @@ export default function DashboardPage() {
   const [editMode, setEditMode] = useState(false)
   const [sidebarCounts, setSidebarCounts] = useState<{ invoiceDrafts: number; quoteDrafts: number }>({ invoiceDrafts: 0, quoteDrafts: 0 })
   const [featureModalOpen, setFeatureModalOpen] = useState(false)
+  const [greeting, setGreeting] = useState<string>(' ')
+
+  useEffect(() => {
+    setGreeting(pickAdaptiveGreeting(user?.fullName?.split(' ')[0]))
+  }, [user?.fullName])
 
   // Drag-and-drop state
   const [draggingId, setDraggingId] = useState<BlockId | null>(null)
@@ -911,15 +1040,27 @@ export default function DashboardPage() {
     switch (id) {
       case 'welcome':
         return (
-          <div className="relative h-full p-6 flex items-center bg-gradient-to-r from-primary/10 via-primary/5 to-transparent">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">
-                {t('dashboard.welcome.hello') || 'Bonjour'}
-                {user?.fullName ? `, ${user.fullName.split(' ')[0]}` : ''} !
-              </h1>
+          <div className="relative h-full p-6 flex items-center bg-gradient-to-r from-primary/10 via-primary/5 to-transparent overflow-hidden">
+            <div className="relative z-10">
+              <TextType
+                key={greeting}
+                text={greeting}
+                as="h1"
+                typingSpeed={22}
+                initialDelay={120}
+                loop={false}
+                showCursor
+                hideCursorWhileTyping={false}
+                cursorCharacter="|"
+                cursorBlinkDuration={0.5}
+                className="text-2xl md:text-3xl font-bold text-foreground tracking-tight"
+              />
               <p className="mt-1 text-sm text-muted-foreground">
                 {t('dashboard.welcome.subtitle') || "Voici un aperçu de votre activité."}
               </p>
+            </div>
+            <div className="absolute -right-6 -bottom-6 h-28 w-28 rounded-2xl bg-primary/10 ring-1 ring-primary/20 flex items-center justify-center opacity-25 rotate-12">
+              <img src="/logo.svg" alt="" className="h-20 w-20" aria-hidden="true" />
             </div>
           </div>
         )

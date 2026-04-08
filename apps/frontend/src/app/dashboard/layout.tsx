@@ -14,6 +14,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import { InvoiceSettingsProvider } from '@/lib/invoice-settings-context'
+import { CompanySettingsProvider } from '@/lib/company-settings-context'
 import { EmailProvider } from '@/lib/email-context'
 import { ArrowRightLeft, LogOut, Check } from 'lucide-react'
 import { FeedbackModal } from '@/components/modals/feedback-modal'
@@ -185,6 +186,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (isPopup) {
     return (
       <InvoiceSettingsProvider>
+      <CompanySettingsProvider>
       <EmailProvider>
         <div className="min-h-screen bg-background">
           <main className="flex-1">
@@ -192,6 +194,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </main>
         </div>
       </EmailProvider>
+      </CompanySettingsProvider>
       </InvoiceSettingsProvider>
     )
   }
@@ -200,6 +203,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <InvoiceSettingsProvider>
+    <CompanySettingsProvider>
     <EmailProvider>
     <div className="relative h-screen overflow-hidden bg-background">
       <Sidebar
@@ -372,6 +376,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <BugReportModal open={bugReportOpen} onClose={() => setBugReportOpen(false)} />
     </div>
     </EmailProvider>
+    </CompanySettingsProvider>
     </InvoiceSettingsProvider>
   )
 }

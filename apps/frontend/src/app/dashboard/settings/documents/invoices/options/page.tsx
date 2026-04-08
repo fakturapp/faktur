@@ -2,18 +2,14 @@
 
 import { motion, type Variants } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { InvoicePreview } from '@/components/settings/invoice-preview'
 import {
   Zap,
   ClipboardList,
-  Banknote,
-  Coins,
-  PenLine,
-  Lock,
+  SlidersHorizontal,
+  Languages,
   Check,
 } from 'lucide-react'
 
@@ -28,14 +24,6 @@ const fadeUp = {
 
 export default function InvoiceOptionsPage() {
   const { settings, loading, updateSettings } = useInvoiceSettings()
-
-  function togglePaymentMethod(method: string) {
-    const current = settings.paymentMethods
-    const updated = current.includes(method)
-      ? current.filter((m) => m !== method)
-      : [...current, method]
-    updateSettings({ paymentMethods: updated })
-  }
 
   if (loading) {
     return (
@@ -168,182 +156,83 @@ export default function InvoiceOptionsPage() {
             </Card>
           </motion.div>
 
-          {/* Payment Methods */}
+          {/* Document Toggles */}
           <motion.div variants={fadeUp} custom={2}>
             <Card className="overflow-hidden border-border/50">
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                    <Banknote className="h-4.5 w-4.5 text-primary" />
+                    <SlidersHorizontal className="h-4.5 w-4.5 text-primary" />
                   </div>
                   <div>
-                    <h2 className="text-base font-semibold text-foreground">Moyens de paiement</h2>
-                    <p className="text-xs text-muted-foreground">Modes de paiement affiches sur vos documents</p>
+                    <h2 className="text-base font-semibold text-foreground">Options du document</h2>
+                    <p className="text-xs text-muted-foreground">Sections affichées par défaut sur vos documents</p>
                   </div>
                 </div>
                 <div className="space-y-3">
-                  {/* Bank Transfer */}
-                  <button
-                    onClick={() => togglePaymentMethod('bank_transfer')}
-                    className={`flex w-full items-center gap-3 rounded-xl border-2 p-4 text-left transition-all ${
-                      settings.paymentMethods.includes('bank_transfer')
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border hover:border-muted-foreground/30'
-                    }`}
-                  >
-                    <div
-                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
-                        settings.paymentMethods.includes('bank_transfer') ? 'bg-primary/10' : 'bg-muted'
-                      }`}
-                    >
-                      <Banknote
-                        className={`h-5 w-5 ${
-                          settings.paymentMethods.includes('bank_transfer')
-                            ? 'text-primary'
-                            : 'text-muted-foreground'
+                  {[
+                    { key: 'defaultSignatureField' as const, label: 'Champ de signature', desc: 'Afficher les zones de signature émetteur/client' },
+                    { key: 'defaultShowNotes' as const, label: 'Notes et conditions', desc: 'Afficher la zone de notes et conditions' },
+                    { key: 'defaultShowDeliveryAddress' as const, label: 'Adresse de livraison', desc: 'Afficher un champ adresse de livraison' },
+                  ].map((opt) => (
+                    <div key={opt.key} className="flex items-center justify-between rounded-xl border-2 border-border p-3">
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{opt.label}</p>
+                        <p className="text-xs text-muted-foreground">{opt.desc}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => updateSettings({ [opt.key]: !settings[opt.key] })}
+                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors shrink-0 ${
+                          settings[opt.key] ? 'bg-primary' : 'bg-muted-foreground/30'
                         }`}
-                      />
+                      >
+                        <span className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform shadow-sm ${
+                          settings[opt.key] ? 'translate-x-[18px]' : 'translate-x-[3px]'
+                        }`} />
+                      </button>
                     </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-foreground">Virement bancaire</p>
-                      <p className="text-xs text-muted-foreground">IBAN, BIC et nom de la banque</p>
-                    </div>
-                    <div
-                      className={`h-5 w-5 rounded-md border-2 flex items-center justify-center transition-colors ${
-                        settings.paymentMethods.includes('bank_transfer')
-                          ? 'border-primary bg-primary'
-                          : 'border-muted-foreground/30'
-                      }`}
-                    >
-                      {settings.paymentMethods.includes('bank_transfer') && (
-                        <Check className="h-3 w-3 text-primary-foreground" />
-                      )}
-                    </div>
-                  </button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-                  {/* Cash */}
-                  <button
-                    onClick={() => togglePaymentMethod('cash')}
-                    className={`flex w-full items-center gap-3 rounded-xl border-2 p-4 text-left transition-all ${
-                      settings.paymentMethods.includes('cash')
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border hover:border-muted-foreground/30'
-                    }`}
-                  >
-                    <div
-                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
-                        settings.paymentMethods.includes('cash') ? 'bg-primary/10' : 'bg-muted'
-                      }`}
-                    >
-                      <Coins
-                        className={`h-5 w-5 ${
-                          settings.paymentMethods.includes('cash') ? 'text-primary' : 'text-muted-foreground'
-                        }`}
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-foreground">Especes</p>
-                      <p className="text-xs text-muted-foreground">Paiement en especes</p>
-                    </div>
-                    <div
-                      className={`h-5 w-5 rounded-md border-2 flex items-center justify-center transition-colors ${
-                        settings.paymentMethods.includes('cash')
-                          ? 'border-primary bg-primary'
-                          : 'border-muted-foreground/30'
-                      }`}
-                    >
-                      {settings.paymentMethods.includes('cash') && (
-                        <Check className="h-3 w-3 text-primary-foreground" />
-                      )}
-                    </div>
-                  </button>
-
-                  {/* Custom */}
+          {/* Default Language */}
+          <motion.div variants={fadeUp} custom={3}>
+            <Card className="overflow-hidden border-border/50">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                    <Languages className="h-4.5 w-4.5 text-primary" />
+                  </div>
                   <div>
+                    <h2 className="text-base font-semibold text-foreground">Langue par défaut</h2>
+                    <p className="text-xs text-muted-foreground">Langue utilisée à la création d&apos;un document</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { id: 'fr', label: 'Français' },
+                    { id: 'en', label: 'English' },
+                  ].map((lang) => (
                     <button
-                      onClick={() => togglePaymentMethod('custom')}
-                      className={`flex w-full items-center gap-3 rounded-xl border-2 p-4 text-left transition-all ${
-                        settings.paymentMethods.includes('custom')
-                          ? 'border-primary bg-primary/5'
-                          : 'border-border hover:border-muted-foreground/30'
+                      key={lang.id}
+                      onClick={() => updateSettings({ defaultLanguage: lang.id })}
+                      className={`rounded-xl border-2 p-3 text-left transition-all ${
+                        settings.defaultLanguage === lang.id ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
                       }`}
                     >
-                      <div
-                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
-                          settings.paymentMethods.includes('custom') ? 'bg-primary/10' : 'bg-muted'
-                        }`}
-                      >
-                        <PenLine
-                          className={`h-5 w-5 ${
-                            settings.paymentMethods.includes('custom') ? 'text-primary' : 'text-muted-foreground'
-                          }`}
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-foreground">Autre</p>
-                        <p className="text-xs text-muted-foreground">Moyen de paiement personnalise</p>
-                      </div>
-                      <div
-                        className={`h-5 w-5 rounded-md border-2 flex items-center justify-center transition-colors ${
-                          settings.paymentMethods.includes('custom')
-                            ? 'border-primary bg-primary'
-                            : 'border-muted-foreground/30'
-                        }`}
-                      >
-                        {settings.paymentMethods.includes('custom') && (
-                          <Check className="h-3 w-3 text-primary-foreground" />
-                        )}
-                      </div>
+                      <p className="text-sm font-medium text-foreground">{lang.label}</p>
                     </button>
-                    {settings.paymentMethods.includes('custom') && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="mt-2 ml-14"
-                      >
-                        <Input
-                          placeholder="Ex: Cheque, PayPal, etc."
-                          value={settings.customPaymentMethod}
-                          onChange={(e) => updateSettings({ customPaymentMethod: e.target.value })}
-                          className="text-sm"
-                        />
-                      </motion.div>
-                    )}
-                  </div>
-
-                  <Separator />
-
-                  {/* Coming Soon */}
-                  <div className="space-y-2">
-                    <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider px-1">
-                      Bientot disponible
-                    </p>
-                    {[
-                      { name: 'Stripe', desc: 'Paiement en ligne par carte bancaire' },
-                      { name: 'PayPal', desc: 'Paiement via compte PayPal' },
-                    ].map((method) => (
-                      <div
-                        key={method.name}
-                        className="flex items-center gap-3 rounded-xl border-2 border-border/50 p-4 opacity-50 cursor-not-allowed"
-                      >
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
-                          <Lock className="h-5 w-5 text-muted-foreground" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-foreground">{method.name}</p>
-                          <p className="text-xs text-muted-foreground">{method.desc}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
           </motion.div>
 
           {/* Auto-save indicator */}
-          <motion.div variants={fadeUp} custom={3} className="flex justify-end">
+          <motion.div variants={fadeUp} custom={4} className="flex justify-end">
             <p className="text-xs text-muted-foreground flex items-center gap-1.5">
               <Check className="h-3.5 w-3.5 text-green-500" />
               Enregistrement automatique
@@ -352,7 +241,7 @@ export default function InvoiceOptionsPage() {
         </div>
 
         {/* Preview Column */}
-        <motion.div variants={fadeUp} custom={2}>
+        <motion.div variants={fadeUp} custom={1}>
           <InvoicePreview />
         </motion.div>
       </div>

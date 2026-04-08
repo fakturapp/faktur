@@ -3,7 +3,6 @@
 import { motion, type Variants } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { InvoicePreview } from '@/components/settings/invoice-preview'
@@ -204,55 +203,6 @@ export default function InvoiceDefaultsPage() {
                     )}
                   </div>
 
-                  <Separator />
-
-                  {/* Toggle options */}
-                  {[
-                    { key: 'defaultSignatureField' as const, label: 'Champ de signature', desc: 'Afficher les zones de signature \u00e9metteur/client' },
-                    { key: 'defaultShowNotes' as const, label: 'Notes et conditions', desc: 'Afficher la zone de notes et conditions' },
-                    { key: 'defaultShowDeliveryAddress' as const, label: 'Adresse de livraison', desc: 'Afficher un champ adresse de livraison' },
-                  ].map((opt) => (
-                    <div key={opt.key} className="flex items-center justify-between rounded-xl border-2 border-border p-3">
-                      <div>
-                        <p className="text-sm font-medium text-foreground">{opt.label}</p>
-                        <p className="text-xs text-muted-foreground">{opt.desc}</p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => updateSettings({ [opt.key]: !settings[opt.key] })}
-                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors shrink-0 ${
-                          settings[opt.key] ? 'bg-primary' : 'bg-muted-foreground/30'
-                        }`}
-                      >
-                        <span className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform shadow-sm ${
-                          settings[opt.key] ? 'translate-x-[18px]' : 'translate-x-[3px]'
-                        }`} />
-                      </button>
-                    </div>
-                  ))}
-
-                  <Separator />
-
-                  {/* Default Language */}
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">Langue par d&eacute;faut</label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {[
-                        { id: 'fr', label: 'Fran\u00e7ais' },
-                        { id: 'en', label: 'English' },
-                      ].map((lang) => (
-                        <button
-                          key={lang.id}
-                          onClick={() => updateSettings({ defaultLanguage: lang.id })}
-                          className={`rounded-xl border-2 p-3 text-left transition-all ${
-                            settings.defaultLanguage === lang.id ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
-                          }`}
-                        >
-                          <p className="text-sm font-medium text-foreground">{lang.label}</p>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
                 </div>
               </CardContent>
             </Card>

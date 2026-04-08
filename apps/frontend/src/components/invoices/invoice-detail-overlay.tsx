@@ -10,6 +10,7 @@ import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/componen
 import { StatusDropdown, invoiceStatusOptions } from '@/components/shared/status-dropdown'
 import { useToast } from '@/components/ui/toast'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
+import { useCompanySettings } from '@/lib/company-settings-context'
 import { api } from '@/lib/api'
 import { A4Sheet, type DocumentLine, type ClientInfo, type CompanyInfo } from '@/components/shared/a4-sheet'
 import { SendEmailModal } from '@/components/shared/send-email-modal'
@@ -97,6 +98,7 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
   const { toast } = useToast()
   const trackFeature = useTrackFeature()
   const { settings: invoiceSettings, companyLogoUrl } = useInvoiceSettings()
+  const { paymentForm: companyPaymentForm } = useCompanySettings()
   const [loading, setLoading] = useState(true)
   const [invoice, setInvoice] = useState<InvoiceDetail | null>(null)
   const [company, setCompany] = useState<CompanyInfo | null>(null)
@@ -459,8 +461,8 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                   showClientSiren={!!invoice.clientSiren}
                   clientVatNumber={invoice.clientVatNumber || ''}
                   showClientVatNumber={!!invoice.clientVatNumber}
-                  paymentMethods={invoiceSettings.paymentMethods}
-                  customPaymentMethod={invoiceSettings.customPaymentMethod}
+                  paymentMethods={companyPaymentForm.paymentMethods}
+                  customPaymentMethod={companyPaymentForm.customPaymentMethod}
                   paymentMethod={invoice.paymentMethod}
                   bankAccountInfo={bankAccountInfo}
                   subject={invoice.subject || ''}
@@ -765,6 +767,8 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
             invoiceDueDate={invoice.dueDate}
             hasBankAccount={!!invoice.bankAccountId}
             hasStripeConfigured={hasStripeConfigured}
+            enabledPaymentMethods={companyPaymentForm.paymentMethods}
+            customPaymentMethodLabel={companyPaymentForm.customPaymentMethod}
             onCreated={(link) => {
               setPaymentLinkInfo({
                 id: link.id,

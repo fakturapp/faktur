@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/toast'
 import { Spinner } from '@/components/ui/spinner'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
+import { useCompanySettings } from '@/lib/company-settings-context'
 import { api } from '@/lib/api'
 import { A4Sheet, ClientModal, type DocumentLine, type ClientInfo, type CompanyInfo } from '@/components/shared/a4-sheet'
 import { DocumentOptionsPanel } from '@/components/shared/document-options'
@@ -50,6 +51,7 @@ function EditInvoiceContent() {
   const router = useRouter()
   const { toast } = useToast()
   const { settings: invoiceSettings, companyLogoUrl, loading: settingsLoading, refreshSettings, updateSettings, uploadLogo } = useInvoiceSettings()
+  const { paymentForm: companyPaymentForm } = useCompanySettings()
   const collabEnabled = invoiceSettings.collaborationEnabled
 
   const [loading, setLoading] = useState(true)
@@ -692,8 +694,8 @@ function EditInvoiceContent() {
               showClientSiren={!!options.clientSiren || invoiceSettings.eInvoicingEnabled}
               clientVatNumber={options.clientVatNumber}
               showClientVatNumber={!!options.clientVatNumber || invoiceSettings.eInvoicingEnabled}
-              paymentMethods={invoiceSettings.paymentMethods}
-              customPaymentMethod={invoiceSettings.customPaymentMethod}
+              paymentMethods={companyPaymentForm.paymentMethods}
+              customPaymentMethod={companyPaymentForm.customPaymentMethod}
               bankAccountInfo={bankAccountInfo}
               paymentMethod={paymentMethod}
               subject={options.subject}
@@ -767,6 +769,8 @@ function EditInvoiceContent() {
                     eInvoicingEnabled={invoiceSettings.eInvoicingEnabled}
                     notes={notes}
                     onNotesChange={setNotes}
+                    enabledPaymentMethods={companyPaymentForm.paymentMethods}
+                    customPaymentMethodLabel={companyPaymentForm.customPaymentMethod}
                   />
                 ) : (
                   <AiChatSidebar

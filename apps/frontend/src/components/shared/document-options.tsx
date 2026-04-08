@@ -65,6 +65,9 @@ interface DocumentOptionsProps {
   eInvoicingEnabled?: boolean
   notes?: string
   onNotesChange?: (notes: string) => void
+  enabledPaymentMethods?: string[]
+  customPaymentMethodLabel?: string
+  stripeConfigured?: boolean
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -173,6 +176,9 @@ export function DocumentOptionsPanel({
   bankAccounts = [], bankAccountId = '', onBankAccountChange, loadingBankAccount = false,
   eInvoicingEnabled = false,
   notes, onNotesChange,
+  enabledPaymentMethods,
+  customPaymentMethodLabel,
+  stripeConfigured = false,
 }: DocumentOptionsProps) {
   const [showSiren, setShowSiren] = useState(!!options.clientSiren || eInvoicingEnabled)
   const [showVat, setShowVat] = useState(!!options.clientVatNumber || eInvoicingEnabled)
@@ -382,17 +388,32 @@ export function DocumentOptionsPanel({
         </CollapsibleSection>
 
         {/* ── Moyen de paiement section (invoices only) ── */}
-        {documentType === 'invoice' && onPaymentMethodChange && (
+        {documentType === 'invoice' && onPaymentMethodChange && (() => {
+          const filterable = [
+            { id: 'bank_transfer', label: 'Virement', icon: Landmark, enabledKey: 'bank_transfer' },
+            { id: 'cash', label: 'Espèces', icon: Banknote, enabledKey: 'cash' },
+            {
+              id: 'other',
+              label: customPaymentMethodLabel?.trim() || 'Autre',
+              icon: MoreHorizontal,
+              enabledKey: 'custom',
+            },
+          ]
+          const visibleFilterable = enabledPaymentMethods
+            ? filterable.filter((m) => enabledPaymentMethods.includes(m.enabledKey))
+            : filterable
+          const visibleMethods = [
+            ...(visibleFilterable.find((m) => m.id === 'bank_transfer') ? [visibleFilterable.find((m) => m.id === 'bank_transfer')!] : []),
+            ...(stripeConfigured || !enabledPaymentMethods ? [{ id: 'stripe', label: 'Carte', icon: CreditCard, enabledKey: 'stripe' }] : []),
+            ...visibleFilterable.filter((m) => m.id !== 'bank_transfer'),
+          ]
+          if (visibleMethods.length === 0) return null
+          return (
           <CollapsibleSection title="Paiement">
             <div className="space-y-2">
               <label className="text-xs text-muted-foreground font-medium block mb-1">Moyen de paiement</label>
-              <div className="flex gap-1">
-                {[
-                  { id: 'bank_transfer', label: 'Virement', icon: Landmark },
-                  { id: 'stripe', label: 'Carte', icon: CreditCard },
-                  { id: 'cash', label: 'Espèces', icon: Banknote },
-                  { id: 'other', label: 'Autre', icon: MoreHorizontal },
-                ].map((t) => (
+              <div className="flex gap-1 flex-wrap">
+                {visibleMethods.map((t) => (
                   <button
                     key={t.id}
                     onClick={() => {
@@ -400,7 +421,7 @@ export function DocumentOptionsPanel({
                       if (paymentMethod === t.id && onBankAccountChange) onBankAccountChange('')
                     }}
                     className={cn(
-                      'flex-1 flex items-center justify-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all',
+                      'flex-1 min-w-[72px] flex items-center justify-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all',
                       paymentMethod === t.id
                         ? 'border-primary bg-primary/5 text-foreground'
                         : 'border-border text-muted-foreground hover:border-muted-foreground/40',
@@ -442,7 +463,8 @@ export function DocumentOptionsPanel({
               )}
             </div>
           </CollapsibleSection>
-        )}
+          )
+        })()}
 
         {/* ── Options section ── */}
         <CollapsibleSection title="Options">

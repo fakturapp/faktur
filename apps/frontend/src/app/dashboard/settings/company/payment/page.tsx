@@ -15,12 +15,22 @@ import { Badge } from '@/components/ui/badge'
 import { useCompanySettings } from '@/lib/company-settings-context'
 import { api } from '@/lib/api'
 import { StripeActivationModal } from '@/components/settings/stripe-activation-modal'
+import { SaveBar } from '@/components/ui/save-bar'
 import { Receipt, Banknote, Coins, PenLine, Lock, CreditCard, Info, CheckCircle, Trash2, AlertTriangle } from 'lucide-react'
 
 export default function PaymentPage() {
   const { toast } = useToast()
-  const { loading, noCompany, paymentForm, setPaymentForm } = useCompanySettings()
-  const [saving, setSaving] = useState(false)
+  const {
+    loading,
+    noCompany,
+    paymentForm,
+    setPaymentForm,
+    paymentHasChanges,
+    paymentSaving,
+    paymentSaveError,
+    savePayment,
+    resetPayment,
+  } = useCompanySettings()
 
   // Stripe state
   const [stripeLoading, setStripeLoading] = useState(true)
@@ -79,18 +89,9 @@ export default function PaymentPage() {
     })
   }
 
-  async function handleSavePayment(e: React.FormEvent) {
-    e.preventDefault()
-    setSaving(true)
-    const { error } = await api.put('/company', {
-      paymentConditions: paymentForm.paymentConditions,
-      currency: paymentForm.currency,
-      paymentMethods: paymentForm.paymentMethods,
-      customPaymentMethod: paymentForm.customPaymentMethod,
-    })
-    setSaving(false)
-    if (error) return toast(error, 'error')
-    toast('Conditions de paiement mises à jour', 'success')
+  async function handleSavePayment(e?: React.FormEvent) {
+    if (e) e.preventDefault()
+    await savePayment()
   }
 
   if (loading) {
@@ -279,10 +280,6 @@ export default function PaymentPage() {
                     <Lock className="h-4 w-4 text-muted-foreground shrink-0" />
                   </div>
                 </div>
-
-                <Button type="submit" disabled={saving}>
-                  {saving ? <><Spinner className="text-primary-foreground" /> Enregistrement...</> : 'Enregistrer'}
-                </Button>
               </FieldGroup>
             </form>
           )}
@@ -295,6 +292,14 @@ export default function PaymentPage() {
         onClose={() => setStripeModalOpen(false)}
         onActivated={() => loadStripeConfig()}
         webhookUrl={webhookUrl || `${window.location.origin.replace('dash.', 'api.')}/webhooks/stripe`}
+      />
+
+      <SaveBar
+        hasChanges={paymentHasChanges}
+        saving={paymentSaving}
+        error={paymentSaveError}
+        onSave={() => handleSavePayment()}
+        onReset={resetPayment}
       />
     </motion.div>
   )

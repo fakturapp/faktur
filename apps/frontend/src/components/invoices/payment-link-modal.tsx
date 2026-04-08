@@ -37,6 +37,8 @@ interface PaymentLinkModalProps {
   invoiceDueDate: string | null
   hasBankAccount: boolean
   hasStripeConfigured: boolean
+  enabledPaymentMethods?: string[]
+  customPaymentMethodLabel?: string
   onCreated: (link: { id: string; token: string; url: string; expiresAt: string | null }) => void
 }
 
@@ -117,8 +119,14 @@ export function PaymentLinkModal({
   invoiceDueDate,
   hasBankAccount,
   hasStripeConfigured,
+  enabledPaymentMethods,
+  customPaymentMethodLabel,
   onCreated,
 }: PaymentLinkModalProps) {
+  const showBankTransfer = !enabledPaymentMethods || enabledPaymentMethods.includes('bank_transfer')
+  const showCash = !enabledPaymentMethods || enabledPaymentMethods.includes('cash')
+  const showCustom = !enabledPaymentMethods || enabledPaymentMethods.includes('custom')
+  const customLabel = customPaymentMethodLabel?.trim() || 'Autre'
   const { toast } = useToast()
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
@@ -230,6 +238,7 @@ export function PaymentLinkModal({
           {/* ── Step 1: Payment method ── */}
           {step === 1 && (
             <motion.div key="s1" {...stepSlide} className="space-y-3">
+              {showBankTransfer && (
               <label
                 className={`flex items-center gap-3 p-3.5 rounded-xl border-2 cursor-pointer transition-all ${
                   paymentMethod === 'bank_transfer'
@@ -249,6 +258,7 @@ export function PaymentLinkModal({
                   {paymentMethod === 'bank_transfer' && <div className="h-2 w-2 rounded-full bg-primary" />}
                 </div>
               </label>
+              )}
 
               {/* Carte bancaire (Stripe) */}
               {hasStripeConfigured ? (
@@ -293,6 +303,7 @@ export function PaymentLinkModal({
               )}
 
               {/* Espèces */}
+              {showCash && (
               <div className="flex items-center gap-3 p-3.5 rounded-xl border-2 border-border opacity-35 cursor-not-allowed">
                 <div className="h-9 w-9 rounded-lg bg-muted/50 flex items-center justify-center shrink-0">
                   <Coins className="h-4.5 w-4.5 text-muted-foreground" />
@@ -303,6 +314,21 @@ export function PaymentLinkModal({
                 </div>
                 <Lock className="h-3.5 w-3.5 text-muted-foreground" />
               </div>
+              )}
+
+              {/* Custom (Autre / PayPal etc.) */}
+              {showCustom && (
+              <div className="flex items-center gap-3 p-3.5 rounded-xl border-2 border-border opacity-35 cursor-not-allowed">
+                <div className="h-9 w-9 rounded-lg bg-muted/50 flex items-center justify-center shrink-0">
+                  <Coins className="h-4.5 w-4.5 text-muted-foreground" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-muted-foreground">{customLabel}</p>
+                  <p className="text-[11px] text-muted-foreground">Non disponible pour les liens</p>
+                </div>
+                <Lock className="h-3.5 w-3.5 text-muted-foreground" />
+              </div>
+              )}
 
               <div className="h-px bg-border my-1" />
 
