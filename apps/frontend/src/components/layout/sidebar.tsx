@@ -12,6 +12,7 @@ import { CreateInvoiceModal } from '@/components/invoices/create-invoice-modal'
 import { useTheme } from '@/lib/theme'
 import { APP_VERSION } from '@/lib/version'
 import { isFakturDesktop, getFakturDesktopVersion } from '@/lib/is-desktop'
+import { DesktopUpdateCard } from '@/components/layout/desktop-update-card'
 import {
   LayoutDashboard,
   FileText,
@@ -481,6 +482,9 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
                 )}
               </div>
             </div>
+
+            {/* ---------- Faktur Desktop update notification ---------- */}
+            {desktop.is && <DesktopUpdateCard collapsed={collapsed} />}
           </motion.div>
         )}
       </AnimatePresence>
