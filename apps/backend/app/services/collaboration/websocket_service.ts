@@ -61,7 +61,7 @@ function getOrCreateRoom(roomKey: string): RoomPresence {
 /**
  * Returns a map of documentId → list of active editors for a given type + team.
  */
-export function getActiveEditors(documentType: string, teamId: string): Record<string, { userId: string; fullName: string | null; email: string; avatarUrl: string | null; color: string }[]> {
+export function getActiveEditors(documentType: string, _teamId: string): Record<string, { userId: string; fullName: string | null; email: string; avatarUrl: string | null; color: string }[]> {
   const result: Record<string, any[]> = {}
   for (const [roomKey, room] of rooms) {
     const [type, docId] = roomKey.split(':')

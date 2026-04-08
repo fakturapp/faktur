@@ -1,7 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import InvoiceSetting from '#models/team/invoice_setting'
 import { saveStripeSettingsValidator } from '#validators/stripe_settings_validator'
-import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
+import { encryptModelFields } from '#services/crypto/field_encryption_helper'
 import encryptionService from '#services/encryption/encryption_service'
 import stripeService from '#services/stripe/stripe_service'
 

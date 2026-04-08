@@ -3,7 +3,6 @@ import vine from '@vinejs/vine'
 import hash from '@adonisjs/core/services/hash'
 import TeamMember from '#models/team/team_member'
 import Team from '#models/team/team'
-import keyStore from '#services/crypto/key_store'
 import { deleteTeamCascade } from '#services/team/delete_team_service'
 import { validateDeletionSession } from './_helpers.js'
 

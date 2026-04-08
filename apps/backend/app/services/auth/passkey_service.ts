@@ -233,8 +233,6 @@ class PasskeyService {
     }
 
     // Try each challenge until one works
-    let challengeRecord: PasskeyChallenge | null = null
-
     let verification: VerifiedAuthenticationResponse | null = null
     let lastError: string | null = null
 
@@ -254,7 +252,6 @@ class PasskeyService {
               : undefined,
           },
         })
-        challengeRecord = challenge
         break // Found the right challenge
       } catch (err: any) {
         lastError = err?.message || String(err)

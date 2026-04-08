@@ -1,6 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import OauthApp from '#models/oauth/oauth_app'
-import OauthToken from '#models/oauth/oauth_token'
 import db from '@adonisjs/lucid/services/db'
 
 /**
