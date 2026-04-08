@@ -61,15 +61,20 @@ function RegisterContent() {
 
   // ---------- Already logged-in short-circuit ----------
   // If the user already has a session and landed on /register via the
-  // Faktur Desktop "Créer un compte" shortcut, bounce them straight to
-  // the ?redirect= target (usually /oauth/authorize?…). No need to
-  // ask them to create yet another account.
+  // Faktur Desktop "Créer un compte" shortcut (or any OAuth consent
+  // bounce), jump straight to the ?redirect= target (usually
+  // /oauth/authorize?…). If no redirect param is present, fall back to
+  // the dashboard as the default post-auth landing.
   useEffect(() => {
     if (authLoading) return
     if (!user) return
     const rawRedirect = searchParams.get('redirect')
-    if (rawRedirect && rawRedirect.startsWith('/')) {
-      router.replace(rawRedirect)
+    const safeRedirect =
+      rawRedirect && rawRedirect.startsWith('/') ? rawRedirect : null
+    if (safeRedirect) {
+      router.replace(safeRedirect)
+    } else {
+      router.replace(user.onboardingCompleted ? '/dashboard' : '/onboarding/team')
     }
   }, [user, authLoading, searchParams, router])
 
