@@ -57,7 +57,21 @@ const STEPS = [
 function RegisterContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { login } = useAuth()
+  const { login, user, loading: authLoading } = useAuth()
+
+  // ---------- Already logged-in short-circuit ----------
+  // If the user already has a session and landed on /register via the
+  // Faktur Desktop "Créer un compte" shortcut, bounce them straight to
+  // the ?redirect= target (usually /oauth/authorize?…). No need to
+  // ask them to create yet another account.
+  useEffect(() => {
+    if (authLoading) return
+    if (!user) return
+    const rawRedirect = searchParams.get('redirect')
+    if (rawRedirect && rawRedirect.startsWith('/')) {
+      router.replace(rawRedirect)
+    }
+  }, [user, authLoading, searchParams, router])
 
   // Step
   const [step, setStep] = useState(0)
