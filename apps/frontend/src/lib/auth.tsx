@@ -202,6 +202,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function logout() {
+    // Faktur Desktop: delegate to the Electron main process so it can
+    // nuke OAuth tokens + clear every session partition (cookies,
+    // localStorage, cache, indexedDB, service workers) before swapping
+    // to the login window. Calling this FIRST prevents the navigation
+    // guard in shell_window.js from triggering a session_expired loop.
+    const desktopBridge =
+      typeof window !== 'undefined' ? (window as any).fakturDesktop : null
+    if (desktopBridge?.logout) {
+      try {
+        await desktopBridge.logout()
+      } catch {
+        /* ignore — still proceed with best-effort web logout */
+      }
+      return
+    }
+
     await api.post('/auth/logout', {})
     localStorage.removeItem('faktur_token')
     localStorage.removeItem('faktur_vault_key')
