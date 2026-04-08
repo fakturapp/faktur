@@ -1085,7 +1085,7 @@ export default function AccountPage() {
             Annuler
           </Button>
           <Button variant="destructive" onClick={confirmRevokeSession} disabled={revoking}>
-            {revoking ? <Spinner size="sm" /> : 'Révoquer'}
+            {revoking ? <><Spinner size="sm" /> Révocation...</> : 'Révoquer'}
           </Button>
         </DialogFooter>
       </Dialog>
@@ -1344,7 +1344,7 @@ export default function AccountPage() {
             Annuler
           </Button>
           <Button variant="destructive" onClick={handleDeletePasskey} disabled={passkeyDeleting}>
-            {passkeyDeleting ? <Spinner size="sm" /> : 'Supprimer'}
+            {passkeyDeleting ? <><Spinner size="sm" /> Suppression...</> : 'Supprimer'}
           </Button>
         </DialogFooter>
       </Dialog>
