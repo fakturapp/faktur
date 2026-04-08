@@ -11,8 +11,15 @@ import { Dropdown, DropdownItem, DropdownLabel, DropdownSeparator, DropdownSub }
 import { CreateInvoiceModal } from '@/components/invoices/create-invoice-modal'
 import { useTheme } from '@/lib/theme'
 import { APP_VERSION } from '@/lib/version'
-import { isFakturDesktop, getFakturDesktopVersion } from '@/lib/is-desktop'
+import {
+  isFakturDesktop,
+  getFakturDesktopVersion,
+  getFakturDesktopBridge,
+  type FakturDesktopCertificationStatus,
+} from '@/lib/is-desktop'
 import { DesktopUpdateCard } from '@/components/layout/desktop-update-card'
+import { VerifiedBadge } from '@/components/ui/verified-badge'
+import { Tooltip } from '@/components/ui/tooltip'
 import {
   LayoutDashboard,
   FileText,
@@ -341,16 +348,27 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
   const [convertModalOpen, setConvertModalOpen] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
 
-  // Desktop detection (hydrated client-side so SSR stays stable)
+  // Desktop detection + attestation (hydrated client-side)
   const [desktop, setDesktop] = useState<{ is: boolean; version: string | null }>({
     is: false,
     version: null,
   })
+  const [certification, setCertification] =
+    useState<FakturDesktopCertificationStatus | null>(null)
+
   React.useEffect(() => {
     setDesktop({ is: isFakturDesktop(), version: getFakturDesktopVersion() })
+    const bridge = getFakturDesktopBridge()
+    if (bridge?.getCertificationStatus) {
+      bridge
+        .getCertificationStatus()
+        .then((status) => setCertification(status))
+        .catch(() => setCertification(null))
+    }
   }, [])
   const brandName = desktop.is ? 'Faktur Desktop' : 'Faktur'
   const brandVersion = desktop.is && desktop.version ? desktop.version : APP_VERSION
+  const isCertifiedOfficial = desktop.is && certification?.certified === true
 
   // Effective collapsed state: the user manually collapsed the sidebar AND
   // they are not currently hovering it. On hover, we temporarily switch
@@ -475,8 +493,15 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
                     <span className="text-[18px] font-semibold text-foreground font-lexend tracking-tight leading-tight whitespace-nowrap">
                       {brandName}
                     </span>
-                    <span className="text-[9px] text-muted-foreground/40 font-medium leading-none whitespace-nowrap">
-                      v{brandVersion}
+                    <span className="flex items-center gap-1 leading-none whitespace-nowrap">
+                      <span className="text-[9px] text-muted-foreground/40 font-medium">
+                        v{brandVersion}
+                      </span>
+                      {isCertifiedOfficial && (
+                        <Tooltip content="Version officielle de Faktur Desktop">
+                          <VerifiedBadge className="h-3 w-3" label="Version officielle" />
+                        </Tooltip>
+                      )}
                     </span>
                   </motion.div>
                 )}
