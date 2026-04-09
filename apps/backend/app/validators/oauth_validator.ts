@@ -55,6 +55,8 @@ export const createOauthAppValidator = vine.compile(
     iconUrl: vine.string().trim().maxLength(500).optional().nullable(),
     websiteUrl: vine.string().trim().maxLength(500).optional().nullable(),
     redirectUris: vine.array(vine.string().trim().maxLength(500)).minLength(1),
+    allowedOrigins: vine.array(vine.string().trim().maxLength(500)).optional(),
+    allowAllOrigins: vine.boolean().optional(),
     scopes: vine.array(vine.string().trim().maxLength(50)).minLength(1),
     webhookUrl: vine.string().trim().maxLength(500).optional().nullable(),
     webhookEvents: vine.array(vine.string().trim().maxLength(50)).optional().nullable(),
@@ -70,9 +72,12 @@ export const updateOauthAppValidator = vine.compile(
     iconUrl: vine.string().trim().maxLength(500).optional().nullable(),
     websiteUrl: vine.string().trim().maxLength(500).optional().nullable(),
     redirectUris: vine.array(vine.string().trim().maxLength(500)).minLength(1).optional(),
+    allowedOrigins: vine.array(vine.string().trim().maxLength(500)).optional(),
+    allowAllOrigins: vine.boolean().optional(),
     scopes: vine.array(vine.string().trim().maxLength(50)).minLength(1).optional(),
     webhookUrl: vine.string().trim().maxLength(500).optional().nullable(),
     webhookEvents: vine.array(vine.string().trim().maxLength(50)).optional().nullable(),
+    kind: vine.string().trim().maxLength(20).optional(),
     isActive: vine.boolean().optional(),
   })
 )

@@ -28,6 +28,8 @@ export default class ListOauthApps {
         websiteUrl: app.websiteUrl,
         clientId: app.clientId,
         redirectUris: app.redirectUris,
+        allowedOrigins: app.allowedOrigins ?? [],
+        allowAllOrigins: app.allowAllOrigins ?? false,
         scopes: app.scopes,
         webhookUrl: app.webhookUrl,
         webhookEvents: app.webhookEvents,

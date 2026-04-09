@@ -1,5 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import oauthAppService from '#services/oauth/oauth_app_service'
+import oauthAppService, { type OauthAppKind } from '#services/oauth/oauth_app_service'
 import { createOauthAppValidator } from '#validators/oauth_validator'
 
 export default class CreateOauthApp {
@@ -13,10 +13,12 @@ export default class CreateOauthApp {
       iconUrl: payload.iconUrl ?? null,
       websiteUrl: payload.websiteUrl ?? null,
       redirectUris: payload.redirectUris,
+      allowedOrigins: payload.allowedOrigins ?? [],
+      allowAllOrigins: payload.allowAllOrigins ?? false,
       scopes: payload.scopes,
       webhookUrl: payload.webhookUrl ?? null,
       webhookEvents: payload.webhookEvents ?? null,
-      kind: (payload.kind as 'desktop' | 'web' | 'cli' | undefined) ?? 'desktop',
+      kind: (payload.kind as OauthAppKind | undefined) ?? 'desktop',
       isFirstParty: payload.isFirstParty ?? false,
       createdByUserId: user.id,
     })
@@ -28,6 +30,8 @@ export default class CreateOauthApp {
         name: app.name,
         clientId: app.clientId,
         redirectUris: app.redirectUris,
+        allowedOrigins: app.allowedOrigins,
+        allowAllOrigins: app.allowAllOrigins,
         scopes: app.scopes,
         webhookUrl: app.webhookUrl,
         webhookEvents: app.webhookEvents,
