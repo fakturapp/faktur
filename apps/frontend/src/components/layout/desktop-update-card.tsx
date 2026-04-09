@@ -57,7 +57,7 @@ export function DesktopUpdateCard({ collapsed = false }: Props) {
           animate={{ opacity: 1, y: 0, height: 'auto' }}
           exit={{ opacity: 0, y: -8, height: 0 }}
           transition={{ duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="mx-3 mb-3 overflow-hidden"
+          className="mx-3 mt-3 overflow-hidden"
         >
           <div
             className={cn(

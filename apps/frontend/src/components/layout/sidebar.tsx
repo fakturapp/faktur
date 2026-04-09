@@ -495,9 +495,6 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
                 )}
               </div>
             </div>
-
-            {}
-            {desktop.is && <DesktopUpdateCard collapsed={collapsed} />}
           </motion.div>
         )}
       </AnimatePresence>
@@ -698,6 +695,8 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
       </AnimatePresence>
 
       <div className="mx-3 h-px bg-border" />
+
+      {desktop.is && <DesktopUpdateCard collapsed={collapsed} />}
 
       {}
       <div className="p-2.5">
