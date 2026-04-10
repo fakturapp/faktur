@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
-import { Select } from '@/components/ui/select'
+import { FormSelect } from '@/components/ui/dropdown'
 import { Switch } from '@/components/ui/switch'
 import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/toast'
@@ -230,11 +230,11 @@ export function ExpensePanel({ open, expense, onClose, onSaved }: ExpensePanelPr
                   </Field>
                   <Field>
                     <FieldLabel>Taux TVA</FieldLabel>
-                    <Select value={vatRate} onChange={(e) => setVatRate(e.target.value)}>
-                      {vatRates.map((r) => (
-                        <option key={r.value} value={r.value}>{r.label}</option>
-                      ))}
-                    </Select>
+                    <FormSelect
+                      value={vatRate}
+                      onChange={setVatRate}
+                      options={vatRates}
+                    />
                   </Field>
                 </div>
 
@@ -266,11 +266,11 @@ export function ExpensePanel({ open, expense, onClose, onSaved }: ExpensePanelPr
                   </Field>
                   <Field>
                     <FieldLabel>Moyen de paiement</FieldLabel>
-                    <Select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
-                      {paymentMethods.map((m) => (
-                        <option key={m.value} value={m.value}>{m.label}</option>
-                      ))}
-                    </Select>
+                    <FormSelect
+                      value={paymentMethod}
+                      onChange={setPaymentMethod}
+                      options={paymentMethods}
+                    />
                   </Field>
                 </div>
               </FieldGroup>
@@ -291,12 +291,14 @@ export function ExpensePanel({ open, expense, onClose, onSaved }: ExpensePanelPr
               <FieldGroup>
                 <Field>
                   <FieldLabel>Categorie</FieldLabel>
-                  <Select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
-                    <option value="">Sans categorie</option>
-                    {categories.map((cat) => (
-                      <option key={cat.id} value={cat.id}>{cat.name}</option>
-                    ))}
-                  </Select>
+                  <FormSelect
+                    value={categoryId}
+                    onChange={setCategoryId}
+                    options={[
+                      { value: '', label: 'Sans categorie' },
+                      ...categories.map((cat) => ({ value: cat.id, label: cat.name })),
+                    ]}
+                  />
                 </Field>
                 <div className="flex items-center gap-2">
                   <Input
