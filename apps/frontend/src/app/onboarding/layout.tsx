@@ -46,7 +46,7 @@ export default function OnboardingLayout({ children }: { children: React.ReactNo
         initial={{ opacity: 0, x: -30 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="relative z-10 flex w-[280px] lg:w-[320px] shrink-0 flex-col bg-overlay shadow-overlay"
+        className="relative z-10 flex w-[280px] lg:w-[320px] shrink-0 flex-col bg-overlay shadow-overlay rounded-r-[2rem]"
       >
         {/* Header */}
         <div className="px-5 pt-6 pb-4">
@@ -144,6 +144,9 @@ export default function OnboardingLayout({ children }: { children: React.ReactNo
         </div>
       </motion.aside>
 
+      {/* Fond derrière les arrondis de la sidebar */}
+      <div className="fixed inset-y-0 left-0 z-0 w-[280px] lg:w-[320px] bg-overlay" aria-hidden="true" />
+
       {/* Contenu principal — droite */}
       <main className="relative flex-1 overflow-y-auto">
         {/* Gradient orbs */}
@@ -157,9 +160,6 @@ export default function OnboardingLayout({ children }: { children: React.ReactNo
           <Link href="/" className="flex items-center gap-2.5 text-foreground hover:opacity-80 transition-opacity">
             <img src="/logo.svg" alt="Faktur" className="h-7 w-7" />
             <span className="text-base font-semibold tracking-[-0.02em]">Faktur</span>
-          </Link>
-          <Link href="https://faktur.app" className="text-[12px] text-muted-foreground hover:text-foreground transition-colors">
-            faktur.app
           </Link>
         </div>
 

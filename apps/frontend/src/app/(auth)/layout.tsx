@@ -30,14 +30,23 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         initial={{ opacity: 0, x: -30 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="relative z-10 flex w-full md:w-[520px] lg:w-[580px] shrink-0 flex-col bg-overlay shadow-overlay"
+        className="relative z-10 flex w-full md:w-[520px] lg:w-[580px] shrink-0 flex-col bg-overlay shadow-overlay rounded-r-[2rem]"
       >
         <div className="flex flex-1 flex-col items-center justify-center px-8 py-12 md:px-12 lg:px-16 overflow-y-auto">
           <div className="w-full max-w-[380px]">
             {children}
           </div>
         </div>
+        {/* Footer */}
+        <div className="px-8 pb-6 text-center">
+          <p className="text-[11px] text-muted-foreground">
+            Gratuit, pour toujours.
+          </p>
+        </div>
       </motion.div>
+
+      {/* Fond derrière les arrondis de la sidebar */}
+      <div className="hidden md:block fixed inset-y-0 left-0 z-0 w-[520px] lg:w-[580px] bg-overlay" aria-hidden="true" />
 
       {/* Côté droit — fond avec textes animés */}
       <div className="relative hidden md:flex flex-1 flex-col items-center justify-center overflow-hidden">
