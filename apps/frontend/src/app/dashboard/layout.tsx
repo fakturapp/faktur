@@ -253,7 +253,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       <div
         className={cn(
-          'relative z-10 flex min-w-0 min-h-0 h-screen flex-col transition-[padding] duration-300 ease-out overflow-hidden bg-transparent transform-gpu will-change-[padding]',
+          'relative flex min-w-0 min-h-0 h-screen flex-col transition-[padding] duration-300 ease-out overflow-hidden bg-transparent will-change-[padding]',
           sidebarCollapsed ? 'pl-16' : 'pl-(--sidebar-width)',
           switching && 'blur-sm pointer-events-none'
         )}
