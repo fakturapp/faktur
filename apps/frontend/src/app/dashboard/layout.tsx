@@ -235,18 +235,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <RouteProgressBar />
 
         <main className="relative flex-1 overflow-y-auto">
-          {/* Dégradé animé — orbes répartis sur toute la page */}
-          <div className="pointer-events-none fixed top-0 left-(--sidebar-width) right-0 h-screen overflow-hidden" aria-hidden="true">
-            {/* Haut gauche — indigo principal */}
-            <div className="absolute -top-40 -left-24 h-[550px] w-[550px] rounded-full bg-[#5957e8]/[0.06] blur-[120px] animate-[gradient-drift_14s_ease-in-out_infinite]" />
-            {/* Haut centre-droit — violet */}
-            <div className="absolute -top-20 right-[20%] h-[400px] w-[450px] rounded-full bg-[#7c5ce8]/[0.04] blur-[100px] animate-[gradient-drift_18s_ease-in-out_infinite_reverse]" />
-            {/* Centre gauche — lavande */}
-            <div className="absolute top-[30%] -left-16 h-[350px] w-[400px] rounded-full bg-[#a78bfa]/[0.035] blur-[110px] animate-[gradient-drift_20s_ease-in-out_infinite]" />
-            {/* Centre droit — indigo doux */}
-            <div className="absolute top-[40%] right-[10%] h-[300px] w-[350px] rounded-full bg-[#5957e8]/[0.03] blur-[100px] animate-[gradient-drift_16s_ease-in-out_infinite_reverse]" />
-            {/* Bas — violet diffus */}
-            <div className="absolute bottom-[5%] left-[30%] h-[350px] w-[400px] rounded-full bg-[#7c5ce8]/[0.03] blur-[110px] animate-[gradient-drift_22s_ease-in-out_infinite]" />
+          {/* Dégradés multi-couleurs animés — Revolut style */}
+          <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
+            {/* Indigo — haut gauche */}
+            <div className="absolute -top-32 -left-20 h-[600px] w-[600px] rounded-full bg-[#5957e8]/[0.12] blur-[130px] animate-[gradient-drift_12s_ease-in-out_infinite]" />
+            {/* Rose — haut droit */}
+            <div className="absolute -top-16 right-[5%] h-[500px] w-[500px] rounded-full bg-[#ec4899]/[0.08] blur-[120px] animate-[gradient-drift_16s_ease-in-out_infinite_reverse]" />
+            {/* Cyan — centre gauche */}
+            <div className="absolute top-[25%] -left-10 h-[450px] w-[500px] rounded-full bg-[#06b6d4]/[0.07] blur-[110px] animate-[gradient-drift_20s_ease-in-out_infinite]" />
+            {/* Violet — centre */}
+            <div className="absolute top-[35%] left-[40%] h-[400px] w-[400px] rounded-full bg-[#8b5cf6]/[0.06] blur-[120px] animate-[gradient-drift_14s_ease-in-out_infinite_reverse]" />
+            {/* Orange — bas droit */}
+            <div className="absolute bottom-[10%] right-[15%] h-[400px] w-[450px] rounded-full bg-[#f59e0b]/[0.06] blur-[110px] animate-[gradient-drift_18s_ease-in-out_infinite]" />
+            {/* Vert — bas gauche */}
+            <div className="absolute bottom-[5%] left-[10%] h-[350px] w-[400px] rounded-full bg-[#10b981]/[0.05] blur-[100px] animate-[gradient-drift_22s_ease-in-out_infinite_reverse]" />
           </div>
           <div className="relative @container/main flex flex-1 flex-col gap-2">
             {children}

@@ -396,9 +396,10 @@
  * ============================================================ */
 
 @keyframes gradient-drift {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(30px, -20px) scale(1.05); }
-  66% { transform: translate(-20px, 15px) scale(0.95); }
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 1; }
+  25% { transform: translate(40px, -25px) scale(1.08); opacity: 0.8; }
+  50% { transform: translate(-15px, 30px) scale(0.95); opacity: 1; }
+  75% { transform: translate(-30px, -10px) scale(1.04); opacity: 0.85; }
 }
 
 * {
