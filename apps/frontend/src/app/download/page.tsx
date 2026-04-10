@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import {
@@ -70,7 +70,7 @@ const MOBILE_FEATURES = [
 
 interface Platform {
   name: string
-  logo: string
+  logo: string | ReactNode
   logoInvert?: boolean
   subtitle: string
   status: 'available' | 'soon'
@@ -98,7 +98,16 @@ export default function DownloadPage() {
   const desktopPlatforms: Platform[] = [
     {
       name: 'Windows',
-      logo: 'https://cdn.simpleicons.org/windows/0078D4',
+      logo: (
+        <svg viewBox="0 0 512 512" fill="#0078D4" className="h-6 w-6">
+          <g transform="translate(0,512) scale(0.1,-0.1)" stroke="none">
+            <path d="M0 3870 l0 -1210 1225 0 1225 0 0 1210 0 1210 -1225 0 -1225 0 0 -1210z"/>
+            <path d="M2670 3870 l0 -1210 1225 0 1225 0 0 1210 0 1210 -1225 0 -1225 0 0 -1210z"/>
+            <path d="M0 1250 l0 -1210 1225 0 1225 0 0 1210 0 1210 -1225 0 -1225 0 0 -1210z"/>
+            <path d="M2670 1250 l0 -1210 1225 0 1225 0 0 1210 0 1210 -1225 0 -1225 0 0 -1210z"/>
+          </g>
+        </svg>
+      ),
       subtitle: 'Installeur NSIS · ~80 MB · Windows 10+',
       status: 'available',
       action: openWindowsDownload,
@@ -324,13 +333,19 @@ function PlatformCard({
     >
       <div className="flex items-center justify-between">
         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-background border border-border/60 overflow-hidden">
-          <img
-            src={platform.logo}
-            alt={`${platform.name} logo`}
-            width={24}
-            height={24}
-            className={cn('h-6 w-6 object-contain', isSoon && 'opacity-60 grayscale')}
-          />
+          {typeof platform.logo === 'string' ? (
+            <img
+              src={platform.logo}
+              alt={`${platform.name} logo`}
+              width={24}
+              height={24}
+              className={cn('h-6 w-6 object-contain', isSoon && 'opacity-60 grayscale')}
+            />
+          ) : (
+            <div className={cn('flex h-6 w-6 items-center justify-center', isSoon && 'opacity-60 grayscale')}>
+              {platform.logo}
+            </div>
+          )}
         </div>
         {isSoon && (
           <Badge variant="muted" className="text-[10px]">
