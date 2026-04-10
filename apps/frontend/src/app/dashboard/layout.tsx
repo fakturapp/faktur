@@ -7,7 +7,7 @@ import { SiteHeader } from '@/components/layout/site-header'
 import { RouteProgressBar } from '@/components/layout/route-progress'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Spinner } from '@/components/ui/spinner'
-import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useRouter, usePathname } from 'next/navigation'
@@ -203,6 +203,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <CompanySettingsProvider>
     <EmailProvider>
     <div className="relative h-screen overflow-hidden bg-background">
+      {/* Fond derrière les arrondis de la sidebar */}
+      <div className={cn('fixed inset-y-0 left-0 z-30 bg-sidebar transition-[width] duration-300 ease-out', sidebarCollapsed ? 'w-16' : 'w-(--sidebar-width)')} aria-hidden="true" />
+
       <Sidebar
         teams={teams}
         currentTeam={currentTeam}
@@ -253,17 +256,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {}
       <Dialog open={!!switchConfirm} onClose={() => setSwitchConfirm(null)}>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft">
-            <ArrowRightLeft className="h-5 w-5 text-accent" />
-          </div>
-          <div>
-            <DialogTitle>Changer d&apos;équipe</DialogTitle>
-            <DialogDescription className="mt-0">
-              Basculer vers une autre équipe
-            </DialogDescription>
-          </div>
-        </div>
+        <DialogHeader onClose={() => setSwitchConfirm(null)} icon={<ArrowRightLeft className="h-5 w-5 text-accent" />}>
+          <DialogTitle>Changer d&apos;équipe</DialogTitle>
+          <DialogDescription>Basculer vers une autre équipe</DialogDescription>
+        </DialogHeader>
 
         {switchConfirm && (
           <div className="rounded-lg shadow-surface bg-surface p-4 mb-2">
@@ -293,17 +289,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {}
       <Dialog open={logoutConfirm} onClose={() => setLogoutConfirm(false)}>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-destructive/10">
-            <LogOut className="h-5 w-5 text-destructive" />
-          </div>
-          <div>
-            <DialogTitle>Se déconnecter</DialogTitle>
-            <DialogDescription className="mt-0">
-              Vous allez être déconnecté de votre compte
-            </DialogDescription>
-          </div>
-        </div>
+        <DialogHeader showClose={false} icon={<LogOut className="h-5 w-5 text-danger" />}>
+          <DialogTitle>Se déconnecter</DialogTitle>
+          <DialogDescription>Vous allez être déconnecté de votre compte</DialogDescription>
+        </DialogHeader>
 
         {isDesktopRuntime && (
           <div className="mb-4 mt-2">
