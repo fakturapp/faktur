@@ -15,8 +15,8 @@ export default class InvoiceSettingsUpdate {
 
     const payload = await request.validateUsing(updateInvoiceSettingsValidator)
 
-    // Normalize legacy 'vat_exempt' → 'company_info'
-    if (payload.footerMode === 'vat_exempt') {
+    // Normalize legacy values → 'company_info'
+    if (payload.footerMode && !['custom', 'company_info'].includes(payload.footerMode)) {
       payload.footerMode = 'company_info'
     }
 
@@ -57,8 +57,8 @@ export default class InvoiceSettingsUpdate {
         logoBorderRadius: payload.logoBorderRadius ?? 0,
         collaborationEnabled: payload.collaborationEnabled ?? false,
         aiEnabled: payload.aiEnabled ?? false,
-        aiProvider: 'groq',
-        aiModel: payload.aiModel || 'llama-3.3-70b-versatile',
+        aiProvider: 'gemini',
+        aiModel: payload.aiModel || 'gemini-2.5-flash',
       })
     } else {
       settings.billingType = payload.billingType
@@ -104,9 +104,9 @@ export default class InvoiceSettingsUpdate {
         settings.logoBorderRadius = payload.logoBorderRadius
       if (payload.collaborationEnabled !== undefined) settings.collaborationEnabled = payload.collaborationEnabled
       if (payload.aiEnabled !== undefined) settings.aiEnabled = payload.aiEnabled
-      settings.aiProvider = 'groq'
+      settings.aiProvider = 'gemini'
       if (payload.aiModel !== undefined)
-        settings.aiModel = payload.aiModel || 'llama-3.3-70b-versatile'
+        settings.aiModel = payload.aiModel || 'gemini-2.5-flash'
       await settings.save()
     }
 
@@ -137,12 +137,12 @@ export default class InvoiceSettingsUpdate {
         defaultLanguage: settings.defaultLanguage || 'fr',
         quoteFilenamePattern: settings.quoteFilenamePattern || 'DEV-{numero}',
         invoiceFilenamePattern: settings.invoiceFilenamePattern || 'FAC-{numero}',
-        footerMode: (settings.footerMode === 'vat_exempt' ? 'company_info' : settings.footerMode) || 'company_info',
+        footerMode: (['custom', 'company_info'].includes(settings.footerMode) ? settings.footerMode : 'company_info'),
         logoBorderRadius: settings.logoBorderRadius ?? 0,
         collaborationEnabled: settings.collaborationEnabled ?? false,
         aiEnabled: settings.aiEnabled ?? false,
-        aiProvider: 'groq',
-        aiModel: settings.aiModel || 'llama-3.3-70b-versatile',
+        aiProvider: 'gemini',
+        aiModel: settings.aiModel || 'gemini-2.5-flash',
       },
     })
   }
