@@ -13,7 +13,7 @@ function getHostname(url: string | undefined): string | null {
   }
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const checkoutHost = getHostname(process.env.NEXT_PUBLIC_CHECKOUT_URL)
   const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_URL
 
