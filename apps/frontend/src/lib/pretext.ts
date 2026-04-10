@@ -22,15 +22,11 @@ import {
   type PreparedRichInline,
 } from '@chenglou/pretext/rich-inline'
 
-// ── A4 dimensions at 96 DPI (CSS pixels) ─────────────────
-// Our A4Sheet uses aspectRatio: 210/297 with max-w-[960px]
-// Inner content: px-10 py-8 → padding 40px L/R, 32px T/B
 export const A4_WIDTH_PX = 960
 export const A4_CONTENT_WIDTH_PX = A4_WIDTH_PX - 80
 export const A4_HEIGHT_PX = Math.round(960 * (297 / 210))
 export const A4_CONTENT_HEIGHT_PX = A4_HEIGHT_PX - 64
 
-// ── Font presets used throughout FactorPro ────────────────
 const DOCUMENT_FONTS: Record<string, string> = {
   default: "'Lexend', 'Segoe UI', sans-serif",
   lexend: "'Lexend', 'Segoe UI', sans-serif",
@@ -43,20 +39,17 @@ const DOCUMENT_FONTS: Record<string, string> = {
   mono: "'Courier New', monospace",
 }
 
-// ── Font size presets matching a4-sheet.tsx ────────────────
 export const FONT_SIZES = {
-  'xs':  9,   // text-[9px]  — footer, labels
-  'sm':  10,  // text-[10px] — VAT, subtotals
-  'md':  11,  // text-[11px] — notes, conditions
-  'base': 12, // text-[12px] — body, descriptions
-  'lg':  13,  // text-[13px] — company name, total
-  'xl':  14,  // text-[14px] — classique title
-  'xxl': 18,  // text-[18px] — banner title
+  'xs':  9,
+  'sm':  10,
+  'md':  11,
+  'base': 12,
+  'lg':  13,
+  'xl':  14,
+  'xxl': 18,
 } as const
 
 export type FontSizeKey = keyof typeof FONT_SIZES
-
-// ── Helpers ───────────────────────────────────────────────
 
 function resolveFontSize(fontSize: number | FontSizeKey): number {
   return typeof fontSize === 'string' ? FONT_SIZES[fontSize] : fontSize
@@ -83,12 +76,6 @@ function stripFormatting(text: string): string {
     .replace(/^- /gm, '')
 }
 
-// ── Core measurement functions ────────────────────────────
-
-/**
- * Fast text measurement: line count + total height.
- * Uses `prepare` + `layout` (the fastest path).
- */
 export function measureTextBlock(
   text: string,
   font: string,
@@ -104,10 +91,6 @@ export function measureTextBlock(
   return { lines: result.lineCount, height: result.height }
 }
 
-/**
- * Detailed line-by-line layout (text content, width per line).
- * Uses `prepareWithSegments` + `layoutWithLines`.
- */
 export function measureTextLines(
   text: string,
   font: string,
@@ -124,10 +107,6 @@ export function measureTextLines(
   return layoutWithLines(prepared, maxWidth, size * lineHeight)
 }
 
-/**
- * Natural (unconstrained) width of a text string.
- * Uses `prepareWithSegments` + `measureNaturalWidth`.
- */
 export function measureTextWidth(
   text: string,
   font: string,
@@ -140,12 +119,6 @@ export function measureTextWidth(
   return measureNaturalWidth(prepared)
 }
 
-// ── Rich inline measurement (mixed fonts/sizes) ──────────
-
-/**
- * Measure rich (formatted) text with mixed fonts/sizes.
- * Useful for descriptions with bold, italic, etc.
- */
 export function measureRichText(
   items: RichInlineItem[],
   maxWidth: number = A4_CONTENT_WIDTH_PX,
@@ -155,10 +128,6 @@ export function measureRichText(
   return measureRichInlineStats(prepared, maxWidth)
 }
 
-/**
- * Build RichInlineItem array from markdown-formatted text.
- * Parses **bold**, *italic*, {font:X}...{/font} etc.
- */
 export function parseRichInlineItems(
   text: string,
   baseFont: string,
@@ -170,7 +139,6 @@ export function parseRichInlineItems(
   const italicFontStr = `italic ${size}px ${baseFont}`
 
   const items: RichInlineItem[] = []
-  // Simple parser: split on bold/italic markers
   const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/)
 
   for (const part of parts) {
@@ -186,8 +154,6 @@ export function parseRichInlineItems(
 
   return items
 }
-
-// ── Document overflow estimation ──────────────────────────
 
 export function estimateDocumentContentHeight(params: {
   lines: { description: string; type: 'standard' | 'section' }[]
@@ -207,19 +173,15 @@ export function estimateDocumentContentHeight(params: {
   const sections: Record<string, number> = {}
   let totalHeight = 0
 
-  // Header area (company + client + title) ~200px
   sections.header = 200
   totalHeight += 200
 
-  // Subject line ~25px
   sections.subject = 25
   totalHeight += 25
 
-  // Table header ~30px
   sections.tableHeader = 30
   totalHeight += 30
 
-  // Line items
   let linesHeight = 0
   for (const line of params.lines) {
     if (line.type === 'section') {
@@ -232,32 +194,27 @@ export function estimateDocumentContentHeight(params: {
   sections.lines = linesHeight
   totalHeight += linesHeight
 
-  // Totals area ~100px
   sections.totals = 100
   totalHeight += 100
 
-  // Notes
   if (params.notes) {
     const h = measureTextBlock(params.notes, font, 'md', 1.6).height + 30
     sections.notes = h
     totalHeight += h
   }
 
-  // Acceptance conditions
   if (params.acceptanceConditions) {
     const h = measureTextBlock(params.acceptanceConditions, font, 'md', 1.6).height + 25
     sections.acceptanceConditions = h
     totalHeight += h
   }
 
-  // Free field
   if (params.freeField) {
     const h = measureTextBlock(params.freeField, font, 'md', 1.6).height + 25
     sections.freeField = h
     totalHeight += h
   }
 
-  // Footer
   if (params.footerText) {
     const h = measureTextBlock(params.footerText, font, 'xs', 1.6).height + 20
     sections.footer = h
@@ -276,7 +233,6 @@ export function estimateDocumentContentHeight(params: {
   }
 }
 
-// ── Re-exports ────────────────────────────────────────────
 export {
   prepare,
   prepareWithSegments,
