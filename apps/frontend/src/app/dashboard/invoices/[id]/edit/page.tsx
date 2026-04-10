@@ -20,7 +20,7 @@ import { ProductCatalogModal, type CatalogProduct } from '@/components/products/
 import { Tabs } from '@/components/ui/tabs'
 import { AiChatSidebar } from '@/components/ai/ai-chat-sidebar'
 import { AiSheetOverlay } from '@/components/ai/ai-sheet-overlay'
-import { DocumentZoom, loadDocumentZoom } from '@/components/shared/document-zoom'
+import { DocumentZoom, loadDocumentZoom, useZoomSpacing } from '@/components/shared/document-zoom'
 import { CollaborationToolbar, CollaborationReadOnlyBanner, CollaborationEditor } from '@/components/collaboration/collaboration-toolbar'
 import { CollaborationProvider } from '@/components/collaboration/collaboration-provider'
 import { SyncBroadcaster } from '@/components/collaboration/sync-broadcaster'
@@ -60,6 +60,8 @@ function EditInvoiceContent() {
   const [mode, setMode] = useState<'edit' | 'preview'>('edit')
   const [docZoom, setDocZoom] = useState(100)
   useEffect(() => setDocZoom(loadDocumentZoom()), [])
+  const a4SheetRef = useRef<HTMLDivElement>(null)
+  const zoomSpacing = useZoomSpacing(a4SheetRef, docZoom)
   const [invoiceNumber, setInvoiceNumber] = useState('')
   const [company, setCompany] = useState<CompanyInfo | null>(null)
   const [selectedClient, setSelectedClient] = useState<ClientInfo | null>(null)
@@ -682,7 +684,7 @@ function EditInvoiceContent() {
               </button>
             </div>
             <CollaborationEditor editorRef={editorAreaRef}>
-            <div className="relative" style={{ transform: `scale(${docZoom / 100})`, transformOrigin: 'top center', transition: 'transform 0.15s ease' }}>
+            <div ref={a4SheetRef} className="relative" style={{ transform: `scale(${docZoom / 100})`, transformOrigin: 'top center', ...zoomSpacing }}>
             <AiSheetOverlay open={aiProcessing} />
             <A4Sheet
               mode={mode}
