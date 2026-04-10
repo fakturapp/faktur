@@ -119,9 +119,9 @@ interface DropdownSubProps {
 export function DropdownSub({ trigger, children, className }: DropdownSubProps) {
   const [open, setOpen] = useState(false)
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
-  const containerRef = useRef<HTMLDivElement>(null)
+  const triggerBtnRef = useRef<HTMLButtonElement>(null)
   const flyoutRef = useRef<HTMLDivElement>(null)
-  const [flyoutStyle, setFlyoutStyle] = useState<React.CSSProperties>({})
+  const [flyoutPos, setFlyoutPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 })
 
   function handleEnter() {
     clearTimeout(timeoutRef.current)
@@ -136,37 +136,67 @@ export function DropdownSub({ trigger, children, className }: DropdownSubProps) 
     return () => clearTimeout(timeoutRef.current)
   }, [])
 
-  // Position flyout to avoid viewport overflow
+  // Calculate position using trigger bounding rect
   useLayoutEffect(() => {
-    if (!open || !containerRef.current || !flyoutRef.current) return
-    const triggerRect = containerRef.current.getBoundingClientRect()
-    const flyoutRect = flyoutRef.current.getBoundingClientRect()
-    const style: React.CSSProperties = {}
+    if (!open || !triggerBtnRef.current) return
+    const rect = triggerBtnRef.current.getBoundingClientRect()
+    let top = rect.top
+    let left = rect.right + 8
 
-    // Horizontal: prefer right, fall back to left
-    if (triggerRect.right + flyoutRect.width + 8 > window.innerWidth) {
-      style.right = '100%'
-      style.left = 'auto'
-      style.marginRight = 6
-    }
+    // Wait a frame so the flyout is rendered and we can read its size
+    requestAnimationFrame(() => {
+      if (!flyoutRef.current) return
+      const flyRect = flyoutRef.current.getBoundingClientRect()
 
-    // Vertical: clamp so it doesn't overflow bottom
-    if (triggerRect.top + flyoutRect.height > window.innerHeight - 8) {
-      style.top = 'auto'
-      style.bottom = 0
-    }
+      // If it would overflow to the right, place it on the left
+      if (left + flyRect.width > window.innerWidth - 8) {
+        left = rect.left - flyRect.width - 8
+      }
 
-    setFlyoutStyle(style)
+      // If it would overflow at the bottom, clamp it
+      if (top + flyRect.height > window.innerHeight - 8) {
+        top = window.innerHeight - flyRect.height - 8
+      }
+
+      setFlyoutPos({ top, left })
+    })
+
+    setFlyoutPos({ top, left })
   }, [open])
+
+  const flyout = (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          ref={flyoutRef}
+          initial={{ opacity: 0, x: -4 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -4 }}
+          transition={{ duration: 0.12, ease: [0.25, 0.46, 0.45, 0.94] }}
+          className={cn(
+            'fixed z-[10000] min-w-[200px] rounded-xl bg-overlay shadow-overlay overflow-hidden border border-border/10',
+            className
+          )}
+          style={{ top: flyoutPos.top, left: flyoutPos.left }}
+          onMouseEnter={handleEnter}
+          onMouseLeave={handleLeave}
+        >
+          <div className="p-1.5">
+            {children}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
 
   return (
     <div
-      ref={containerRef}
       className="relative"
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
     >
       <button
+        ref={triggerBtnRef}
         type="button"
         className={cn(
           'flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
@@ -179,26 +209,7 @@ export function DropdownSub({ trigger, children, className }: DropdownSubProps) 
         <ChevronRight className="h-3.5 w-3.5 ml-auto text-muted-foreground" />
       </button>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            ref={flyoutRef}
-            initial={{ opacity: 0, x: -4 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -4 }}
-            transition={{ duration: 0.12, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className={cn(
-              'absolute left-full top-0 ml-1.5 min-w-[200px] rounded-xl bg-overlay shadow-overlay overflow-hidden border border-border/10',
-              className
-            )}
-            style={flyoutStyle}
-          >
-            <div className="p-1.5">
-              {children}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {typeof document !== 'undefined' && createPortal(flyout, document.body)}
     </div>
   )
 }
