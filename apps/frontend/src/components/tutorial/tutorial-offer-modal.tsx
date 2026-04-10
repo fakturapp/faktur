@@ -4,12 +4,11 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { useTutorial } from '@/lib/tutorial-context'
-import { TUTORIAL_LEVELS, getTotalXp } from '@/components/tutorial/tutorial-steps'
-import { GraduationCap, Zap, ArrowRight } from 'lucide-react'
+import { TUTORIAL_LEVELS } from '@/components/tutorial/tutorial-steps'
+import { GraduationCap, ArrowRight } from 'lucide-react'
 
 export function TutorialOfferModal() {
   const { showOffer, startTutorial, dismissOffer } = useTutorial()
-  const totalXp = getTotalXp()
 
   return (
     <Dialog open={showOffer} onClose={() => {}} dismissible={false} className="max-w-md">
@@ -55,11 +54,6 @@ export function TutorialOfferModal() {
                   </motion.div>
                 )
               })}
-            </div>
-
-            <div className="flex items-center justify-center gap-1.5 rounded-lg bg-amber-500/5 border border-amber-500/10 py-2 mb-5">
-              <Zap className="h-3.5 w-3.5 text-amber-400" />
-              <span className="text-xs font-semibold text-amber-400">{totalXp} XP à débloquer</span>
             </div>
 
             <DialogFooter className="flex-col gap-2 sm:flex-col">

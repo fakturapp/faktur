@@ -265,7 +265,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         )}
       >
         <SiteHeader onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)} />
-        <TutorialBanner />
         <RouteProgressBar />
 
         <main className="relative flex-1 overflow-y-auto" data-tutorial="main-content">
@@ -396,6 +395,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <BugReportModal open={bugReportOpen} onClose={() => setBugReportOpen(false)} />
 
       {/* Tutorial system */}
+      <TutorialBanner />
       <TutorialOverlay />
       <TutorialOfferModal />
       <TutorialLevelComplete />

@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { TUTORIAL_LEVELS, getLevel, getXpUpToLevel, type TutorialStep } from '@/components/tutorial/tutorial-steps'
+import { TUTORIAL_LEVELS, getLevel, type TutorialStep } from '@/components/tutorial/tutorial-steps'
 
 const STORAGE_KEY = 'faktur_tutorial'
 const OFFER_KEY = 'faktur_tutorial_offer'
@@ -21,7 +21,6 @@ interface TutorialContextType {
   currentStep: TutorialStep | null
   totalLevels: number
   totalStepsInLevel: number
-  earnedXp: number
   showOffer: boolean
   showLevelComplete: boolean
   showTutorialComplete: boolean
@@ -34,6 +33,7 @@ interface TutorialContextType {
   dismissLevelComplete: () => void
   dismissTutorialComplete: () => void
   openTutorialFromMenu: () => void
+  goToLevel: (levelId: number) => void
 }
 
 const TutorialContext = createContext<TutorialContextType | null>(null)
@@ -100,7 +100,6 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
   const currentStep = currentLevel?.steps[step] ?? null
   const totalLevels = TUTORIAL_LEVELS.length
   const totalStepsInLevel = currentLevel?.steps.length ?? 0
-  const earnedXp = getXpUpToLevel(level)
 
   useEffect(() => {
     if (!active || !currentStep?.route) return
@@ -184,6 +183,20 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
     router.push('/dashboard')
   }, [router])
 
+  const goToLevel = useCallback((levelId: number) => {
+    const target = getLevel(levelId)
+    if (!target) return
+    setLevel(levelId)
+    setStep(0)
+    setShowLevelComplete(false)
+    setShowTutorialComplete(false)
+    if (!active) {
+      setActive(true)
+      setShowOffer(false)
+      localStorage.removeItem(OFFER_KEY)
+    }
+  }, [active])
+
   const openTutorialFromMenu = useCallback(() => {
     setShowOffer(true)
   }, [])
@@ -203,7 +216,6 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
         currentStep,
         totalLevels,
         totalStepsInLevel,
-        earnedXp,
         showOffer,
         showLevelComplete,
         showTutorialComplete,
@@ -216,6 +228,7 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
         dismissLevelComplete,
         dismissTutorialComplete,
         openTutorialFromMenu,
+        goToLevel,
       }}
     >
       {children}

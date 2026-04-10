@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useTutorial } from '@/lib/tutorial-context'
 import { getLevel, TUTORIAL_LEVELS } from '@/components/tutorial/tutorial-steps'
 import { Button } from '@/components/ui/button'
-import { ArrowRight, Zap, PartyPopper, Trophy } from 'lucide-react'
+import { ArrowRight, PartyPopper, Trophy } from 'lucide-react'
 
 function ConfettiPiece({ delay }: { delay: number }) {
   const colors = ['#6366f1', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6']
@@ -95,11 +95,6 @@ export function TutorialLevelComplete() {
                 </>
               )}
             </motion.div>
-          </div>
-
-          <div className="flex items-center justify-center gap-1.5 py-2.5 border-t border-b border-border/10">
-            <Zap className="h-3.5 w-3.5 text-amber-400" />
-            <span className="text-sm font-bold text-amber-400">+{currentLevel?.xp || 0} XP</span>
           </div>
 
           <div className="p-4">

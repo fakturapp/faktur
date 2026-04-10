@@ -28,7 +28,7 @@ export interface TutorialLevel {
   subtitle: string
   icon: LucideIcon
   color: string
-  xp: number
+
   steps: TutorialStep[]
 }
 
@@ -36,8 +36,7 @@ export const TUTORIAL_LEVELS: TutorialLevel[] = [
   /* ──── Niveau 1 : Bienvenue ──── */
   {
     id: 1, name: 'Bienvenue', subtitle: 'Découvrez votre espace de travail',
-    icon: Sparkles, color: '#6366f1', xp: 50,
-    steps: [
+    icon: Sparkles, color: '#6366f1',    steps: [
       {
         id: '1-1',
         title: 'Bienvenue sur Faktur !',
@@ -85,7 +84,7 @@ export const TUTORIAL_LEVELS: TutorialLevel[] = [
   /* ──── Niveau 2 : Votre entreprise ──── */
   {
     id: 2, name: 'Votre Entreprise', subtitle: 'Vérifiez les informations de votre société',
-    icon: Building2, color: '#8b5cf6', xp: 75,
+    icon: Building2, color: '#8b5cf6',
     steps: [
       {
         id: '2-1',
@@ -134,7 +133,7 @@ export const TUTORIAL_LEVELS: TutorialLevel[] = [
   /* ──── Niveau 3 : Premier client ──── */
   {
     id: 3, name: 'Premier Client', subtitle: 'Créez votre premier contact',
-    icon: UserPlus, color: '#10b981', xp: 100,
+    icon: UserPlus, color: '#10b981',
     steps: [
       {
         id: '3-1',
@@ -170,7 +169,7 @@ export const TUTORIAL_LEVELS: TutorialLevel[] = [
   /* ──── Niveau 4 : Premier produit ──── */
   {
     id: 4, name: 'Premier Produit', subtitle: 'Ajoutez un produit ou service',
-    icon: Package, color: '#f59e0b', xp: 100,
+    icon: Package, color: '#f59e0b',
     steps: [
       {
         id: '4-1',
@@ -198,7 +197,7 @@ export const TUTORIAL_LEVELS: TutorialLevel[] = [
   /* ──── Niveau 5 : Première facture ──── */
   {
     id: 5, name: 'Première Facture', subtitle: 'Créez votre première facture',
-    icon: FileText, color: '#3b82f6', xp: 150,
+    icon: FileText, color: '#3b82f6',
     steps: [
       {
         id: '5-1',
@@ -234,7 +233,7 @@ export const TUTORIAL_LEVELS: TutorialLevel[] = [
   /* ──── Niveau 6 : Aperçu & PDF ──── */
   {
     id: 6, name: 'Aperçu & PDF', subtitle: 'Prévisualisez et exportez',
-    icon: Eye, color: '#06b6d4', xp: 100,
+    icon: Eye, color: '#06b6d4',
     steps: [
       {
         id: '6-1',
@@ -258,7 +257,7 @@ export const TUTORIAL_LEVELS: TutorialLevel[] = [
   /* ──── Niveau 7 : Envoi par email ──── */
   {
     id: 7, name: 'Envoi Email', subtitle: 'Envoyez depuis Faktur',
-    icon: Mail, color: '#ec4899', xp: 100,
+    icon: Mail, color: '#ec4899',
     steps: [
       {
         id: '7-1',
@@ -282,7 +281,7 @@ export const TUTORIAL_LEVELS: TutorialLevel[] = [
   /* ──── Niveau 8 : Devis ──── */
   {
     id: 8, name: 'Devis', subtitle: 'Proposez et convertissez',
-    icon: Receipt, color: '#f97316', xp: 125,
+    icon: Receipt, color: '#f97316',
     steps: [
       {
         id: '8-1',
@@ -310,7 +309,7 @@ export const TUTORIAL_LEVELS: TutorialLevel[] = [
   /* ──── Niveau 9 : Paiements ──── */
   {
     id: 9, name: 'Paiements', subtitle: 'Gérez vos encaissements',
-    icon: CreditCard, color: '#22c55e', xp: 125,
+    icon: CreditCard, color: '#22c55e',
     steps: [
       {
         id: '9-1',
@@ -335,7 +334,7 @@ export const TUTORIAL_LEVELS: TutorialLevel[] = [
   /* ──── Niveau 10 : Maîtrise ──── */
   {
     id: 10, name: 'Maîtrise', subtitle: 'Fonctionnalités avancées',
-    icon: Trophy, color: '#eab308', xp: 200,
+    icon: Trophy, color: '#eab308',
     steps: [
       {
         id: '10-1',
@@ -371,14 +370,6 @@ export const TUTORIAL_LEVELS: TutorialLevel[] = [
     ],
   },
 ]
-
-export function getTotalXp(): number {
-  return TUTORIAL_LEVELS.reduce((sum, l) => sum + l.xp, 0)
-}
-
-export function getXpUpToLevel(levelId: number): number {
-  return TUTORIAL_LEVELS.filter((l) => l.id < levelId).reduce((sum, l) => sum + l.xp, 0)
-}
 
 export function getLevel(id: number): TutorialLevel | undefined {
   return TUTORIAL_LEVELS.find((l) => l.id === id)
