@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { Dropdown, DropdownItem } from '@/components/ui/dropdown'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/toast'
@@ -217,19 +218,31 @@ export function SendEmailModal({
               De
             </label>
             <div className="relative">
-              <select
-                value={selectedAccountId}
-                onChange={(e) => setSelectedAccountId(e.target.value)}
-                disabled={showSendConfirm || sending}
-                className="w-full appearance-none rounded-lg border border-border bg-muted/30 px-3 py-2.5 pr-8 text-sm text-foreground outline-none focus:border-primary/50 transition-colors disabled:opacity-50"
+              <Dropdown
+                trigger={
+                  <button
+                    disabled={showSendConfirm || sending}
+                    className="flex w-full items-center justify-between gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary/50 transition-colors disabled:opacity-50"
+                  >
+                    <span>
+                      {accounts.find(a => a.id === selectedAccountId)?.email}
+                      {accounts.find(a => a.id === selectedAccountId)?.isDefault ? ' (par défaut)' : ''}
+                    </span>
+                    <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                  </button>
+                }
+                className="w-[300px]"
               >
                 {accounts.map((acc) => (
-                  <option key={acc.id} value={acc.id}>
+                  <DropdownItem
+                    key={acc.id}
+                    selected={selectedAccountId === acc.id}
+                    onClick={() => setSelectedAccountId(acc.id)}
+                  >
                     {acc.email}{acc.isDefault ? ' (par défaut)' : ''}
-                  </option>
+                  </DropdownItem>
                 ))}
-              </select>
-              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+              </Dropdown>
             </div>
           </div>
 

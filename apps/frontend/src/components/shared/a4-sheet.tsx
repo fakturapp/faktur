@@ -11,6 +11,7 @@ import {
 import { api } from '@/lib/api'
 import { RichTextarea, mdToHtml } from '@/components/ui/rich-textarea'
 import { Dialog, DialogTitle } from '@/components/ui/dialog'
+import { Dropdown, DropdownItem } from '@/components/ui/dropdown'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -1378,11 +1379,30 @@ export function A4Sheet({
                         </div>
                         <div className="px-1.5 py-2 text-center">
                           {isPreview ? <span className="text-[11px]" style={{ color: T.textMuted }}>{line.vatRate}%</span>
-                            : <select value={line.vatRate} onChange={(e) => onUpdateLine(idx, { vatRate: parseFloat(e.target.value) })}
-                                className="w-full text-[10px] rounded py-0.5 px-0.5 outline-none cursor-pointer"
-                                style={{ border: `1px solid ${T.borderLight}`, backgroundColor: T.inputBg, color: T.text }}>
-                                <option value="20">20%</option><option value="10">10%</option><option value="5.5">5,5%</option><option value="0">0%</option>
-                              </select>}
+                            : <div className="w-full flex justify-center">
+                                <Dropdown
+                                  align="right"
+                                  trigger={
+                                    <button
+                                      className="flex justify-between items-center px-1 text-[10px] rounded cursor-pointer outline-none min-w-[36px]"
+                                      style={{ border: `1px solid ${T.borderLight}`, backgroundColor: T.inputBg, color: T.text }}
+                                    >
+                                      <span>{line.vatRate}%</span>
+                                      <ChevronDown className="h-2.5 w-2.5 opacity-50" />
+                                    </button>
+                                  }
+                                >
+                                  {['20', '10', '5.5', '0'].map(rate => (
+                                    <DropdownItem
+                                      key={rate}
+                                      selected={line.vatRate === parseFloat(rate)}
+                                      onClick={() => onUpdateLine(idx, { vatRate: parseFloat(rate) })}
+                                    >
+                                      {rate.replace('.', ',')}%
+                                    </DropdownItem>
+                                  ))}
+                                </Dropdown>
+                              </div>}
                         </div>
                       </>)}
 

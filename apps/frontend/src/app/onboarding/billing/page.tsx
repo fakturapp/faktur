@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Field, FieldLabel, FieldDescription } from '@/components/ui/field'
+import { Dropdown, DropdownItem } from '@/components/ui/dropdown'
 import { Spinner } from '@/components/ui/spinner'
 import { useAuth } from '@/lib/auth'
 import { api } from '@/lib/api'
@@ -20,6 +21,7 @@ import {
   FileText,
   CreditCard,
   Banknote,
+  ChevronDown,
 } from 'lucide-react'
 
 const fadeUp = {
@@ -190,15 +192,25 @@ export default function OnboardingBillingPage() {
           {/* TVA */}
           <motion.div variants={fadeUp} custom={2} className="mb-6">
             <h2 className="text-sm font-semibold text-foreground mb-3">Régime de TVA</h2>
-            <select
-              value={vatExemptReason}
-              onChange={(e) => setVatExemptReason(e.target.value)}
-              className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+            <Dropdown
+              trigger={
+                <button className="flex w-full items-center justify-between rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
+                  <span>{vatExemptOptions.find(o => o.value === vatExemptReason)?.label}</span>
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                </button>
+              }
+              className="w-full min-w-[300px]"
             >
               {vatExemptOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                <DropdownItem
+                  key={opt.value}
+                  selected={vatExemptReason === opt.value}
+                  onClick={() => setVatExemptReason(opt.value)}
+                >
+                  {opt.label}
+                </DropdownItem>
               ))}
-            </select>
+            </Dropdown>
             <p className="mt-2 text-xs text-muted-foreground">
               Ce réglage sera appliqué par défaut à vos nouveaux documents.
             </p>
@@ -210,29 +222,49 @@ export default function OnboardingBillingPage() {
               <FieldLabel>
                 <span className="flex items-center gap-1.5"><Globe className="h-3.5 w-3.5" /> Devise</span>
               </FieldLabel>
-              <select
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value)}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+              <Dropdown
+                trigger={
+                  <button className="flex w-full items-center justify-between rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
+                    <span>{currencies.find(c => c.value === currency)?.label}</span>
+                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                  </button>
+                }
+                className="w-full"
               >
                 {currencies.map((c) => (
-                  <option key={c.value} value={c.value}>{c.label}</option>
+                  <DropdownItem
+                    key={c.value}
+                    selected={currency === c.value}
+                    onClick={() => setCurrency(c.value)}
+                  >
+                    {c.label}
+                  </DropdownItem>
                 ))}
-              </select>
+              </Dropdown>
             </Field>
             <Field>
               <FieldLabel>
                 <span className="flex items-center gap-1.5"><FileText className="h-3.5 w-3.5" /> Langue des documents</span>
               </FieldLabel>
-              <select
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+              <Dropdown
+                trigger={
+                  <button className="flex w-full items-center justify-between rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
+                    <span>{languages.find(l => l.value === language)?.label}</span>
+                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                  </button>
+                }
+                className="w-full"
               >
                 {languages.map((l) => (
-                  <option key={l.value} value={l.value}>{l.label}</option>
+                  <DropdownItem
+                    key={l.value}
+                    selected={language === l.value}
+                    onClick={() => setLanguage(l.value)}
+                  >
+                    {l.label}
+                  </DropdownItem>
                 ))}
-              </select>
+              </Dropdown>
             </Field>
           </motion.div>
 

@@ -13,7 +13,8 @@ import { api } from '@/lib/api'
 import { Spinner } from '@/components/ui/spinner'
 import { PhoneInput } from '@/components/ui/phone-input'
 import { IbanInput } from '@/components/ui/iban-input'
-import { Building2, Search, Phone, Mail, Globe, ChevronLeft, ChevronRight, MapPin, CreditCard, AlertTriangle, Check } from 'lucide-react'
+import { Dropdown, DropdownItem } from '@/components/ui/dropdown'
+import { Building2, Search, Phone, Mail, Globe, ChevronLeft, ChevronRight, MapPin, CreditCard, AlertTriangle, Check, ChevronDown } from 'lucide-react'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -349,17 +350,28 @@ export default function OnboardingCompanyPage() {
                       </Field>
                       <Field>
                         <FieldLabel htmlFor="legalForm">Forme juridique</FieldLabel>
-                        <select
-                          id="legalForm"
-                          value={form.legalForm}
-                          onChange={(e) => updateForm('legalForm', e.target.value)}
-                          className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                        <Dropdown
+                          trigger={
+                            <button className="flex w-full items-center justify-between rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
+                              <span>{form.legalForm || 'Sélectionner...'}</span>
+                              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                            </button>
+                          }
+                          className="w-full max-h-[300px]"
                         >
-                          <option value="">Sélectionner...</option>
+                          <DropdownItem selected={form.legalForm === ''} onClick={() => updateForm('legalForm', '')}>
+                            Sélectionner...
+                          </DropdownItem>
                           {legalForms.map((f) => (
-                            <option key={f} value={f}>{f}</option>
+                            <DropdownItem
+                              key={f}
+                              selected={form.legalForm === f}
+                              onClick={() => updateForm('legalForm', f)}
+                            >
+                              {f}
+                            </DropdownItem>
                           ))}
-                        </select>
+                        </Dropdown>
                       </Field>
                     </div>
                   </FieldGroup>
@@ -401,16 +413,25 @@ export default function OnboardingCompanyPage() {
                       </Field>
                       <Field>
                         <FieldLabel htmlFor="country">Pays</FieldLabel>
-                        <select
-                          id="country"
-                          value={form.country}
-                          onChange={(e) => updateForm('country', e.target.value)}
-                          className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                        <Dropdown
+                          trigger={
+                            <button className="flex w-full items-center justify-between rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
+                              <span>{countries.find(c => c.code === form.country)?.label || 'Sélectionner...'}</span>
+                              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                            </button>
+                          }
+                          className="w-full max-h-[300px]"
                         >
                           {countries.map((c) => (
-                            <option key={c.code} value={c.code}>{c.label}</option>
+                            <DropdownItem
+                              key={c.code}
+                              selected={form.country === c.code}
+                              onClick={() => updateForm('country', c.code)}
+                            >
+                              {c.label}
+                            </DropdownItem>
                           ))}
-                        </select>
+                        </Dropdown>
                       </Field>
                     </div>
                   </FieldGroup>
