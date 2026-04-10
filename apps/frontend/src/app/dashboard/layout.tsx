@@ -203,8 +203,29 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <CompanySettingsProvider>
     <EmailProvider>
     <div className="relative h-screen overflow-hidden bg-background">
-      {/* Fond derrière les arrondis de la sidebar */}
-      <div className={cn('fixed inset-y-0 left-0 z-30 bg-sidebar transition-[width] duration-300 ease-out', sidebarCollapsed ? 'w-16' : 'w-(--sidebar-width)')} aria-hidden="true" />
+      {/* Dégradés multi-couleurs animés — Revolut style — Vraiment partout */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
+        {/* Indigo — haut gauche */}
+        <div className="absolute -top-32 -left-20 h-[600px] w-[600px] rounded-full bg-[#5957e8]/[0.12] blur-[130px] animate-[gradient-drift_12s_ease-in-out_infinite]" />
+        {/* Rose — haut droit */}
+        <div className="absolute -top-16 right-[5%] h-[500px] w-[500px] rounded-full bg-[#ec4899]/[0.08] blur-[120px] animate-[gradient-drift_16s_ease-in-out_infinite_reverse]" />
+        {/* Cyan — centre gauche */}
+        <div className="absolute top-[25%] -left-10 h-[450px] w-[500px] rounded-full bg-[#06b6d4]/[0.07] blur-[110px] animate-[gradient-drift_20s_ease-in-out_infinite]" />
+        {/* Violet — centre */}
+        <div className="absolute top-[35%] left-[40%] h-[400px] w-[400px] rounded-full bg-[#8b5cf6]/[0.06] blur-[120px] animate-[gradient-drift_14s_ease-in-out_infinite_reverse]" />
+        {/* Orange — bas droit */}
+        <div className="absolute bottom-[10%] right-[15%] h-[400px] w-[450px] rounded-full bg-[#f59e0b]/[0.06] blur-[110px] animate-[gradient-drift_18s_ease-in-out_infinite]" />
+        {/* Vert — bas gauche */}
+        <div className="absolute bottom-[5%] left-[10%] h-[350px] w-[400px] rounded-full bg-[#10b981]/[0.05] blur-[100px] animate-[gradient-drift_22s_ease-in-out_infinite_reverse]" />
+        
+        {/* Nouvelles orbes ajoutées */}
+        <div className="absolute -top-10 left-[14rem] h-[350px] w-[350px] rounded-full bg-blue-500/[0.09] blur-[100px] animate-[gradient-drift_15s_ease-in-out_infinite]" />
+        <div className="absolute top-[60%] right-[30%] h-[350px] w-[350px] rounded-full bg-rose-400/[0.07] blur-[110px] animate-[gradient-drift_19s_ease-in-out_infinite_reverse]" />
+        <div className="absolute bottom-[20%] left-[40%] h-[400px] w-[500px] rounded-full bg-emerald-400/[0.06] blur-[120px] animate-[gradient-drift_17s_ease-in-out_infinite]" />
+        <div className="absolute -bottom-10 right-[40%] h-[500px] w-[500px] rounded-full bg-amber-500/[0.06] blur-[130px] animate-[gradient-drift_24s_ease-in-out_infinite_reverse]" />
+        <div className="absolute top-[50%] left-[15%] h-[450px] w-[450px] rounded-full bg-fuchsia-500/[0.07] blur-[120px] animate-[gradient-drift_21s_ease-in-out_infinite]" />
+        <div className="absolute -bottom-20 -left-10 h-[600px] w-[600px] rounded-full bg-indigo-500/[0.08] blur-[140px] animate-[gradient-drift_25s_ease-in-out_infinite_reverse]" />
+      </div>
 
       <Sidebar
         teams={teams}
@@ -226,7 +247,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       <div
         className={cn(
-          'relative flex min-w-0 min-h-0 h-screen flex-col transition-[padding] duration-300 ease-out overflow-hidden bg-background',
+          'relative z-10 flex min-w-0 min-h-0 h-screen flex-col transition-[padding] duration-300 ease-out overflow-hidden bg-transparent transform-gpu will-change-[padding]',
           sidebarCollapsed ? 'pl-16' : 'pl-(--sidebar-width)',
           switching && 'blur-sm pointer-events-none'
         )}
@@ -235,21 +256,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <RouteProgressBar />
 
         <main className="relative flex-1 overflow-y-auto">
-          {/* Dégradés multi-couleurs animés — Revolut style */}
-          <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
-            {/* Indigo — haut gauche */}
-            <div className="absolute -top-32 -left-20 h-[600px] w-[600px] rounded-full bg-[#5957e8]/[0.12] blur-[130px] animate-[gradient-drift_12s_ease-in-out_infinite]" />
-            {/* Rose — haut droit */}
-            <div className="absolute -top-16 right-[5%] h-[500px] w-[500px] rounded-full bg-[#ec4899]/[0.08] blur-[120px] animate-[gradient-drift_16s_ease-in-out_infinite_reverse]" />
-            {/* Cyan — centre gauche */}
-            <div className="absolute top-[25%] -left-10 h-[450px] w-[500px] rounded-full bg-[#06b6d4]/[0.07] blur-[110px] animate-[gradient-drift_20s_ease-in-out_infinite]" />
-            {/* Violet — centre */}
-            <div className="absolute top-[35%] left-[40%] h-[400px] w-[400px] rounded-full bg-[#8b5cf6]/[0.06] blur-[120px] animate-[gradient-drift_14s_ease-in-out_infinite_reverse]" />
-            {/* Orange — bas droit */}
-            <div className="absolute bottom-[10%] right-[15%] h-[400px] w-[450px] rounded-full bg-[#f59e0b]/[0.06] blur-[110px] animate-[gradient-drift_18s_ease-in-out_infinite]" />
-            {/* Vert — bas gauche */}
-            <div className="absolute bottom-[5%] left-[10%] h-[350px] w-[400px] rounded-full bg-[#10b981]/[0.05] blur-[100px] animate-[gradient-drift_22s_ease-in-out_infinite_reverse]" />
-          </div>
           <div className="relative @container/main flex flex-1 flex-col gap-2">
             {children}
           </div>

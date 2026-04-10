@@ -133,10 +133,10 @@ const mainNav: NavItem[] = [
     ],
   },
   { href: '/dashboard/credit-notes', label: 'Avoirs', icon: FileMinus2 },
-  { href: '/dashboard/recurring-invoices', label: 'Recurrences', icon: RefreshCw },
+  { href: '/dashboard/recurring-invoices', label: 'Récurrences', icon: RefreshCw },
   { href: '/dashboard/clients', label: 'Clients', icon: Users },
   { href: '/dashboard/products', label: 'Produits', icon: Package },
-  { href: '/dashboard/expenses', label: 'Depenses', icon: Wallet },
+  { href: '/dashboard/expenses', label: 'Dépenses', icon: Wallet },
 ]
 
 const settingsNav: NavItem[] = [
@@ -378,7 +378,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
       onMouseEnter={collapsedProp ? () => setIsHovered(true) : undefined}
       onMouseLeave={collapsedProp ? () => setIsHovered(false) : undefined}
       className={cn(
-        'fixed left-0 top-0 z-40 flex h-screen flex-col bg-sidebar border-r border-sidebar-border rounded-r-[2rem] shadow-2xl overflow-hidden transition-[width] duration-300 ease-out',
+        'fixed left-0 top-0 z-40 flex h-screen flex-col bg-sidebar border-r border-sidebar-border rounded-r-[2rem] shadow-2xl overflow-hidden transition-[width] duration-300 ease-out transform-gpu will-change-[width]',
         collapsed ? 'w-16' : 'w-(--sidebar-width)'
       )}
     >

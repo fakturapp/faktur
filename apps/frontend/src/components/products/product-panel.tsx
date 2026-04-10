@@ -1,12 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
-import { Select } from '@/components/ui/select'
+import { SelectRoot, SelectTrigger, SelectValue, SelectIndicator, SelectPopover } from '@/components/ui/select'
+import { ListBoxRoot as ListBox, ListBoxItemRoot as ListBoxItem } from '@/components/ui/list-box'
 import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/toast'
 import { api } from '@/lib/api'
@@ -31,6 +33,9 @@ export function ProductPanel({ open, product, onClose, onSaved }: ProductPanelPr
   const { toast } = useToast()
   const trackFeature = useTrackFeature()
   const [saving, setSaving] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => setMounted(true), [])
 
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
@@ -100,7 +105,7 @@ export function ProductPanel({ open, product, onClose, onSaved }: ProductPanelPr
     onSaved()
   }
 
-  return (
+  const content = (
     <AnimatePresence>
       {open && (
         <>
@@ -109,7 +114,7 @@ export function ProductPanel({ open, product, onClose, onSaved }: ProductPanelPr
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/50"
+            className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm"
             onClick={onClose}
           />
 
@@ -119,10 +124,10 @@ export function ProductPanel({ open, product, onClose, onSaved }: ProductPanelPr
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed inset-y-0 right-0 z-50 w-full max-w-lg bg-background border-l border-border shadow-xl flex flex-col"
+            className="fixed inset-y-0 right-0 z-[100] w-full max-w-lg bg-card/40 backdrop-blur-2xl border-l border-border/40 shadow-overlay liquid-glass flex flex-col overflow-hidden"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border/40 relative z-10 bg-card/20 backdrop-blur-md">
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
                   <Package className="h-4.5 w-4.5 text-primary" />
@@ -134,6 +139,7 @@ export function ProductPanel({ open, product, onClose, onSaved }: ProductPanelPr
               <button
                 onClick={onClose}
                 className="p-2 rounded-lg hover:bg-muted transition-colors"
+                type="button"
               >
                 <X className="h-4 w-4 text-muted-foreground" />
               </button>
@@ -168,15 +174,19 @@ export function ProductPanel({ open, product, onClose, onSaved }: ProductPanelPr
                 <div className="grid grid-cols-2 gap-4">
                   <Field>
                     <FieldLabel htmlFor="productSaleType">Type</FieldLabel>
-                    <Select
-                      id="productSaleType"
-                      value={saleType}
-                      onChange={(e) => setSaleType(e.target.value)}
-                    >
-                      <option value="">Non défini</option>
-                      <option value="service">Service</option>
-                      <option value="product">Produit</option>
-                    </Select>
+                    <SelectRoot selectedKey={saleType} onSelectionChange={(k) => setSaleType(k === 'none' ? '' : k as string)}>
+                      <SelectTrigger id="productSaleType">
+                        <SelectValue />
+                        <SelectIndicator />
+                      </SelectTrigger>
+                      <SelectPopover>
+                        <ListBox>
+                          <ListBoxItem id="none">Non défini</ListBoxItem>
+                          <ListBoxItem id="service">Service</ListBoxItem>
+                          <ListBoxItem id="product">Produit</ListBoxItem>
+                        </ListBox>
+                      </SelectPopover>
+                    </SelectRoot>
                   </Field>
 
                   <Field>
@@ -207,41 +217,49 @@ export function ProductPanel({ open, product, onClose, onSaved }: ProductPanelPr
 
                   <Field>
                     <FieldLabel htmlFor="productUnit">Unité</FieldLabel>
-                    <Select
-                      id="productUnit"
-                      value={unit}
-                      onChange={(e) => setUnit(e.target.value)}
-                    >
-                      <option value="">Aucune</option>
-                      <option value="heure">Heure</option>
-                      <option value="jour">Jour</option>
-                      <option value="unité">Unité</option>
-                      <option value="forfait">Forfait</option>
-                      <option value="mois">Mois</option>
-                      <option value="an">An</option>
-                    </Select>
+                    <SelectRoot selectedKey={unit} onSelectionChange={(k) => setUnit(k === 'none' ? '' : k as string)}>
+                      <SelectTrigger id="productUnit">
+                        <SelectValue />
+                        <SelectIndicator />
+                      </SelectTrigger>
+                      <SelectPopover>
+                        <ListBox>
+                          <ListBoxItem id="none">Aucune</ListBoxItem>
+                          <ListBoxItem id="heure">Heure</ListBoxItem>
+                          <ListBoxItem id="jour">Jour</ListBoxItem>
+                          <ListBoxItem id="unité">Unité</ListBoxItem>
+                          <ListBoxItem id="forfait">Forfait</ListBoxItem>
+                          <ListBoxItem id="mois">Mois</ListBoxItem>
+                          <ListBoxItem id="an">An</ListBoxItem>
+                        </ListBox>
+                      </SelectPopover>
+                    </SelectRoot>
                   </Field>
                 </div>
 
-                <Field>
+                <Field className="mb-20">
                   <FieldLabel htmlFor="productVatRate">Taux de TVA</FieldLabel>
-                  <Select
-                    id="productVatRate"
-                    value={vatRate}
-                    onChange={(e) => setVatRate(e.target.value)}
-                  >
-                    <option value="20">20%</option>
-                    <option value="10">10%</option>
-                    <option value="5.5">5,5%</option>
-                    <option value="2.1">2,1%</option>
-                    <option value="0">0%</option>
-                  </Select>
+                  <SelectRoot selectedKey={vatRate} onSelectionChange={(k) => setVatRate(k as string)}>
+                    <SelectTrigger id="productVatRate">
+                      <SelectValue />
+                      <SelectIndicator />
+                    </SelectTrigger>
+                    <SelectPopover>
+                      <ListBox>
+                        <ListBoxItem id="20">20%</ListBoxItem>
+                        <ListBoxItem id="10">10%</ListBoxItem>
+                        <ListBoxItem id="5.5">5.5%</ListBoxItem>
+                        <ListBoxItem id="2.1">2.1%</ListBoxItem>
+                        <ListBoxItem id="0">0%</ListBoxItem>
+                      </ListBox>
+                    </SelectPopover>
+                  </SelectRoot>
                 </Field>
               </FieldGroup>
             </form>
 
             {/* Footer */}
-            <div className="px-6 py-4 border-t border-border flex items-center justify-end gap-3">
+            <div className="px-6 py-4 border-t border-border/40 relative z-10 bg-card/20 backdrop-blur-md flex items-center justify-end gap-3">
               <Button variant="outline" onClick={onClose} type="button">
                 Annuler
               </Button>
@@ -254,4 +272,7 @@ export function ProductPanel({ open, product, onClose, onSaved }: ProductPanelPr
       )}
     </AnimatePresence>
   )
+
+  if (!mounted) return null
+  return createPortal(content, document.body)
 }

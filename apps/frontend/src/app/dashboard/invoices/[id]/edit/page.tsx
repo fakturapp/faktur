@@ -492,25 +492,54 @@ function EditInvoiceContent() {
         <div className="flex flex-col xl:flex-row gap-5">
           <div className="flex-1 min-w-0 flex justify-center">
             <div className="w-full max-w-[960px] rounded-xl">
-              <div className="bg-card rounded-lg border border-border p-8 space-y-6" style={{ aspectRatio: '210/297' }}>
-                <div className="flex justify-between">
-                  <div className="space-y-2"><Skeleton className="h-10 w-20 rounded" /><Skeleton className="h-3 w-32" /><Skeleton className="h-3 w-28" /></div>
-                  <div className="text-right space-y-2"><Skeleton className="h-4 w-16 ml-auto" /><Skeleton className="h-3 w-24 ml-auto" /><Skeleton className="h-3 w-20 ml-auto" /></div>
+              <div className="bg-card/40 backdrop-blur-md rounded-2xl border border-border/40 p-10 shadow-overlay relative overflow-hidden liquid-glass" style={{ aspectRatio: '210/297' }}>
+                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.03] to-transparent skeleton-shimmer" />
+                <div className="flex justify-between mb-12">
+                  <div className="space-y-3">
+                    <Skeleton className="h-10 w-24 rounded-xl bg-primary/10" />
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-4 w-28" />
+                  </div>
+                  <div className="text-right space-y-3">
+                    <Skeleton className="h-6 w-40 ml-auto rounded-lg" />
+                    <Skeleton className="h-3 w-32 ml-auto" />
+                    <Skeleton className="h-3 w-24 ml-auto" />
+                  </div>
                 </div>
-                <Skeleton className="h-0.5 w-full" />
-                <div className="grid grid-cols-2 gap-8">
-                  <div className="space-y-1.5"><Skeleton className="h-3 w-16" /><Skeleton className="h-3.5 w-32" /><Skeleton className="h-3 w-40" /><Skeleton className="h-3 w-28" /></div>
-                  <div className="space-y-1.5"><Skeleton className="h-3 w-12" /><Skeleton className="h-3.5 w-28" /><Skeleton className="h-3 w-36" /><Skeleton className="h-3 w-24" /></div>
+                
+                <Skeleton className="h-px w-full bg-border/40 my-8" />
+                
+                <div className="grid grid-cols-2 gap-12 mb-12">
+                  <div className="space-y-3">
+                    <Skeleton className="h-4 w-20 bg-muted/40" />
+                    <Skeleton className="h-5 w-40" />
+                    <Skeleton className="h-4 w-48" />
+                    <Skeleton className="h-4 w-32" />
+                  </div>
+                  <div className="space-y-3">
+                    <Skeleton className="h-4 w-16 bg-muted/40" />
+                    <Skeleton className="h-5 w-36" />
+                    <Skeleton className="h-4 w-40" />
+                    <Skeleton className="h-4 w-28" />
+                  </div>
                 </div>
-                <div>
-                  <Skeleton className="h-8 w-full rounded-t" />
-                  {[...Array(3)].map((_, i) => (<Skeleton key={i} className="h-10 w-full rounded-none" style={{ opacity: 1 - i * 0.15 }} />))}
+                
+                <div className="mt-12">
+                  <Skeleton className="h-10 w-full rounded-t-xl bg-muted/30" />
+                  {[...Array(4)].map((_, i) => (
+                    <Skeleton key={i} className="h-12 w-full rounded-none border-t border-border/20" style={{ opacity: 1 - i * 0.15 }} />
+                  ))}
                 </div>
-                <div className="flex justify-end">
-                  <div className="w-48 space-y-2">
-                    <div className="flex justify-between"><Skeleton className="h-3 w-20" /><Skeleton className="h-3 w-16" /></div>
-                    <div className="flex justify-between"><Skeleton className="h-3 w-16" /><Skeleton className="h-3 w-12" /></div>
-                    <Skeleton className="h-8 w-full rounded" />
+                
+                <div className="flex justify-end mt-8">
+                  <div className="w-64 space-y-3">
+                    <div className="flex justify-between"><Skeleton className="h-4 w-24" /><Skeleton className="h-4 w-20" /></div>
+                    <div className="flex justify-between"><Skeleton className="h-4 w-20" /><Skeleton className="h-4 w-16" /></div>
+                    <Skeleton className="h-px w-full bg-border/40" />
+                    <div className="flex justify-between items-center mt-2">
+                       <Skeleton className="h-6 w-20 bg-primary/10" />
+                       <Skeleton className="h-7 w-28 bg-primary/20" />
+                    </div>
                   </div>
                 </div>
               </div>
