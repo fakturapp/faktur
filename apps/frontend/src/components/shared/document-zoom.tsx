@@ -21,16 +21,26 @@ export function loadDocumentZoom(): number {
 }
 
 /**
- * Compensate for CSS transform: scale() overflow on the A4 sheet.
+ * Compensate for CSS transform: scale() on the A4 sheet, so the
+ * reserved layout box matches the visual size of the scaled sheet.
  *
- * Because `transform: scale()` doesn't affect layout, scaling above 100%
- * makes the visual sheet extend below its layout box, colliding with the
- * page bottom. This hook measures the unscaled sheet height via a ref
- * and returns the pixel margin-bottom needed to push following content
- * past the visual overflow, plus a base breathing space.
+ * Problem: `transform: scale()` never affects the element's layout box.
+ * - At zoom < 100%: the layout box still reserves the natural height,
+ *   leaving a huge empty gap below the visually-small sheet.
+ * - At zoom > 100%: the visual sheet extends below its layout box and
+ *   collides with the page bottom / save bar.
  *
- * Returns a style object ready to spread onto the transform container:
- *   <div style={{ transform: `scale(${zoom/100})`, ...zoomSpacing }}>
+ * Fix: measure the unscaled sheet height via a ref and return a
+ * margin-bottom that shifts following content by `(scale - 1) * H`
+ * — negative when zoom < 100% (pulls content up into the wasted gap),
+ * positive when zoom > 100% (pushes content past the overflow) — plus
+ * a base breathing space that scales slightly with zoom so high-zoom
+ * layouts keep enough clearance for the sticky save bar.
+ *
+ * Usage:
+ *   const ref = useRef<HTMLDivElement>(null)
+ *   const spacing = useZoomSpacing(ref, docZoom)
+ *   <div ref={ref} style={{ transform: `scale(${docZoom/100})`, ...spacing }}>
  */
 export function useZoomSpacing(
   ref: RefObject<HTMLElement | null>,
@@ -51,15 +61,14 @@ export function useZoomSpacing(
   }, [ref])
 
   const scale = zoom / 100
-  // Overflow = the visual-space portion of the sheet that extends below
-  // its layout box when scale > 1.
-  const overflow = Math.max(0, (scale - 1) * naturalHeight)
-  // Always add a small base padding so the sheet isn't flush with the
-  // page bottom even at 100% zoom.
-  const base = 32
+  // Visual-vs-layout delta: negative below 100%, positive above.
+  const scaleOffset = (scale - 1) * naturalHeight
+  // Base breathing space that grows with zoom so high-zoom layouts
+  // keep enough clearance for the sticky save bar at the bottom.
+  const base = 32 + Math.max(0, (scale - 1)) * 96
   return {
-    marginBottom: `${Math.round(overflow + base)}px`,
-    transition: 'margin-bottom 0.15s ease, transform 0.15s ease',
+    marginBottom: `${Math.round(scaleOffset + base)}px`,
+    transition: 'margin-bottom 0.2s ease, transform 0.15s ease',
   }
 }
 
