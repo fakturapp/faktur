@@ -15,6 +15,11 @@ export default class InvoiceSettingsUpdate {
 
     const payload = await request.validateUsing(updateInvoiceSettingsValidator)
 
+    // Normalize legacy 'vat_exempt' → 'company_info'
+    if (payload.footerMode === 'vat_exempt') {
+      payload.footerMode = 'company_info'
+    }
+
     let pdpApiKeyToStore: string | null = null
     if (payload.pdpApiKey && payload.pdpApiKey !== '••••••••') {
       pdpApiKeyToStore = zeroAccessCryptoService.encryptField(payload.pdpApiKey, dek)
@@ -48,7 +53,7 @@ export default class InvoiceSettingsUpdate {
         defaultLanguage: payload.defaultLanguage || 'fr',
         quoteFilenamePattern: payload.quoteFilenamePattern || 'DEV-{numero}',
         invoiceFilenamePattern: payload.invoiceFilenamePattern || 'FAC-{numero}',
-        footerMode: payload.footerMode || 'vat_exempt',
+        footerMode: payload.footerMode || 'company_info',
         logoBorderRadius: payload.logoBorderRadius ?? 0,
         collaborationEnabled: payload.collaborationEnabled ?? false,
         aiEnabled: payload.aiEnabled ?? false,
@@ -94,7 +99,7 @@ export default class InvoiceSettingsUpdate {
         settings.quoteFilenamePattern = payload.quoteFilenamePattern || 'DEV-{numero}'
       if (payload.invoiceFilenamePattern !== undefined)
         settings.invoiceFilenamePattern = payload.invoiceFilenamePattern || 'FAC-{numero}'
-      if (payload.footerMode !== undefined) settings.footerMode = payload.footerMode || 'vat_exempt'
+      if (payload.footerMode !== undefined) settings.footerMode = payload.footerMode || 'company_info'
       if (payload.logoBorderRadius !== undefined)
         settings.logoBorderRadius = payload.logoBorderRadius
       if (payload.collaborationEnabled !== undefined) settings.collaborationEnabled = payload.collaborationEnabled
@@ -132,7 +137,7 @@ export default class InvoiceSettingsUpdate {
         defaultLanguage: settings.defaultLanguage || 'fr',
         quoteFilenamePattern: settings.quoteFilenamePattern || 'DEV-{numero}',
         invoiceFilenamePattern: settings.invoiceFilenamePattern || 'FAC-{numero}',
-        footerMode: settings.footerMode || 'vat_exempt',
+        footerMode: (settings.footerMode === 'vat_exempt' ? 'company_info' : settings.footerMode) || 'company_info',
         logoBorderRadius: settings.logoBorderRadius ?? 0,
         collaborationEnabled: settings.collaborationEnabled ?? false,
         aiEnabled: settings.aiEnabled ?? false,
