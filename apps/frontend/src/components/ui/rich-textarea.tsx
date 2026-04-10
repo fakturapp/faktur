@@ -10,6 +10,7 @@ import {
   Unlink,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { measureTextBlock, resolveFont } from '@/lib/pretext'
 
 
 function rgbToHex(rgb: string): string {
@@ -872,7 +873,19 @@ export function RichTextarea({
     if (singleLine && e.key === 'Enter') e.preventDefault()
   }, [singleLine])
 
-  const minHeight = singleLine ? undefined : `${Math.max(rows * 20, 24)}px`
+  // Use pretext to estimate content height without DOM measurement
+  const pretextHeight = (() => {
+    if (singleLine || !value) return 0
+    try {
+      const font = resolveFont()
+      const result = measureTextBlock(value, font, 'base', 1.6, 600)
+      return result.height
+    } catch { return 0 }
+  })()
+
+  const minHeight = singleLine
+    ? undefined
+    : `${Math.max(rows * 20, pretextHeight || 24, 24)}px`
 
   return (
     <div className="relative">

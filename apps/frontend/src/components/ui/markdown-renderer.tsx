@@ -3,11 +3,32 @@
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { cn } from '@/lib/utils'
+import { measureTextBlock, resolveFont, type FontSizeKey } from '@/lib/pretext'
 
 interface MarkdownRendererProps {
   content: string
   className?: string
   compact?: boolean
+}
+
+/**
+ * Estimate the rendered height of markdown content using pretext.
+ * No DOM measurement needed — uses pure arithmetic text layout.
+ */
+export function estimateMarkdownHeight(
+  content: string,
+  options: {
+    font?: string
+    fontSize?: number | FontSizeKey
+    maxWidth?: number
+    lineHeight?: number
+  } = {},
+): number {
+  const { font = 'Lexend', fontSize = 'base', maxWidth = 600, lineHeight = 1.5 } = options
+  if (!content) return 0
+  const resolvedFont = resolveFont(font)
+  const result = measureTextBlock(content, resolvedFont, fontSize, lineHeight, maxWidth)
+  return result.height
 }
 
 export function MarkdownRenderer({ content, className, compact = false }: MarkdownRendererProps) {
