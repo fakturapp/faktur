@@ -90,8 +90,7 @@ export function Dropdown({ trigger, children, align = 'right', position = 'below
           }}
           onClick={() => setOpen(false)}
         >
-          {/* Scrollable interior with fade mask at top and bottom if overflowing */}
-          <div className="max-h-[300px] overflow-y-auto p-1.5 [mask-image:linear-gradient(to_bottom,transparent_0px,black_16px,black_calc(100%-16px),transparent_100%)]">
+          <div className="p-1.5">
             {children}
           </div>
         </motion.div>
@@ -194,7 +193,7 @@ export function DropdownSub({ trigger, children, className }: DropdownSubProps) 
             )}
             style={flyoutStyle}
           >
-            <div className="max-h-[300px] overflow-y-auto p-1.5 [mask-image:linear-gradient(to_bottom,transparent_0px,black_16px,black_calc(100%-16px),transparent_100%)]">
+            <div className="p-1.5">
               {children}
             </div>
           </motion.div>

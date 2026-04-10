@@ -124,7 +124,7 @@ export function ProductPanel({ open, product, onClose, onSaved }: ProductPanelPr
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed inset-y-0 right-0 z-[100] w-full max-w-lg bg-white dark:bg-card/40 dark:backdrop-blur-2xl border-l border-border/20 dark:border-border/40 dark:liquid-glass flex flex-col overflow-hidden shadow-xl dark:shadow-none"
+            className="fixed inset-y-0 right-0 z-[100] w-full max-w-lg bg-white dark:bg-card/40 dark:backdrop-blur-2xl border-l border-border/20 dark:border-border/40 dark:liquid-glass flex flex-col overflow-hidden shadow-xl dark:shadow-none rounded-l-3xl"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-border/20 dark:border-border/40 relative z-10 dark:bg-card/20 dark:backdrop-blur-md">

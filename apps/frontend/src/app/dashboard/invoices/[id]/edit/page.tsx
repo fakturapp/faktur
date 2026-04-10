@@ -492,7 +492,7 @@ function EditInvoiceContent() {
         <div className="flex flex-col xl:flex-row gap-5">
           <div className="flex-1 min-w-0 flex justify-center">
             <div className="w-full max-w-[960px] rounded-xl">
-              <div className="bg-white dark:bg-zinc-900 rounded-sm border border-border/20 p-10 relative overflow-hidden" style={{ aspectRatio: '210/297' }}>
+              <div className="bg-white dark:bg-zinc-900 rounded-sm p-10 relative overflow-hidden" style={{ aspectRatio: '210/297' }}>
                 <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.03] to-transparent skeleton-shimmer" />
                 <div className="flex justify-between mb-12">
                   <div className="space-y-3">
