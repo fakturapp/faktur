@@ -13,7 +13,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { useAuth } from '@/lib/auth'
 import { api } from '@/lib/api'
 import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile'
-import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { ArrowRight, ArrowLeft, UserPlus, Check, Eye, EyeOff, Mail, Lock, User, Shield, AlertTriangle, MailX } from 'lucide-react'
 
 const fadeUp: Variants = {
@@ -748,15 +748,10 @@ function RegisterContent() {
       {/* Disposable email modal */}
       <Dialog open={showDisposableModal} onClose={() => setShowDisposableModal(false)}>
         <div className="p-6 max-w-md">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-destructive/10">
-              <MailX className="h-6 w-6 text-destructive" />
-            </div>
-            <div>
-              <DialogTitle>Email temporaire détecté</DialogTitle>
-              <DialogDescription>Ce type d&apos;adresse n&apos;est pas autorisé</DialogDescription>
-            </div>
-          </div>
+          <DialogHeader showClose={false} icon={<MailX className="h-5 w-5 text-danger" />}>
+            <DialogTitle>Email temporaire détecté</DialogTitle>
+            <DialogDescription>Ce type d&apos;adresse n&apos;est pas autorisé</DialogDescription>
+          </DialogHeader>
 
           <div className="space-y-3 mb-6">
             <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4">

@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Select } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { useAuth } from '@/lib/auth'
@@ -645,10 +645,12 @@ export default function DeleteAccountPage() {
 
       {/* Delete team dialog */}
       <Dialog open={!!deleteTeamDialog} onClose={() => setDeleteTeamDialog(null)}>
-        <DialogTitle>Supprimer l&apos;équipe &laquo; {deleteTeamDialog?.name} &raquo;</DialogTitle>
-        <DialogDescription>
-          Toutes les données de cette équipe seront perdues. Entrez votre mot de passe pour confirmer.
-        </DialogDescription>
+        <DialogHeader showClose={false} icon={<Trash2 className="h-5 w-5 text-danger" />}>
+          <DialogTitle>Supprimer l&apos;équipe &laquo; {deleteTeamDialog?.name} &raquo;</DialogTitle>
+          <DialogDescription>
+            Toutes les données de cette équipe seront perdues. Entrez votre mot de passe pour confirmer.
+          </DialogDescription>
+        </DialogHeader>
         <div className="mt-4 relative">
           <Input
             type={showDeleteTeamPassword ? 'text' : 'password'}
@@ -682,10 +684,12 @@ export default function DeleteAccountPage() {
 
       {/* Leave team confirmation dialog */}
       <Dialog open={!!leaveConfirm} onClose={() => setLeaveConfirm(null)} className="max-w-sm">
-        <DialogTitle>Quitter &laquo; {leaveConfirm?.name} &raquo; ?</DialogTitle>
-        <DialogDescription>
-          Vous perdrez l&apos;acc&egrave;s &agrave; toutes les donn&eacute;es de cette &eacute;quipe. Cette action est irr&eacute;versible.
-        </DialogDescription>
+        <DialogHeader showClose={false} icon={<LogOut className="h-5 w-5 text-danger" />}>
+          <DialogTitle>Quitter &laquo; {leaveConfirm?.name} &raquo; ?</DialogTitle>
+          <DialogDescription>
+            Vous perdrez l&apos;acc&egrave;s &agrave; toutes les donn&eacute;es de cette &eacute;quipe. Cette action est irr&eacute;versible.
+          </DialogDescription>
+        </DialogHeader>
         <DialogFooter>
           <Button variant="outline" onClick={() => setLeaveConfirm(null)} disabled={loading}>
             Annuler
@@ -706,10 +710,12 @@ export default function DeleteAccountPage() {
 
       {/* Transfer ownership dialog */}
       <Dialog open={!!transferDialog} onClose={() => setTransferDialog(null)}>
-        <DialogTitle>Transférer &laquo; {transferDialog?.name} &raquo;</DialogTitle>
-        <DialogDescription>
-          Choisissez un membre qui deviendra le nouveau propriétaire de cette équipe.
-        </DialogDescription>
+        <DialogHeader onClose={() => setTransferDialog(null)} icon={<UserCheck className="h-5 w-5 text-accent" />}>
+          <DialogTitle>Transférer &laquo; {transferDialog?.name} &raquo;</DialogTitle>
+          <DialogDescription>
+            Choisissez un membre qui deviendra le nouveau propriétaire de cette équipe.
+          </DialogDescription>
+        </DialogHeader>
         <div className="mt-4">
           {transferDialog && transferDialog.members.length === 0 ? (
             <p className="text-sm text-muted-foreground py-4 text-center">

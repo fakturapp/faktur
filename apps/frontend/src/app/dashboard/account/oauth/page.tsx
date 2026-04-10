@@ -5,7 +5,7 @@ import { api } from '@/lib/api'
 import { Spinner } from '@/components/ui/spinner'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/toast'
-import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
@@ -368,19 +368,14 @@ export default function AccountOauthAppsPage() {
         open={!!confirmRevokeSession}
         onClose={() => setConfirmRevokeSession(null)}
       >
-        <div className="flex items-start gap-3 mb-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10">
-            <LogOut className="h-5 w-5 text-amber-500" />
-          </div>
-          <div>
-            <DialogTitle>Déconnecter cet appareil ?</DialogTitle>
-            <DialogDescription className="mt-1">
-              &quot;{confirmRevokeSession?.session.deviceName || 'Cet appareil'}&quot; sera
-              déconnecté immédiatement de {confirmRevokeSession?.app.app.name}. L&apos;utilisateur
-              devra se reconnecter pour reprendre.
-            </DialogDescription>
-          </div>
-        </div>
+        <DialogHeader showClose={false} icon={<LogOut className="h-5 w-5 text-amber-500" />}>
+          <DialogTitle>Déconnecter cet appareil ?</DialogTitle>
+          <DialogDescription>
+            &quot;{confirmRevokeSession?.session.deviceName || 'Cet appareil'}&quot; sera
+            déconnecté immédiatement de {confirmRevokeSession?.app.app.name}. L&apos;utilisateur
+            devra se reconnecter pour reprendre.
+          </DialogDescription>
+        </DialogHeader>
         <DialogFooter>
           <Button
             variant="outline"
@@ -406,18 +401,13 @@ export default function AccountOauthAppsPage() {
 
       {/* Revoke full app confirm */}
       <Dialog open={!!confirmRevokeApp} onClose={() => setConfirmRevokeApp(null)}>
-        <div className="flex items-start gap-3 mb-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-destructive/10">
-            <AlertTriangle className="h-5 w-5 text-destructive" />
-          </div>
-          <div>
-            <DialogTitle>Révoquer {confirmRevokeApp?.app.name} ?</DialogTitle>
-            <DialogDescription className="mt-1">
-              Toutes les sessions actives seront immédiatement déconnectées et l&apos;application
-              devra redemander votre autorisation la prochaine fois que vous l&apos;ouvrirez.
-            </DialogDescription>
-          </div>
-        </div>
+        <DialogHeader showClose={false} icon={<AlertTriangle className="h-5 w-5 text-danger" />}>
+          <DialogTitle>Révoquer {confirmRevokeApp?.app.name} ?</DialogTitle>
+          <DialogDescription>
+            Toutes les sessions actives seront immédiatement déconnectées et l&apos;application
+            devra redemander votre autorisation la prochaine fois que vous l&apos;ouvrirez.
+          </DialogDescription>
+        </DialogHeader>
         <DialogFooter>
           <Button
             variant="outline"

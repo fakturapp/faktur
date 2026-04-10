@@ -11,7 +11,7 @@ import { Tabs } from '@/components/ui/tabs'
 import { Avatar } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { SecurityVerificationModal } from '@/components/modals/security-verification-modal'
 import { useAuth } from '@/lib/auth'
 import { useToast } from '@/components/ui/toast'
@@ -1034,7 +1034,9 @@ export default function AccountPage() {
       {/* Modals */}
       {/* Name edit modal */}
       <Dialog open={nameModalOpen} onClose={() => setNameModalOpen(false)} className="max-w-sm">
-        <DialogTitle>Modifier le pseudo</DialogTitle>
+        <DialogHeader onClose={() => setNameModalOpen(false)}>
+          <DialogTitle>Modifier le pseudo</DialogTitle>
+        </DialogHeader>
         <form onSubmit={async (e) => {
           e.preventDefault()
           setProfileLoading(true)
@@ -1075,10 +1077,12 @@ export default function AccountPage() {
 
       {/* Revoke session confirmation */}
       <Dialog open={!!revokeConfirm} onClose={() => setRevokeConfirm(null)}>
-        <DialogTitle>Révoquer cette session</DialogTitle>
-        <DialogDescription>
-          Cette session sera déconnectée immédiatement. L&apos;appareil devra se reconnecter.
-        </DialogDescription>
+        <DialogHeader showClose={false}>
+          <DialogTitle>Révoquer cette session</DialogTitle>
+          <DialogDescription>
+            Cette session sera déconnectée immédiatement. L&apos;appareil devra se reconnecter.
+          </DialogDescription>
+        </DialogHeader>
         <DialogFooter>
           <Button variant="outline" onClick={() => setRevokeConfirm(null)} disabled={revoking}>
             Annuler
@@ -1091,10 +1095,12 @@ export default function AccountPage() {
 
       {/* Delete account redirect dialog */}
       <Dialog open={deleteRedirectOpen} onClose={() => setDeleteRedirectOpen(false)}>
-        <DialogTitle>Supprimer votre compte</DialogTitle>
-        <DialogDescription>
-          Vous allez être redirigé vers la page de suppression de compte. Ce processus comporte plusieurs étapes de vérification.
-        </DialogDescription>
+        <DialogHeader showClose={false}>
+          <DialogTitle>Supprimer votre compte</DialogTitle>
+          <DialogDescription>
+            Vous allez être redirigé vers la page de suppression de compte. Ce processus comporte plusieurs étapes de vérification.
+          </DialogDescription>
+        </DialogHeader>
         <DialogFooter>
           <Button variant="outline" onClick={() => setDeleteRedirectOpen(false)}>
             Annuler
@@ -1113,15 +1119,10 @@ export default function AccountPage() {
       <Dialog open={emailStep !== 'idle'} onClose={closeEmailDialog}>
         {emailStep === 'verify_current' && (
           <>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft">
-                <Shield className="h-5 w-5 text-accent" />
-              </div>
-              <div>
-                <DialogTitle>Vérification d&apos;identité</DialogTitle>
-                <p className="text-xs text-muted-foreground mt-0.5">Étape 1 sur 3</p>
-              </div>
-            </div>
+            <DialogHeader onClose={closeEmailDialog} icon={<Shield className="h-5 w-5 text-accent" />}>
+              <DialogTitle>Vérification d&apos;identité</DialogTitle>
+              <DialogDescription>Étape 1 sur 3</DialogDescription>
+            </DialogHeader>
 
             {!emailCodeSent ? (
               <div className="space-y-4">
@@ -1174,15 +1175,10 @@ export default function AccountPage() {
 
         {emailStep === 'enter_new' && (
           <>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft">
-                <Globe className="h-5 w-5 text-accent" />
-              </div>
-              <div>
-                <DialogTitle>Nouvelle adresse email</DialogTitle>
-                <p className="text-xs text-muted-foreground mt-0.5">Étape 2 sur 3</p>
-              </div>
-            </div>
+            <DialogHeader onClose={closeEmailDialog} icon={<Globe className="h-5 w-5 text-accent" />}>
+              <DialogTitle>Nouvelle adresse email</DialogTitle>
+              <DialogDescription>Étape 2 sur 3</DialogDescription>
+            </DialogHeader>
             <form onSubmit={handleEmailSubmitNew} className="space-y-4">
               <p className="text-sm text-muted-foreground">
                 Saisissez la nouvelle adresse email que vous souhaitez utiliser.
@@ -1211,15 +1207,10 @@ export default function AccountPage() {
 
         {emailStep === 'verify_new' && (
           <>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft">
-                <Lock className="h-5 w-5 text-accent" />
-              </div>
-              <div>
-                <DialogTitle>Vérification du nouvel email</DialogTitle>
-                <p className="text-xs text-muted-foreground mt-0.5">Étape 3 sur 3</p>
-              </div>
-            </div>
+            <DialogHeader onClose={closeEmailDialog} icon={<Lock className="h-5 w-5 text-accent" />}>
+              <DialogTitle>Vérification du nouvel email</DialogTitle>
+              <DialogDescription>Étape 3 sur 3</DialogDescription>
+            </DialogHeader>
 
             {!emailCodeSent ? (
               <div className="space-y-4">
@@ -1273,10 +1264,12 @@ export default function AccountPage() {
 
       {/* Disable 2FA dialog */}
       <Dialog open={disableOpen} onClose={() => setDisableOpen(false)}>
-        <DialogTitle>Désactiver la 2FA</DialogTitle>
-        <DialogDescription>
-          Entrez un code de votre application d&apos;authentification pour confirmer la désactivation.
-        </DialogDescription>
+        <DialogHeader showClose={false}>
+          <DialogTitle>Désactiver la 2FA</DialogTitle>
+          <DialogDescription>
+            Entrez un code de votre application d&apos;authentification pour confirmer la désactivation.
+          </DialogDescription>
+        </DialogHeader>
         <form onSubmit={executeDisable2FA} className="mt-4">
           <Input
             type="text"
@@ -1306,10 +1299,12 @@ export default function AccountPage() {
 
       {/* Add passkey dialog */}
       <Dialog open={passkeyAddOpen} onClose={() => { setPasskeyAddOpen(false); setPasskeyName('') }}>
-        <DialogTitle>Ajouter une clé d'accès</DialogTitle>
-        <DialogDescription>
-          Donnez un nom à cette clé d'accès pour la reconnaître facilement.
-        </DialogDescription>
+        <DialogHeader onClose={() => { setPasskeyAddOpen(false); setPasskeyName('') }}>
+          <DialogTitle>Ajouter une clé d'accès</DialogTitle>
+          <DialogDescription>
+            Donnez un nom à cette clé d'accès pour la reconnaître facilement.
+          </DialogDescription>
+        </DialogHeader>
         <div className="mt-4 space-y-4">
           <Field>
             <FieldLabel htmlFor="passkeyName">Nom de la clé</FieldLabel>
@@ -1334,10 +1329,12 @@ export default function AccountPage() {
 
       {/* Delete passkey dialog */}
       <Dialog open={!!passkeyDeleteConfirm} onClose={() => setPasskeyDeleteConfirm(null)}>
-        <DialogTitle>Supprimer cette clé d'accès</DialogTitle>
-        <DialogDescription>
-          Vous ne pourrez plus vous connecter avec cette clé d'accès. Cette action est irréversible.
-        </DialogDescription>
+        <DialogHeader showClose={false}>
+          <DialogTitle>Supprimer cette clé d'accès</DialogTitle>
+          <DialogDescription>
+            Vous ne pourrez plus vous connecter avec cette clé d'accès. Cette action est irréversible.
+          </DialogDescription>
+        </DialogHeader>
         <DialogFooter>
           <Button variant="outline" onClick={() => setPasskeyDeleteConfirm(null)} disabled={passkeyDeleting}>
             Annuler
@@ -1350,8 +1347,10 @@ export default function AccountPage() {
 
       {/* Password change dialog */}
       <Dialog open={passwordDialogOpen} onClose={() => { setPasswordDialogOpen(false); setCurrentPassword(''); setNewPassword(''); setConfirmPassword(''); setShowCurrentPassword(false); setShowNewPassword(false); setShowConfirmPassword(false) }}>
-        <DialogTitle>Modifier le mot de passe</DialogTitle>
-        <DialogDescription>Entrez votre mot de passe actuel puis choisissez un nouveau mot de passe.</DialogDescription>
+        <DialogHeader onClose={() => { setPasswordDialogOpen(false); setCurrentPassword(''); setNewPassword(''); setConfirmPassword(''); setShowCurrentPassword(false); setShowNewPassword(false); setShowConfirmPassword(false) }}>
+          <DialogTitle>Modifier le mot de passe</DialogTitle>
+          <DialogDescription>Entrez votre mot de passe actuel puis choisissez un nouveau mot de passe.</DialogDescription>
+        </DialogHeader>
         <form onSubmit={handleChangePassword} className="mt-4 space-y-4">
           <Field>
             <FieldLabel htmlFor="currentPassword">Mot de passe actuel</FieldLabel>
