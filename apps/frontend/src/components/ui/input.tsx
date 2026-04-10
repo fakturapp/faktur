@@ -1,27 +1,38 @@
-import * as React from 'react'
-import { cn } from '@/lib/utils'
+﻿"use client";
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+import type { ComponentPropsWithRef } from "react";
+import { useContext } from "react";
+import { Input as InputPrimitive } from "react-aria-components";
 
-const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, ...props }, ref) => {
-    return (
-      <input
-        type={type}
-        className={cn(
-          'flex h-10 w-full rounded-lg border border-input bg-background/50 px-3 py-2 text-sm text-foreground',
-          'placeholder:text-muted-foreground',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-transparent',
-          'disabled:cursor-not-allowed disabled:opacity-50',
-          'transition-all duration-200',
-          className
-        )}
-        ref={ref}
-        {...props}
-      />
-    )
-  }
-)
-Input.displayName = 'Input'
+import { composeTwRenderProps } from "@/lib/compose-tw-render-props";
+import { TextFieldContext } from "@/components/ui/textfield";
 
-export { Input }
+import { inputVariants, type InputVariants } from "./input.styles";
+
+interface InputProps
+  extends ComponentPropsWithRef<typeof InputPrimitive>,
+    InputVariants {}
+
+function Input({
+  className,
+  fullWidth,
+  variant: variantProp,
+  ...rest
+}: InputProps) {
+  const textFieldContext = useContext(TextFieldContext);
+  const variant = variantProp ?? textFieldContext.variant;
+
+  return (
+    <InputPrimitive
+      className={composeTwRenderProps(
+        className,
+        inputVariants({ fullWidth, variant }),
+      )}
+      data-slot="input"
+      {...rest}
+    />
+  );
+}
+
+export { Input };
+export type { InputProps };

@@ -21,7 +21,7 @@ const FieldLabel = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <label
     ref={ref}
-    className={cn('text-sm font-medium leading-none text-foreground', className)}
+    className={cn('text-sm font-medium leading-none tracking-[-0.015em] text-foreground', className)}
     {...props}
   />
 ))
@@ -34,7 +34,7 @@ const FieldDescription = React.forwardRef<
   <p
     ref={ref}
     className={cn(
-      'text-sm text-muted-foreground [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary/80',
+      'text-xs text-muted-foreground [&_a]:text-accent [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-accent/80',
       className
     )}
     {...props}
@@ -48,13 +48,13 @@ const FieldSeparator = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <div ref={ref} className={cn('relative', className)} {...props}>
     <div className="absolute inset-0 flex items-center">
-      <span className="w-full border-t border-border" />
+      <span className="w-full border-t border-separator" />
     </div>
     {children && (
       <div className="relative flex justify-center text-xs uppercase">
         <span
           data-slot="field-separator-content"
-          className="bg-card px-2 text-muted-foreground"
+          className="bg-background px-2 text-muted-foreground"
         >
           {children}
         </span>
@@ -68,7 +68,7 @@ const FieldError = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => (
-  <p ref={ref} className={cn('text-sm text-destructive', className)} {...props} />
+  <p ref={ref} className={cn('text-xs text-danger', className)} {...props} />
 ))
 FieldError.displayName = 'FieldError'
 
