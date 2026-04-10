@@ -203,28 +203,34 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <CompanySettingsProvider>
     <EmailProvider>
     <div className="relative h-screen overflow-hidden bg-background">
-      {/* Dégradés multi-couleurs animés — Revolut style — Vraiment partout */}
+      {/* Dégradés multi-couleurs animés — radial-gradient (net, sans pixelisation) */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
-        {/* Indigo — haut gauche */}
-        <div className="absolute -top-32 -left-20 h-[600px] w-[600px] rounded-full bg-[#5957e8]/[0.12] blur-[130px] animate-[gradient-drift_12s_ease-in-out_infinite]" />
-        {/* Rose — haut droit */}
-        <div className="absolute -top-16 right-[5%] h-[500px] w-[500px] rounded-full bg-[#ec4899]/[0.08] blur-[120px] animate-[gradient-drift_16s_ease-in-out_infinite_reverse]" />
-        {/* Cyan — centre gauche */}
-        <div className="absolute top-[25%] -left-10 h-[450px] w-[500px] rounded-full bg-[#06b6d4]/[0.07] blur-[110px] animate-[gradient-drift_20s_ease-in-out_infinite]" />
-        {/* Violet — centre */}
-        <div className="absolute top-[35%] left-[40%] h-[400px] w-[400px] rounded-full bg-[#8b5cf6]/[0.06] blur-[120px] animate-[gradient-drift_14s_ease-in-out_infinite_reverse]" />
-        {/* Orange — bas droit */}
-        <div className="absolute bottom-[10%] right-[15%] h-[400px] w-[450px] rounded-full bg-[#f59e0b]/[0.06] blur-[110px] animate-[gradient-drift_18s_ease-in-out_infinite]" />
-        {/* Vert — bas gauche */}
-        <div className="absolute bottom-[5%] left-[10%] h-[350px] w-[400px] rounded-full bg-[#10b981]/[0.05] blur-[100px] animate-[gradient-drift_22s_ease-in-out_infinite_reverse]" />
-        
-        {/* Nouvelles orbes ajoutées */}
-        <div className="absolute -top-10 left-[14rem] h-[350px] w-[350px] rounded-full bg-blue-500/[0.09] blur-[100px] animate-[gradient-drift_15s_ease-in-out_infinite]" />
-        <div className="absolute top-[60%] right-[30%] h-[350px] w-[350px] rounded-full bg-rose-400/[0.07] blur-[110px] animate-[gradient-drift_19s_ease-in-out_infinite_reverse]" />
-        <div className="absolute bottom-[20%] left-[40%] h-[400px] w-[500px] rounded-full bg-emerald-400/[0.06] blur-[120px] animate-[gradient-drift_17s_ease-in-out_infinite]" />
-        <div className="absolute -bottom-10 right-[40%] h-[500px] w-[500px] rounded-full bg-amber-500/[0.06] blur-[130px] animate-[gradient-drift_24s_ease-in-out_infinite_reverse]" />
-        <div className="absolute top-[50%] left-[15%] h-[450px] w-[450px] rounded-full bg-fuchsia-500/[0.07] blur-[120px] animate-[gradient-drift_21s_ease-in-out_infinite]" />
-        <div className="absolute -bottom-20 -left-10 h-[600px] w-[600px] rounded-full bg-indigo-500/[0.08] blur-[140px] animate-[gradient-drift_25s_ease-in-out_infinite_reverse]" />
+        <div
+          className="absolute inset-0 animate-[gradient-drift_20s_ease-in-out_infinite] will-change-transform"
+          style={{
+            background: [
+              'radial-gradient(ellipse 600px 600px at 5% 5%, rgba(89,87,232,0.12) 0%, transparent 70%)',
+              'radial-gradient(ellipse 500px 500px at 90% 8%, rgba(236,72,153,0.08) 0%, transparent 70%)',
+              'radial-gradient(ellipse 500px 450px at 3% 30%, rgba(6,182,212,0.07) 0%, transparent 70%)',
+              'radial-gradient(ellipse 400px 400px at 45% 38%, rgba(139,92,246,0.06) 0%, transparent 70%)',
+              'radial-gradient(ellipse 450px 400px at 80% 85%, rgba(245,158,11,0.06) 0%, transparent 70%)',
+              'radial-gradient(ellipse 400px 350px at 12% 90%, rgba(16,185,129,0.05) 0%, transparent 70%)',
+            ].join(', '),
+          }}
+        />
+        <div
+          className="absolute inset-0 animate-[gradient-drift_25s_ease-in-out_infinite_reverse] will-change-transform"
+          style={{
+            background: [
+              'radial-gradient(ellipse 350px 350px at 18% 3%, rgba(59,130,246,0.09) 0%, transparent 70%)',
+              'radial-gradient(ellipse 350px 350px at 65% 62%, rgba(251,113,133,0.07) 0%, transparent 70%)',
+              'radial-gradient(ellipse 500px 400px at 42% 78%, rgba(52,211,153,0.06) 0%, transparent 70%)',
+              'radial-gradient(ellipse 500px 500px at 55% 95%, rgba(245,158,11,0.06) 0%, transparent 70%)',
+              'radial-gradient(ellipse 450px 450px at 18% 55%, rgba(232,121,249,0.07) 0%, transparent 70%)',
+              'radial-gradient(ellipse 600px 600px at 5% 95%, rgba(99,102,241,0.08) 0%, transparent 70%)',
+            ].join(', '),
+          }}
+        />
       </div>
 
       <Sidebar
