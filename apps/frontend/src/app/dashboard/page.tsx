@@ -37,7 +37,6 @@ import {
   Gift,
 } from 'lucide-react'
 import { AiDashboardSummary } from '@/components/ai/ai-dashboard-summary'
-import { CheckoutFeatureModal, CHECKOUT_FEATURE_SEEN_KEY } from '@/components/dashboard/checkout-feature-modal'
 import TextType from '@/components/ui/text-type'
 
 function pickAdaptiveGreeting(firstName: string | undefined): string {
@@ -823,7 +822,6 @@ export default function DashboardPage() {
   const [layout, setLayout] = useState<BlockId[]>(loadLayout)
   const [editMode, setEditMode] = useState(false)
   const [sidebarCounts, setSidebarCounts] = useState<{ invoiceDrafts: number; quoteDrafts: number }>({ invoiceDrafts: 0, quoteDrafts: 0 })
-  const [featureModalOpen, setFeatureModalOpen] = useState(false)
   const [greeting, setGreeting] = useState<string>(' ')
 
   useEffect(() => {
@@ -847,18 +845,6 @@ export default function DashboardPage() {
     })
   }, [])
 
-  // Auto-open the checkout feature announcement once per user.
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    try {
-      const seen = localStorage.getItem(CHECKOUT_FEATURE_SEEN_KEY)
-      if (!seen) {
-        // Small delay so it doesn't land before the skeleton fades out.
-        const t = window.setTimeout(() => setFeatureModalOpen(true), 800)
-        return () => window.clearTimeout(t)
-      }
-    } catch {}
-  }, [])
 
   // Ensure dynamic chart blocks appear in the layout when toggled on
   useEffect(() => {
@@ -1189,14 +1175,6 @@ export default function DashboardPage() {
     <div className="relative px-4 lg:px-6 py-4 md:py-6 space-y-4">
       {/* Action bar */}
       <div className="flex items-center justify-end gap-2">
-        <button
-          onClick={() => setFeatureModalOpen(true)}
-          className="button button--sm button--tertiary gap-1.5 text-accent"
-          title={t('dashboard.whatsNew') || 'Nouveautés'}
-        >
-          <Gift className="h-3.5 w-3.5" />
-          <span className="hidden md:inline">{t('dashboard.whatsNew') || 'Nouveautés'}</span>
-        </button>
         {editMode && (
           <button
             onClick={handleResetLayout}
@@ -1274,7 +1252,6 @@ export default function DashboardPage() {
         activeCharts={activeCharts}
       />
 
-      <CheckoutFeatureModal open={featureModalOpen} onClose={() => setFeatureModalOpen(false)} />
     </div>
   )
 }
