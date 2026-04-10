@@ -20,6 +20,11 @@ export const controllers = {
       EmailConfirmChange: () => import('#controllers/account/email/email_confirm_change'),
       EmailRequestChange: () => import('#controllers/account/email/email_request_change'),
     },
+    oauthApps: {
+      List: () => import('#controllers/account/oauth_apps/list'),
+      RevokeApp: () => import('#controllers/account/oauth_apps/revoke_app'),
+      RevokeSession: () => import('#controllers/account/oauth_apps/revoke_session'),
+    },
     passkeys: {
       Delete: () => import('#controllers/account/passkeys/delete'),
       List: () => import('#controllers/account/passkeys/list'),
@@ -61,6 +66,14 @@ export const controllers = {
     },
     BugReports: () => import('#controllers/admin/bug_reports'),
     Feedbacks: () => import('#controllers/admin/feedbacks'),
+    oauthApps: {
+      Create: () => import('#controllers/admin/oauth_apps/create'),
+      Destroy: () => import('#controllers/admin/oauth_apps/destroy'),
+      List: () => import('#controllers/admin/oauth_apps/list'),
+      RevokeSessions: () => import('#controllers/admin/oauth_apps/revoke_sessions'),
+      RotateSecrets: () => import('#controllers/admin/oauth_apps/rotate_secrets'),
+      Update: () => import('#controllers/admin/oauth_apps/update'),
+    },
   },
   ai: {
     AiQuota: () => import('#controllers/ai/ai_quota'),
@@ -290,6 +303,12 @@ export const controllers = {
       Index: () => import('#controllers/invoice/payments/index'),
       Store: () => import('#controllers/invoice/payments/store'),
     },
+  },
+  oauth: {
+    Authorize: () => import('#controllers/oauth/authorize'),
+    ExchangeSession: () => import('#controllers/oauth/exchange_session'),
+    Revoke: () => import('#controllers/oauth/revoke'),
+    Token: () => import('#controllers/oauth/token'),
   },
   onboarding: {
     company: {
