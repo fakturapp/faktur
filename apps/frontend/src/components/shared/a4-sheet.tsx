@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import {
   Trash2, Search, X, Building2, UserRound,
   RefreshCw, MousePointerClick, FileText, Plus, Type, ChevronDown, Package, ImagePlus, Upload,
+  AlertTriangle,
 } from 'lucide-react'
 import { api } from '@/lib/api'
 import { RichTextarea, mdToHtml } from '@/components/ui/rich-textarea'
@@ -19,6 +20,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { DatePicker } from '@/components/ui/date-picker'
 import { getTemplate, type TemplateConfig } from '@/lib/invoice-templates'
 import { getTranslations } from '@/lib/invoice-i18n'
+import { useDocumentOverflow } from '@/hooks/use-text-measure'
 
 
 export interface DocumentLine {
@@ -936,6 +938,17 @@ export function A4Sheet({
   // Template font override takes precedence
   const effectiveFont = T.font || documentFont
 
+  // ── Pretext: detect A4 page overflow without DOM reflows ──
+  const overflowData = useDocumentOverflow({
+    lines,
+    notes: showNotes ? notes : undefined,
+    acceptanceConditions: showAcceptanceConditions ? acceptanceConditions : undefined,
+    freeField: showFreeField ? freeField : undefined,
+    footerText: footerMode === 'custom' ? footerText : undefined,
+    font: effectiveFont,
+    billingType,
+  })
+
   // Dynamically load document font from Google Fonts
   useEffect(() => {
     if (!effectiveFont || effectiveFont === 'Lexend') return // Lexend already loaded via next/font
@@ -985,6 +998,18 @@ export function A4Sheet({
           colorScheme: darkMode ? 'dark' : 'light',
         }}
       >
+        {/* ── Pretext overflow warning ── */}
+        {overflowData.overflows && !isPreview && (
+          <div className="absolute top-2 right-2 z-20">
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-500/15 border border-amber-500/30 backdrop-blur-sm">
+              <AlertTriangle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+              <span className="text-[10px] font-medium text-amber-500">
+                {lang === 'en' ? 'Content overflows page' : 'Contenu dépasse la page'}
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* Scrollable content — flex column so bottom sticks */}
         <div className="absolute inset-0 overflow-y-auto">
           <div
