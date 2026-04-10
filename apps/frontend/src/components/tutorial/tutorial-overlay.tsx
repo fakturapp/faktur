@@ -1,18 +1,22 @@
 'use client'
 
 import { useEffect, useState, useRef, useLayoutEffect, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { usePathname } from 'next/navigation'
 import { useTutorial } from '@/lib/tutorial-context'
 import { cn } from '@/lib/utils'
-import { ChevronLeft, ChevronRight, SkipForward, Wand2 } from 'lucide-react'
-import type { TutorialHighlight } from '@/components/tutorial/tutorial-steps'
+import { ChevronLeft, ChevronRight, SkipForward, Wand2, GripVertical } from 'lucide-react'
 
 interface Rect { top: number; left: number; width: number; height: number }
 
 function getRect(el: Element): Rect {
   const r = el.getBoundingClientRect()
   return { top: r.top, left: r.left, width: r.width, height: r.height }
+}
+
+function isVisible(el: Element): boolean {
+  const r = el.getBoundingClientRect()
+  return r.width > 0 && r.height > 0 && r.top < window.innerHeight && r.bottom > 0
 }
 
 export function TutorialOverlay() {
@@ -28,12 +32,10 @@ export function TutorialOverlay() {
   const tooltipRef = useRef<HTMLDivElement>(null)
   const [tooltipPos, setTooltipPos] = useState({ top: 0, left: 0 })
 
-  // Wait for page to load + target element to appear
+  // Resolve elements with retry
   useEffect(() => {
     if (!active || !currentStep) { setReady(false); return }
     if (showLevelComplete || showTutorialComplete || showOffer) { setReady(false); return }
-
-    // If step has a route, wait for pathname match
     if (currentStep.route && pathname !== currentStep.route) { setReady(false); return }
 
     let cancelled = false
@@ -42,21 +44,19 @@ export function TutorialOverlay() {
     function tryResolve() {
       if (cancelled) return
 
-      // Check main target
       if (currentStep!.target) {
         const el = document.querySelector(currentStep!.target)
-        if (!el && attempts < 40) { attempts++; setTimeout(tryResolve, 100); return }
-        if (el) setTargetRect(getRect(el)); else setTargetRect(null)
+        if (!el && attempts < 30) { attempts++; setTimeout(tryResolve, 150); return }
+        if (el && isVisible(el)) setTargetRect(getRect(el)); else setTargetRect(null)
       } else {
         setTargetRect(null)
       }
 
-      // Check highlights
       if (currentStep!.highlights?.length) {
         const found: (Rect & { label: string; pos: string })[] = []
         for (const h of currentStep!.highlights!) {
           const el = document.querySelector(h.target)
-          if (el) found.push({ ...getRect(el), label: h.label, pos: h.position || 'right' })
+          if (el && isVisible(el)) found.push({ ...getRect(el), label: h.label, pos: h.position || 'right' })
         }
         setHighlightRects(found)
       } else {
@@ -66,23 +66,22 @@ export function TutorialOverlay() {
       setReady(true)
     }
 
-    // Small delay to let the page render
-    const timer = setTimeout(tryResolve, 200)
+    const timer = setTimeout(tryResolve, 250)
     return () => { cancelled = true; clearTimeout(timer) }
   }, [active, currentStep?.id, pathname, showLevelComplete, showTutorialComplete, showOffer])
 
-  // Track target on scroll/resize
+  // Track positions on scroll/resize
   const updatePositions = useCallback(() => {
     if (!ready || !currentStep) return
     if (currentStep.target) {
       const el = document.querySelector(currentStep.target)
-      if (el) setTargetRect(getRect(el))
+      if (el && isVisible(el)) setTargetRect(getRect(el))
     }
     if (currentStep.highlights?.length) {
       const found: (Rect & { label: string; pos: string })[] = []
       for (const h of currentStep.highlights) {
         const el = document.querySelector(h.target)
-        if (el) found.push({ ...getRect(el), label: h.label, pos: h.position || 'right' })
+        if (el && isVisible(el)) found.push({ ...getRect(el), label: h.label, pos: h.position || 'right' })
       }
       setHighlightRects(found)
     }
@@ -98,7 +97,7 @@ export function TutorialOverlay() {
     }
   }, [ready, updatePositions])
 
-  // Position tooltip
+  // Compute tooltip position
   useLayoutEffect(() => {
     if (!ready || !tooltipRef.current) return
     const tt = tooltipRef.current.getBoundingClientRect()
@@ -127,17 +126,17 @@ export function TutorialOverlay() {
   if (!active || !currentStep || !ready) return null
   if (showLevelComplete || showTutorialComplete || showOffer) return null
 
-  const pad = 8
+  const spotPad = 10
 
   return (
     <>
-      {/* Dark overlay */}
+      {/* Dark overlay — pointer-events:none so user can interact with the page */}
       <motion.div
         key="tutorial-bg"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[9990] bg-black/50 pointer-events-none"
+        className="fixed inset-0 z-[9990] bg-black/40 pointer-events-none"
       />
 
       {/* Spotlight cutout */}
@@ -149,75 +148,78 @@ export function TutorialOverlay() {
           transition={{ duration: 0.3 }}
           className="fixed z-[9991] rounded-xl pointer-events-none"
           style={{
-            top: targetRect.top - pad, left: targetRect.left - pad,
-            width: targetRect.width + pad * 2, height: targetRect.height + pad * 2,
-            boxShadow: '0 0 0 9999px rgba(0,0,0,0.55)',
+            top: targetRect.top - spotPad, left: targetRect.left - spotPad,
+            width: targetRect.width + spotPad * 2, height: targetRect.height + spotPad * 2,
+            boxShadow: '0 0 0 9999px rgba(0,0,0,0.45)',
           }}
         />
       )}
 
-      {/* Highlight labels */}
+      {/* Highlight frames + labels */}
       {highlightRects.map((h, i) => (
-        <motion.div
-          key={`hl-${i}`}
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 + i * 0.08 }}
-          className="fixed z-[9993] pointer-events-none flex items-center gap-2"
-          style={{
-            top: h.pos === 'bottom' ? h.top + h.height + 6 : h.pos === 'top' ? h.top - 30 : h.top + h.height / 2 - 12,
-            left: h.pos === 'left' ? h.left - 8 : h.pos === 'right' ? h.left + h.width + 8 : h.left + h.width / 2,
-            transform: h.pos === 'left' ? 'translateX(-100%)' : h.pos === 'top' || h.pos === 'bottom' ? 'translateX(-50%)' : undefined,
-          }}
-        >
-          {/* Connector dot */}
-          <div className="h-2 w-2 rounded-full bg-accent shadow-[0_0_8px_rgba(99,102,241,0.5)]" />
+        <div key={`hl-group-${i}`}>
+          {/* Frame */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.1 + i * 0.06 }}
+            className="fixed z-[9992] pointer-events-none rounded-lg ring-2 ring-accent/60 ring-offset-2 ring-offset-transparent"
+            style={{ top: h.top - 2, left: h.left - 2, width: h.width + 4, height: h.height + 4 }}
+          />
           {/* Label */}
-          <span className="rounded-md bg-accent px-2 py-0.5 text-[11px] font-semibold text-white whitespace-nowrap shadow-lg">
-            {h.label}
-          </span>
-        </motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: h.pos === 'right' ? -8 : h.pos === 'left' ? 8 : 0, y: h.pos === 'top' ? 8 : h.pos === 'bottom' ? -8 : 0 }}
+            animate={{ opacity: 1, x: 0, y: 0 }}
+            transition={{ delay: 0.15 + i * 0.06 }}
+            className="fixed z-[9993] pointer-events-none"
+            style={{
+              top: h.pos === 'bottom' ? h.top + h.height + 8
+                 : h.pos === 'top' ? h.top - 28
+                 : h.top + h.height / 2 - 11,
+              left: h.pos === 'right' ? h.left + h.width + 10
+                  : h.pos === 'left' ? h.left - 10
+                  : h.left + h.width / 2,
+              transform: h.pos === 'left' ? 'translateX(-100%)' : h.pos === 'top' || h.pos === 'bottom' ? 'translateX(-50%)' : undefined,
+            }}
+          >
+            <span className="inline-flex items-center gap-1.5 rounded-md bg-accent px-2.5 py-1 text-[11px] font-semibold text-white whitespace-nowrap shadow-lg shadow-accent/25">
+              <span className="h-1.5 w-1.5 rounded-full bg-white/60" />
+              {h.label}
+            </span>
+          </motion.div>
+        </div>
       ))}
 
-      {/* Highlight frames */}
-      {highlightRects.map((h, i) => (
-        <motion.div
-          key={`frame-${i}`}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.15 + i * 0.08 }}
-          className="fixed z-[9992] pointer-events-none rounded-lg border-2 border-accent/50 border-dashed"
-          style={{ top: h.top - 4, left: h.left - 4, width: h.width + 8, height: h.height + 8 }}
-        />
-      ))}
-
-      {/* Click blocker */}
-      <div className="fixed inset-0 z-[9994]" onClick={(e) => e.stopPropagation()} />
-
-      {/* Tooltip */}
+      {/* Draggable Tooltip */}
       <motion.div
         ref={tooltipRef}
         key={`tt-${currentStep.id}`}
+        drag
+        dragMomentum={false}
+        dragElastic={0}
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="fixed z-[9995] w-[360px] max-w-[calc(100vw-32px)]"
+        className="fixed z-[9996] w-[380px] max-w-[calc(100vw-32px)] cursor-grab active:cursor-grabbing"
         style={{ top: tooltipPos.top, left: tooltipPos.left }}
       >
         <div className="rounded-2xl bg-overlay shadow-2xl border border-border/20 overflow-hidden">
-          {/* Level bar */}
+          {/* Drag handle + Level bar */}
           <div
-            className="px-4 py-2 flex items-center justify-between text-xs font-semibold"
+            className="px-4 py-2 flex items-center justify-between text-xs font-semibold select-none"
             style={{ backgroundColor: `${currentLevel?.color}12`, color: currentLevel?.color }}
           >
-            <span>Niveau {level} · {currentLevel?.name}</span>
+            <div className="flex items-center gap-2">
+              <GripVertical className="h-3.5 w-3.5 opacity-40" />
+              <span>Niv. {level} · {currentLevel?.name}</span>
+            </div>
             <span className="text-muted-foreground font-normal">{step + 1}/{totalStepsInLevel}</span>
           </div>
 
           {/* Content */}
           <div className="p-4">
             <h3 className="text-sm font-bold text-foreground mb-1.5">{currentStep.title}</h3>
-            <p className="text-[13px] text-muted-foreground leading-relaxed">{currentStep.description}</p>
+            <p className="text-[13px] text-muted-foreground leading-relaxed whitespace-pre-line">{currentStep.description}</p>
 
             {currentStep.prefill && (
               <button
@@ -225,8 +227,7 @@ export function TutorialOverlay() {
                 className="mt-3 flex items-center gap-2 rounded-lg bg-accent/10 px-3 py-2 text-[13px] font-medium text-accent transition-colors hover:bg-accent/15"
                 onClick={() => window.dispatchEvent(new CustomEvent('tutorial:prefill', { detail: { type: currentStep.prefill } }))}
               >
-                <Wand2 className="h-3.5 w-3.5" />
-                Préremplir
+                <Wand2 className="h-3.5 w-3.5" /> Préremplir
               </button>
             )}
           </div>

@@ -52,7 +52,7 @@ export function TutorialBanner() {
         transition={{ type: 'spring', bounce: 0.4, delay: 0.3 }}
         onClick={() => setOpen(!open)}
         className={cn(
-          'fixed bottom-6 right-6 z-[9980] flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-colors',
+          'fixed bottom-6 right-6 z-[9997] flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-colors',
           'bg-accent text-white hover:bg-accent/90',
           open && 'ring-4 ring-accent/20'
         )}
@@ -75,7 +75,7 @@ export function TutorialBanner() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 12, scale: 0.95 }}
             transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="fixed bottom-20 right-6 z-[9981] w-[280px] rounded-2xl bg-overlay shadow-2xl border border-border/20 overflow-hidden"
+            className="fixed bottom-20 right-6 z-[9998] w-[280px] rounded-2xl bg-overlay shadow-2xl border border-border/20 overflow-hidden"
           >
             {/* Header */}
             <div className="px-4 py-3 border-b border-border/10">
