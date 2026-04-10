@@ -270,7 +270,7 @@ function RegisterContent() {
 
   return (
     <motion.div initial="hidden" animate="visible" className="w-full max-w-md">
-      <div className="rounded-2xl border border-border/50 bg-card overflow-hidden">
+      <div className="rounded-xl bg-overlay shadow-surface overflow-hidden">
         {/* Header with step indicator */}
         <div className="relative px-8 pt-8 pb-5">
           <motion.div variants={fadeUp} custom={0} className="flex flex-col items-center gap-4 text-center">
@@ -292,8 +292,8 @@ function RegisterContent() {
               </div>
             ) : (
               <>
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 border border-primary/20">
-                  <UserPlus className="h-6 w-6 text-primary" />
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent-soft border border-accent/20">
+                  <UserPlus className="h-6 w-6 text-accent" />
                 </div>
                 <div>
                   <h1 className="text-xl font-bold text-foreground">Créer un compte</h1>
@@ -392,7 +392,7 @@ function RegisterContent() {
                       type="button"
                       onClick={handleGoogleLogin}
                       disabled={googleLoading}
-                      className="w-full flex items-center justify-center gap-3 h-11 rounded-lg border border-border bg-card text-sm font-medium text-foreground transition-colors hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full flex items-center justify-center gap-3 h-11 rounded-lg border border-border bg-card text-sm font-medium text-foreground transition-colors hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {googleLoading ? (
                         <Spinner size="sm" />
@@ -459,10 +459,10 @@ function RegisterContent() {
                       Comment devons-nous vous appeler ?
                     </p>
 
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border mb-2">
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-surface-hover shadow-surface mb-2">
                       <Mail className="h-4 w-4 text-muted-foreground shrink-0" />
                       <span className="text-sm text-foreground truncate">{email}</span>
-                      <button type="button" onClick={() => goToStep(0)} className="text-xs text-primary font-medium ml-auto shrink-0 hover:underline">
+                      <button type="button" onClick={() => goToStep(0)} className="text-xs text-accent font-medium ml-auto shrink-0 hover:underline">
                         Modifier
                       </button>
                     </div>
@@ -621,10 +621,10 @@ function RegisterContent() {
                     </p>
 
                     {/* Summary */}
-                    <div className="rounded-xl border border-border bg-muted/30 p-4 space-y-2.5">
+                    <div className="rounded-xl bg-surface shadow-surface p-4 space-y-2.5">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-                          <User className="h-4 w-4 text-primary" />
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-soft">
+                          <User className="h-4 w-4 text-accent" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-xs text-muted-foreground">Nom</p>
@@ -632,8 +632,8 @@ function RegisterContent() {
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-                          <Mail className="h-4 w-4 text-primary" />
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-soft">
+                          <Mail className="h-4 w-4 text-accent" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-xs text-muted-foreground">Email</p>
@@ -641,8 +641,8 @@ function RegisterContent() {
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-                          <Lock className="h-4 w-4 text-primary" />
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-soft">
+                          <Lock className="h-4 w-4 text-accent" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-xs text-muted-foreground">Mot de passe</p>
@@ -670,7 +670,7 @@ function RegisterContent() {
                         />
                         <span className="text-sm text-muted-foreground leading-tight">
                           J&apos;accepte les{' '}
-                          <a href="/legal/terms" target="_blank" className="text-primary underline-offset-2 hover:underline">
+                          <a href="/legal/terms" target="_blank" className="text-accent underline-offset-2 hover:underline">
                             Conditions g&eacute;n&eacute;rales d&apos;utilisation
                           </a>
                         </span>
@@ -685,7 +685,7 @@ function RegisterContent() {
                         />
                         <span className="text-sm text-muted-foreground leading-tight">
                           J&apos;accepte la{' '}
-                          <a href="/legal/privacy" target="_blank" className="text-primary underline-offset-2 hover:underline">
+                          <a href="/legal/privacy" target="_blank" className="text-accent underline-offset-2 hover:underline">
                             Politique de confidentialit&eacute;
                           </a>
                         </span>
@@ -736,7 +736,7 @@ function RegisterContent() {
                   const r = searchParams.get('redirect')
                   return r ? `/login?redirect=${encodeURIComponent(r)}` : '/login'
                 })()}
-                className="text-primary font-medium underline-offset-2 hover:underline"
+                className="text-accent font-medium underline-offset-2 hover:underline"
               >
                 Se connecter
               </Link>
@@ -768,13 +768,13 @@ function RegisterContent() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-border bg-muted/30 p-4">
+            <div className="rounded-xl bg-surface shadow-surface p-4">
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Si vous pensez que votre adresse est légitime, contactez notre support pour faire whitelister votre domaine :
               </p>
               <a
                 href="mailto:support@fakturapp.cc"
-                className="inline-flex items-center gap-2 mt-2 px-3 py-2 rounded-lg bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors"
+                className="inline-flex items-center gap-2 mt-2 px-3 py-2 rounded-lg bg-accent-soft text-accent text-sm font-medium hover:bg-accent/20 transition-colors"
               >
                 <Mail className="h-4 w-4" />
                 support@fakturapp.cc

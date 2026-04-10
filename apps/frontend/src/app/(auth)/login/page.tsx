@@ -218,9 +218,9 @@ function LoginContent() {
   if (isDesktop && !authLoading && !user) {
     return (
       <motion.div initial="hidden" animate="visible" className="w-full max-w-sm mx-auto">
-        <div className="rounded-2xl border border-border bg-card p-6 text-center">
-          <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-            <Lock className="h-6 w-6 text-primary" />
+        <div className="rounded-xl bg-overlay shadow-surface p-6 text-center">
+          <div className="h-12 w-12 rounded-2xl bg-accent-soft flex items-center justify-center mx-auto mb-4">
+            <Lock className="h-6 w-6 text-accent" />
           </div>
           <h1 className="text-base font-semibold text-foreground mb-1">
             Connexion via Faktur Desktop
@@ -402,7 +402,7 @@ function LoginContent() {
                   type="button"
                   onClick={handleGoogleLogin}
                   disabled={googleLoading}
-                  className="w-full flex items-center justify-center gap-3 h-11 rounded-lg border border-border bg-background text-sm font-medium text-foreground transition-all hover:bg-muted/50 disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-full flex items-center justify-center gap-3 h-11 rounded-lg border border-border bg-background text-sm font-medium text-foreground transition-all hover:bg-surface-hover disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {googleLoading ? (
                     <Spinner size="sm" />
@@ -424,7 +424,7 @@ function LoginContent() {
                   type="button"
                   onClick={handlePasskeyLogin}
                   disabled={passkeyLoading}
-                  className="flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-border bg-background text-xs font-medium text-foreground transition-all hover:bg-muted/50 disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-border bg-background text-xs font-medium text-foreground transition-all hover:bg-surface-hover disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {passkeyLoading ? (
                     <Spinner size="sm" />
@@ -436,7 +436,7 @@ function LoginContent() {
                 <button
                   type="button"
                   disabled
-                  className="flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-border/50 bg-muted/30 text-xs font-medium text-muted-foreground cursor-not-allowed relative"
+                  className="flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-border/50 bg-surface text-xs font-medium text-muted-foreground cursor-not-allowed relative"
                 >
                   <Smartphone className="h-3.5 w-3.5" />
                   App mobile
@@ -492,7 +492,7 @@ function LoginContent() {
                         <FieldLabel htmlFor="password">Mot de passe</FieldLabel>
                         <Link
                           href="/forgot-password"
-                          className="text-xs text-primary hover:text-primary/80 transition-colors"
+                          className="text-xs text-accent hover:text-accent/80 transition-colors"
                         >
                           Oublié ?
                         </Link>
@@ -553,7 +553,7 @@ function LoginContent() {
                           const r = searchParams.get('redirect')
                           return r ? `/register?redirect=${encodeURIComponent(r)}` : '/register'
                         })()}
-                        className="text-primary font-medium hover:text-primary/80 transition-colors"
+                        className="text-accent font-medium hover:text-accent/80 transition-colors"
                       >
                         Créer un compte
                       </Link>
@@ -572,7 +572,7 @@ function LoginContent() {
         custom={9}
         initial="hidden"
         animate="visible"
-        className="text-center mt-8 text-[11px] text-muted-foreground/60"
+        className="text-center mt-8 text-[11px] text-muted-secondary"
       >
         En continuant, vous acceptez nos{' '}
         <a href="/legal/terms" target="_blank" className="hover:text-muted-foreground transition-colors underline underline-offset-2">CGU</a> et notre{' '}

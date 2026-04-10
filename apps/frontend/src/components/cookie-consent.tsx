@@ -144,7 +144,7 @@ export function CookieConsent() {
               setVisible(true)
               setShowSettings(true)
             }}
-            className="fixed bottom-4 right-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-card border border-border/50 shadow-lg hover:bg-muted transition-colors cursor-grab active:cursor-grabbing"
+            className="fixed bottom-4 right-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-overlay shadow-overlay hover:bg-surface-hover transition-colors cursor-grab active:cursor-grabbing"
             aria-label="Paramètres des cookies"
           >
             <Cookie className="h-4 w-4 text-muted-foreground" />
@@ -160,7 +160,7 @@ export function CookieConsent() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.3, ease: 'easeOut' }}
-            className="fixed bottom-4 right-4 z-50 w-[380px] max-w-[calc(100vw-2rem)] rounded-xl border border-border/50 bg-card p-5 shadow-xl"
+            className="fixed bottom-4 right-4 z-50 w-[380px] max-w-[calc(100vw-2rem)] rounded-xl bg-overlay shadow-overlay p-5"
           >
             {/* Close button */}
             <button
@@ -176,7 +176,7 @@ export function CookieConsent() {
             {!showSettings ? (
               <>
                 <div className="mb-3 flex items-center gap-2">
-                  <Cookie className="h-5 w-5 text-primary" />
+                  <Cookie className="h-5 w-5 text-accent" />
                   <h3 className="text-sm font-semibold text-foreground">Cookies</h3>
                 </div>
                 <p className="mb-4 text-sm text-muted-foreground leading-relaxed">
@@ -191,7 +191,7 @@ export function CookieConsent() {
                   </button>
                   <button
                     onClick={handleRejectAnalytics}
-                    className="flex-1 rounded-lg border border-border bg-muted/50 px-3 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+                    className="flex-1 rounded-lg bg-surface-hover px-3 py-2 text-sm font-medium text-foreground hover:bg-surface transition-colors"
                   >
                     Refuser
                   </button>
@@ -206,12 +206,12 @@ export function CookieConsent() {
             ) : (
               <>
                 <div className="mb-4 flex items-center gap-2">
-                  <Cookie className="h-5 w-5 text-primary" />
+                  <Cookie className="h-5 w-5 text-accent" />
                   <h3 className="text-sm font-semibold text-foreground">Préférences cookies</h3>
                 </div>
 
                 {/* Essential */}
-                <div className="mb-3 rounded-lg border border-border bg-muted/30 p-3">
+                <div className="mb-3 rounded-lg bg-surface shadow-surface p-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Shield className="h-4 w-4 text-emerald-500" />
@@ -225,7 +225,7 @@ export function CookieConsent() {
                 </div>
 
                 {/* Analytics */}
-                <div className="mb-4 rounded-lg border border-border bg-muted/30 p-3">
+                <div className="mb-4 rounded-lg bg-surface shadow-surface p-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <BarChart3 className="h-4 w-4 text-blue-500" />

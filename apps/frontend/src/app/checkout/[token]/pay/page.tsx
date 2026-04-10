@@ -224,7 +224,7 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
   function DlBtn() {
     if (!d?.hasPdf) return null
     return (
-      <button onClick={dl} disabled={dling} className="w-full flex items-center justify-center gap-2.5 h-11 rounded-xl border border-border bg-muted/40 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all disabled:opacity-50">
+      <button onClick={dl} disabled={dling} className="w-full flex items-center justify-center gap-2.5 h-11 rounded-xl border border-border bg-surface text-sm text-muted-foreground hover:text-foreground hover:bg-surface-hover transition-all disabled:opacity-50">
         {dling ? <Spinner className="text-muted-foreground" /> : <IconDownload className="h-4 w-4" />}
         {dling ? 'Téléchargement...' : 'Télécharger la facture'}
       </button>
@@ -240,14 +240,14 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
         {/* Loading */}
         {step === 'loading' && (
           <motion.div key="l" {...slide} className="flex flex-col items-center py-28">
-            <Spinner size="lg" className="text-primary" />
+            <Spinner size="lg" className="text-accent" />
             <p className="mt-5 text-sm text-muted-foreground font-medium">Chargement du paiement...</p>
           </motion.div>
         )}
 
         {/* Error */}
         {step === 'error' && (
-          <motion.div key="e" {...slide} className="rounded-2xl border border-border bg-card p-8 shadow-sm">
+          <motion.div key="e" {...slide} className="rounded-xl bg-overlay shadow-surface p-8">
             <div className="flex flex-col items-center text-center">
               <div className="h-16 w-16 rounded-2xl bg-red-500/10 flex items-center justify-center mb-5">
                 <IconAlert className="h-8 w-8 text-red-400" />
@@ -260,7 +260,7 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
 
         {/* Expired */}
         {step === 'expired' && (
-          <motion.div key="x" {...slide} className="rounded-2xl border border-border bg-card p-8 shadow-sm">
+          <motion.div key="x" {...slide} className="rounded-xl bg-overlay shadow-surface p-8">
             <div className="flex flex-col items-center text-center">
               <div className="h-16 w-16 rounded-2xl bg-amber-500/10 flex items-center justify-center mb-5">
                 <IconClock className="h-8 w-8 text-amber-400" />
@@ -273,20 +273,20 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
 
         {/* Password */}
         {step === 'password' && (
-          <motion.div key="p" {...slide} className="rounded-2xl border border-border bg-card p-8 shadow-sm">
+          <motion.div key="p" {...slide} className="rounded-xl bg-overlay shadow-surface p-8">
             <div className="flex flex-col items-center text-center mb-7">
-              <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-5">
-                <IconLock className="h-8 w-8 text-primary" />
+              <div className="h-16 w-16 rounded-2xl bg-accent-soft flex items-center justify-center mb-5">
+                <IconLock className="h-8 w-8 text-accent" />
               </div>
               <h2 className="text-lg font-semibold text-foreground">Accès protégé</h2>
               <p className="text-sm text-muted-foreground mt-1.5">Ce lien est protégé. Entrez le mot de passe communiqué par l&apos;émetteur.</p>
             </div>
             <div className="space-y-3">
               <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && submitPw()} placeholder="Mot de passe" autoFocus
-                className="w-full h-12 rounded-xl border border-border bg-muted/50 px-4 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/15 transition-all" />
+                className="w-full h-12 rounded-xl border border-border bg-surface-hover px-4 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/15 transition-all" />
               {pwErr && <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="text-sm text-red-400 flex items-center gap-1.5"><IconAlert className="h-3.5 w-3.5" /> {pwErr}</motion.p>}
               <button onClick={submitPw} disabled={busy || !pw}
-                className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-semibold transition-all disabled:opacity-40 shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+                className="w-full h-12 rounded-xl bg-accent hover:bg-accent/90 text-primary-foreground text-sm font-semibold transition-all disabled:opacity-40 shadow-lg shadow-accent/20 flex items-center justify-center gap-2">
                 {busy ? <Spinner className="text-primary-foreground" /> : 'Accéder'}
               </button>
             </div>
@@ -295,7 +295,7 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
 
         {/* Method */}
         {step === 'method' && d && (
-          <motion.div key="m" {...slide} className="rounded-2xl border border-border bg-card p-8 shadow-sm">
+          <motion.div key="m" {...slide} className="rounded-xl bg-overlay shadow-surface p-8">
             <div className="text-center mb-8">
               {d.companyName && <p className="text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-[0.15em] mb-3">{d.companyName}</p>}
               <motion.p initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.1, type: 'spring', bounce: 0.3 }}
@@ -303,25 +303,25 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
               <p className="text-sm text-muted-foreground mt-2">Facture {d.invoiceNumber}</p>
             </div>
 
-            <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em] mb-3">Mode de paiement</p>
+            <p className="text-[10px] font-bold text-muted-secondary uppercase tracking-[0.2em] mb-3">Mode de paiement</p>
 
             <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }} onClick={pickBank} disabled={busy}
-              className="w-full flex items-center gap-4 p-4 rounded-xl border border-border bg-muted/40 hover:bg-primary/5 hover:border-primary/30 transition-all text-left group mb-2.5">
-              <div className="h-11 w-11 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/15 transition-colors">
-                <IconBank className="h-5 w-5 text-primary" />
+              className="w-full flex items-center gap-4 p-4 rounded-xl border border-border bg-surface hover:bg-accent/5 hover:border-accent/30 transition-all text-left group mb-2.5">
+              <div className="h-11 w-11 rounded-xl bg-accent-soft flex items-center justify-center shrink-0 group-hover:bg-accent/15 transition-colors">
+                <IconBank className="h-5 w-5 text-accent" />
               </div>
               <div className="flex-1">
                 <p className="text-sm font-semibold text-foreground">Virement bancaire</p>
                 <p className="text-[11px] text-muted-foreground/80 mt-0.5">Coordonnées bancaires fournies</p>
               </div>
-              {busy ? <Spinner className="text-primary" /> : (
+              {busy ? <Spinner className="text-accent" /> : (
                 <svg className="h-4 w-4 text-muted-foreground/50 group-group-hover:text-muted-foreground transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6"/></svg>
               )}
             </motion.button>
 
             {d.hasStripe ? (
               <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }} onClick={() => setStep('stripe')}
-                className="w-full flex items-center gap-4 p-4 rounded-xl border border-border bg-muted/40 hover:bg-primary/5 hover:border-primary/30 transition-all text-left group mb-6">
+                className="w-full flex items-center gap-4 p-4 rounded-xl border border-border bg-surface hover:bg-accent/5 hover:border-accent/30 transition-all text-left group mb-6">
                 <div className="h-11 w-11 rounded-xl bg-violet-500/10 flex items-center justify-center shrink-0 group-hover:bg-violet-500/15 transition-colors">
                   <svg className="h-5 w-5 text-violet-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
                 </div>
@@ -333,7 +333,7 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
               </motion.button>
             ) : (
               <div className="flex items-center gap-4 p-4 rounded-xl border border-border/50 opacity-25 cursor-not-allowed mb-6">
-                <div className="h-11 w-11 rounded-xl bg-muted/50 flex items-center justify-center shrink-0">
+                <div className="h-11 w-11 rounded-xl bg-surface-hover flex items-center justify-center shrink-0">
                   <svg className="h-5 w-5 text-muted-foreground/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
                 </div>
                 <div className="flex-1"><p className="text-sm text-muted-foreground">Carte bancaire</p><p className="text-[11px] text-muted-foreground/50">Non disponible</p></div>
@@ -351,9 +351,9 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
 
         {/* IBAN */}
         {step === 'iban' && d && (
-          <motion.div key="i" {...slide} className="rounded-2xl border border-border bg-card p-8 shadow-sm">
+          <motion.div key="i" {...slide} className="rounded-xl bg-overlay shadow-surface p-8">
             <div className="text-center mb-6">
-              <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4"><IconBank className="h-6 w-6 text-primary" /></div>
+              <div className="h-12 w-12 rounded-2xl bg-accent-soft flex items-center justify-center mx-auto mb-4"><IconBank className="h-6 w-6 text-accent" /></div>
               <h2 className="text-lg font-semibold text-foreground">Virement bancaire</h2>
               <p className="text-2xl font-bold text-foreground mt-1">{amt}</p>
               <p className="text-sm text-muted-foreground mt-0.5">Facture {d.invoiceNumber}</p>
@@ -361,10 +361,10 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
 
             {ib?.iban ? (
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="space-y-4">
-                <div className="rounded-xl bg-muted/40 border border-border p-5">
+                <div className="rounded-xl bg-surface border border-border p-5">
                   <div className="flex items-center gap-2 mb-4">
-                    <svg className="h-4 w-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                    <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em]">Coordonnées bancaires</span>
+                    <svg className="h-4 w-4 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <span className="text-[10px] font-bold text-muted-secondary uppercase tracking-[0.2em]">Coordonnées bancaires</span>
                   </div>
                   {ib.bankName && <div className="mb-4"><p className="text-[10px] text-muted-foreground/50 uppercase tracking-wider mb-1">Banque</p><p className="text-sm font-medium text-foreground">{ib.bankName}</p></div>}
                   <div className="mb-4">
@@ -372,19 +372,19 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
                     <div className="flex items-center gap-2">
                       <p className="text-[15px] font-mono font-semibold text-foreground tracking-[0.15em] break-all leading-relaxed">{ib.iban}</p>
                       <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={cp}
-                        className="shrink-0 h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground/70 hover:text-foreground hover:bg-muted/60 transition-all" title="Copier">
+                        className="shrink-0 h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground/70 hover:text-foreground hover:bg-surface-hover transition-all" title="Copier">
                         {copied ? <IconCheck className="h-4 w-4 text-emerald-400" /> : <IconCopy className="h-4 w-4" />}
                       </motion.button>
                     </div>
                   </div>
                   {ib.bic && <div><p className="text-[10px] text-muted-foreground/50 uppercase tracking-wider mb-1">BIC</p><p className="text-sm font-mono font-medium text-foreground tracking-wider">{ib.bic}</p></div>}
                 </div>
-                <div className="rounded-xl bg-primary/5 border border-primary/20 p-3.5">
-                  <p className="text-xs text-primary leading-relaxed">Indiquez <strong className="text-primary">{d.invoiceNumber}</strong> en référence du virement.</p>
+                <div className="rounded-xl bg-accent/5 border border-accent/20 p-3.5">
+                  <p className="text-xs text-accent leading-relaxed">Indiquez <strong className="text-accent">{d.invoiceNumber}</strong> en référence du virement.</p>
                 </div>
               </motion.div>
             ) : (
-              <div className="rounded-xl bg-muted/40 border border-border p-5 text-center">
+              <div className="rounded-xl bg-surface border border-border p-5 text-center">
                 <p className="text-sm text-muted-foreground">Contactez l&apos;émetteur pour les coordonnées bancaires.</p>
               </div>
             )}
@@ -395,7 +395,7 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
                 <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6"/></svg> Retour
               </motion.button>
               <motion.button whileTap={{ scale: 0.97 }} onClick={() => setStep('confirm')}
-                className="flex-1 h-11 rounded-xl bg-primary hover:bg-primary/90 text-sm font-semibold text-primary-foreground transition-all shadow-lg shadow-primary/20">
+                className="flex-1 h-11 rounded-xl bg-accent hover:bg-accent/90 text-sm font-semibold text-primary-foreground transition-all shadow-lg shadow-accent/20">
                 J&apos;ai payé
               </motion.button>
             </div>
@@ -405,7 +405,7 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
 
         {/* Stripe */}
         {step === 'stripe' && d && (
-          <motion.div key="s" {...slide} className="rounded-2xl border border-border bg-card p-8 shadow-sm">
+          <motion.div key="s" {...slide} className="rounded-xl bg-overlay shadow-surface p-8">
             <StripePaymentForm
               token={token}
               amount={amt}
@@ -422,7 +422,7 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
 
         {/* Confirm */}
         {step === 'confirm' && (
-          <motion.div key="c" {...slide} className="rounded-2xl border border-border bg-card p-8 shadow-sm">
+          <motion.div key="c" {...slide} className="rounded-xl bg-overlay shadow-surface p-8">
             <div className="flex flex-col items-center text-center mb-6">
               <div className="h-16 w-16 rounded-2xl bg-amber-500/10 flex items-center justify-center mb-5"><IconAlert className="h-8 w-8 text-amber-400" /></div>
               <h2 className="text-lg font-semibold text-foreground">Confirmer le paiement</h2>
@@ -436,7 +436,7 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
               <motion.button whileTap={{ scale: 0.97 }} onClick={() => setStep('iban')}
                 className="flex-1 h-11 rounded-xl border border-border text-sm font-medium text-muted-foreground hover:text-foreground transition-all">Annuler</motion.button>
               <motion.button whileTap={{ scale: 0.97 }} onClick={pay} disabled={busy}
-                className="flex-1 h-11 rounded-xl bg-primary hover:bg-primary/90 text-sm font-semibold text-primary-foreground transition-all disabled:opacity-40 shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+                className="flex-1 h-11 rounded-xl bg-accent hover:bg-accent/90 text-sm font-semibold text-primary-foreground transition-all disabled:opacity-40 shadow-lg shadow-accent/20 flex items-center justify-center gap-2">
                 {busy ? <Spinner className="text-primary-foreground" /> : 'Confirmer'}
               </motion.button>
             </div>
@@ -445,10 +445,10 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
 
         {/* Pending */}
         {step === 'pending' && d && (
-          <motion.div key="w" {...slide} className="rounded-2xl border border-border bg-card p-8 shadow-sm">
+          <motion.div key="w" {...slide} className="rounded-xl bg-overlay shadow-surface p-8">
             <div className="flex flex-col items-center text-center">
               <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', bounce: 0.5 }}
-                className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-5"><IconClock className="h-8 w-8 text-primary" /></motion.div>
+                className="h-16 w-16 rounded-2xl bg-accent-soft flex items-center justify-center mb-5"><IconClock className="h-8 w-8 text-accent" /></motion.div>
               <h2 className="text-lg font-semibold text-foreground mb-2">Paiement envoyé</h2>
               <p className="text-sm text-muted-foreground leading-relaxed mb-2">
                 Facture <strong className="text-foreground">{d.invoiceNumber}</strong> le paiement a été signalé et est en attente de confirmation par l&apos;émetteur.
@@ -470,7 +470,7 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
 
         {/* Done */}
         {step === 'done' && d && (
-          <motion.div key="d" {...slide} className="rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 via-card to-card p-8 shadow-sm">
+          <motion.div key="d" {...slide} className="rounded-xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 via-card to-card p-8 shadow-surface">
             <div className="flex flex-col items-center text-center">
               <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', bounce: 0.5, delay: 0.1 }}
                 className="h-16 w-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-5"><IconCheck className="h-8 w-8 text-emerald-400" /></motion.div>

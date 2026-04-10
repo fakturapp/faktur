@@ -131,15 +131,15 @@ export default function OnboardingBillingPage() {
       <Card className="overflow-hidden border-border/50">
         <CardContent className="p-8">
           <motion.div variants={fadeUp} custom={0} className="flex flex-col items-center gap-4 text-center mb-6">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
-              <Receipt className="h-8 w-8 text-primary" />
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-accent-soft">
+              <Receipt className="h-8 w-8 text-accent" />
             </div>
             <div>
               <h1 className="text-2xl font-bold">Paramètres de facturation</h1>
               <p className="mt-2 text-sm text-muted-foreground">
                 Configurez vos préférences de facturation par défaut.
                 <br />
-                <span className="text-xs text-muted-foreground/70">
+                <span className="text-xs text-muted-secondary">
                   Dernière étape avant de commencer !
                 </span>
               </p>

@@ -236,8 +236,8 @@ export default function OnboardingCompanyPage() {
                 <motion.div key="search" {...stepTransition}>
                   <FieldGroup>
                     <motion.div variants={fadeUp} custom={0} className="flex flex-col items-center gap-3 text-center mb-2">
-                      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
-                        <Building2 className="h-7 w-7 text-primary" />
+                      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-soft">
+                        <Building2 className="h-7 w-7 text-accent" />
                       </div>
                       <div>
                         <h2 className="text-xl font-bold">Votre entreprise</h2>
@@ -281,7 +281,7 @@ export default function OnboardingCompanyPage() {
                               key={i}
                               type="button"
                               onClick={() => selectResult(r)}
-                              className="w-full px-4 py-3 text-left hover:bg-muted/50 transition-colors"
+                              className="w-full px-4 py-3 text-left hover:bg-surface-hover transition-colors"
                             >
                               <p className="text-sm font-medium text-foreground">{r.legalName}</p>
                               <p className="text-xs text-muted-foreground">
@@ -297,7 +297,7 @@ export default function OnboardingCompanyPage() {
                       <button
                         type="button"
                         onClick={goManual}
-                        className="text-sm text-primary underline underline-offset-4 hover:text-primary/80"
+                        className="text-sm text-accent underline underline-offset-4 hover:text-accent/80"
                       >
                         Saisir manuellement
                       </button>
@@ -311,8 +311,8 @@ export default function OnboardingCompanyPage() {
                 <motion.div key="identity" {...stepTransition}>
                   <FieldGroup>
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-                        <Building2 className="h-5 w-5 text-primary" />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft">
+                        <Building2 className="h-5 w-5 text-accent" />
                       </div>
                       <div>
                         <h2 className="text-lg font-bold">Identité de l&apos;entreprise</h2>
@@ -371,8 +371,8 @@ export default function OnboardingCompanyPage() {
                 <motion.div key="address" {...stepTransition}>
                   <FieldGroup>
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-                        <MapPin className="h-5 w-5 text-primary" />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft">
+                        <MapPin className="h-5 w-5 text-accent" />
                       </div>
                       <div>
                         <h2 className="text-lg font-bold">Adresse</h2>
@@ -422,8 +422,8 @@ export default function OnboardingCompanyPage() {
                 <motion.div key="contact" {...stepTransition}>
                   <FieldGroup>
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-                        <Phone className="h-5 w-5 text-primary" />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft">
+                        <Phone className="h-5 w-5 text-accent" />
                       </div>
                       <div>
                         <h2 className="text-lg font-bold">Contact & Banque</h2>

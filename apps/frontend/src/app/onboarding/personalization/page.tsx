@@ -83,15 +83,15 @@ export default function OnboardingPersonalizationPage() {
       <Card className="overflow-hidden border-border/50">
         <CardContent className="p-8">
           <motion.div variants={fadeUp} custom={0} className="flex flex-col items-center gap-4 text-center mb-6">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
-              <Paintbrush className="h-8 w-8 text-primary" />
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-accent-soft">
+              <Paintbrush className="h-8 w-8 text-accent" />
             </div>
             <div>
               <h1 className="text-2xl font-bold">Personnalisez vos documents</h1>
               <p className="mt-2 text-sm text-muted-foreground">
                 Choisissez l&apos;apparence de vos factures et devis.
                 <br />
-                <span className="text-xs text-muted-foreground/70">
+                <span className="text-xs text-muted-secondary">
                   Toutes ces options sont modifiables à tout moment.
                 </span>
               </p>
@@ -103,7 +103,7 @@ export default function OnboardingPersonalizationPage() {
             <h2 className="text-sm font-semibold text-foreground mb-3">Logo de vos documents</h2>
             <div className="flex items-center gap-4">
               <div className="relative group">
-                <div className="h-20 w-20 rounded-xl border-2 border-dashed border-border bg-muted/30 flex items-center justify-center overflow-hidden">
+                <div className="h-20 w-20 rounded-xl border-2 border-dashed border-border bg-surface flex items-center justify-center overflow-hidden">
                   {logoUrl ? (
                     <img src={logoUrl} alt="Logo" className="h-full w-full object-contain p-2" />
                   ) : (

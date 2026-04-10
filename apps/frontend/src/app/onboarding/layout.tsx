@@ -62,7 +62,7 @@ export default function OnboardingLayout({ children }: { children: React.ReactNo
 
         {}
         <div className="px-4 pt-4 pb-3">
-          <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.15em] mb-1">
+          <p className="text-[10px] font-bold text-muted-secondary uppercase tracking-[0.15em] mb-1">
             Bienvenue
           </p>
           <p className="text-[13px] font-semibold text-foreground leading-snug">
@@ -101,7 +101,7 @@ export default function OnboardingLayout({ children }: { children: React.ReactNo
                 disabled={!isClickable}
                 className={cn(
                   'flex items-center gap-3 w-full rounded-lg px-2.5 py-[9px] text-[13px] font-medium transition-all duration-200 relative text-left',
-                  isActive && 'bg-muted/60 dark:bg-white/[0.06] shadow-sm text-foreground',
+                  isActive && 'bg-surface dark:bg-white/[0.06] shadow-sm text-foreground',
                   isCompleted && 'text-foreground hover:bg-muted/40 dark:hover:bg-white/[0.04] cursor-pointer',
                   isPending && 'text-muted-foreground/50 cursor-not-allowed'
                 )}
@@ -139,7 +139,7 @@ export default function OnboardingLayout({ children }: { children: React.ReactNo
         {/* Footer with user */}
         <div className="p-3">
           <div className="flex items-center gap-2.5 rounded-lg px-2 py-2">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary text-[10px] font-bold">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent text-[10px] font-bold">
               {(user.fullName || user.email).slice(0, 2).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">

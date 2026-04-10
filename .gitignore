@@ -35,3 +35,8 @@ public/assets
 .claude/
 .claude-flow/
 .swarm/
+
+# UI preview (brouillon direction artistique — hors repo)
+ui-preview/
+heroui/
+heroui-native/
