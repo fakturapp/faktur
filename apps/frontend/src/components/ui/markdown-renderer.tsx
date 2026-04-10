@@ -11,10 +11,6 @@ interface MarkdownRendererProps {
   compact?: boolean
 }
 
-/**
- * Estimate the rendered height of markdown content using pretext.
- * No DOM measurement needed — uses pure arithmetic text layout.
- */
 export function estimateMarkdownHeight(
   content: string,
   options: {
