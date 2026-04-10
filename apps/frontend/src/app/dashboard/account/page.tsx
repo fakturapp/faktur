@@ -588,8 +588,8 @@ export default function AccountPage() {
             <CardContent className="p-5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                    <User className="h-4 w-4 text-primary" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
+                    <User className="h-4 w-4 text-accent" />
                   </div>
                   <div>
                     <h3 className="text-sm font-semibold text-foreground">Pseudo</h3>
@@ -608,8 +608,8 @@ export default function AccountPage() {
             <CardContent className="p-5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                    <Globe className="h-4 w-4 text-primary" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
+                    <Globe className="h-4 w-4 text-accent" />
                   </div>
                   <div>
                     <h3 className="text-sm font-semibold text-foreground">Adresse email</h3>
@@ -634,8 +634,8 @@ export default function AccountPage() {
               {/* Password row */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                    <Lock className="h-4.5 w-4.5 text-primary" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
+                    <Lock className="h-4.5 w-4.5 text-accent" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-foreground">Mot de passe</h3>
@@ -653,8 +653,8 @@ export default function AccountPage() {
               {twoFactorStep === 'idle' && (
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                      <Smartphone className="h-4.5 w-4.5 text-primary" />
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
+                      <Smartphone className="h-4.5 w-4.5 text-accent" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-foreground">Authentification à deux facteurs</h3>
@@ -753,7 +753,7 @@ export default function AccountPage() {
                     Conservez ces codes en lieu sûr. Ils vous permettront d&apos;accéder à votre compte si vous perdez votre appareil d&apos;authentification.
                   </p>
 
-                  <div className="rounded-xl border border-border bg-muted/30 p-4 mb-4">
+                  <div className="rounded-xl border border-border bg-surface p-4 mb-4">
                     <div className="grid grid-cols-2 gap-2">
                       {recoveryCodes.map((code) => (
                         <code key={code} className="text-sm font-mono text-foreground text-center py-1">
@@ -785,8 +785,8 @@ export default function AccountPage() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                    <Fingerprint className="h-4.5 w-4.5 text-primary" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
+                    <Fingerprint className="h-4.5 w-4.5 text-accent" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-foreground">Clés d'accès FakturApp</h3>
@@ -800,7 +800,7 @@ export default function AccountPage() {
 
               {passkeys.length === 0 ? (
                 <div className="flex flex-col items-center text-center gap-3 py-8">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted/50">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-hover">
                     <KeyRound className="h-6 w-6 text-muted-foreground" />
                   </div>
                   <p className="text-sm text-muted-foreground">Aucune clé d'accès enregistrée</p>
@@ -813,7 +813,7 @@ export default function AccountPage() {
                       className="flex items-center justify-between rounded-xl border border-border p-4"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted/50">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface-hover">
                           <KeyRound className="h-5 w-5 text-muted-foreground" />
                         </div>
                         <div>
@@ -856,8 +856,8 @@ export default function AccountPage() {
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                  <Link2 className="h-4.5 w-4.5 text-primary" />
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
+                  <Link2 className="h-4.5 w-4.5 text-accent" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground">Connexions externes</h3>
@@ -946,8 +946,8 @@ export default function AccountPage() {
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                  <Monitor className="h-4.5 w-4.5 text-primary" />
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
+                  <Monitor className="h-4.5 w-4.5 text-accent" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground">Sessions actives</h3>
@@ -972,9 +972,9 @@ export default function AccountPage() {
                     >
                       <div className="flex items-start gap-3">
                         <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl mt-0.5 ${
-                          session.isCurrent ? 'bg-primary/10' : 'bg-muted/50'
+                          session.isCurrent ? 'bg-accent-soft' : 'bg-surface-hover'
                         }`}>
-                          <DeviceIcon className={`h-5 w-5 ${session.isCurrent ? 'text-primary' : 'text-muted-foreground'}`} />
+                          <DeviceIcon className={`h-5 w-5 ${session.isCurrent ? 'text-accent' : 'text-muted-foreground'}`} />
                         </div>
                         <div className="min-w-0">
                           <div className="flex items-center gap-2 mb-1">
@@ -1021,7 +1021,7 @@ export default function AccountPage() {
                 })}
                 {sessions.length === 0 && (
                   <div className="flex items-center justify-center gap-2 py-8">
-                    <Spinner size="sm" className="text-primary" />
+                    <Spinner size="sm" className="text-accent" />
                     <span className="text-sm text-muted-foreground">Chargement des sessions...</span>
                   </div>
                 )}
@@ -1114,8 +1114,8 @@ export default function AccountPage() {
         {emailStep === 'verify_current' && (
           <>
             <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-                <Shield className="h-5 w-5 text-primary" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft">
+                <Shield className="h-5 w-5 text-accent" />
               </div>
               <div>
                 <DialogTitle>Vérification d&apos;identité</DialogTitle>
@@ -1175,8 +1175,8 @@ export default function AccountPage() {
         {emailStep === 'enter_new' && (
           <>
             <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-                <Globe className="h-5 w-5 text-primary" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft">
+                <Globe className="h-5 w-5 text-accent" />
               </div>
               <div>
                 <DialogTitle>Nouvelle adresse email</DialogTitle>
@@ -1212,8 +1212,8 @@ export default function AccountPage() {
         {emailStep === 'verify_new' && (
           <>
             <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-                <Lock className="h-5 w-5 text-primary" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft">
+                <Lock className="h-5 w-5 text-accent" />
               </div>
               <div>
                 <DialogTitle>Vérification du nouvel email</DialogTitle>

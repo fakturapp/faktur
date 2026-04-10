@@ -167,7 +167,7 @@ export default function AccountOauthAppsPage() {
       {loading ? (
         <div className="space-y-3">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="rounded-2xl border border-border bg-card p-5">
+            <div key={i} className="rounded-xl bg-overlay shadow-surface p-5">
               <div className="flex items-center gap-4">
                 <Skeleton className="h-12 w-12 rounded-xl shrink-0" />
                 <div className="flex-1 space-y-2">
@@ -180,9 +180,9 @@ export default function AccountOauthAppsPage() {
           ))}
         </div>
       ) : apps.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-card/50 p-12 text-center">
-          <div className="flex h-14 w-14 mx-auto items-center justify-center rounded-2xl bg-primary/10 mb-4">
-            <ShieldCheck className="h-7 w-7 text-primary" />
+        <div className="rounded-xl border border-dashed border-border bg-surface shadow-surface p-12 text-center">
+          <div className="flex h-14 w-14 mx-auto items-center justify-center rounded-xl bg-accent-soft mb-4">
+            <ShieldCheck className="h-7 w-7 text-accent" />
           </div>
           <h3 className="text-base font-semibold text-foreground">Aucune application connectée</h3>
           <p className="text-sm text-muted-foreground mt-1 max-w-sm mx-auto">
@@ -205,12 +205,12 @@ export default function AccountOauthAppsPage() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.04 }}
-                className="rounded-2xl border border-border bg-card overflow-hidden"
+                className="rounded-xl bg-overlay shadow-surface overflow-hidden"
               >
                 {/* Header row */}
                 <button
                   onClick={() => toggleExpand(app.authorizationId)}
-                  className="w-full flex items-center gap-4 p-5 text-left hover:bg-muted/20 transition-colors"
+                  className="w-full flex items-center gap-4 p-5 text-left hover:bg-surface-hover transition-colors"
                 >
                   <div
                     className={cn(
@@ -281,7 +281,7 @@ export default function AccountOauthAppsPage() {
                                 key={scope}
                                 className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/40 px-2 py-1 text-[11px] text-foreground"
                               >
-                                <ShieldCheck className="h-3 w-3 text-primary" />
+                                <ShieldCheck className="h-3 w-3 text-accent" />
                                 {SCOPE_LABELS[scope] ?? scope}
                               </span>
                             ))}

@@ -124,8 +124,8 @@ export default function ReminderSettingsPage() {
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                  <Bell className="h-5 w-5 text-primary" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-soft">
+                  <Bell className="h-5 w-5 text-accent" />
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-foreground">Activer les relances</p>

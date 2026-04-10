@@ -41,7 +41,7 @@ export default function CollaborationSettingsPage() {
     >
       {}
       <div className="flex items-center gap-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-500/10">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/10">
           <Users className="h-6 w-6 text-purple-500" />
         </div>
         <div>
@@ -59,7 +59,7 @@ export default function CollaborationSettingsPage() {
       </div>
 
       {}
-      <div className="rounded-2xl border border-border bg-card p-6">
+      <div className="rounded-xl bg-overlay shadow-surface p-6">
         <div className="flex items-center justify-between gap-6">
           <div className="flex-1">
             <h3 className="text-base font-semibold text-foreground">
@@ -100,7 +100,7 @@ export default function CollaborationSettingsPage() {
           ].map(({ icon: Icon, title, desc }) => (
             <div
               key={title}
-              className={`rounded-xl border border-border p-4 transition-all duration-200 ${enabled ? 'opacity-100 bg-card/50' : 'opacity-40 bg-transparent'}`}
+              className={`rounded-xl border border-border p-4 transition-all duration-200 ${enabled ? 'opacity-100 bg-surface' : 'opacity-40 bg-transparent'}`}
             >
               <div className="flex items-center gap-3 mb-2">
                 <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${enabled ? 'bg-purple-500/10' : 'bg-muted'}`}>

@@ -90,7 +90,7 @@ export default function InvoiceDefaultsPage() {
               </div>
               <Skeleton className="h-3 w-28" />
             </div>
-            <div className="p-4 bg-muted/30">
+            <div className="p-4 bg-surface">
               <Skeleton className="w-full rounded-lg" style={{ aspectRatio: '210/270' }} />
             </div>
           </div>
@@ -115,8 +115,8 @@ export default function InvoiceDefaultsPage() {
             <Card className="overflow-hidden border-border/50">
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                    <ClipboardList className="h-4.5 w-4.5 text-primary" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
+                    <ClipboardList className="h-4.5 w-4.5 text-accent" />
                   </div>
                   <div>
                     <h2 className="text-base font-semibold text-foreground">Valeurs par d&eacute;faut des devis</h2>
@@ -182,7 +182,7 @@ export default function InvoiceDefaultsPage() {
                           <div className={`h-5 w-5 rounded-md border-2 flex items-center justify-center transition-colors shrink-0 ${
                             settings.footerMode === opt.id ? 'border-primary bg-primary' : 'border-muted-foreground/30'
                           }`}>
-                            {settings.footerMode === opt.id && <Check className="h-3 w-3 text-primary-foreground" />}
+                            {settings.footerMode === opt.id && <Check className="h-3 w-3 text-accent-foreground" />}
                           </div>
                         </button>
                       ))}
@@ -213,8 +213,8 @@ export default function InvoiceDefaultsPage() {
             <Card className="overflow-hidden border-border/50">
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                    <FileText className="h-4.5 w-4.5 text-primary" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
+                    <FileText className="h-4.5 w-4.5 text-accent" />
                   </div>
                   <div>
                     <h2 className="text-base font-semibold text-foreground">Nommage des fichiers</h2>
@@ -255,7 +255,7 @@ export default function InvoiceDefaultsPage() {
                       { var: '{entreprise}', desc: 'Nom de votre entreprise' },
                     ].map((v) => (
                       <div key={v.var} className="flex items-center gap-2">
-                        <code className="text-[11px] font-mono bg-muted px-1.5 py-0.5 rounded text-primary">{v.var}</code>
+                        <code className="text-[11px] font-mono bg-muted px-1.5 py-0.5 rounded text-accent">{v.var}</code>
                         <span className="text-[11px] text-muted-foreground">{v.desc}</span>
                       </div>
                     ))}

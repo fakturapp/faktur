@@ -344,7 +344,7 @@ function EmailSettingsContent() {
                               {meta.label}
                             </span>
                             {acc.isDefault && (
-                              <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                              <span className="inline-flex items-center gap-1 rounded-full bg-accent-soft px-2 py-0.5 text-[10px] font-semibold text-accent">
                                 <Star className="h-2.5 w-2.5" /> Par défaut
                               </span>
                             )}
@@ -359,7 +359,7 @@ function EmailSettingsContent() {
                           <button
                             onClick={() => handleSendTest(acc)}
                             disabled={sendingTestId === acc.id}
-                            className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                            className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-accent hover:bg-accent-soft transition-colors"
                             title="Envoyer un email de test"
                           >
                             {sendingTestId === acc.id ? <Spinner className="h-3.5 w-3.5" /> : <Send className="h-3.5 w-3.5" />}
@@ -423,7 +423,7 @@ function EmailSettingsContent() {
                   Templates d&apos;email
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Personnalisez les messages par défaut. Variables : <code className="text-primary">{'{type}'}</code> <code className="text-primary">{'{numero}'}</code> <code className="text-primary">{'{montant}'}</code> <code className="text-primary">{'{client_name}'}</code>
+                  Personnalisez les messages par défaut. Variables : <code className="text-accent">{'{type}'}</code> <code className="text-accent">{'{numero}'}</code> <code className="text-accent">{'{montant}'}</code> <code className="text-accent">{'{client_name}'}</code>
                 </p>
               </div>
 
@@ -544,7 +544,7 @@ function EmailSettingsContent() {
                 <button
                   onClick={() => selectProvider('gmail')}
                   disabled={connecting}
-                  className="w-full flex items-center gap-4 rounded-xl border border-border p-4 hover:bg-muted/50 hover:border-red-500/30 transition-all text-left group"
+                  className="w-full flex items-center gap-4 rounded-xl border border-border p-4 hover:bg-surface-hover hover:border-red-500/30 transition-all text-left group"
                 >
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-red-500/10 group-hover:bg-red-500/15 transition-colors">
                     <Mail className="h-5 w-5 text-red-500" />
@@ -558,7 +558,7 @@ function EmailSettingsContent() {
 
                 <button
                   onClick={() => selectProvider('resend')}
-                  className="w-full flex items-center gap-4 rounded-xl border border-border p-4 hover:bg-muted/50 hover:border-violet-500/30 transition-all text-left group"
+                  className="w-full flex items-center gap-4 rounded-xl border border-border p-4 hover:bg-surface-hover hover:border-violet-500/30 transition-all text-left group"
                 >
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-violet-500/10 group-hover:bg-violet-500/15 transition-colors">
                     <Zap className="h-5 w-5 text-violet-500" />
@@ -572,7 +572,7 @@ function EmailSettingsContent() {
 
                 <button
                   onClick={() => selectProvider('smtp')}
-                  className="w-full flex items-center gap-4 rounded-xl border border-border p-4 hover:bg-muted/50 hover:border-blue-500/30 transition-all text-left group"
+                  className="w-full flex items-center gap-4 rounded-xl border border-border p-4 hover:bg-surface-hover hover:border-blue-500/30 transition-all text-left group"
                 >
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 group-hover:bg-blue-500/15 transition-colors">
                     <Server className="h-5 w-5 text-blue-500" />
@@ -599,7 +599,7 @@ function EmailSettingsContent() {
               <div className="flex items-center gap-2 mb-1">
                 <button
                   onClick={() => { setDialogStep('choose'); setConfigError('') }}
-                  className="h-7 w-7 rounded-lg flex items-center justify-center hover:bg-muted/50 transition-colors"
+                  className="h-7 w-7 rounded-lg flex items-center justify-center hover:bg-surface-hover transition-colors"
                 >
                   <ArrowLeft className="h-4 w-4 text-muted-foreground" />
                 </button>
@@ -643,7 +643,7 @@ function EmailSettingsContent() {
                     <p className="text-xs text-destructive mt-1">Ce champ est requis</p>
                   )}
                   <FieldDescription>
-                    Disponible dans votre <a href="https://resend.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">tableau de bord Resend</a>
+                    Disponible dans votre <a href="https://resend.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">tableau de bord Resend</a>
                   </FieldDescription>
                 </Field>
 
@@ -701,7 +701,7 @@ function EmailSettingsContent() {
               <div className="flex items-center gap-2 mb-1">
                 <button
                   onClick={() => { setDialogStep('choose'); setConfigError('') }}
-                  className="h-7 w-7 rounded-lg flex items-center justify-center hover:bg-muted/50 transition-colors"
+                  className="h-7 w-7 rounded-lg flex items-center justify-center hover:bg-surface-hover transition-colors"
                 >
                   <ArrowLeft className="h-4 w-4 text-muted-foreground" />
                 </button>
@@ -836,7 +836,7 @@ function EmailSettingsContent() {
                 transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
                 className="mb-6"
               >
-                <Spinner className="h-8 w-8 text-primary" />
+                <Spinner className="h-8 w-8 text-accent" />
               </motion.div>
               <DialogTitle className="text-center">Test de connexion en cours...</DialogTitle>
               <DialogDescription className="text-center">

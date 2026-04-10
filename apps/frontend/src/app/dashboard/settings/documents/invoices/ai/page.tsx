@@ -478,7 +478,7 @@ export default function FakturAIPage() {
                         className={`rounded-xl border-2 p-4 text-left transition-all relative group ${
                           isSelected
                             ? 'border-primary bg-primary/5 shadow-sm shadow-primary/10'
-                            : 'border-border hover:border-muted-foreground/30 hover:bg-muted/30'
+                            : 'border-border hover:border-muted-foreground/30 hover:bg-surface'
                         }`}>
                         {isSelected && (
                           <div className="absolute top-2.5 right-2.5">
@@ -529,7 +529,7 @@ export default function FakturAIPage() {
                         className={`rounded-xl border-2 p-4 text-left transition-all relative ${
                           isSelected
                             ? 'border-primary bg-primary/5 shadow-sm shadow-primary/10'
-                            : 'border-border hover:border-muted-foreground/30 hover:bg-muted/30'
+                            : 'border-border hover:border-muted-foreground/30 hover:bg-surface'
                         }`}>
                         {isSelected && (
                           <div className="absolute top-2.5 right-2.5">

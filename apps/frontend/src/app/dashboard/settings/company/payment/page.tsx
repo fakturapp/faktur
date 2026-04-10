@@ -100,7 +100,7 @@ export default function PaymentPage() {
           <Skeleton className="h-7 w-40" />
           <Skeleton className="h-4 w-64" />
         </div>
-        <div className="rounded-2xl border border-border/50 p-6 space-y-4">
+        <div className="rounded-xl bg-surface shadow-surface p-6 space-y-4">
           {[...Array(4)].map((_, i) => (
             <Skeleton key={i} className="h-16 w-full rounded-xl" />
           ))}
@@ -156,10 +156,10 @@ export default function PaymentPage() {
                 <FieldDescription>Sélectionnez les moyens de paiement que vous souhaitez afficher sur vos factures.</FieldDescription>
 
                 <div className="space-y-3">
-                  <label className="flex items-center gap-4 rounded-xl border border-border p-4 cursor-pointer hover:bg-muted/30 transition-colors has-[:checked]:border-primary/40 has-[:checked]:bg-primary/5">
+                  <label className="flex items-center gap-4 rounded-xl border border-border p-4 cursor-pointer hover:bg-surface transition-colors has-[:checked]:border-primary/40 has-[:checked]:bg-primary/5">
                     <input type="checkbox" checked={paymentForm.paymentMethods.includes('bank_transfer')} onChange={() => togglePaymentMethod('bank_transfer')} className="sr-only" />
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                      <Banknote className="h-5 w-5 text-primary" />
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent-soft">
+                      <Banknote className="h-5 w-5 text-accent" />
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-medium text-foreground">Virement bancaire</p>
@@ -172,7 +172,7 @@ export default function PaymentPage() {
                     </div>
                   </label>
 
-                  <label className="flex items-center gap-4 rounded-xl border border-border p-4 cursor-pointer hover:bg-muted/30 transition-colors has-[:checked]:border-primary/40 has-[:checked]:bg-primary/5">
+                  <label className="flex items-center gap-4 rounded-xl border border-border p-4 cursor-pointer hover:bg-surface transition-colors has-[:checked]:border-primary/40 has-[:checked]:bg-primary/5">
                     <input type="checkbox" checked={paymentForm.paymentMethods.includes('cash')} onChange={() => togglePaymentMethod('cash')} className="sr-only" />
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-green-500/10">
                       <Coins className="h-5 w-5 text-green-500" />
@@ -188,7 +188,7 @@ export default function PaymentPage() {
                     </div>
                   </label>
 
-                  <label className="flex items-center gap-4 rounded-xl border border-border p-4 cursor-pointer hover:bg-muted/30 transition-colors has-[:checked]:border-primary/40 has-[:checked]:bg-primary/5">
+                  <label className="flex items-center gap-4 rounded-xl border border-border p-4 cursor-pointer hover:bg-surface transition-colors has-[:checked]:border-primary/40 has-[:checked]:bg-primary/5">
                     <input type="checkbox" checked={paymentForm.paymentMethods.includes('custom')} onChange={() => togglePaymentMethod('custom')} className="sr-only" />
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-yellow-500/10">
                       <PenLine className="h-5 w-5 text-yellow-500" />

@@ -291,7 +291,7 @@ export default function TeamPage() {
     return (
       <div className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
         {/* Team header card */}
-        <div className="rounded-2xl border border-border/50 overflow-hidden">
+        <div className="rounded-xl shadow-surface overflow-hidden">
           <div className="p-6 flex items-end justify-between">
             <div className="flex items-end gap-4">
               <Skeleton className="h-16 w-16 rounded-xl" />
@@ -312,7 +312,7 @@ export default function TeamPage() {
             <Skeleton className="h-4 w-4 rounded" />
             <Skeleton className="h-3.5 w-16" />
           </div>
-          <div className="rounded-2xl border border-border/50">
+          <div className="rounded-xl shadow-surface">
             {[...Array(3)].map((_, i) => (
               <div key={i} className="flex items-center justify-between px-5 py-4 border-b border-border/50 last:border-b-0">
                 <div className="flex items-center gap-3.5">
@@ -471,7 +471,7 @@ export default function TeamPage() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: index * 0.03 }}
-                    className="flex items-center justify-between px-5 py-4 hover:bg-muted/20 transition-colors"
+                    className="flex items-center justify-between px-5 py-4 hover:bg-surface-hover transition-colors"
                   >
                     <div className="flex items-center gap-3.5">
                       <Avatar
@@ -486,7 +486,7 @@ export default function TeamPage() {
                             {memberUser?.fullName || memberUser?.email}
                           </p>
                           {member.userId === user?.id && (
-                            <span className="text-[10px] font-medium text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">
+                            <span className="text-[10px] font-medium text-accent bg-accent-soft px-1.5 py-0.5 rounded-full">
                               vous
                             </span>
                           )}
@@ -666,7 +666,7 @@ export default function TeamPage() {
                     animate={{ opacity: 1, scale: 1 }}
                     className="flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 p-3"
                   >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary overflow-hidden">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent-soft text-xs font-bold text-accent overflow-hidden">
                       {selectedUser.avatarUrl ? (
                         <img src={selectedUser.avatarUrl} alt="" className="h-full w-full object-cover" />
                       ) : (
@@ -714,12 +714,12 @@ export default function TeamPage() {
                     autoComplete="off"
                   />
                   {showSuggestions && searchResults.length > 0 && (
-                    <div className="absolute z-50 top-full left-0 right-0 mt-1 rounded-xl border border-border bg-card shadow-xl overflow-hidden">
+                    <div className="absolute z-50 top-full left-0 right-0 mt-1 rounded-xl bg-overlay shadow-surface overflow-hidden">
                       {searchResults.map((u) => (
                         <button
                           key={u.id}
                           type="button"
-                          className="flex items-center gap-3 w-full px-3 py-2.5 hover:bg-muted/50 transition-colors text-left"
+                          className="flex items-center gap-3 w-full px-3 py-2.5 hover:bg-surface-hover transition-colors text-left"
                           onMouseDown={(e) => {
                             e.preventDefault()
                             setSelectedUser(u)
@@ -728,7 +728,7 @@ export default function TeamPage() {
                             setSearchResults([])
                           }}
                         >
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary overflow-hidden">
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent-soft text-xs font-bold text-accent overflow-hidden">
                             {u.avatarUrl ? (
                               <img src={u.avatarUrl} alt="" className="h-full w-full object-cover" />
                             ) : (
@@ -1027,8 +1027,8 @@ export default function TeamPage() {
             disabled={uploadingIcon}
             className="flex w-full items-center gap-4 rounded-xl border-2 border-border p-4 text-left transition-all hover:border-primary/40 hover:bg-primary/5 disabled:opacity-50"
           >
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-              <BuildingIcon className="h-6 w-6 text-primary" />
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-accent-soft">
+              <BuildingIcon className="h-6 w-6 text-accent" />
             </div>
             <div className="flex-1">
               <p className="text-sm font-medium text-foreground">Utiliser le logo de l&apos;entreprise</p>
@@ -1043,8 +1043,8 @@ export default function TeamPage() {
             disabled={uploadingIcon}
             className="flex w-full items-center gap-4 rounded-xl border-2 border-border p-4 text-left transition-all hover:border-primary/40 hover:bg-primary/5 disabled:opacity-50"
           >
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-              <Upload className="h-6 w-6 text-primary" />
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-accent-soft">
+              <Upload className="h-6 w-6 text-accent" />
             </div>
             <div className="flex-1">
               <p className="text-sm font-medium text-foreground">Importer un logo</p>

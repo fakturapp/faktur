@@ -89,8 +89,8 @@ export default function EInvoicingPage() {
           <CardContent className="p-6">
             {}
             <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                <FileCheck className="h-4.5 w-4.5 text-primary" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
+                <FileCheck className="h-4.5 w-4.5 text-accent" />
               </div>
               <div>
                 <h2 className="text-base font-semibold text-foreground">Facturation electronique</h2>
@@ -100,7 +100,7 @@ export default function EInvoicingPage() {
 
             {}
             <div className="flex items-start gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 mb-4">
-              <Info className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+              <Info className="h-4 w-4 text-accent shrink-0 mt-0.5" />
               <p className="text-xs text-foreground leading-relaxed">
                 A partir de septembre 2026, toutes les entreprises francaises doivent emettre des factures electroniques au format structure (Factur-X, UBL ou CII) via une Plateforme de Dematerialisation Partenaire (PDP).
               </p>
@@ -109,7 +109,7 @@ export default function EInvoicingPage() {
             {}
             <div className="flex items-center justify-between rounded-xl border-2 border-border p-4 mb-4">
               <div className="flex items-center gap-3">
-                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${settings.eInvoicingEnabled ? 'bg-primary/10' : 'bg-muted'}`}>
+                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${settings.eInvoicingEnabled ? 'bg-accent-soft' : 'bg-muted'}`}>
                   <Shield className={`h-5 w-5 ${settings.eInvoicingEnabled ? 'text-primary' : 'text-muted-foreground'}`} />
                 </div>
                 <div>
@@ -212,7 +212,7 @@ export default function EInvoicingPage() {
                         'Suivi des statuts en temps reel',
                       ].map((feature) => (
                         <div key={feature} className="flex items-center gap-2">
-                          <Check className="h-3.5 w-3.5 text-primary shrink-0" />
+                          <Check className="h-3.5 w-3.5 text-accent shrink-0" />
                           <span className="text-[11px] text-muted-foreground">{feature}</span>
                         </div>
                       ))}
@@ -237,8 +237,8 @@ export default function EInvoicingPage() {
       <Dialog open={showEInvoicingModal} onClose={() => setShowEInvoicingModal(false)}>
         <div className="p-6 max-w-md">
           <div className="flex items-center gap-3 mb-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-              <FileCheck className="h-6 w-6 text-primary" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent-soft">
+              <FileCheck className="h-6 w-6 text-accent" />
             </div>
             <div>
               <DialogTitle>Activer la facturation electronique</DialogTitle>
@@ -256,7 +256,7 @@ export default function EInvoicingPage() {
                 'Aucun impact sur vos documents existants',
               ].map((item) => (
                 <div key={item} className="flex items-start gap-2">
-                  <Check className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" />
+                  <Check className="h-3.5 w-3.5 text-accent shrink-0 mt-0.5" />
                   <span className="text-xs text-foreground">{item}</span>
                 </div>
               ))}

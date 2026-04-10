@@ -147,8 +147,8 @@ export default function ExportPage() {
     >
       {/* Header */}
       <div className="flex items-center gap-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
-          <Download className="h-6 w-6 text-primary" />
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent-soft">
+          <Download className="h-6 w-6 text-accent" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-foreground">Exporter mes donn&eacute;es</h1>
@@ -157,7 +157,7 @@ export default function ExportPage() {
       </div>
 
       {/* Progress bar */}
-      <div className="rounded-2xl border border-border bg-card p-4">
+      <div className="rounded-xl bg-overlay shadow-surface p-4">
         <div className="flex items-center justify-between">
           <p className="text-xs font-semibold text-muted-foreground">
             &Eacute;tape {visualStep + 1} sur {activeSteps.length}
@@ -194,8 +194,8 @@ export default function ExportPage() {
             <Card>
               <CardContent className="p-6 space-y-5">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-                    <Download className="h-5 w-5 text-primary" />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft">
+                    <Download className="h-5 w-5 text-accent" />
                   </div>
                   <div>
                     <h2 className="text-lg font-bold text-foreground">Choisir l&apos;&eacute;quipe</h2>
@@ -269,8 +269,8 @@ export default function ExportPage() {
             <Card>
               <CardContent className="p-6 space-y-5">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-                    <FileArchive className="h-5 w-5 text-primary" />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft">
+                    <FileArchive className="h-5 w-5 text-accent" />
                   </div>
                   <div>
                     <h2 className="text-lg font-bold text-foreground">Options d&apos;export</h2>
@@ -288,8 +288,8 @@ export default function ExportPage() {
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                      <Lock className="h-4 w-4 text-primary" />
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
+                      <Lock className="h-4 w-4 text-accent" />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-foreground">Chiffrer l&apos;export</p>
@@ -303,8 +303,8 @@ export default function ExportPage() {
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                      <Landmark className="h-4 w-4 text-primary" />
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
+                      <Landmark className="h-4 w-4 text-accent" />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-foreground">Inclure les comptes bancaires</p>
@@ -318,8 +318,8 @@ export default function ExportPage() {
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                      <CreditCard className="h-4 w-4 text-primary" />
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
+                      <CreditCard className="h-4 w-4 text-accent" />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-foreground">Inclure les cl&eacute;s Stripe</p>
@@ -343,8 +343,8 @@ export default function ExportPage() {
             <Card>
               <CardContent className="p-6 space-y-5">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-                    <Shield className="h-5 w-5 text-primary" />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft">
+                    <Shield className="h-5 w-5 text-accent" />
                   </div>
                   <div>
                     <h2 className="text-lg font-bold text-foreground">Mot de passe de chiffrement</h2>
@@ -382,8 +382,8 @@ export default function ExportPage() {
                 {exportStatus === 'idle' ? (
                   <>
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-                        <CheckCircle2 className="h-5 w-5 text-primary" />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft">
+                        <CheckCircle2 className="h-5 w-5 text-accent" />
                       </div>
                       <div>
                         <h2 className="text-lg font-bold text-foreground">Confirmer l&apos;export</h2>
@@ -392,7 +392,7 @@ export default function ExportPage() {
                     </div>
 
                     {/* Summary */}
-                    <div className="rounded-xl border border-border bg-muted/30 p-4 space-y-2.5">
+                    <div className="rounded-lg bg-surface-secondary p-4 space-y-2.5">
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">&Eacute;quipe</span>
                         <span className="font-medium text-foreground">{selectedTeamInfo?.name}</span>

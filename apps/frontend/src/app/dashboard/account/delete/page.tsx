@@ -248,7 +248,7 @@ export default function DeleteAccountPage() {
     >
       {}
       <div className="flex items-center gap-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-destructive/10">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-destructive/10">
           <Trash2 className="h-6 w-6 text-destructive" />
         </div>
         <div>
@@ -258,7 +258,7 @@ export default function DeleteAccountPage() {
       </div>
 
       {}
-      <div className="rounded-2xl border border-border bg-card p-4">
+      <div className="rounded-xl bg-overlay shadow-surface p-4">
         <div className="flex items-center justify-between">
           <p className="text-xs font-semibold text-muted-foreground">
             &Eacute;tape {currentStep + 1} sur {steps.length}
@@ -348,8 +348,8 @@ export default function DeleteAccountPage() {
             <Card>
               <CardContent className="p-6 space-y-5">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-                    <Users className="h-6 w-6 text-primary" />
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent-soft">
+                    <Users className="h-6 w-6 text-accent" />
                   </div>
                   <div>
                     <h2 className="text-lg font-bold text-foreground">Résoudre les équipes</h2>
@@ -369,7 +369,7 @@ export default function DeleteAccountPage() {
                 )}
 
                 {teamsLoaded && teams.length === 0 && (
-                  <div className="rounded-xl border border-border bg-muted/30 p-6 text-center">
+                  <div className="rounded-lg bg-surface-secondary p-6 text-center">
                     <Check className="h-8 w-8 text-green-500 mx-auto mb-2" />
                     <p className="text-sm text-muted-foreground">Toutes les équipes ont été résolues.</p>
                   </div>
@@ -449,8 +449,8 @@ export default function DeleteAccountPage() {
             <Card>
               <CardContent className="p-6 space-y-5">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-                    <UserCheck className="h-6 w-6 text-primary" />
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent-soft">
+                    <UserCheck className="h-6 w-6 text-accent" />
                   </div>
                   <div>
                     <h2 className="text-lg font-bold text-foreground">Confirmez votre identité</h2>
@@ -487,8 +487,8 @@ export default function DeleteAccountPage() {
             <Card>
               <CardContent className="p-6 space-y-5">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-                    <Mail className="h-6 w-6 text-primary" />
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent-soft">
+                    <Mail className="h-6 w-6 text-accent" />
                   </div>
                   <div>
                     <h2 className="text-lg font-bold text-foreground">Vérification par email</h2>
@@ -556,8 +556,8 @@ export default function DeleteAccountPage() {
             <Card>
               <CardContent className="p-6 space-y-5">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-                    <Lock className="h-6 w-6 text-primary" />
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent-soft">
+                    <Lock className="h-6 w-6 text-accent" />
                   </div>
                   <div>
                     <h2 className="text-lg font-bold text-foreground">Mot de passe</h2>
