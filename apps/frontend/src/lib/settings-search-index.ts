@@ -90,10 +90,10 @@ export const settingsSearchIndex: SettingsSearchItem[] = [
   {
     href: '/dashboard/settings/documents/invoices/ai',
     label: 'Faktur AI',
-    description: 'Assistant IA, Claude, Gemini, Groq, clés API',
+    description: 'Assistant IA, Gemini, intelligence artificielle',
     section: 'Facturation',
     icon: Sparkles,
-    keywords: ['ia', 'ai', 'faktur', 'claude', 'gemini', 'groq', 'intelligence', 'artificielle', 'api'],
+    keywords: ['ia', 'ai', 'faktur', 'gemini', 'google', 'intelligence', 'artificielle', 'api'],
   },
   {
     href: '/dashboard/settings/email/accounts',

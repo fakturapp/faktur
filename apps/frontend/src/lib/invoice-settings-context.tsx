@@ -39,7 +39,7 @@ export interface InvoiceSettings {
   logoBorderRadius: number
   collaborationEnabled: boolean
   aiEnabled: boolean
-  aiProvider: 'groq'
+  aiProvider: 'gemini'
   aiModel: string
 }
 
@@ -88,8 +88,8 @@ const defaultSettings: InvoiceSettings = {
   logoBorderRadius: 0,
   collaborationEnabled: false,
   aiEnabled: false,
-  aiProvider: 'groq',
-  aiModel: 'llama-3.3-70b-versatile',
+  aiProvider: 'gemini',
+  aiModel: 'nvidia/nemotron-3-super-120b-a12b:free',
 }
 
 const InvoiceSettingsContext = createContext<InvoiceSettingsContextType>({
