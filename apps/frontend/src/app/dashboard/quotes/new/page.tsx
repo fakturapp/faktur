@@ -22,7 +22,7 @@ import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
 import { useTrackFeature } from '@/hooks/use-analytics'
 import { FirstDocumentBanner } from '@/components/shared/first-document-banner'
 import { ProductCatalogModal, type CatalogProduct } from '@/components/products/product-catalog-modal'
-import { DocumentZoom, loadDocumentZoom } from '@/components/shared/document-zoom'
+import { DocumentZoom, loadDocumentZoom, useZoomSpacing } from '@/components/shared/document-zoom'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -88,6 +88,8 @@ export default function NewQuotePage() {
   const [mode, setMode] = useState<'edit' | 'preview'>('edit')
   const [docZoom, setDocZoom] = useState(100)
   useEffect(() => setDocZoom(loadDocumentZoom()), [])
+  const a4SheetRef = useRef<HTMLDivElement>(null)
+  const zoomSpacing = useZoomSpacing(a4SheetRef, docZoom)
   const [quoteNumber, setQuoteNumber] = useState('')
   const [company, setCompany] = useState<CompanyInfo | null>(null)
   const [selectedClient, setSelectedClient] = useState<ClientInfo | null>(null)
@@ -624,7 +626,7 @@ export default function NewQuotePage() {
             currentNumber={quoteNumber}
             onNumberChange={setQuoteNumber}
           />
-          <div className="relative" style={{ transform: `scale(${docZoom / 100})`, transformOrigin: 'top center', transition: 'transform 0.15s ease' }}>
+          <div ref={a4SheetRef} className="relative" style={{ transform: `scale(${docZoom / 100})`, transformOrigin: 'top center', ...zoomSpacing }}>
           <AiSheetOverlay
             open={aiProcessing}
             error={aiError}
