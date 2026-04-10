@@ -205,7 +205,7 @@ function AuthorizeContent() {
           transition={{ duration: 0.25 }}
           className="w-[380px]"
         >
-          <div className="rounded-2xl border border-amber-500/20 bg-card p-6 text-center">
+          <div className="rounded-xl border border-amber-500/20 bg-overlay shadow-surface p-6 text-center">
             <div className="h-12 w-12 rounded-full bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
               <Lock className="h-6 w-6 text-amber-500" />
             </div>
@@ -240,7 +240,7 @@ function AuthorizeContent() {
         <motion.div
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="w-[380px] rounded-2xl border border-border bg-card p-8 text-center"
+          className="w-[380px] rounded-xl bg-overlay shadow-surface p-8 text-center"
         >
           <div className="h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-4">
             <X className="h-6 w-6 text-destructive" />
@@ -290,9 +290,9 @@ function AuthorizeContent() {
           transition={{ duration: 0.25 }}
           className="w-[400px]"
         >
-          <div className="rounded-2xl border border-border bg-card p-6">
+          <div className="rounded-xl bg-overlay shadow-surface p-6">
             <div className="flex items-center gap-3 pb-5 border-b border-border">
-              <div className="h-11 w-11 shrink-0 rounded-xl bg-muted/60 flex items-center justify-center overflow-hidden">
+              <div className="h-11 w-11 shrink-0 rounded-xl bg-surface flex items-center justify-center overflow-hidden">
                 {data.client.iconUrl ? (
                   <img
                     src={data.client.iconUrl}

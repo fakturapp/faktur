@@ -1,0 +1,8 @@
+@layer components {
+/* Description — copied from HeroUI v3 (packages/styles/components/description.css) */
+
+.description {
+  @apply text-[12px] text-wrap text-muted;
+  word-wrap: break-word;
+}
+}

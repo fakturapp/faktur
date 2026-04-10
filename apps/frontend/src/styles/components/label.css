@@ -1,0 +1,30 @@
+@layer components {
+/* Label — copied from HeroUI v3 (packages/styles/components/label.css) */
+
+.label {
+  @apply text-[13px] font-medium text-foreground;
+  letter-spacing: var(--tracking-ui);
+}
+
+/*
+ * Required marker — only on atomic form field labels and group labels,
+ * not on individual radio/checkbox options.
+ */
+.label--required,
+[data-required="true"]:not([role="group"]):not([role="radiogroup"]):not([role="checkboxgroup"])
+  > .label,
+[data-required="true"]:not([data-slot="radio"]):not([data-slot="checkbox"]) > .label {
+  @apply after:ml-0.5 after:text-danger after:content-['*'];
+}
+
+.label--disabled,
+[data-disabled="true"] .label {
+  @apply status-disabled;
+}
+
+.label--invalid,
+[data-invalid="true"] .label,
+[aria-invalid="true"] .label {
+  @apply text-danger;
+}
+}

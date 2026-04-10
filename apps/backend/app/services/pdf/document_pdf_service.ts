@@ -145,7 +145,7 @@ export async function generateInvoicePdf(
     documentFont: invoiceSettings?.documentFont || 'Lexend',
     documentType: 'invoice' as const,
     footerMode:
-      (invoiceSettings?.footerMode as 'company_info' | 'vat_exempt' | 'custom') || 'vat_exempt',
+      (invoiceSettings?.footerMode as 'company_info' | 'custom') || 'company_info',
   }
 
   const logoSource = invoiceSettings?.logoSource || 'custom'
@@ -274,7 +274,7 @@ export async function generateQuotePdf(
     documentFont: invoiceSettings?.documentFont || 'Lexend',
     documentType: 'quote' as const,
     footerMode:
-      (invoiceSettings?.footerMode as 'company_info' | 'vat_exempt' | 'custom') || 'vat_exempt',
+      (invoiceSettings?.footerMode as 'company_info' | 'custom') || 'company_info',
   }
 
   const logoSource = invoiceSettings?.logoSource || 'custom'
@@ -376,7 +376,7 @@ export async function generateCreditNotePdf(
     documentFont: invoiceSettings?.documentFont || 'Lexend',
     documentType: 'credit_note' as const,
     footerMode:
-      (invoiceSettings?.footerMode as 'company_info' | 'vat_exempt' | 'custom') || 'vat_exempt',
+      (invoiceSettings?.footerMode as 'company_info' | 'custom') || 'company_info',
   }
 
   const logoSource = invoiceSettings?.logoSource || 'custom'

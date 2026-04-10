@@ -15,17 +15,17 @@ export default class SecurityCodeNotification extends BaseMail {
 
   prepare() {
     const content = `
-      <h1 style="margin: 0 0 12px; font-size: 22px; font-weight: 700; color: #ffffff; letter-spacing: -0.3px; line-height: 1.3; text-align: center;">Code de v&eacute;rification</h1>
-      <p style="margin: 0 0 24px; font-size: 15px; line-height: 1.7; color: #a1a1aa; text-align: center;">
-        Bonjour${this.name ? ` <span style="color: #c7d2fe; font-weight: 500;">${this.name}</span>` : ''},<br><br>
+      <h2 style="font-size: 20px; font-weight: 600; color: #171717; letter-spacing: -0.02em; margin: 0 0 12px; text-align: center;">Code de v&eacute;rification</h2>
+      <p style="font-size: 14px; line-height: 1.7; color: #707070; margin: 0 0 16px; text-align: center;">
+        Bonjour${this.name ? ` <span style="color: #5957e8; font-weight: 600;">${this.name}</span>` : ''},<br><br>
         Utilisez le code ci-dessous pour confirmer votre action. Ne partagez jamais ce code avec qui que ce soit.
       </p>
-      <div style="background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(79,70,229,0.04)); border: 1px solid rgba(99,102,241,0.15); border-radius: 16px; padding: 28px; text-align: center; margin: 28px 0;">
-        <p style="margin: 0; font-size: 40px; font-weight: 800; color: #ffffff; letter-spacing: 12px; font-family: 'SF Mono', 'Fira Code', Consolas, monospace;">${this.code}</p>
-        <p style="margin: 12px 0 0; font-size: 12px; color: #6366f1; font-weight: 500; text-transform: uppercase; letter-spacing: 1.5px;">Code de s&eacute;curit&eacute;</p>
+      <div style="background: #f5f5f5; border-radius: 14px; padding: 20px; text-align: center; margin: 28px 0;">
+        <p style="margin: 0; font-size: 32px; font-weight: 700; letter-spacing: 0.15em; color: #171717; font-family: 'SF Mono', 'Fira Code', Consolas, monospace;">${this.code}</p>
+        <p style="margin: 12px 0 0; font-size: 12px; color: #5957e8; font-weight: 500; text-transform: uppercase; letter-spacing: 1.5px;">Code de s&eacute;curit&eacute;</p>
       </div>
       ${validityTag('Valide 5 minutes')}
-      <p style="margin: 20px 0 0; font-size: 13px; line-height: 1.6; color: #71717a; text-align: center;">
+      <p style="margin: 20px 0 0; font-size: 13px; line-height: 1.6; color: #a3a3a3; text-align: center;">
         Si vous n'avez pas demand&eacute; ce code, vous pouvez ignorer cet email en toute s&eacute;curit&eacute;.
       </p>
     `

@@ -1,0 +1,107 @@
+@layer components {
+/* ============================================================
+ * Card — Faktur DA (inspired Link by Stripe list groups)
+ *
+ * Base pattern: surface bg + inset ring (shadow-surface) + 14px radius
+ * (--radius-xl). Interactive variant adds hover + press scale.
+ * ============================================================ */
+
+.card {
+  @apply relative flex flex-col rounded-xl p-5;
+  background-color: var(--color-overlay);
+  color: var(--color-foreground);
+  box-shadow: var(--shadow-surface);
+}
+
+/* ============================================================
+ * Variants
+ * ============================================================ */
+.card--inset {
+  @apply p-1;
+}
+
+.card--flat {
+  box-shadow: none;
+}
+
+.card--plain {
+  background-color: var(--color-background);
+  box-shadow: var(--shadow-surface);
+}
+
+.card--interactive {
+  cursor: var(--cursor-interactive);
+
+  transition:
+    background-color 150ms var(--ease-link),
+    transform 250ms var(--ease-link),
+    box-shadow 150ms var(--ease-link);
+  @apply motion-reduce:transition-none;
+
+  @media (hover: hover) {
+    &:hover {
+      background-color: var(--color-surface-hover);
+    }
+  }
+
+  &:active {
+    transform: scale(0.995);
+  }
+}
+
+/* ============================================================
+ * Size modifiers
+ * ============================================================ */
+.card--sm {
+  @apply p-4;
+}
+
+.card--md {
+  /* default */
+}
+
+.card--lg {
+  @apply p-6;
+}
+
+/* ============================================================
+ * Sub-elements
+ * ============================================================ */
+.card__header {
+  @apply relative flex flex-col gap-1 pb-3;
+}
+
+.card__title {
+  @apply text-[15px] font-semibold text-foreground;
+  letter-spacing: -0.02em;
+}
+
+.card__description {
+  @apply text-[13px] text-muted leading-relaxed;
+}
+
+.card__body {
+  @apply flex flex-col gap-3 text-[13px] text-foreground leading-relaxed;
+}
+
+.card__footer {
+  @apply flex items-center justify-end gap-2 pt-4;
+}
+
+.card__action {
+  @apply absolute top-4 right-4;
+}
+
+/* Spacing between sub-elements (HeroUI pattern) */
+.card__header + .card__body {
+  @apply mt-0;
+}
+
+.card__header + .card__footer {
+  @apply mt-4;
+}
+
+.card__body + .card__footer {
+  @apply mt-4;
+}
+}

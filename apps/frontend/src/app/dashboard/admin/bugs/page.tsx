@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/auth'
 import { motion } from 'framer-motion'
 import { api } from '@/lib/api'
 import { useToast } from '@/components/ui/toast'
-import { Select } from '@/components/ui/select'
+import { FormSelect } from '@/components/ui/dropdown'
 import { Spinner } from '@/components/ui/spinner'
 import { Avatar } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
@@ -167,17 +167,19 @@ export default function AdminBugsPage() {
                   )}
                 </div>
                 <div className="shrink-0">
-                  <Select
+                  <FormSelect
                     value={b.status}
-                    onChange={(e) => updateBugStatus(b.id, e.target.value)}
+                    onChange={(v) => updateBugStatus(b.id, v)}
                     disabled={updatingStatus === b.id}
                     className="w-32 text-xs"
-                  >
-                    <option value="open">Ouvert</option>
-                    <option value="in_progress">En cours</option>
-                    <option value="resolved">Résolu</option>
-                    <option value="closed">Fermé</option>
-                  </Select>
+                    showCheck={false}
+                    options={[
+                      { value: 'open', label: 'Ouvert' },
+                      { value: 'in_progress', label: 'En cours' },
+                      { value: 'resolved', label: 'Résolu' },
+                      { value: 'closed', label: 'Fermé' },
+                    ]}
+                  />
                 </div>
               </div>
             </motion.div>

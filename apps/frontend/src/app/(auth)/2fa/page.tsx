@@ -50,7 +50,7 @@ function TwoFactorContent() {
 
   if (!userId) {
     return (
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-sm">
         <Card className="overflow-hidden p-0 border-border/50">
           <CardContent className="p-8 text-center">
             <h1 className="text-2xl font-bold mb-4">Session invalide</h1>
@@ -65,14 +65,14 @@ function TwoFactorContent() {
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" className="w-full max-w-md">
+    <motion.div initial="hidden" animate="visible" className="w-full max-w-sm">
       <Card className="overflow-hidden p-0 border-border/50">
         <CardContent className="p-8">
           <form onSubmit={handleSubmit}>
             <FieldGroup>
               <motion.div variants={fadeUp} custom={0} className="flex flex-col items-center gap-4 text-center mb-2">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                  <svg className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <div className="w-16 h-16 rounded-full bg-accent-soft flex items-center justify-center">
+                  <svg className="h-8 w-8 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
                 </div>
@@ -128,7 +128,7 @@ function TwoFactorContent() {
                       setCode('')
                       setError('')
                     }}
-                    className="text-primary underline underline-offset-4 hover:text-primary/80 block mx-auto"
+                    className="text-accent underline underline-offset-4 hover:text-accent/80 block mx-auto"
                   >
                     {useRecovery
                       ? 'Utiliser le code authenticator'

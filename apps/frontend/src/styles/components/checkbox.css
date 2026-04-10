@@ -1,0 +1,190 @@
+@layer components {
+/* Checkbox — copied from HeroUI v3 (packages/styles/components/checkbox.css) */
+
+.checkbox {
+  @apply flex gap-3 outline-none no-highlight;
+  cursor: var(--cursor-interactive);
+
+  /* Align center when there's no description */
+  &:not(:has([data-slot="description"])) {
+    @apply items-center;
+  }
+
+  /* Align start when there's a description */
+  &:has([data-slot="description"]) {
+    @apply items-start;
+  }
+
+  [data-slot="label"] {
+    @apply select-none;
+  }
+
+  [data-slot="description"] {
+    @apply select-none;
+  }
+
+  /* Disabled state */
+  &:disabled,
+  &[data-disabled="true"],
+  &[aria-disabled="true"] {
+    @apply status-disabled;
+  }
+
+  /* Indicator styles (selected / indeterminate) */
+  &[data-selected="true"],
+  &[data-indeterminate="true"] {
+    .checkbox__indicator {
+      color: var(--color-accent-foreground);
+    }
+  }
+
+  /* Checkmark SVG */
+  [data-slot="checkbox-default-indicator--checkmark"] {
+    @apply size-2.5 stroke-[2.5px] text-accent-foreground;
+    @apply transition-all duration-200 motion-reduce:transition-none;
+  }
+
+  &[data-selected="true"] [data-slot="checkbox-default-indicator--checkmark"] {
+    transition: stroke-dashoffset 150ms linear 15ms;
+  }
+
+  /* Invalid + selected checkmark color */
+  &[data-invalid="true"][data-selected="true"] [data-slot="checkbox-default-indicator--checkmark"],
+  &[data-invalid="true"][aria-checked="true"] [data-slot="checkbox-default-indicator--checkmark"],
+  &[aria-invalid="true"][data-selected="true"] [data-slot="checkbox-default-indicator--checkmark"],
+  &[aria-invalid="true"][aria-checked="true"] [data-slot="checkbox-default-indicator--checkmark"] {
+    @apply text-danger-foreground;
+  }
+
+  /* Indeterminate line */
+  &[data-indeterminate="true"] {
+    [data-slot="checkbox-default-indicator--indeterminate"] {
+      @apply size-3;
+    }
+  }
+
+  &[data-indeterminate="true"][data-invalid="true"]
+    [data-slot="checkbox-default-indicator--indeterminate"],
+  &[data-indeterminate="true"][aria-invalid="true"]
+    [data-slot="checkbox-default-indicator--indeterminate"] {
+    @apply text-danger-foreground;
+  }
+}
+
+/* ============================================================
+ * Control (the square box)
+ * ============================================================ */
+.checkbox__control {
+  @apply relative inline-flex size-[18px] shrink-0 items-center justify-center overflow-hidden rounded-md bg-field shadow-field outline-none no-highlight;
+
+  transition:
+    background-color 200ms var(--ease-out),
+    transform 100ms var(--ease-out);
+  @apply motion-reduce:transition-none;
+
+  cursor: var(--cursor-interactive);
+
+  .checkbox:has([data-slot="description"]) & {
+    @apply mt-0.5;
+  }
+
+  /* Background indicator pseudo-element (the accent fill) */
+  &::before {
+    @apply pointer-events-none absolute inset-0 z-0 origin-center rounded-md bg-accent opacity-0 content-[''];
+    transform: scale(0.7);
+    transition:
+      transform 100ms var(--ease-linear),
+      opacity 200ms var(--ease-linear),
+      background-color 200ms var(--ease-out);
+    @apply motion-reduce:transition-none;
+  }
+
+  /* Focus */
+  .checkbox:focus-visible &,
+  .checkbox[data-focus-visible="true"] & {
+    @apply status-focused;
+  }
+
+  /* Hover */
+  .checkbox:hover &,
+  .checkbox[data-hovered="true"] & {
+    &::before {
+      @apply bg-accent-hover;
+    }
+  }
+
+  /* Selected */
+  .checkbox[aria-checked="true"] &,
+  .checkbox[data-selected="true"] & {
+    @apply border-transparent text-accent-foreground;
+
+    &::before {
+      transform: scale(1);
+      @apply opacity-100;
+    }
+  }
+
+  /* Indeterminate */
+  .checkbox[data-indeterminate="true"] & {
+    @apply bg-accent text-accent-foreground;
+  }
+
+  .checkbox:active[data-indeterminate="true"] &,
+  .checkbox[data-pressed="true"][data-indeterminate="true"] & {
+    @apply bg-accent-hover;
+  }
+
+  /* Invalid (unselected) */
+  .checkbox[data-invalid="true"]:not([aria-checked="true"]):not([data-selected="true"]):not(
+      [data-indeterminate="true"]
+    )
+    &,
+  .checkbox[aria-invalid="true"]:not([aria-checked="true"]):not([data-selected="true"]):not(
+      [data-indeterminate="true"]
+    )
+    & {
+    @apply status-invalid-field;
+  }
+
+  /* Invalid + selected */
+  .checkbox[data-invalid="true"][aria-checked="true"] &,
+  .checkbox[data-invalid="true"][data-selected="true"] &,
+  .checkbox[aria-invalid="true"][aria-checked="true"] &,
+  .checkbox[aria-invalid="true"][data-selected="true"] & {
+    @apply border-transparent bg-danger text-danger-foreground;
+
+    &::before {
+      transform: scale(1);
+      @apply bg-danger opacity-100;
+    }
+  }
+
+  /* Invalid + indeterminate */
+  .checkbox[data-indeterminate="true"][aria-invalid="true"] &,
+  .checkbox[data-indeterminate="true"][data-invalid="true"] & {
+    @apply bg-danger text-danger-foreground;
+  }
+}
+
+/* ============================================================
+ * Indicator (SVG wrapper)
+ * ============================================================ */
+.checkbox__indicator {
+  @apply relative z-10 flex size-3 items-center justify-center;
+
+  & svg {
+    @apply transform-gpu;
+  }
+}
+
+/* ============================================================
+ * Content (label + description)
+ * ============================================================ */
+.checkbox__content {
+  @apply flex flex-col gap-0.5;
+}
+
+.checkbox--disabled {
+  @apply status-disabled;
+}
+}

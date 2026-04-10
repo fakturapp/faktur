@@ -1,16 +1,18 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import {
   Trash2, Search, X, Building2, UserRound,
   RefreshCw, MousePointerClick, FileText, Plus, Type, ChevronDown, Package, ImagePlus, Upload,
+  AlertTriangle,
 } from 'lucide-react'
 import { api } from '@/lib/api'
 import { RichTextarea, mdToHtml } from '@/components/ui/rich-textarea'
 import { Dialog, DialogTitle } from '@/components/ui/dialog'
+import { Dropdown, DropdownItem } from '@/components/ui/dropdown'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -18,6 +20,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { DatePicker } from '@/components/ui/date-picker'
 import { getTemplate, type TemplateConfig } from '@/lib/invoice-templates'
 import { getTranslations } from '@/lib/invoice-i18n'
+import { useDocumentOverflow } from '@/hooks/use-text-measure'
 
 
 export interface DocumentLine {
@@ -935,6 +938,16 @@ export function A4Sheet({
   // Template font override takes precedence
   const effectiveFont = T.font || documentFont
 
+  const overflowData = useDocumentOverflow({
+    lines,
+    notes: showNotes ? notes : undefined,
+    acceptanceConditions: showAcceptanceConditions ? acceptanceConditions : undefined,
+    freeField: showFreeField ? freeField : undefined,
+    footerText: footerMode === 'custom' ? footerText : undefined,
+    font: effectiveFont,
+    billingType,
+  })
+
   // Dynamically load document font from Google Fonts
   useEffect(() => {
     if (!effectiveFont || effectiveFont === 'Lexend') return // Lexend already loaded via next/font
@@ -984,6 +997,17 @@ export function A4Sheet({
           colorScheme: darkMode ? 'dark' : 'light',
         }}
       >
+        {overflowData.overflows && !isPreview && (
+          <div className="absolute top-2 right-2 z-20">
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-500/15 border border-amber-500/30 backdrop-blur-sm">
+              <AlertTriangle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+              <span className="text-[10px] font-medium text-amber-500">
+                {lang === 'en' ? 'Content overflows page' : 'Contenu dépasse la page'}
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* Scrollable content — flex column so bottom sticks */}
         <div className="absolute inset-0 overflow-y-auto">
           <div
@@ -1378,11 +1402,30 @@ export function A4Sheet({
                         </div>
                         <div className="px-1.5 py-2 text-center">
                           {isPreview ? <span className="text-[11px]" style={{ color: T.textMuted }}>{line.vatRate}%</span>
-                            : <select value={line.vatRate} onChange={(e) => onUpdateLine(idx, { vatRate: parseFloat(e.target.value) })}
-                                className="w-full text-[10px] rounded py-0.5 px-0.5 outline-none cursor-pointer"
-                                style={{ border: `1px solid ${T.borderLight}`, backgroundColor: T.inputBg, color: T.text }}>
-                                <option value="20">20%</option><option value="10">10%</option><option value="5.5">5,5%</option><option value="0">0%</option>
-                              </select>}
+                            : <div className="w-full flex justify-center">
+                                <Dropdown
+                                  align="right"
+                                  trigger={
+                                    <button
+                                      className="flex justify-between items-center px-1 text-[10px] rounded cursor-pointer outline-none min-w-[36px]"
+                                      style={{ border: `1px solid ${T.borderLight}`, backgroundColor: T.inputBg, color: T.text }}
+                                    >
+                                      <span>{line.vatRate}%</span>
+                                      <ChevronDown className="h-2.5 w-2.5 opacity-50" />
+                                    </button>
+                                  }
+                                >
+                                  {['20', '10', '5.5', '0'].map(rate => (
+                                    <DropdownItem
+                                      key={rate}
+                                      selected={line.vatRate === parseFloat(rate)}
+                                      onClick={() => onUpdateLine(idx, { vatRate: parseFloat(rate) })}
+                                    >
+                                      {rate.replace('.', ',')}%
+                                    </DropdownItem>
+                                  ))}
+                                </Dropdown>
+                              </div>}
                         </div>
                       </>)}
 

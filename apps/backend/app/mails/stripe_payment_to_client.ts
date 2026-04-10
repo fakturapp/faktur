@@ -1,5 +1,5 @@
 import { BaseMail } from '@adonisjs/mail'
-import { wrapHtml, infoBox } from '#mails/helpers/email_template'
+import { wrapHtml } from '#mails/helpers/email_template'
 
 export class StripePaymentToClient extends BaseMail {
   subject: string
@@ -15,21 +15,20 @@ export class StripePaymentToClient extends BaseMail {
 
   prepare() {
     const content = `
-      <h2 style="margin: 0 0 8px; font-size: 22px; font-weight: 700; color: #ffffff; letter-spacing: -0.5px;">
+      <h2 style="font-size: 20px; font-weight: 600; color: #171717; letter-spacing: -0.02em; margin: 0 0 12px;">
         Paiement confirm&eacute;
       </h2>
-      <p style="margin: 0 0 24px; font-size: 15px; color: #a1a1aa; line-height: 1.6;">
+      <p style="font-size: 14px; line-height: 1.7; color: #707070; margin: 0 0 16px;">
         Bonjour${this.clientName ? ` ${this.clientName}` : ''},
       </p>
-      <p style="margin: 0 0 24px; font-size: 15px; color: #a1a1aa; line-height: 1.6;">
-        Votre paiement par carte bancaire pour la facture <strong style="color: #ffffff;">${this.invoiceNumber}</strong> a &eacute;t&eacute; trait&eacute; avec succ&egrave;s.
+      <p style="font-size: 14px; line-height: 1.7; color: #707070; margin: 0 0 16px;">
+        Votre paiement par carte bancaire pour la facture <strong style="color: #171717;">${this.invoiceNumber}</strong> a &eacute;t&eacute; trait&eacute; avec succ&egrave;s.
       </p>
-      ${infoBox(
-        '&#10003; Tout est en ordre. Aucune action suppl&eacute;mentaire n&rsquo;est n&eacute;cessaire.',
-        'rgba(34,197,94,0.08)',
-        'rgba(34,197,94,0.2)',
-        '#4ade80'
-      )}
+      <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 24px 0;"><tr>
+        <td style="border-radius: 14px; padding: 16px 20px; font-size: 14px; line-height: 1.6; background: #f0fdf4; color: #16a34a;">
+          &#10003; Tout est en ordre. Aucune action suppl&eacute;mentaire n&rsquo;est n&eacute;cessaire.
+        </td>
+      </tr></table>
     `
 
     const plainText = `Paiement confirmé\n\nBonjour${this.clientName ? ` ${this.clientName}` : ''},\n\nVotre paiement par carte bancaire pour la facture ${this.invoiceNumber} a été traité avec succès.\n\nTout est en ordre.`

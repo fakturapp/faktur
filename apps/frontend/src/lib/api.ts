@@ -1,3 +1,5 @@
+import { tutorialIntercept } from './tutorial-sandbox'
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333'
 
 let vaultLockListeners: (() => void)[] = []
@@ -27,6 +29,9 @@ async function request<T = unknown>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<{ data?: T; error?: string }> {
+  const sandboxed = tutorialIntercept<T>(endpoint, options)
+  if (sandboxed) return sandboxed
+
   const token = typeof window !== 'undefined' ? localStorage.getItem('faktur_token') : null
   const vaultKey = typeof window !== 'undefined' ? localStorage.getItem('faktur_vault_key') : null
 

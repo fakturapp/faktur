@@ -37,7 +37,6 @@ import {
   Gift,
 } from 'lucide-react'
 import { AiDashboardSummary } from '@/components/ai/ai-dashboard-summary'
-import { CheckoutFeatureModal, CHECKOUT_FEATURE_SEEN_KEY } from '@/components/dashboard/checkout-feature-modal'
 import TextType from '@/components/ui/text-type'
 
 function pickAdaptiveGreeting(firstName: string | undefined): string {
@@ -392,12 +391,12 @@ function BentoBlock({
         }
         onDragEnd={editMode ? () => onDragEnd() : undefined}
         className={cn(
-          'group/block relative w-full h-full rounded-2xl border bg-card shadow-sm overflow-hidden transition-all',
+          'group/block relative w-full h-full rounded-xl bg-card shadow-surface overflow-hidden transition-all duration-200 hover:shadow-md hover:bg-surface-hover/50',
           editMode
-            ? 'border-dashed border-primary/40 cursor-grab active:cursor-grabbing hover:border-primary/70 hover:shadow-md'
-            : 'border-border',
+            ? 'border border-dashed border-accent/40 cursor-grab active:cursor-grabbing hover:border-accent/70'
+            : '',
           isDragging && 'opacity-40 scale-[0.98]',
-          isDragOver && 'ring-2 ring-primary/60 ring-offset-2 ring-offset-background'
+          isDragOver && 'ring-2 ring-accent/60 ring-offset-2 ring-offset-background'
         )}
       >
         {/* Drag handle — visible only in edit mode */}
@@ -435,21 +434,21 @@ function StatBlock({
 }) {
   const themes = {
     indigo: {
-      grad: 'from-indigo-500/10 via-indigo-500/5 to-transparent dark:from-indigo-500/15',
-      accent: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 ring-indigo-500/20',
-      trendBg: 'bg-indigo-50 text-indigo-600 border-indigo-200 dark:bg-indigo-500/10 dark:text-indigo-300 dark:border-indigo-500/20',
+      grad: 'from-accent-soft/80 via-accent-soft/30 to-transparent',
+      accent: 'bg-accent-soft text-accent ring-accent/20',
+      trendBg: 'bg-accent-soft text-accent-soft-foreground',
       icon: DollarSign,
     },
     amber: {
-      grad: 'from-amber-500/10 via-amber-500/5 to-transparent dark:from-amber-500/15',
-      accent: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 ring-amber-500/20',
-      trendBg: 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-300 dark:border-amber-500/20',
+      grad: 'from-warning-soft/80 via-warning-soft/30 to-transparent',
+      accent: 'bg-warning-soft text-warning ring-warning/20',
+      trendBg: 'bg-warning-soft text-warning-soft-foreground',
       icon: AlertCircle,
     },
     emerald: {
-      grad: 'from-emerald-500/10 via-emerald-500/5 to-transparent dark:from-emerald-500/15',
-      accent: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 ring-emerald-500/20',
-      trendBg: 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:border-emerald-500/20',
+      grad: 'from-success-soft/80 via-success-soft/30 to-transparent',
+      accent: 'bg-success-soft text-success ring-success/20',
+      trendBg: 'bg-success-soft text-success-soft-foreground',
       icon: Wallet,
     },
   }
@@ -471,7 +470,7 @@ function StatBlock({
         {description}
         {previousValue && <div className="mt-0.5 text-[10px] opacity-70">{previousValue}</div>}
       </div>
-      <div className={cn('absolute -right-4 -bottom-4 h-20 w-20 rounded-2xl ring-1 flex items-center justify-center opacity-20 rotate-12', t.accent)}>
+      <div className={cn('absolute -right-4 -bottom-4 h-20 w-20 rounded-xl ring-1 flex items-center justify-center opacity-15 rotate-12', t.accent)}>
         <Icon className="h-10 w-10" />
       </div>
     </div>
@@ -494,8 +493,8 @@ function LatestInvoiceBlock({
           {t('dashboard.latestInvoice')}
         </span>
         <div className="flex-1 flex flex-col items-center justify-center text-center gap-2 py-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted/60">
-            <FileText className="h-5 w-5 text-muted-foreground/60" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-surface">
+            <FileText className="h-5 w-5 text-muted-foreground" />
           </div>
           <p className="text-xs text-muted-foreground">{t('dashboard.noInvoiceYet')}</p>
           <Link
@@ -521,7 +520,7 @@ function LatestInvoiceBlock({
         <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover/latest:opacity-100 transition-opacity" />
       </div>
       <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent">
           <Icon className="h-5 w-5" />
         </div>
         <div className="flex-1 min-w-0">
@@ -568,25 +567,25 @@ function QuickActionsBlock({ t }: { t: (key: string) => string }) {
       href: '/dashboard/invoices/new',
       icon: FileText,
       label: t('dashboard.quickActions.newInvoice') || 'Nouvelle facture',
-      color: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400',
+      color: 'bg-accent-soft text-accent',
     },
     {
       href: '/dashboard/quotes/new',
       icon: Receipt,
       label: t('dashboard.quickActions.newQuote') || 'Nouveau devis',
-      color: 'bg-orange-500/10 text-orange-600 dark:text-orange-400',
+      color: 'bg-warning-soft text-warning-soft-foreground',
     },
     {
       href: '/dashboard/clients',
       icon: Users,
       label: t('dashboard.quickActions.newClient') || 'Nouveau client',
-      color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+      color: 'bg-success-soft text-success-soft-foreground',
     },
   ]
   return (
     <div className="h-full p-5 flex flex-col">
       <div className="flex items-center gap-2 mb-4">
-        <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/10 text-primary">
+        <div className="flex h-6 w-6 items-center justify-center rounded-md bg-accent-soft text-accent">
           <Zap className="h-3.5 w-3.5" />
         </div>
         <h3 className="text-sm font-semibold text-foreground">{t('dashboard.quickActions.title') || 'Actions rapides'}</h3>
@@ -598,7 +597,7 @@ function QuickActionsBlock({ t }: { t: (key: string) => string }) {
             <Link
               key={action.href}
               href={action.href}
-              className="flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-background hover:bg-muted/50 hover:border-primary/40 transition-all p-3 group/action"
+              className="flex flex-col items-center justify-center gap-2 rounded-lg bg-surface shadow-surface hover:bg-surface-hover transition-all p-3 group/action"
             >
               <div className={cn('flex h-9 w-9 items-center justify-center rounded-lg transition-transform group-hover/action:scale-110', action.color)}>
                 <Icon className="h-4 w-4" />
@@ -623,7 +622,7 @@ function DraftsBlock({
 }) {
   const total = invoiceDrafts + quoteDrafts
   return (
-    <Link href="/dashboard/invoices/drafts" className="relative h-full p-5 flex flex-col group/drafts bg-gradient-to-br from-slate-500/10 via-slate-500/5 to-transparent">
+    <Link href="/dashboard/invoices/drafts" className="relative h-full p-5 flex flex-col group/drafts bg-gradient-to-br from-surface via-surface/50 to-transparent">
       <div className="flex items-center justify-between mb-3">
         <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
           {t('dashboard.drafts.title') || 'Brouillons'}
@@ -639,7 +638,7 @@ function DraftsBlock({
           <Receipt className="h-3 w-3" /> {quoteDrafts} {t('dashboard.drafts.quotes') || 'devis'}
         </span>
       </div>
-      <div className="absolute -right-4 -bottom-4 h-20 w-20 rounded-2xl bg-slate-500/10 text-slate-500 ring-1 ring-slate-500/20 flex items-center justify-center opacity-20 rotate-12">
+      <div className="absolute -right-4 -bottom-4 h-20 w-20 rounded-xl bg-surface text-muted-foreground ring-1 ring-border flex items-center justify-center opacity-15 rotate-12">
         <Files className="h-10 w-10" />
       </div>
     </Link>
@@ -664,8 +663,8 @@ function OverdueBlock({
       className={cn(
         'relative h-full p-5 flex flex-col group/overdue bg-gradient-to-br',
         hasOverdue
-          ? 'from-red-500/15 via-red-500/5 to-transparent dark:from-red-500/20'
-          : 'from-emerald-500/10 via-emerald-500/5 to-transparent dark:from-emerald-500/15'
+          ? 'from-danger-soft/80 via-danger-soft/30 to-transparent'
+          : 'from-success-soft/80 via-success-soft/30 to-transparent'
       )}
     >
       <div className="flex items-center justify-between mb-3">
@@ -674,15 +673,15 @@ function OverdueBlock({
         </span>
         <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover/overdue:opacity-100 transition-opacity" />
       </div>
-      <div className={cn('text-3xl font-bold tabular-nums leading-none', hasOverdue ? 'text-red-500' : 'text-emerald-500')}>{count}</div>
+      <div className={cn('text-3xl font-bold tabular-nums leading-none', hasOverdue ? 'text-danger' : 'text-success')}>{count}</div>
       <div className="mt-auto pt-3 text-[11px] text-muted-foreground">
         {hasOverdue
           ? `${formatCurrency(amount, locale)} ${t('dashboard.overdue.toRecover') || 'à récupérer'}`
           : t('dashboard.overdue.allClear') || 'Tout est en règle'}
       </div>
       <div className={cn(
-        'absolute -right-4 -bottom-4 h-20 w-20 rounded-2xl ring-1 flex items-center justify-center opacity-20 rotate-12',
-        hasOverdue ? 'bg-red-500/10 text-red-500 ring-red-500/20' : 'bg-emerald-500/10 text-emerald-500 ring-emerald-500/20'
+        'absolute -right-4 -bottom-4 h-20 w-20 rounded-xl ring-1 flex items-center justify-center opacity-15 rotate-12',
+        hasOverdue ? 'bg-danger-soft text-danger ring-danger/20' : 'bg-success-soft text-success ring-success/20'
       )}>
         <AlertTriangle className="h-10 w-10" />
       </div>
@@ -702,9 +701,9 @@ function ThisYearBlock({
   t: (key: string) => string
 }) {
   return (
-    <div className="relative h-full p-5 flex flex-col bg-gradient-to-br from-primary/10 via-primary/5 to-transparent">
+    <div className="relative h-full p-5 flex flex-col bg-gradient-to-br from-accent-soft/80 via-accent-soft/30 to-transparent">
       <div className="flex items-center gap-2 mb-3">
-        <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/10 text-primary">
+        <div className="flex h-6 w-6 items-center justify-center rounded-md bg-accent-soft text-accent">
           <Calendar className="h-3.5 w-3.5" />
         </div>
         <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
@@ -741,7 +740,7 @@ function ShortcutsBlock() {
             <Link
               key={s.href}
               href={s.href}
-              className="flex flex-col items-center justify-center gap-1.5 rounded-xl border border-border bg-background hover:bg-muted/50 hover:border-primary/40 transition-all p-2 group/sc"
+              className="flex flex-col items-center justify-center gap-1.5 rounded-lg bg-surface shadow-surface hover:bg-surface-hover transition-all p-2 group/sc"
             >
               <Icon className="h-4 w-4 text-muted-foreground group-hover/sc:text-primary transition-colors" />
               <span className="text-[10px] font-medium text-foreground leading-tight text-center">{s.label}</span>
@@ -772,8 +771,8 @@ function RecentActivityBlock({
       </div>
       {items.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center gap-2 text-center">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted/60">
-            <Clock className="h-5 w-5 text-muted-foreground/60" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-surface">
+            <Clock className="h-5 w-5 text-muted-foreground" />
           </div>
           <p className="text-xs text-muted-foreground">{t('dashboard.recentActivity.empty')}</p>
         </div>
@@ -785,9 +784,9 @@ function RecentActivityBlock({
               <Link
                 key={item.id}
                 href={`/dashboard/${item.type === 'invoice' ? 'invoices' : 'quotes'}/${item.id}`}
-                className="flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-muted/50 transition-colors"
+                className="flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-surface transition-colors"
               >
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface text-muted-foreground">
                   <Icon className="h-4 w-4" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -823,7 +822,6 @@ export default function DashboardPage() {
   const [layout, setLayout] = useState<BlockId[]>(loadLayout)
   const [editMode, setEditMode] = useState(false)
   const [sidebarCounts, setSidebarCounts] = useState<{ invoiceDrafts: number; quoteDrafts: number }>({ invoiceDrafts: 0, quoteDrafts: 0 })
-  const [featureModalOpen, setFeatureModalOpen] = useState(false)
   const [greeting, setGreeting] = useState<string>(' ')
 
   useEffect(() => {
@@ -847,18 +845,6 @@ export default function DashboardPage() {
     })
   }, [])
 
-  // Auto-open the checkout feature announcement once per user.
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    try {
-      const seen = localStorage.getItem(CHECKOUT_FEATURE_SEEN_KEY)
-      if (!seen) {
-        // Small delay so it doesn't land before the skeleton fades out.
-        const t = window.setTimeout(() => setFeatureModalOpen(true), 800)
-        return () => window.clearTimeout(t)
-      }
-    } catch {}
-  }, [])
 
   // Ensure dynamic chart blocks appear in the layout when toggled on
   useEffect(() => {
@@ -1018,13 +1004,13 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="px-4 lg:px-6 py-4 md:py-6 space-y-4">
-        <Skeleton className="h-9 w-64" />
+        <Skeleton className="h-9 w-64 rounded-lg" />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[...Array(8)].map((_, i) => (
             <Skeleton
               key={i}
               className={cn(
-                'rounded-2xl',
+                'rounded-xl',
                 i < 4 ? 'h-32 col-span-1 md:col-span-1' : 'h-64 col-span-2 md:col-span-2'
               )}
             />
@@ -1040,7 +1026,7 @@ export default function DashboardPage() {
     switch (id) {
       case 'welcome':
         return (
-          <div className="relative h-full p-6 flex items-center bg-gradient-to-r from-primary/10 via-primary/5 to-transparent overflow-hidden">
+          <div className="relative h-full p-6 flex items-center bg-gradient-to-r from-accent-soft via-accent-soft/50 to-transparent overflow-hidden">
             <div className="relative z-10">
               <TextType
                 key={greeting}
@@ -1059,7 +1045,7 @@ export default function DashboardPage() {
                 {t('dashboard.welcome.subtitle') || "Voici un aperçu de votre activité."}
               </p>
             </div>
-            <div className="absolute -right-6 -bottom-6 h-28 w-28 rounded-2xl bg-primary/10 ring-1 ring-primary/20 flex items-center justify-center opacity-25 rotate-12">
+            <div className="absolute -right-6 -bottom-6 h-28 w-28 rounded-xl bg-accent-soft ring-1 ring-accent/20 flex items-center justify-center opacity-25 rotate-12">
               <img src="/logo.svg" alt="" className="h-20 w-20" aria-hidden="true" />
             </div>
           </div>
@@ -1141,7 +1127,7 @@ export default function DashboardPage() {
             <div className="relative p-1 h-full">
               <button
                 onClick={() => handleRemoveChart(key)}
-                className="absolute top-3 right-3 z-10 h-7 w-7 rounded-full bg-card/80 backdrop-blur-sm shadow border border-border flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors opacity-0 group-hover/block:opacity-100"
+                className="absolute top-3 right-3 z-10 h-7 w-7 rounded-full bg-overlay/80 backdrop-blur-sm shadow-surface flex items-center justify-center text-muted-foreground hover:text-danger transition-colors opacity-0 group-hover/block:opacity-100"
                 title={t('dashboard.remove') || 'Retirer'}
               >
                 <X className="h-3.5 w-3.5" />
@@ -1186,21 +1172,13 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="px-4 lg:px-6 py-4 md:py-6 space-y-4">
+    <div className="relative px-4 lg:px-6 py-4 md:py-6 space-y-4">
       {/* Action bar */}
       <div className="flex items-center justify-end gap-2">
-        <button
-          onClick={() => setFeatureModalOpen(true)}
-          className="flex items-center gap-1.5 h-8 px-3 rounded-lg border border-primary/30 bg-primary/5 hover:bg-primary/10 text-[12px] text-primary transition-colors"
-          title={t('dashboard.whatsNew') || 'Nouveautés'}
-        >
-          <Gift className="h-3.5 w-3.5" />
-          <span className="hidden md:inline">{t('dashboard.whatsNew') || 'Nouveautés'}</span>
-        </button>
         {editMode && (
           <button
             onClick={handleResetLayout}
-            className="flex items-center gap-1.5 h-8 px-3 rounded-lg border border-border bg-card hover:bg-muted/50 text-[12px] text-muted-foreground hover:text-foreground transition-colors"
+            className="button button--sm button--secondary gap-1.5"
             title={t('dashboard.resetLayout') || 'Réinitialiser la disposition'}
           >
             <RotateCcw className="h-3.5 w-3.5" />
@@ -1209,7 +1187,7 @@ export default function DashboardPage() {
         )}
         <button
           onClick={() => setAddChartOpen(true)}
-          className="flex items-center gap-1.5 h-8 px-3 rounded-lg border border-border bg-card hover:bg-muted/50 text-[12px] text-muted-foreground hover:text-foreground transition-colors"
+          className="button button--sm button--secondary gap-1.5"
         >
           <Plus className="h-3.5 w-3.5" />
           <span className="hidden md:inline">{t('dashboard.addChart') || 'Ajouter un graphique'}</span>
@@ -1217,10 +1195,8 @@ export default function DashboardPage() {
         <button
           onClick={() => setEditMode((v) => !v)}
           className={cn(
-            'flex items-center gap-1.5 h-8 px-3 rounded-lg border text-[12px] transition-all',
-            editMode
-              ? 'border-primary bg-primary text-primary-foreground hover:bg-primary/90'
-              : 'border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted/50'
+            'button button--sm gap-1.5',
+            editMode ? 'button--primary' : 'button--secondary'
           )}
           title={editMode ? (t('dashboard.done') || 'Terminer') : (t('dashboard.customize') || 'Personnaliser')}
         >
@@ -1238,7 +1214,7 @@ export default function DashboardPage() {
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            className="flex items-center gap-2 rounded-xl border border-primary/30 bg-primary/5 px-4 py-2 text-[12px] text-primary"
+            className="flex items-center gap-2 rounded-lg bg-accent-soft px-4 py-2 text-[12px] text-accent-soft-foreground"
           >
             <GripVertical className="h-3.5 w-3.5 shrink-0" />
             <span>{t('dashboard.editHint') || "Glissez-déposez les cartes pour réorganiser votre tableau de bord."}</span>
@@ -1276,7 +1252,6 @@ export default function DashboardPage() {
         activeCharts={activeCharts}
       />
 
-      <CheckoutFeatureModal open={featureModalOpen} onClose={() => setFeatureModalOpen(false)} />
     </div>
   )
 }

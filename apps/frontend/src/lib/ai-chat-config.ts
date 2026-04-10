@@ -19,15 +19,15 @@ export const CHAT_MODES: ChatModeConfig[] = [
     description: 'Modifier le contenu du document',
     icon: '✏️',
     color: 'text-blue-400',
-    placeholder: 'Décrivez ce que vous voulez modifier...',
+    placeholder: 'Que veut-tu modifier',
   },
   {
     id: 'question',
     label: 'Question',
-    description: 'Poser des questions sur la conformité',
+    description: 'Poser une question',
     icon: '❓',
     color: 'text-amber-400',
-    placeholder: 'Posez votre question sur les règles...',
+    placeholder: 'Poser une question',
   },
   {
     id: 'libre',
@@ -35,12 +35,12 @@ export const CHAT_MODES: ChatModeConfig[] = [
     description: 'Instructions libres avec suggestions',
     icon: '🔮',
     color: 'text-purple-400',
-    placeholder: 'Donnez une instruction libre...',
+    placeholder: 'Donner une instruction',
   },
 ]
 
 
-export type ProviderId = 'groq'
+export type ProviderId = 'gemini'
 
 export interface ProviderConfig {
   id: ProviderId
@@ -57,14 +57,14 @@ export interface ModelConfig {
 }
 
 export const CHAT_PROVIDERS: ProviderConfig[] = [
-  { id: 'groq', name: 'Groq', iconClass: 'text-orange-500', iconBg: 'bg-orange-500/10' },
+  { id: 'gemini', name: 'Faktur AI', iconClass: 'text-indigo-500', iconBg: 'bg-indigo-500/10' },
 ]
 
 export const CHAT_MODELS: Record<ProviderId, ModelConfig[]> = {
-  groq: [
-    { id: 'llama-3.1-8b-instant', name: 'Rapide', tier: 'rapide', description: 'Réponses instantanées' },
-    { id: 'llama-3.3-70b-versatile', name: 'Raisonnement', tier: 'raisonnement', description: 'Bon équilibre qualité/vitesse' },
-    { id: 'deepseek-r1-distill-llama-70b', name: 'Pro', tier: 'pro', description: 'Meilleur modèle disponible' },
+  gemini: [
+    { id: 'google/gemma-4-26b-a4b-it:free', name: 'Rapide', tier: 'rapide', description: 'Reponses instantanees' },
+    { id: 'google/gemma-4-31b-it:free', name: 'Raisonnement', tier: 'raisonnement', description: 'Bon equilibre qualite/vitesse' },
+    { id: 'nvidia/nemotron-3-super-120b-a12b:free', name: 'Pro', tier: 'pro', description: 'Meilleur modele disponible' },
   ],
 }
 

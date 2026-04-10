@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Users, FlaskConical, AlertTriangle, Zap, Eye, MousePointer2, Share2 } from 'lucide-react'
 
 export default function CollaborationSettingsPage() {
@@ -41,7 +41,7 @@ export default function CollaborationSettingsPage() {
     >
       {}
       <div className="flex items-center gap-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-500/10">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/10">
           <Users className="h-6 w-6 text-purple-500" />
         </div>
         <div>
@@ -59,7 +59,7 @@ export default function CollaborationSettingsPage() {
       </div>
 
       {}
-      <div className="rounded-2xl border border-border bg-card p-6">
+      <div className="rounded-xl bg-overlay shadow-surface p-6">
         <div className="flex items-center justify-between gap-6">
           <div className="flex-1">
             <h3 className="text-base font-semibold text-foreground">
@@ -100,7 +100,7 @@ export default function CollaborationSettingsPage() {
           ].map(({ icon: Icon, title, desc }) => (
             <div
               key={title}
-              className={`rounded-xl border border-border p-4 transition-all duration-200 ${enabled ? 'opacity-100 bg-card/50' : 'opacity-40 bg-transparent'}`}
+              className={`rounded-xl border border-border p-4 transition-all duration-200 ${enabled ? 'opacity-100 bg-surface' : 'opacity-40 bg-transparent'}`}
             >
               <div className="flex items-center gap-3 mb-2">
                 <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${enabled ? 'bg-purple-500/10' : 'bg-muted'}`}>
@@ -116,15 +116,10 @@ export default function CollaborationSettingsPage() {
 
       {/* Warning confirmation dialog */}
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)} className="max-w-md">
-        <DialogTitle className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10">
-            <AlertTriangle className="h-5 w-5 text-amber-500" />
-          </div>
-          <div>
-            <p>Fonctionnalit&eacute; en b&ecirc;ta extr&ecirc;me</p>
-            <p className="text-xs font-normal text-muted-foreground mt-0.5">Lisez attentivement avant d&apos;activer</p>
-          </div>
-        </DialogTitle>
+        <DialogHeader onClose={() => setConfirmOpen(false)} icon={<AlertTriangle className="h-5 w-5 text-amber-500" />}>
+          <DialogTitle>Fonctionnalit&eacute; en b&ecirc;ta extr&ecirc;me</DialogTitle>
+          <DialogDescription>Lisez attentivement avant d&apos;activer</DialogDescription>
+        </DialogHeader>
 
         <div className="mt-4 space-y-4">
           <p className="text-sm text-muted-foreground leading-relaxed">

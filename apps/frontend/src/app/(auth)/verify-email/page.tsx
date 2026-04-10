@@ -63,7 +63,7 @@ function VerifyEmailContent() {
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" className="w-full max-w-md">
+    <motion.div initial="hidden" animate="visible" className="w-full max-w-sm">
       <Card className="overflow-hidden p-0 border-border/50">
         <CardContent className="p-8">
           <FieldGroup>
@@ -87,8 +87,8 @@ function VerifyEmailContent() {
 
               {status === 'verifying' && (
                 <>
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Spinner size="lg" className="text-primary" />
+                  <div className="w-16 h-16 rounded-full bg-accent-soft flex items-center justify-center">
+                    <Spinner size="lg" className="text-accent" />
                   </div>
                   <h1 className="text-2xl font-bold">Vérification en cours...</h1>
                 </>
@@ -123,8 +123,8 @@ function VerifyEmailContent() {
 
               {status === 'pending' && (
                 <>
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <svg className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <div className="w-16 h-16 rounded-full bg-accent-soft flex items-center justify-center">
+                    <svg className="h-8 w-8 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                   </div>
@@ -151,7 +151,7 @@ function VerifyEmailContent() {
             {status !== 'already_verified' && (
               <motion.div variants={fadeUp} custom={1}>
                 <FieldDescription className="text-center">
-                  <Link href="/login" className="text-primary underline underline-offset-4">
+                  <Link href="/login" className="text-accent underline underline-offset-4">
                     Retour à la connexion
                   </Link>
                 </FieldDescription>

@@ -15,6 +15,11 @@ export default class InvoiceSettingsUpdate {
 
     const payload = await request.validateUsing(updateInvoiceSettingsValidator)
 
+    // Normalize legacy values → 'company_info'
+    if (payload.footerMode && !['custom', 'company_info'].includes(payload.footerMode)) {
+      payload.footerMode = 'company_info'
+    }
+
     let pdpApiKeyToStore: string | null = null
     if (payload.pdpApiKey && payload.pdpApiKey !== '••••••••') {
       pdpApiKeyToStore = zeroAccessCryptoService.encryptField(payload.pdpApiKey, dek)
@@ -48,12 +53,12 @@ export default class InvoiceSettingsUpdate {
         defaultLanguage: payload.defaultLanguage || 'fr',
         quoteFilenamePattern: payload.quoteFilenamePattern || 'DEV-{numero}',
         invoiceFilenamePattern: payload.invoiceFilenamePattern || 'FAC-{numero}',
-        footerMode: payload.footerMode || 'vat_exempt',
+        footerMode: payload.footerMode || 'company_info',
         logoBorderRadius: payload.logoBorderRadius ?? 0,
         collaborationEnabled: payload.collaborationEnabled ?? false,
         aiEnabled: payload.aiEnabled ?? false,
-        aiProvider: 'groq',
-        aiModel: payload.aiModel || 'llama-3.3-70b-versatile',
+        aiProvider: 'gemini',
+        aiModel: payload.aiModel || 'nvidia/nemotron-3-super-120b-a12b:free',
       })
     } else {
       settings.billingType = payload.billingType
@@ -94,14 +99,14 @@ export default class InvoiceSettingsUpdate {
         settings.quoteFilenamePattern = payload.quoteFilenamePattern || 'DEV-{numero}'
       if (payload.invoiceFilenamePattern !== undefined)
         settings.invoiceFilenamePattern = payload.invoiceFilenamePattern || 'FAC-{numero}'
-      if (payload.footerMode !== undefined) settings.footerMode = payload.footerMode || 'vat_exempt'
+      if (payload.footerMode !== undefined) settings.footerMode = payload.footerMode || 'company_info'
       if (payload.logoBorderRadius !== undefined)
         settings.logoBorderRadius = payload.logoBorderRadius
       if (payload.collaborationEnabled !== undefined) settings.collaborationEnabled = payload.collaborationEnabled
       if (payload.aiEnabled !== undefined) settings.aiEnabled = payload.aiEnabled
-      settings.aiProvider = 'groq'
+      settings.aiProvider = 'gemini'
       if (payload.aiModel !== undefined)
-        settings.aiModel = payload.aiModel || 'llama-3.3-70b-versatile'
+        settings.aiModel = payload.aiModel || 'nvidia/nemotron-3-super-120b-a12b:free'
       await settings.save()
     }
 
@@ -132,12 +137,12 @@ export default class InvoiceSettingsUpdate {
         defaultLanguage: settings.defaultLanguage || 'fr',
         quoteFilenamePattern: settings.quoteFilenamePattern || 'DEV-{numero}',
         invoiceFilenamePattern: settings.invoiceFilenamePattern || 'FAC-{numero}',
-        footerMode: settings.footerMode || 'vat_exempt',
+        footerMode: (['custom', 'company_info'].includes(settings.footerMode) ? settings.footerMode : 'company_info'),
         logoBorderRadius: settings.logoBorderRadius ?? 0,
         collaborationEnabled: settings.collaborationEnabled ?? false,
         aiEnabled: settings.aiEnabled ?? false,
-        aiProvider: 'groq',
-        aiModel: settings.aiModel || 'llama-3.3-70b-versatile',
+        aiProvider: 'gemini',
+        aiModel: settings.aiModel || 'nvidia/nemotron-3-super-120b-a12b:free',
       },
     })
   }

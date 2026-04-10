@@ -9,9 +9,9 @@ import { Button } from '@/components/ui/button'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Avatar } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { Select } from '@/components/ui/select'
+import { FormSelect } from '@/components/ui/dropdown'
 import { Separator } from '@/components/ui/separator'
-import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Dropdown, DropdownItem, DropdownSeparator } from '@/components/ui/dropdown'
 import { useAuth } from '@/lib/auth'
 import { useToast } from '@/components/ui/toast'
@@ -291,7 +291,7 @@ export default function TeamPage() {
     return (
       <div className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
         {/* Team header card */}
-        <div className="rounded-2xl border border-border/50 overflow-hidden">
+        <div className="rounded-xl shadow-surface overflow-hidden">
           <div className="p-6 flex items-end justify-between">
             <div className="flex items-end gap-4">
               <Skeleton className="h-16 w-16 rounded-xl" />
@@ -312,7 +312,7 @@ export default function TeamPage() {
             <Skeleton className="h-4 w-4 rounded" />
             <Skeleton className="h-3.5 w-16" />
           </div>
-          <div className="rounded-2xl border border-border/50">
+          <div className="rounded-xl shadow-surface">
             {[...Array(3)].map((_, i) => (
               <div key={i} className="flex items-center justify-between px-5 py-4 border-b border-border/50 last:border-b-0">
                 <div className="flex items-center gap-3.5">
@@ -471,7 +471,7 @@ export default function TeamPage() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: index * 0.03 }}
-                    className="flex items-center justify-between px-5 py-4 hover:bg-muted/20 transition-colors"
+                    className="flex items-center justify-between px-5 py-4 hover:bg-surface-hover transition-colors"
                   >
                     <div className="flex items-center gap-3.5">
                       <Avatar
@@ -486,7 +486,7 @@ export default function TeamPage() {
                             {memberUser?.fullName || memberUser?.email}
                           </p>
                           {member.userId === user?.id && (
-                            <span className="text-[10px] font-medium text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">
+                            <span className="text-[10px] font-medium text-accent bg-accent-soft px-1.5 py-0.5 rounded-full">
                               vous
                             </span>
                           )}
@@ -651,10 +651,12 @@ export default function TeamPage() {
       <Dialog open={inviteOpen} onClose={resetInviteDialog}>
         {!inviteResult ? (
           <>
-            <DialogTitle>Inviter un membre</DialogTitle>
-            <DialogDescription>
-              Envoyez une invitation par email pour ajouter un membre à votre équipe.
-            </DialogDescription>
+            <DialogHeader onClose={resetInviteDialog}>
+              <DialogTitle>Inviter un membre</DialogTitle>
+              <DialogDescription>
+                Envoyez une invitation par email pour ajouter un membre à votre équipe.
+              </DialogDescription>
+            </DialogHeader>
 
             <form onSubmit={handleInvite} className="mt-4 space-y-4">
               <Field>
@@ -666,7 +668,7 @@ export default function TeamPage() {
                     animate={{ opacity: 1, scale: 1 }}
                     className="flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 p-3"
                   >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary overflow-hidden">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent-soft text-xs font-bold text-accent overflow-hidden">
                       {selectedUser.avatarUrl ? (
                         <img src={selectedUser.avatarUrl} alt="" className="h-full w-full object-cover" />
                       ) : (
@@ -714,12 +716,12 @@ export default function TeamPage() {
                     autoComplete="off"
                   />
                   {showSuggestions && searchResults.length > 0 && (
-                    <div className="absolute z-50 top-full left-0 right-0 mt-1 rounded-xl border border-border bg-card shadow-xl overflow-hidden">
+                    <div className="absolute z-50 top-full left-0 right-0 mt-1 rounded-xl bg-overlay shadow-surface overflow-hidden">
                       {searchResults.map((u) => (
                         <button
                           key={u.id}
                           type="button"
-                          className="flex items-center gap-3 w-full px-3 py-2.5 hover:bg-muted/50 transition-colors text-left"
+                          className="flex items-center gap-3 w-full px-3 py-2.5 hover:bg-surface-hover transition-colors text-left"
                           onMouseDown={(e) => {
                             e.preventDefault()
                             setSelectedUser(u)
@@ -728,7 +730,7 @@ export default function TeamPage() {
                             setSearchResults([])
                           }}
                         >
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary overflow-hidden">
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent-soft text-xs font-bold text-accent overflow-hidden">
                             {u.avatarUrl ? (
                               <img src={u.avatarUrl} alt="" className="h-full w-full object-cover" />
                             ) : (
@@ -749,15 +751,16 @@ export default function TeamPage() {
 
               <Field>
                 <FieldLabel htmlFor="inviteRole">Rôle</FieldLabel>
-                <Select
+                <FormSelect
                   id="inviteRole"
                   value={inviteRole}
-                  onChange={(e) => setInviteRole(e.target.value)}
-                >
-                  <option value="viewer">Lecteur - Consultation en lecture seule</option>
-                  <option value="member">Membre - Créer des factures et devis</option>
-                  <option value="admin">Administrateur - Gestion des membres</option>
-                </Select>
+                  onChange={setInviteRole}
+                  options={[
+                    { value: 'viewer', label: 'Lecteur - Consultation en lecture seule' },
+                    { value: 'member', label: 'Membre - Créer des factures et devis' },
+                    { value: 'admin', label: 'Administrateur - Gestion des membres' },
+                  ]}
+                />
               </Field>
 
               <DialogFooter>
@@ -806,18 +809,24 @@ export default function TeamPage() {
 
       {/* Role Change Dialog */}
       <Dialog open={roleDialogOpen} onClose={() => setRoleDialogOpen(false)}>
-        <DialogTitle>Changer le rôle</DialogTitle>
-        <DialogDescription>
-          Modifier le rôle de{' '}
-          <strong>{roleTarget?.user?.fullName || roleTarget?.user?.email}</strong>.
-        </DialogDescription>
+        <DialogHeader onClose={() => setRoleDialogOpen(false)}>
+          <DialogTitle>Changer le rôle</DialogTitle>
+          <DialogDescription>
+            Modifier le rôle de{' '}
+            <strong>{roleTarget?.user?.fullName || roleTarget?.user?.email}</strong>.
+          </DialogDescription>
+        </DialogHeader>
 
         <div className="mt-4">
-          <Select value={newRole} onChange={(e) => setNewRole(e.target.value)}>
-            <option value="viewer">Lecteur</option>
-            <option value="member">Membre</option>
-            {isSuperAdmin && <option value="admin">Administrateur</option>}
-          </Select>
+          <FormSelect
+            value={newRole}
+            onChange={setNewRole}
+            options={[
+              { value: 'viewer', label: 'Lecteur' },
+              { value: 'member', label: 'Membre' },
+              ...(isSuperAdmin ? [{ value: 'admin', label: 'Administrateur' }] : []),
+            ]}
+          />
         </div>
 
         <DialogFooter>
@@ -832,12 +841,14 @@ export default function TeamPage() {
 
       {/* Transfer Ownership Dialog */}
       <Dialog open={transferOpen} onClose={() => setTransferOpen(false)}>
-        <DialogTitle>Transférer la propriété</DialogTitle>
-        <DialogDescription>
-          Vous êtes sur le point de transférer le rôle de Super Admin à{' '}
-          <strong>{transferTarget?.user?.fullName || transferTarget?.user?.email}</strong>. Vous
-          serez rétrogradé au rôle d&apos;Administrateur. Cette action est irréversible.
-        </DialogDescription>
+        <DialogHeader showClose={false}>
+          <DialogTitle>Transférer la propriété</DialogTitle>
+          <DialogDescription>
+            Vous êtes sur le point de transférer le rôle de Super Admin à{' '}
+            <strong>{transferTarget?.user?.fullName || transferTarget?.user?.email}</strong>. Vous
+            serez rétrogradé au rôle d&apos;Administrateur. Cette action est irréversible.
+          </DialogDescription>
+        </DialogHeader>
 
         <div className="mt-4">
           <Input
@@ -866,12 +877,14 @@ export default function TeamPage() {
 
       {/* Remove Member Dialog */}
       <Dialog open={removeOpen} onClose={() => setRemoveOpen(false)}>
-        <DialogTitle>Retirer un membre</DialogTitle>
-        <DialogDescription>
-          Êtes-vous sûr de vouloir retirer{' '}
-          <strong>{removeTarget?.user?.fullName || removeTarget?.user?.email}</strong> de
-          l&apos;équipe ? Cette personne n&apos;aura plus accès aux données de l&apos;équipe.
-        </DialogDescription>
+        <DialogHeader showClose={false}>
+          <DialogTitle>Retirer un membre</DialogTitle>
+          <DialogDescription>
+            Êtes-vous sûr de vouloir retirer{' '}
+            <strong>{removeTarget?.user?.fullName || removeTarget?.user?.email}</strong> de
+            l&apos;équipe ? Cette personne n&apos;aura plus accès aux données de l&apos;équipe.
+          </DialogDescription>
+        </DialogHeader>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => setRemoveOpen(false)}>
@@ -907,15 +920,10 @@ export default function TeamPage() {
         <AnimatePresence mode="wait">
           {deleteStep === 1 && (
             <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-destructive/10">
-                  <AlertTriangle className="h-5.5 w-5.5 text-destructive" />
-                </div>
-                <div>
-                  <DialogTitle className="mb-0">Supprimer l&apos;équipe</DialogTitle>
-                  <p className="text-xs text-muted-foreground mt-0.5">Étape 1 sur 3 — Avertissement</p>
-                </div>
-              </div>
+              <DialogHeader showClose={false} icon={<AlertTriangle className="h-5 w-5 text-danger" />}>
+                <DialogTitle>Supprimer l&apos;équipe</DialogTitle>
+                <DialogDescription>Étape 1 sur 3 — Avertissement</DialogDescription>
+              </DialogHeader>
 
               <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4 space-y-2">
                 <p className="text-sm font-medium text-destructive">Cette action est irréversible.</p>
@@ -947,8 +955,10 @@ export default function TeamPage() {
 
           {deleteStep === 2 && (
             <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
-              <DialogTitle>Confirmer le nom</DialogTitle>
-              <p className="text-xs text-muted-foreground mt-0.5 mb-4">Étape 2 sur 3 — Vérification</p>
+              <DialogHeader showClose={false}>
+                <DialogTitle>Confirmer le nom</DialogTitle>
+                <DialogDescription>Étape 2 sur 3 — Vérification</DialogDescription>
+              </DialogHeader>
 
               <Field>
                 <FieldLabel htmlFor="deleteTeamName">
@@ -981,8 +991,10 @@ export default function TeamPage() {
 
           {deleteStep === 3 && (
             <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
-              <DialogTitle>Mot de passe</DialogTitle>
-              <p className="text-xs text-muted-foreground mt-0.5 mb-4">Étape 3 sur 3 — Authentification</p>
+              <DialogHeader showClose={false}>
+                <DialogTitle>Mot de passe</DialogTitle>
+                <DialogDescription>Étape 3 sur 3 — Authentification</DialogDescription>
+              </DialogHeader>
 
               <Field>
                 <FieldLabel htmlFor="deletePassword">Entrez votre mot de passe pour confirmer</FieldLabel>
@@ -1016,10 +1028,12 @@ export default function TeamPage() {
 
       {/* Team Logo Dialog */}
       <Dialog open={logoOpen} onClose={() => setLogoOpen(false)}>
-        <DialogTitle>Logo de l&apos;équipe</DialogTitle>
-        <DialogDescription>
-          Choisissez comment définir le logo de votre équipe.
-        </DialogDescription>
+        <DialogHeader onClose={() => setLogoOpen(false)}>
+          <DialogTitle>Logo de l&apos;équipe</DialogTitle>
+          <DialogDescription>
+            Choisissez comment définir le logo de votre équipe.
+          </DialogDescription>
+        </DialogHeader>
 
         <div className="mt-4 space-y-3">
           <button
@@ -1027,8 +1041,8 @@ export default function TeamPage() {
             disabled={uploadingIcon}
             className="flex w-full items-center gap-4 rounded-xl border-2 border-border p-4 text-left transition-all hover:border-primary/40 hover:bg-primary/5 disabled:opacity-50"
           >
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-              <BuildingIcon className="h-6 w-6 text-primary" />
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-accent-soft">
+              <BuildingIcon className="h-6 w-6 text-accent" />
             </div>
             <div className="flex-1">
               <p className="text-sm font-medium text-foreground">Utiliser le logo de l&apos;entreprise</p>
@@ -1043,8 +1057,8 @@ export default function TeamPage() {
             disabled={uploadingIcon}
             className="flex w-full items-center gap-4 rounded-xl border-2 border-border p-4 text-left transition-all hover:border-primary/40 hover:bg-primary/5 disabled:opacity-50"
           >
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-              <Upload className="h-6 w-6 text-primary" />
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-accent-soft">
+              <Upload className="h-6 w-6 text-accent" />
             </div>
             <div className="flex-1">
               <p className="text-sm font-medium text-foreground">Importer un logo</p>

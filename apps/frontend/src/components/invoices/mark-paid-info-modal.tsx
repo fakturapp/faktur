@@ -2,8 +2,10 @@
 
 import { useState } from 'react'
 import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { Dropdown, DropdownItem } from '@/components/ui/dropdown'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { ChevronDown } from 'lucide-react'
 
 interface MarkPaidInfoModalProps {
   open: boolean
@@ -60,16 +62,26 @@ export function MarkPaidInfoModal({ open, onClose, onSubmit, onSkip }: MarkPaidI
           <label className="text-sm font-medium text-foreground mb-1.5 block">
             Méthode de paiement
           </label>
-          <select
-            value={paymentMethod}
-            onChange={(e) => setPaymentMethod(e.target.value)}
-            className="w-full h-10 rounded-lg border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-primary/50 transition-colors"
-          >
-            <option value="">Non spécifié</option>
-            <option value="bank_transfer">Virement bancaire</option>
-            <option value="cash">Espèces</option>
-            <option value="other">Autre</option>
-          </select>
+          <div className="relative">
+            <Dropdown
+              trigger={
+                <button className="flex w-full items-center justify-between gap-2 h-10 rounded-lg border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-primary/50 transition-colors">
+                  <span>
+                    {paymentMethod === 'bank_transfer' ? 'Virement bancaire' : 
+                     paymentMethod === 'cash' ? 'Espèces' : 
+                     paymentMethod === 'other' ? 'Autre' : 'Non spécifié'}
+                  </span>
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                </button>
+              }
+              className="w-full min-w-[200px]"
+            >
+              <DropdownItem selected={paymentMethod === ''} onClick={() => setPaymentMethod('')}>Non spécifié</DropdownItem>
+              <DropdownItem selected={paymentMethod === 'bank_transfer'} onClick={() => setPaymentMethod('bank_transfer')}>Virement bancaire</DropdownItem>
+              <DropdownItem selected={paymentMethod === 'cash'} onClick={() => setPaymentMethod('cash')}>Espèces</DropdownItem>
+              <DropdownItem selected={paymentMethod === 'other'} onClick={() => setPaymentMethod('other')}>Autre</DropdownItem>
+            </Dropdown>
+          </div>
         </div>
 
         <div>

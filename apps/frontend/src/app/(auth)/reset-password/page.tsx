@@ -52,7 +52,7 @@ function ResetPasswordContent() {
 
   if (!token) {
     return (
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-sm">
         <Card className="overflow-hidden p-0 border-border/50">
           <CardContent className="p-8 text-center">
             <h1 className="text-2xl font-bold mb-4">Lien invalide</h1>
@@ -69,7 +69,7 @@ function ResetPasswordContent() {
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" className="w-full max-w-md">
+    <motion.div initial="hidden" animate="visible" className="w-full max-w-sm">
       <Card className="overflow-hidden p-0 border-border/50">
         <CardContent className="p-8">
           {success ? (

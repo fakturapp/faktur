@@ -86,7 +86,7 @@ export default function InvitePage() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md mx-auto"
+        className="w-full max-w-sm mx-auto"
       >
         <Card>
           <CardContent className="p-8 text-center">
@@ -111,7 +111,7 @@ export default function InvitePage() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md mx-auto"
+        className="w-full max-w-sm mx-auto"
       >
         <Card>
           <CardContent className="p-8 text-center">
@@ -132,18 +132,18 @@ export default function InvitePage() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-md mx-auto"
+      className="w-full max-w-sm mx-auto"
     >
       <Card>
         <CardContent className="p-8">
           <div className="text-center mb-6">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
-              <Users className="h-7 w-7 text-primary" />
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-soft">
+              <Users className="h-7 w-7 text-accent" />
             </div>
             <h2 className="text-xl font-bold text-foreground">Invitation à rejoindre une équipe</h2>
           </div>
 
-          <div className="rounded-xl border border-border bg-muted/30 p-4 space-y-3 mb-6">
+          <div className="rounded-xl bg-surface shadow-surface p-4 space-y-3 mb-6">
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Équipe</span>
               <span className="text-sm font-medium text-foreground">{info?.team.name}</span>

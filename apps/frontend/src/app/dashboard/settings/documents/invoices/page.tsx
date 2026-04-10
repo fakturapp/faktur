@@ -147,7 +147,7 @@ export default function InvoiceAppearancePage() {
               </div>
               <Skeleton className="h-3 w-28" />
             </div>
-            <div className="p-4 bg-muted/30">
+            <div className="p-4 bg-surface">
               <Skeleton className="w-full rounded-lg" style={{ aspectRatio: '210/270' }} />
             </div>
           </div>
@@ -172,8 +172,8 @@ export default function InvoiceAppearancePage() {
             <Card className="overflow-hidden border-border/50">
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                    <LayoutTemplate className="h-4.5 w-4.5 text-primary" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
+                    <LayoutTemplate className="h-4.5 w-4.5 text-accent" />
                   </div>
                   <div>
                     <h2 className="text-base font-semibold text-foreground">Modele de document</h2>
@@ -188,25 +188,25 @@ export default function InvoiceAppearancePage() {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-foreground">{currentTemplate.name}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">{currentTemplate.description}</p>
-                    <p className="text-xs text-primary mt-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <p className="text-xs text-accent mt-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       Changer de modèle <ChevronRight className="h-3 w-3" />
                     </p>
                   </div>
-                  <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                  <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-accent transition-colors shrink-0" />
                 </button>
                 <button onClick={() => updateSettings({ darkMode: !settings.darkMode })}
                   className={`mt-3 w-full flex items-center gap-3 rounded-xl border-2 p-3 text-left transition-all ${
                     settings.darkMode ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
                   }`}>
-                  <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${settings.darkMode ? 'bg-primary/10' : 'bg-muted'}`}>
-                    {settings.darkMode ? <Moon className="h-4 w-4 text-primary" /> : <Sun className="h-4 w-4 text-muted-foreground" />}
+                  <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${settings.darkMode ? 'bg-accent-soft' : 'bg-muted'}`}>
+                    {settings.darkMode ? <Moon className="h-4 w-4 text-accent" /> : <Sun className="h-4 w-4 text-muted-foreground" />}
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-foreground">Mode sombre</p>
                     <p className="text-xs text-muted-foreground">Appliquer le thème sombre au document</p>
                   </div>
                   <div className={`h-5 w-5 rounded-md border-2 flex items-center justify-center transition-colors ${settings.darkMode ? 'border-primary bg-primary' : 'border-muted-foreground/30'}`}>
-                    {settings.darkMode && <Check className="h-3 w-3 text-primary-foreground" />}
+                    {settings.darkMode && <Check className="h-3 w-3 text-accent-foreground" />}
                   </div>
                 </button>
               </CardContent>
@@ -218,8 +218,8 @@ export default function InvoiceAppearancePage() {
             <Card className="overflow-hidden border-border/50">
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                    <ImagePlus className="h-4.5 w-4.5 text-primary" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
+                    <ImagePlus className="h-4.5 w-4.5 text-accent" />
                   </div>
                   <div>
                     <h2 className="text-base font-semibold text-foreground">Logo</h2>
@@ -233,8 +233,8 @@ export default function InvoiceAppearancePage() {
                     className={`flex items-center gap-2.5 rounded-xl border-2 p-3 text-left transition-all ${
                       settings.logoSource === 'custom' ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
                     }`}>
-                    <div className={`flex h-8 w-8 items-center justify-center rounded-lg shrink-0 ${settings.logoSource === 'custom' ? 'bg-primary/10' : 'bg-muted'}`}>
-                      <ImagePlus className={`h-4 w-4 ${settings.logoSource === 'custom' ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <div className={`flex h-8 w-8 items-center justify-center rounded-lg shrink-0 ${settings.logoSource === 'custom' ? 'bg-accent-soft' : 'bg-muted'}`}>
+                      <ImagePlus className={`h-4 w-4 ${settings.logoSource === 'custom' ? 'text-accent' : 'text-muted-foreground'}`} />
                     </div>
                     <div className="min-w-0">
                       <p className="text-xs font-medium text-foreground">Logo personnalisé</p>
@@ -242,7 +242,7 @@ export default function InvoiceAppearancePage() {
                     </div>
                     {settings.logoSource === 'custom' && (
                       <div className="h-4 w-4 rounded-md border-2 border-primary bg-primary flex items-center justify-center shrink-0 ml-auto">
-                        <Check className="h-2.5 w-2.5 text-primary-foreground" />
+                        <Check className="h-2.5 w-2.5 text-accent-foreground" />
                       </div>
                     )}
                   </button>
@@ -250,8 +250,8 @@ export default function InvoiceAppearancePage() {
                     className={`flex items-center gap-2.5 rounded-xl border-2 p-3 text-left transition-all ${
                       settings.logoSource === 'company' ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
                     }`}>
-                    <div className={`flex h-8 w-8 items-center justify-center rounded-lg shrink-0 ${settings.logoSource === 'company' ? 'bg-primary/10' : 'bg-muted'}`}>
-                      <Building2 className={`h-4 w-4 ${settings.logoSource === 'company' ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <div className={`flex h-8 w-8 items-center justify-center rounded-lg shrink-0 ${settings.logoSource === 'company' ? 'bg-accent-soft' : 'bg-muted'}`}>
+                      <Building2 className={`h-4 w-4 ${settings.logoSource === 'company' ? 'text-accent' : 'text-muted-foreground'}`} />
                     </div>
                     <div className="min-w-0">
                       <p className="text-xs font-medium text-foreground">Logo entreprise</p>
@@ -259,7 +259,7 @@ export default function InvoiceAppearancePage() {
                     </div>
                     {settings.logoSource === 'company' && (
                       <div className="h-4 w-4 rounded-md border-2 border-primary bg-primary flex items-center justify-center shrink-0 ml-auto">
-                        <Check className="h-2.5 w-2.5 text-primary-foreground" />
+                        <Check className="h-2.5 w-2.5 text-accent-foreground" />
                       </div>
                     )}
                   </button>
@@ -268,11 +268,11 @@ export default function InvoiceAppearancePage() {
                 {settings.logoSource === 'custom' ? (
                   <div className="flex items-start gap-6">
                     <div className="relative group">
-                      <div className="h-24 w-24 border-2 border-dashed border-border bg-muted/30 flex items-center justify-center overflow-hidden" style={{ borderRadius: `${settings.logoBorderRadius}px` }}>
+                      <div className="h-24 w-24 border-2 border-dashed border-border bg-surface flex items-center justify-center overflow-hidden" style={{ borderRadius: `${settings.logoBorderRadius}px` }}>
                         {settings.logoUrl ? (
                           <img src={settings.logoUrl} alt="Logo" className="h-full w-full object-contain p-2" style={{ borderRadius: `${settings.logoBorderRadius}px` }} />
                         ) : (
-                          <ImagePlus className="h-8 w-8 text-muted-foreground/50" />
+                          <ImagePlus className="h-8 w-8 text-muted-secondary" />
                         )}
                       </div>
                       {settings.logoUrl && (
@@ -292,18 +292,18 @@ export default function InvoiceAppearancePage() {
                   </div>
                 ) : (
                   <div className="flex items-center gap-4 rounded-xl border border-border p-4">
-                    <div className="h-16 w-16 bg-muted/30 flex items-center justify-center overflow-hidden shrink-0" style={{ borderRadius: `${settings.logoBorderRadius}px` }}>
+                    <div className="h-16 w-16 bg-surface flex items-center justify-center overflow-hidden shrink-0" style={{ borderRadius: `${settings.logoBorderRadius}px` }}>
                       {companyLogoUrl ? (
                         <img src={companyLogoUrl} alt="Logo entreprise" className="h-full w-full object-contain p-2" style={{ borderRadius: `${settings.logoBorderRadius}px` }} />
                       ) : (
-                        <Building2 className="h-6 w-6 text-muted-foreground/50" />
+                        <Building2 className="h-6 w-6 text-muted-secondary" />
                       )}
                     </div>
                     <div className="flex-1">
                       {companyLogoUrl ? (
                         <p className="text-sm text-muted-foreground">Le logo de votre entreprise sera utilisé sur vos documents.</p>
                       ) : (
-                        <p className="text-sm text-muted-foreground">Aucun logo d&apos;entreprise configuré. Ajoutez-en un dans la page <a href="/dashboard/company" className="text-primary underline underline-offset-2">Entreprise</a>.</p>
+                        <p className="text-sm text-muted-foreground">Aucun logo d&apos;entreprise configuré. Ajoutez-en un dans la page <a href="/dashboard/company" className="text-accent underline underline-offset-2">Entreprise</a>.</p>
                       )}
                     </div>
                   </div>
@@ -339,8 +339,8 @@ export default function InvoiceAppearancePage() {
             <Card className="overflow-hidden border-border/50">
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                    <Palette className="h-4.5 w-4.5 text-primary" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
+                    <Palette className="h-4.5 w-4.5 text-accent" />
                   </div>
                   <div>
                     <h2 className="text-base font-semibold text-foreground">Couleur des factures et devis</h2>
@@ -377,8 +377,8 @@ export default function InvoiceAppearancePage() {
             <Card className="overflow-hidden border-border/50">
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                    <Type className="h-4.5 w-4.5 text-primary" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
+                    <Type className="h-4.5 w-4.5 text-accent" />
                   </div>
                   <div>
                     <h2 className="text-base font-semibold text-foreground">Police des documents</h2>
@@ -406,7 +406,7 @@ export default function InvoiceAppearancePage() {
                       </div>
                       {settings.documentFont === font.id && (
                         <div className="h-5 w-5 rounded-md border-2 border-primary bg-primary flex items-center justify-center shrink-0">
-                          <Check className="h-3 w-3 text-primary-foreground" />
+                          <Check className="h-3 w-3 text-accent-foreground" />
                         </div>
                       )}
                     </button>

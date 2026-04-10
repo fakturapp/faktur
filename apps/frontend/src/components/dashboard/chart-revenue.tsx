@@ -3,6 +3,8 @@
 import * as React from 'react'
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardAction } from '@/components/ui/card'
+import { Dropdown, DropdownItem } from '@/components/ui/dropdown'
+import { ChevronDown } from 'lucide-react'
 
 interface RevenueDataPoint {
   date: string
@@ -64,15 +66,26 @@ export function ChartRevenue({ data }: ChartRevenueProps) {
               </button>
             ))}
           </div>
-          <select
-            value={timeRange}
-            onChange={(e) => setTimeRange(e.target.value)}
-            className="@[767px]/card:hidden h-8 rounded-lg border border-border bg-card px-3 text-xs text-foreground"
-          >
-            {timeRanges.map((range) => (
-              <option key={range.value} value={range.value}>{range.label}</option>
-            ))}
-          </select>
+          <div className="@[767px]/card:hidden">
+            <Dropdown
+              trigger={
+                <button className="flex h-8 items-center justify-between gap-2 rounded-lg border border-border bg-card px-3 text-xs text-foreground min-w-[100px]">
+                  {timeRanges.find(r => r.value === timeRange)?.label}
+                  <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                </button>
+              }
+            >
+              {timeRanges.map((range) => (
+                <DropdownItem
+                  key={range.value}
+                  selected={timeRange === range.value}
+                  onClick={() => setTimeRange(range.value)}
+                >
+                  {range.label}
+                </DropdownItem>
+              ))}
+            </Dropdown>
+          </div>
         </CardAction>
       </CardHeader>
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">

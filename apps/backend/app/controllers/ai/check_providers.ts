@@ -16,7 +16,7 @@ export default class CheckProviders {
     }
 
     return response.ok({
-      providers: [{ provider: 'groq', available: true, source: 'server' }],
+      providers: [{ provider: 'gemini', available: true, source: 'server' }],
     })
   }
 }

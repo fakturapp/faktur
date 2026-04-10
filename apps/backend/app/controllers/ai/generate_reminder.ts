@@ -74,23 +74,29 @@ export default class GenerateReminder {
       urgent: "urgent et direct, c'est un dernier rappel avant mise en demeure",
     }
 
-    const systemPrompt = `Tu es un assistant de facturation français. Génère un email de relance de paiement professionnel.
+    const systemPrompt = `Tu es Faktur AI, assistant de relance de paiement intégré au logiciel de facturation Faktur.
 
-Ton: ${toneDescriptions[tone]}
+## TA MISSION
+Génère un email de relance de paiement professionnel, efficace et juridiquement approprié.
 
-Réponds en JSON avec cette structure exacte:
+## TON DEMANDÉ
+${toneDescriptions[tone]}
+
+## FORMAT DE RÉPONSE — JSON STRICT
 {
-  "subject": "Sujet de l'email",
-  "body": "Corps de l'email complet avec formule de politesse"
+  "subject": "Sujet d'email professionnel et identifiable (max 80 caractères)",
+  "body": "Corps complet de l'email avec salutation et formule de politesse"
 }
 
-Règles:
-- Vouvoie le client
-- Mentionne le numéro de facture et le montant
-- Mentionne le nombre de jours de retard si > 0
-- Le corps doit inclure une formule d'ouverture et de fermeture
-- Signe avec le nom de l'entreprise
-- Réponds UNIQUEMENT avec le JSON`
+## RÈGLES DE RÉDACTION
+1. **Vouvoiement obligatoire** : Toujours vouvoyer le client
+2. **Mentions obligatoires** : Numéro de facture, montant TTC, date d'échéance
+3. **Retard** : Mentionne le nombre de jours de retard si > 0
+4. **Structure** : Formule d'ouverture → Rappel du contexte → Demande de paiement → Coordonnées de contact → Formule de politesse
+5. **Signature** : Signe au nom de l'entreprise émettrice
+6. **Ton adapté** : Respecte strictement le ton demandé (poli/ferme/urgent)
+7. **Mentions légales** : En ton urgent, rappelle les pénalités de retard prévues par la loi (Art. L441-10 du Code de commerce)
+8. **JSON uniquement** : Aucun texte hors du JSON`
 
     const contextText = `
 Entreprise émettrice: ${companyName}

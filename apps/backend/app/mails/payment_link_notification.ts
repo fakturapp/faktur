@@ -33,25 +33,20 @@ export class PaymentLinkNotification {
     }).format(this.amount)
 
     const content = `
-      <h2 style="margin: 0 0 8px; font-size: 22px; font-weight: 700; color: #ffffff; letter-spacing: -0.5px;">
+      <h2 style="font-size: 20px; font-weight: 600; color: #171717; letter-spacing: -0.02em; margin: 0 0 12px;">
         Paiement de votre facture
       </h2>
-      <p style="margin: 0 0 24px; font-size: 15px; color: #a1a1aa; line-height: 1.6;">
+      <p style="font-size: 14px; line-height: 1.7; color: #707070; margin: 0 0 16px;">
         Bonjour${this.clientName ? ` ${this.clientName}` : ''},
       </p>
-      <p style="margin: 0 0 8px; font-size: 15px; color: #a1a1aa; line-height: 1.6;">
-        Vous avez re&ccedil;u une facture <strong style="color: #ffffff;">${this.invoiceNumber}</strong> d&rsquo;un montant de <strong style="color: #ffffff;">${formattedAmount}</strong>.
+      <p style="font-size: 14px; line-height: 1.7; color: #707070; margin: 0 0 16px;">
+        Vous avez re&ccedil;u une facture <strong style="color: #171717;">${this.invoiceNumber}</strong> d&rsquo;un montant de <strong style="color: #171717;">${formattedAmount}</strong>.
       </p>
-      <p style="margin: 0 0 24px; font-size: 15px; color: #a1a1aa; line-height: 1.6;">
+      <p style="font-size: 14px; line-height: 1.7; color: #707070; margin: 0 0 16px;">
         Cliquez sur le bouton ci-dessous pour acc&eacute;der aux instructions de paiement.
       </p>
       ${ctaButton(this.paymentUrl, 'Payer la facture')}
-      ${infoBox(
-        'La facture est &eacute;galement jointe &agrave; cet email au format PDF.',
-        'rgba(99,102,241,0.06)',
-        'rgba(99,102,241,0.15)',
-        '#a1a1aa'
-      )}
+      ${infoBox('La facture est &eacute;galement jointe &agrave; cet email au format PDF.')}
       ${linkFallback(this.paymentUrl)}
     `
 

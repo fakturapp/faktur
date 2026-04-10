@@ -108,8 +108,8 @@ export default function CreateTeamPage() {
           <ArrowLeft className="h-4 w-4" /> Retour aux &eacute;quipes
         </Link>
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
-            <Users className="h-6 w-6 text-primary" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent-soft">
+            <Users className="h-6 w-6 text-accent" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">Nouvelle &eacute;quipe</h1>
@@ -131,7 +131,7 @@ export default function CreateTeamPage() {
           }`}
         >
           <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
-            mode === 'create' ? 'bg-primary/20' : 'bg-muted/50'
+            mode === 'create' ? 'bg-primary/20' : 'bg-surface-hover'
           }`}>
             <Plus className={`h-5 w-5 ${mode === 'create' ? 'text-primary' : 'text-muted-foreground'}`} />
           </div>
@@ -150,7 +150,7 @@ export default function CreateTeamPage() {
           }`}
         >
           <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
-            mode === 'import' ? 'bg-primary/20' : 'bg-muted/50'
+            mode === 'import' ? 'bg-primary/20' : 'bg-surface-hover'
           }`}>
             <Upload className={`h-5 w-5 ${mode === 'import' ? 'text-primary' : 'text-muted-foreground'}`} />
           </div>

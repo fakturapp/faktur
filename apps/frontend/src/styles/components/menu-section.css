@@ -1,0 +1,7 @@
+@layer components {
+/* Menu Section — copied from HeroUI v3 */
+
+.menu-section {
+  @apply flex flex-col items-start gap-0;
+}
+}

@@ -9,12 +9,13 @@ import { Button } from '@/components/ui/button'
 import { Field, FieldLabel, FieldDescription } from '@/components/ui/field'
 import { useToast } from '@/components/ui/toast'
 import { Spinner } from '@/components/ui/spinner'
-import { Dialog, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { IbanInput } from '@/components/ui/iban-input'
 import { useCompanySettings, type BankAccountItem, type BankAccountForm } from '@/lib/company-settings-context'
 import { api } from '@/lib/api'
 import { CreditCard, Banknote, Plus, Shield, Star, Pencil, Trash2 } from 'lucide-react'
+import { CheckboxRoot, CheckboxControl, CheckboxIndicator, CheckboxContent } from '@/components/ui/checkbox'
 
 const BANK_DOMAINS: Record<string, string> = {
   'bnp paribas': 'bnpparibas.com', 'bnp': 'bnpparibas.com',
@@ -115,7 +116,7 @@ export default function BankPage() {
           <Skeleton className="h-7 w-40" />
           <Skeleton className="h-4 w-64" />
         </div>
-        <div className="rounded-2xl border border-border/50 p-6 space-y-4">
+        <div className="rounded-xl bg-surface shadow-surface p-6 space-y-4">
           {[...Array(3)].map((_, i) => (
             <Skeleton key={i} className="h-20 w-full rounded-xl" />
           ))}
@@ -165,19 +166,18 @@ export default function BankPage() {
                   {bankAccounts.map((account) => {
                     const logoUrl = getBankLogoUrl(account.bankName)
                     return (
-                      <div key={account.id} className="flex items-center gap-4 rounded-xl border border-border p-4 hover:bg-muted/30 transition-colors">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 overflow-hidden">
+                      <div key={account.id} className="flex items-center gap-4 rounded-xl border border-border p-4 hover:bg-surface transition-colors">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent-soft overflow-hidden">
                           {logoUrl ? (
                             <img src={logoUrl} alt={account.bankName || ''} className="h-6 w-6 object-contain"
                               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden') }} />
                           ) : null}
-                          <Banknote className={`h-5 w-5 text-primary ${logoUrl ? 'hidden' : ''}`} />
+                          <Banknote className={`h-5 w-5 text-accent ${logoUrl ? 'hidden' : ''}`} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
                             <p className="text-sm font-medium text-foreground truncate">{account.label}</p>
                             {account.isDefault && <Badge variant="default" className="text-[10px] shrink-0">Par défaut</Badge>}
-                            <Badge variant="muted" className="text-[10px] shrink-0"><Shield className="h-2.5 w-2.5 mr-0.5" /> Chiffré</Badge>
                           </div>
                           <div className="flex items-center gap-3 mt-0.5">
                             {account.bankName && <span className="text-xs text-muted-foreground">{account.bankName}</span>}
@@ -187,7 +187,7 @@ export default function BankPage() {
                         </div>
                         <div className="flex items-center gap-1 shrink-0">
                           <button onClick={() => openBankDialog(account)}
-                            className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
+                            className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-surface-hover transition-colors">
                             <Pencil className="h-3.5 w-3.5" />
                           </button>
                           <button onClick={() => handleDeleteBank(account.id)} disabled={bankDeleting === account.id}
@@ -207,7 +207,9 @@ export default function BankPage() {
 
       {/* Bank account add/edit dialog */}
       <Dialog open={bankDialogOpen} onClose={() => setBankDialogOpen(false)} className="max-w-md">
-        <DialogTitle>{bankEditId ? 'Modifier le compte bancaire' : 'Ajouter un compte bancaire'}</DialogTitle>
+        <DialogHeader onClose={() => setBankDialogOpen(false)}>
+          <DialogTitle>{bankEditId ? 'Modifier le compte bancaire' : 'Ajouter un compte bancaire'}</DialogTitle>
+        </DialogHeader>
         <div className="space-y-4 mt-4">
           <Field>
             <FieldLabel htmlFor="bankLabel">Libellé *</FieldLabel>
@@ -237,27 +239,26 @@ export default function BankPage() {
             <FieldDescription>{bankForm.bic.length}/11 caractères</FieldDescription>
           </Field>
           <div className="space-y-3">
-            <div className="flex items-center gap-3 rounded-lg bg-muted/50 px-3 py-2">
-              <Shield className="h-4 w-4 text-primary shrink-0" />
+            <div className="flex items-center gap-3 rounded-lg bg-surface-hover px-3 py-2">
+              <Shield className="h-4 w-4 text-accent shrink-0" />
               <div>
                 <span className="text-sm font-medium text-foreground">Chiffrement zero-access</span>
                 <span className="text-xs text-muted-foreground block">L&apos;IBAN et le BIC sont automatiquement chiffrés (AES-256-GCM).</span>
               </div>
             </div>
-            <label className="flex items-center gap-3 cursor-pointer">
-              <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-colors ${bankForm.isDefault ? 'bg-primary border-primary' : 'border-muted-foreground/30'}`}>
-                {bankForm.isDefault && (
-                  <svg className="h-3 w-3 text-primary-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                )}
-              </div>
-              <div>
+            <CheckboxRoot 
+              isSelected={bankForm.isDefault} 
+              onChange={(checked) => setBankForm((p) => ({ ...p, isDefault: checked }))} 
+              className="flex items-center gap-3 cursor-pointer"
+            >
+              <CheckboxControl>
+                <CheckboxIndicator />
+              </CheckboxControl>
+              <CheckboxContent>
                 <span className="text-sm font-medium text-foreground flex items-center gap-1.5"><Star className="h-3.5 w-3.5" /> Compte par défaut</span>
-                <span className="text-xs text-muted-foreground block">Ce compte sera sélectionné par défaut sur les nouvelles factures.</span>
-              </div>
-              <input type="checkbox" checked={bankForm.isDefault} onChange={(e) => setBankForm((p) => ({ ...p, isDefault: e.target.checked }))} className="sr-only" />
-            </label>
+                <span className="text-xs text-muted-foreground mt-[1px] block">Ce compte sera sélectionné par défaut sur les nouvelles factures.</span>
+              </CheckboxContent>
+            </CheckboxRoot>
           </div>
         </div>
         <DialogFooter>

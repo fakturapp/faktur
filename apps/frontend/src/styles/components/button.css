@@ -1,0 +1,176 @@
+@layer components {
+/* ============================================================
+ * Button — adapted from HeroUI v3 (packages/styles/components/button.css)
+ *
+ * Faktur adjustments:
+ *   - px-5 instead of px-4 (more generous spacing like Link by Stripe)
+ *   - Removed md:h-9 / md:h-8 / md:h-10 (keep h-10/9/11 across breakpoints)
+ *   - transition uses --ease-link (cubic-bezier(.2, 1, .25, 1))
+ *   - rounded-3xl (24px) creates pill shape on h-10 buttons (Revolut-style)
+ * ============================================================ */
+
+.button {
+  @apply relative isolate inline-flex h-10 w-fit origin-center items-center justify-center gap-2 rounded-xl px-5 text-sm font-medium whitespace-nowrap outline-none select-none no-highlight;
+
+  /**
+   * Transitions
+   * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
+   */
+  transition:
+    transform 250ms var(--ease-link),
+    background-color 150ms var(--ease-link),
+    box-shadow 150ms var(--ease-link),
+    color 150ms var(--ease-link);
+  @apply transform-gpu motion-reduce:transition-none;
+
+  cursor: var(--cursor-interactive);
+  letter-spacing: var(--tracking-ui);
+
+  /* Default tokens (fallback behavior) */
+  --button-bg: transparent;
+  --button-bg-hover: var(--button-bg);
+  --button-bg-pressed: var(--button-bg-hover);
+  --button-fg: currentColor;
+
+  background-color: var(--button-bg);
+  color: var(--button-fg);
+
+  /* Focus state (react-aria data-focus-visible) */
+  &:focus-visible:not(:focus),
+  &[data-focus-visible="true"] {
+    @apply status-focused;
+  }
+
+  /* Disabled state */
+  &:disabled,
+  &[aria-disabled="true"] {
+    @apply status-disabled;
+  }
+
+  /* Pending state */
+  &[data-pending="true"] {
+    @apply status-pending;
+  }
+
+  /* Active / pressed */
+  &:active,
+  &[data-pressed="true"] {
+    background-color: var(--button-bg-pressed);
+    transform: scale(0.97);
+  }
+
+  /* Hover (desktop only) */
+  @media (hover: hover) {
+    &:hover,
+    &[data-hovered="true"] {
+      background-color: var(--button-bg-hover);
+    }
+  }
+
+  /* SVG icon default sizing */
+  & svg {
+    @apply pointer-events-none size-5 shrink-0 self-center;
+  }
+}
+
+/* ============================================================
+ * Size modifiers
+ * ============================================================ */
+.button--sm {
+  @apply h-9 px-4 text-[13px];
+
+  & svg {
+    @apply size-4;
+  }
+
+  &:active,
+  &[data-pressed="true"] {
+    transform: scale(0.98);
+  }
+}
+
+.button--md {
+  /* Default — no overrides */
+}
+
+.button--lg {
+  @apply h-11 px-6 text-[15px];
+
+  &:active,
+  &[data-pressed="true"] {
+    transform: scale(0.96);
+  }
+}
+
+/* ============================================================
+ * Color variants — only set the --button-bg/fg custom properties
+ * ============================================================ */
+.button--primary {
+  --button-bg: var(--color-accent);
+  --button-bg-hover: var(--color-accent-hover);
+  --button-bg-pressed: var(--color-accent-hover);
+  --button-fg: var(--color-accent-foreground);
+}
+
+.button--secondary {
+  --button-bg: var(--color-surface);
+  --button-bg-hover: var(--color-surface-hover);
+  --button-bg-pressed: var(--color-surface-hover);
+  --button-fg: var(--color-foreground);
+}
+
+.button--tertiary {
+  --button-bg: transparent;
+  --button-bg-hover: var(--color-surface);
+  --button-bg-pressed: var(--color-surface-hover);
+  --button-fg: var(--color-foreground);
+}
+
+.button--ghost {
+  --button-bg: transparent;
+  --button-bg-hover: var(--color-surface);
+  --button-bg-pressed: var(--color-surface-hover);
+  --button-fg: var(--color-foreground);
+}
+
+.button--outline {
+  --button-bg: transparent;
+  --button-bg-hover: var(--color-surface);
+  --button-bg-pressed: var(--color-surface-hover);
+  --button-fg: var(--color-foreground);
+  border: 1px solid var(--color-border);
+}
+
+.button--danger {
+  --button-bg: var(--color-danger);
+  --button-bg-hover: var(--color-danger-hover);
+  --button-bg-pressed: var(--color-danger-hover);
+  --button-fg: var(--color-danger-foreground);
+}
+
+.button--danger-soft {
+  --button-bg: var(--color-danger-soft);
+  --button-bg-hover: var(--color-danger-soft);
+  --button-bg-pressed: var(--color-danger-soft);
+  --button-fg: var(--color-danger-soft-foreground);
+}
+
+/* ============================================================
+ * Shape modifiers
+ * ============================================================ */
+.button--icon-only {
+  @apply w-10 p-0;
+}
+
+.button--icon-only.button--sm {
+  @apply w-9;
+}
+
+.button--icon-only.button--lg {
+  @apply w-11;
+}
+
+.button--full-width {
+  @apply w-full;
+}
+}

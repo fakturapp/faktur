@@ -8,6 +8,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/toast'
 import { api } from '@/lib/api'
 import { AlertTriangle, CheckCircle } from 'lucide-react'
+import { CheckboxRoot, CheckboxControl, CheckboxIndicator, CheckboxContent } from '@/components/ui/checkbox'
 
 interface ConfirmPaymentModalProps {
   open: boolean
@@ -94,17 +95,18 @@ export function ConfirmPaymentModal({
         </div>
 
         {/* Notify client */}
-        <label className="flex items-center gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={notifyClient}
-            onChange={(e) => setNotifyClient(e.target.checked)}
-            className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
-          />
-          <span className="text-sm text-foreground">
+        <CheckboxRoot 
+          isSelected={notifyClient} 
+          onChange={setNotifyClient} 
+          className="flex items-center gap-3"
+        >
+          <CheckboxControl>
+            <CheckboxIndicator />
+          </CheckboxControl>
+          <CheckboxContent className="text-sm text-foreground">
             Avertir le client que le paiement est confirmé
-          </span>
-        </label>
+          </CheckboxContent>
+        </CheckboxRoot>
       </div>
 
       <DialogFooter>

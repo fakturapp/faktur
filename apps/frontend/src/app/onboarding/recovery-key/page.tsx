@@ -43,7 +43,7 @@ export default function OnboardingRecoveryKeyPage() {
         <CardContent className="p-8">
           <div className="space-y-6">
             <motion.div variants={fadeUp} custom={0} className="flex flex-col items-center gap-4 text-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-500/10 border border-indigo-500/20">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-accent-soft border border-accent/20">
                 <KeyRound className="h-8 w-8 text-indigo-500" />
               </div>
               <div>

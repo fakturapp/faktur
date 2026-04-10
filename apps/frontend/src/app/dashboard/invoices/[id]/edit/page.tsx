@@ -14,13 +14,13 @@ import { api } from '@/lib/api'
 import { A4Sheet, ClientModal, type DocumentLine, type ClientInfo, type CompanyInfo } from '@/components/shared/a4-sheet'
 import { DocumentOptionsPanel } from '@/components/shared/document-options'
 import { Save, ArrowLeft, Eye, Pencil, SlidersHorizontal, Download, Link2, Unlink, X, Sparkles, Settings } from 'lucide-react'
-import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
 import { ProductCatalogModal, type CatalogProduct } from '@/components/products/product-catalog-modal'
 import { Tabs } from '@/components/ui/tabs'
 import { AiChatSidebar } from '@/components/ai/ai-chat-sidebar'
 import { AiSheetOverlay } from '@/components/ai/ai-sheet-overlay'
-import { DocumentZoom, loadDocumentZoom } from '@/components/shared/document-zoom'
+import { DocumentZoom, loadDocumentZoom, useZoomSpacing } from '@/components/shared/document-zoom'
 import { CollaborationToolbar, CollaborationReadOnlyBanner, CollaborationEditor } from '@/components/collaboration/collaboration-toolbar'
 import { CollaborationProvider } from '@/components/collaboration/collaboration-provider'
 import { SyncBroadcaster } from '@/components/collaboration/sync-broadcaster'
@@ -60,6 +60,8 @@ function EditInvoiceContent() {
   const [mode, setMode] = useState<'edit' | 'preview'>('edit')
   const [docZoom, setDocZoom] = useState(100)
   useEffect(() => setDocZoom(loadDocumentZoom()), [])
+  const a4SheetRef = useRef<HTMLDivElement>(null)
+  const zoomSpacing = useZoomSpacing(a4SheetRef, docZoom)
   const [invoiceNumber, setInvoiceNumber] = useState('')
   const [company, setCompany] = useState<CompanyInfo | null>(null)
   const [selectedClient, setSelectedClient] = useState<ClientInfo | null>(null)
@@ -492,25 +494,54 @@ function EditInvoiceContent() {
         <div className="flex flex-col xl:flex-row gap-5">
           <div className="flex-1 min-w-0 flex justify-center">
             <div className="w-full max-w-[960px] rounded-xl">
-              <div className="bg-card rounded-lg border border-border p-8 space-y-6" style={{ aspectRatio: '210/297' }}>
-                <div className="flex justify-between">
-                  <div className="space-y-2"><Skeleton className="h-10 w-20 rounded" /><Skeleton className="h-3 w-32" /><Skeleton className="h-3 w-28" /></div>
-                  <div className="text-right space-y-2"><Skeleton className="h-4 w-16 ml-auto" /><Skeleton className="h-3 w-24 ml-auto" /><Skeleton className="h-3 w-20 ml-auto" /></div>
+              <div className="bg-white dark:bg-zinc-900 rounded-sm p-10 relative overflow-hidden" style={{ aspectRatio: '210/297' }}>
+                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.03] to-transparent skeleton-shimmer" />
+                <div className="flex justify-between mb-12">
+                  <div className="space-y-3">
+                    <Skeleton className="h-10 w-24 rounded-xl bg-primary/10" />
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-4 w-28" />
+                  </div>
+                  <div className="text-right space-y-3">
+                    <Skeleton className="h-6 w-40 ml-auto rounded-lg" />
+                    <Skeleton className="h-3 w-32 ml-auto" />
+                    <Skeleton className="h-3 w-24 ml-auto" />
+                  </div>
                 </div>
-                <Skeleton className="h-0.5 w-full" />
-                <div className="grid grid-cols-2 gap-8">
-                  <div className="space-y-1.5"><Skeleton className="h-3 w-16" /><Skeleton className="h-3.5 w-32" /><Skeleton className="h-3 w-40" /><Skeleton className="h-3 w-28" /></div>
-                  <div className="space-y-1.5"><Skeleton className="h-3 w-12" /><Skeleton className="h-3.5 w-28" /><Skeleton className="h-3 w-36" /><Skeleton className="h-3 w-24" /></div>
+                
+                <Skeleton className="h-px w-full bg-border/40 my-8" />
+                
+                <div className="grid grid-cols-2 gap-12 mb-12">
+                  <div className="space-y-3">
+                    <Skeleton className="h-4 w-20 bg-muted/40" />
+                    <Skeleton className="h-5 w-40" />
+                    <Skeleton className="h-4 w-48" />
+                    <Skeleton className="h-4 w-32" />
+                  </div>
+                  <div className="space-y-3">
+                    <Skeleton className="h-4 w-16 bg-muted/40" />
+                    <Skeleton className="h-5 w-36" />
+                    <Skeleton className="h-4 w-40" />
+                    <Skeleton className="h-4 w-28" />
+                  </div>
                 </div>
-                <div>
-                  <Skeleton className="h-8 w-full rounded-t" />
-                  {[...Array(3)].map((_, i) => (<Skeleton key={i} className="h-10 w-full rounded-none" style={{ opacity: 1 - i * 0.15 }} />))}
+                
+                <div className="mt-12">
+                  <Skeleton className="h-10 w-full rounded-t-xl bg-muted/30" />
+                  {[...Array(4)].map((_, i) => (
+                    <Skeleton key={i} className="h-12 w-full rounded-none border-t border-border/20" style={{ opacity: 1 - i * 0.15 }} />
+                  ))}
                 </div>
-                <div className="flex justify-end">
-                  <div className="w-48 space-y-2">
-                    <div className="flex justify-between"><Skeleton className="h-3 w-20" /><Skeleton className="h-3 w-16" /></div>
-                    <div className="flex justify-between"><Skeleton className="h-3 w-16" /><Skeleton className="h-3 w-12" /></div>
-                    <Skeleton className="h-8 w-full rounded" />
+                
+                <div className="flex justify-end mt-8">
+                  <div className="w-64 space-y-3">
+                    <div className="flex justify-between"><Skeleton className="h-4 w-24" /><Skeleton className="h-4 w-20" /></div>
+                    <div className="flex justify-between"><Skeleton className="h-4 w-20" /><Skeleton className="h-4 w-16" /></div>
+                    <Skeleton className="h-px w-full bg-border/40" />
+                    <div className="flex justify-between items-center mt-2">
+                       <Skeleton className="h-6 w-20 bg-primary/10" />
+                       <Skeleton className="h-7 w-28 bg-primary/20" />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -653,7 +684,7 @@ function EditInvoiceContent() {
               </button>
             </div>
             <CollaborationEditor editorRef={editorAreaRef}>
-            <div className="relative" style={{ transform: `scale(${docZoom / 100})`, transformOrigin: 'top center', transition: 'transform 0.15s ease' }}>
+            <div ref={a4SheetRef} className="relative" style={{ transform: `scale(${docZoom / 100})`, transformOrigin: 'top center', ...zoomSpacing }}>
             <AiSheetOverlay open={aiProcessing} />
             <A4Sheet
               mode={mode}
@@ -818,7 +849,7 @@ function EditInvoiceContent() {
       </div>
 
       {/* Sticky save bar */}
-      <div className="sticky bottom-4 z-20 flex flex-col items-center gap-2 pointer-events-none">
+      <div className="fixed bottom-4 left-0 right-0 z-20 flex flex-col items-center gap-2 pointer-events-none">
         <AnimatePresence>
           {validationErrors.length > 0 && (
             <motion.div
@@ -872,8 +903,10 @@ function EditInvoiceContent() {
       />
 
       <Dialog open={showModal} onClose={cancelNavigation} className="max-w-sm">
-        <DialogTitle>Modifications non enregistrées</DialogTitle>
-        <p className="mt-2 text-sm text-muted-foreground">Vous avez des modifications non enregistrées. Que souhaitez-vous faire ?</p>
+        <DialogHeader showClose={false}>
+          <DialogTitle>Modifications non enregistrées</DialogTitle>
+          <DialogDescription>Vous avez des modifications non enregistrées. Que souhaitez-vous faire ?</DialogDescription>
+        </DialogHeader>
         <DialogFooter>
           <Button variant="outline" size="sm" onClick={cancelNavigation}>Annuler</Button>
           <Button variant="ghost" size="sm" onClick={() => confirmNavigation('/dashboard/invoices')}>Ignorer</Button>
@@ -882,10 +915,12 @@ function EditInvoiceContent() {
       </Dialog>
 
       <Dialog open={showUnlinkConfirm} onClose={() => setShowUnlinkConfirm(false)} className="max-w-sm">
-        <DialogTitle>Délier le devis</DialogTitle>
-        <DialogDescription>
-          Êtes-vous sûr de vouloir délier le devis {sourceQuote?.quoteNumber} de cette facture ? Cette action est réversible.
-        </DialogDescription>
+        <DialogHeader showClose={false}>
+          <DialogTitle>Délier le devis</DialogTitle>
+          <DialogDescription>
+            Êtes-vous sûr de vouloir délier le devis {sourceQuote?.quoteNumber} de cette facture ? Cette action est réversible.
+          </DialogDescription>
+        </DialogHeader>
         <DialogFooter>
           <Button variant="outline" size="sm" onClick={() => setShowUnlinkConfirm(false)}>Annuler</Button>
           <Button variant="destructive" size="sm" disabled={unlinking} onClick={async () => { await handleUnlinkQuote(); setShowUnlinkConfirm(false) }}>

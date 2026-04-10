@@ -10,6 +10,9 @@ import {
   Palette, Pen, Info, Landmark, Banknote, CreditCard, MoreHorizontal, Shield,
 } from 'lucide-react'
 import { Tooltip } from '@/components/ui/tooltip'
+import { SelectRoot, SelectTrigger, SelectValue, SelectIndicator, SelectPopover } from '@/components/ui/select'
+import { ListBoxRoot as ListBox, ListBoxItemRoot as ListBoxItem } from '@/components/ui/list-box'
+import { CheckboxRoot, CheckboxControl, CheckboxIndicator, CheckboxContent } from '@/components/ui/checkbox'
 import { AiGenerateButton } from '@/components/ai/ai-generate-button'
 import type { ClientInfo } from './a4-sheet'
 
@@ -129,24 +132,19 @@ function OptionCheckbox({
 }) {
   return (
     <div>
-      <button
-        type="button"
-        onClick={onToggle}
+      <CheckboxRoot 
+        isSelected={checked} 
+        onChange={onToggle} 
         className="flex items-center gap-2 cursor-pointer py-1 w-full text-left"
       >
-        <div
-          className={cn(
-            'h-3.5 w-3.5 rounded border flex-shrink-0 flex items-center justify-center transition-colors',
-            checked
-              ? 'border-primary bg-primary'
-              : 'border-muted-foreground/30 hover:border-muted-foreground/50',
-          )}
-        >
-          {checked && <Check className="h-2 w-2 text-primary-foreground" />}
-        </div>
-        <span className="text-[13px] text-foreground">{label}</span>
-      </button>
-      {checked && children && <div className="ml-5.5 mt-1 mb-1">{children}</div>}
+        <CheckboxControl>
+          <CheckboxIndicator />
+        </CheckboxControl>
+        <CheckboxContent className="text-[13px] text-foreground mt-[1px]">
+          {label}
+        </CheckboxContent>
+      </CheckboxRoot>
+      {checked && children && <div className="ml-6 mt-1 mb-1">{children}</div>}
     </div>
   )
 }
@@ -173,7 +171,7 @@ export function DocumentOptionsPanel({
   return (
     <div className="space-y-3">
       {}
-      <div className="rounded-xl border border-border bg-card px-4 py-1 shadow-sm">
+      <div className="rounded-3xl border border-border/40 bg-card/40 backdrop-blur-2xl liquid-glass px-4 py-2 overflow-hidden">
 
         {}
         <CollapsibleSection title="Document" defaultOpen>
@@ -233,15 +231,18 @@ export function DocumentOptionsPanel({
           <div className="mb-3">
             <label className="text-xs text-muted-foreground font-medium block mb-1">Langue</label>
             <div className="relative">
-              <select
-                value={options.language}
-                onChange={(e) => onChange({ language: e.target.value })}
-                className="w-full appearance-none rounded-lg border border-border bg-transparent px-3 py-1.5 pr-8 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer"
-              >
-                <option value="fr">Francais</option>
-                <option value="en">English</option>
-              </select>
-              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+              <SelectRoot selectedKey={options.language} onSelectionChange={(k) => onChange({ language: k as string })}>
+                <SelectTrigger>
+                  <SelectValue />
+                  <SelectIndicator />
+                </SelectTrigger>
+                <SelectPopover>
+                  <ListBox>
+                    <ListBoxItem id="fr">Français</ListBoxItem>
+                    <ListBoxItem id="en">English</ListBoxItem>
+                  </ListBox>
+                </SelectPopover>
+              </SelectRoot>
             </div>
           </div>
 
@@ -420,24 +421,26 @@ export function DocumentOptionsPanel({
                 <div>
                   <label className="text-xs text-muted-foreground font-medium block mb-1">Compte bancaire</label>
                   <div className="relative">
-                    <select
-                      value={bankAccountId}
-                      onChange={(e) => onBankAccountChange(e.target.value)}
-                      disabled={loadingBankAccount}
-                      className="w-full appearance-none rounded-lg border border-border bg-transparent px-3 py-1.5 pr-8 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer disabled:opacity-50"
-                    >
-                      <option value="">Sélectionner un compte</option>
-                      {bankAccounts.map((a) => (
-                        <option key={a.id} value={a.id}>{a.label}{a.isDefault ? ' (défaut)' : ''}</option>
-                      ))}
-                    </select>
-                    {loadingBankAccount ? (
-                      <svg viewBox="25 25 50 50" className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none animate-spinner-rotate">
-                        <circle r={20} cy={50} cx={50} className="animate-spinner-dash fill-none stroke-current stroke-2" strokeLinecap="round" />
-                      </svg>
-                    ) : (
-                      <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
-                    )}
+                    <SelectRoot selectedKey={bankAccountId} onSelectionChange={(k) => onBankAccountChange(k === 'none' ? '' : k as string)} isDisabled={loadingBankAccount}>
+                      <SelectTrigger>
+                        <SelectValue />
+                        {loadingBankAccount ? (
+                          <svg viewBox="25 25 50 50" className="h-3.5 w-3.5 text-muted-foreground animate-spinner-rotate">
+                            <circle r={20} cy={50} cx={50} className="animate-spinner-dash fill-none stroke-current stroke-2" strokeLinecap="round" />
+                          </svg>
+                        ) : (
+                          <SelectIndicator />
+                        )}
+                      </SelectTrigger>
+                      <SelectPopover>
+                        <ListBox>
+                          <ListBoxItem id="none">Sélectionner un compte</ListBoxItem>
+                          {bankAccounts.map((a) => (
+                            <ListBoxItem key={a.id} id={a.id}>{a.label}{a.isDefault ? ' (défaut)' : ''}</ListBoxItem>
+                          ))}
+                        </ListBox>
+                      </SelectPopover>
+                    </SelectRoot>
                   </div>
                 </div>
               )}
@@ -590,24 +593,28 @@ export function DocumentOptionsPanel({
           <div>
             <label className="text-xs text-muted-foreground font-medium block mb-1">Exonération</label>
             <div className="relative">
-              <select
-                value={options.vatExemptReason}
-                onChange={(e) => onChange({ vatExemptReason: e.target.value as DocumentOptions['vatExemptReason'] })}
-                className="w-full appearance-none rounded-lg border border-border bg-transparent px-3 py-1.5 pr-8 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer"
-              >
-                <option value="none">Aucun motif</option>
-                <option value="not_subject">Non soumis à la TVA (art. 293B)</option>
-                <option value="france_no_vat">Exonération TVA (art. 261)</option>
-                <option value="outside_france">Prestation hors France (art. 259-1)</option>
-              </select>
-              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+              <SelectRoot selectedKey={options.vatExemptReason} onSelectionChange={(k) => onChange({ vatExemptReason: k as DocumentOptions['vatExemptReason'] })}>
+                <SelectTrigger>
+                  <SelectValue />
+                  <SelectIndicator />
+                </SelectTrigger>
+                <SelectPopover>
+                  <ListBox>
+                    <ListBoxItem id="none">Aucun motif</ListBoxItem>
+                    <ListBoxItem id="not_subject">Non soumis à la TVA (art. 293B)</ListBoxItem>
+                    <ListBoxItem id="france_no_vat">Exonération TVA (art. 261)</ListBoxItem>
+                    <ListBoxItem id="outside_france">Prestation hors France (art. 259-1)</ListBoxItem>
+                  </ListBox>
+                </SelectPopover>
+              </SelectRoot>
             </div>
           </div>
         </CollapsibleSection>
       </div>
 
       {/* ── Summary card ── */}
-      <div className="rounded-xl border border-border bg-card px-4 py-3 shadow-sm">
+      <div className="rounded-[2rem] border border-border/40 bg-card/40 backdrop-blur-2xl liquid-glass px-5 py-4 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none" />
         <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-[0.5px] mb-3">
           Recapitulatif
         </h3>

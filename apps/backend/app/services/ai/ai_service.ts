@@ -6,7 +6,13 @@ interface ChatMessage {
   content: string
 }
 
-const DEFAULT_MODEL = 'llama-3.3-70b-versatile'
+const DEFAULT_MODEL = 'nvidia/nemotron-3-super-120b-a12b:free'
+
+const VALID_MODELS = [
+  'google/gemma-4-26b-a4b-it:free',
+  'google/gemma-4-31b-it:free',
+  'nvidia/nemotron-3-super-120b-a12b:free',
+]
 
 export default class AiService {
   static async isEnabled(teamId: string): Promise<boolean> {
@@ -15,13 +21,19 @@ export default class AiService {
   }
 
   private static getApiKey(): string | null {
-    return env.get('GROQ_API_KEY', '') || null
+    return env.get('OPENROUTER_API_KEY', '') || null
+  }
+
+  private static isValidModel(model: string): boolean {
+    return VALID_MODELS.includes(model)
   }
 
   private static async getModel(teamId: string, overrideModel?: string): Promise<string> {
-    if (overrideModel) return overrideModel
+    if (overrideModel && AiService.isValidModel(overrideModel)) return overrideModel
     const settings = await InvoiceSetting.findBy('teamId', teamId)
-    return settings?.aiModel || DEFAULT_MODEL
+    const stored = settings?.aiModel
+    if (stored && AiService.isValidModel(stored)) return stored
+    return DEFAULT_MODEL
   }
 
   static async generate(
@@ -38,10 +50,10 @@ export default class AiService {
     const model = await AiService.getModel(teamId, overrideModel)
 
     if (!apiKey) {
-      throw new Error('GROQ_API_KEY is not configured on the server.')
+      throw new Error('OPENROUTER_API_KEY is not configured on the server.')
     }
 
-    return AiService.callGroq(apiKey, model, systemPrompt, userPrompt, maxTokens)
+    return AiService.callOpenRouter(apiKey, model, systemPrompt, userPrompt, maxTokens)
   }
 
   static async chat(
@@ -58,21 +70,20 @@ export default class AiService {
     const model = await AiService.getModel(teamId, overrideModel)
 
     if (!apiKey) {
-      throw new Error('GROQ_API_KEY is not configured on the server.')
+      throw new Error('OPENROUTER_API_KEY is not configured on the server.')
     }
 
-    return AiService.chatGroq(apiKey, model, systemPrompt, messages, maxTokens)
+    return AiService.chatOpenRouter(apiKey, model, systemPrompt, messages, maxTokens)
   }
 
-
-  private static async callGroq(
+  private static async callOpenRouter(
     apiKey: string,
     model: string,
     system: string,
     userPrompt: string,
     maxTokens: number
   ): Promise<string> {
-    return AiService.chatGroq(
+    return AiService.chatOpenRouter(
       apiKey,
       model,
       system,
@@ -81,7 +92,7 @@ export default class AiService {
     )
   }
 
-  private static async chatGroq(
+  private static async chatOpenRouter(
     apiKey: string,
     model: string,
     system: string,
@@ -93,18 +104,20 @@ export default class AiService {
       ...messages.map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content })),
     ]
 
-    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`,
+        'HTTP-Referer': 'https://faktur.app',
+        'X-Title': 'Faktur AI',
       },
       body: JSON.stringify({ model, max_tokens: maxTokens, messages: openaiMessages }),
     })
 
     if (!res.ok) {
       const errorText = await res.text()
-      throw new Error(`Groq API error ${res.status}: ${errorText}`)
+      throw new Error(`OpenRouter API error ${res.status}: ${errorText}`)
     }
 
     const data = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> }

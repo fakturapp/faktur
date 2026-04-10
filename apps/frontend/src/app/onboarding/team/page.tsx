@@ -63,8 +63,8 @@ export default function OnboardingTeamPage() {
           <form onSubmit={handleSubmit}>
             <FieldGroup>
               <motion.div variants={fadeUp} custom={0} className="flex flex-col items-center gap-4 text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
-                  <Users className="h-8 w-8 text-primary" />
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-accent-soft">
+                  <Users className="h-8 w-8 text-accent" />
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold">Créez votre équipe</h1>

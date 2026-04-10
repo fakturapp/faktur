@@ -6,10 +6,9 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { useToast } from '@/components/ui/toast'
-import { GroqIcon } from '@/components/icons/groq-icon'
 import { api } from '@/lib/api'
 import {
   Sparkles,
@@ -30,9 +29,9 @@ import {
 
 const MODEL_TIERS = [
   {
-    id: 'llama-3.1-8b-instant',
+    id: 'google/gemma-4-26b-a4b-it:free',
     name: 'Rapide',
-    description: 'Réponses instantanées, idéal pour les tâches simples',
+    description: 'Reponses instantanees, ideal pour les taches simples',
     icon: Zap,
     iconBg: 'bg-emerald-500/10',
     iconColor: 'text-emerald-500',
@@ -40,19 +39,19 @@ const MODEL_TIERS = [
     badgeColor: 'bg-emerald-500/10 text-emerald-500',
   },
   {
-    id: 'llama-3.3-70b-versatile',
+    id: 'google/gemma-4-31b-it:free',
     name: 'Raisonnement',
-    description: 'Bon équilibre entre qualité et vitesse',
+    description: 'Bon equilibre entre qualite et vitesse',
     icon: Brain,
     iconBg: 'bg-blue-500/10',
     iconColor: 'text-blue-500',
-    badge: 'Recommandé',
+    badge: 'Recommande',
     badgeColor: 'bg-blue-500/10 text-blue-500',
   },
   {
-    id: 'deepseek-r1-distill-llama-70b',
+    id: 'nvidia/nemotron-3-super-120b-a12b:free',
     name: 'Pro',
-    description: 'Meilleur modèle pour les tâches complexes',
+    description: 'Modele le plus puissant disponible',
     icon: Crown,
     iconBg: 'bg-amber-500/10',
     iconColor: 'text-amber-500',
@@ -244,20 +243,19 @@ export default function FakturAIPage() {
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="text-base font-semibold text-foreground">Faktur AI</h2>
-                  <span className="px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-500 text-[10px] font-semibold uppercase tracking-wide animate-pulse">Bêta</span>
                 </div>
-                <p className="text-xs text-muted-foreground">Propulsé par Groq</p>
+                <p className="text-xs text-muted-foreground">Assistant IA integre</p>
               </div>
             </div>
           </div>
 
-          {/* Beta info banner */}
-          <div className="flex items-start gap-3 rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-4 mb-4">
-            <FlaskConical className="h-4 w-4 text-yellow-500 shrink-0 mt-0.5" />
+          {/* Info banner */}
+          <div className="flex items-start gap-3 rounded-xl border border-indigo-500/20 bg-indigo-500/5 p-4 mb-4">
+            <Sparkles className="h-4 w-4 text-indigo-500 shrink-0 mt-0.5" />
             <div className="space-y-1">
-              <p className="text-xs font-medium text-yellow-500">Fonctionnalité en bêta</p>
+              <p className="text-xs font-medium text-indigo-500">Faktur AI</p>
               <p className="text-xs text-foreground/80 leading-relaxed">
-                Faktur AI est en développement actif. L&apos;assistant vous aide à modifier, analyser et optimiser vos factures et devis grâce à l&apos;intelligence artificielle.
+                Faktur AI vous aide a modifier, analyser et optimiser vos factures et devis grace a l&apos;intelligence artificielle. 100% gratuit, aucune cle API requise.
               </p>
             </div>
           </div>
@@ -271,7 +269,6 @@ export default function FakturAIPage() {
               <div>
                 <div className="flex items-center gap-2">
                   <p className="text-sm font-medium text-foreground">Activer Faktur AI</p>
-                  <span className="px-1.5 py-0.5 rounded-full bg-yellow-500/10 text-yellow-500 text-[8px] font-semibold uppercase">Bêta</span>
                 </div>
                 <p className="text-xs text-muted-foreground">Active Faktur AI dans toute l&apos;application</p>
               </div>
@@ -445,8 +442,8 @@ export default function FakturAIPage() {
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-500/10">
-                    <GroqIcon className="h-4.5 w-4.5 text-orange-500" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-500/10">
+                    <Sparkles className="h-4.5 w-4.5 text-blue-500" />
                   </div>
                   <div>
                     <h2 className="text-sm font-semibold text-foreground">Modèle préféré</h2>
@@ -455,11 +452,11 @@ export default function FakturAIPage() {
                 </div>
 
                 {/* Provider info */}
-                <div className="rounded-xl border border-orange-500/20 bg-orange-500/5 p-3 mb-4">
+                <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-3 mb-4">
                   <div className="flex items-center gap-2.5">
-                    <GroqIcon className="h-4 w-4 text-orange-500 shrink-0" />
+                    <Sparkles className="h-4 w-4 text-blue-500 shrink-0" />
                     <p className="text-[11px] text-foreground/70">
-                      <span className="font-medium text-orange-500">Groq</span> — API intégrée, aucune configuration nécessaire
+                      <span className="font-medium text-indigo-500">Faktur AI</span> — 100% gratuit, aucune configuration necessaire
                     </p>
                   </div>
                 </div>
@@ -472,13 +469,13 @@ export default function FakturAIPage() {
                     return (
                       <button key={tier.id}
                         onClick={() => {
-                          updateSettings({ aiProvider: 'groq', aiModel: tier.id })
+                          updateSettings({ aiProvider: 'gemini', aiModel: tier.id })
                           toast(`Modèle ${tier.name} sélectionné`, 'success')
                         }}
                         className={`rounded-xl border-2 p-4 text-left transition-all relative group ${
                           isSelected
                             ? 'border-primary bg-primary/5 shadow-sm shadow-primary/10'
-                            : 'border-border hover:border-muted-foreground/30 hover:bg-muted/30'
+                            : 'border-border hover:border-muted-foreground/30 hover:bg-surface'
                         }`}>
                         {isSelected && (
                           <div className="absolute top-2.5 right-2.5">
@@ -529,7 +526,7 @@ export default function FakturAIPage() {
                         className={`rounded-xl border-2 p-4 text-left transition-all relative ${
                           isSelected
                             ? 'border-primary bg-primary/5 shadow-sm shadow-primary/10'
-                            : 'border-border hover:border-muted-foreground/30 hover:bg-muted/30'
+                            : 'border-border hover:border-muted-foreground/30 hover:bg-surface'
                         }`}>
                         {isSelected && (
                           <div className="absolute top-2.5 right-2.5">
@@ -619,38 +616,23 @@ export default function FakturAIPage() {
         )}
       </AnimatePresence>
 
-      {/* ═══ AI Beta Activation Modal ═══ */}
+      {/* ═══ AI Activation Modal ═══ */}
       <Dialog open={showAiBetaModal} onClose={() => setShowAiBetaModal(false)}>
         <div className="p-6 max-w-md">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20">
-              <Sparkles className="h-6 w-6 text-indigo-400" />
-            </div>
-            <div>
-              <DialogTitle className="flex items-center gap-2">
-                Activer Faktur AI
-                <span className="px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-500 text-[10px] font-semibold uppercase tracking-wide">Bêta</span>
-              </DialogTitle>
-              <DialogDescription>Assistant intelligent pour vos documents</DialogDescription>
-            </div>
-          </div>
+          <DialogHeader onClose={() => setShowAiBetaModal(false)} icon={<Sparkles className="h-5 w-5 text-accent" />}>
+            <DialogTitle>Activer Faktur AI</DialogTitle>
+            <DialogDescription>Assistant intelligent assistant intelligent integre</DialogDescription>
+          </DialogHeader>
           <div className="space-y-3 mb-6">
-            <div className="rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-4 space-y-2">
-              <div className="flex items-start gap-2">
-                <AlertTriangle className="h-4 w-4 text-yellow-500 shrink-0 mt-0.5" />
-                <p className="text-sm text-foreground leading-relaxed">
-                  Faktur AI est actuellement en <strong>version bêta</strong>. Les réponses générées par l&apos;IA peuvent contenir des erreurs ou des inexactitudes.
-                </p>
-              </div>
-            </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              En activant Faktur AI, vous pourrez utiliser l&apos;assistant dans l&apos;éditeur de factures et devis pour modifier, analyser et optimiser vos documents.
+              En activant Faktur AI, vous pourrez utiliser l&apos;assistant dans l&apos;editeur de factures et devis pour modifier, analyser et optimiser vos documents.
             </p>
             <div className="rounded-lg border border-border p-3 space-y-2">
               {[
-                'Vérifiez toujours les suggestions de l\'IA avant de les appliquer',
-                'Les données de vos documents ne quittent pas votre session',
-                'Vous pouvez désactiver l\'IA à tout moment',
+                'Verifiez toujours les suggestions de l\'IA avant de les appliquer',
+                'Les donnees de vos documents ne quittent pas votre session',
+                'Vous pouvez desactiver l\'IA a tout moment',
+                '100% gratuit — assistant intelligent integre',
               ].map((item) => (
                 <div key={item} className="flex items-start gap-2">
                   <Info className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
@@ -662,9 +644,9 @@ export default function FakturAIPage() {
           <DialogFooter>
             <Button variant="ghost" onClick={() => setShowAiBetaModal(false)}>Annuler</Button>
             <Button onClick={() => {
-              updateSettings({ aiEnabled: true, aiProvider: 'groq', aiModel: 'llama-3.3-70b-versatile' })
+              updateSettings({ aiEnabled: true, aiProvider: 'gemini', aiModel: 'nvidia/nemotron-3-super-120b-a12b:free' })
               setShowAiBetaModal(false)
-              toast('Faktur AI activé', 'success')
+              toast('Faktur AI active', 'success')
             }}
               className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white">
               <Sparkles className="h-4 w-4 mr-2" /> Activer Faktur AI

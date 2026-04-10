@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Field, FieldLabel, FieldDescription } from '@/components/ui/field'
-import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/toast'
 import { api } from '@/lib/api'
@@ -233,8 +233,8 @@ function OnboardingEmailContent() {
       <Card className="overflow-hidden border-border/50">
         <CardContent className="p-8">
           <motion.div variants={fadeUp} custom={0} className="flex flex-col items-center gap-4 text-center mb-6">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
-              <Mail className="h-8 w-8 text-primary" />
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-accent-soft">
+              <Mail className="h-8 w-8 text-accent" />
             </div>
             <div>
               <h1 className="text-2xl font-bold">Configurez votre email</h1>
@@ -304,7 +304,7 @@ function OnboardingEmailContent() {
                 <p className="text-sm text-muted-foreground">
                   Aucun compte email configuré
                 </p>
-                <p className="text-xs text-muted-foreground/60 mt-1">
+                <p className="text-xs text-muted-secondary mt-1">
                   Ajoutez un fournisseur pour commencer à envoyer des emails
                 </p>
               </div>
@@ -382,21 +382,18 @@ function OnboardingEmailContent() {
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.2 }}
             >
-              <div className="flex items-center justify-between mb-1">
+              <DialogHeader onClose={closeDialog} icon={<Mail className="h-5 w-5 text-accent" />}>
                 <DialogTitle>Choisir un fournisseur</DialogTitle>
-                <button onClick={closeDialog} className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-              <DialogDescription className="mb-6">
-                Sélectionnez le service que vous souhaitez utiliser pour envoyer vos emails.
-              </DialogDescription>
+                <DialogDescription>
+                  Sélectionnez le service que vous souhaitez utiliser pour envoyer vos emails.
+                </DialogDescription>
+              </DialogHeader>
 
               <div className="space-y-3">
                 <button
                   onClick={() => selectProvider('gmail')}
                   disabled={connecting}
-                  className="w-full flex items-center gap-4 rounded-xl border border-border p-4 hover:bg-muted/50 hover:border-red-500/30 transition-all text-left group"
+                  className="w-full flex items-center gap-4 rounded-xl border border-border p-4 hover:bg-surface-hover hover:border-red-500/30 transition-all text-left group"
                 >
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-red-500/10 group-hover:bg-red-500/15 transition-colors">
                     <Mail className="h-5 w-5 text-red-500" />
@@ -410,7 +407,7 @@ function OnboardingEmailContent() {
 
                 <button
                   onClick={() => selectProvider('resend')}
-                  className="w-full flex items-center gap-4 rounded-xl border border-border p-4 hover:bg-muted/50 hover:border-violet-500/30 transition-all text-left group"
+                  className="w-full flex items-center gap-4 rounded-xl border border-border p-4 hover:bg-surface-hover hover:border-violet-500/30 transition-all text-left group"
                 >
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-violet-500/10 group-hover:bg-violet-500/15 transition-colors">
                     <Zap className="h-5 w-5 text-violet-500" />
@@ -424,7 +421,7 @@ function OnboardingEmailContent() {
 
                 <button
                   onClick={() => selectProvider('smtp')}
-                  className="w-full flex items-center gap-4 rounded-xl border border-border p-4 hover:bg-muted/50 hover:border-blue-500/30 transition-all text-left group"
+                  className="w-full flex items-center gap-4 rounded-xl border border-border p-4 hover:bg-surface-hover hover:border-blue-500/30 transition-all text-left group"
                 >
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 group-hover:bg-blue-500/15 transition-colors">
                     <Server className="h-5 w-5 text-blue-500" />
@@ -451,7 +448,7 @@ function OnboardingEmailContent() {
               <div className="flex items-center gap-2 mb-1">
                 <button
                   onClick={() => { setDialogStep('choose'); setConfigError('') }}
-                  className="h-7 w-7 rounded-lg flex items-center justify-center hover:bg-muted/50 transition-colors"
+                  className="h-7 w-7 rounded-lg flex items-center justify-center hover:bg-surface-hover transition-colors"
                 >
                   <ArrowLeft className="h-4 w-4 text-muted-foreground" />
                 </button>
@@ -495,7 +492,7 @@ function OnboardingEmailContent() {
                     <p className="text-xs text-destructive mt-1">Ce champ est requis</p>
                   )}
                   <FieldDescription>
-                    Disponible dans votre <a href="https://resend.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">tableau de bord Resend</a>
+                    Disponible dans votre <a href="https://resend.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">tableau de bord Resend</a>
                   </FieldDescription>
                 </Field>
 
@@ -552,7 +549,7 @@ function OnboardingEmailContent() {
               <div className="flex items-center gap-2 mb-1">
                 <button
                   onClick={() => { setDialogStep('choose'); setConfigError('') }}
-                  className="h-7 w-7 rounded-lg flex items-center justify-center hover:bg-muted/50 transition-colors"
+                  className="h-7 w-7 rounded-lg flex items-center justify-center hover:bg-surface-hover transition-colors"
                 >
                   <ArrowLeft className="h-4 w-4 text-muted-foreground" />
                 </button>

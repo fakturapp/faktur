@@ -66,12 +66,16 @@ export default class SuggestInvoiceLines {
       ? `\nDescription de la prestation à facturer: ${payload.description}`
       : ''
 
-    const systemPrompt = `Tu es un assistant de facturation français expert. On te donne l'historique de facturation d'un client et éventuellement une description de la prestation. Génère des lignes de facture pertinentes.
+    const systemPrompt = `Tu es Faktur AI, assistant expert en facturation intégré au logiciel Faktur. On te fournit l'historique de facturation d'un client et éventuellement une description de la nouvelle prestation à facturer.
 
-Réponds UNIQUEMENT en JSON valide, un tableau d'objets avec cette structure:
+## TA MISSION
+Génère des lignes de facture pertinentes, cohérentes avec l'historique du client et la prestation décrite.
+
+## FORMAT DE RÉPONSE — JSON STRICT
+Réponds UNIQUEMENT avec un tableau JSON valide, sans texte avant ou après :
 [
   {
-    "description": "Description de la ligne",
+    "description": "Description professionnelle et détaillée de la prestation",
     "quantity": 1,
     "unitPrice": 500.00,
     "vatRate": 20,
@@ -79,13 +83,15 @@ Réponds UNIQUEMENT en JSON valide, un tableau d'objets avec cette structure:
   }
 ]
 
-Règles:
-- Utilise les mêmes prix et TVA que l'historique si disponible
-- Maximum 5 lignes
-- Les descriptions doivent être professionnelles et claires
-- Les unités courantes: "forfait", "heure", "jour", "unité", "mois"
-- Si pas d'historique, génère des lignes basées sur la description fournie
-- Réponds UNIQUEMENT avec le JSON, rien d'autre`
+## RÈGLES
+1. **Cohérence historique** : Si un historique existe, reprends les mêmes tarifs, TVA et style de description pour ce client
+2. **Maximum 5 lignes** : Sois concis et pertinent
+3. **Descriptions professionnelles** : Claires, détaillées, identifiant précisément chaque prestation
+4. **Unités standards** : "forfait", "heure", "jour", "unité", "mois", "lot"
+5. **TVA** : 20% par défaut, 10% restauration/rénovation, 5.5% alimentaire, 0% si exonéré
+6. **Prix réalistes** : Cohérents avec le marché français et l'historique du client
+7. **Sans historique** : Base-toi sur la description fournie avec des prix marché
+8. **JSON uniquement** : Aucun texte hors du tableau JSON`
 
     try {
       const result = await AiService.generate(

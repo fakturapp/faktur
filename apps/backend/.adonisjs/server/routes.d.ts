@@ -53,6 +53,9 @@ export type ScannedRoutes = {
     'passkey_register_verify': { paramsTuple?: []; params?: {} }
     'passkey_list': { paramsTuple?: []; params?: {} }
     'passkey_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'list_user_oauth_apps': { paramsTuple?: []; params?: {} }
+    'revoke_user_oauth_app': { paramsTuple: [ParamValue]; params: {'authorizationId': ParamValue} }
+    'revoke_user_oauth_session': { paramsTuple: [ParamValue]; params: {'tokenId': ParamValue} }
     'create_team': { paramsTuple?: []; params?: {} }
     'create_company': { paramsTuple?: []; params?: {} }
     'skip_company': { paramsTuple?: []; params?: {} }
@@ -205,6 +208,12 @@ export type ScannedRoutes = {
     'admin_feedbacks': { paramsTuple?: []; params?: {} }
     'admin_bug_reports.index': { paramsTuple?: []; params?: {} }
     'admin_bug_reports.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'list_oauth_apps': { paramsTuple?: []; params?: {} }
+    'create_oauth_app': { paramsTuple?: []; params?: {} }
+    'update_oauth_app': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'destroy_oauth_app': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'rotate_oauth_app_secrets': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'revoke_oauth_app_sessions': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'analytics_ingest': { paramsTuple?: []; params?: {} }
     'analytics_consent': { paramsTuple?: []; params?: {} }
     'analytics_overview': { paramsTuple?: []; params?: {} }
@@ -237,6 +246,11 @@ export type ScannedRoutes = {
     'checkout_download_pdf': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'checkout_create_intent': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'stripe_webhook': { paramsTuple?: []; params?: {} }
+    'authorize.show': { paramsTuple?: []; params?: {} }
+    'authorize.consent': { paramsTuple?: []; params?: {} }
+    'token': { paramsTuple?: []; params?: {} }
+    'revoke': { paramsTuple?: []; params?: {} }
+    'exchange_session': { paramsTuple?: []; params?: {} }
     'create_feedback': { paramsTuple?: []; params?: {} }
     'my_feedback': { paramsTuple?: []; params?: {} }
     'create_bug_report': { paramsTuple?: []; params?: {} }
@@ -276,6 +290,8 @@ export type ScannedRoutes = {
     'unlink_provider': { paramsTuple?: []; params?: {} }
     'passkey_register_options': { paramsTuple?: []; params?: {} }
     'passkey_register_verify': { paramsTuple?: []; params?: {} }
+    'revoke_user_oauth_app': { paramsTuple: [ParamValue]; params: {'authorizationId': ParamValue} }
+    'revoke_user_oauth_session': { paramsTuple: [ParamValue]; params: {'tokenId': ParamValue} }
     'create_team': { paramsTuple?: []; params?: {} }
     'create_company': { paramsTuple?: []; params?: {} }
     'skip_company': { paramsTuple?: []; params?: {} }
@@ -322,6 +338,9 @@ export type ScannedRoutes = {
     'generate_reminder': { paramsTuple?: []; params?: {} }
     'generate_document': { paramsTuple?: []; params?: {} }
     'chat_document': { paramsTuple?: []; params?: {} }
+    'create_oauth_app': { paramsTuple?: []; params?: {} }
+    'rotate_oauth_app_secrets': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'revoke_oauth_app_sessions': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'analytics_ingest': { paramsTuple?: []; params?: {} }
     'analytics_consent': { paramsTuple?: []; params?: {} }
     'share_create': { paramsTuple?: []; params?: {} }
@@ -333,6 +352,10 @@ export type ScannedRoutes = {
     'checkout_mark_paid': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'checkout_create_intent': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'stripe_webhook': { paramsTuple?: []; params?: {} }
+    'authorize.consent': { paramsTuple?: []; params?: {} }
+    'token': { paramsTuple?: []; params?: {} }
+    'revoke': { paramsTuple?: []; params?: {} }
+    'exchange_session': { paramsTuple?: []; params?: {} }
     'create_feedback': { paramsTuple?: []; params?: {} }
     'create_bug_report': { paramsTuple?: []; params?: {} }
   }
@@ -346,6 +369,7 @@ export type ScannedRoutes = {
     'deletion_teams': { paramsTuple?: []; params?: {} }
     'list_providers': { paramsTuple?: []; params?: {} }
     'passkey_list': { paramsTuple?: []; params?: {} }
+    'list_user_oauth_apps': { paramsTuple?: []; params?: {} }
     'search_company': { paramsTuple?: []; params?: {} }
     'dashboard.index': { paramsTuple?: []; params?: {} }
     'dashboard.stats': { paramsTuple?: []; params?: {} }
@@ -409,6 +433,7 @@ export type ScannedRoutes = {
     'ai_quota': { paramsTuple?: []; params?: {} }
     'admin_feedbacks': { paramsTuple?: []; params?: {} }
     'admin_bug_reports.index': { paramsTuple?: []; params?: {} }
+    'list_oauth_apps': { paramsTuple?: []; params?: {} }
     'analytics_overview': { paramsTuple?: []; params?: {} }
     'analytics_pages': { paramsTuple?: []; params?: {} }
     'analytics_features': { paramsTuple?: []; params?: {} }
@@ -424,6 +449,7 @@ export type ScannedRoutes = {
     'checkout_show': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'checkout_get_iban': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'checkout_download_pdf': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'authorize.show': { paramsTuple?: []; params?: {} }
     'my_feedback': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
@@ -436,6 +462,7 @@ export type ScannedRoutes = {
     'deletion_teams': { paramsTuple?: []; params?: {} }
     'list_providers': { paramsTuple?: []; params?: {} }
     'passkey_list': { paramsTuple?: []; params?: {} }
+    'list_user_oauth_apps': { paramsTuple?: []; params?: {} }
     'search_company': { paramsTuple?: []; params?: {} }
     'dashboard.index': { paramsTuple?: []; params?: {} }
     'dashboard.stats': { paramsTuple?: []; params?: {} }
@@ -499,6 +526,7 @@ export type ScannedRoutes = {
     'ai_quota': { paramsTuple?: []; params?: {} }
     'admin_feedbacks': { paramsTuple?: []; params?: {} }
     'admin_bug_reports.index': { paramsTuple?: []; params?: {} }
+    'list_oauth_apps': { paramsTuple?: []; params?: {} }
     'analytics_overview': { paramsTuple?: []; params?: {} }
     'analytics_pages': { paramsTuple?: []; params?: {} }
     'analytics_features': { paramsTuple?: []; params?: {} }
@@ -514,6 +542,7 @@ export type ScannedRoutes = {
     'checkout_show': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'checkout_get_iban': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'checkout_download_pdf': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'authorize.show': { paramsTuple?: []; params?: {} }
     'my_feedback': { paramsTuple?: []; params?: {} }
   }
   PUT: {
@@ -536,6 +565,7 @@ export type ScannedRoutes = {
     'recurring_invoice_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'reminder_settings_update': { paramsTuple?: []; params?: {} }
     'expense_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'update_oauth_app': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   DELETE: {
     'session_revoke': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -558,6 +588,7 @@ export type ScannedRoutes = {
     'recurring_invoice_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'expense_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'expense_category_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'destroy_oauth_app': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'share_revoke': { paramsTuple: [ParamValue]; params: {'shareId': ParamValue} }
     'link_destroy': { paramsTuple: [ParamValue]; params: {'linkId': ParamValue} }
     'payment_link_delete': { paramsTuple: [ParamValue]; params: {'invoiceId': ParamValue} }

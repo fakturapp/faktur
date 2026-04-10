@@ -9,6 +9,7 @@ import { MarkdownRenderer, ModificationBlock } from '@/components/ui/markdown-re
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
+import { measureTextBlock, resolveFont } from '@/lib/pretext'
 import {
   Send,
   Sparkles,
@@ -22,7 +23,7 @@ import {
   ArrowLeft,
   RotateCcw,
 } from 'lucide-react'
-import { GroqIcon } from '@/components/icons/groq-icon'
+import { GeminiIcon } from '@/components/icons/gemini-icon'
 import {
   type ChatMode,
   type ChatMessage,
@@ -46,29 +47,16 @@ function nextMsgId() {
   return `msg_${Date.now()}_${++messageIdCounter}`
 }
 
-// ─── Thinking steps per mode ────────────────────────────────────────
-const THINKING_STEPS: Record<ChatMode, string[]> = {
-  edition: [
-    'Analyse de votre demande...',
-    'Lecture du document actuel...',
-    'Application des modifications...',
-    'Vérification de la cohérence...',
-    'Finalisation du document...',
-  ],
-  question: [
-    'Analyse de votre question...',
-    'Vérification des règles légales...',
-    'Consultation du Code de commerce...',
-    'Rédaction de la réponse...',
-  ],
-  libre: [
-    'Analyse de votre instruction...',
-    'Création des éléments...',
-    'Ajout des lignes de facturation...',
-    'Calcul des montants...',
-    'Finalisation des modifications...',
-  ],
-}
+// ─── AI model constants ─────────────────────────────────────────────
+const DEFAULT_AI_MODEL = 'nvidia/nemotron-3-super-120b-a12b:free'
+const VALID_MODELS = [
+  'google/gemma-4-26b-a4b-it:free',
+  'google/gemma-4-31b-it:free',
+  'nvidia/nemotron-3-super-120b-a12b:free',
+]
+
+// ─── Thinking label ─────────────────────────────────────────────────
+const THINKING_LABEL = 'Réflexion en cours...'
 
 // ─── Props ───────────────────────────────────────────────────────────────
 
@@ -117,17 +105,18 @@ export function AiChatSidebar({
   // ─── State ──────────────────────────────────────────────────────────
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
-      id: nextMsgId(),
+      id: 'welcome',
       role: 'assistant',
-      content: `Bonjour ! Je suis **Faktur AI**. Choisissez un **mode** pour commencer :\n\n- **Édition** : Modifier le contenu du document\n- **Question** : Poser des questions de conformité\n- **Libre** : Instructions libres avec suggestions`,
+      content: `Bonjour ! Je suis **Faktur AI**. Choisissez un **mode** pour commencer :\n\n- **Édition** : Modifier le contenu du document\n- **Question** : Poser des questions\n- **Libre** : Instructions libres`,
       mode: 'edition',
       timestamp: Date.now(),
     },
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
-  const [thinkingStep, setThinkingStep] = useState(0)
-  const [chatModel, setChatModel] = useState(settings.aiModel || 'llama-3.3-70b-versatile')
+  const [chatModel, setChatModel] = useState(
+    VALID_MODELS.includes(settings.aiModel) ? settings.aiModel : DEFAULT_AI_MODEL
+  )
   const [chatMode, setChatMode] = useState<ChatMode>('edition')
   const detailLevel = 'complet' as const
   const [showSettings, setShowSettings] = useState(false)
@@ -138,7 +127,6 @@ export function AiChatSidebar({
   const settingsBtnRef = useRef<HTMLButtonElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
-  const thinkingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const lastUserMessageRef = useRef<string>('')
 
   // ─── Expose retry to parent ─────────────────────────────────────────
@@ -159,34 +147,14 @@ export function AiChatSidebar({
     }
   }, [])
 
+
+
   // ─── Auto-scroll ────────────────────────────────────────────────────
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
-  }, [messages, loading, thinkingStep])
-
-  // ─── Thinking step cycling ──────────────────────────────────────────
-  useEffect(() => {
-    if (loading) {
-      setThinkingStep(0)
-      thinkingTimerRef.current = setInterval(() => {
-        setThinkingStep((prev) => {
-          const steps = THINKING_STEPS[chatMode]
-          return prev < steps.length - 1 ? prev + 1 : prev
-        })
-      }, 2200)
-    } else {
-      if (thinkingTimerRef.current) {
-        clearInterval(thinkingTimerRef.current)
-        thinkingTimerRef.current = null
-      }
-      setThinkingStep(0)
-    }
-    return () => {
-      if (thinkingTimerRef.current) clearInterval(thinkingTimerRef.current)
-    }
-  }, [loading, chatMode])
+  }, [messages, loading])
 
   // ─── Position dropdown above the button, smart overflow ─────────────
   useLayoutEffect(() => {
@@ -299,7 +267,7 @@ export function AiChatSidebar({
       onProcessingChange?.(true)
     }
 
-    saveChatPreferences({ provider: 'groq', model: chatModel, mode: chatMode })
+    saveChatPreferences({ provider: 'gemini', model: chatModel, mode: chatMode })
 
     const { data, error } = await api.post<{
       message: string
@@ -316,7 +284,7 @@ export function AiChatSidebar({
       clientContext: buildClientContext(),
       type: documentType,
       detailLevel,
-      provider: 'groq',
+      provider: 'gemini',
       model: chatModel,
       mode: chatMode,
       source: 'faktur',
@@ -398,15 +366,23 @@ export function AiChatSidebar({
 
   function handleInputChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
     setInput(e.target.value)
-    e.target.style.height = 'auto'
-    e.target.style.height = Math.min(e.target.scrollHeight, 100) + 'px'
+    try {
+      const font = resolveFont()
+      const width = e.target.clientWidth || 280
+      const measured = measureTextBlock(e.target.value, font, 'base', 1.5, width)
+      e.target.style.height = 'auto'
+      e.target.style.height = Math.min(Math.max(measured.height + 16, 36), 100) + 'px'
+    } catch {
+      e.target.style.height = 'auto'
+      e.target.style.height = Math.min(e.target.scrollHeight, 100) + 'px'
+    }
   }
 
   // ─── Derived ───────────────────────────────────────────────────────
   const currentMode = CHAT_MODES.find((m) => m.id === chatMode)!
   const CurrentModeIcon = MODE_ICONS[chatMode]
-  const currentModelName = CHAT_MODELS.groq?.find(m => m.id === chatModel)?.name || 'Raisonnement'
-  const thinkingText = THINKING_STEPS[chatMode][thinkingStep] || 'Réflexion...'
+  const currentModelName = CHAT_MODELS.gemini?.find(m => m.id === chatModel)?.name || 'Raisonnement'
+  const thinkingText = THINKING_LABEL
   // ─── Settings dropdown rendered via portal ─────────────────────────
   const settingsDropdown = (
     <AnimatePresence>
@@ -441,12 +417,12 @@ export function AiChatSidebar({
                     onClick={() => setSettingsMenu('model')}
                     className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left hover:bg-muted/50 transition-all"
                   >
-                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-orange-500/10">
-                      <GroqIcon className="h-3.5 w-3.5 text-orange-500" />
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10">
+                      <GeminiIcon className="h-3.5 w-3.5 text-blue-500" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-[11px] font-medium text-foreground">Modèle</div>
-                      <div className="text-[9px] text-muted-foreground">Groq &middot; {currentModelName}</div>
+                      <div className="text-[9px] text-muted-foreground">{currentModelName}</div>
                     </div>
                     <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/40 shrink-0" />
                   </button>
@@ -490,7 +466,7 @@ export function AiChatSidebar({
                     <ArrowLeft className="h-3 w-3" />
                     Modèle
                   </button>
-                  {CHAT_MODELS.groq?.map((m) => {
+                  {CHAT_MODELS.gemini?.map((m) => {
                     const isActive = chatModel === m.id
                     return (
                       <button
@@ -579,9 +555,9 @@ export function AiChatSidebar({
   )
 
   return (
-    <div className="flex flex-col h-[calc(100vh-200px)] max-h-[600px] rounded-2xl border border-border bg-card/50">
+    <div className="flex flex-col h-[calc(100vh-200px)] max-h-[600px] rounded-[2rem] border border-border/40 bg-card/40 backdrop-blur-2xl liquid-glass relative overflow-hidden">
       {/* ─── Header ─────────────────────────────────────────────── */}
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
+      <div className="flex items-center gap-2 px-5 py-4 border-b border-border/40 bg-card/20 backdrop-blur-md relative z-10">
         <Sparkles className="h-4 w-4 text-purple-500 shrink-0" />
         <span className="text-sm font-semibold text-foreground shrink-0">Faktur AI</span>
 
@@ -680,37 +656,16 @@ export function AiChatSidebar({
             <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-purple-500/10 mt-0.5">
               <Sparkles className="h-3 w-3 text-purple-500 animate-pulse" />
             </div>
-            <div className="bg-muted/50 rounded-xl px-3 py-2.5 space-y-1.5 min-w-[180px]">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={thinkingStep}
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -4 }}
-                  transition={{ duration: 0.2 }}
-                  className="flex items-center gap-2"
-                >
-                  <Spinner className="h-3 w-3 shrink-0" />
-                  <ShinyText
-                    text={thinkingText}
-                    className="text-xs font-medium"
-                    color="#a78bfa"
-                    shineColor="#e0e7ff"
-                    speed={1.5}
-                  />
-                </motion.div>
-              </AnimatePresence>
-              {/* Progress dots */}
-              <div className="flex items-center gap-1 pl-5">
-                {THINKING_STEPS[chatMode].map((_, i) => (
-                  <div
-                    key={i}
-                    className={cn(
-                      'h-1 w-1 rounded-full transition-all duration-300',
-                      i <= thinkingStep ? 'bg-purple-400' : 'bg-muted-foreground/20'
-                    )}
-                  />
-                ))}
+            <div className="bg-muted/50 rounded-xl px-3 py-2.5">
+              <div className="flex items-center gap-2">
+                <Spinner className="h-3 w-3 shrink-0" />
+                <ShinyText
+                  text={thinkingText}
+                  className="text-xs font-medium"
+                  color="#a78bfa"
+                  shineColor="#e0e7ff"
+                  speed={2}
+                />
               </div>
             </div>
           </motion.div>

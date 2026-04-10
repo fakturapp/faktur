@@ -18,6 +18,7 @@ import {
   type FakturDesktopCertificationStatus,
 } from '@/lib/is-desktop'
 import { DesktopUpdateCard } from '@/components/layout/desktop-update-card'
+import { WhatsNewModal } from '@/components/layout/whats-new-modal'
 import { VerifiedBadge } from '@/components/ui/verified-badge'
 import { Tooltip } from '@/components/ui/tooltip'
 import {
@@ -66,7 +67,10 @@ import {
   Trash2,
   FilePlus,
   ArrowRight,
+  GraduationCap,
+  Gift,
 } from 'lucide-react'
+import { useTutorialSafe } from '@/lib/tutorial-context'
 
 interface TeamListItem {
   id: string
@@ -133,10 +137,10 @@ const mainNav: NavItem[] = [
     ],
   },
   { href: '/dashboard/credit-notes', label: 'Avoirs', icon: FileMinus2 },
-  { href: '/dashboard/recurring-invoices', label: 'Recurrences', icon: RefreshCw },
+  { href: '/dashboard/recurring-invoices', label: 'Récurrences', icon: RefreshCw },
   { href: '/dashboard/clients', label: 'Clients', icon: Users },
   { href: '/dashboard/products', label: 'Produits', icon: Package },
-  { href: '/dashboard/expenses', label: 'Depenses', icon: Wallet },
+  { href: '/dashboard/expenses', label: 'Dépenses', icon: Wallet },
 ]
 
 const settingsNav: NavItem[] = [
@@ -257,9 +261,14 @@ function NavLink({ item, pathname, badges, persistKey, collapsed }: { item: NavI
     isActive ? 'text-primary' : 'opacity-70'
   )
 
+  const tutorialMap: Record<string, string> = {
+    '/dashboard': 'nav-dashboard', '/dashboard/invoices': 'nav-invoices', '/dashboard/quotes': 'nav-quotes',
+    '/dashboard/clients': 'nav-clients', '/dashboard/products': 'nav-products', '/dashboard/expenses': 'nav-expenses',
+  }
+
   if (!hasChildren) {
     return (
-      <Link href={item.href} className={rowClass}>
+      <Link href={item.href} className={rowClass} data-tutorial={tutorialMap[item.href]}>
         <item.icon className={iconClass} />
         {!collapsed && (
           <motion.span {...labelFade} className="whitespace-nowrap">
@@ -339,6 +348,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
   const router = useRouter()
   const { theme, setTheme } = useTheme()
   const [convertModalOpen, setConvertModalOpen] = useState(false)
+  const [whatsNewOpen, setWhatsNewOpen] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
 
   const [desktop, setDesktop] = useState<{ is: boolean; version: string | null }>({
@@ -375,10 +385,11 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
 
   return (
     <aside
+      data-tutorial="sidebar"
       onMouseEnter={collapsedProp ? () => setIsHovered(true) : undefined}
       onMouseLeave={collapsedProp ? () => setIsHovered(false) : undefined}
       className={cn(
-        'fixed left-0 top-0 z-40 flex h-screen flex-col bg-sidebar border-r border-sidebar-border rounded-r-[2rem] shadow-2xl overflow-hidden transition-[width] duration-300 ease-out',
+        'fixed left-0 top-0 z-40 flex h-screen flex-col bg-sidebar border-r border-sidebar-border rounded-r-[2rem] shadow-2xl overflow-hidden transition-[width] duration-300 ease-out will-change-[width]',
         collapsed ? 'w-16' : 'w-(--sidebar-width)'
       )}
     >
@@ -472,7 +483,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             exit={{ opacity: 0, x: 20 }}
             transition={{ duration: 0.25, ease: 'easeInOut' }}
           >
-            {}
+            { }
             <div className="px-3 pt-4 pb-3">
               <div className="flex items-center justify-center gap-2.5">
                 <img src="/logo.svg" alt={brandName} className="h-10 w-10 shrink-0 drop-shadow-sm" />
@@ -511,7 +522,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             transition={{ duration: 0.25, ease: 'easeInOut' }}
             className="flex flex-1 flex-col overflow-hidden"
           >
-            {}
+            { }
             <div className="px-3 pt-2 pb-1">
               <Link
                 href="/dashboard"
@@ -529,7 +540,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
               </Link>
             </div>
 
-            {}
+            { }
             <nav className={cn('flex-1 overflow-y-auto overflow-x-hidden px-3 py-1 space-y-0.5', collapsed && 'scrollbar-hidden')}>
               <NavLink
                 item={{ href: '/dashboard/admin', label: "Vue d'ensemble", icon: LayoutDashboard }}
@@ -567,7 +578,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             transition={{ duration: 0.25, ease: 'easeInOut' }}
             className="flex flex-1 flex-col overflow-hidden"
           >
-            {}
+            { }
             <div className="px-3 pt-2 pb-1">
               <Link
                 href="/dashboard"
@@ -585,7 +596,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
               </Link>
             </div>
 
-            {}
+            { }
             <nav className={cn('flex-1 overflow-y-auto overflow-x-hidden px-3 py-1 space-y-0.5', collapsed && 'scrollbar-hidden')}>
               {accountNav.map((item) => (
                 <NavLink key={item.href} item={item} pathname={pathname} persistKey="account" collapsed={collapsed} />
@@ -601,7 +612,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             transition={{ duration: 0.25, ease: 'easeInOut' }}
             className="flex flex-1 flex-col overflow-hidden"
           >
-            {}
+            { }
             <div className="px-3 pt-2 pb-1">
               <Link
                 href="/dashboard"
@@ -619,7 +630,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
               </Link>
             </div>
 
-            {}
+            { }
             <nav className={cn('flex-1 overflow-y-auto overflow-x-hidden px-3 py-1 space-y-0.5', collapsed && 'scrollbar-hidden')}>
               {settingsNav.map((item) => (
                 <NavLink key={item.href} item={item} pathname={pathname} persistKey="settings" collapsed={collapsed} />
@@ -635,12 +646,13 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             transition={{ duration: 0.25, ease: 'easeInOut' }}
             className="flex flex-1 flex-col overflow-hidden"
           >
-            {}
+            { }
             <div className="px-3 pt-2 pb-1">
               <Dropdown
                 align="left"
                 trigger={
                   <div
+                    data-tutorial="create-button"
                     className={cn(
                       'flex items-center justify-center rounded-lg text-[13px] font-semibold hover:bg-muted/40 dark:hover:bg-white/[0.04] transition-all cursor-pointer',
                       collapsed ? 'h-10 w-10 mx-auto' : 'gap-2 px-2.5 py-2'
@@ -678,7 +690,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
               </Dropdown>
             </div>
 
-            {}
+            { }
             <nav className={cn('flex-1 overflow-y-auto overflow-x-hidden px-3 py-1 space-y-0.5', collapsed && 'scrollbar-hidden')}>
               {mainNav.map((item) => (
                 <NavLink key={item.href} item={item} pathname={pathname} badges={badges} collapsed={collapsed} />
@@ -694,11 +706,30 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
         )}
       </AnimatePresence>
 
+      <div className="px-3 pb-1.5">
+        <button
+          type="button"
+          onClick={() => setWhatsNewOpen(true)}
+          className={cn(
+            'flex w-full items-center rounded-lg text-[13px] font-medium text-muted-foreground hover:bg-muted/40 dark:hover:bg-white/[0.04] hover:text-foreground transition-all duration-200',
+            collapsed ? 'justify-center h-10 w-10 mx-auto' : 'justify-start gap-2 px-2.5 py-2'
+          )}
+          title="Quoi de neuf"
+        >
+          <Gift className={cn('shrink-0 transition-all duration-200', collapsed ? 'h-5 w-5' : 'h-3.5 w-3.5')} />
+          {!collapsed && (
+            <motion.span {...labelFade} className="whitespace-nowrap">
+              Quoi de neuf ?
+            </motion.span>
+          )}
+        </button>
+      </div>
+
       <div className="mx-3 h-px bg-border" />
 
       {desktop.is && <DesktopUpdateCard collapsed={collapsed} />}
 
-      {}
+      { }
       <div className="p-2.5">
         <Dropdown
           align="left"
@@ -708,6 +739,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
           className="min-w-[260px]"
           trigger={
             <div
+              data-tutorial="user-dropdown"
               className={cn(
                 'flex items-center rounded-lg hover:bg-muted/40 dark:hover:bg-white/[0.04] transition-all duration-200',
                 collapsed ? 'justify-center h-10 w-10 mx-auto' : 'justify-start gap-2.5 px-2 py-2 w-full'
@@ -789,7 +821,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
 
           <DropdownSeparator />
 
-          {}
+          { }
           <DropdownSub
             trigger={
               <>
@@ -843,6 +875,14 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
               </>
             }
           >
+            <DropdownItem onClick={() => {
+              const tutorial = (window as any).__fakturTutorialOpen
+              if (typeof tutorial === 'function') tutorial()
+            }}>
+              <GraduationCap className="h-4 w-4" /> Didacticiel
+              <span className="ml-auto inline-flex items-center rounded-full bg-amber-500/10 px-1.5 py-0.5 text-[8px] font-bold text-amber-500 uppercase">Beta</span>
+            </DropdownItem>
+            <DropdownSeparator />
             <DropdownItem onClick={() => onOpenFeedback?.()}>
               <Star className="h-4 w-4" /> Laisser un avis
             </DropdownItem>
@@ -864,7 +904,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
 
           <DropdownSeparator />
 
-          <Link href="/dashboard/download">
+          <Link href="/download">
             <DropdownItem>
               <Download className="h-4 w-4" /> Installer l&apos;application
             </DropdownItem>
@@ -881,6 +921,11 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
       <CreateInvoiceModal
         open={convertModalOpen}
         onClose={() => setConvertModalOpen(false)}
+      />
+
+      <WhatsNewModal
+        open={whatsNewOpen}
+        onClose={() => setWhatsNewOpen(false)}
       />
     </aside>
   )

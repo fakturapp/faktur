@@ -10,12 +10,13 @@ import { Field, FieldGroup, FieldLabel, FieldDescription } from '@/components/ui
 import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/components/ui/toast'
 import { Spinner } from '@/components/ui/spinner'
-import { Select } from '@/components/ui/select'
+import { FormSelect } from '@/components/ui/dropdown'
 import { Badge } from '@/components/ui/badge'
 import { useCompanySettings } from '@/lib/company-settings-context'
 import { api } from '@/lib/api'
 import { StripeActivationModal } from '@/components/settings/stripe-activation-modal'
 import { SaveBar } from '@/components/ui/save-bar'
+import { CheckboxRoot, CheckboxControl, CheckboxIndicator, CheckboxContent } from '@/components/ui/checkbox'
 import { Receipt, Banknote, Coins, PenLine, Lock, CreditCard, Info, CheckCircle, Trash2, AlertTriangle } from 'lucide-react'
 
 export default function PaymentPage() {
@@ -100,7 +101,7 @@ export default function PaymentPage() {
           <Skeleton className="h-7 w-40" />
           <Skeleton className="h-4 w-64" />
         </div>
-        <div className="rounded-2xl border border-border/50 p-6 space-y-4">
+        <div className="rounded-xl bg-surface shadow-surface p-6 space-y-4">
           {[...Array(4)].map((_, i) => (
             <Skeleton key={i} className="h-16 w-full rounded-xl" />
           ))}
@@ -132,13 +133,18 @@ export default function PaymentPage() {
 
                 <Field>
                   <FieldLabel htmlFor="currency">Devise</FieldLabel>
-                  <Select id="currency" value={paymentForm.currency} onChange={(e) => setPaymentForm((p) => ({ ...p, currency: e.target.value }))}>
-                    <option value="EUR">EUR - Euro</option>
-                    <option value="USD">USD - Dollar américain</option>
-                    <option value="GBP">GBP - Livre sterling</option>
-                    <option value="CHF">CHF - Franc suisse</option>
-                    <option value="CAD">CAD - Dollar canadien</option>
-                  </Select>
+                  <FormSelect
+                    id="currency"
+                    value={paymentForm.currency}
+                    onChange={(v) => setPaymentForm((p) => ({ ...p, currency: v }))}
+                    options={[
+                      { value: 'EUR', label: 'EUR - Euro' },
+                      { value: 'USD', label: 'USD - Dollar américain' },
+                      { value: 'GBP', label: 'GBP - Livre sterling' },
+                      { value: 'CHF', label: 'CHF - Franc suisse' },
+                      { value: 'CAD', label: 'CAD - Dollar canadien' },
+                    ]}
+                  />
                   <FieldDescription>La devise utilisée par défaut sur vos factures et devis.</FieldDescription>
                 </Field>
 
@@ -156,53 +162,56 @@ export default function PaymentPage() {
                 <FieldDescription>Sélectionnez les moyens de paiement que vous souhaitez afficher sur vos factures.</FieldDescription>
 
                 <div className="space-y-3">
-                  <label className="flex items-center gap-4 rounded-xl border border-border p-4 cursor-pointer hover:bg-muted/30 transition-colors has-[:checked]:border-primary/40 has-[:checked]:bg-primary/5">
-                    <input type="checkbox" checked={paymentForm.paymentMethods.includes('bank_transfer')} onChange={() => togglePaymentMethod('bank_transfer')} className="sr-only" />
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                      <Banknote className="h-5 w-5 text-primary" />
+                  <CheckboxRoot 
+                    isSelected={paymentForm.paymentMethods.includes('bank_transfer')} 
+                    onChange={() => togglePaymentMethod('bank_transfer')} 
+                    className="flex items-center w-full gap-4 rounded-xl border border-border p-4 cursor-pointer hover:bg-surface transition-colors data-[selected=true]:border-primary/40 data-[selected=true]:bg-primary/5"
+                  >
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent-soft">
+                      <Banknote className="h-5 w-5 text-accent" />
                     </div>
-                    <div className="flex-1">
+                    <CheckboxContent className="flex-1 text-left">
                       <p className="text-sm font-medium text-foreground">Virement bancaire</p>
-                      <p className="text-xs text-muted-foreground">Vos coordonnées bancaires seront affichées sur la facture</p>
-                    </div>
-                    <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-colors ${paymentForm.paymentMethods.includes('bank_transfer') ? 'bg-primary border-primary' : 'border-muted-foreground/30'}`}>
-                      {paymentForm.paymentMethods.includes('bank_transfer') && (
-                        <svg className="h-3 w-3 text-primary-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                      )}
-                    </div>
-                  </label>
+                      <p className="text-xs text-muted-foreground mt-[1px]">Vos coordonnées bancaires seront affichées sur la facture</p>
+                    </CheckboxContent>
+                    <CheckboxControl>
+                      <CheckboxIndicator />
+                    </CheckboxControl>
+                  </CheckboxRoot>
 
-                  <label className="flex items-center gap-4 rounded-xl border border-border p-4 cursor-pointer hover:bg-muted/30 transition-colors has-[:checked]:border-primary/40 has-[:checked]:bg-primary/5">
-                    <input type="checkbox" checked={paymentForm.paymentMethods.includes('cash')} onChange={() => togglePaymentMethod('cash')} className="sr-only" />
+                  <CheckboxRoot 
+                    isSelected={paymentForm.paymentMethods.includes('cash')} 
+                    onChange={() => togglePaymentMethod('cash')} 
+                    className="flex items-center w-full gap-4 rounded-xl border border-border p-4 cursor-pointer hover:bg-surface transition-colors data-[selected=true]:border-primary/40 data-[selected=true]:bg-primary/5"
+                  >
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-green-500/10">
                       <Coins className="h-5 w-5 text-green-500" />
                     </div>
-                    <div className="flex-1">
+                    <CheckboxContent className="flex-1 text-left">
                       <p className="text-sm font-medium text-foreground">Espèces</p>
-                      <p className="text-xs text-muted-foreground">Paiement en espèces accepté</p>
-                    </div>
-                    <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-colors ${paymentForm.paymentMethods.includes('cash') ? 'bg-primary border-primary' : 'border-muted-foreground/30'}`}>
-                      {paymentForm.paymentMethods.includes('cash') && (
-                        <svg className="h-3 w-3 text-primary-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                      )}
-                    </div>
-                  </label>
+                      <p className="text-xs text-muted-foreground mt-[1px]">Paiement en espèces accepté</p>
+                    </CheckboxContent>
+                    <CheckboxControl>
+                      <CheckboxIndicator />
+                    </CheckboxControl>
+                  </CheckboxRoot>
 
-                  <label className="flex items-center gap-4 rounded-xl border border-border p-4 cursor-pointer hover:bg-muted/30 transition-colors has-[:checked]:border-primary/40 has-[:checked]:bg-primary/5">
-                    <input type="checkbox" checked={paymentForm.paymentMethods.includes('custom')} onChange={() => togglePaymentMethod('custom')} className="sr-only" />
+                  <CheckboxRoot 
+                    isSelected={paymentForm.paymentMethods.includes('custom')} 
+                    onChange={() => togglePaymentMethod('custom')} 
+                    className="flex items-center w-full gap-4 rounded-xl border border-border p-4 cursor-pointer hover:bg-surface transition-colors data-[selected=true]:border-primary/40 data-[selected=true]:bg-primary/5"
+                  >
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-yellow-500/10">
                       <PenLine className="h-5 w-5 text-yellow-500" />
                     </div>
-                    <div className="flex-1">
+                    <CheckboxContent className="flex-1 text-left">
                       <p className="text-sm font-medium text-foreground">Autre</p>
-                      <p className="text-xs text-muted-foreground">Définissez un moyen de paiement personnalisé</p>
-                    </div>
-                    <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-colors ${paymentForm.paymentMethods.includes('custom') ? 'bg-primary border-primary' : 'border-muted-foreground/30'}`}>
-                      {paymentForm.paymentMethods.includes('custom') && (
-                        <svg className="h-3 w-3 text-primary-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                      )}
-                    </div>
-                  </label>
+                      <p className="text-xs text-muted-foreground mt-[1px]">Définissez un moyen de paiement personnalisé</p>
+                    </CheckboxContent>
+                    <CheckboxControl>
+                      <CheckboxIndicator />
+                    </CheckboxControl>
+                  </CheckboxRoot>
 
                   {paymentForm.paymentMethods.includes('custom') && (
                     <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="pl-14">

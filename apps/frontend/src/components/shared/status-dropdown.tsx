@@ -15,6 +15,7 @@ import {
   Ban,
   AlertTriangle,
   CreditCard,
+  ChevronDown,
 } from 'lucide-react'
 
 interface StatusOption {
@@ -58,9 +59,10 @@ export function StatusDropdown({ id, currentStatus, options, endpoint, onStatusC
         align="left"
         trigger={
           fullWidth ? (
-            <div className={`flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg border text-sm font-semibold cursor-pointer transition-all shadow-sm hover:shadow ${current.color} ${current.bgColor} border-current/20 ${loading ? 'animate-pulse' : ''}`}>
+            <div className={`relative flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg border text-sm font-semibold cursor-pointer transition-all shadow-sm hover:shadow ${current.color} ${current.bgColor} border-current/20 ${loading ? 'animate-pulse' : ''}`}>
               {loading ? <Spinner className="h-4 w-4" /> : current.icon}
               {current.label}
+              <ChevronDown className="absolute right-4 h-4 w-4 opacity-50" />
             </div>
           ) : (
             <Badge
@@ -70,6 +72,7 @@ export function StatusDropdown({ id, currentStatus, options, endpoint, onStatusC
               <span className="flex items-center gap-1">
                 {current.icon}
                 {current.label}
+                <ChevronDown className="h-3 w-3 ml-0.5 opacity-70" />
               </span>
             </Badge>
           )

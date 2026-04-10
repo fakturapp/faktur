@@ -1,0 +1,197 @@
+@layer components {
+/* ============================================================
+ * Menu Item — Faktur DA, Revolut-style
+ *
+ * Non-nested selectors for maximum reliability. Strong hover
+ * contrast via --color-surface-secondary. Danger variant forces
+ * color inheritance on all descendants (label + svg icons).
+ * ============================================================ */
+
+.menu-item {
+  position: relative;
+  display: flex;
+  min-height: 2.5rem; /* 40px */
+  width: 100%;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  border-radius: var(--radius-xl);
+  padding: 0.625rem 0.75rem; /* py-2.5 px-3 */
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  cursor: var(--cursor-interactive);
+  letter-spacing: var(--tracking-ui);
+  color: var(--color-foreground);
+  background-color: transparent;
+
+  transition:
+    transform 250ms var(--ease-out-quad),
+    background-color 120ms var(--ease-smooth),
+    color 120ms var(--ease-smooth);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-item {
+    transition: none;
+  }
+}
+
+/* ============================================================
+ * Label & description slots
+ * ============================================================ */
+.menu-item [data-slot="label"] {
+  pointer-events: none;
+  width: fit-content;
+  user-select: none;
+  font-size: 14px;
+  font-weight: 400;
+  color: inherit;
+}
+
+.menu-item [data-slot="description"] {
+  pointer-events: none;
+  user-select: none;
+  text-wrap: wrap;
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+.menu-item [data-slot="submenu-indicator"] svg {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+/* ============================================================
+ * Indicator padding (when checkmark is present)
+ * ============================================================ */
+.menu-item:has(.menu-item__indicator) {
+  padding-left: 2.25rem; /* pl-9 */
+}
+
+.menu-item[data-has-submenu="true"]:has(.menu-item__indicator) {
+  padding-right: 2.25rem;
+  padding-left: 0.75rem;
+}
+
+/* ============================================================
+ * Interactive states (NON-NESTED for maximum reliability)
+ * ============================================================ */
+.menu-item:hover,
+.menu-item[data-hovered="true"],
+.menu-item[data-focused="true"]:not([data-disabled="true"]) {
+  background-color: var(--color-surface-secondary);
+  color: var(--color-foreground);
+}
+
+.menu-item:active,
+.menu-item[data-pressed="true"] {
+  transform: scale(0.98);
+}
+
+.menu-item:focus-visible:not(:focus),
+.menu-item[data-focus-visible="true"] {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+ * Selected state indicators
+ * ============================================================ */
+.menu-item[aria-checked="true"] [data-slot="menu-item-indicator--checkmark"],
+.menu-item[aria-selected="true"] [data-slot="menu-item-indicator--checkmark"],
+.menu-item[data-selected="true"] [data-slot="menu-item-indicator--checkmark"] {
+  transition: stroke-dashoffset 100ms linear;
+}
+
+.menu-item[aria-checked="true"] [data-slot="menu-item-indicator--dot"],
+.menu-item[aria-selected="true"] [data-slot="menu-item-indicator--dot"],
+.menu-item[data-selected="true"] [data-slot="menu-item-indicator--dot"] {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* ============================================================
+ * Disabled
+ * ============================================================ */
+.menu-item[data-disabled="true"] {
+  opacity: var(--disabled-opacity);
+  cursor: var(--cursor-disabled);
+  pointer-events: none;
+}
+
+/* ============================================================
+ * Checkmark / dot indicator
+ * ============================================================ */
+.menu-item__indicator {
+  position: absolute;
+  top: 50%;
+  left: 0.75rem;
+  display: flex;
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  transform: translateY(-50%);
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent);
+  transition-duration: 250ms;
+}
+
+.menu-item[data-has-submenu="true"] .menu-item__indicator {
+  right: 0.75rem;
+  left: auto;
+}
+
+.menu-item__indicator [data-slot="menu-item-indicator--checkmark"] {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.menu-item__indicator [data-slot="menu-item-indicator--dot"] {
+  width: 0.5rem;
+  height: 0.5rem;
+  transform: scale(0.7);
+  opacity: 0;
+}
+
+.menu-item__indicator--submenu {
+  color: var(--color-muted);
+}
+
+.menu-item__indicator--submenu svg {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+/* ============================================================
+ * Default variant (no overrides)
+ * ============================================================ */
+.menu-item--default {
+  /* default */
+}
+
+/* ============================================================
+ * Danger variant — full color inheritance to icons AND labels
+ * ============================================================ */
+.menu-item--danger {
+  color: var(--color-danger);
+}
+
+.menu-item--danger [data-slot="label"],
+.menu-item--danger svg,
+.menu-item--danger .menu-item__indicator {
+  color: var(--color-danger);
+}
+
+.menu-item--danger:hover,
+.menu-item--danger[data-hovered="true"],
+.menu-item--danger[data-focused="true"]:not([data-disabled="true"]) {
+  background-color: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.menu-item--danger:hover svg,
+.menu-item--danger[data-hovered="true"] svg {
+  color: var(--color-danger);
+}
+}

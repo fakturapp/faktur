@@ -1,0 +1,52 @@
+@layer components {
+/* Close Button — copied from HeroUI v3 */
+
+.close-button {
+  @apply relative isolate inline-flex size-8 shrink-0 origin-center items-center justify-center rounded-full p-1 select-none no-highlight;
+
+  cursor: var(--cursor-interactive);
+
+  transition:
+    transform 250ms var(--ease-out-quad),
+    color 150ms var(--ease-out),
+    background-color 100ms var(--ease-out),
+    box-shadow 150ms var(--ease-out);
+  @apply transform-gpu motion-reduce:transition-none;
+
+  &:focus-visible:not(:focus),
+  &[data-focus-visible="true"] {
+    @apply status-focused;
+  }
+
+  &:disabled,
+  &[aria-disabled="true"] {
+    @apply status-disabled;
+  }
+
+  &[data-pending="true"] {
+    @apply status-pending;
+  }
+
+  & svg {
+    @apply pointer-events-none size-4 shrink-0 self-center;
+  }
+}
+
+.close-button--default {
+  background-color: var(--color-surface);
+  color: var(--color-muted);
+
+  @media (hover: hover) {
+    &:hover,
+    &[data-hovered="true"] {
+      background-color: var(--color-surface-hover);
+      color: var(--color-foreground);
+    }
+  }
+
+  &:active,
+  &[data-pressed="true"] {
+    transform: scale(0.93);
+  }
+}
+}

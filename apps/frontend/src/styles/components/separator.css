@@ -1,0 +1,49 @@
+@layer components {
+/* Separator — copied from HeroUI v3 */
+
+.separator {
+  @apply shrink-0 rounded-[4px] border-t-0 border-b-0;
+  background-color: var(--color-separator);
+  @apply h-px w-full;
+}
+
+.separator--horizontal {
+  @apply h-px w-full;
+}
+
+.separator--vertical {
+  @apply h-auto min-h-2 w-px self-stretch;
+}
+
+.separator--default {
+  background-color: var(--color-separator);
+}
+
+.separator--secondary {
+  background-color: var(--color-separator-secondary);
+}
+
+.separator--tertiary {
+  background-color: var(--color-separator-tertiary);
+}
+
+.separator__container {
+  @apply flex items-center gap-3;
+}
+
+.separator__container--horizontal {
+  @apply w-full flex-row;
+}
+
+.separator__container--vertical {
+  @apply h-full flex-col justify-center;
+}
+
+.separator__line {
+  @apply shrink-0 grow;
+}
+
+.separator__content {
+  @apply inline-flex items-center justify-center text-center whitespace-nowrap text-muted text-[12px];
+}
+}

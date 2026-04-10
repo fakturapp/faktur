@@ -375,7 +375,7 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
                   <button
                     onClick={handleDownloadPdf}
                     disabled={downloading}
-                    className="h-9 px-4 rounded-full bg-card shadow-lg flex items-center gap-2 text-sm font-medium transition-colors border border-border"
+                    className="h-9 px-4 rounded-full bg-overlay shadow-overlay flex items-center gap-2 text-sm font-medium transition-colors"
                   >
                     {downloading ? <Spinner className="h-4 w-4" /> : <Download className="h-4 w-4 text-muted-foreground" />}
                     <span className="text-foreground">{downloading ? 'Téléchargement...' : 'Télécharger'}</span>
@@ -383,7 +383,7 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
                   <button
                     onClick={handlePrint}
                     disabled={printing}
-                    className="h-9 px-4 rounded-full bg-card shadow-lg flex items-center gap-2 text-sm font-medium transition-colors border border-border"
+                    className="h-9 px-4 rounded-full bg-overlay shadow-overlay flex items-center gap-2 text-sm font-medium transition-colors"
                   >
                     {printing ? <Spinner className="h-4 w-4" /> : <Printer className="h-4 w-4 text-muted-foreground" />}
                     <span className="text-foreground">{printing ? 'Préparation...' : 'Imprimer'}</span>
@@ -399,7 +399,7 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: 320, opacity: 0 }}
             transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
-            className="w-[320px] shrink-0 bg-card border-l border-border flex flex-col overflow-hidden rounded-l-2xl"
+            className="w-[320px] shrink-0 bg-overlay border-l border-separator flex flex-col overflow-hidden rounded-l-2xl"
           >
             {loading ? (
               <div className="flex-1 flex items-center justify-center">
@@ -408,11 +408,11 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
             ) : quote ? (
               <>
                 {/* Header */}
-                <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-separator">
                   <h3 className="text-lg font-bold text-foreground">{quote.quoteNumber}</h3>
                   <button
                     onClick={onClose}
-                    className="h-7 w-7 rounded-full bg-card shadow flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors border border-border"
+                    className="h-7 w-7 rounded-full bg-overlay shadow-surface flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
@@ -437,7 +437,7 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
                   </div>
 
                   {/* Status */}
-                  <div className="px-5 py-3 border-b border-border">
+                  <div className="px-5 py-3 border-b border-separator">
                     <StatusDropdown
                       id={quote.id}
                       currentStatus={quote.status}
@@ -450,7 +450,7 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
 
                   {/* Expiry notice for expired quotes */}
                   {quote.status === 'expired' && (
-                    <div className="px-5 py-4 border-b border-border">
+                    <div className="px-5 py-4 border-b border-separator">
                       <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-3">
                         <div className="flex items-center gap-2 mb-1">
                           <Clock className="h-4 w-4 text-amber-500" />
@@ -464,10 +464,10 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
                   )}
 
                   {/* Client */}
-                  <div className="px-5 py-4 border-b border-border">
+                  <div className="px-5 py-4 border-b border-separator">
                     {quote.client ? (
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0">
+                        <div className="h-10 w-10 rounded-xl bg-accent-soft flex items-center justify-center text-accent font-bold text-sm shrink-0">
                           {quote.client.displayName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
                         </div>
                         <div className="min-w-0">
@@ -481,12 +481,12 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
                   </div>
 
                   {/* Actions */}
-                  <div className="px-5 py-4 border-b border-border space-y-1">
+                  <div className="px-5 py-4 border-b border-separator space-y-1">
                     <div className="relative group/send">
                       <button
                         onClick={handleSendEmail}
                         disabled={!hasEmailConfigured || quote.status !== 'draft'}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted/50 transition-colors disabled:opacity-40 disabled:cursor-default"
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-surface-hover transition-colors disabled:opacity-40 disabled:cursor-default"
                       >
                         <Send className="h-4 w-4" /> Envoyer le devis
                       </button>
@@ -505,7 +505,7 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
                       <button
                         onClick={handleReminder}
                         disabled={!hasEmailConfigured || quote.status === 'draft' || quote.status === 'accepted' || quote.status === 'refused'}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted/50 transition-colors disabled:opacity-40 disabled:cursor-default"
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-surface-hover transition-colors disabled:opacity-40 disabled:cursor-default"
                       >
                         <Send className="h-4 w-4" /> Relancer le client
                       </button>
@@ -522,7 +522,7 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
                     </div>
                     <button
                       onClick={() => setEmailHistoryOpen(true)}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted/50 transition-colors"
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-surface-hover transition-colors"
                     >
                       <History className="h-4 w-4" /> Historique des emails
                     </button>
@@ -531,7 +531,7 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
                     <Dropdown
                       align="left"
                       trigger={
-                        <button className="w-full flex items-center justify-center gap-2 mt-2 px-3 py-2 rounded-full bg-card shadow-sm text-sm font-semibold text-muted-foreground border border-border hover:text-foreground transition-colors">
+                        <button className="w-full flex items-center justify-center gap-2 mt-2 px-3 py-2 rounded-full bg-overlay shadow-surface text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors">
                           <MoreHorizontal className="h-4 w-4" /> Plus d&apos;actions
                         </button>
                       }
@@ -559,7 +559,7 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
                       placeholder="Ajouter un commentaire..."
                       value={comment}
                       onChange={(e) => handleCommentChange(e.target.value)}
-                      className="w-full rounded-lg border border-border bg-muted/30 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none resize-none focus:border-primary/50 transition-colors"
+                      className="w-full rounded-lg bg-field shadow-field px-3 py-2 text-sm text-field-foreground placeholder:text-field-placeholder outline-none resize-none focus:ring-2 focus:ring-accent/40 transition-colors"
                     />
                   </div>
                 </div>

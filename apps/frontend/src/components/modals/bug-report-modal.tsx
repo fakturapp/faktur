@@ -6,7 +6,7 @@ import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/componen
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Select } from '@/components/ui/select'
+import { FormSelect } from '@/components/ui/dropdown'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Spinner } from '@/components/ui/spinner'
 import { api } from '@/lib/api'
@@ -122,16 +122,17 @@ export function BugReportModal({ open, onClose }: BugReportModalProps) {
 
                 <Field>
                   <FieldLabel htmlFor="bugSeverity">Sévérité</FieldLabel>
-                  <Select
+                  <FormSelect
                     id="bugSeverity"
                     value={severity}
-                    onChange={(e) => setSeverity(e.target.value)}
-                  >
-                    <option value="low">Faible</option>
-                    <option value="medium">Moyenne</option>
-                    <option value="high">Haute</option>
-                    <option value="critical">Critique</option>
-                  </Select>
+                    onChange={setSeverity}
+                    options={[
+                      { value: 'low', label: 'Faible' },
+                      { value: 'medium', label: 'Moyenne' },
+                      { value: 'high', label: 'Haute' },
+                      { value: 'critical', label: 'Critique' },
+                    ]}
+                  />
                 </Field>
               </FieldGroup>
             </div>

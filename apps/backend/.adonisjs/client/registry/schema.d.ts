@@ -595,6 +595,42 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/passkeys/delete').default['handle']>>>
     }
   }
+  'list_user_oauth_apps': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/account/oauth-apps'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/account/oauth_apps/list').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/oauth_apps/list').default['handle']>>>
+    }
+  }
+  'revoke_user_oauth_app': {
+    methods: ["POST"]
+    pattern: '/api/v1/account/oauth-apps/:authorizationId/revoke'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { authorizationId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/account/oauth_apps/revoke_app').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/oauth_apps/revoke_app').default['handle']>>>
+    }
+  }
+  'revoke_user_oauth_session': {
+    methods: ["POST"]
+    pattern: '/api/v1/account/oauth-apps/sessions/:tokenId/revoke'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { tokenId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/account/oauth_apps/revoke_session').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/oauth_apps/revoke_session').default['handle']>>>
+    }
+  }
   'create_team': {
     methods: ["POST"]
     pattern: '/api/v1/onboarding/team'
@@ -2419,6 +2455,78 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/bug_reports').default['update']>>>
     }
   }
+  'list_oauth_apps': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/admin/oauth-apps'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/oauth_apps/list').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/oauth_apps/list').default['handle']>>>
+    }
+  }
+  'create_oauth_app': {
+    methods: ["POST"]
+    pattern: '/api/v1/admin/oauth-apps'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/oauth_validator').createOauthAppValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/oauth_validator').createOauthAppValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/oauth_apps/create').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/oauth_apps/create').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'update_oauth_app': {
+    methods: ["PUT"]
+    pattern: '/api/v1/admin/oauth-apps/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/oauth_validator').updateOauthAppValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/oauth_validator').updateOauthAppValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/oauth_apps/update').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/oauth_apps/update').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'destroy_oauth_app': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/admin/oauth-apps/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/oauth_apps/destroy').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/oauth_apps/destroy').default['handle']>>>
+    }
+  }
+  'rotate_oauth_app_secrets': {
+    methods: ["POST"]
+    pattern: '/api/v1/admin/oauth-apps/:id/rotate-secrets'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/oauth_apps/rotate_secrets').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/oauth_apps/rotate_secrets').default['handle']>>>
+    }
+  }
+  'revoke_oauth_app_sessions': {
+    methods: ["POST"]
+    pattern: '/api/v1/admin/oauth-apps/:id/revoke-sessions'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/oauth_apps/revoke_sessions').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/oauth_apps/revoke_sessions').default['handle']>>>
+    }
+  }
   'analytics_ingest': {
     methods: ["POST"]
     pattern: '/api/v1/analytics/ingest'
@@ -2801,6 +2909,66 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/webhooks/stripe_webhook').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/webhooks/stripe_webhook').default['handle']>>>
+    }
+  }
+  'authorize.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/oauth/authorize'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/oauth_validator').authorizeRequestValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/oauth/authorize').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/oauth/authorize').default['show']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'authorize.consent': {
+    methods: ["POST"]
+    pattern: '/api/v1/oauth/authorize/consent'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/oauth_validator').consentSubmitValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/oauth_validator').consentSubmitValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/oauth/authorize').default['consent']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/oauth/authorize').default['consent']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'token': {
+    methods: ["POST"]
+    pattern: '/api/v1/oauth/token'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/oauth_validator').tokenRequestValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/oauth_validator').tokenRequestValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/oauth/token').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/oauth/token').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'revoke': {
+    methods: ["POST"]
+    pattern: '/api/v1/oauth/revoke'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/oauth_validator').revokeRequestValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/oauth_validator').revokeRequestValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/oauth/revoke').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/oauth/revoke').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'exchange_session': {
+    methods: ["POST"]
+    pattern: '/api/v1/oauth/exchange-session'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/oauth/exchange_session').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/oauth/exchange_session').default['handle']>>>
     }
   }
   'create_feedback': {

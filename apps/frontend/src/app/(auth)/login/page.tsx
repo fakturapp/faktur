@@ -62,6 +62,7 @@ function LoginContent() {
   const [googleLoading, setGoogleLoading] = useState(false)
   const [passkeyLoading, setPasskeyLoading] = useState(false)
   const [turnstileToken, setTurnstileToken] = useState('')
+  const [redirecting, setRedirecting] = useState(false)
   const [isDesktop, setIsDesktop] = useState(false)
   const turnstileRef = useRef<TurnstileInstance>(null)
   const resetTurnstile = useCallback(() => {
@@ -87,6 +88,7 @@ function LoginContent() {
           return
         }
         login(token, data.user)
+        setRedirecting(true)
         router.push(getPostLoginRedirect(data.user.onboardingCompleted, searchParams.get('redirect')))
       })
     } else if (oauthError) {
@@ -136,6 +138,7 @@ function LoginContent() {
 
       if (data?.token && data?.user) {
         login(data.token, data.user, data.vaultKey)
+        setRedirecting(true)
         router.push(getPostLoginRedirect(data.user.onboardingCompleted, searchParams.get('redirect')))
       }
     } catch (err: any) {
@@ -162,6 +165,7 @@ function LoginContent() {
       if (err) return setError(err)
       if (data?.token) {
         login(data.token, data.user)
+        setRedirecting(true)
         router.push(getPostLoginRedirect(data.user.onboardingCompleted, searchParams.get('redirect')))
       }
       return
@@ -196,6 +200,7 @@ function LoginContent() {
 
     if (data?.token && data?.user) {
       login(data.token, data.user, data.vaultKey)
+      setRedirecting(true)
       router.push(getPostLoginRedirect(data.user.onboardingCompleted))
     }
   }
@@ -212,15 +217,30 @@ function LoginContent() {
     }
   }, [authLoading, user, searchParams, router])
 
+  if (redirecting) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="w-full max-w-sm mx-auto flex flex-col items-center justify-center py-20"
+      >
+        <Spinner size="lg" className="text-accent" />
+        <p className="mt-4 text-sm font-medium text-foreground">
+          Connexion en cours...
+        </p>
+      </motion.div>
+    )
+  }
+
   // Desktop shell detected — the email/password login form is a
   // dead end here (no keychain, no 2FA flow, no Turnstile). Show a
   // blocker card that explains how to connect instead.
   if (isDesktop && !authLoading && !user) {
     return (
       <motion.div initial="hidden" animate="visible" className="w-full max-w-sm mx-auto">
-        <div className="rounded-2xl border border-border bg-card p-6 text-center">
-          <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-            <Lock className="h-6 w-6 text-primary" />
+        <div className="rounded-xl bg-overlay shadow-surface p-6 text-center">
+          <div className="h-12 w-12 rounded-2xl bg-accent-soft flex items-center justify-center mx-auto mb-4">
+            <Lock className="h-6 w-6 text-accent" />
           </div>
           <h1 className="text-base font-semibold text-foreground mb-1">
             Connexion via Faktur Desktop
@@ -402,7 +422,7 @@ function LoginContent() {
                   type="button"
                   onClick={handleGoogleLogin}
                   disabled={googleLoading}
-                  className="w-full flex items-center justify-center gap-3 h-11 rounded-lg border border-border bg-background text-sm font-medium text-foreground transition-all hover:bg-muted/50 disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-full flex items-center justify-center gap-3 h-11 rounded-lg border border-border bg-background text-sm font-medium text-foreground transition-all hover:bg-surface-hover disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {googleLoading ? (
                     <Spinner size="sm" />
@@ -424,7 +444,7 @@ function LoginContent() {
                   type="button"
                   onClick={handlePasskeyLogin}
                   disabled={passkeyLoading}
-                  className="flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-border bg-background text-xs font-medium text-foreground transition-all hover:bg-muted/50 disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-border bg-background text-xs font-medium text-foreground transition-all hover:bg-surface-hover disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {passkeyLoading ? (
                     <Spinner size="sm" />
@@ -436,7 +456,7 @@ function LoginContent() {
                 <button
                   type="button"
                   disabled
-                  className="flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-border/50 bg-muted/30 text-xs font-medium text-muted-foreground cursor-not-allowed relative"
+                  className="flex-1 flex items-center justify-center gap-2 h-9 rounded-lg border border-border/50 bg-surface text-xs font-medium text-muted-foreground cursor-not-allowed relative"
                 >
                   <Smartphone className="h-3.5 w-3.5" />
                   App mobile
@@ -452,7 +472,7 @@ function LoginContent() {
                   <Separator />
                 </div>
                 <div className="relative flex justify-center">
-                  <span className="bg-background px-3 text-xs text-muted-foreground uppercase tracking-wider">ou</span>
+                  <span className="bg-background px-3 text-xs text-muted-foreground uppercase tracking-wider rounded-full">ou</span>
                 </div>
               </motion.div>
 
@@ -492,7 +512,7 @@ function LoginContent() {
                         <FieldLabel htmlFor="password">Mot de passe</FieldLabel>
                         <Link
                           href="/forgot-password"
-                          className="text-xs text-primary hover:text-primary/80 transition-colors"
+                          className="text-xs text-accent hover:text-accent/80 transition-colors"
                         >
                           Oublié ?
                         </Link>
@@ -553,7 +573,7 @@ function LoginContent() {
                           const r = searchParams.get('redirect')
                           return r ? `/register?redirect=${encodeURIComponent(r)}` : '/register'
                         })()}
-                        className="text-primary font-medium hover:text-primary/80 transition-colors"
+                        className="text-accent font-medium hover:text-accent/80 transition-colors"
                       >
                         Créer un compte
                       </Link>
@@ -572,7 +592,7 @@ function LoginContent() {
         custom={9}
         initial="hidden"
         animate="visible"
-        className="text-center mt-8 text-[11px] text-muted-foreground/60"
+        className="text-center mt-8 text-[11px] text-muted-secondary"
       >
         En continuant, vous acceptez nos{' '}
         <a href="/legal/terms" target="_blank" className="hover:text-muted-foreground transition-colors underline underline-offset-2">CGU</a> et notre{' '}

@@ -7,7 +7,7 @@ import { SiteHeader } from '@/components/layout/site-header'
 import { RouteProgressBar } from '@/components/layout/route-progress'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Spinner } from '@/components/ui/spinner'
-import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useRouter, usePathname } from 'next/navigation'
@@ -17,12 +17,18 @@ import { InvoiceSettingsProvider } from '@/lib/invoice-settings-context'
 import { CompanySettingsProvider } from '@/lib/company-settings-context'
 import { EmailProvider } from '@/lib/email-context'
 import { ArrowRightLeft, LogOut, Check } from 'lucide-react'
+import { CheckboxRoot, CheckboxControl, CheckboxIndicator, CheckboxContent } from '@/components/ui/checkbox'
 import { FeedbackModal } from '@/components/modals/feedback-modal'
 import { BugReportModal } from '@/components/modals/bug-report-modal'
 import { isFakturDesktop } from '@/lib/is-desktop'
 import { usePageView } from '@/hooks/use-page-view'
 import { initWebVitals } from '@/lib/web-vitals'
 import { useAnalyticsContext } from '@/lib/analytics'
+import { TutorialProvider, useTutorialSafe } from '@/lib/tutorial-context'
+import { TutorialBanner } from '@/components/tutorial/tutorial-banner'
+import { TutorialOverlay } from '@/components/tutorial/tutorial-overlay'
+import { TutorialOfferModal } from '@/components/tutorial/tutorial-offer-modal'
+import { TutorialLevelComplete } from '@/components/tutorial/tutorial-level-complete'
 
 interface TeamListItem {
   id: string
@@ -202,7 +208,38 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <InvoiceSettingsProvider>
     <CompanySettingsProvider>
     <EmailProvider>
+    <TutorialProvider>
     <div className="relative h-screen overflow-hidden bg-background">
+      {/* Dégradés multi-couleurs animés — radial-gradient (net, sans pixelisation) */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
+        <div
+          className="absolute -inset-[100px] animate-[gradient-drift_20s_ease-in-out_infinite] will-change-transform"
+          style={{
+            background: [
+              'radial-gradient(ellipse 600px 600px at 5% 5%, rgba(89,87,232,0.12) 0%, transparent 70%)',
+              'radial-gradient(ellipse 500px 500px at 90% 8%, rgba(236,72,153,0.08) 0%, transparent 70%)',
+              'radial-gradient(ellipse 500px 450px at 3% 30%, rgba(6,182,212,0.07) 0%, transparent 70%)',
+              'radial-gradient(ellipse 400px 400px at 45% 38%, rgba(139,92,246,0.06) 0%, transparent 70%)',
+              'radial-gradient(ellipse 450px 400px at 80% 85%, rgba(245,158,11,0.06) 0%, transparent 70%)',
+              'radial-gradient(ellipse 400px 350px at 12% 90%, rgba(16,185,129,0.05) 0%, transparent 70%)',
+            ].join(', '),
+          }}
+        />
+        <div
+          className="absolute -inset-[100px] animate-[gradient-drift_25s_ease-in-out_infinite_reverse] will-change-transform"
+          style={{
+            background: [
+              'radial-gradient(ellipse 350px 350px at 18% 3%, rgba(59,130,246,0.09) 0%, transparent 70%)',
+              'radial-gradient(ellipse 350px 350px at 65% 62%, rgba(251,113,133,0.07) 0%, transparent 70%)',
+              'radial-gradient(ellipse 500px 400px at 42% 78%, rgba(52,211,153,0.06) 0%, transparent 70%)',
+              'radial-gradient(ellipse 500px 500px at 55% 95%, rgba(245,158,11,0.06) 0%, transparent 70%)',
+              'radial-gradient(ellipse 450px 450px at 18% 55%, rgba(232,121,249,0.07) 0%, transparent 70%)',
+              'radial-gradient(ellipse 600px 600px at 5% 95%, rgba(99,102,241,0.08) 0%, transparent 70%)',
+            ].join(', '),
+          }}
+        />
+      </div>
+
       <Sidebar
         teams={teams}
         currentTeam={currentTeam}
@@ -223,7 +260,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       <div
         className={cn(
-          'relative flex min-w-0 min-h-0 h-screen flex-col transition-[padding] duration-300 ease-out overflow-hidden bg-background',
+          'relative flex min-w-0 min-h-0 h-screen flex-col transition-[padding] duration-300 ease-out overflow-hidden bg-transparent will-change-[padding]',
           sidebarCollapsed ? 'pl-16' : 'pl-(--sidebar-width)',
           switching && 'blur-sm pointer-events-none'
         )}
@@ -231,8 +268,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <SiteHeader onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)} />
         <RouteProgressBar />
 
-        <main className="flex-1 overflow-y-auto">
-          <div className="@container/main flex flex-1 flex-col gap-2">
+        <main className="relative flex-1 overflow-y-auto" data-tutorial="main-content">
+          <div className="relative @container/main flex flex-1 flex-col gap-2">
             {children}
           </div>
         </main>
@@ -240,22 +277,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {}
       <Dialog open={!!switchConfirm} onClose={() => setSwitchConfirm(null)}>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-            <ArrowRightLeft className="h-5 w-5 text-primary" />
-          </div>
-          <div>
-            <DialogTitle>Changer d&apos;équipe</DialogTitle>
-            <DialogDescription className="mt-0">
-              Basculer vers une autre équipe
-            </DialogDescription>
-          </div>
-        </div>
+        <DialogHeader onClose={() => setSwitchConfirm(null)} icon={<ArrowRightLeft className="h-5 w-5 text-accent" />}>
+          <DialogTitle>Changer d&apos;équipe</DialogTitle>
+          <DialogDescription>Basculer vers une autre équipe</DialogDescription>
+        </DialogHeader>
 
         {switchConfirm && (
-          <div className="rounded-lg border border-border bg-muted/30 p-4 mb-2">
+          <div className="rounded-lg shadow-surface bg-surface p-4 mb-2">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary font-semibold">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent font-semibold">
                 {switchConfirm.name.charAt(0).toUpperCase()}
               </div>
               <div>
@@ -280,55 +310,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {}
       <Dialog open={logoutConfirm} onClose={() => setLogoutConfirm(false)}>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-destructive/10">
-            <LogOut className="h-5 w-5 text-destructive" />
-          </div>
-          <div>
-            <DialogTitle>Se déconnecter</DialogTitle>
-            <DialogDescription className="mt-0">
-              Vous allez être déconnecté de votre compte
-            </DialogDescription>
-          </div>
-        </div>
+        <DialogHeader showClose={false} icon={<LogOut className="h-5 w-5 text-danger" />}>
+          <DialogTitle>Se déconnecter</DialogTitle>
+          <DialogDescription>Vous allez être déconnecté de votre compte</DialogDescription>
+        </DialogHeader>
 
         {isDesktopRuntime && (
           <div className="mb-4 mt-2">
-            <label
-              htmlFor="logout-wipe-all"
-              className="group flex cursor-pointer items-start gap-3 rounded-xl border border-border bg-muted/30 p-3.5 transition-colors hover:bg-muted/50"
+            <CheckboxRoot 
+              isSelected={logoutWipeAll} 
+              onChange={setLogoutWipeAll} 
+              className="group flex cursor-pointer items-start gap-3 rounded-xl shadow-surface bg-surface p-3.5 transition-colors hover:bg-surface-hover"
             >
-              <input
-                id="logout-wipe-all"
-                type="checkbox"
-                checked={logoutWipeAll}
-                onChange={(e) => setLogoutWipeAll(e.target.checked)}
-                className="sr-only"
-              />
-              <span
-                className={cn(
-                  'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-all duration-200',
-                  logoutWipeAll
-                    ? 'border-destructive bg-destructive shadow-[0_0_0_4px_rgba(239,68,68,0.12)]'
-                    : 'border-border bg-transparent group-hover:border-destructive/50'
-                )}
-              >
-                <AnimatePresence>
-                  {logoutWipeAll && (
-                    <motion.span
-                      key="check"
-                      initial={{ scale: 0, rotate: -45, opacity: 0 }}
-                      animate={{ scale: 1, rotate: 0, opacity: 1 }}
-                      exit={{ scale: 0, opacity: 0 }}
-                      transition={{ type: 'spring', stiffness: 380, damping: 22 }}
-                      className="flex"
-                    >
-                      <Check className="h-3 w-3 text-white" strokeWidth={3.5} />
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </span>
-              <div className="flex-1 min-w-0">
+              <CheckboxControl className="mt-0.5 data-[selected=true]:border-destructive data-[selected=true]:bg-destructive shadow-[0_0_0_4px_rgba(239,68,68,0)] data-[selected=true]:shadow-[0_0_0_4px_rgba(239,68,68,0.12)]">
+                <CheckboxIndicator />
+              </CheckboxControl>
+              <CheckboxContent className="flex-1 min-w-0 text-left">
                 <p className="text-[13px] font-semibold text-foreground leading-tight">
                   Effacer aussi mes données locales
                 </p>
@@ -337,8 +334,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   seront supprimés. Sinon, seules les clés d&apos;authentification
                   (jetons, sessions, refresh) sont effacées.
                 </p>
-              </div>
-            </label>
+              </CheckboxContent>
+            </CheckboxRoot>
           </div>
         )}
 
@@ -361,7 +358,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-background/60 backdrop-blur-md"
           >
-            <Spinner size="lg" className="text-primary" />
+            <Spinner size="lg" className="text-accent" />
             <p className="mt-4 text-sm font-medium text-foreground">
               {loggingOut ? 'Deconnexion en cours...' : "Changement d\u0027equipe en cours..."}
             </p>
@@ -371,7 +368,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
       <BugReportModal open={bugReportOpen} onClose={() => setBugReportOpen(false)} />
+
+      {/* Tutorial system */}
+      <TutorialBanner />
+      <TutorialOverlay />
+      <TutorialOfferModal />
+      <TutorialLevelComplete />
     </div>
+    </TutorialProvider>
     </EmailProvider>
     </CompanySettingsProvider>
     </InvoiceSettingsProvider>

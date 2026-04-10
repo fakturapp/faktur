@@ -47,7 +47,7 @@ export default await Env.create(new URL('../', import.meta.url), {
 
   LIMITER_STORE: Env.schema.enum.optional(['database', 'memory'] as const),
 
-  GROQ_API_KEY: Env.schema.string.optional(),
+  OPENROUTER_API_KEY: Env.schema.string.optional(),
 
   ADMIN_EMAILS: Env.schema.string.optional(),
 

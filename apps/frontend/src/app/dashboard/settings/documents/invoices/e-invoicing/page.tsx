@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { useToast } from '@/components/ui/toast'
 import {
@@ -89,8 +89,8 @@ export default function EInvoicingPage() {
           <CardContent className="p-6">
             {}
             <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                <FileCheck className="h-4.5 w-4.5 text-primary" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
+                <FileCheck className="h-4.5 w-4.5 text-accent" />
               </div>
               <div>
                 <h2 className="text-base font-semibold text-foreground">Facturation electronique</h2>
@@ -100,7 +100,7 @@ export default function EInvoicingPage() {
 
             {}
             <div className="flex items-start gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 mb-4">
-              <Info className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+              <Info className="h-4 w-4 text-accent shrink-0 mt-0.5" />
               <p className="text-xs text-foreground leading-relaxed">
                 A partir de septembre 2026, toutes les entreprises francaises doivent emettre des factures electroniques au format structure (Factur-X, UBL ou CII) via une Plateforme de Dematerialisation Partenaire (PDP).
               </p>
@@ -109,7 +109,7 @@ export default function EInvoicingPage() {
             {}
             <div className="flex items-center justify-between rounded-xl border-2 border-border p-4 mb-4">
               <div className="flex items-center gap-3">
-                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${settings.eInvoicingEnabled ? 'bg-primary/10' : 'bg-muted'}`}>
+                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${settings.eInvoicingEnabled ? 'bg-accent-soft' : 'bg-muted'}`}>
                   <Shield className={`h-5 w-5 ${settings.eInvoicingEnabled ? 'text-primary' : 'text-muted-foreground'}`} />
                 </div>
                 <div>
@@ -212,7 +212,7 @@ export default function EInvoicingPage() {
                         'Suivi des statuts en temps reel',
                       ].map((feature) => (
                         <div key={feature} className="flex items-center gap-2">
-                          <Check className="h-3.5 w-3.5 text-primary shrink-0" />
+                          <Check className="h-3.5 w-3.5 text-accent shrink-0" />
                           <span className="text-[11px] text-muted-foreground">{feature}</span>
                         </div>
                       ))}
@@ -236,15 +236,10 @@ export default function EInvoicingPage() {
       {/* E-Invoicing Confirmation Modal */}
       <Dialog open={showEInvoicingModal} onClose={() => setShowEInvoicingModal(false)}>
         <div className="p-6 max-w-md">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-              <FileCheck className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <DialogTitle>Activer la facturation electronique</DialogTitle>
-              <DialogDescription>Reforme obligatoire a partir de septembre 2026</DialogDescription>
-            </div>
-          </div>
+          <DialogHeader onClose={() => setShowEInvoicingModal(false)} icon={<FileCheck className="h-5 w-5 text-accent" />}>
+            <DialogTitle>Activer la facturation electronique</DialogTitle>
+            <DialogDescription>Reforme obligatoire a partir de septembre 2026</DialogDescription>
+          </DialogHeader>
           <div className="space-y-3 mb-6">
             <p className="text-sm text-muted-foreground leading-relaxed">
               En activant cette option, vos documents seront generes au format Factur-X (PDF/A-3) conforme aux exigences de la reforme francaise.
@@ -256,7 +251,7 @@ export default function EInvoicingPage() {
                 'Aucun impact sur vos documents existants',
               ].map((item) => (
                 <div key={item} className="flex items-start gap-2">
-                  <Check className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" />
+                  <Check className="h-3.5 w-3.5 text-accent shrink-0 mt-0.5" />
                   <span className="text-xs text-foreground">{item}</span>
                 </div>
               ))}
@@ -274,18 +269,13 @@ export default function EInvoicingPage() {
       {/* Beta Warning Modal */}
       <Dialog open={showBetaWarningModal} onClose={() => setShowBetaWarningModal(false)}>
         <div className="p-6 max-w-md">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-yellow-500/10">
-              <FlaskConical className="h-6 w-6 text-yellow-500" />
-            </div>
-            <div>
-              <DialogTitle className="flex items-center gap-2">
-                Fonctionnalite en beta
-                <span className="px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-500 text-[10px] font-semibold uppercase tracking-wide">Beta</span>
-              </DialogTitle>
-              <DialogDescription>Apercu anticipe de la facturation electronique</DialogDescription>
-            </div>
-          </div>
+          <DialogHeader onClose={() => setShowBetaWarningModal(false)} icon={<FlaskConical className="h-5 w-5 text-yellow-500" />}>
+            <DialogTitle className="flex items-center gap-2">
+              Fonctionnalite en beta
+              <span className="px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-500 text-[10px] font-semibold uppercase tracking-wide">Beta</span>
+            </DialogTitle>
+            <DialogDescription>Apercu anticipe de la facturation electronique</DialogDescription>
+          </DialogHeader>
           <div className="space-y-3 mb-6">
             <div className="rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-4 space-y-2">
               <div className="flex items-start gap-2">

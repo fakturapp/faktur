@@ -43,12 +43,12 @@ export default class InvoiceSettingsShow {
           defaultLanguage: 'fr',
           quoteFilenamePattern: 'DEV-{numero}',
           invoiceFilenamePattern: 'FAC-{numero}',
-          footerMode: 'vat_exempt',
+          footerMode: 'company_info',
           logoBorderRadius: 0,
           collaborationEnabled: false,
           aiEnabled: false,
-          aiProvider: 'groq',
-          aiModel: 'llama-3.3-70b-versatile',
+          aiProvider: 'gemini',
+          aiModel: 'nvidia/nemotron-3-super-120b-a12b:free',
         },
       })
     }
@@ -80,12 +80,12 @@ export default class InvoiceSettingsShow {
         defaultLanguage: settings.defaultLanguage || 'fr',
         quoteFilenamePattern: settings.quoteFilenamePattern || 'DEV-{numero}',
         invoiceFilenamePattern: settings.invoiceFilenamePattern || 'FAC-{numero}',
-        footerMode: settings.footerMode || 'vat_exempt',
+        footerMode: (['custom', 'company_info'].includes(settings.footerMode) ? settings.footerMode : 'company_info'),
         logoBorderRadius: settings.logoBorderRadius ?? 0,
         collaborationEnabled: settings.collaborationEnabled ?? false,
         aiEnabled: settings.aiEnabled ?? false,
-        aiProvider: 'groq',
-        aiModel: settings.aiModel || 'llama-3.3-70b-versatile',
+        aiProvider: 'gemini',
+        aiModel: settings.aiModel || 'nvidia/nemotron-3-super-120b-a12b:free',
       },
     })
   }

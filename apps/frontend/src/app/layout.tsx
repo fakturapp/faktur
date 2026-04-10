@@ -6,6 +6,7 @@ import { Providers } from './providers'
 
 const lexend = Lexend({ subsets: ['latin'], variable: '--font-lexend' })
 
+
 export const metadata: Metadata = {
   title: {
     default: 'Faktur - Facturation professionnelle gratuite',

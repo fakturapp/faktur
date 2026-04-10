@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Field, FieldGroup, FieldLabel, FieldDescription } from '@/components/ui/field'
-import { Select } from '@/components/ui/select'
+import { FormSelect } from '@/components/ui/dropdown'
 import { Switch } from '@/components/ui/switch'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Spinner } from '@/components/ui/spinner'
@@ -124,8 +124,8 @@ export default function ReminderSettingsPage() {
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                  <Bell className="h-5 w-5 text-primary" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-soft">
+                  <Bell className="h-5 w-5 text-accent" />
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-foreground">Activer les relances</p>
@@ -204,18 +204,16 @@ export default function ReminderSettingsPage() {
                 <h3 className="text-sm font-semibold text-foreground">Compte email</h3>
                 <Field>
                   <FieldLabel htmlFor="emailAccount">Compte utilise pour les relances</FieldLabel>
-                  <Select
+                  <FormSelect
                     id="emailAccount"
                     value={emailAccountId}
-                    onChange={(e) => setEmailAccountId(e.target.value)}
-                  >
-                    <option value="">Selectionner un compte</option>
-                    {accounts.map((a) => (
-                      <option key={a.id} value={a.id}>
-                        {a.email} ({a.provider})
-                      </option>
-                    ))}
-                  </Select>
+                    onChange={setEmailAccountId}
+                    placeholder="Selectionner un compte"
+                    options={[
+                      { value: '', label: 'Selectionner un compte' },
+                      ...accounts.map((a) => ({ value: a.id, label: `${a.email} (${a.provider})` })),
+                    ]}
+                  />
                   {accounts.length === 0 && !accountsLoading && (
                     <p className="text-xs text-orange-500 mt-1">
                       Aucun compte email configure. Ajoutez-en un dans Parametres &gt; Email.

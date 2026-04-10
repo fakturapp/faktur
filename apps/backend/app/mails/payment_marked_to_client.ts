@@ -15,21 +15,16 @@ export class PaymentMarkedToClient extends BaseMail {
 
   prepare() {
     const content = `
-      <h2 style="margin: 0 0 8px; font-size: 22px; font-weight: 700; color: #ffffff; letter-spacing: -0.5px;">
+      <h2 style="font-size: 20px; font-weight: 600; color: #171717; letter-spacing: -0.02em; margin: 0 0 12px;">
         Paiement envoy&eacute;
       </h2>
-      <p style="margin: 0 0 24px; font-size: 15px; color: #a1a1aa; line-height: 1.6;">
+      <p style="font-size: 14px; line-height: 1.7; color: #707070; margin: 0 0 16px;">
         Bonjour${this.clientName ? ` ${this.clientName}` : ''},
       </p>
-      <p style="margin: 0 0 24px; font-size: 15px; color: #a1a1aa; line-height: 1.6;">
-        Votre paiement pour la facture <strong style="color: #ffffff;">${this.invoiceNumber}</strong> a bien &eacute;t&eacute; signal&eacute;.
+      <p style="font-size: 14px; line-height: 1.7; color: #707070; margin: 0 0 16px;">
+        Votre paiement pour la facture <strong style="color: #171717;">${this.invoiceNumber}</strong> a bien &eacute;t&eacute; signal&eacute;.
       </p>
-      ${infoBox(
-        'Votre paiement est en attente de confirmation par le destinataire. Vous recevrez un email d&egrave;s que le paiement sera confirm&eacute;.',
-        'rgba(99,102,241,0.06)',
-        'rgba(99,102,241,0.15)',
-        '#a1a1aa'
-      )}
+      ${infoBox('Votre paiement est en attente de confirmation par le destinataire. Vous recevrez un email d&egrave;s que le paiement sera confirm&eacute;.')}
     `
 
     const plainText = `Paiement envoyé\n\nBonjour${this.clientName ? ` ${this.clientName}` : ''},\n\nVotre paiement pour la facture ${this.invoiceNumber} a bien été signalé.\n\nVotre paiement est en attente de confirmation par le destinataire. Vous recevrez un email dès que le paiement sera confirmé.`

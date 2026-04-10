@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/auth'
 import { api } from '@/lib/api'
 import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/toast'
-import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -33,6 +33,7 @@ import {
   EyeOff,
   Pencil,
 } from 'lucide-react'
+import { CheckboxRoot, CheckboxControl, CheckboxIndicator, CheckboxContent } from '@/components/ui/checkbox'
 
 interface OauthApp {
   id: string
@@ -313,18 +314,13 @@ export default function AdminOauthAppsPage() {
 
       {/* Delete confirm */}
       <Dialog open={!!confirmDelete} onClose={() => setConfirmDelete(null)}>
-        <div className="flex items-start gap-3 mb-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-destructive/10">
-            <Trash2 className="h-5 w-5 text-destructive" />
-          </div>
-          <div>
-            <DialogTitle>Supprimer cette application ?</DialogTitle>
-            <DialogDescription className="mt-1">
-              &quot;{confirmDelete?.name}&quot; sera définitivement supprimée. Tous les tokens
-              actifs seront révoqués et les utilisateurs connectés seront déconnectés.
-            </DialogDescription>
-          </div>
-        </div>
+        <DialogHeader showClose={false} icon={<Trash2 className="h-5 w-5 text-danger" />}>
+          <DialogTitle>Supprimer cette application ?</DialogTitle>
+          <DialogDescription>
+            &quot;{confirmDelete?.name}&quot; sera définitivement supprimée. Tous les tokens
+            actifs seront révoqués et les utilisateurs connectés seront déconnectés.
+          </DialogDescription>
+        </DialogHeader>
         <DialogFooter>
           <Button variant="outline" size="sm" onClick={() => setConfirmDelete(null)}>
             Annuler
@@ -337,20 +333,15 @@ export default function AdminOauthAppsPage() {
 
       {/* Revoke all sessions confirm */}
       <Dialog open={!!confirmRevokeAll} onClose={() => setConfirmRevokeAll(null)}>
-        <div className="flex items-start gap-3 mb-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10">
-            <ShieldAlert className="h-5 w-5 text-amber-500" />
-          </div>
-          <div>
-            <DialogTitle>Révoquer toutes les sessions ?</DialogTitle>
-            <DialogDescription className="mt-1">
-              {confirmRevokeAll?.activeSessions} utilisateur(s) connecté(s) via &quot;
-              {confirmRevokeAll?.name}&quot; seront immédiatement déconnectés. Un webhook{' '}
-              <code className="text-[11px] px-1 rounded bg-muted">session.revoked</code> sera
-              envoyé pour chaque session.
-            </DialogDescription>
-          </div>
-        </div>
+        <DialogHeader showClose={false} icon={<ShieldAlert className="h-5 w-5 text-amber-500" />}>
+          <DialogTitle>Révoquer toutes les sessions ?</DialogTitle>
+          <DialogDescription>
+            {confirmRevokeAll?.activeSessions} utilisateur(s) connecté(s) via &quot;
+            {confirmRevokeAll?.name}&quot; seront immédiatement déconnectés. Un webhook{' '}
+            <code className="text-[11px] px-1 rounded bg-muted">session.revoked</code> sera
+            envoyé pour chaque session.
+          </DialogDescription>
+        </DialogHeader>
         <DialogFooter>
           <Button variant="outline" size="sm" onClick={() => setConfirmRevokeAll(null)}>
             Annuler
@@ -363,10 +354,12 @@ export default function AdminOauthAppsPage() {
 
       {/* Rotate secrets modal */}
       <Dialog open={!!rotatingApp} onClose={() => setRotatingApp(null)}>
-        <DialogTitle>Régénérer les secrets</DialogTitle>
-        <DialogDescription className="mt-1 mb-4">
-          Choisissez le secret à régénérer. L&apos;ancien sera immédiatement invalide.
-        </DialogDescription>
+        <DialogHeader onClose={() => setRotatingApp(null)}>
+          <DialogTitle>Régénérer les secrets</DialogTitle>
+          <DialogDescription>
+            Choisissez le secret à régénérer. L&apos;ancien sera immédiatement invalide.
+          </DialogDescription>
+        </DialogHeader>
         <div className="space-y-2">
           <button
             onClick={() => rotatingApp && handleRotateClientSecret(rotatingApp)}
@@ -862,14 +855,16 @@ function OauthAppFormModal({
 
   return (
     <Dialog open={open} onClose={onClose} className="max-w-xl">
-      <DialogTitle>
-        {mode === 'create' ? 'Nouvelle application OAuth' : 'Éditer l’application OAuth'}
-      </DialogTitle>
-      <DialogDescription className="mt-1">
-        {mode === 'create'
-          ? 'Configurez une application tierce qui pourra se connecter à Faktur via OAuth2.'
-          : 'Modifiez les redirect URIs, les origines autorisées et les scopes de cette application.'}
-      </DialogDescription>
+      <DialogHeader onClose={onClose}>
+        <DialogTitle>
+          {mode === 'create' ? 'Nouvelle application OAuth' : "Éditer l\u0027application OAuth"}
+        </DialogTitle>
+        <DialogDescription>
+          {mode === 'create'
+            ? 'Configurez une application tierce qui pourra se connecter à Faktur via OAuth2.'
+            : 'Modifiez les redirect URIs, les origines autorisées et les scopes de cette application.'}
+        </DialogDescription>
+      </DialogHeader>
 
       <div className="mt-5 space-y-4 max-h-[60vh] overflow-y-auto pr-1 -mr-1">
         {/* Name */}
@@ -1130,20 +1125,21 @@ function OauthAppFormModal({
 
         {/* First party (create only) */}
         {mode === 'create' && (
-          <label className="flex items-start gap-3 rounded-lg border border-border bg-card p-3 cursor-pointer hover:bg-muted/40 transition-colors">
-            <input
-              type="checkbox"
-              checked={form.isFirstParty}
-              onChange={(e) => setForm({ ...form, isFirstParty: e.target.checked })}
-              className="mt-0.5"
-            />
-            <div>
+          <CheckboxRoot 
+            isSelected={form.isFirstParty} 
+            onChange={(selected) => setForm({ ...form, isFirstParty: selected })} 
+            className="flex items-start gap-3 rounded-lg border border-border bg-card p-3 cursor-pointer hover:bg-muted/40 transition-colors"
+          >
+            <CheckboxControl className="mt-0.5">
+              <CheckboxIndicator />
+            </CheckboxControl>
+            <CheckboxContent>
               <p className="text-[13px] font-medium text-foreground">Application 1st-party</p>
-              <p className="text-[11px] text-muted-foreground">
+              <p className="text-[11px] text-muted-foreground mt-[1px]">
                 Cochez pour les apps officielles (le badge sera affiché sur l&apos;écran de consentement).
               </p>
-            </div>
-          </label>
+            </CheckboxContent>
+          </CheckboxRoot>
         )}
       </div>
 
@@ -1186,18 +1182,13 @@ function SecretRevealModal({
 
   return (
     <Dialog open={true} onClose={onClose} className="max-w-lg" dismissible={false}>
-      <div className="flex items-start gap-3 mb-4">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10">
-          <AlertTriangle className="h-5 w-5 text-amber-500" />
-        </div>
-        <div>
-          <DialogTitle>Copiez les secrets maintenant</DialogTitle>
-          <DialogDescription className="mt-1">
-            Ces valeurs ne seront <strong>plus jamais affichées</strong>. Stockez-les dans un
-            gestionnaire de secrets ou directement dans le fichier <code>.env</code> du client.
-          </DialogDescription>
-        </div>
-      </div>
+      <DialogHeader showClose={false} icon={<AlertTriangle className="h-5 w-5 text-amber-500" />}>
+        <DialogTitle>Copiez les secrets maintenant</DialogTitle>
+        <DialogDescription>
+          Ces valeurs ne seront <strong>plus jamais affichées</strong>. Stockez-les dans un
+          gestionnaire de secrets ou directement dans le fichier <code>.env</code> du client.
+        </DialogDescription>
+      </DialogHeader>
 
       <div className="space-y-3">
         {payload.clientId && (

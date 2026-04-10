@@ -5,13 +5,14 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Dialog, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Select } from '@/components/ui/select'
+import { FormSelect } from '@/components/ui/dropdown'
 import { useToast } from '@/components/ui/toast'
 import { api } from '@/lib/api'
 import {
   Link2, Copy, Check, Mail, X, UserPlus, Globe,
   ChevronDown, Shield, Eye, Pencil, Trash2, Users
 } from 'lucide-react'
+import { CheckboxRoot, CheckboxControl, CheckboxIndicator, CheckboxContent } from '@/components/ui/checkbox'
 
 
 type DocumentType = 'invoice' | 'quote' | 'credit_note'
@@ -226,14 +227,16 @@ export function ShareModal({ open, onClose, documentType, documentId }: ShareMod
               onKeyDown={(e) => e.key === 'Enter' && inviteByEmail()}
               className="flex-1"
             />
-            <Select
+            <FormSelect
               value={invitePermission}
-              onChange={(e) => setInvitePermission(e.target.value as Permission)}
+              onChange={(v) => setInvitePermission(v as Permission)}
               className="w-[140px]"
-            >
-              <option value="viewer">Lecture seule</option>
-              <option value="editor">Peut modifier</option>
-            </Select>
+              showCheck={false}
+              options={[
+                { value: 'viewer', label: 'Lecture seule' },
+                { value: 'editor', label: 'Peut modifier' },
+              ]}
+            />
             <Button
               onClick={inviteByEmail}
               disabled={!inviteEmail.trim() || inviting}
@@ -258,20 +261,22 @@ export function ShareModal({ open, onClose, documentType, documentId }: ShareMod
                 <span className="flex-1 truncate text-sm text-muted-foreground">
                   {FRONTEND_URL}/share/{activeLink.token.slice(0, 12)}...
                 </span>
-                <Select
+                <FormSelect
                   value={activeLink.permission}
-                  onChange={async (e) => {
-                    const perm = e.target.value as Permission
+                  onChange={async (v) => {
+                    const perm = v as Permission
                     await api.patch(`/collaboration/share-links/${activeLink.id}`, { permission: perm })
                     setLinks((prev) =>
                       prev.map((l) => (l.id === activeLink.id ? { ...l, permission: perm } : l))
                     )
                   }}
                   className="h-8 w-[120px] text-xs"
-                >
-                  <option value="viewer">Lecture seule</option>
-                  <option value="editor">Peut modifier</option>
-                </Select>
+                  showCheck={false}
+                  options={[
+                    { value: 'viewer', label: 'Lecture seule' },
+                    { value: 'editor', label: 'Peut modifier' },
+                  ]}
+                />
                 <Button
                   variant="ghost"
                   size="icon"
@@ -292,10 +297,10 @@ export function ShareModal({ open, onClose, documentType, documentId }: ShareMod
                 </Button>
               </div>
               <div className="flex items-center gap-2 px-1">
-                <Select
+                <FormSelect
                   value={activeLink.visibility}
-                  onChange={async (e) => {
-                    const vis = e.target.value as Visibility
+                  onChange={async (v) => {
+                    const vis = v as Visibility
                     await api.patch(`/collaboration/share-links/${activeLink.id}`, { visibility: vis })
                     setLinks((prev) =>
                       prev.map((l) => (l.id === activeLink.id ? { ...l, visibility: vis } : l))
@@ -303,10 +308,12 @@ export function ShareModal({ open, onClose, documentType, documentId }: ShareMod
                     toast(vis === 'anyone' ? 'Lien accessible \u00e0 tous' : 'Lien restreint \u00e0 l\'\u00e9quipe', 'success')
                   }}
                   className="h-7 text-xs w-[160px]"
-                >
-                  <option value="anyone">Tout le monde</option>
-                  <option value="team">\u00c9quipe uniquement</option>
-                </Select>
+                  showCheck={false}
+                  options={[
+                    { value: 'anyone', label: 'Tout le monde' },
+                    { value: 'team', label: '\u00c9quipe uniquement' },
+                  ]}
+                />
                 {activeLink.autoExpire && (
                   <span className="text-[10px] text-amber-500">Expire quand vous quittez</span>
                 )}
@@ -315,38 +322,43 @@ export function ShareModal({ open, onClose, documentType, documentId }: ShareMod
           ) : (
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <Select
+                <FormSelect
                   value={linkPermission}
-                  onChange={(e) => setLinkPermission(e.target.value as Permission)}
+                  onChange={(v) => setLinkPermission(v as Permission)}
                   className="w-[130px]"
-                >
-                  <option value="viewer">Lecture seule</option>
-                  <option value="editor">Peut modifier</option>
-                </Select>
-                <Select
+                  showCheck={false}
+                  options={[
+                    { value: 'viewer', label: 'Lecture seule' },
+                    { value: 'editor', label: 'Peut modifier' },
+                  ]}
+                />
+                <FormSelect
                   value={linkVisibility}
-                  onChange={(e) => setLinkVisibility(e.target.value as Visibility)}
+                  onChange={(v) => setLinkVisibility(v as Visibility)}
                   className="w-[150px]"
-                >
-                  <option value="anyone">Tout le monde</option>
-                  <option value="team">\u00c9quipe uniquement</option>
-                </Select>
+                  showCheck={false}
+                  options={[
+                    { value: 'anyone', label: 'Tout le monde' },
+                    { value: 'team', label: '\u00c9quipe uniquement' },
+                  ]}
+                />
                 <Button variant="outline" onClick={createShareLink} className="gap-1.5 shrink-0">
                   <Link2 className="h-4 w-4" />
                   G\u00e9n\u00e9rer
                 </Button>
               </div>
-              <label className="flex items-center gap-2 cursor-pointer px-1">
-                <input
-                  type="checkbox"
-                  checked={linkAutoExpire}
-                  onChange={(e) => setLinkAutoExpire(e.target.checked)}
-                  className="h-3.5 w-3.5 rounded border-border accent-primary"
-                />
-                <span className="text-xs text-muted-foreground">
-                  D\u00e9sactiver le lien quand je quitte la page
-                </span>
-              </label>
+              <CheckboxRoot 
+                isSelected={linkAutoExpire} 
+                onChange={setLinkAutoExpire} 
+                className="flex items-center gap-2 px-1"
+              >
+                <CheckboxControl>
+                  <CheckboxIndicator />
+                </CheckboxControl>
+                <CheckboxContent className="text-xs text-muted-foreground mt-[1px]">
+                  Désactiver le lien quand je quitte la page
+                </CheckboxContent>
+              </CheckboxRoot>
             </div>
           )}
         </div>
@@ -392,14 +404,16 @@ export function ShareModal({ open, onClose, documentType, documentId }: ShareMod
                       )}
 
                       {/* Permission selector */}
-                      <Select
+                      <FormSelect
                         value={share.permission}
-                        onChange={(e) => updatePermission(share.id, e.target.value as Permission)}
+                        onChange={(v) => updatePermission(share.id, v as Permission)}
                         className="h-7 w-[120px] text-xs"
-                      >
-                        <option value="viewer">Lecture seule</option>
-                        <option value="editor">Peut modifier</option>
-                      </Select>
+                        showCheck={false}
+                        options={[
+                          { value: 'viewer', label: 'Lecture seule' },
+                          { value: 'editor', label: 'Peut modifier' },
+                        ]}
+                      />
 
                       {/* Revoke */}
                       <Button

@@ -1,0 +1,27 @@
+@layer components {
+/* Text field — copied from HeroUI v3 (packages/styles/components/textfield.css) */
+
+.textfield {
+  @apply flex flex-col gap-1.5;
+
+  &[data-invalid="true"],
+  &[aria-invalid="true"] {
+    [data-slot="description"] {
+      @apply hidden;
+    }
+  }
+
+  [data-slot="description"] {
+    @apply px-0.5;
+  }
+}
+
+.textfield--full-width {
+  @apply w-full;
+
+  [data-slot="input"],
+  [data-slot="textarea"] {
+    @apply w-full;
+  }
+}
+}

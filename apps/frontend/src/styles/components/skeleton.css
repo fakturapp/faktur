@@ -1,0 +1,64 @@
+@layer components {
+/* Skeleton — pixel-perfect copy of HeroUI v3 packages/styles/components/skeleton.css */
+
+.skeleton {
+  @apply pointer-events-none relative overflow-hidden rounded-xl bg-surface-secondary;
+}
+
+.skeleton--shimmer {
+  &::after {
+    @apply absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-surface-tertiary to-transparent content-[''];
+    animation: skeleton 2s linear infinite;
+  }
+
+  /* When applied to a parent container with multiple skeletons */
+  &:has(.skeleton) {
+    &::after {
+      content: none;
+    }
+
+    /* Single synchronized shimmer that passes over all children */
+    &::before {
+      @apply absolute inset-0 -translate-x-full content-[''];
+      animation: skeleton 2s linear infinite;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.5) 50%,
+        transparent 100%
+      );
+      z-index: 10;
+      pointer-events: none;
+      mix-blend-mode: overlay;
+    }
+
+    /* Children don't have their own shimmer */
+    & .skeleton {
+      &::after {
+        content: none;
+      }
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton--shimmer::after,
+  .skeleton--shimmer::before {
+    animation: none;
+  }
+}
+
+.skeleton--pulse {
+  animation: skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes skeleton-pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.skeleton--none {
+  /* no animation */
+}
+}

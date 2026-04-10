@@ -1,0 +1,88 @@
+@layer components {
+/* List Box — Faktur spacing (mirrors menu) */
+
+.list-box {
+  @apply relative flex w-full flex-col gap-0.5 overflow-clip p-2;
+
+  [data-slot="separator"][data-orientation="horizontal"] {
+    @apply ml-[3%] w-[94%] my-1;
+  }
+}
+
+.list-box-item {
+  @apply relative flex min-h-10 w-full items-center justify-start gap-3 rounded-xl px-3 py-2.5 outline-none no-highlight;
+
+  transition:
+    transform 250ms var(--ease-out-quad),
+    background-color 150ms var(--ease-smooth),
+    box-shadow 150ms var(--ease-out);
+  @apply motion-reduce:transition-none;
+
+  cursor: var(--cursor-interactive);
+  letter-spacing: var(--tracking-ui);
+
+  [data-slot="label"] {
+    @apply pointer-events-none w-fit select-none text-[14px] font-normal text-foreground;
+  }
+
+  [data-slot="description"] {
+    @apply pointer-events-none text-wrap select-none text-[12px] text-muted;
+  }
+
+  &:has(.list-box-item__indicator) {
+    @apply pr-9;
+  }
+
+  &:focus-visible:not(:focus),
+  &[data-focus-visible="true"] {
+    @apply status-focused;
+  }
+
+  &:active,
+  &[data-pressed="true"] {
+    transform: scale(0.98);
+  }
+
+  @media (hover: hover) {
+    &:hover,
+    &[data-hovered="true"] {
+      background-color: var(--color-surface);
+    }
+  }
+
+  &[data-disabled="true"] {
+    @apply status-disabled;
+  }
+}
+
+.list-box-item__indicator {
+  @apply absolute top-1/2 right-3 flex size-4 shrink-0 -translate-y-1/2 items-center justify-center;
+  color: var(--color-accent);
+  @apply transition duration-250 motion-reduce:transition-none;
+
+  [data-slot="list-box-item-indicator--checkmark"] {
+    @apply size-3;
+    @apply transition-all duration-300 motion-reduce:transition-none;
+  }
+
+  .list-box-item[aria-selected="true"] [data-slot="list-box-item-indicator--checkmark"],
+  .list-box-item[data-selected="true"] [data-slot="list-box-item-indicator--checkmark"] {
+    transition: stroke-dashoffset 250ms linear;
+    @apply motion-reduce:transition-none;
+  }
+}
+
+.list-box-item--default {
+  /* default */
+}
+
+.list-box-item--danger {
+  .list-box-item__indicator {
+    @apply text-danger;
+  }
+
+  [data-slot="label"] {
+    @apply text-danger;
+  }
+}
+}

@@ -75,7 +75,7 @@ export default function InvoiceOptionsPage() {
               </div>
               <Skeleton className="h-3 w-28" />
             </div>
-            <div className="p-4 bg-muted/30">
+            <div className="p-4 bg-surface">
               <Skeleton className="w-full rounded-lg" style={{ aspectRatio: '210/270' }} />
             </div>
           </div>
@@ -100,8 +100,8 @@ export default function InvoiceOptionsPage() {
             <Card className="overflow-hidden border-border/50">
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                    <ClipboardList className="h-4.5 w-4.5 text-primary" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
+                    <ClipboardList className="h-4.5 w-4.5 text-accent" />
                   </div>
                   <div>
                     <h2 className="text-base font-semibold text-foreground">Modele de facturation</h2>
@@ -114,17 +114,17 @@ export default function InvoiceOptionsPage() {
                     className={`relative rounded-xl border-2 p-4 text-left transition-all ${
                       settings.billingType === 'quick'
                         ? 'border-primary bg-primary/5 shadow-sm'
-                        : 'border-border hover:border-muted-foreground/30 hover:bg-muted/30'
+                        : 'border-border hover:border-muted-foreground/30 hover:bg-surface'
                     }`}
                   >
                     {settings.billingType === 'quick' && (
                       <div className="absolute top-3 right-3">
                         <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary">
-                          <Check className="h-3 w-3 text-primary-foreground" />
+                          <Check className="h-3 w-3 text-accent-foreground" />
                         </div>
                       </div>
                     )}
-                    <Zap className="h-5 w-5 text-primary mb-2" />
+                    <Zap className="h-5 w-5 text-accent mb-2" />
                     <p className="font-medium text-sm text-foreground">Rapide</p>
                     <p className="text-xs text-muted-foreground mt-1">
                       Facturation simplifiee avec les informations essentielles
@@ -135,17 +135,17 @@ export default function InvoiceOptionsPage() {
                     className={`relative rounded-xl border-2 p-4 text-left transition-all ${
                       settings.billingType === 'detailed'
                         ? 'border-primary bg-primary/5 shadow-sm'
-                        : 'border-border hover:border-muted-foreground/30 hover:bg-muted/30'
+                        : 'border-border hover:border-muted-foreground/30 hover:bg-surface'
                     }`}
                   >
                     {settings.billingType === 'detailed' && (
                       <div className="absolute top-3 right-3">
                         <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary">
-                          <Check className="h-3 w-3 text-primary-foreground" />
+                          <Check className="h-3 w-3 text-accent-foreground" />
                         </div>
                       </div>
                     )}
-                    <ClipboardList className="h-5 w-5 text-primary mb-2" />
+                    <ClipboardList className="h-5 w-5 text-accent mb-2" />
                     <p className="font-medium text-sm text-foreground">Complet</p>
                     <p className="text-xs text-muted-foreground mt-1">
                       Factures detaillees avec TVA, remises, conditions et mentions
@@ -161,8 +161,8 @@ export default function InvoiceOptionsPage() {
             <Card className="overflow-hidden border-border/50">
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                    <SlidersHorizontal className="h-4.5 w-4.5 text-primary" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
+                    <SlidersHorizontal className="h-4.5 w-4.5 text-accent" />
                   </div>
                   <div>
                     <h2 className="text-base font-semibold text-foreground">Options du document</h2>
@@ -203,8 +203,8 @@ export default function InvoiceOptionsPage() {
             <Card className="overflow-hidden border-border/50">
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                    <Languages className="h-4.5 w-4.5 text-primary" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
+                    <Languages className="h-4.5 w-4.5 text-accent" />
                   </div>
                   <div>
                     <h2 className="text-base font-semibold text-foreground">Langue par défaut</h2>

@@ -1,0 +1,17 @@
+@layer components {
+/* Field error — copied from HeroUI v3 (packages/styles/components/field-error.css) */
+
+.field-error {
+  @apply h-0 px-0.5 text-[12px] text-danger opacity-0 data-[visible=true]:h-auto data-[visible=true]:opacity-100;
+  word-wrap: break-word;
+
+  /**
+   * Transitions
+   * CRITICAL: motion-reduce must be AFTER transition for correct override specificity
+   */
+  transition:
+    opacity 150ms var(--ease-out),
+    height 350ms var(--ease-smooth);
+  @apply motion-reduce:transition-none;
+}
+}

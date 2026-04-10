@@ -25,22 +25,22 @@ interface SectionCardsProps {
 
 const cardThemes = [
   {
-    gradient: 'from-indigo-500/10 via-indigo-500/5 to-transparent dark:from-indigo-500/15',
-    accent: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 ring-indigo-500/20',
+    gradient: 'from-accent-soft/80 via-accent-soft/30 to-transparent',
+    accent: 'bg-accent-soft text-accent ring-accent/20',
     icon: DollarSign,
-    trendBg: 'bg-indigo-50 text-indigo-600 border-indigo-200 dark:bg-indigo-500/10 dark:text-indigo-300 dark:border-indigo-500/20',
+    trendBg: 'bg-accent-soft text-accent-soft-foreground',
   },
   {
-    gradient: 'from-amber-500/10 via-amber-500/5 to-transparent dark:from-amber-500/15',
-    accent: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 ring-amber-500/20',
+    gradient: 'from-warning-soft/80 via-warning-soft/30 to-transparent',
+    accent: 'bg-warning-soft text-warning ring-warning/20',
     icon: AlertCircle,
-    trendBg: 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-300 dark:border-amber-500/20',
+    trendBg: 'bg-warning-soft text-warning-soft-foreground',
   },
   {
-    gradient: 'from-emerald-500/10 via-emerald-500/5 to-transparent dark:from-emerald-500/15',
-    accent: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 ring-emerald-500/20',
+    gradient: 'from-success-soft/80 via-success-soft/30 to-transparent',
+    accent: 'bg-success-soft text-success ring-success/20',
     icon: Wallet,
-    trendBg: 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:border-emerald-500/20',
+    trendBg: 'bg-success-soft text-success-soft-foreground',
   },
 ]
 
@@ -70,7 +70,7 @@ export function SectionCards({ cards }: SectionCardsProps) {
                 </CardAction>
               )}
             </CardHeader>
-            <div className={`absolute -right-3 -bottom-3 h-20 w-20 rounded-2xl ${theme.accent} ring-1 flex items-center justify-center opacity-20 rotate-12`}>
+            <div className={`absolute -right-3 -bottom-3 h-20 w-20 rounded-xl ${theme.accent} ring-1 flex items-center justify-center opacity-15 rotate-12`}>
               <Icon className="h-10 w-10" />
             </div>
           </Card>

@@ -5,7 +5,7 @@ import { api } from '@/lib/api'
 import { Spinner } from '@/components/ui/spinner'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/toast'
-import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
@@ -167,7 +167,7 @@ export default function AccountOauthAppsPage() {
       {loading ? (
         <div className="space-y-3">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="rounded-2xl border border-border bg-card p-5">
+            <div key={i} className="rounded-xl bg-overlay shadow-surface p-5">
               <div className="flex items-center gap-4">
                 <Skeleton className="h-12 w-12 rounded-xl shrink-0" />
                 <div className="flex-1 space-y-2">
@@ -180,9 +180,9 @@ export default function AccountOauthAppsPage() {
           ))}
         </div>
       ) : apps.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-card/50 p-12 text-center">
-          <div className="flex h-14 w-14 mx-auto items-center justify-center rounded-2xl bg-primary/10 mb-4">
-            <ShieldCheck className="h-7 w-7 text-primary" />
+        <div className="rounded-xl border border-dashed border-border bg-surface shadow-surface p-12 text-center">
+          <div className="flex h-14 w-14 mx-auto items-center justify-center rounded-xl bg-accent-soft mb-4">
+            <ShieldCheck className="h-7 w-7 text-accent" />
           </div>
           <h3 className="text-base font-semibold text-foreground">Aucune application connectée</h3>
           <p className="text-sm text-muted-foreground mt-1 max-w-sm mx-auto">
@@ -205,12 +205,12 @@ export default function AccountOauthAppsPage() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.04 }}
-                className="rounded-2xl border border-border bg-card overflow-hidden"
+                className="rounded-xl bg-overlay shadow-surface overflow-hidden"
               >
                 {/* Header row */}
                 <button
                   onClick={() => toggleExpand(app.authorizationId)}
-                  className="w-full flex items-center gap-4 p-5 text-left hover:bg-muted/20 transition-colors"
+                  className="w-full flex items-center gap-4 p-5 text-left hover:bg-surface-hover transition-colors"
                 >
                   <div
                     className={cn(
@@ -281,7 +281,7 @@ export default function AccountOauthAppsPage() {
                                 key={scope}
                                 className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/40 px-2 py-1 text-[11px] text-foreground"
                               >
-                                <ShieldCheck className="h-3 w-3 text-primary" />
+                                <ShieldCheck className="h-3 w-3 text-accent" />
                                 {SCOPE_LABELS[scope] ?? scope}
                               </span>
                             ))}
@@ -368,19 +368,14 @@ export default function AccountOauthAppsPage() {
         open={!!confirmRevokeSession}
         onClose={() => setConfirmRevokeSession(null)}
       >
-        <div className="flex items-start gap-3 mb-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10">
-            <LogOut className="h-5 w-5 text-amber-500" />
-          </div>
-          <div>
-            <DialogTitle>Déconnecter cet appareil ?</DialogTitle>
-            <DialogDescription className="mt-1">
-              &quot;{confirmRevokeSession?.session.deviceName || 'Cet appareil'}&quot; sera
-              déconnecté immédiatement de {confirmRevokeSession?.app.app.name}. L&apos;utilisateur
-              devra se reconnecter pour reprendre.
-            </DialogDescription>
-          </div>
-        </div>
+        <DialogHeader showClose={false} icon={<LogOut className="h-5 w-5 text-amber-500" />}>
+          <DialogTitle>Déconnecter cet appareil ?</DialogTitle>
+          <DialogDescription>
+            &quot;{confirmRevokeSession?.session.deviceName || 'Cet appareil'}&quot; sera
+            déconnecté immédiatement de {confirmRevokeSession?.app.app.name}. L&apos;utilisateur
+            devra se reconnecter pour reprendre.
+          </DialogDescription>
+        </DialogHeader>
         <DialogFooter>
           <Button
             variant="outline"
@@ -406,18 +401,13 @@ export default function AccountOauthAppsPage() {
 
       {/* Revoke full app confirm */}
       <Dialog open={!!confirmRevokeApp} onClose={() => setConfirmRevokeApp(null)}>
-        <div className="flex items-start gap-3 mb-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-destructive/10">
-            <AlertTriangle className="h-5 w-5 text-destructive" />
-          </div>
-          <div>
-            <DialogTitle>Révoquer {confirmRevokeApp?.app.name} ?</DialogTitle>
-            <DialogDescription className="mt-1">
-              Toutes les sessions actives seront immédiatement déconnectées et l&apos;application
-              devra redemander votre autorisation la prochaine fois que vous l&apos;ouvrirez.
-            </DialogDescription>
-          </div>
-        </div>
+        <DialogHeader showClose={false} icon={<AlertTriangle className="h-5 w-5 text-danger" />}>
+          <DialogTitle>Révoquer {confirmRevokeApp?.app.name} ?</DialogTitle>
+          <DialogDescription>
+            Toutes les sessions actives seront immédiatement déconnectées et l&apos;application
+            devra redemander votre autorisation la prochaine fois que vous l&apos;ouvrirez.
+          </DialogDescription>
+        </DialogHeader>
         <DialogFooter>
           <Button
             variant="outline"

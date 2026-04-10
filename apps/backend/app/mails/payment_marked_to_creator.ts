@@ -1,5 +1,5 @@
 import { BaseMail } from '@adonisjs/mail'
-import { wrapHtml, ctaButton, infoBox } from '#mails/helpers/email_template'
+import { wrapHtml, ctaButton } from '#mails/helpers/email_template'
 
 export class PaymentMarkedToCreator extends BaseMail {
   subject: string
@@ -22,18 +22,17 @@ export class PaymentMarkedToCreator extends BaseMail {
     }).format(this.amount)
 
     const content = `
-      <h2 style="margin: 0 0 8px; font-size: 22px; font-weight: 700; color: #ffffff; letter-spacing: -0.5px;">
+      <h2 style="font-size: 20px; font-weight: 600; color: #171717; letter-spacing: -0.02em; margin: 0 0 12px;">
         Paiement signal&eacute;
       </h2>
-      <p style="margin: 0 0 24px; font-size: 15px; color: #a1a1aa; line-height: 1.6;">
-        Votre client a indiqu&eacute; avoir effectu&eacute; le paiement de la facture <strong style="color: #ffffff;">${this.invoiceNumber}</strong> d&rsquo;un montant de <strong style="color: #ffffff;">${formattedAmount}</strong>.
+      <p style="font-size: 14px; line-height: 1.7; color: #707070; margin: 0 0 16px;">
+        Votre client a indiqu&eacute; avoir effectu&eacute; le paiement de la facture <strong style="color: #171717;">${this.invoiceNumber}</strong> d&rsquo;un montant de <strong style="color: #171717;">${formattedAmount}</strong>.
       </p>
-      ${infoBox(
-        '&#9888;&#65039; Ce paiement n&rsquo;est pas encore confirm&eacute;. V&eacute;rifiez la r&eacute;ception sur votre compte bancaire puis confirmez le paiement.',
-        'rgba(245,158,11,0.08)',
-        'rgba(245,158,11,0.2)',
-        '#fbbf24'
-      )}
+      <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 24px 0;"><tr>
+        <td style="border-radius: 14px; padding: 16px 20px; font-size: 14px; line-height: 1.6; background: #fef2f2; color: #dc2626;">
+          &#9888;&#65039; Ce paiement n&rsquo;est pas encore confirm&eacute;. V&eacute;rifiez la r&eacute;ception sur votre compte bancaire puis confirmez le paiement.
+        </td>
+      </tr></table>
       ${ctaButton(this.invoiceUrl, 'Voir la facture et confirmer')}
     `
 

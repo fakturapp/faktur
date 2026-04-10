@@ -14,12 +14,12 @@ export default class TeamInviteNotification extends BaseMail {
 
   prepare() {
     const content = `
-      <h1 style="margin: 0 0 12px; font-size: 22px; font-weight: 700; color: #ffffff; letter-spacing: -0.3px; line-height: 1.3; text-align: center;">Invitation &agrave; rejoindre une &eacute;quipe</h1>
-      <p style="margin: 0 0 24px; font-size: 15px; line-height: 1.7; color: #a1a1aa; text-align: center;">
-        <span style="color: #c7d2fe; font-weight: 500;">${this.inviterName}</span> vous invite &agrave; rejoindre son &eacute;quipe sur Faktur.
+      <h2 style="font-size: 20px; font-weight: 600; color: #171717; letter-spacing: -0.02em; margin: 0 0 12px; text-align: center;">Invitation &agrave; rejoindre une &eacute;quipe</h2>
+      <p style="font-size: 14px; line-height: 1.7; color: #707070; margin: 0 0 16px; text-align: center;">
+        <span style="color: #5957e8; font-weight: 600;">${this.inviterName}</span> vous invite &agrave; rejoindre son &eacute;quipe sur Faktur.
       </p>
       ${ctaButton(this.inviteUrl, "Accepter l'invitation")}
-      ${infoBox("Si vous n'avez pas encore de compte Faktur, vous pourrez en cr&eacute;er un apr&egrave;s avoir cliqu&eacute; sur le lien.", 'rgba(59,130,246,0.08)', 'rgba(59,130,246,0.15)', '#60a5fa')}
+      ${infoBox("Si vous n'avez pas encore de compte Faktur, vous pourrez en cr&eacute;er un apr&egrave;s avoir cliqu&eacute; sur le lien.")}
       ${linkFallback(this.inviteUrl)}
     `
 

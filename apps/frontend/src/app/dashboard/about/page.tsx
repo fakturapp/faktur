@@ -137,7 +137,7 @@ export default function AboutPage() {
         <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">S&eacute;curit&eacute;</h2>
         <div className="space-y-3">
           <div className="flex items-start gap-3.5 rounded-xl border border-primary/20 bg-primary/5 p-4">
-            <Shield className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+            <Shield className="h-5 w-5 text-accent mt-0.5 shrink-0" />
             <div>
               <p className="text-sm font-semibold text-foreground">Chiffrement zero-access</p>
               <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
@@ -206,7 +206,7 @@ export default function AboutPage() {
             { name: 'Socket.io', icon: Zap },
           ].map((tech) => (
             <div key={tech.name} className="flex items-center gap-2.5 rounded-lg border border-border p-2.5">
-              <tech.icon className="h-4 w-4 text-primary shrink-0" />
+              <tech.icon className="h-4 w-4 text-accent shrink-0" />
               <span className="text-xs font-medium text-foreground">{tech.name}</span>
             </div>
           ))}
@@ -230,9 +230,9 @@ export default function AboutPage() {
               href={link.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2.5 rounded-lg border border-border p-2.5 hover:bg-muted/50 transition-colors group"
+              className="flex items-center gap-2.5 rounded-lg border border-border p-2.5 hover:bg-surface-hover transition-colors group"
             >
-              <link.icon className="h-4 w-4 text-primary shrink-0" />
+              <link.icon className="h-4 w-4 text-accent shrink-0" />
               <span className="text-xs font-medium text-foreground flex-1">{link.label}</span>
               <ExternalLink className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
             </a>
@@ -256,7 +256,7 @@ export default function AboutPage() {
             <Link
               key={link.href}
               href={link.href}
-              className="flex items-center gap-2 rounded-lg border border-border p-2.5 hover:bg-muted/50 transition-colors text-xs font-medium text-muted-foreground hover:text-foreground"
+              className="flex items-center gap-2 rounded-lg border border-border p-2.5 hover:bg-surface-hover transition-colors text-xs font-medium text-muted-foreground hover:text-foreground"
             >
               <link.icon className="h-3.5 w-3.5 shrink-0" />
               {link.label}
@@ -267,7 +267,7 @@ export default function AboutPage() {
 
       {}
       <motion.div variants={fadeUp} custom={7} className="text-center pb-4 pt-2">
-        <p className="text-[11px] text-muted-foreground/50 flex items-center justify-center gap-1">
+        <p className="text-[11px] text-muted-secondary flex items-center justify-center gap-1">
           Fait avec <Heart className="h-3 w-3 text-red-400" /> par danbenba &mdash; 2025-2026
         </p>
       </motion.div>

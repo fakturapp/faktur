@@ -9,7 +9,7 @@ const looseBool = vine.any().optional().transform((v) => {
 
 const BILLING_TYPES = ['quick', 'detailed'] as const
 const LOGO_SOURCES = ['custom', 'company'] as const
-const FOOTER_MODES = ['custom', 'company_info', 'vat_exempt'] as const
+const FOOTER_MODES = ['custom', 'company_info', 'vat_exempt', 'auto'] as const
 const PDP_PROVIDERS = ['b2brouter', 'sandbox'] as const
 
 export const updateInvoiceSettingsValidator = vine.compile(

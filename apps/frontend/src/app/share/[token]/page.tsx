@@ -82,8 +82,8 @@ export default function ShareLinkPage() {
           animate={{ opacity: 1, scale: 1 }}
           className="text-center max-w-sm mx-auto px-6"
         >
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 mx-auto mb-5">
-            <LogIn className="h-7 w-7 text-primary" />
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-soft mx-auto mb-5">
+            <LogIn className="h-7 w-7 text-accent" />
           </div>
           <h2 className="text-xl font-bold text-foreground mb-2">Connexion requise</h2>
           <p className="text-sm text-muted-foreground mb-6 leading-relaxed">

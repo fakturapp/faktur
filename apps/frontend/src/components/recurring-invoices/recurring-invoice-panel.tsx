@@ -1,12 +1,14 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
-import { Select } from '@/components/ui/select'
+import { SelectRoot, SelectTrigger, SelectValue, SelectIndicator, SelectPopover } from '@/components/ui/select'
+import { ListBoxRoot as ListBox, ListBoxItemRoot as ListBoxItem } from '@/components/ui/list-box'
 import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/toast'
 import { api } from '@/lib/api'
@@ -61,6 +63,9 @@ export function RecurringInvoicePanel({ open, editingId, onClose, onSaved }: Rec
   const [saving, setSaving] = useState(false)
   const [loadingDetail, setLoadingDetail] = useState(false)
   const [clients, setClients] = useState<ClientOption[]>([])
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => setMounted(true), [])
 
   const [name, setName] = useState('')
   const [frequency, setFrequency] = useState('monthly')
@@ -210,7 +215,7 @@ export function RecurringInvoicePanel({ open, editingId, onClose, onSaved }: Rec
     onSaved()
   }
 
-  return (
+  const content = (
     <AnimatePresence>
       {open && (
         <>
@@ -218,7 +223,7 @@ export function RecurringInvoicePanel({ open, editingId, onClose, onSaved }: Rec
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/50"
+            className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm"
             onClick={onClose}
           />
 
@@ -227,16 +232,16 @@ export function RecurringInvoicePanel({ open, editingId, onClose, onSaved }: Rec
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed inset-y-0 right-0 z-50 w-full max-w-2xl bg-background border-l border-border shadow-xl flex flex-col"
+            className="fixed inset-y-0 right-0 z-[100] w-full max-w-2xl bg-white dark:bg-card/40 dark:backdrop-blur-2xl border-l border-border/20 dark:border-border/40 dark:liquid-glass flex flex-col overflow-hidden shadow-xl dark:shadow-none rounded-l-3xl"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border/20 dark:border-border/40 relative z-10 dark:bg-card/20 dark:backdrop-blur-md">
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
                   <RefreshCw className="h-4.5 w-4.5 text-primary" />
                 </div>
                 <h2 className="text-lg font-semibold text-foreground">
-                  {isEditing ? 'Modifier la recurrence' : 'Nouvelle recurrence'}
+                  {isEditing ? 'Modifier la récurrence' : 'Nouvelle récurrence'}
                 </h2>
               </div>
               <button onClick={onClose} className="p-2 rounded-lg hover:bg-muted transition-colors">
@@ -268,12 +273,20 @@ export function RecurringInvoicePanel({ open, editingId, onClose, onSaved }: Rec
 
                     <div className="grid grid-cols-2 gap-4">
                       <Field>
-                        <FieldLabel htmlFor="recFrequency">Frequence *</FieldLabel>
-                        <Select id="recFrequency" value={frequency} onChange={(e) => setFrequency(e.target.value)}>
-                          {frequencyOptions.map((o) => (
-                            <option key={o.value} value={o.value}>{o.label}</option>
-                          ))}
-                        </Select>
+                        <FieldLabel htmlFor="recFrequency">Fréquence *</FieldLabel>
+                        <SelectRoot selectedKey={frequency} onSelectionChange={(k) => setFrequency(k as string)}>
+                          <SelectTrigger id="recFrequency">
+                            <SelectValue />
+                            <SelectIndicator />
+                          </SelectTrigger>
+                          <SelectPopover>
+                            <ListBox>
+                              {frequencyOptions.map((o) => (
+                                <ListBoxItem key={o.value} id={o.value}>{o.label}</ListBoxItem>
+                              ))}
+                            </ListBox>
+                          </SelectPopover>
+                        </SelectRoot>
                       </Field>
 
                       {frequency === 'custom' && (
@@ -327,16 +340,23 @@ export function RecurringInvoicePanel({ open, editingId, onClose, onSaved }: Rec
                   </FieldGroup>
                 </div>
 
-                {/* Client */}
                 <div>
                   <h3 className="text-sm font-semibold text-foreground mb-3">Client</h3>
                   <Field>
-                    <Select value={clientId} onChange={(e) => setClientId(e.target.value)}>
-                      <option value="">Aucun client</option>
-                      {clients.map((c) => (
-                        <option key={c.id} value={c.id}>{c.displayName}</option>
-                      ))}
-                    </Select>
+                    <SelectRoot selectedKey={clientId} onSelectionChange={(k) => setClientId(k === 'none' ? '' : k as string)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                        <SelectIndicator />
+                      </SelectTrigger>
+                      <SelectPopover>
+                        <ListBox>
+                          <ListBoxItem id="none">Aucun client</ListBoxItem>
+                          {clients.map((c) => (
+                            <ListBoxItem key={c.id} id={c.id}>{c.displayName}</ListBoxItem>
+                          ))}
+                        </ListBox>
+                      </SelectPopover>
+                    </SelectRoot>
                   </Field>
                 </div>
 
@@ -366,14 +386,22 @@ export function RecurringInvoicePanel({ open, editingId, onClose, onSaved }: Rec
                       </Field>
                       <Field>
                         <FieldLabel htmlFor="recPaymentMethod">Mode de paiement</FieldLabel>
-                        <Select id="recPaymentMethod" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
-                          <option value="">Non defini</option>
-                          <option value="bank_transfer">Virement bancaire</option>
-                          <option value="check">Cheque</option>
-                          <option value="cash">Especes</option>
-                          <option value="card">Carte bancaire</option>
-                          <option value="direct_debit">Prelevement</option>
-                        </Select>
+                        <SelectRoot selectedKey={paymentMethod} onSelectionChange={(k) => setPaymentMethod(k === 'none' ? '' : k as string)}>
+                          <SelectTrigger id="recPaymentMethod">
+                            <SelectValue />
+                            <SelectIndicator />
+                          </SelectTrigger>
+                          <SelectPopover>
+                            <ListBox>
+                              <ListBoxItem id="none">Non défini</ListBoxItem>
+                              <ListBoxItem id="bank_transfer">Virement bancaire</ListBoxItem>
+                              <ListBoxItem id="check">Chèque</ListBoxItem>
+                              <ListBoxItem id="cash">Espèces</ListBoxItem>
+                              <ListBoxItem id="card">Carte bancaire</ListBoxItem>
+                              <ListBoxItem id="direct_debit">Prélèvement</ListBoxItem>
+                            </ListBox>
+                          </SelectPopover>
+                        </SelectRoot>
                       </Field>
                     </div>
 
@@ -435,18 +463,22 @@ export function RecurringInvoicePanel({ open, editingId, onClose, onSaved }: Rec
                             placeholder="Qte"
                             className="text-sm"
                           />
-                          <Select
-                            value={line.unit}
-                            onChange={(e) => updateLine(idx, 'unit', e.target.value)}
-                            className="text-sm"
-                          >
-                            <option value="">Unite</option>
-                            <option value="heure">Heure</option>
-                            <option value="jour">Jour</option>
-                            <option value="unite">Unite</option>
-                            <option value="forfait">Forfait</option>
-                            <option value="mois">Mois</option>
-                          </Select>
+                          <SelectRoot selectedKey={line.unit} onSelectionChange={(k) => updateLine(idx, 'unit', k === 'none' ? '' : k as string)}>
+                            <SelectTrigger className="text-sm">
+                              <SelectValue />
+                              <SelectIndicator />
+                            </SelectTrigger>
+                            <SelectPopover>
+                              <ListBox>
+                                <ListBoxItem id="none">Unité</ListBoxItem>
+                                <ListBoxItem id="heure">Heure</ListBoxItem>
+                                <ListBoxItem id="jour">Jour</ListBoxItem>
+                                <ListBoxItem id="unite">Unité</ListBoxItem>
+                                <ListBoxItem id="forfait">Forfait</ListBoxItem>
+                                <ListBoxItem id="mois">Mois</ListBoxItem>
+                              </ListBox>
+                            </SelectPopover>
+                          </SelectRoot>
                           <Input
                             type="number"
                             step="0.01"
@@ -455,17 +487,21 @@ export function RecurringInvoicePanel({ open, editingId, onClose, onSaved }: Rec
                             placeholder="Prix HT"
                             className="text-sm"
                           />
-                          <Select
-                            value={line.vatRate}
-                            onChange={(e) => updateLine(idx, 'vatRate', e.target.value)}
-                            className="text-sm"
-                          >
-                            <option value="20">20%</option>
-                            <option value="10">10%</option>
-                            <option value="5.5">5,5%</option>
-                            <option value="2.1">2,1%</option>
-                            <option value="0">0%</option>
-                          </Select>
+                          <SelectRoot selectedKey={line.vatRate} onSelectionChange={(k) => updateLine(idx, 'vatRate', k as string)}>
+                            <SelectTrigger className="text-sm">
+                              <SelectValue />
+                              <SelectIndicator />
+                            </SelectTrigger>
+                            <SelectPopover>
+                              <ListBox>
+                                <ListBoxItem id="20">20%</ListBoxItem>
+                                <ListBoxItem id="10">10%</ListBoxItem>
+                                <ListBoxItem id="5.5">5.5%</ListBoxItem>
+                                <ListBoxItem id="2.1">2.1%</ListBoxItem>
+                                <ListBoxItem id="0">0%</ListBoxItem>
+                              </ListBox>
+                            </SelectPopover>
+                          </SelectRoot>
                         </div>
                         <div className="text-right text-xs text-muted-foreground">
                           Ligne : {((parseFloat(line.quantity) || 0) * (parseFloat(line.unitPrice) || 0)).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })} HT
@@ -494,12 +530,12 @@ export function RecurringInvoicePanel({ open, editingId, onClose, onSaved }: Rec
             )}
 
             {/* Footer */}
-            <div className="px-6 py-4 border-t border-border flex items-center justify-end gap-3">
+            <div className="px-6 py-4 border-t border-border/20 dark:border-border/40 relative z-10 dark:bg-card/20 dark:backdrop-blur-md flex items-center justify-end gap-3">
               <Button variant="outline" onClick={onClose} type="button">
                 Annuler
               </Button>
               <Button onClick={handleSubmit} disabled={saving || !name.trim() || lines.length === 0}>
-                {saving ? <><Spinner /> Enregistrement...</> : isEditing ? 'Mettre a jour' : 'Creer'}
+                {saving ? <><Spinner /> Enregistrement...</> : isEditing ? 'Mettre à jour' : 'Créer'}
               </Button>
             </div>
           </motion.div>
@@ -507,4 +543,7 @@ export function RecurringInvoicePanel({ open, editingId, onClose, onSaved }: Rec
       )}
     </AnimatePresence>
   )
+
+  if (!mounted) return null
+  return createPortal(content, document.body)
 }

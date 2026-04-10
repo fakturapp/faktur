@@ -24,7 +24,7 @@ export default function CheckoutLayout({ children }: { children: React.ReactNode
             href="https://fakturapp.cc"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary hover:underline font-medium transition-colors"
+            className="text-accent hover:underline font-medium transition-colors"
           >
             Faktur
           </a>

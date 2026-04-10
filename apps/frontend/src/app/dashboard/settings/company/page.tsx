@@ -10,7 +10,7 @@ import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/components/ui/toast'
 import { Spinner } from '@/components/ui/spinner'
-import { Dialog, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { PhoneInput } from '@/components/ui/phone-input'
 import { useCompanySettings, type Company } from '@/lib/company-settings-context'
 import { api } from '@/lib/api'
@@ -128,7 +128,7 @@ export default function CompanyInfoPage() {
           <Skeleton className="h-7 w-40" />
           <Skeleton className="h-4 w-64" />
         </div>
-        <div className="rounded-2xl border border-border/50 p-6 space-y-5">
+        <div className="rounded-xl bg-surface shadow-surface p-6 space-y-5">
           <div className="flex items-start gap-6">
             <Skeleton className="h-24 w-24 rounded-xl shrink-0" />
             <div className="flex-1 space-y-3">
@@ -158,7 +158,7 @@ export default function CompanyInfoPage() {
       {noCompany ? (
         <Card>
           <CardContent className="p-6 flex flex-col items-center py-12 text-center">
-            <Building2 className="h-10 w-10 text-muted-foreground/40 mb-4" />
+            <Building2 className="h-10 w-10 text-muted-secondary mb-4" />
             <p className="text-lg font-semibold text-foreground mb-1">Aucune entreprise</p>
             <p className="text-sm text-muted-foreground mb-4">Créez votre entreprise pour commencer à facturer.</p>
             <Button onClick={openEditModal}>
@@ -170,11 +170,11 @@ export default function CompanyInfoPage() {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-start gap-6 mb-6">
-              <div className="h-20 w-20 rounded-xl border border-border bg-muted/30 flex items-center justify-center overflow-hidden shrink-0">
+              <div className="h-20 w-20 rounded-xl bg-surface flex items-center justify-center overflow-hidden shrink-0">
                 {logoUrl ? (
                   <img src={logoUrl} alt="Logo" className="h-full w-full object-contain p-2" />
                 ) : (
-                  <Building2 className="h-8 w-8 text-muted-foreground/40" />
+                  <Building2 className="h-8 w-8 text-muted-secondary" />
                 )}
               </div>
               <div className="flex-1 min-w-0">
@@ -198,7 +198,7 @@ export default function CompanyInfoPage() {
               ].map((item) => (
                 <div key={item.label}>
                   <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{item.label}</span>
-                  <p className="text-sm text-foreground mt-0.5">{item.value || <span className="text-muted-foreground/50 italic">Non renseigné</span>}</p>
+                  <p className="text-sm text-foreground mt-0.5">{item.value || <span className="text-muted-secondary italic">Non renseigné</span>}</p>
                 </div>
               ))}
             </div>
@@ -213,7 +213,7 @@ export default function CompanyInfoPage() {
                   {form.addressLine1 || form.city ? (
                     <>{form.addressLine1}{form.addressLine2 ? `, ${form.addressLine2}` : ''}<br />{form.postalCode} {form.city}</>
                   ) : (
-                    <span className="text-muted-foreground/50 italic">Non renseignée</span>
+                    <span className="text-muted-secondary italic">Non renseignée</span>
                   )}
                 </p>
               </div>
@@ -224,21 +224,21 @@ export default function CompanyInfoPage() {
                 <Phone className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
                 <div>
                   <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Téléphone</span>
-                  <p className="text-sm text-foreground mt-0.5">{form.phone || <span className="text-muted-foreground/50 italic">—</span>}</p>
+                  <p className="text-sm text-foreground mt-0.5">{form.phone || <span className="text-muted-secondary italic">—</span>}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <Building2 className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
                 <div>
                   <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Email</span>
-                  <p className="text-sm text-foreground mt-0.5">{form.email || <span className="text-muted-foreground/50 italic">—</span>}</p>
+                  <p className="text-sm text-foreground mt-0.5">{form.email || <span className="text-muted-secondary italic">—</span>}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <Globe className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
                 <div>
                   <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Site web</span>
-                  <p className="text-sm text-foreground mt-0.5">{form.website || <span className="text-muted-foreground/50 italic">—</span>}</p>
+                  <p className="text-sm text-foreground mt-0.5">{form.website || <span className="text-muted-secondary italic">—</span>}</p>
                 </div>
               </div>
             </div>
@@ -248,7 +248,9 @@ export default function CompanyInfoPage() {
 
       {/* Multi-step edit modal */}
       <Dialog open={editModalOpen} onClose={() => setEditModalOpen(false)} className="max-w-lg">
-        <DialogTitle>Modifier les informations</DialogTitle>
+        <DialogHeader onClose={() => setEditModalOpen(false)}>
+          <DialogTitle>Modifier les informations</DialogTitle>
+        </DialogHeader>
 
         <div className="flex items-center gap-1 mt-4 mb-6">
           {editSteps.map((step, i) => (
@@ -357,11 +359,11 @@ export default function CompanyInfoPage() {
             <div className="space-y-4">
               <div className="flex items-start gap-6">
                 <div className="relative group">
-                  <div className="h-24 w-24 rounded-xl border-2 border-dashed border-border bg-muted/30 flex items-center justify-center overflow-hidden">
+                  <div className="h-24 w-24 rounded-xl border-2 border-dashed border-border bg-surface flex items-center justify-center overflow-hidden">
                     {editLogoUrl ? (
                       <img src={editLogoUrl} alt="Logo" className="h-full w-full object-contain p-2" />
                     ) : (
-                      <ImagePlus className="h-8 w-8 text-muted-foreground/50" />
+                      <ImagePlus className="h-8 w-8 text-muted-secondary" />
                     )}
                   </div>
                   {editLogoUrl && (

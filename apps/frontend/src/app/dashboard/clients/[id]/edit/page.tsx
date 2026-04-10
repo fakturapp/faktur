@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { Select } from '@/components/ui/select'
+import { FormSelect } from '@/components/ui/dropdown'
 import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
@@ -365,9 +365,23 @@ export default function ClientEditPage() {
                     <div className="col-span-3"><label className="text-sm font-medium text-foreground mb-1.5 block">Ville</label><Input value={form.city} onChange={(e) => update('city', e.target.value)} /></div>
                   </div>
                   <div><label className="text-sm font-medium text-foreground mb-1.5 block">Pays</label>
-                    <Select value={form.country} onChange={(e) => update('country', e.target.value)}>
-                      <option value="FR">France</option><option value="BE">Belgique</option><option value="CH">Suisse</option><option value="LU">Luxembourg</option><option value="DE">Allemagne</option><option value="ES">Espagne</option><option value="IT">Italie</option><option value="GB">Royaume-Uni</option><option value="US">Etats-Unis</option><option value="CA">Canada</option><option value="OTHER">Autre</option>
-                    </Select>
+                    <FormSelect
+                      value={form.country}
+                      onChange={(v) => update('country', v)}
+                      options={[
+                        { value: 'FR', label: 'France' },
+                        { value: 'BE', label: 'Belgique' },
+                        { value: 'CH', label: 'Suisse' },
+                        { value: 'LU', label: 'Luxembourg' },
+                        { value: 'DE', label: 'Allemagne' },
+                        { value: 'ES', label: 'Espagne' },
+                        { value: 'IT', label: 'Italie' },
+                        { value: 'GB', label: 'Royaume-Uni' },
+                        { value: 'US', label: 'Etats-Unis' },
+                        { value: 'CA', label: 'Canada' },
+                        { value: 'OTHER', label: 'Autre' },
+                      ]}
+                    />
                   </div>
                 </div>
               )}

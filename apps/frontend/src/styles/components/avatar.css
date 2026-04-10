@@ -1,0 +1,78 @@
+@layer components {
+/* Avatar — copied from HeroUI v3 */
+
+.avatar {
+  @apply relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full;
+  background-color: var(--color-default);
+}
+
+.avatar__fallback {
+  @apply flex size-full items-center justify-center text-[13px] font-medium;
+  background-color: var(--color-default);
+  letter-spacing: var(--tracking-ui);
+}
+
+.avatar__image {
+  @apply absolute inset-0 aspect-square size-full;
+  @apply transition-opacity duration-250 motion-reduce:transition-none;
+}
+
+.avatar--sm {
+  @apply size-8;
+
+  .avatar__fallback {
+    @apply text-[11px];
+  }
+}
+
+.avatar--md {
+  /* default */
+}
+
+.avatar--lg {
+  @apply size-12;
+
+  .avatar__fallback {
+    @apply text-[15px];
+  }
+}
+
+/* Fallback color variants */
+.avatar__fallback--accent {
+  color: var(--color-accent);
+}
+.avatar__fallback--default {
+  color: var(--color-default-foreground);
+}
+.avatar__fallback--success {
+  color: var(--color-success);
+}
+.avatar__fallback--warning {
+  color: var(--color-warning);
+}
+.avatar__fallback--danger {
+  color: var(--color-danger);
+}
+
+/* Soft variant */
+.avatar--soft {
+  background-color: transparent;
+}
+
+.avatar--soft .avatar__fallback--accent {
+  background-color: var(--color-accent-soft);
+  color: var(--color-accent-soft-foreground);
+}
+.avatar--soft .avatar__fallback--success {
+  background-color: var(--color-success-soft);
+  color: var(--color-success-soft-foreground);
+}
+.avatar--soft .avatar__fallback--warning {
+  background-color: var(--color-warning-soft);
+  color: var(--color-warning-soft-foreground);
+}
+.avatar--soft .avatar__fallback--danger {
+  background-color: var(--color-danger-soft);
+  color: var(--color-danger-soft-foreground);
+}
+}
