@@ -134,7 +134,7 @@ export default function InvoiceDraftsPage() {
         <div className="flex items-center gap-3">
           <Link
             href="/dashboard/invoices"
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-border hover:bg-muted/50 transition-colors"
+            className="flex h-9 w-9 items-center justify-center rounded-lg bg-overlay shadow-surface hover:bg-surface-hover transition-colors"
           >
             <ArrowLeft className="h-4 w-4 text-muted-foreground" />
           </Link>
@@ -167,7 +167,7 @@ export default function InvoiceDraftsPage() {
       {loading ? (
         <div className="space-y-2">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="flex items-center gap-4 rounded-xl border border-border bg-card/50 p-4">
+            <div key={i} className="flex items-center gap-4 rounded-lg bg-overlay shadow-surface p-4">
               <Skeleton className="h-10 w-10 rounded-lg shrink-0" />
               <div className="flex-1 min-w-0 space-y-1.5">
                 <div className="flex items-center gap-2">
@@ -185,8 +185,8 @@ export default function InvoiceDraftsPage() {
         </div>
       ) : invoices.length === 0 ? (
         <motion.div variants={fadeUp} custom={2} className="text-center py-16">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/50 mx-auto mb-4">
-            <FileText className="h-8 w-8 text-muted-foreground/50" />
+          <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-surface-hover mx-auto mb-4">
+            <FileText className="h-8 w-8 text-muted-secondary" />
           </div>
           <p className="text-lg font-medium text-foreground">
             {debouncedSearch ? 'Aucun resultat' : 'Aucun brouillon'}
@@ -208,7 +208,7 @@ export default function InvoiceDraftsPage() {
             <motion.div key={invoice.id} variants={fadeUp} custom={2 + i * 0.3}>
               <Link
                 href={`/dashboard/invoices/${invoice.id}/edit`}
-                className="w-full flex items-center gap-4 rounded-xl border border-border bg-card/50 hover:bg-card/80 p-4 transition-colors text-left group"
+                className="w-full flex items-center gap-4 rounded-lg bg-overlay shadow-surface hover:bg-surface-hover p-4 transition-colors text-left group"
               >
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted-foreground/10">
                   <FileText className="h-5 w-5 text-muted-foreground" />
@@ -246,7 +246,7 @@ export default function InvoiceDraftsPage() {
                 <button
                   onClick={(e) => handleDownloadPdf(e, invoice.id)}
                   disabled={downloadingId === invoice.id}
-                  className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors shrink-0"
+                  className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-accent hover:bg-accent-soft transition-colors shrink-0"
                   title="Télécharger le PDF"
                 >
                   <Download className={`h-4 w-4 ${downloadingId === invoice.id ? 'animate-pulse' : ''}`} />
@@ -261,7 +261,7 @@ export default function InvoiceDraftsPage() {
                   <Trash2 className={`h-4 w-4 ${deletingId === invoice.id ? 'animate-pulse' : ''}`} />
                 </button>
 
-                <ChevronRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors shrink-0" />
+                <ChevronRight className="h-4 w-4 text-muted-secondary group-hover:text-muted-foreground transition-colors shrink-0" />
               </Link>
             </motion.div>
           ))}

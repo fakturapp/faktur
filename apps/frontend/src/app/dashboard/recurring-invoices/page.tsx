@@ -174,10 +174,10 @@ export default function RecurringInvoicesPage() {
 
       {/* Stats */}
       <motion.div variants={fadeUp} custom={1} className="grid grid-cols-1 gap-4 @xl/main:grid-cols-3">
-        <div className="rounded-xl border border-border bg-card/50 p-4">
+        <div className="rounded-lg bg-overlay shadow-surface p-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-              <RefreshCw className="h-4.5 w-4.5 text-primary" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
+              <RefreshCw className="h-4.5 w-4.5 text-accent" />
             </div>
             <div>
               <p className="text-2xl font-bold text-foreground">{items.length}</p>
@@ -185,10 +185,10 @@ export default function RecurringInvoicesPage() {
             </div>
           </div>
         </div>
-        <div className="rounded-xl border border-border bg-card/50 p-4">
+        <div className="rounded-lg bg-overlay shadow-surface p-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-500/10">
-              <Play className="h-4.5 w-4.5 text-green-500" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-success-soft">
+              <Play className="h-4.5 w-4.5 text-success" />
             </div>
             <div>
               <p className="text-2xl font-bold text-foreground">{activeCount}</p>
@@ -196,7 +196,7 @@ export default function RecurringInvoicesPage() {
             </div>
           </div>
         </div>
-        <div className="rounded-xl border border-border bg-card/50 p-4">
+        <div className="rounded-lg bg-overlay shadow-surface p-4">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-500/10">
               <Pause className="h-4.5 w-4.5 text-orange-500" />
@@ -220,7 +220,7 @@ export default function RecurringInvoicesPage() {
             className="pl-10"
           />
         </div>
-        <div className="flex rounded-lg border border-border bg-muted/30 p-0.5">
+        <div className="flex rounded-lg bg-surface-secondary p-0.5">
           {[
             { id: 'all' as const, label: 'Toutes' },
             { id: 'active' as const, label: 'Actives' },
@@ -231,7 +231,7 @@ export default function RecurringInvoicesPage() {
               onClick={() => setFilterActive(f.id)}
               className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
                 filterActive === f.id
-                  ? 'bg-card text-foreground shadow-sm'
+                  ? 'bg-overlay text-foreground shadow-surface'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
@@ -245,7 +245,7 @@ export default function RecurringInvoicesPage() {
       {loading ? (
         <div className="space-y-2">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="flex items-center gap-4 rounded-xl border border-border bg-card/50 p-4">
+            <div key={i} className="flex items-center gap-4 rounded-lg bg-overlay shadow-surface p-4">
               <Skeleton className="h-10 w-10 rounded-lg shrink-0" />
               <div className="flex-1 min-w-0 space-y-1.5">
                 <Skeleton className="h-4 w-40" />
@@ -258,8 +258,8 @@ export default function RecurringInvoicesPage() {
         </div>
       ) : filtered.length === 0 ? (
         <motion.div variants={fadeUp} custom={3} className="text-center py-16">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/50 mx-auto mb-4">
-            <RefreshCw className="h-8 w-8 text-muted-foreground/50" />
+          <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-surface-hover mx-auto mb-4">
+            <RefreshCw className="h-8 w-8 text-muted-secondary" />
           </div>
           <p className="text-lg font-medium text-foreground">
             {search ? 'Aucun résultat' : 'Aucune récurrence'}
@@ -279,13 +279,13 @@ export default function RecurringInvoicesPage() {
         <div className="space-y-2">
           {paginatedItems.map((item, i) => (
             <motion.div key={item.id} variants={fadeUp} custom={3 + i * 0.3}>
-              <div className="w-full flex items-center gap-4 rounded-xl border border-border bg-card/50 hover:bg-card/80 p-4 transition-colors group">
+              <div className="w-full flex items-center gap-4 rounded-lg bg-overlay shadow-surface hover:bg-surface-hover p-4 transition-colors group">
                 {/* Icon */}
                 <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
-                  item.isActive ? 'bg-green-500/10' : 'bg-muted'
+                  item.isActive ? 'bg-success-soft' : 'bg-muted'
                 }`}>
                   {item.isActive ? (
-                    <RefreshCw className="h-5 w-5 text-green-500" />
+                    <RefreshCw className="h-5 w-5 text-success" />
                   ) : (
                     <Pause className="h-5 w-5 text-muted-foreground" />
                   )}
@@ -326,7 +326,7 @@ export default function RecurringInvoicesPage() {
                 <button
                   onClick={() => handleGenerate(item)}
                   disabled={generatingId === item.id}
-                  className="h-8 px-3 rounded-lg flex items-center gap-1.5 text-xs font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors shrink-0 disabled:opacity-50"
+                  className="h-8 px-3 rounded-lg flex items-center gap-1.5 text-xs font-medium bg-accent-soft text-accent hover:bg-primary/20 transition-colors shrink-0 disabled:opacity-50"
                   title="Générer la facture"
                 >
                   {generatingId === item.id ? <Spinner className="h-3.5 w-3.5" /> : <Zap className="h-3.5 w-3.5" />}
@@ -337,7 +337,7 @@ export default function RecurringInvoicesPage() {
                 <Dropdown
                   align="right"
                   trigger={
-                    <button className="p-1.5 rounded-md hover:bg-muted transition-colors">
+                    <button className="p-1.5 rounded-md hover:bg-surface-hover transition-colors">
                       <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
                     </button>
                   }

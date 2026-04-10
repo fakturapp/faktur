@@ -159,10 +159,10 @@ export default function ExpensesPage() {
 
       {/* Stats */}
       <motion.div variants={fadeUp} custom={1} className="grid grid-cols-1 gap-4 @xl/main:grid-cols-3">
-        <div className="rounded-xl border border-border bg-card/50 p-4">
+        <div className="rounded-lg bg-overlay shadow-surface p-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-500/10">
-              <TrendingDown className="h-4.5 w-4.5 text-red-500" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-danger-soft">
+              <TrendingDown className="h-4.5 w-4.5 text-danger" />
             </div>
             <div>
               <p className="text-2xl font-bold text-foreground">
@@ -172,7 +172,7 @@ export default function ExpensesPage() {
             </div>
           </div>
         </div>
-        <div className="rounded-xl border border-border bg-card/50 p-4">
+        <div className="rounded-lg bg-overlay shadow-surface p-4">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-500/10">
               <Receipt className="h-4.5 w-4.5 text-orange-500" />
@@ -185,10 +185,10 @@ export default function ExpensesPage() {
             </div>
           </div>
         </div>
-        <div className="rounded-xl border border-border bg-card/50 p-4">
+        <div className="rounded-lg bg-overlay shadow-surface p-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-              <Wallet className="h-4.5 w-4.5 text-primary" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
+              <Wallet className="h-4.5 w-4.5 text-accent" />
             </div>
             <div>
               <p className="text-2xl font-bold text-foreground">
@@ -217,7 +217,7 @@ export default function ExpensesPage() {
       {loading ? (
         <div className="space-y-2">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="flex items-center gap-4 rounded-xl border border-border bg-card/50 p-4">
+            <div key={i} className="flex items-center gap-4 rounded-lg bg-overlay shadow-surface p-4">
               <Skeleton className="h-10 w-10 rounded-lg shrink-0" />
               <div className="flex-1 min-w-0 space-y-1.5">
                 <Skeleton className="h-4 w-48" />
@@ -229,8 +229,8 @@ export default function ExpensesPage() {
         </div>
       ) : filtered.length === 0 ? (
         <motion.div variants={fadeUp} custom={3} className="text-center py-16">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/50 mx-auto mb-4">
-            <Wallet className="h-8 w-8 text-muted-foreground/50" />
+          <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-surface-hover mx-auto mb-4">
+            <Wallet className="h-8 w-8 text-muted-secondary" />
           </div>
           <p className="text-lg font-medium text-foreground">
             {search ? 'Aucun resultat' : 'Aucune depense'}
@@ -253,7 +253,7 @@ export default function ExpensesPage() {
               </h3>
               <div className="space-y-2">
                 {grouped[monthKey].map((item) => (
-                  <div key={item.id} className="w-full flex items-center gap-4 rounded-xl border border-border bg-card/50 hover:bg-card/80 p-4 transition-colors group">
+                  <div key={item.id} className="w-full flex items-center gap-4 rounded-lg bg-overlay shadow-surface hover:bg-surface-hover p-4 transition-colors group">
                     {/* Icon */}
                     <div
                       className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
@@ -296,7 +296,7 @@ export default function ExpensesPage() {
                     <Dropdown
                       align="right"
                       trigger={
-                        <button className="p-1.5 rounded-md hover:bg-muted transition-colors">
+                        <button className="p-1.5 rounded-md hover:bg-surface-hover transition-colors">
                           <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
                         </button>
                       }
