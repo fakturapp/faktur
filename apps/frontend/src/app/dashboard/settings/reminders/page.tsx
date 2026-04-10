@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Field, FieldGroup, FieldLabel, FieldDescription } from '@/components/ui/field'
-import { Select } from '@/components/ui/select'
+import { FormSelect } from '@/components/ui/dropdown'
 import { Switch } from '@/components/ui/switch'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Spinner } from '@/components/ui/spinner'
@@ -204,18 +204,16 @@ export default function ReminderSettingsPage() {
                 <h3 className="text-sm font-semibold text-foreground">Compte email</h3>
                 <Field>
                   <FieldLabel htmlFor="emailAccount">Compte utilise pour les relances</FieldLabel>
-                  <Select
+                  <FormSelect
                     id="emailAccount"
                     value={emailAccountId}
-                    onChange={(e) => setEmailAccountId(e.target.value)}
-                  >
-                    <option value="">Selectionner un compte</option>
-                    {accounts.map((a) => (
-                      <option key={a.id} value={a.id}>
-                        {a.email} ({a.provider})
-                      </option>
-                    ))}
-                  </Select>
+                    onChange={setEmailAccountId}
+                    placeholder="Selectionner un compte"
+                    options={[
+                      { value: '', label: 'Selectionner un compte' },
+                      ...accounts.map((a) => ({ value: a.id, label: `${a.email} (${a.provider})` })),
+                    ]}
+                  />
                   {accounts.length === 0 && !accountsLoading && (
                     <p className="text-xs text-orange-500 mt-1">
                       Aucun compte email configure. Ajoutez-en un dans Parametres &gt; Email.

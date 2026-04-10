@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Avatar } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { Select } from '@/components/ui/select'
+import { FormSelect } from '@/components/ui/dropdown'
 import { Separator } from '@/components/ui/separator'
 import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Dropdown, DropdownItem, DropdownSeparator } from '@/components/ui/dropdown'
@@ -751,15 +751,16 @@ export default function TeamPage() {
 
               <Field>
                 <FieldLabel htmlFor="inviteRole">Rôle</FieldLabel>
-                <Select
+                <FormSelect
                   id="inviteRole"
                   value={inviteRole}
-                  onChange={(e) => setInviteRole(e.target.value)}
-                >
-                  <option value="viewer">Lecteur - Consultation en lecture seule</option>
-                  <option value="member">Membre - Créer des factures et devis</option>
-                  <option value="admin">Administrateur - Gestion des membres</option>
-                </Select>
+                  onChange={setInviteRole}
+                  options={[
+                    { value: 'viewer', label: 'Lecteur - Consultation en lecture seule' },
+                    { value: 'member', label: 'Membre - Créer des factures et devis' },
+                    { value: 'admin', label: 'Administrateur - Gestion des membres' },
+                  ]}
+                />
               </Field>
 
               <DialogFooter>
@@ -817,11 +818,15 @@ export default function TeamPage() {
         </DialogHeader>
 
         <div className="mt-4">
-          <Select value={newRole} onChange={(e) => setNewRole(e.target.value)}>
-            <option value="viewer">Lecteur</option>
-            <option value="member">Membre</option>
-            {isSuperAdmin && <option value="admin">Administrateur</option>}
-          </Select>
+          <FormSelect
+            value={newRole}
+            onChange={setNewRole}
+            options={[
+              { value: 'viewer', label: 'Lecteur' },
+              { value: 'member', label: 'Membre' },
+              ...(isSuperAdmin ? [{ value: 'admin', label: 'Administrateur' }] : []),
+            ]}
+          />
         </div>
 
         <DialogFooter>

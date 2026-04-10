@@ -10,7 +10,7 @@ import { Field, FieldGroup, FieldLabel, FieldDescription } from '@/components/ui
 import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/components/ui/toast'
 import { Spinner } from '@/components/ui/spinner'
-import { Select } from '@/components/ui/select'
+import { FormSelect } from '@/components/ui/dropdown'
 import { Badge } from '@/components/ui/badge'
 import { useCompanySettings } from '@/lib/company-settings-context'
 import { api } from '@/lib/api'
@@ -132,13 +132,18 @@ export default function PaymentPage() {
 
                 <Field>
                   <FieldLabel htmlFor="currency">Devise</FieldLabel>
-                  <Select id="currency" value={paymentForm.currency} onChange={(e) => setPaymentForm((p) => ({ ...p, currency: e.target.value }))}>
-                    <option value="EUR">EUR - Euro</option>
-                    <option value="USD">USD - Dollar américain</option>
-                    <option value="GBP">GBP - Livre sterling</option>
-                    <option value="CHF">CHF - Franc suisse</option>
-                    <option value="CAD">CAD - Dollar canadien</option>
-                  </Select>
+                  <FormSelect
+                    id="currency"
+                    value={paymentForm.currency}
+                    onChange={(v) => setPaymentForm((p) => ({ ...p, currency: v }))}
+                    options={[
+                      { value: 'EUR', label: 'EUR - Euro' },
+                      { value: 'USD', label: 'USD - Dollar américain' },
+                      { value: 'GBP', label: 'GBP - Livre sterling' },
+                      { value: 'CHF', label: 'CHF - Franc suisse' },
+                      { value: 'CAD', label: 'CAD - Dollar canadien' },
+                    ]}
+                  />
                   <FieldDescription>La devise utilisée par défaut sur vos factures et devis.</FieldDescription>
                 </Field>
 
