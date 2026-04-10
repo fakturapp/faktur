@@ -5,7 +5,7 @@ import { useEffect, useRef, useLayoutEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronRight } from 'lucide-react'
+import { ChevronDown, ChevronRight } from 'lucide-react'
 
 interface DropdownProps {
   trigger: React.ReactNode
@@ -272,3 +272,113 @@ export function DropdownLabel({ children, className }: { children: React.ReactNo
 }
 
 export const DropdownSeparator = () => <div className="my-1.5 h-px bg-separator" />
+
+/* ── FormSelect (native <select> replacement) ── */
+
+interface FormSelectProps {
+  value: string
+  onChange: (value: string) => void
+  options: { value: string; label: string }[]
+  placeholder?: string
+  className?: string
+  id?: string
+  disabled?: boolean
+  showCheck?: boolean
+}
+
+export function FormSelect({
+  value,
+  onChange,
+  options,
+  placeholder = 'Sélectionner...',
+  className,
+  id,
+  disabled,
+  showCheck = true,
+}: FormSelectProps) {
+  const [open, setOpen] = useState(false)
+  const triggerBtnRef = useRef<HTMLButtonElement>(null)
+  const popupRef = useRef<HTMLDivElement>(null)
+  const [pos, setPos] = useState({ top: 0, left: 0, width: 220 })
+
+  const selected = options.find((o) => o.value === value)
+
+  useEffect(() => {
+    if (!open) return
+    function handleClick(e: MouseEvent) {
+      const target = e.target as Node
+      if (
+        triggerBtnRef.current && !triggerBtnRef.current.contains(target) &&
+        popupRef.current && !popupRef.current.contains(target)
+      ) {
+        setOpen(false)
+      }
+    }
+    function handleEscape(e: KeyboardEvent) {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    document.addEventListener('keydown', handleEscape)
+    return () => {
+      document.removeEventListener('mousedown', handleClick)
+      document.removeEventListener('keydown', handleEscape)
+    }
+  }, [open])
+
+  useLayoutEffect(() => {
+    if (!open || !triggerBtnRef.current) return
+    const rect = triggerBtnRef.current.getBoundingClientRect()
+    setPos({ top: rect.bottom + 4, left: rect.left, width: Math.max(220, rect.width) })
+  }, [open])
+
+  const popup = (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          ref={popupRef}
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -4 }}
+          transition={{ duration: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
+          className="fixed z-[9999] rounded-xl bg-overlay shadow-overlay overflow-hidden border border-border/10"
+          style={{ top: pos.top, left: pos.left, minWidth: pos.width }}
+        >
+          <div className="p-1.5 max-h-[280px] overflow-y-auto">
+            {options.map((opt) => (
+              <DropdownItem
+                key={opt.value}
+                selected={showCheck ? value === opt.value : undefined}
+                onClick={() => { onChange(opt.value); setOpen(false) }}
+              >
+                {opt.label}
+              </DropdownItem>
+            ))}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+
+  return (
+    <div className="relative">
+      <button
+        ref={triggerBtnRef}
+        type="button"
+        id={id}
+        disabled={disabled}
+        onClick={() => !disabled && setOpen(!open)}
+        className={cn(
+          'input w-full flex items-center justify-between gap-2 text-left',
+          disabled && 'opacity-50 cursor-not-allowed',
+          className
+        )}
+      >
+        <span className={cn('truncate text-sm', !selected && 'text-muted-foreground')}>
+          {selected?.label || placeholder}
+        </span>
+        <ChevronDown className={cn('h-4 w-4 shrink-0 text-muted-foreground transition-transform', open && 'rotate-180')} />
+      </button>
+      {typeof document !== 'undefined' && createPortal(popup, document.body)}
+    </div>
+  )
+}
