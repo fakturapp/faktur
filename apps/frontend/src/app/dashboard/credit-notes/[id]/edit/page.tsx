@@ -13,7 +13,7 @@ import { api } from '@/lib/api'
 import { A4Sheet, ClientModal, type DocumentLine, type ClientInfo, type CompanyInfo } from '@/components/shared/a4-sheet'
 import { DocumentOptionsPanel } from '@/components/shared/document-options'
 import { Save, ArrowLeft, Eye, Pencil, SlidersHorizontal, X, FileText } from 'lucide-react'
-import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
 import { ProductCatalogModal, type CatalogProduct } from '@/components/products/product-catalog-modal'
 import { CollaborationToolbar, CollaborationReadOnlyBanner, CollaborationEditor } from '@/components/collaboration/collaboration-toolbar'
@@ -635,8 +635,10 @@ function EditCreditNoteContent() {
       />
 
       <Dialog open={showModal} onClose={cancelNavigation} className="max-w-sm">
-        <DialogTitle>Modifications non enregistrees</DialogTitle>
-        <p className="mt-2 text-sm text-muted-foreground">Vous avez des modifications non enregistrees. Que souhaitez-vous faire ?</p>
+        <DialogHeader showClose={false}>
+          <DialogTitle>Modifications non enregistrees</DialogTitle>
+          <DialogDescription>Vous avez des modifications non enregistrees. Que souhaitez-vous faire ?</DialogDescription>
+        </DialogHeader>
         <DialogFooter>
           <Button variant="outline" size="sm" onClick={cancelNavigation}>Annuler</Button>
           <Button variant="ghost" size="sm" onClick={() => confirmNavigation('/dashboard/credit-notes')}>Ignorer</Button>

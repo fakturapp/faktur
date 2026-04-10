@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Pagination } from '@/components/ui/pagination'
 import { Dropdown, DropdownItem, DropdownSeparator } from '@/components/ui/dropdown'
-import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { api } from '@/lib/api'
 import { useToast } from '@/components/ui/toast'
 import { Spinner } from '@/components/ui/spinner'
@@ -325,10 +325,12 @@ export default function ExpensesPage() {
       />
 
       <Dialog open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} className="max-w-sm">
-        <DialogTitle>Supprimer la depense</DialogTitle>
-        <DialogDescription>
-          Etes-vous sur de vouloir supprimer cette depense ? Cette action est irreversible.
-        </DialogDescription>
+        <DialogHeader showClose={false}>
+          <DialogTitle>Supprimer la depense</DialogTitle>
+          <DialogDescription>
+            Etes-vous sur de vouloir supprimer cette depense ? Cette action est irreversible.
+          </DialogDescription>
+        </DialogHeader>
         <DialogFooter>
           <Button variant="outline" size="sm" onClick={() => setDeleteConfirm(null)}>Annuler</Button>
           <Button variant="destructive" size="sm" disabled={deleting} onClick={handleDelete}>

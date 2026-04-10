@@ -17,7 +17,7 @@ import { retrieveAiDocument, clearAiDocument } from '@/lib/ai-document'
 import { Tabs } from '@/components/ui/tabs'
 import { AiChatSidebar } from '@/components/ai/ai-chat-sidebar'
 import { AiSheetOverlay } from '@/components/ai/ai-sheet-overlay'
-import { Dialog, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
 import { useTrackFeature } from '@/hooks/use-analytics'
 import { FirstDocumentBanner } from '@/components/shared/first-document-banner'
@@ -826,8 +826,10 @@ export default function NewInvoicePage() {
       />
 
       <Dialog open={showModal} onClose={cancelNavigation} className="max-w-sm">
-        <DialogTitle>Modifications non enregistrées</DialogTitle>
-        <p className="mt-2 text-sm text-muted-foreground">Vous avez des modifications non enregistrées. Que souhaitez-vous faire ?</p>
+        <DialogHeader showClose={false}>
+          <DialogTitle>Modifications non enregistrées</DialogTitle>
+          <DialogDescription>Vous avez des modifications non enregistrées. Que souhaitez-vous faire ?</DialogDescription>
+        </DialogHeader>
         <DialogFooter>
           <Button variant="outline" size="sm" onClick={cancelNavigation}>Annuler</Button>
           <Button variant="ghost" size="sm" onClick={() => confirmNavigation('/dashboard/invoices')}>Ignorer</Button>

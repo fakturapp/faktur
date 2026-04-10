@@ -14,7 +14,7 @@ import { api } from '@/lib/api'
 import { A4Sheet, ClientModal, type DocumentLine, type ClientInfo, type CompanyInfo } from '@/components/shared/a4-sheet'
 import { DocumentOptionsPanel } from '@/components/shared/document-options'
 import { Save, ArrowLeft, Eye, Pencil, SlidersHorizontal, Download, Link2, Unlink, X, Sparkles, Settings } from 'lucide-react'
-import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { useUnsavedChanges } from '@/hooks/use-unsaved-changes'
 import { ProductCatalogModal, type CatalogProduct } from '@/components/products/product-catalog-modal'
 import { Tabs } from '@/components/ui/tabs'
@@ -872,8 +872,10 @@ function EditInvoiceContent() {
       />
 
       <Dialog open={showModal} onClose={cancelNavigation} className="max-w-sm">
-        <DialogTitle>Modifications non enregistrées</DialogTitle>
-        <p className="mt-2 text-sm text-muted-foreground">Vous avez des modifications non enregistrées. Que souhaitez-vous faire ?</p>
+        <DialogHeader showClose={false}>
+          <DialogTitle>Modifications non enregistrées</DialogTitle>
+          <DialogDescription>Vous avez des modifications non enregistrées. Que souhaitez-vous faire ?</DialogDescription>
+        </DialogHeader>
         <DialogFooter>
           <Button variant="outline" size="sm" onClick={cancelNavigation}>Annuler</Button>
           <Button variant="ghost" size="sm" onClick={() => confirmNavigation('/dashboard/invoices')}>Ignorer</Button>
@@ -882,10 +884,12 @@ function EditInvoiceContent() {
       </Dialog>
 
       <Dialog open={showUnlinkConfirm} onClose={() => setShowUnlinkConfirm(false)} className="max-w-sm">
-        <DialogTitle>Délier le devis</DialogTitle>
-        <DialogDescription>
-          Êtes-vous sûr de vouloir délier le devis {sourceQuote?.quoteNumber} de cette facture ? Cette action est réversible.
-        </DialogDescription>
+        <DialogHeader showClose={false}>
+          <DialogTitle>Délier le devis</DialogTitle>
+          <DialogDescription>
+            Êtes-vous sûr de vouloir délier le devis {sourceQuote?.quoteNumber} de cette facture ? Cette action est réversible.
+          </DialogDescription>
+        </DialogHeader>
         <DialogFooter>
           <Button variant="outline" size="sm" onClick={() => setShowUnlinkConfirm(false)}>Annuler</Button>
           <Button variant="destructive" size="sm" disabled={unlinking} onClick={async () => { await handleUnlinkQuote(); setShowUnlinkConfirm(false) }}>
