@@ -120,10 +120,10 @@ export const controllers = {
       },
     },
     session: {
+      CheckEmail: () => import('#controllers/auth/session/check_email'),
       Login: () => import('#controllers/auth/session/login'),
       Logout: () => import('#controllers/auth/session/logout'),
       Me: () => import('#controllers/auth/session/me'),
-      CheckEmail: () => import('#controllers/auth/session/check_email'),
     },
     vault: {
       Unlock: () => import('#controllers/auth/vault/unlock'),

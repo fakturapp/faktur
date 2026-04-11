@@ -167,6 +167,7 @@ function LoginContent() {
         initial: (data.initial ?? email[0] ?? '?').toUpperCase(),
       })
       setEmailStatus('exists')
+      setStage('password')
     }, 700)
 
     return () => clearTimeout(timer)
@@ -615,22 +616,6 @@ function LoginContent() {
                               )}
                             </div>
                           </div>
-                        )}
-
-                        {emailStatus === 'exists' && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 14 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                          >
-                            <Button
-                              type="button"
-                              className="w-full h-11 font-semibold gap-2"
-                              onClick={() => setStage('password')}
-                            >
-                              Continuer <ArrowRight className="h-4 w-4" />
-                            </Button>
-                          </motion.div>
                         )}
 
                         {emailStatus === 'not-exists' && (
