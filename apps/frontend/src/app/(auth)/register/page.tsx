@@ -105,6 +105,14 @@ function RegisterContent() {
   const passwordStrength = getPasswordStrength(password)
 
   useEffect(() => {
+    const preEmail = searchParams.get('email')
+    if (preEmail && !email) {
+      setEmail(preEmail)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
     const gd = searchParams.get('google_data')
     if (!gd) return
     setGoogleData(gd)
