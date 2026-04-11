@@ -655,7 +655,6 @@ function PlatformCard({
 }: {
   platform: Platform
   isCurrentlyInstalled?: boolean
-  /** Libellé OS quand Faktur Desktop tourne déjà sur cette carte (Windows / macOS / Linux). */
   installedOsBadge?: string | null
 }) {
   const isSoon = platform.status === 'soon'
@@ -721,11 +720,6 @@ function PlatformCard({
             <Check className="h-3.5 w-3.5 shrink-0" />
             <span>Installée</span>
           </span>
-          {installedOsBadge ? (
-            <Badge variant="success" className="text-[10px] font-semibold tabular-nums">
-              Faktur Desktop · {installedOsBadge}
-            </Badge>
-          ) : null}
         </Button>
       )}
       {isSoon && (
