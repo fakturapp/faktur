@@ -9,13 +9,19 @@ import { Input } from '@/components/ui/input'
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldError } from '@/components/ui/field'
 import { Avatar } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
+import { AccountIndicator } from '@/components/ui/account-indicator/account-indicator'
 import { useAuth } from '@/lib/auth'
 import { isFakturDesktop } from '@/lib/is-desktop'
 import { api } from '@/lib/api'
 import { Spinner } from '@/components/ui/spinner'
 import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile'
 import { startAuthentication } from '@simplewebauthn/browser'
-import { LogOut, LayoutDashboard, ArrowRight, Shield, Eye, EyeOff, KeyRound, Smartphone, Lock } from 'lucide-react'
+import { LogOut, LayoutDashboard, ArrowRight, Shield, Eye, EyeOff, KeyRound, Smartphone, Lock, Mail } from 'lucide-react'
+
+type LoginStage = 'email' | 'password'
+type EmailStatus = 'idle' | 'checking' | 'exists' | 'not-exists'
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const LAST_LOGIN_TTL_MS = 30 * 24 * 60 * 60 * 1000
 
 const fadeIn = {
   hidden: { opacity: 0, y: 12 },
@@ -64,6 +70,9 @@ function LoginContent() {
   const [turnstileToken, setTurnstileToken] = useState('')
   const [redirecting, setRedirecting] = useState(false)
   const [isDesktop, setIsDesktop] = useState(false)
+  const [stage, setStage] = useState<LoginStage>('email')
+  const [emailStatus, setEmailStatus] = useState<EmailStatus>('idle')
+  const [checkData, setCheckData] = useState<{ avatarUrl: string | null; initial: string } | null>(null)
   const turnstileRef = useRef<TurnstileInstance>(null)
   const resetTurnstile = useCallback(() => {
     setTurnstileToken('')
@@ -96,6 +105,73 @@ function LoginContent() {
       setError(OAUTH_ERRORS[oauthError] || 'Une erreur est survenue.')
     }
   }, [])
+
+  useEffect(() => {
+    if (searchParams.get('error')) return
+    if (searchParams.get('token')) return
+    if (isDesktop) return
+    if (stage !== 'email') return
+
+    try {
+      const raw = localStorage.getItem('faktur_last_login')
+      if (!raw) return
+      const parsed = JSON.parse(raw) as {
+        email?: string
+        avatarUrl?: string | null
+        initial?: string
+        ts?: number
+      }
+      if (!parsed.email || !parsed.ts || Date.now() - parsed.ts > LAST_LOGIN_TTL_MS) {
+        localStorage.removeItem('faktur_last_login')
+        return
+      }
+      setEmail(parsed.email)
+      setCheckData({
+        avatarUrl: parsed.avatarUrl ?? null,
+        initial: (parsed.initial ?? parsed.email[0] ?? '?').toUpperCase(),
+      })
+      setEmailStatus('exists')
+      setStage('password')
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDesktop])
+
+  useEffect(() => {
+    if (stage !== 'email') return
+    if (requires2FA) return
+    if (!email || !EMAIL_REGEX.test(email)) {
+      setEmailStatus('idle')
+      return
+    }
+
+    setEmailStatus('checking')
+    const timer = setTimeout(async () => {
+      const { data, error: err } = await api.post<{
+        exists: boolean
+        avatarUrl?: string | null
+        initial?: string
+      }>('/auth/check-email', { email })
+
+      if (err) {
+        setEmailStatus('idle')
+        return
+      }
+
+      if (!data?.exists) {
+        setEmailStatus('not-exists')
+        return
+      }
+
+      setCheckData({
+        avatarUrl: data.avatarUrl ?? null,
+        initial: (data.initial ?? email[0] ?? '?').toUpperCase(),
+      })
+      setEmailStatus('exists')
+    }, 700)
+
+    return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [email, stage, requires2FA])
 
   async function handleGoogleLogin() {
     setError('')
@@ -476,111 +552,233 @@ function LoginContent() {
                 </div>
               </motion.div>
 
-              {/* Form */}
-              <form onSubmit={handleSubmit}>
-                <FieldGroup>
-                  {error && (
+              <motion.div variants={fadeIn} custom={4}>
+                <AnimatePresence mode="wait" initial={false}>
+                  {stage === 'email' ? (
                     <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
+                      key="stage-email"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.25 }}
                     >
-                      <FieldError className="text-center bg-destructive/10 border border-destructive/20 rounded-lg p-3">
-                        {error}
-                      </FieldError>
-                    </motion.div>
-                  )}
-
-                  <motion.div variants={fadeIn} custom={4}>
-                    <Field>
-                      <FieldLabel htmlFor="email">Email</FieldLabel>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="vous@exemple.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        autoFocus
-                        className="h-11"
-                      />
-                    </Field>
-                  </motion.div>
-
-                  <motion.div variants={fadeIn} custom={5}>
-                    <Field>
-                      <div className="flex items-center justify-between">
-                        <FieldLabel htmlFor="password">Mot de passe</FieldLabel>
-                        <Link
-                          href="/forgot-password"
-                          className="text-xs text-accent hover:text-accent/80 transition-colors"
+                      {error && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          className="mb-3"
                         >
-                          Oublié ?
-                        </Link>
-                      </div>
-                      <div className="relative">
-                        <Input
-                          id="password"
-                          type={showPassword ? 'text' : 'password'}
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          required
-                          className="h-11 pr-10"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                          tabIndex={-1}
-                        >
-                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </button>
-                      </div>
-                    </Field>
-                  </motion.div>
-
-                  {process.env.NEXT_PUBLIC_CAPTCHA_ENABLED === 'true' && process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY && (
-                    <motion.div variants={fadeIn} custom={6} className="flex justify-center">
-                      <Turnstile
-                        ref={turnstileRef}
-                        siteKey={process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY}
-                        onSuccess={setTurnstileToken}
-                        onError={resetTurnstile}
-                        onExpire={resetTurnstile}
-                        options={{ theme: 'dark', language: 'fr' }}
-                      />
-                    </motion.div>
-                  )}
-
-                  <motion.div variants={fadeIn} custom={7}>
-                    <Button
-                      type="submit"
-                      className="w-full h-11 font-semibold gap-2"
-                      disabled={loading || (process.env.NEXT_PUBLIC_CAPTCHA_ENABLED === 'true' && !!process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY && !turnstileToken)}
-                    >
-                      {loading ? (
-                        <><Spinner /> Connexion...</>
-                      ) : (
-                        <>Se connecter <ArrowRight className="h-4 w-4" /></>
+                          <FieldError className="text-center bg-destructive/10 border border-destructive/20 rounded-lg p-3">
+                            {error}
+                          </FieldError>
+                        </motion.div>
                       )}
-                    </Button>
-                  </motion.div>
 
-                  <motion.div variants={fadeIn} custom={8}>
-                    <p className="text-center text-sm text-muted-foreground">
-                      Pas encore de compte ?{' '}
-                      <Link
-                        href={(() => {
-                          const r = searchParams.get('redirect')
-                          return r ? `/register?redirect=${encodeURIComponent(r)}` : '/register'
-                        })()}
-                        className="text-accent font-medium hover:text-accent/80 transition-colors"
-                      >
-                        Créer un compte
-                      </Link>
-                    </p>
-                  </motion.div>
-                </FieldGroup>
-              </form>
+                      <div className="space-y-4">
+                        {emailStatus === 'exists' && checkData ? (
+                          <AccountIndicator
+                            email={email}
+                            avatarUrl={checkData.avatarUrl}
+                            fallback={checkData.initial}
+                            onClear={() => {
+                              setEmailStatus('idle')
+                              setCheckData(null)
+                              setEmail('')
+                              try {
+                                localStorage.removeItem('faktur_last_login')
+                              } catch {}
+                            }}
+                          />
+                        ) : (
+                          <div className="rounded-xl border border-border bg-card shadow-surface p-4">
+                            <div className="flex items-center gap-3">
+                              <div className="shrink-0 h-8 w-8 rounded-full bg-surface flex items-center justify-center">
+                                <Mail className="h-3.5 w-3.5 text-muted-foreground" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <Input
+                                  id="email"
+                                  type="email"
+                                  placeholder="vous@exemple.com"
+                                  value={email}
+                                  onChange={(e) => setEmail(e.target.value)}
+                                  required
+                                  autoFocus
+                                  aria-label="Adresse email"
+                                  className="h-9 border-0 bg-transparent shadow-none focus-visible:ring-0 px-0"
+                                />
+                              </div>
+                              {emailStatus === 'checking' && (
+                                <div className="shrink-0">
+                                  <Spinner size="sm" />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {emailStatus === 'exists' && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 14 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                          >
+                            <Button
+                              type="button"
+                              className="w-full h-11 font-semibold gap-2"
+                              onClick={() => setStage('password')}
+                            >
+                              Continuer <ArrowRight className="h-4 w-4" />
+                            </Button>
+                          </motion.div>
+                        )}
+
+                        {emailStatus === 'not-exists' && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 14 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                          >
+                            <Button
+                              type="button"
+                              className="w-full h-11 font-semibold gap-2"
+                              onClick={() => {
+                                router.push('/register?email=' + encodeURIComponent(email))
+                              }}
+                            >
+                              Créer un compte <ArrowRight className="h-4 w-4" />
+                            </Button>
+                          </motion.div>
+                        )}
+                      </div>
+
+                      <p className="text-center text-sm text-muted-foreground mt-6">
+                        Pas encore de compte ?{' '}
+                        <Link
+                          href={(() => {
+                            const r = searchParams.get('redirect')
+                            return r ? `/register?redirect=${encodeURIComponent(r)}` : '/register'
+                          })()}
+                          className="text-accent font-medium hover:text-accent/80 transition-colors"
+                        >
+                          Créer un compte
+                        </Link>
+                      </p>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="stage-password"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.25 }}
+                    >
+                      <form onSubmit={handleSubmit}>
+                        <FieldGroup>
+                          {error && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                            >
+                              <FieldError className="text-center bg-destructive/10 border border-destructive/20 rounded-lg p-3">
+                                {error}
+                              </FieldError>
+                            </motion.div>
+                          )}
+
+                          <AccountIndicator
+                            email={email}
+                            avatarUrl={checkData?.avatarUrl ?? null}
+                            fallback={checkData?.initial ?? (email[0] ?? '?').toUpperCase()}
+                            onClear={() => {
+                              setStage('email')
+                              setEmailStatus('idle')
+                              setCheckData(null)
+                              setEmail('')
+                              setPassword('')
+                              setError('')
+                              try {
+                                localStorage.removeItem('faktur_last_login')
+                              } catch {}
+                            }}
+                          />
+
+
+                          <Field>
+                            <div className="flex items-center justify-between">
+                              <FieldLabel htmlFor="password">Mot de passe</FieldLabel>
+                              <Link
+                                href="/forgot-password"
+                                className="text-xs text-accent hover:text-accent/80 transition-colors"
+                              >
+                                Oublié ?
+                              </Link>
+                            </div>
+                            <div className="relative">
+                              <Input
+                                id="password"
+                                type={showPassword ? 'text' : 'password'}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                                autoFocus
+                                className="h-11 pr-10"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                                tabIndex={-1}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                              >
+                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                              </button>
+                            </div>
+                          </Field>
+
+                          {process.env.NEXT_PUBLIC_CAPTCHA_ENABLED === 'true' && process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY && (
+                            <div className="flex justify-center">
+                              <Turnstile
+                                ref={turnstileRef}
+                                siteKey={process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY}
+                                onSuccess={setTurnstileToken}
+                                onError={resetTurnstile}
+                                onExpire={resetTurnstile}
+                                options={{ theme: 'dark', language: 'fr' }}
+                              />
+                            </div>
+                          )}
+
+                          <Button
+                            type="submit"
+                            className="w-full h-11 font-semibold gap-2"
+                            disabled={loading || (process.env.NEXT_PUBLIC_CAPTCHA_ENABLED === 'true' && !!process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY && !turnstileToken)}
+                          >
+                            {loading ? (
+                              <><Spinner /> Connexion...</>
+                            ) : (
+                              <>Se connecter <ArrowRight className="h-4 w-4" /></>
+                            )}
+                          </Button>
+
+                          <p className="text-center text-sm text-muted-foreground">
+                            Pas encore de compte ?{' '}
+                            <Link
+                              href={(() => {
+                                const r = searchParams.get('redirect')
+                                return r ? `/register?redirect=${encodeURIComponent(r)}` : '/register'
+                              })()}
+                              className="text-accent font-medium hover:text-accent/80 transition-colors"
+                            >
+                              Créer un compte
+                            </Link>
+                          </p>
+                        </FieldGroup>
+                      </form>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
             </div>
           </motion.div>
         )}
