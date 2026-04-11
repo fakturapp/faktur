@@ -2,7 +2,7 @@ import Stripe from 'stripe'
 
 class StripeService {
   getClient(secretKey: string): Stripe {
-    return new Stripe(secretKey, { apiVersion: '2025-04-30.basil' })
+    return new Stripe(secretKey, { apiVersion: '2026-03-25.dahlia' })
   }
 
   async validateKeys(
@@ -52,7 +52,7 @@ class StripeService {
     signature: string,
     webhookSecret: string
   ): Stripe.Event {
-    const stripe = new Stripe('', { apiVersion: '2025-04-30.basil' })
+    const stripe = new Stripe('', { apiVersion: '2026-03-25.dahlia' })
     return stripe.webhooks.constructEvent(rawBody, signature, webhookSecret)
   }
 }
