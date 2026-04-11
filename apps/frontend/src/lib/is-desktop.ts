@@ -17,6 +17,18 @@ export interface FakturDesktopUpdateInfo {
   publishedAt?: string
 }
 
+/** Plateforme d’exécution du client Faktur Desktop (Electron / OS). */
+export type FakturDesktopRuntime = 'windows' | 'darwin' | 'linux'
+
+function normalizeDesktopRuntime(raw: string | undefined | null): FakturDesktopRuntime | null {
+  if (!raw) return null
+  const p = String(raw).toLowerCase()
+  if (p === 'win32' || p === 'windows') return 'windows'
+  if (p === 'darwin' || p === 'macos' || p === 'mac') return 'darwin'
+  if (p === 'linux') return 'linux'
+  return null
+}
+
 export interface FakturDesktopBridge {
   isDesktop: true
   version: string
@@ -68,4 +80,43 @@ export function getFakturDesktopVersion(): string | null {
   const ua = window.navigator?.userAgent ?? ''
   const match = ua.match(/FakturDesktop\/(\d+(?:\.\d+){0,2})/i)
   return match?.[1] ?? null
+}
+
+export function getFakturDesktopPlatform(): FakturDesktopRuntime | null {
+  if (!isFakturDesktop() || typeof window === 'undefined') return null
+
+  const bridge = getFakturDesktopBridge()
+  const fromBridge = normalizeDesktopRuntime(bridge?.platform)
+  if (fromBridge) return fromBridge
+
+  try {
+    const uad = (navigator as Navigator & { userAgentData?: { platform?: string } }).userAgentData?.platform
+    const fromUaData = normalizeDesktopRuntime(uad)
+    if (fromUaData) return fromUaData
+  } catch {
+  }
+
+  const pf = window.navigator?.platform?.toLowerCase() ?? ''
+  if (pf.includes('win')) return 'windows'
+  if (pf.includes('mac')) return 'darwin'
+  if (pf.includes('linux')) return 'linux'
+
+  const ua = window.navigator?.userAgent?.toLowerCase() ?? ''
+  if (ua.includes('windows')) return 'windows'
+  if (ua.includes('mac os') || ua.includes('macos')) return 'darwin'
+  if (ua.includes('linux')) return 'linux'
+
+  return null
+}
+
+export async function resolveFakturDesktopPlatform(): Promise<FakturDesktopRuntime | null> {
+  const initial = getFakturDesktopPlatform()
+  const bridge = getFakturDesktopBridge()
+  if (!bridge?.getAppInfo) return initial
+  try {
+    const info = await bridge.getAppInfo()
+    return normalizeDesktopRuntime(info.platform) ?? initial
+  } catch {
+    return initial
+  }
 }

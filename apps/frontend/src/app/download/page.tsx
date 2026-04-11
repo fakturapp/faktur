@@ -34,7 +34,13 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
-import { isFakturDesktop, getFakturDesktopVersion } from '@/lib/is-desktop'
+import {
+  isFakturDesktop,
+  getFakturDesktopVersion,
+  getFakturDesktopPlatform,
+  resolveFakturDesktopPlatform,
+  type FakturDesktopRuntime,
+} from '@/lib/is-desktop'
 
 const DESKTOP_RELEASE_BASE =
   'https://github.com/fakturapp/faktur-desktop/releases/download/latest'
@@ -105,6 +111,25 @@ interface Platform {
   badge?: string
   action?: () => void
   customDownload?: ReactNode
+}
+
+function desktopCardMatchesRuntime(platformName: string, rt: FakturDesktopRuntime | null): boolean {
+  if (!rt) return false
+  if (platformName === 'Windows' && rt === 'windows') return true
+  if (platformName === 'macOS' && rt === 'darwin') return true
+  if (platformName === 'Linux' && rt === 'linux') return true
+  return false
+}
+
+function desktopRuntimeBadgeLabel(rt: FakturDesktopRuntime): string {
+  switch (rt) {
+    case 'windows':
+      return 'Windows'
+    case 'darwin':
+      return 'macOS'
+    case 'linux':
+      return 'Linux'
+  }
 }
 
 function openDesktopDownloadUrl(url: string) {
@@ -252,6 +277,7 @@ export default function DownloadPage() {
   const { toast } = useToast()
   const [isDesktop, setIsDesktop] = useState(false)
   const [desktopVersion, setDesktopVersion] = useState<string | null>(null)
+  const [desktopRuntime, setDesktopRuntime] = useState<FakturDesktopRuntime | null>(null)
   const [macGatekeeperOpen, setMacGatekeeperOpen] = useState(false)
   const [macCmdCopied, setMacCmdCopied] = useState(false)
   const [macGatekeeperFormat, setMacGatekeeperFormat] = useState<'dmg' | 'zip' | null>(null)
@@ -260,6 +286,15 @@ export default function DownloadPage() {
   useEffect(() => {
     setIsDesktop(isFakturDesktop())
     setDesktopVersion(getFakturDesktopVersion())
+    setDesktopRuntime(getFakturDesktopPlatform())
+
+    let cancelled = false
+    void resolveFakturDesktopPlatform().then((rt) => {
+      if (!cancelled && rt) setDesktopRuntime(rt)
+    })
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   function openWindowsDownload() {
@@ -417,13 +452,20 @@ export default function DownloadPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {desktopPlatforms.map((platform) => (
-              <PlatformCard
-                key={platform.name}
-                platform={platform}
-                isCurrentlyInstalled={isDesktop && platform.name === 'Windows'}
-              />
-            ))}
+            {desktopPlatforms.map((platform) => {
+              const installedHere =
+                isDesktop && desktopCardMatchesRuntime(platform.name, desktopRuntime)
+              return (
+                <PlatformCard
+                  key={platform.name}
+                  platform={platform}
+                  isCurrentlyInstalled={installedHere}
+                  installedOsBadge={
+                    installedHere && desktopRuntime ? desktopRuntimeBadgeLabel(desktopRuntime) : null
+                  }
+                />
+              )
+            })}
           </div>
         </div>
       </motion.section>
@@ -609,9 +651,12 @@ export default function DownloadPage() {
 function PlatformCard({
   platform,
   isCurrentlyInstalled = false,
+  installedOsBadge = null,
 }: {
   platform: Platform
   isCurrentlyInstalled?: boolean
+  /** Libellé OS quand Faktur Desktop tourne déjà sur cette carte (Windows / macOS / Linux). */
+  installedOsBadge?: string | null
 }) {
   const isSoon = platform.status === 'soon'
 
@@ -670,10 +715,17 @@ function PlatformCard({
           size="sm"
           variant="outline"
           disabled
-          className="gap-2 w-full mt-auto opacity-100 cursor-default border-emerald-500/30 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/10"
+          className="mt-auto flex h-auto min-h-9 w-full flex-wrap items-center justify-center gap-2 py-2 opacity-100 cursor-default border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10"
         >
-          <Check className="h-3.5 w-3.5" />
-          Installée
+          <span className="inline-flex items-center gap-2">
+            <Check className="h-3.5 w-3.5 shrink-0" />
+            <span>Installée</span>
+          </span>
+          {installedOsBadge ? (
+            <Badge variant="success" className="text-[10px] font-semibold tabular-nums">
+              Faktur Desktop · {installedOsBadge}
+            </Badge>
+          ) : null}
         </Button>
       )}
       {isSoon && (
