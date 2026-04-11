@@ -12,6 +12,16 @@ export const loginLimiter = limiter.define('login', (ctx) => {
     })
 })
 
+export const checkEmailLimiter = limiter.define('check-email', (ctx) => {
+  return limiter
+    .allowRequests(120)
+    .every('1 minute')
+    .usingKey(ctx.request.ip())
+    .limitExceeded((error) => {
+      error.setMessage('Trop de vérifications d’email. Réessayez dans une minute.')
+    })
+})
+
 export const registerLimiter = limiter.define('register', (ctx) => {
   return limiter
     .allowRequests(3)

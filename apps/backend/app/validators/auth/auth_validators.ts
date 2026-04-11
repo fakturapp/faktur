@@ -26,6 +26,12 @@ export const loginValidator = vine.compile(
   })
 )
 
+export const checkEmailValidator = vine.compile(
+  vine.object({
+    email: vine.string().trim().email().normalizeEmail(),
+  })
+)
+
 export const passwordResetRequestValidator = vine.compile(
   vine.object({
     email: vine.string().trim().email().normalizeEmail(),
