@@ -36,6 +36,12 @@ const routes = {
     tokens: [{"old":"/api/v1/auth/login/2fa","type":0,"val":"api","end":""},{"old":"/api/v1/auth/login/2fa","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/login/2fa","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/login/2fa","type":0,"val":"login","end":""},{"old":"/api/v1/auth/login/2fa","type":0,"val":"2fa","end":""}],
     types: placeholder as Registry['two_factor_verify']['types'],
   },
+  'check_email': {
+    methods: ["POST"],
+    pattern: '/api/v1/auth/check-email',
+    tokens: [{"old":"/api/v1/auth/check-email","type":0,"val":"api","end":""},{"old":"/api/v1/auth/check-email","type":0,"val":"v1","end":""},{"old":"/api/v1/auth/check-email","type":0,"val":"auth","end":""},{"old":"/api/v1/auth/check-email","type":0,"val":"check-email","end":""}],
+    types: placeholder as Registry['check_email']['types'],
+  },
   'passkey_login_options': {
     methods: ["POST"],
     pattern: '/api/v1/auth/passkey/login-options',

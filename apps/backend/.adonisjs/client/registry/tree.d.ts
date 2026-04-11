@@ -7,6 +7,7 @@ export interface ApiDefinition {
   resendVerification: typeof routes['resend_verification']
   login: typeof routes['login']
   twoFactorVerify: typeof routes['two_factor_verify']
+  checkEmail: typeof routes['check_email']
   passkeyLoginOptions: typeof routes['passkey_login_options']
   passkeyLoginVerify: typeof routes['passkey_login_verify']
   passwordResetRequest: typeof routes['password_reset_request']

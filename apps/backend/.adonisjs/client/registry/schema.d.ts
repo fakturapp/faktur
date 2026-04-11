@@ -67,6 +67,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/auth/security/two_factor/verify').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'check_email': {
+    methods: ["POST"]
+    pattern: '/api/v1/auth/check-email'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/auth/auth_validators').checkEmailValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/auth/auth_validators').checkEmailValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/auth/session/check_email').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/auth/session/check_email').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'passkey_login_options': {
     methods: ["POST"]
     pattern: '/api/v1/auth/passkey/login-options'

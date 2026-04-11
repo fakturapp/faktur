@@ -9,6 +9,7 @@ export type ScannedRoutes = {
     'resend_verification': { paramsTuple?: []; params?: {} }
     'login': { paramsTuple?: []; params?: {} }
     'two_factor_verify': { paramsTuple?: []; params?: {} }
+    'check_email': { paramsTuple?: []; params?: {} }
     'passkey_login_options': { paramsTuple?: []; params?: {} }
     'passkey_login_verify': { paramsTuple?: []; params?: {} }
     'password_reset_request': { paramsTuple?: []; params?: {} }
@@ -261,6 +262,7 @@ export type ScannedRoutes = {
     'resend_verification': { paramsTuple?: []; params?: {} }
     'login': { paramsTuple?: []; params?: {} }
     'two_factor_verify': { paramsTuple?: []; params?: {} }
+    'check_email': { paramsTuple?: []; params?: {} }
     'passkey_login_options': { paramsTuple?: []; params?: {} }
     'passkey_login_verify': { paramsTuple?: []; params?: {} }
     'password_reset_request': { paramsTuple?: []; params?: {} }
