@@ -162,6 +162,12 @@ const routes = {
     tokens: [{"old":"/api/v1/account/sessions","type":0,"val":"api","end":""},{"old":"/api/v1/account/sessions","type":0,"val":"v1","end":""},{"old":"/api/v1/account/sessions","type":0,"val":"account","end":""},{"old":"/api/v1/account/sessions","type":0,"val":"sessions","end":""}],
     types: placeholder as Registry['sessions_list']['types'],
   },
+  'session_revoke_all': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/account/sessions',
+    tokens: [{"old":"/api/v1/account/sessions","type":0,"val":"api","end":""},{"old":"/api/v1/account/sessions","type":0,"val":"v1","end":""},{"old":"/api/v1/account/sessions","type":0,"val":"account","end":""},{"old":"/api/v1/account/sessions","type":0,"val":"sessions","end":""}],
+    types: placeholder as Registry['session_revoke_all']['types'],
+  },
   'session_revoke': {
     methods: ["DELETE"],
     pattern: '/api/v1/account/sessions/:id',
@@ -870,11 +876,53 @@ const routes = {
     tokens: [{"old":"/api/v1/einvoicing/submit/:id","type":0,"val":"api","end":""},{"old":"/api/v1/einvoicing/submit/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/einvoicing/submit/:id","type":0,"val":"einvoicing","end":""},{"old":"/api/v1/einvoicing/submit/:id","type":0,"val":"submit","end":""},{"old":"/api/v1/einvoicing/submit/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['e_invoicing_submit']['types'],
   },
+  'submit_invoice': {
+    methods: ["POST"],
+    pattern: '/api/v1/einvoicing/submit-invoice/:id',
+    tokens: [{"old":"/api/v1/einvoicing/submit-invoice/:id","type":0,"val":"api","end":""},{"old":"/api/v1/einvoicing/submit-invoice/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/einvoicing/submit-invoice/:id","type":0,"val":"einvoicing","end":""},{"old":"/api/v1/einvoicing/submit-invoice/:id","type":0,"val":"submit-invoice","end":""},{"old":"/api/v1/einvoicing/submit-invoice/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['submit_invoice']['types'],
+  },
   'validate_connection': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/einvoicing/validate-connection',
     tokens: [{"old":"/api/v1/einvoicing/validate-connection","type":0,"val":"api","end":""},{"old":"/api/v1/einvoicing/validate-connection","type":0,"val":"v1","end":""},{"old":"/api/v1/einvoicing/validate-connection","type":0,"val":"einvoicing","end":""},{"old":"/api/v1/einvoicing/validate-connection","type":0,"val":"validate-connection","end":""}],
     types: placeholder as Registry['validate_connection']['types'],
+  },
+  'check_status': {
+    methods: ["POST"],
+    pattern: '/api/v1/einvoicing/status/:id',
+    tokens: [{"old":"/api/v1/einvoicing/status/:id","type":0,"val":"api","end":""},{"old":"/api/v1/einvoicing/status/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/einvoicing/status/:id","type":0,"val":"einvoicing","end":""},{"old":"/api/v1/einvoicing/status/:id","type":0,"val":"status","end":""},{"old":"/api/v1/einvoicing/status/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['check_status']['types'],
+  },
+  'list_submissions': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/einvoicing/submissions',
+    tokens: [{"old":"/api/v1/einvoicing/submissions","type":0,"val":"api","end":""},{"old":"/api/v1/einvoicing/submissions","type":0,"val":"v1","end":""},{"old":"/api/v1/einvoicing/submissions","type":0,"val":"einvoicing","end":""},{"old":"/api/v1/einvoicing/submissions","type":0,"val":"submissions","end":""}],
+    types: placeholder as Registry['list_submissions']['types'],
+  },
+  'directory_lookup': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/einvoicing/directory',
+    tokens: [{"old":"/api/v1/einvoicing/directory","type":0,"val":"api","end":""},{"old":"/api/v1/einvoicing/directory","type":0,"val":"v1","end":""},{"old":"/api/v1/einvoicing/directory","type":0,"val":"einvoicing","end":""},{"old":"/api/v1/einvoicing/directory","type":0,"val":"directory","end":""}],
+    types: placeholder as Registry['directory_lookup']['types'],
+  },
+  'setup_e_reporting': {
+    methods: ["POST"],
+    pattern: '/api/v1/einvoicing/ereporting/setup',
+    tokens: [{"old":"/api/v1/einvoicing/ereporting/setup","type":0,"val":"api","end":""},{"old":"/api/v1/einvoicing/ereporting/setup","type":0,"val":"v1","end":""},{"old":"/api/v1/einvoicing/ereporting/setup","type":0,"val":"einvoicing","end":""},{"old":"/api/v1/einvoicing/ereporting/setup","type":0,"val":"ereporting","end":""},{"old":"/api/v1/einvoicing/ereporting/setup","type":0,"val":"setup","end":""}],
+    types: placeholder as Registry['setup_e_reporting']['types'],
+  },
+  'get_e_reporting_status': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/einvoicing/ereporting/status',
+    tokens: [{"old":"/api/v1/einvoicing/ereporting/status","type":0,"val":"api","end":""},{"old":"/api/v1/einvoicing/ereporting/status","type":0,"val":"v1","end":""},{"old":"/api/v1/einvoicing/ereporting/status","type":0,"val":"einvoicing","end":""},{"old":"/api/v1/einvoicing/ereporting/status","type":0,"val":"ereporting","end":""},{"old":"/api/v1/einvoicing/ereporting/status","type":0,"val":"status","end":""}],
+    types: placeholder as Registry['get_e_reporting_status']['types'],
+  },
+  'b_2_b_router_webhook': {
+    methods: ["POST"],
+    pattern: '/api/v1/webhooks/b2brouter',
+    tokens: [{"old":"/api/v1/webhooks/b2brouter","type":0,"val":"api","end":""},{"old":"/api/v1/webhooks/b2brouter","type":0,"val":"v1","end":""},{"old":"/api/v1/webhooks/b2brouter","type":0,"val":"webhooks","end":""},{"old":"/api/v1/webhooks/b2brouter","type":0,"val":"b2brouter","end":""}],
+    types: placeholder as Registry['b_2_b_router_webhook']['types'],
   },
   'gmail_callback': {
     methods: ["GET","HEAD"],

@@ -30,6 +30,7 @@ export type ScannedRoutes = {
     'password_change': { paramsTuple?: []; params?: {} }
     'upload_avatar': { paramsTuple?: []; params?: {} }
     'sessions_list': { paramsTuple?: []; params?: {} }
+    'session_revoke_all': { paramsTuple?: []; params?: {} }
     'session_revoke': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'account_delete': { paramsTuple?: []; params?: {} }
     'deletion_start': { paramsTuple?: []; params?: {} }
@@ -148,7 +149,14 @@ export type ScannedRoutes = {
     'invoice_payment_store': { paramsTuple: [ParamValue]; params: {'invoiceId': ParamValue} }
     'invoice_payment_destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'invoiceId': ParamValue,'id': ParamValue} }
     'e_invoicing_submit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'submit_invoice': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'validate_connection': { paramsTuple?: []; params?: {} }
+    'check_status': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'list_submissions': { paramsTuple?: []; params?: {} }
+    'directory_lookup': { paramsTuple?: []; params?: {} }
+    'setup_e_reporting': { paramsTuple?: []; params?: {} }
+    'get_e_reporting_status': { paramsTuple?: []; params?: {} }
+    'b_2_b_router_webhook': { paramsTuple?: []; params?: {} }
     'gmail_callback': { paramsTuple?: []; params?: {} }
     'email_accounts_list': { paramsTuple?: []; params?: {} }
     'email_accounts_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -321,6 +329,10 @@ export type ScannedRoutes = {
     'invoice_duplicate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_payment_store': { paramsTuple: [ParamValue]; params: {'invoiceId': ParamValue} }
     'e_invoicing_submit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'submit_invoice': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'check_status': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'setup_e_reporting': { paramsTuple?: []; params?: {} }
+    'b_2_b_router_webhook': { paramsTuple?: []; params?: {} }
     'configure_resend': { paramsTuple?: []; params?: {} }
     'configure_smtp': { paramsTuple?: []; params?: {} }
     'send_email': { paramsTuple?: []; params?: {} }
@@ -411,6 +423,9 @@ export type ScannedRoutes = {
     'invoice_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_payment_index': { paramsTuple: [ParamValue]; params: {'invoiceId': ParamValue} }
     'validate_connection': { paramsTuple?: []; params?: {} }
+    'list_submissions': { paramsTuple?: []; params?: {} }
+    'directory_lookup': { paramsTuple?: []; params?: {} }
+    'get_e_reporting_status': { paramsTuple?: []; params?: {} }
     'gmail_callback': { paramsTuple?: []; params?: {} }
     'email_accounts_list': { paramsTuple?: []; params?: {} }
     'gmail_auth_url': { paramsTuple?: []; params?: {} }
@@ -504,6 +519,9 @@ export type ScannedRoutes = {
     'invoice_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_payment_index': { paramsTuple: [ParamValue]; params: {'invoiceId': ParamValue} }
     'validate_connection': { paramsTuple?: []; params?: {} }
+    'list_submissions': { paramsTuple?: []; params?: {} }
+    'directory_lookup': { paramsTuple?: []; params?: {} }
+    'get_e_reporting_status': { paramsTuple?: []; params?: {} }
     'gmail_callback': { paramsTuple?: []; params?: {} }
     'email_accounts_list': { paramsTuple?: []; params?: {} }
     'gmail_auth_url': { paramsTuple?: []; params?: {} }
@@ -570,6 +588,7 @@ export type ScannedRoutes = {
     'update_oauth_app': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   DELETE: {
+    'session_revoke_all': { paramsTuple?: []; params?: {} }
     'session_revoke': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'account_delete': { paramsTuple?: []; params?: {} }
     'deletion_confirm': { paramsTuple?: []; params?: {} }

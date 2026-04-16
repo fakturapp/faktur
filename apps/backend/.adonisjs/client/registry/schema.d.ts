@@ -319,6 +319,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/security/sessions').default['handle']>>>
     }
   }
+  'session_revoke_all': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/account/sessions'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/account/security/revoke_all_sessions').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/security/revoke_all_sessions').default['handle']>>>
+    }
+  }
   'session_revoke': {
     methods: ["DELETE"]
     pattern: '/api/v1/account/sessions/:id'
@@ -1735,6 +1747,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/einvoicing/submit').default['handle']>>>
     }
   }
+  'submit_invoice': {
+    methods: ["POST"]
+    pattern: '/api/v1/einvoicing/submit-invoice/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/einvoicing/submit_invoice').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/einvoicing/submit_invoice').default['handle']>>>
+    }
+  }
   'validate_connection': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/einvoicing/validate-connection'
@@ -1745,6 +1769,78 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/einvoicing/validate_connection').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/einvoicing/validate_connection').default['handle']>>>
+    }
+  }
+  'check_status': {
+    methods: ["POST"]
+    pattern: '/api/v1/einvoicing/status/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/einvoicing/check_status').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/einvoicing/check_status').default['handle']>>>
+    }
+  }
+  'list_submissions': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/einvoicing/submissions'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/einvoicing/list_submissions').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/einvoicing/list_submissions').default['handle']>>>
+    }
+  }
+  'directory_lookup': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/einvoicing/directory'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/einvoicing/directory_lookup').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/einvoicing/directory_lookup').default['handle']>>>
+    }
+  }
+  'setup_e_reporting': {
+    methods: ["POST"]
+    pattern: '/api/v1/einvoicing/ereporting/setup'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/einvoicing/setup_ereporting').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/einvoicing/setup_ereporting').default['handle']>>>
+    }
+  }
+  'get_e_reporting_status': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/einvoicing/ereporting/status'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/einvoicing/get_ereporting_status').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/einvoicing/get_ereporting_status').default['handle']>>>
+    }
+  }
+  'b_2_b_router_webhook': {
+    methods: ["POST"]
+    pattern: '/api/v1/webhooks/b2brouter'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/einvoicing/webhook').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/einvoicing/webhook').default['handle']>>>
     }
   }
   'gmail_callback': {

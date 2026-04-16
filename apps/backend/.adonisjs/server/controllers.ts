@@ -45,6 +45,7 @@ export const controllers = {
     },
     security: {
       Password: () => import('#controllers/account/security/password'),
+      RevokeAllSessions: () => import('#controllers/account/security/revoke_all_sessions'),
       RevokeSession: () => import('#controllers/account/security/revoke_session'),
       SecurityVerify: () => import('#controllers/account/security/security_verify'),
       Sessions: () => import('#controllers/account/security/sessions'),
@@ -209,8 +210,15 @@ export const controllers = {
     Stats: () => import('#controllers/dashboard/stats'),
   },
   einvoicing: {
+    CheckStatus: () => import('#controllers/einvoicing/check_status'),
+    DirectoryLookup: () => import('#controllers/einvoicing/directory_lookup'),
+    GetEreportingStatus: () => import('#controllers/einvoicing/get_ereporting_status'),
+    ListSubmissions: () => import('#controllers/einvoicing/list_submissions'),
+    SetupEreporting: () => import('#controllers/einvoicing/setup_ereporting'),
+    SubmitInvoice: () => import('#controllers/einvoicing/submit_invoice'),
     Submit: () => import('#controllers/einvoicing/submit'),
     ValidateConnection: () => import('#controllers/einvoicing/validate_connection'),
+    Webhook: () => import('#controllers/einvoicing/webhook'),
   },
   email: {
     accounts: {
