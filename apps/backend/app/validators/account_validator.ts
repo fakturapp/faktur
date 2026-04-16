@@ -1,5 +1,5 @@
 import vine from '@vinejs/vine'
-import securityConfig from '#config/security'
+import { confirmedPasswordField } from '#validators/shared/password_schema'
 
 export const emailChangeValidator = vine.compile(
   vine.object({
@@ -63,6 +63,6 @@ export const updateProfileValidator = vine.compile(
 export const changePasswordValidator = vine.compile(
   vine.object({
     currentPassword: vine.string(),
-    password: vine.string().minLength(securityConfig.password.minLength).maxLength(128).confirmed(),
+    password: confirmedPasswordField(),
   })
 )
