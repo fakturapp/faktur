@@ -61,4 +61,6 @@ export default await Env.create(new URL('../', import.meta.url), {
   R2_SECRET_ACCESS_KEY: Env.schema.string.optional(),
   R2_BUCKET_NAME: Env.schema.string.optional(),
   R2_PUBLIC_URL: Env.schema.string.optional(),
+
+  B2BROUTER_WEBHOOK_SECRET: Env.schema.string.optional(),
 })
