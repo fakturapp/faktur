@@ -39,6 +39,7 @@ export default class InvoiceSettingsUpdate {
         accentColor: payload.accentColor,
         paymentMethods: payload.paymentMethods,
         logoSource: payload.logoSource || 'custom',
+        logoUrl: payload.logoUrl || null,
         customPaymentMethod: payload.customPaymentMethod || null,
         template: payload.template || 'classique',
         darkMode: payload.darkMode ?? false,
@@ -46,7 +47,13 @@ export default class InvoiceSettingsUpdate {
         eInvoicingEnabled: payload.eInvoicingEnabled ?? false,
         pdpProvider: payload.pdpProvider ?? null,
         pdpApiKey: pdpApiKeyToStore,
-        pdpSandbox: payload.pdpSandbox ?? false,
+        pdpSandbox: payload.pdpSandbox ?? true,
+        defaultOperationCategory: payload.defaultOperationCategory ?? 'service',
+        b2bAccountId: payload.b2bAccountId || null,
+        b2bEnterpriseSize: payload.b2bEnterpriseSize || null,
+        b2bNafCode: payload.b2bNafCode || null,
+        b2bTypeOperation: payload.b2bTypeOperation || null,
+        b2bEreportingEnabled: payload.b2bEreportingEnabled ?? false,
         defaultSubject: payload.defaultSubject || null,
         defaultAcceptanceConditions: payload.defaultAcceptanceConditions || null,
         defaultSignatureField: payload.defaultSignatureField ?? false,
@@ -70,6 +77,7 @@ export default class InvoiceSettingsUpdate {
       settings.accentColor = payload.accentColor
       settings.paymentMethods = payload.paymentMethods
       settings.customPaymentMethod = payload.customPaymentMethod || null
+      if (payload.logoUrl !== undefined) settings.logoUrl = payload.logoUrl || null
       if (payload.logoSource !== undefined) settings.logoSource = payload.logoSource || 'custom'
       if (payload.template) settings.template = payload.template
       if (payload.darkMode !== undefined) settings.darkMode = payload.darkMode
@@ -82,6 +90,8 @@ export default class InvoiceSettingsUpdate {
         settings.pdpApiKey = pdpApiKeyToStore
       }
       if (payload.pdpSandbox !== undefined) settings.pdpSandbox = payload.pdpSandbox
+      if (payload.defaultOperationCategory !== undefined)
+        settings.defaultOperationCategory = payload.defaultOperationCategory ?? 'service'
       if (payload.defaultSubject !== undefined)
         settings.defaultSubject = payload.defaultSubject || null
       if (payload.defaultAcceptanceConditions !== undefined)
@@ -135,12 +145,13 @@ export default class InvoiceSettingsUpdate {
         eInvoicingEnabled: settings.eInvoicingEnabled || false,
         pdpProvider: settings.pdpProvider || null,
         pdpApiKey: settings.pdpApiKey ? maskApiKey(settings.pdpApiKey) : null,
-        pdpSandbox: settings.pdpSandbox ?? false,
+        pdpSandbox: settings.pdpSandbox ?? true,
         b2bAccountId: settings.b2bAccountId || null,
         b2bEnterpriseSize: settings.b2bEnterpriseSize || null,
         b2bNafCode: settings.b2bNafCode || null,
         b2bTypeOperation: settings.b2bTypeOperation || null,
         b2bEreportingEnabled: settings.b2bEreportingEnabled ?? false,
+        defaultOperationCategory: settings.defaultOperationCategory || 'service',
         defaultSubject: settings.defaultSubject || null,
         defaultAcceptanceConditions: settings.defaultAcceptanceConditions || null,
         defaultSignatureField: settings.defaultSignatureField || false,

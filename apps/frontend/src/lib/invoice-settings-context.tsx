@@ -9,6 +9,33 @@ function resolveLogoUrl(url: string | null): string | null {
   return `${url}${sep}_t=${Date.now()}`
 }
 
+function stripLogoCacheParam(url: string | null): string | null {
+  if (!url) return null
+  const [base, hash = ''] = url.split('#')
+  const [path, query = ''] = base.split('?')
+  if (!query) return url
+
+  const params = new URLSearchParams(query)
+  params.delete('_t')
+  const nextQuery = params.toString()
+  const nextBase = nextQuery ? `${path}?${nextQuery}` : path
+  return hash ? `${nextBase}#${hash}` : nextBase
+}
+
+function toStateSettings(settings: InvoiceSettings): InvoiceSettings {
+  return {
+    ...settings,
+    logoUrl: resolveLogoUrl(stripLogoCacheParam(settings.logoUrl)),
+  }
+}
+
+function toRequestSettings(settings: InvoiceSettings): InvoiceSettings {
+  return {
+    ...settings,
+    logoUrl: stripLogoCacheParam(settings.logoUrl),
+  }
+}
+
 export interface InvoiceSettings {
   billingType: 'quick' | 'detailed'
   logoUrl: string | null
@@ -23,6 +50,11 @@ export interface InvoiceSettings {
   pdpProvider: 'b2brouter' | 'sandbox' | null
   pdpApiKey: string | null
   pdpSandbox: boolean
+  b2bAccountId: string | null
+  b2bEnterpriseSize: string | null
+  b2bNafCode: string | null
+  b2bTypeOperation: string | null
+  b2bEreportingEnabled: boolean
   defaultOperationCategory: 'service' | 'goods' | 'mixed' | null
   defaultSubject: string | null
   defaultAcceptanceConditions: string | null
@@ -52,8 +84,9 @@ interface InvoiceSettingsContextType {
   hasChanges: boolean
   updateSettings: (partial: Partial<InvoiceSettings>) => void
   save: () => Promise<void>
+  persistSettings: (partial: Partial<InvoiceSettings>) => Promise<{ error?: string }>
   resetChanges: () => void
-  uploadLogo: (file: File) => Promise<void>
+  uploadLogo: (file: File) => Promise<string | null>
   refreshCompanyLogo: () => Promise<void>
   refreshSettings: () => Promise<void>
 }
@@ -72,6 +105,11 @@ const defaultSettings: InvoiceSettings = {
   pdpProvider: null,
   pdpApiKey: null,
   pdpSandbox: true,
+  b2bAccountId: null,
+  b2bEnterpriseSize: null,
+  b2bNafCode: null,
+  b2bTypeOperation: null,
+  b2bEreportingEnabled: false,
   defaultOperationCategory: 'service',
   defaultSubject: null,
   defaultAcceptanceConditions: null,
@@ -101,8 +139,9 @@ const InvoiceSettingsContext = createContext<InvoiceSettingsContextType>({
   hasChanges: false,
   updateSettings: () => {},
   save: async () => {},
+  persistSettings: async () => ({}),
   resetChanges: () => {},
-  uploadLogo: async () => {},
+  uploadLogo: async () => null,
   refreshCompanyLogo: async () => {},
   refreshSettings: async () => {},
 })
@@ -127,7 +166,7 @@ export function InvoiceSettingsProvider({ children }: { children: React.ReactNod
   const loadSettings = useCallback(async () => {
     const { data } = await api.get<{ settings: InvoiceSettings; companyLogoUrl: string | null }>('/settings/invoices')
     if (data?.settings) {
-      const resolved = { ...data.settings, logoUrl: resolveLogoUrl(data.settings.logoUrl) }
+      const resolved = toStateSettings(data.settings)
       setSettings(resolved)
       setSavedSettings(resolved)
     }
@@ -144,13 +183,36 @@ export function InvoiceSettingsProvider({ children }: { children: React.ReactNod
   const save = useCallback(async () => {
     setSaving(true)
     setSaveError(null)
-    const { error } = await api.put('/settings/invoices', settingsRef.current)
+    const payload = toRequestSettings(settingsRef.current)
+    const { data, error } = await api.put<{ settings: InvoiceSettings }>('/settings/invoices', payload)
     setSaving(false)
     if (error) {
       setSaveError(error)
     } else {
-      setSavedSettings({ ...settingsRef.current })
+      const resolved = data?.settings ? toStateSettings(data.settings) : toStateSettings(payload)
+      setSettings(resolved)
+      setSavedSettings(resolved)
     }
+  }, [])
+
+  const persistSettings = useCallback(async (partial: Partial<InvoiceSettings>) => {
+    setSaving(true)
+    setSaveError(null)
+
+    const mergedState = toStateSettings({ ...settingsRef.current, ...partial })
+    const payload = toRequestSettings({ ...settingsRef.current, ...partial })
+    const { data, error } = await api.put<{ settings: InvoiceSettings }>('/settings/invoices', payload)
+
+    setSaving(false)
+    if (error) {
+      setSaveError(error)
+      return { error }
+    }
+
+    const resolved = data?.settings ? toStateSettings(data.settings) : mergedState
+    setSettings(resolved)
+    setSavedSettings(resolved)
+    return {}
   }, [])
 
   const resetChanges = useCallback(() => {
@@ -171,8 +233,12 @@ export function InvoiceSettingsProvider({ children }: { children: React.ReactNod
     formData.append('logo', file)
     const { data } = await api.upload<{ logoUrl: string }>('/settings/invoices/logo', formData)
     if (data?.logoUrl) {
-      setSettings((prev) => ({ ...prev, logoUrl: resolveLogoUrl(data.logoUrl) }))
+      const resolvedLogoUrl = resolveLogoUrl(data.logoUrl)
+      setSettings((prev) => ({ ...prev, logoUrl: resolvedLogoUrl }))
+      setSavedSettings((prev) => ({ ...prev, logoUrl: resolvedLogoUrl }))
+      return data.logoUrl
     }
+    return null
   }, [])
 
   const refreshCompanyLogo = useCallback(async () => {
@@ -183,7 +249,7 @@ export function InvoiceSettingsProvider({ children }: { children: React.ReactNod
   }, [])
 
   return (
-    <InvoiceSettingsContext.Provider value={{ settings, companyLogoUrl, loading, saving, saveError, hasChanges, updateSettings, save, resetChanges, uploadLogo, refreshCompanyLogo, refreshSettings: loadSettings }}>
+    <InvoiceSettingsContext.Provider value={{ settings, companyLogoUrl, loading, saving, saveError, hasChanges, updateSettings, save, persistSettings, resetChanges, uploadLogo, refreshCompanyLogo, refreshSettings: loadSettings }}>
       {children}
     </InvoiceSettingsContext.Provider>
   )
