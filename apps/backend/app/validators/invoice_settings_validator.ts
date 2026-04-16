@@ -46,5 +46,10 @@ export const updateInvoiceSettingsValidator = vine.compile(
     aiEnabled: looseBool.clone(),
     aiProvider: vine.string().trim().maxLength(30).optional(),
     aiModel: vine.string().trim().maxLength(100).optional(),
+    b2bAccountId: vine.string().trim().maxLength(100).optional().nullable(),
+    b2bEnterpriseSize: vine.string().trim().maxLength(10).optional().nullable(),
+    b2bNafCode: vine.string().trim().maxLength(10).optional().nullable(),
+    b2bTypeOperation: vine.string().trim().maxLength(20).optional().nullable(),
+    b2bEreportingEnabled: looseBool.clone(),
   })
 )

@@ -329,12 +329,14 @@ export class ClientContactSchema extends BaseModel {
 }
 
 export class ClientSchema extends BaseModel {
-  static $columns = ['address', 'addressComplement', 'city', 'companyName', 'country', 'createdAt', 'email', 'firstName', 'id', 'includeInEmails', 'lastName', 'notes', 'phone', 'postalCode', 'siren', 'siret', 'teamId', 'type', 'updatedAt', 'vatNumber'] as const
+  static $columns = ['address', 'addressComplement', 'b2BContactId', 'city', 'companyName', 'country', 'createdAt', 'email', 'firstName', 'id', 'includeInEmails', 'lastName', 'notes', 'phone', 'postalCode', 'siren', 'siret', 'teamId', 'type', 'updatedAt', 'vatNumber'] as const
   $columns = ClientSchema.$columns
   @column()
   declare address: string | null
   @column()
   declare addressComplement: string | null
+  @column()
+  declare b2BContactId: number | null
   @column()
   declare city: string | null
   @column()
@@ -479,7 +481,7 @@ export class CreditNoteLineSchema extends BaseModel {
 }
 
 export class CreditNoteSchema extends BaseModel {
-  static $columns = ['accentColor', 'acceptanceConditions', 'billingType', 'clientId', 'clientSiren', 'clientVatNumber', 'comment', 'createdAt', 'creditNoteNumber', 'deliveryAddress', 'documentTitle', 'freeField', 'globalDiscountType', 'globalDiscountValue', 'id', 'issueDate', 'language', 'logoUrl', 'notes', 'operationCategory', 'reason', 'signatureField', 'sourceInvoiceId', 'status', 'subject', 'subtotal', 'taxAmount', 'teamId', 'total', 'updatedAt', 'vatExemptReason'] as const
+  static $columns = ['accentColor', 'acceptanceConditions', 'billingType', 'clientId', 'clientSiren', 'clientSnapshot', 'clientVatNumber', 'comment', 'companySnapshot', 'createdAt', 'creditNoteNumber', 'deliveryAddress', 'documentTitle', 'freeField', 'globalDiscountType', 'globalDiscountValue', 'id', 'issueDate', 'language', 'logoUrl', 'notes', 'operationCategory', 'reason', 'signatureField', 'sourceInvoiceId', 'status', 'subject', 'subtotal', 'taxAmount', 'teamId', 'total', 'updatedAt', 'vatExemptReason'] as const
   $columns = CreditNoteSchema.$columns
   @column()
   declare accentColor: string
@@ -492,9 +494,13 @@ export class CreditNoteSchema extends BaseModel {
   @column()
   declare clientSiren: string | null
   @column()
+  declare clientSnapshot: string | null
+  @column()
   declare clientVatNumber: string | null
   @column()
   declare comment: string | null
+  @column()
+  declare companySnapshot: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()
@@ -601,6 +607,45 @@ export class DocumentShareSchema extends BaseModel {
   declare teamId: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
+}
+
+export class EinvoicingSubmissionSchema extends BaseModel {
+  static $columns = ['createdAt', 'documentId', 'documentNumber', 'documentType', 'externalId', 'id', 'lastCheckedAt', 'lifecycleEvents', 'provider', 'status', 'statusMessage', 'submittedAt', 'submittedByUserId', 'teamId', 'trackingId', 'updatedAt', 'xmlContent'] as const
+  $columns = EinvoicingSubmissionSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare documentId: string
+  @column()
+  declare documentNumber: string
+  @column()
+  declare documentType: any
+  @column()
+  declare externalId: string | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column.dateTime()
+  declare lastCheckedAt: DateTime | null
+  @column()
+  declare lifecycleEvents: any
+  @column()
+  declare provider: string
+  @column()
+  declare status: any
+  @column()
+  declare statusMessage: string | null
+  @column.dateTime()
+  declare submittedAt: DateTime | null
+  @column()
+  declare submittedByUserId: string | null
+  @column()
+  declare teamId: string
+  @column()
+  declare trackingId: string | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+  @column()
+  declare xmlContent: string | null
 }
 
 export class EmailAccountSchema extends BaseModel {
@@ -816,7 +861,7 @@ export class InvoicePaymentSchema extends BaseModel {
 }
 
 export class InvoiceSettingSchema extends BaseModel {
-  static $columns = ['accentColor', 'aiApiKeyClaude', 'aiApiKeyGemini', 'aiApiKeyGroq', 'aiCustomApiKey', 'aiEnabled', 'aiKeyMode', 'aiModel', 'aiProvider', 'billingType', 'collaborationEnabled', 'createdAt', 'customPaymentMethod', 'darkMode', 'defaultAcceptanceConditions', 'defaultFooterText', 'defaultFreeField', 'defaultLanguage', 'defaultOperationCategory', 'defaultShowDeliveryAddress', 'defaultShowNotes', 'defaultSignatureField', 'defaultSubject', 'defaultVatExempt', 'documentFont', 'eInvoicingEnabled', 'footerMode', 'id', 'invoiceFilenamePattern', 'logoBorderRadius', 'logoSource', 'logoUrl', 'nextInvoiceNumber', 'nextQuoteNumber', 'paymentMethods', 'pdpApiKey', 'pdpProvider', 'pdpSandbox', 'quoteFilenamePattern', 'stripePublishableKey', 'stripeSecretKey', 'stripeWebhookSecret', 'stripeWebhookSecretApp', 'teamId', 'template', 'updatedAt'] as const
+  static $columns = ['accentColor', 'aiApiKeyClaude', 'aiApiKeyGemini', 'aiApiKeyGroq', 'aiCustomApiKey', 'aiEnabled', 'aiKeyMode', 'aiModel', 'aiProvider', 'b2BAccountId', 'b2BEnterpriseSize', 'b2BEreportingEnabled', 'b2BNafCode', 'b2BTypeOperation', 'billingType', 'collaborationEnabled', 'createdAt', 'creditNoteFilenamePattern', 'customPaymentMethod', 'darkMode', 'defaultAcceptanceConditions', 'defaultFooterText', 'defaultFreeField', 'defaultLanguage', 'defaultOperationCategory', 'defaultShowDeliveryAddress', 'defaultShowNotes', 'defaultSignatureField', 'defaultSubject', 'defaultVatExempt', 'documentFont', 'eInvoicingEnabled', 'footerMode', 'id', 'invoiceFilenamePattern', 'logoBorderRadius', 'logoSource', 'logoUrl', 'nextCreditNoteNumber', 'nextInvoiceNumber', 'nextQuoteNumber', 'paymentMethods', 'pdpApiKey', 'pdpProvider', 'pdpSandbox', 'quoteFilenamePattern', 'stripePublishableKey', 'stripeSecretKey', 'stripeWebhookSecret', 'stripeWebhookSecretApp', 'teamId', 'template', 'updatedAt'] as const
   $columns = InvoiceSettingSchema.$columns
   @column()
   declare accentColor: string
@@ -837,11 +882,23 @@ export class InvoiceSettingSchema extends BaseModel {
   @column()
   declare aiProvider: string | null
   @column()
+  declare b2BAccountId: string | null
+  @column()
+  declare b2BEnterpriseSize: string | null
+  @column()
+  declare b2BEreportingEnabled: boolean
+  @column()
+  declare b2BNafCode: string | null
+  @column()
+  declare b2BTypeOperation: string | null
+  @column()
   declare billingType: string
   @column()
   declare collaborationEnabled: boolean
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
+  @column()
+  declare creditNoteFilenamePattern: string
   @column()
   declare customPaymentMethod: string | null
   @column()
@@ -882,6 +939,8 @@ export class InvoiceSettingSchema extends BaseModel {
   declare logoSource: string | null
   @column()
   declare logoUrl: string | null
+  @column()
+  declare nextCreditNoteNumber: string | null
   @column()
   declare nextInvoiceNumber: string | null
   @column()
@@ -1528,7 +1587,7 @@ export class RecurringInvoiceLineSchema extends BaseModel {
 }
 
 export class RecurringInvoiceSchema extends BaseModel {
-  static $columns = ['accentColor', 'acceptanceConditions', 'bankAccountId', 'billingType', 'clientId', 'clientSiren', 'clientVatNumber', 'createdAt', 'customIntervalDays', 'deliveryAddress', 'documentTitle', 'dueDays', 'endDate', 'freeField', 'frequency', 'generationCount', 'globalDiscountType', 'globalDiscountValue', 'id', 'isActive', 'language', 'lastGeneratedAt', 'logoUrl', 'name', 'nextExecutionDate', 'notes', 'operationCategory', 'paymentMethod', 'paymentTerms', 'signatureField', 'startDate', 'subject', 'teamId', 'updatedAt', 'vatExemptReason'] as const
+  static $columns = ['accentColor', 'acceptanceConditions', 'bankAccountId', 'billingType', 'clientId', 'clientSiren', 'clientSnapshot', 'clientVatNumber', 'companySnapshot', 'createdAt', 'customIntervalDays', 'deliveryAddress', 'documentTitle', 'dueDays', 'endDate', 'freeField', 'frequency', 'generationCount', 'globalDiscountType', 'globalDiscountValue', 'id', 'isActive', 'language', 'lastGeneratedAt', 'logoUrl', 'name', 'nextExecutionDate', 'notes', 'operationCategory', 'paymentMethod', 'paymentTerms', 'signatureField', 'startDate', 'subject', 'teamId', 'updatedAt', 'vatExemptReason'] as const
   $columns = RecurringInvoiceSchema.$columns
   @column()
   declare accentColor: string
@@ -1543,7 +1602,11 @@ export class RecurringInvoiceSchema extends BaseModel {
   @column()
   declare clientSiren: string | null
   @column()
+  declare clientSnapshot: string | null
+  @column()
   declare clientVatNumber: string | null
+  @column()
+  declare companySnapshot: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()
@@ -1603,7 +1666,7 @@ export class RecurringInvoiceSchema extends BaseModel {
 }
 
 export class TeamMemberSchema extends BaseModel {
-  static $columns = ['createdAt', 'dekVersion', 'encryptedInviteDek', 'encryptedTeamDek', 'encryptedTeamDekRecovery', 'id', 'invitationToken', 'invitedAt', 'invitedEmail', 'joinedAt', 'role', 'status', 'teamId', 'updatedAt', 'userId'] as const
+  static $columns = ['createdAt', 'dekVersion', 'encryptedInviteDek', 'encryptedTeamDek', 'encryptedTeamDekRecovery', 'id', 'invitationExpiresAt', 'invitationToken', 'invitedAt', 'invitedEmail', 'joinedAt', 'role', 'status', 'teamId', 'updatedAt', 'userId'] as const
   $columns = TeamMemberSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -1617,6 +1680,8 @@ export class TeamMemberSchema extends BaseModel {
   declare encryptedTeamDekRecovery: string | null
   @column({ isPrimary: true })
   declare id: string
+  @column.dateTime()
+  declare invitationExpiresAt: DateTime | null
   @column()
   declare invitationToken: string | null
   @column.dateTime()
@@ -1638,8 +1703,10 @@ export class TeamMemberSchema extends BaseModel {
 }
 
 export class TeamSchema extends BaseModel {
-  static $columns = ['createdAt', 'iconUrl', 'id', 'name', 'ownerId', 'updatedAt'] as const
+  static $columns = ['b2BAccountId', 'createdAt', 'iconUrl', 'id', 'name', 'ownerId', 'updatedAt'] as const
   $columns = TeamSchema.$columns
+  @column()
+  declare b2BAccountId: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()

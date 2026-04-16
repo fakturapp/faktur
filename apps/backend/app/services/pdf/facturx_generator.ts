@@ -15,6 +15,7 @@ interface FacturXSeller {
 interface FacturXBuyer {
   name: string
   siren?: string | null
+  siret?: string | null
   vatNumber?: string | null
   address?: string | null
   postalCode?: string | null
@@ -48,6 +49,10 @@ export interface FacturXDocument {
   notes?: string | null
   language?: string
   operationCategory?: 'service' | 'goods' | 'mixed' | null
+  paymentMeansCode?: string | null
+  sellerIban?: string | null
+  sellerBic?: string | null
+  vatExemptReason?: string | null
 }
 
 function escapeXml(str: string): string {
@@ -83,17 +88,48 @@ function getCountryCode(country?: string | null): string {
   return 'FR'
 }
 
-function getOperationCategoryCode(category?: 'service' | 'goods' | 'mixed' | null): string | null {
+function getOperationCategoryLabel(category?: 'service' | 'goods' | 'mixed' | null): string | null {
   switch (category) {
     case 'service':
-      return 'SERVICE'
+      return 'Prestation de services'
     case 'goods':
-      return 'LIVRAISON'
+      return 'Livraison de biens'
     case 'mixed':
-      return 'MIXTE'
+      return 'Mixte (biens et services)'
     default:
       return null
   }
+}
+
+function getPaymentMeansCode(method?: string | null): string {
+  switch (method) {
+    case 'bank_transfer':
+    case 'virement':
+      return '30'
+    case 'card':
+    case 'cb':
+      return '48'
+    case 'direct_debit':
+    case 'prelevement':
+      return '49'
+    case 'check':
+    case 'cheque':
+      return '20'
+    case 'cash':
+    case 'especes':
+      return '10'
+    default:
+      return '30'
+  }
+}
+
+function getVatCategoryCode(rate: number, exemptReason?: string | null): string {
+  if (rate === 0) {
+    if (exemptReason === 'not_subject') return 'O'
+    if (exemptReason === 'outside_france') return 'G'
+    return 'E'
+  }
+  return 'S'
 }
 
 export function generateFacturXXml(doc: FacturXDocument): string {
@@ -123,12 +159,21 @@ export function generateFacturXXml(doc: FacturXDocument): string {
     </ram:IncludedNote>`
   }
 
+  const opCatLabel = getOperationCategoryLabel(doc.operationCategory)
+  if (opCatLabel) {
+    xml += `
+    <ram:IncludedNote>
+      <ram:Content>${escapeXml(opCatLabel)}</ram:Content>
+      <ram:SubjectCode>REG</ram:SubjectCode>
+    </ram:IncludedNote>`
+  }
+
   xml += `
   </rsm:ExchangedDocument>
   <rsm:SupplyChainTradeTransaction>`
 
-  // ── Line items ──
   for (const line of doc.lines) {
+    const lineCatCode = getVatCategoryCode(line.vatRate, doc.vatExemptReason)
     xml += `
     <ram:IncludedSupplyChainTradeLineItem>
       <ram:AssociatedDocumentLineDocument>
@@ -148,7 +193,7 @@ export function generateFacturXXml(doc: FacturXDocument): string {
       <ram:SpecifiedLineTradeSettlement>
         <ram:ApplicableTradeTax>
           <ram:TypeCode>VAT</ram:TypeCode>
-          <ram:CategoryCode>S</ram:CategoryCode>
+          <ram:CategoryCode>${lineCatCode}</ram:CategoryCode>
           <ram:RateApplicablePercent>${formatAmount(line.vatRate)}</ram:RateApplicablePercent>
         </ram:ApplicableTradeTax>
         <ram:SpecifiedTradeSettlementLineMonetarySummation>
@@ -158,18 +203,8 @@ export function generateFacturXXml(doc: FacturXDocument): string {
     </ram:IncludedSupplyChainTradeLineItem>`
   }
 
-  // ── Trade agreement (seller + buyer) ──
   xml += `
-    <ram:ApplicableHeaderTradeAgreement>`
-
-  // BuyerReference for operation category (French e-invoicing reform)
-  const opCatCode = getOperationCategoryCode(doc.operationCategory)
-  if (opCatCode) {
-    xml += `
-      <ram:BuyerReference>${escapeXml(opCatCode)}</ram:BuyerReference>`
-  }
-
-  xml += `
+    <ram:ApplicableHeaderTradeAgreement>
       <ram:SellerTradeParty>
         <ram:Name>${escapeXml(doc.seller.name)}</ram:Name>`
 
@@ -222,13 +257,17 @@ export function generateFacturXXml(doc: FacturXDocument): string {
   xml += `
       </ram:SellerTradeParty>`
 
-  // Buyer
   if (doc.buyer) {
     xml += `
       <ram:BuyerTradeParty>
         <ram:Name>${escapeXml(doc.buyer.name)}</ram:Name>`
 
-    if (doc.buyer.siren) {
+    if (doc.buyer.siret) {
+      xml += `
+        <ram:SpecifiedLegalOrganization>
+          <ram:ID schemeID="0002">${escapeXml(doc.buyer.siret)}</ram:ID>
+        </ram:SpecifiedLegalOrganization>`
+    } else if (doc.buyer.siren) {
       xml += `
         <ram:SpecifiedLegalOrganization>
           <ram:ID schemeID="0002">${escapeXml(doc.buyer.siren)}</ram:ID>
@@ -274,30 +313,44 @@ export function generateFacturXXml(doc: FacturXDocument): string {
   }
 
   xml += `
-    </ram:ApplicableHeaderTradeAgreement>`
-
-  // ── Trade delivery ──
-  xml += `
-    <ram:ApplicableHeaderTradeDelivery/>`
-
-  // ── Trade settlement ──
-  xml += `
+    </ram:ApplicableHeaderTradeAgreement>
+    <ram:ApplicableHeaderTradeDelivery/>
     <ram:ApplicableHeaderTradeSettlement>
       <ram:InvoiceCurrencyCode>${currencyCode}</ram:InvoiceCurrencyCode>`
 
-  // VAT breakdown
+  const meansCode = getPaymentMeansCode(doc.paymentMeansCode)
+  xml += `
+      <ram:SpecifiedTradeSettlementPaymentMeans>
+        <ram:TypeCode>${meansCode}</ram:TypeCode>`
+
+  if (doc.sellerIban) {
+    xml += `
+        <ram:PayeePartyCreditorFinancialAccount>
+          <ram:IBANID>${escapeXml(doc.sellerIban)}</ram:IBANID>
+        </ram:PayeePartyCreditorFinancialAccount>`
+    if (doc.sellerBic) {
+      xml += `
+        <ram:PayeeSpecifiedCreditorFinancialInstitution>
+          <ram:BICID>${escapeXml(doc.sellerBic)}</ram:BICID>
+        </ram:PayeeSpecifiedCreditorFinancialInstitution>`
+    }
+  }
+
+  xml += `
+      </ram:SpecifiedTradeSettlementPaymentMeans>`
+
   for (const vat of doc.vatBreakdown) {
+    const catCode = getVatCategoryCode(vat.rate, doc.vatExemptReason)
     xml += `
       <ram:ApplicableTradeTax>
         <ram:CalculatedAmount>${formatAmount(vat.amount)}</ram:CalculatedAmount>
         <ram:TypeCode>VAT</ram:TypeCode>
         <ram:BasisAmount>${formatAmount(vat.base)}</ram:BasisAmount>
-        <ram:CategoryCode>${vat.rate === 0 ? 'E' : 'S'}</ram:CategoryCode>
+        <ram:CategoryCode>${catCode}</ram:CategoryCode>
         <ram:RateApplicablePercent>${formatAmount(vat.rate)}</ram:RateApplicablePercent>
       </ram:ApplicableTradeTax>`
   }
 
-  // Due date
   if (doc.dueDate) {
     xml += `
       <ram:SpecifiedTradePaymentTerms>
@@ -307,7 +360,6 @@ export function generateFacturXXml(doc: FacturXDocument): string {
       </ram:SpecifiedTradePaymentTerms>`
   }
 
-  // Monetary summation
   xml += `
       <ram:SpecifiedTradeSettlementHeaderMonetarySummation>
         <ram:LineTotalAmount>${formatAmount(doc.subtotalHT)}</ram:LineTotalAmount>
@@ -323,9 +375,6 @@ export function generateFacturXXml(doc: FacturXDocument): string {
   return xml
 }
 
-/**
- * Build a FacturXDocument from quote data.
- */
 export function buildFacturXFromQuote(
   quoteData: any,
   linesData: any[],
@@ -356,9 +405,6 @@ export function buildFacturXFromQuote(
   }
 }
 
-/**
- * Build a FacturXDocument from invoice data.
- */
 export function buildFacturXFromInvoice(
   invoiceData: any,
   linesData: any[],
@@ -387,13 +433,13 @@ export function buildFacturXFromInvoice(
     notes: invoiceData.notes,
     language: invoiceData.language,
     operationCategory: invoiceData.operationCategory || null,
+    paymentMeansCode: invoiceData.paymentMethod || null,
+    sellerIban: companyData?.iban || null,
+    sellerBic: companyData?.bic || null,
+    vatExemptReason: invoiceData.vatExemptReason || null,
   }
 }
 
-/**
- * Build common Factur-X parts (VAT breakdown, seller, buyer, lines)
- * shared between invoice and quote builders.
- */
 function buildCommonFacturXParts(
   linesData: any[],
   clientData: any | null,
@@ -438,6 +484,7 @@ function buildCommonFacturXParts(
           clientData.companyName ||
           `${clientData.firstName} ${clientData.lastName}`,
         siren: clientData.siren,
+        siret: clientData.siret,
         vatNumber: clientData.vatNumber,
         address: clientData.address,
         postalCode: clientData.postalCode,
