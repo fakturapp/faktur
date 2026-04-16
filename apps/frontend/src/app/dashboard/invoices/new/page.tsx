@@ -22,6 +22,7 @@ import { useTrackFeature } from '@/hooks/use-analytics'
 import { FirstDocumentBanner } from '@/components/shared/first-document-banner'
 import { ProductCatalogModal, type CatalogProduct } from '@/components/products/product-catalog-modal'
 import { DocumentZoom, loadDocumentZoom, useZoomSpacing } from '@/components/shared/document-zoom'
+import { formatCurrency } from '@/lib/currency'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -45,42 +46,11 @@ function getDefaultDueDate() {
   return d.toISOString().split('T')[0]
 }
 
-const INVOICE_OPTIONS_KEY = 'faktur_invoice_options'
-
-function loadSavedOptions(): Partial<Record<string, any>> | null {
-  try {
-    const raw = localStorage.getItem(INVOICE_OPTIONS_KEY)
-    return raw ? JSON.parse(raw) : null
-  } catch { return null }
-}
-
-function saveOptionsToStorage(opts: Record<string, any>) {
-  try {
-    const toSave = {
-      billingType: opts.billingType,
-      language: opts.language,
-      signatureField: opts.signatureField,
-      freeField: opts.freeField,
-      showNotes: opts.showNotes,
-      vatExemptReason: opts.vatExemptReason,
-      footerText: opts.footerText,
-      showSubject: opts.showSubject,
-      showDeliveryAddress: opts.showDeliveryAddress,
-      showAcceptanceConditions: opts.showAcceptanceConditions,
-      showFreeField: opts.showFreeField,
-      showFooterText: opts.showFooterText,
-      footerMode: opts.footerMode,
-      paymentMethod: opts.paymentMethod,
-    }
-    localStorage.setItem(INVOICE_OPTIONS_KEY, JSON.stringify(toSave))
-  } catch { }
-}
-
 export default function NewInvoicePage() {
   const router = useRouter()
   const { toast } = useToast()
   const trackFeature = useTrackFeature()
-  const { settings: invoiceSettings, companyLogoUrl, loading: settingsLoading, refreshSettings, updateSettings, uploadLogo } = useInvoiceSettings()
+  const { settings: invoiceSettings, companyLogoUrl, loading: settingsLoading, refreshSettings, persistSettings, uploadLogo } = useInvoiceSettings()
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -185,29 +155,31 @@ export default function NewInvoicePage() {
     init()
   }, [])
 
-  // Sync from settings + localStorage
+  // Sync from global settings
   useEffect(() => {
     if (!settingsLoading) {
-      const saved = loadSavedOptions()
       setOptions((prev) => ({
         ...prev,
-        billingType: saved?.billingType || invoiceSettings.billingType,
-        subject: saved?.subject || invoiceSettings.defaultSubject || prev.subject,
-        acceptanceConditions: saved?.acceptanceConditions || invoiceSettings.defaultAcceptanceConditions || prev.acceptanceConditions,
-        signatureField: saved?.signatureField ?? invoiceSettings.defaultSignatureField ?? prev.signatureField,
-        freeField: saved?.freeField || invoiceSettings.defaultFreeField || prev.freeField,
-        showNotes: saved?.showNotes ?? invoiceSettings.defaultShowNotes ?? prev.showNotes,
-        vatExemptReason: saved?.vatExemptReason || (invoiceSettings.defaultVatExempt ? 'not_subject' : prev.vatExemptReason),
-        footerText: saved?.footerText || invoiceSettings.defaultFooterText || prev.footerText,
-        showDeliveryAddress: saved?.showDeliveryAddress ?? invoiceSettings.defaultShowDeliveryAddress ?? prev.showDeliveryAddress,
-        language: saved?.language || invoiceSettings.defaultLanguage || prev.language,
-        showSubject: saved?.showSubject ?? (!!(invoiceSettings.defaultSubject) || prev.showSubject),
-        showAcceptanceConditions: saved?.showAcceptanceConditions ?? (!!(invoiceSettings.defaultAcceptanceConditions) || prev.showAcceptanceConditions),
-        showFreeField: saved?.showFreeField ?? (!!(invoiceSettings.defaultFreeField) || prev.showFreeField),
-        showFooterText: saved?.showFooterText ?? (!!(invoiceSettings.defaultFooterText) || prev.showFooterText),
-        footerMode: saved?.footerMode || invoiceSettings.footerMode || prev.footerMode,
+        billingType: invoiceSettings.billingType,
+        subject: invoiceSettings.defaultSubject || prev.subject,
+        acceptanceConditions: invoiceSettings.defaultAcceptanceConditions || prev.acceptanceConditions,
+        signatureField: invoiceSettings.defaultSignatureField ?? prev.signatureField,
+        freeField: invoiceSettings.defaultFreeField || prev.freeField,
+        showNotes: invoiceSettings.defaultShowNotes ?? prev.showNotes,
+        vatExemptReason: invoiceSettings.defaultVatExempt ? 'not_subject' : prev.vatExemptReason,
+        footerText: invoiceSettings.defaultFooterText || prev.footerText,
+        showDeliveryAddress: invoiceSettings.defaultShowDeliveryAddress ?? prev.showDeliveryAddress,
+        language: invoiceSettings.defaultLanguage || prev.language,
+        showSubject: !!invoiceSettings.defaultSubject || prev.showSubject,
+        showAcceptanceConditions: !!invoiceSettings.defaultAcceptanceConditions || prev.showAcceptanceConditions,
+        showFreeField: !!invoiceSettings.defaultFreeField || prev.showFreeField,
+        showFooterText: !!invoiceSettings.defaultFooterText || prev.showFooterText,
+        footerMode: invoiceSettings.footerMode || prev.footerMode,
       }))
-      if (saved?.paymentMethod) setPaymentMethod(saved.paymentMethod)
+      setPaymentMethod((prev) => {
+        if (prev && invoiceSettings.paymentMethods.includes(prev)) return prev
+        return invoiceSettings.paymentMethods.length === 1 ? invoiceSettings.paymentMethods[0] : ''
+      })
       setAccentColor(invoiceSettings.accentColor)
     }
   }, [settingsLoading, invoiceSettings])
@@ -278,13 +250,9 @@ export default function NewInvoicePage() {
   }, [])
 
   const handleOptionsChange = useCallback((partial: Partial<typeof options>) => {
-    setOptions((prev) => {
-      const next = { ...prev, ...partial }
-      saveOptionsToStorage({ ...next, paymentMethod })
-      return next
-    })
+    setOptions((prev) => ({ ...prev, ...partial }))
     setIsDirty(true); setValidationErrors([])
-  }, [paymentMethod])
+  }, [])
 
   const handleSelectClient = useCallback((client: ClientInfo) => {
     setSelectedClient(client)
@@ -312,27 +280,37 @@ export default function NewInvoicePage() {
     ? localLogoUrl
     : (invoiceSettings.logoSource === 'company' ? companyLogoUrl : invoiceSettings.logoUrl) || companyLogoUrl
 
-  const handleLogoChange = useCallback((url: string | null, saveToSettings: boolean) => {
+  const handleLogoChange = useCallback(async (url: string | null, saveToSettings: boolean) => {
     setLocalLogoUrl(url)
     if (saveToSettings) {
-      if (url === null) updateSettings({ logoUrl: null, logoSource: 'custom' })
-      else if (url === companyLogoUrl) updateSettings({ logoSource: 'company' })
-      else updateSettings({ logoUrl: url, logoSource: 'custom' })
+      const partial =
+        url === null
+          ? { logoUrl: null, logoSource: 'custom' as const }
+          : url === companyLogoUrl
+            ? { logoSource: 'company' as const }
+            : { logoUrl: url, logoSource: 'custom' as const }
+      const { error } = await persistSettings(partial)
+      if (error) toast(error, 'error')
     }
     setIsDirty(true)
-  }, [companyLogoUrl, updateSettings])
+  }, [companyLogoUrl, persistSettings, toast])
 
-  const handleLogoUpload = useCallback((file: File, saveToSettings: boolean) => {
+  const handleLogoUpload = useCallback(async (file: File, saveToSettings: boolean) => {
     const reader = new FileReader()
     reader.onload = () => setLocalLogoUrl(reader.result as string)
     reader.readAsDataURL(file)
-    if (saveToSettings) { uploadLogo(file); updateSettings({ logoSource: 'custom' }) }
+    if (saveToSettings) {
+      const logoUrl = await uploadLogo(file)
+      const { error } = await persistSettings({ logoUrl: logoUrl || null, logoSource: 'custom' })
+      if (error) toast(error, 'error')
+    }
     setIsDirty(true)
-  }, [uploadLogo, updateSettings])
+  }, [persistSettings, toast, uploadLogo])
 
-  const handleLogoBorderRadiusChange = useCallback((radius: number) => {
-    updateSettings({ logoBorderRadius: radius })
-  }, [updateSettings])
+  const handleLogoBorderRadiusChange = useCallback(async (radius: number) => {
+    const { error } = await persistSettings({ logoBorderRadius: radius })
+    if (error) toast(error, 'error')
+  }, [persistSettings, toast])
 
   // Calculations
   const { subtotal, taxAmount, discountAmount, total, tvaBreakdown } = useMemo(() => {
@@ -397,7 +375,7 @@ export default function NewInvoicePage() {
       dueDate: options.validityDate || undefined,
       billingType: options.billingType,
       accentColor,
-      logoUrl: (invoiceSettings.logoSource === 'company' ? companyLogoUrl : invoiceSettings.logoUrl) || undefined,
+      logoUrl: effectiveLogoUrl || undefined,
       language: options.language,
       notes: notes || undefined,
       acceptanceConditions: options.showAcceptanceConditions ? (options.acceptanceConditions || undefined) : undefined,
@@ -409,6 +387,7 @@ export default function NewInvoicePage() {
       deliveryAddress: options.showDeliveryAddress ? (options.deliveryAddress || undefined) : undefined,
       clientSiren: options.clientSiren || undefined,
       clientVatNumber: options.clientVatNumber || undefined,
+      paymentTerms: company?.paymentConditions || undefined,
       paymentMethod: paymentMethod || undefined,
       bankAccountId: bankAccountId || undefined,
       vatExemptReason: options.vatExemptReason,
@@ -440,6 +419,8 @@ export default function NewInvoicePage() {
         email: company.email,
         siren: company.siren,
         vatNumber: company.vatNumber,
+        paymentConditions: company.paymentConditions,
+        currency: company.currency,
       } : undefined,
       lines: lines
         .filter((l) => l.description.trim())
@@ -750,7 +731,7 @@ export default function NewInvoicePage() {
                     tvaBreakdown={tvaBreakdown}
                     documentType="invoice"
                     paymentMethod={paymentMethod}
-                    onPaymentMethodChange={(v) => { setPaymentMethod(v); saveOptionsToStorage({ ...options, paymentMethod: v }); setIsDirty(true) }}
+                    onPaymentMethodChange={(v) => { setPaymentMethod(v); setIsDirty(true) }}
                     bankAccounts={bankAccounts}
                     bankAccountId={bankAccountId}
                     onBankAccountChange={handleBankAccountChange}
@@ -834,7 +815,7 @@ export default function NewInvoicePage() {
           className="pointer-events-auto inline-flex items-center gap-4 px-5 py-2.5 rounded-2xl bg-card/90 backdrop-blur-xl border border-border/50 shadow-lg shadow-black/5"
         >
           <div className="text-sm text-muted-foreground">
-            Total : <span className="font-bold text-foreground">{total.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</span>
+            Total : <span className="font-bold text-foreground">{formatCurrency(total, company?.currency || 'EUR')}</span>
           </div>
           <Button onClick={handleSave} disabled={saving || loadingBankAccount} size="sm" className="min-w-[140px] rounded-xl">
             {saving ? (<><Spinner /> Enregistrement...</>) : (<><Save className="h-4 w-4 mr-1.5" /> Sauvegarder</>)}
