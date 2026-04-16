@@ -6,6 +6,7 @@ import {
   decryptModelFieldsArray,
   ENCRYPTED_FIELDS,
 } from '#services/crypto/field_encryption_helper'
+import { ApiError } from '#exceptions/api_error'
 
 export default class List {
   async handle(ctx: HttpContext) {
@@ -15,10 +16,13 @@ export default class List {
     const dek: Buffer = (ctx as any).dek
 
     if (!teamId) {
-      return response.badRequest({ message: 'No team selected' })
+      throw new ApiError('team_not_selected')
     }
 
     const status = request.input('status', '')
+    const clientId = request.input('clientId', '')
+    const issueDateFrom = request.input('issueDateFrom', '')
+    const issueDateTo = request.input('issueDateTo', '')
     const page = request.input('page', 1)
     const perPage = request.input('perPage', 20)
 
@@ -29,6 +33,18 @@ export default class List {
 
     if (status) {
       query.where('status', status)
+    }
+
+    if (clientId) {
+      query.where('client_id', clientId)
+    }
+
+    if (issueDateFrom) {
+      query.where('issue_date', '>=', issueDateFrom)
+    }
+
+    if (issueDateTo) {
+      query.where('issue_date', '<=', issueDateTo)
     }
 
     const search = request.input('search', '')
