@@ -20,6 +20,8 @@ import { Spinner } from '@/components/ui/spinner'
 import { DatePicker } from '@/components/ui/date-picker'
 import { getTemplate, type TemplateConfig } from '@/lib/invoice-templates'
 import { getTranslations } from '@/lib/invoice-i18n'
+import { formatCurrency } from '@/lib/currency'
+import { useCompanySettings } from '@/lib/company-settings-context'
 import { useDocumentOverflow } from '@/hooks/use-text-measure'
 
 
@@ -63,6 +65,8 @@ export interface CompanyInfo {
   email: string | null
   siren: string | null
   vatNumber: string | null
+  paymentConditions?: string | null
+  currency?: string | null
 }
 
 
@@ -73,8 +77,8 @@ function contrastText(hex: string) {
   return (r * 299 + g * 587 + b * 114) / 1000 > 128 ? '#000' : '#fff'
 }
 
-function fmtCurrency(n: number, lang?: string) {
-  return new Intl.NumberFormat(lang === 'en' ? 'en-GB' : 'fr-FR', { style: 'currency', currency: 'EUR' }).format(n)
+function fmtCurrency(n: number, lang: string | undefined, currency: string) {
+  return formatCurrency(n, currency, lang)
 }
 
 function fmtDate(d: string, lang?: string) {
@@ -924,9 +928,11 @@ export function A4Sheet({
   onAcceptanceConditionsChange, onFreeFieldChange, onFooterTextChange, onDeliveryAddressChange,
   onIssueDateChange, onValidityDateChange,
 }: A4SheetProps) {
+  const { company: companySettings } = useCompanySettings()
   const isPreview = mode === 'preview'
   const ed = !isPreview // shorthand: is editable?
   const lang = language || 'fr'
+  const documentCurrency = company?.currency || companySettings?.currency || 'EUR'
 
   const T = getTemplate(template, darkMode)
   const t = getTranslations(lang)
@@ -1394,7 +1400,7 @@ export function A4Sheet({
                                 style={{ color: T.textMuted }} />}
                         </div>
                         <div className="px-1 py-2 text-right overflow-hidden">
-                          {isPreview ? <span className="text-[11px] truncate block">{fmtCurrency(line.unitPrice, lang)}</span>
+                          {isPreview ? <span className="text-[11px] truncate block">{fmtCurrency(line.unitPrice, lang, documentCurrency)}</span>
                             : <input type="number" min="0" step="0.01" value={line.unitPrice}
                                 onChange={(e) => onUpdateLine(idx, { unitPrice: parseFloat(e.target.value) || 0 })}
                                 className="w-full bg-transparent text-[12px] text-right focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
@@ -1438,7 +1444,7 @@ export function A4Sheet({
                               onChange={(e) => onUpdateLine(idx, { unitPrice: parseFloat(e.target.value) || 0 })}
                               className="w-full bg-transparent text-[12px] text-right font-semibold focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
                               style={{ color: T.text }} />
-                          ) : fmtCurrency(ht, lang)}
+                          ) : fmtCurrency(ht, lang, documentCurrency)}
                         </div>
                       ) : <div />}
 
@@ -1479,24 +1485,24 @@ export function A4Sheet({
                     <div className="px-2 flex flex-col gap-3">
                       <div className="flex justify-between items-center">
                         <span className="text-[14px] font-semibold">{t.totalHT}</span>
-                        <span className="text-[14px] font-semibold">{fmtCurrency(subtotal, lang)}</span>
+                        <span className="text-[14px] font-semibold">{fmtCurrency(subtotal, lang, documentCurrency)}</span>
                       </div>
                       {tvaBreakdown.map((e) => (
                         <div key={e.rate} className="flex justify-between items-center">
                           <span className="text-[12px] font-semibold">{t.vatRate(e.rate)}</span>
-                          <span className="text-[12px] font-semibold">{fmtCurrency(e.amount, lang)}</span>
+                          <span className="text-[12px] font-semibold">{fmtCurrency(e.amount, lang, documentCurrency)}</span>
                         </div>
                       ))}
                       {taxAmount > 0 && (
                         <div className="flex justify-between items-center pt-1" style={{ borderTop: `1px solid ${accentColor}30` }}>
                           <span className="text-[12px] font-semibold">{t.totalTVA}</span>
-                          <span className="text-[12px] font-semibold">{fmtCurrency(taxAmount, lang)}</span>
+                          <span className="text-[12px] font-semibold">{fmtCurrency(taxAmount, lang, documentCurrency)}</span>
                         </div>
                       )}
                       {discountAmount > 0 && (
                         <div className="flex justify-between items-center">
                           <span className="text-[12px] font-semibold">{t.discount}</span>
-                          <span className="text-[12px] font-semibold">-{fmtCurrency(discountAmount, lang)}</span>
+                          <span className="text-[12px] font-semibold">-{fmtCurrency(discountAmount, lang, documentCurrency)}</span>
                         </div>
                       )}
                     </div>
@@ -1506,7 +1512,7 @@ export function A4Sheet({
                         className="text-[20px] font-extrabold tracking-wide py-1 px-3"
                         style={{ borderRadius: 100, background: `${accentColor}15` }}
                       >
-                        {fmtCurrency(total, lang)}
+                        {fmtCurrency(total, lang, documentCurrency)}
                       </span>
                     </div>
                   </div>
@@ -1514,24 +1520,24 @@ export function A4Sheet({
                   <div className="w-[260px]">
                     <div className="flex justify-between py-1.5" style={{ borderBottom: `1px solid ${T.borderLight}` }}>
                       <span className="text-[12px]" style={{ color: T.textMuted }}>{t.totalHT}</span>
-                      <span className="text-[12px] font-semibold" style={{ color: T.text }}>{fmtCurrency(subtotal, lang)}</span>
+                      <span className="text-[12px] font-semibold" style={{ color: T.text }}>{fmtCurrency(subtotal, lang, documentCurrency)}</span>
                     </div>
                     {tvaBreakdown.map((e) => (
                       <div key={e.rate} className="flex justify-between py-1" style={{ borderBottom: `1px solid ${T.borderLight}` }}>
-                        <span className="text-[10px]" style={{ color: T.textMuted }}>{t.vatRate(e.rate)} {t.vatBase(fmtCurrency(e.base, lang))}</span>
-                        <span className="text-[10px]" style={{ color: T.textMuted }}>{fmtCurrency(e.amount, lang)}</span>
+                        <span className="text-[10px]" style={{ color: T.textMuted }}>{t.vatRate(e.rate)} {t.vatBase(fmtCurrency(e.base, lang, documentCurrency))}</span>
+                        <span className="text-[10px]" style={{ color: T.textMuted }}>{fmtCurrency(e.amount, lang, documentCurrency)}</span>
                       </div>
                     ))}
                     {taxAmount > 0 && (
                       <div className="flex justify-between py-1" style={{ borderBottom: `1px solid ${T.borderLight}` }}>
                         <span className="text-[10px] font-semibold" style={{ color: T.text }}>{t.totalTVA}</span>
-                        <span className="text-[10px] font-semibold" style={{ color: T.text }}>{fmtCurrency(taxAmount, lang)}</span>
+                        <span className="text-[10px] font-semibold" style={{ color: T.text }}>{fmtCurrency(taxAmount, lang, documentCurrency)}</span>
                       </div>
                     )}
                     {discountAmount > 0 && (
                       <div className="flex justify-between py-1" style={{ borderBottom: `1px solid ${T.borderLight}` }}>
                         <span className="text-[10px]" style={{ color: T.textMuted }}>{t.discount}</span>
-                        <span className="text-[10px] text-[#e53935]">-{fmtCurrency(discountAmount, lang)}</span>
+                        <span className="text-[10px] text-[#e53935]">-{fmtCurrency(discountAmount, lang, documentCurrency)}</span>
                       </div>
                     )}
                     <div className="flex justify-between px-3.5 py-2.5 mt-1.5"
@@ -1541,7 +1547,7 @@ export function A4Sheet({
                         borderRadius: T.borderRadius,
                       }}>
                       <span className="text-[13px] font-bold" style={{ color: T.text }}>{billingType === 'detailed' ? t.totalTTC : t.totalHT}</span>
-                      <span className="text-[15px] font-bold" style={{ color: accentColor }}>{fmtCurrency(total, lang)}</span>
+                      <span className="text-[15px] font-bold" style={{ color: accentColor }}>{fmtCurrency(total, lang, documentCurrency)}</span>
                     </div>
                   </div>
                 )}

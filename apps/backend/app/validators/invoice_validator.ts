@@ -61,6 +61,8 @@ export const createInvoiceValidator = vine.compile(
         phone: vine.string().trim().maxLength(30).optional().nullable(),
         email: vine.string().trim().maxLength(255).optional().nullable(),
         website: vine.string().trim().maxLength(255).optional().nullable(),
+        paymentConditions: vine.string().trim().maxLength(500).optional().nullable(),
+        currency: vine.string().trim().maxLength(3).optional().nullable(),
       })
       .optional(),
     vatExemptReason: vine.string().trim().maxLength(50).optional(),

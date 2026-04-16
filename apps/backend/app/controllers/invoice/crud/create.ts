@@ -106,10 +106,11 @@ export default class Create {
       taxAmount: Math.round(taxAmount * 100) / 100,
       total: Math.round(total * 100) / 100,
       sourceQuoteId: payload.sourceQuoteId || null,
-      paymentTerms: payload.paymentTerms || null,
+      paymentTerms: payload.paymentTerms || payload.companySnapshot?.paymentConditions || null,
       paymentMethod: payload.paymentMethod || null,
       bankAccountId: payload.bankAccountId || null,
       vatExemptReason: payload.vatExemptReason || 'none',
+      operationCategory: settings?.defaultOperationCategory || null,
       clientSnapshot: payload.clientSnapshot ? JSON.stringify(payload.clientSnapshot) : null,
       companySnapshot: payload.companySnapshot ? JSON.stringify(payload.companySnapshot) : null,
     }

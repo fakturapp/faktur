@@ -77,7 +77,7 @@ export default class Update {
       subtotal: Math.round(subtotal * 100) / 100,
       taxAmount: Math.round(taxAmount * 100) / 100,
       total: Math.round(total * 100) / 100,
-      paymentTerms: payload.paymentTerms || null,
+      paymentTerms: payload.paymentTerms !== undefined ? payload.paymentTerms || null : invoice.paymentTerms,
       paymentMethod: payload.paymentMethod || null,
       bankAccountId: payload.bankAccountId || null,
       vatExemptReason: payload.vatExemptReason || 'none',

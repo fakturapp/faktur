@@ -14,6 +14,8 @@ import { SelectRoot, SelectTrigger, SelectValue, SelectIndicator, SelectPopover 
 import { ListBoxRoot as ListBox, ListBoxItemRoot as ListBoxItem } from '@/components/ui/list-box'
 import { CheckboxRoot, CheckboxControl, CheckboxIndicator, CheckboxContent } from '@/components/ui/checkbox'
 import { AiGenerateButton } from '@/components/ai/ai-generate-button'
+import { formatCurrency } from '@/lib/currency'
+import { useCompanySettings } from '@/lib/company-settings-context'
 import type { ClientInfo } from './a4-sheet'
 
 
@@ -76,8 +78,8 @@ const ACCENT_COLORS = [
   '#f97316', '#22c55e', '#14b8a6', '#6b7280', '#18181b',
 ]
 
-function fmtCurrency(n: number) {
-  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(n)
+function fmtCurrency(n: number, currency: string) {
+  return formatCurrency(n, currency)
 }
 
 
@@ -163,10 +165,12 @@ export function DocumentOptionsPanel({
   customPaymentMethodLabel,
   stripeConfigured = false,
 }: DocumentOptionsProps) {
+  const { company } = useCompanySettings()
   const [showSiren, setShowSiren] = useState(!!options.clientSiren || eInvoicingEnabled)
   const [showVat, setShowVat] = useState(!!options.clientVatNumber || eInvoicingEnabled)
   const [showTitle, setShowTitle] = useState(!!options.documentTitle)
   const [showDiscount, setShowDiscount] = useState(options.globalDiscountType !== 'none')
+  const currency = company?.currency || 'EUR'
 
   return (
     <div className="space-y-3">
@@ -621,26 +625,26 @@ export function DocumentOptionsPanel({
 
         <div className="flex justify-between mb-1.5">
           <span className="text-[13px] text-muted-foreground">Total HT</span>
-          <span className="text-[13px] font-semibold text-foreground">{fmtCurrency(subtotal)}</span>
+          <span className="text-[13px] font-semibold text-foreground">{fmtCurrency(subtotal, currency)}</span>
         </div>
 
         {tvaBreakdown.map((e) => (
           <div key={e.rate} className="flex justify-between mb-1">
             <span className="text-xs text-muted-foreground">TVA {e.rate}%</span>
-            <span className="text-xs text-muted-foreground">{fmtCurrency(e.amount)}</span>
+            <span className="text-xs text-muted-foreground">{fmtCurrency(e.amount, currency)}</span>
           </div>
         ))}
 
         {discountAmount > 0 && (
           <div className="flex justify-between mb-1">
             <span className="text-xs text-muted-foreground">Remise</span>
-            <span className="text-xs text-red-400">-{fmtCurrency(discountAmount)}</span>
+            <span className="text-xs text-red-400">-{fmtCurrency(discountAmount, currency)}</span>
           </div>
         )}
 
         <div className="border-t-2 border-foreground/20 pt-2 mt-2 flex justify-between">
           <span className="text-[15px] font-bold text-foreground">Total TTC</span>
-          <span className="text-[15px] font-bold" style={{ color: accentColor }}>{fmtCurrency(total)}</span>
+          <span className="text-[15px] font-bold" style={{ color: accentColor }}>{fmtCurrency(total, currency)}</span>
         </div>
       </div>
     </div>

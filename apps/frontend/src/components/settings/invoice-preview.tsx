@@ -3,12 +3,16 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { getTemplate } from '@/lib/invoice-templates'
+import { formatCurrency } from '@/lib/currency'
+import { useCompanySettings } from '@/lib/company-settings-context'
 import { Eye, ImagePlus } from 'lucide-react'
 
 export function InvoicePreview() {
   const { settings, companyLogoUrl } = useInvoiceSettings()
+  const { company } = useCompanySettings()
   const currentTemplate = getTemplate(settings.template, settings.darkMode)
   const effectiveLogoUrl = settings.logoSource === 'company' ? companyLogoUrl : settings.logoUrl
+  const currency = company?.currency || 'EUR'
 
   return (
     <div className="sticky top-6">
@@ -132,7 +136,7 @@ export function InvoicePreview() {
                     </>)}
                     <div className="flex items-center justify-between px-3 py-2" style={{ backgroundColor: settings.accentColor + currentTemplate.totalBg, borderRadius: currentTemplate.borderRadius }}>
                       <p className="text-[10px] font-semibold" style={{ color: settings.accentColor }}>Total TTC</p>
-                      <p className="text-xs font-bold" style={{ color: settings.accentColor }}>1 234,00 EUR</p>
+                      <p className="text-xs font-bold" style={{ color: settings.accentColor }}>{formatCurrency(1234, currency)}</p>
                     </div>
                   </div>
                 </div>

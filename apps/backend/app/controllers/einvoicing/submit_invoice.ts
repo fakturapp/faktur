@@ -109,6 +109,8 @@ export default class SubmitInvoice {
             phone: company.phone,
             iban: company.iban,
             bic: company.bic,
+            paymentConditions: company.paymentConditions,
+            currency: company.currency,
           }
         : null
 
@@ -166,10 +168,10 @@ export default class SubmitInvoice {
         number: invoice.invoiceNumber,
         date: invoice.issueDate,
         due_date: invoice.dueDate || undefined,
-        currency: 'EUR',
+        currency: companyData?.currency || 'EUR',
         payment_method: b2b.mapPaymentMethod(invoice.paymentMethod),
         payment_method_text: invoice.paymentMethod || 'Virement bancaire',
-        payment_terms: invoice.paymentTerms || 'A reception',
+        payment_terms: invoice.paymentTerms || companyData?.paymentConditions || 'A reception',
         remittance_information: invoice.invoiceNumber,
         invoice_lines_attributes: b2bLines,
       }
@@ -187,6 +189,7 @@ export default class SubmitInvoice {
         language: invoice.language || 'fr',
         operationCategory: invoice.operationCategory,
         paymentMethod: invoice.paymentMethod,
+        currency: companyData?.currency || 'EUR',
         vatExemptReason: invoice.vatExemptReason,
       }
 

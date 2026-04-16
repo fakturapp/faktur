@@ -182,6 +182,11 @@ export function CompanySettingsProvider({ children }: { children: React.ReactNod
       setPaymentSaveError(error)
       return
     }
+    setCompany((prev) => prev ? {
+      ...prev,
+      paymentConditions: next.paymentConditions || null,
+      currency: next.currency || 'EUR',
+    } : prev)
     setSavedPaymentForm({ ...next })
   }, [])
 

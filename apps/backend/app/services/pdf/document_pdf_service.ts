@@ -105,6 +105,8 @@ function buildCompanyData(company: Company | null) {
     iban: company.iban,
     bic: company.bic,
     bankName: company.bankName,
+    paymentConditions: company.paymentConditions,
+    currency: company.currency,
   }
 }
 
