@@ -13,16 +13,17 @@ import { Spinner } from '@/components/ui/spinner'
 import { FormSelect } from '@/components/ui/dropdown'
 import { Badge } from '@/components/ui/badge'
 import { useCompanySettings } from '@/lib/company-settings-context'
+import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { api } from '@/lib/api'
 import { StripeActivationModal } from '@/components/settings/stripe-activation-modal'
 import { SaveBar } from '@/components/ui/save-bar'
 import { CheckboxRoot, CheckboxControl, CheckboxIndicator, CheckboxContent } from '@/components/ui/checkbox'
-import { Receipt, Banknote, Coins, PenLine, Lock, CreditCard, Info, CheckCircle, Trash2, AlertTriangle } from 'lucide-react'
+import { Receipt, Banknote, Coins, PenLine, Lock, CreditCard, CheckCircle, Trash2, AlertTriangle } from 'lucide-react'
 
 export default function PaymentPage() {
   const { toast } = useToast()
   const {
-    loading,
+    loading: companyLoading,
     noCompany,
     paymentForm,
     setPaymentForm,
@@ -32,6 +33,22 @@ export default function PaymentPage() {
     savePayment,
     resetPayment,
   } = useCompanySettings()
+
+  const {
+    settings: invoiceSettings,
+    loading: invoiceLoading,
+    hasChanges: invoiceHasChanges,
+    saving: invoiceSaving,
+    saveError: invoiceSaveError,
+    updateSettings: updateInvoiceSettings,
+    save: saveInvoiceSettings,
+    resetChanges: resetInvoiceChanges,
+  } = useInvoiceSettings()
+
+  const loading = companyLoading || invoiceLoading
+  const hasChanges = paymentHasChanges || invoiceHasChanges
+  const saving = paymentSaving || invoiceSaving
+  const saveError = paymentSaveError || invoiceSaveError
 
   const [stripeLoading, setStripeLoading] = useState(true)
   const [stripeConfigured, setStripeConfigured] = useState(false)
@@ -81,17 +98,24 @@ export default function PaymentPage() {
       setStripeModalOpen(true)
       return
     }
-    setPaymentForm((p) => {
-      const methods = p.paymentMethods.includes(method)
-        ? p.paymentMethods.filter((m) => m !== method)
-        : [...p.paymentMethods, method]
-      return { ...p, paymentMethods: methods }
-    })
+    const current = invoiceSettings.paymentMethods || []
+    const methods = current.includes(method)
+      ? current.filter((m) => m !== method)
+      : [...current, method]
+    updateInvoiceSettings({ paymentMethods: methods })
   }
 
-  async function handleSavePayment(e?: React.FormEvent) {
+  async function handleSave(e?: React.FormEvent) {
     if (e) e.preventDefault()
-    await savePayment()
+    const ops: Promise<void>[] = []
+    if (paymentHasChanges) ops.push(savePayment())
+    if (invoiceHasChanges) ops.push(saveInvoiceSettings())
+    await Promise.all(ops)
+  }
+
+  function handleReset() {
+    if (paymentHasChanges) resetPayment()
+    if (invoiceHasChanges) resetInvoiceChanges()
   }
 
   if (loading) {
@@ -110,6 +134,9 @@ export default function PaymentPage() {
     )
   }
 
+  const selectedMethods = invoiceSettings.paymentMethods || []
+  const customMethod = invoiceSettings.customPaymentMethod || ''
+
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
       <div>
@@ -127,7 +154,7 @@ export default function PaymentPage() {
               </p>
             </div>
           ) : (
-            <form onSubmit={handleSavePayment}>
+            <form onSubmit={handleSave}>
               <FieldGroup>
                 <h3 className="font-semibold text-foreground">Devise et conditions</h3>
 
@@ -162,9 +189,9 @@ export default function PaymentPage() {
                 <FieldDescription>Sélectionnez les moyens de paiement que vous souhaitez afficher sur vos factures.</FieldDescription>
 
                 <div className="space-y-3">
-                  <CheckboxRoot 
-                    isSelected={paymentForm.paymentMethods.includes('bank_transfer')} 
-                    onChange={() => togglePaymentMethod('bank_transfer')} 
+                  <CheckboxRoot
+                    isSelected={selectedMethods.includes('bank_transfer')}
+                    onChange={() => togglePaymentMethod('bank_transfer')}
                     className="flex items-center w-full gap-4 rounded-xl border border-border p-4 cursor-pointer hover:bg-surface transition-colors data-[selected=true]:border-primary/40 data-[selected=true]:bg-primary/5"
                   >
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent-soft">
@@ -179,9 +206,9 @@ export default function PaymentPage() {
                     </CheckboxControl>
                   </CheckboxRoot>
 
-                  <CheckboxRoot 
-                    isSelected={paymentForm.paymentMethods.includes('cash')} 
-                    onChange={() => togglePaymentMethod('cash')} 
+                  <CheckboxRoot
+                    isSelected={selectedMethods.includes('cash')}
+                    onChange={() => togglePaymentMethod('cash')}
                     className="flex items-center w-full gap-4 rounded-xl border border-border p-4 cursor-pointer hover:bg-surface transition-colors data-[selected=true]:border-primary/40 data-[selected=true]:bg-primary/5"
                   >
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-green-500/10">
@@ -196,9 +223,9 @@ export default function PaymentPage() {
                     </CheckboxControl>
                   </CheckboxRoot>
 
-                  <CheckboxRoot 
-                    isSelected={paymentForm.paymentMethods.includes('custom')} 
-                    onChange={() => togglePaymentMethod('custom')} 
+                  <CheckboxRoot
+                    isSelected={selectedMethods.includes('custom')}
+                    onChange={() => togglePaymentMethod('custom')}
                     className="flex items-center w-full gap-4 rounded-xl border border-border p-4 cursor-pointer hover:bg-surface transition-colors data-[selected=true]:border-primary/40 data-[selected=true]:bg-primary/5"
                   >
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-yellow-500/10">
@@ -213,10 +240,10 @@ export default function PaymentPage() {
                     </CheckboxControl>
                   </CheckboxRoot>
 
-                  {paymentForm.paymentMethods.includes('custom') && (
+                  {selectedMethods.includes('custom') && (
                     <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="pl-14">
-                      <Input placeholder="Ex: Chèque, PayPal, etc." value={paymentForm.customPaymentMethod}
-                        onChange={(e) => setPaymentForm((p) => ({ ...p, customPaymentMethod: e.target.value }))} />
+                      <Input placeholder="Ex: Chèque, PayPal, etc." value={customMethod}
+                        onChange={(e) => updateInvoiceSettings({ customPaymentMethod: e.target.value })} />
                     </motion.div>
                   )}
                 </div>
@@ -226,7 +253,6 @@ export default function PaymentPage() {
                 <h3 className="font-semibold text-foreground">Paiement en ligne</h3>
 
                 <div className="space-y-3">
-                  {/* Stripe */}
                   {stripeLoading ? (
                     <Skeleton className="h-20 w-full rounded-xl" />
                   ) : stripeConfigured ? (
@@ -276,7 +302,6 @@ export default function PaymentPage() {
                     </div>
                   )}
 
-                  {/* PayPal placeholder */}
                   <div className="flex items-center gap-4 rounded-xl border border-border p-4 opacity-50 cursor-not-allowed">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
                       <CreditCard className="h-5 w-5 text-muted-foreground" />
@@ -294,7 +319,6 @@ export default function PaymentPage() {
         </CardContent>
       </Card>
 
-      {/* Stripe activation modal */}
       <StripeActivationModal
         open={stripeModalOpen}
         onClose={() => setStripeModalOpen(false)}
@@ -303,11 +327,11 @@ export default function PaymentPage() {
       />
 
       <SaveBar
-        hasChanges={paymentHasChanges}
-        saving={paymentSaving}
-        error={paymentSaveError}
-        onSave={() => handleSavePayment()}
-        onReset={resetPayment}
+        hasChanges={hasChanges}
+        saving={saving}
+        error={saveError}
+        onSave={() => handleSave()}
+        onReset={handleReset}
       />
     </motion.div>
   )

@@ -8,7 +8,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/toast'
 import { Spinner } from '@/components/ui/spinner'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
-import { useCompanySettings } from '@/lib/company-settings-context'
 import { api } from '@/lib/api'
 import { A4Sheet, ClientModal, type DocumentLine, type ClientInfo, type CompanyInfo } from '@/components/shared/a4-sheet'
 import { DocumentOptionsPanel } from '@/components/shared/document-options'
@@ -81,7 +80,6 @@ export default function NewQuotePage() {
   const { toast } = useToast()
   const trackFeature = useTrackFeature()
   const { settings: invoiceSettings, companyLogoUrl, loading: settingsLoading, refreshSettings, updateSettings, uploadLogo } = useInvoiceSettings()
-  const { paymentForm: companyPaymentForm } = useCompanySettings()
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -670,8 +668,8 @@ export default function NewQuotePage() {
             showClientSiren={!!options.clientSiren}
             clientVatNumber={options.clientVatNumber}
             showClientVatNumber={!!options.clientVatNumber}
-            paymentMethods={companyPaymentForm.paymentMethods}
-            customPaymentMethod={companyPaymentForm.customPaymentMethod}
+            paymentMethods={invoiceSettings.paymentMethods}
+            customPaymentMethod={invoiceSettings.customPaymentMethod}
             subject={options.subject}
             onSubjectChange={(v) => handleOptionsChange({ subject: v })}
             template={invoiceSettings.template}

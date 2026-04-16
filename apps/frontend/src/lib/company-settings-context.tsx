@@ -63,8 +63,6 @@ export interface CompanyForm {
 export interface PaymentForm {
   paymentConditions: string
   currency: string
-  paymentMethods: string[]
-  customPaymentMethod: string
 }
 
 interface CompanySettingsContextType {
@@ -95,7 +93,7 @@ const defaultForm: CompanyForm = {
 }
 
 const defaultPaymentForm: PaymentForm = {
-  paymentConditions: '', currency: 'EUR', paymentMethods: ['bank_transfer'], customPaymentMethod: '',
+  paymentConditions: '', currency: 'EUR',
 }
 
 const CompanySettingsContext = createContext<CompanySettingsContextType>({
@@ -161,8 +159,6 @@ export function CompanySettingsProvider({ children }: { children: React.ReactNod
         const initialPaymentForm: PaymentForm = {
           paymentConditions: data.company.paymentConditions || '',
           currency: data.company.currency || 'EUR',
-          paymentMethods: (data.company as any).paymentMethods || ['bank_transfer'],
-          customPaymentMethod: (data.company as any).customPaymentMethod || '',
         }
         setPaymentForm(initialPaymentForm)
         setSavedPaymentForm(initialPaymentForm)
@@ -180,8 +176,6 @@ export function CompanySettingsProvider({ children }: { children: React.ReactNod
     const { error } = await api.put('/company', {
       paymentConditions: next.paymentConditions,
       currency: next.currency,
-      paymentMethods: next.paymentMethods,
-      customPaymentMethod: next.customPaymentMethod,
     })
     setPaymentSaving(false)
     if (error) {
