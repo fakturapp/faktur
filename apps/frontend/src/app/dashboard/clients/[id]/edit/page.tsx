@@ -257,20 +257,26 @@ export default function ClientEditPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="rounded-xl border border-border bg-card/50 p-4 flex items-center gap-3">
+        <Link
+          href={`/dashboard/clients/${id}/invoices?tab=invoices`}
+          className="rounded-xl border border-border bg-card/50 p-4 flex items-center gap-3 hover:border-primary/30 hover:bg-primary/5 transition-colors"
+        >
           <FileText className="h-4 w-4 text-muted-foreground" />
           <div>
             <p className="text-lg font-bold text-foreground">{client.invoiceCount}</p>
             <p className="text-xs text-muted-foreground">Factures</p>
           </div>
-        </div>
-        <div className="rounded-xl border border-border bg-card/50 p-4 flex items-center gap-3">
+        </Link>
+        <Link
+          href={`/dashboard/clients/${id}/invoices?tab=quotes`}
+          className="rounded-xl border border-border bg-card/50 p-4 flex items-center gap-3 hover:border-primary/30 hover:bg-primary/5 transition-colors"
+        >
           <Receipt className="h-4 w-4 text-muted-foreground" />
           <div>
             <p className="text-lg font-bold text-foreground">{client.quoteCount}</p>
             <p className="text-xs text-muted-foreground">Devis</p>
           </div>
-        </div>
+        </Link>
         <div className="rounded-xl border border-border bg-card/50 p-4">
           <p className="text-lg font-bold text-foreground">{formatCurrency(client.totalRevenue)}</p>
           <p className="text-xs text-muted-foreground">CA total</p>
