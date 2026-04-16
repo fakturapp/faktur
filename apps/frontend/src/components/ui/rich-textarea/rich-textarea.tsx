@@ -56,17 +56,53 @@ function escHtml(str: string): string {
     .replace(/"/g, '&quot;')
 }
 
+const COLOR_REGEX = /^(#[0-9a-fA-F]{3,8}|rgba?\(\s*\d{1,3}(\s*,\s*\d{1,3}){2}(\s*,\s*(0|1|0?\.\d+))?\s*\)|[a-zA-Z]{3,20})$/
+const ALLOWED_FONTS = new Set(['inherit', 'Arial', 'Georgia', 'Courier New', 'Helvetica', 'Times New Roman', 'Verdana', 'sans-serif', 'serif', 'monospace'])
+const SAFE_URL_REGEX = /^(https?:|mailto:|tel:|#|\/[^/])/i
+
+function sanitizeColor(value: string): string | null {
+  const v = value.trim()
+  return COLOR_REGEX.test(v) ? v : null
+}
+
+function sanitizeFont(value: string): string | null {
+  const v = value.trim().replace(/^['"]|['"]$/g, '')
+  return ALLOWED_FONTS.has(v) ? v : null
+}
+
+function sanitizeUrl(value: string): string | null {
+  const v = value.trim()
+  if (!SAFE_URL_REGEX.test(v)) return null
+  return v.replace(/"/g, '%22')
+}
+
 function applyInlineFormat(h: string): string {
   h = h.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
   h = h.replace(/__(.+?)__/g, '<u>$1</u>')
   h = h.replace(/\*(.+?)\*/g, '<em>$1</em>')
   h = h.replace(/~~(.+?)~~/g, '<s>$1</s>')
-  h = h.replace(/\{color:([^}]+)\}(.+?)\{\/color\}/g, '<span style="color:$1">$2</span>')
-  h = h.replace(/\{bg:([^}]+)\}(.+?)\{\/bg\}/g, '<span style="background-color:$1;border-radius:2px;padding:0 1px">$2</span>')
+  h = h.replace(/\{color:([^}]+)\}(.+?)\{\/color\}/g, (_, color, content) => {
+    const safe = sanitizeColor(color)
+    return safe ? `<span style="color:${safe}">${content}</span>` : content
+  })
+  h = h.replace(/\{bg:([^}]+)\}(.+?)\{\/bg\}/g, (_, color, content) => {
+    const safe = sanitizeColor(color)
+    return safe
+      ? `<span style="background-color:${safe};border-radius:2px;padding:0 1px">${content}</span>`
+      : content
+  })
   h = h.replace(/\{size:sm\}(.+?)\{\/size\}/g, '<span style="font-size:0.85em">$1</span>')
   h = h.replace(/\{size:lg\}(.+?)\{\/size\}/g, '<span style="font-size:1.3em">$1</span>')
-  h = h.replace(/\{font:([^}]+)\}(.+?)\{\/font\}/g, '<span style="font-family:$1">$2</span>')
-  h = h.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" style="color:inherit;text-decoration:underline">$1</a>')
+  h = h.replace(/\{font:([^}]+)\}(.+?)\{\/font\}/g, (_, font, content) => {
+    const safe = sanitizeFont(font)
+    return safe ? `<span style="font-family:${safe}">${content}</span>` : content
+  })
+  h = h.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, text, href) => {
+    const safe = sanitizeUrl(href)
+    return safe
+      ? `<a href="${safe}" rel="noopener noreferrer" target="_blank" style="color:inherit;text-decoration:underline">${text}</a>`
+      : text
+  })
   return h
 }
 
