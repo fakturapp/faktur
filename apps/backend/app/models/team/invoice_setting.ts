@@ -91,6 +91,9 @@ export default class InvoiceSetting extends BaseModel {
   declare invoiceFilenamePattern: string
 
   @column()
+  declare creditNoteFilenamePattern: string
+
+  @column()
   declare footerMode: 'company_info' | 'custom' | 'vat_exempt'
 
   @column()
@@ -101,6 +104,9 @@ export default class InvoiceSetting extends BaseModel {
 
   @column()
   declare nextQuoteNumber: string | null
+
+  @column()
+  declare nextCreditNoteNumber: string | null
 
   @column()
   declare stripePublishableKey: string | null
@@ -125,6 +131,21 @@ export default class InvoiceSetting extends BaseModel {
 
   @column()
   declare aiModel: string
+
+  @column()
+  declare b2bAccountId: string | null
+
+  @column()
+  declare b2bEnterpriseSize: string | null
+
+  @column()
+  declare b2bNafCode: string | null
+
+  @column()
+  declare b2bTypeOperation: string | null
+
+  @column()
+  declare b2bEreportingEnabled: boolean
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
