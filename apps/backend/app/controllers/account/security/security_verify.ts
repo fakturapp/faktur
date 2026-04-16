@@ -4,6 +4,7 @@ import crypto from 'node:crypto'
 import SecurityCodeRequested from '#events/security_code_requested'
 import TwoFactorService from '#services/auth/two_factor_service'
 import { securityVerifyValidator } from '#validators/account_validator'
+import { timingSafeEqualStr } from '#services/security/timing_safe'
 
 export default class SecurityVerify {
   async sendCode({ auth, response }: HttpContext) {
@@ -78,7 +79,7 @@ export default class SecurityVerify {
       return response.unauthorized({ message: 'Security code expired' })
     }
 
-    if (user.securityCode !== payload.code) {
+    if (!timingSafeEqualStr(user.securityCode, payload.code)) {
       return response.unauthorized({ message: 'Invalid security code' })
     }
 

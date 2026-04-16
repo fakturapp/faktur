@@ -2,6 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import vine from '@vinejs/vine'
 import { DateTime } from 'luxon'
 import AuditLog from '#models/shared/audit_log'
+import { timingSafeEqualStr } from '#services/security/timing_safe'
 
 const validator = vine.compile(
   vine.object({
@@ -26,7 +27,7 @@ export default class EmailConfirmChange {
       return response.badRequest({ message: 'Le code a expiré. Veuillez en demander un nouveau.' })
     }
 
-    if (user.securityCode !== code) {
+    if (!timingSafeEqualStr(user.securityCode, code)) {
       return response.badRequest({ message: 'Code invalide' })
     }
 

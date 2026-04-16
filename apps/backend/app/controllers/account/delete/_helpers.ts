@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
 import type User from '#models/account/user'
+import { timingSafeEqualStr } from '#services/security/timing_safe'
 
 const DELETION_SESSION_TTL_MINUTES = 30
 
@@ -12,7 +13,7 @@ export function validateDeletionSession(
     return 'Aucune session de suppression en cours'
   }
 
-  if (user.deletionToken !== token) {
+  if (!timingSafeEqualStr(user.deletionToken, token)) {
     return 'Token de suppression invalide'
   }
 

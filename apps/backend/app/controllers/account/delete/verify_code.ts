@@ -2,6 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import vine from '@vinejs/vine'
 import { validateDeletionSession } from './_helpers.js'
+import { timingSafeEqualStr } from '#services/security/timing_safe'
 
 const verifyCodeValidator = vine.compile(
   vine.object({
@@ -27,7 +28,7 @@ export default class VerifyCode {
       return response.badRequest({ message: 'Le code a expiré' })
     }
 
-    if (payload.code !== user.deletionCode) {
+    if (!timingSafeEqualStr(payload.code, user.deletionCode)) {
       return response.unprocessableEntity({ message: 'Code incorrect' })
     }
 
