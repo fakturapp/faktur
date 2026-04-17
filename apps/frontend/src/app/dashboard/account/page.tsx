@@ -172,18 +172,9 @@ export default function AccountPage() {
 
     setAvatarUploading(true)
     try {
-      const token = localStorage.getItem('faktur_token')
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333'
-      const res = await fetch(`${baseUrl}/account/avatar`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        toast(data.message || 'Erreur lors de l\'upload', 'error')
+      const { error } = await api.upload('/account/avatar', formData)
+      if (error) {
+        toast(error, 'error')
       } else {
         await refreshUser()
         toast('Photo de profil mise à jour', 'success')
@@ -373,23 +364,6 @@ export default function AccountPage() {
       setSessions(data.sessions)
       setSessionsLoaded(true)
 
-      // Fetch location for each unique IP
-      const ips = [...new Set(data.sessions.map((s) => s.ipAddress).filter(Boolean))] as string[]
-      for (const ip of ips) {
-        if (ip === '::1' || ip === '127.0.0.1') continue
-        try {
-          const res = await fetch(`http://ip-api.com/json/${ip}?fields=status,city,country`)
-          if (res.ok) {
-            const geo = await res.json()
-            if (geo.status === 'success') {
-              const loc = [geo.city, geo.country].filter(Boolean).join(', ')
-              setSessions((prev) =>
-                prev.map((s) => (s.ipAddress === ip ? { ...s, location: loc } : s))
-              )
-            }
-          }
-        } catch { }
-      }
     }
   }
 

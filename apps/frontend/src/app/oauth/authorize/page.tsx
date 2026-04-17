@@ -188,10 +188,6 @@ function AuthorizeContent() {
     try {
       await api.post('/auth/logout', {})
     } catch {}
-    try {
-      localStorage.removeItem('faktur_token')
-      localStorage.removeItem('faktur_vault_key')
-    } catch {}
     const returnTo = encodeURIComponent(`/oauth/authorize?${queryString}`)
     router.replace(`/login?redirect=${returnTo}`)
   }
