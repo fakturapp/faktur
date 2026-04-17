@@ -6,6 +6,7 @@ import LoginHistory from '#models/account/login_history'
 import TwoFactorService from '#services/auth/two_factor_service'
 import { twoFactorVerifyValidator } from '#validators/auth/auth_validators'
 import UserTransformer from '#transformers/user_transformer'
+import { setAuthSessionCookies } from '#services/auth/auth_cookie_service'
 
 export default class Verify {
   async handle(ctx: HttpContext) {
@@ -76,10 +77,13 @@ export default class Verify {
       severity: 'info',
     })
 
+    const releasedToken = token.value!.release()
+    setAuthSessionCookies(response, { authToken: releasedToken })
+
     return response.ok({
       message: 'Login successful',
       user: await ctx.serialize.withoutWrapping(UserTransformer.transform(user)),
-      token: token.value!.release(),
+      token: releasedToken,
     })
   }
 }

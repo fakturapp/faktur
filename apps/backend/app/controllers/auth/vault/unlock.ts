@@ -7,6 +7,7 @@ import crypto from 'node:crypto'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import encryptionService from '#services/encryption/encryption_service'
 import keyStore from '#services/crypto/key_store'
+import { setVaultCookie } from '#services/auth/auth_cookie_service'
 
 const unlockValidator = vine.compile(
   vine.object({
@@ -98,6 +99,9 @@ export default class VaultUnlock {
       .where('id', String(tokenId))
       .update({ encrypted_kek: layer2 })
 
-    return response.ok({ message: 'Vault unlocked', vaultKey: sessionKey.toString('hex') })
+    const vaultKey = sessionKey.toString('hex')
+    setVaultCookie(response, vaultKey)
+
+    return response.ok({ message: 'Vault unlocked', vaultKey })
   }
 }
