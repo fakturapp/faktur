@@ -43,8 +43,6 @@ interface OauthApp {
   websiteUrl: string | null
   clientId: string
   redirectUris: string[]
-  allowedOrigins: string[]
-  allowAllOrigins: boolean
   scopes: string[]
   webhookUrl: string | null
   webhookEvents: string[] | null
@@ -543,16 +541,8 @@ function AppRow({
             {/* Redirect URIs */}
             <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
               <Link2 className="h-3 w-3" />
-              {app.redirectUris.length + app.allowedOrigins.length} URL
-              {app.redirectUris.length + app.allowedOrigins.length !== 1 ? 's' : ''}
+              {app.redirectUris.length} URI{app.redirectUris.length !== 1 ? 's' : ''}
             </div>
-
-            {app.allowAllOrigins && (
-              <div className="flex items-center gap-1.5 text-[11px] text-destructive font-semibold">
-                <AlertTriangle className="h-3 w-3" />
-                TOUTES ORIGINES
-              </div>
-            )}
 
             {app.webhookUrl && (
               <div className="flex items-center gap-1.5 text-[11px] text-violet-500">
@@ -695,8 +685,6 @@ function OauthAppFormModal({
     description: '',
     websiteUrl: '',
     redirectUris: 'http://127.0.0.1/callback',
-    allowedOrigins: '',
-    allowAllOrigins: false,
     scopes: ['profile', 'invoices:read', 'offline_access'] as string[],
     allScopes: false,
     kind: 'desktop' as OauthApp['kind'],
@@ -711,8 +699,6 @@ function OauthAppFormModal({
       description: '',
       websiteUrl: '',
       redirectUris: 'http://127.0.0.1/callback',
-      allowedOrigins: '',
-      allowAllOrigins: false,
       scopes: ['profile', 'invoices:read', 'offline_access'],
       allScopes: false,
       kind: 'desktop',
@@ -733,8 +719,6 @@ function OauthAppFormModal({
         description: existingApp.description ?? '',
         websiteUrl: existingApp.websiteUrl ?? '',
         redirectUris: existingApp.redirectUris.join('\n'),
-        allowedOrigins: existingApp.allowedOrigins.join('\n'),
-        allowAllOrigins: existingApp.allowAllOrigins,
         scopes: isAllScopes ? ALL_SCOPE_IDS : existingApp.scopes,
         allScopes: isAllScopes,
         kind: existingApp.kind,
@@ -772,14 +756,10 @@ function OauthAppFormModal({
       .split('\n')
       .map((s) => s.trim())
       .filter(Boolean)
-    if (redirects.length === 0 && !form.allowAllOrigins) {
+    if (redirects.length === 0) {
       toast('Au moins un redirect URI est requis', 'error')
       return
     }
-    const origins = form.allowedOrigins
-      .split('\n')
-      .map((s) => s.trim())
-      .filter(Boolean)
     const scopes = form.allScopes ? ALL_SCOPE_IDS : form.scopes
     if (scopes.length === 0) {
       toast('Au moins un scope est requis', 'error')
@@ -791,9 +771,7 @@ function OauthAppFormModal({
       name: form.name.trim(),
       description: form.description.trim() || null,
       websiteUrl: form.websiteUrl.trim() || null,
-      redirectUris: redirects.length > 0 ? redirects : ['http://127.0.0.1/callback'],
-      allowedOrigins: origins,
-      allowAllOrigins: form.allowAllOrigins,
+      redirectUris: redirects,
       scopes,
       kind: form.kind,
     }
@@ -923,17 +901,13 @@ function OauthAppFormModal({
         {/* Redirect URIs */}
         <div>
           <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">
-            Redirect URIs {form.allowAllOrigins ? '' : '*'}
+            Redirect URIs *
           </label>
           <textarea
             value={form.redirectUris}
             onChange={(e) => setForm({ ...form, redirectUris: e.target.value })}
             rows={3}
-            disabled={form.allowAllOrigins}
-            className={cn(
-              'w-full rounded-lg border border-border bg-background px-3 py-2 text-[13px] font-mono text-foreground placeholder:text-muted-foreground/60 focus:border-primary/50 focus:ring-2 focus:ring-primary/15 outline-none transition-all',
-              form.allowAllOrigins && 'opacity-40'
-            )}
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-[13px] font-mono text-foreground placeholder:text-muted-foreground/60 focus:border-primary/50 focus:ring-2 focus:ring-primary/15 outline-none transition-all"
             placeholder="http://127.0.0.1/callback&#10;https://example.com/callback&#10;faktur-mobile://oauth/callback"
           />
           <p className="text-[11px] text-muted-foreground mt-1.5">
@@ -942,58 +916,6 @@ function OauthAppFormModal({
             le port est auto-assigné au runtime.
           </p>
         </div>
-
-        {/* Allowed origins (wildcards) */}
-        <div>
-          <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">
-            Origines autorisées (wildcards)
-          </label>
-          <textarea
-            value={form.allowedOrigins}
-            onChange={(e) => setForm({ ...form, allowedOrigins: e.target.value })}
-            rows={3}
-            disabled={form.allowAllOrigins}
-            className={cn(
-              'w-full rounded-lg border border-border bg-background px-3 py-2 text-[13px] font-mono text-foreground placeholder:text-muted-foreground/60 focus:border-primary/50 focus:ring-2 focus:ring-primary/15 outline-none transition-all',
-              form.allowAllOrigins && 'opacity-40'
-            )}
-            placeholder="exp://*/--/oauth/callback&#10;faktur-mobile://*&#10;http://127.0.0.1:*/callback"
-          />
-          <p className="text-[11px] text-muted-foreground mt-1.5 leading-relaxed">
-            Un par ligne. Supporte les wildcards <code className="text-[10px] px-1 rounded bg-muted">*</code> (segment) et <code className="text-[10px] px-1 rounded bg-muted">**</code> (chemin complet). Utile pour Expo Go (<code className="text-[10px] px-1 rounded bg-muted">exp://*/--/oauth/callback</code>) ou les ports loopback dynamiques.
-          </p>
-        </div>
-
-        {/* DANGER ZONE: allow all origins */}
-        <button
-          type="button"
-          onClick={() => setForm({ ...form, allowAllOrigins: !form.allowAllOrigins })}
-          className={cn(
-            'w-full flex items-start gap-3 rounded-lg border-2 p-3 transition-all text-left',
-            form.allowAllOrigins
-              ? 'border-destructive/70 bg-destructive/5'
-              : 'border-border bg-card hover:bg-muted/40'
-          )}
-        >
-          <div
-            className={cn(
-              'h-5 w-5 shrink-0 rounded border-2 flex items-center justify-center mt-0.5 transition-colors',
-              form.allowAllOrigins ? 'bg-destructive border-destructive' : 'border-muted-foreground/40'
-            )}
-          >
-            {form.allowAllOrigins && <Check className="h-3 w-3 text-white" />}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-semibold text-foreground flex items-center gap-2">
-              <AlertTriangle className="h-3.5 w-3.5 text-destructive" />
-              Autoriser TOUTES les origines
-              <Badge variant="destructive" className="text-[9px]">DÉV UNIQUEMENT</Badge>
-            </p>
-            <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug">
-              N&apos;importe quel <code className="text-[10px] px-1 rounded bg-muted">redirect_uri</code> sera accepté sans validation — tout attaquant avec le client_id pourra détourner le code d&apos;autorisation. À n&apos;utiliser <strong>que</strong> pendant le développement local.
-            </p>
-          </div>
-        </button>
 
         {/* Scopes */}
         <div>
