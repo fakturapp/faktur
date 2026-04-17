@@ -52,6 +52,9 @@ function EditQuoteContent() {
   const { settings: invoiceSettings, companyLogoUrl, loading: settingsLoading, refreshSettings, updateSettings, uploadLogo } = useInvoiceSettings()
   const { paymentForm: companyPaymentForm } = useCompanySettings()
   const collabEnabled = invoiceSettings.collaborationEnabled
+  const defaultVatRate = Number.isFinite(Number(invoiceSettings.defaultVatRate))
+    ? Number(invoiceSettings.defaultVatRate)
+    : 20
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -201,6 +204,25 @@ function EditQuoteContent() {
     }
   }, [loading, searchParams])
 
+  useEffect(() => {
+    if (loading || settingsLoading) return
+    setLines((prev) => {
+      if (prev.length !== 1) return prev
+      const [line] = prev
+      if (
+        line.type !== 'standard' ||
+        line.description ||
+        line.saleType ||
+        line.unit ||
+        line.quantity !== 1 ||
+        line.unitPrice !== 0
+      ) {
+        return prev
+      }
+      return [{ ...line, vatRate: defaultVatRate }]
+    })
+  }, [defaultVatRate, loading, settingsLoading])
+
   // Handlers
   const handleUpdateLine = useCallback((index: number, partial: Partial<DocumentLine>) => {
     setLines((prev) => prev.map((l, i) => (i === index ? { ...l, ...partial } : l)))
@@ -210,10 +232,10 @@ function EditQuoteContent() {
   const handleAddLine = useCallback((type: 'standard' | 'section') => {
     setLines((prev) => [
       ...prev,
-      { id: generateId(), type, description: '', saleType: '', quantity: 1, unit: '', unitPrice: 0, vatRate: type === 'section' ? 0 : 20 },
+      { id: generateId(), type, description: '', saleType: '', quantity: 1, unit: '', unitPrice: 0, vatRate: type === 'section' ? 0 : defaultVatRate },
     ])
     setIsDirty(true); setValidationErrors([])
-  }, [])
+  }, [defaultVatRate])
 
   const handleRemoveLine = useCallback((index: number) => {
     setLines((prev) => prev.filter((_, i) => i !== index))

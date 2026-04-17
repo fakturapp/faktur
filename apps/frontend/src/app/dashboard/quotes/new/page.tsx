@@ -86,6 +86,9 @@ export default function NewQuotePage() {
   const trackFeature = useTrackFeature()
   const { settings: invoiceSettings, companyLogoUrl, loading: settingsLoading, refreshSettings, updateSettings, uploadLogo } = useInvoiceSettings()
   const { paymentForm: companyPaymentForm } = useCompanySettings()
+  const defaultVatRate = Number.isFinite(Number(invoiceSettings.defaultVatRate))
+    ? Number(invoiceSettings.defaultVatRate)
+    : 20
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -167,7 +170,7 @@ export default function NewQuotePage() {
       const saved = loadSavedOptions()
       setOptions((prev) => ({
         ...prev,
-        billingType: saved?.billingType || invoiceSettings.billingType,
+        billingType: invoiceSettings.billingType || saved?.billingType || prev.billingType,
         subject: saved?.subject || invoiceSettings.defaultSubject || prev.subject,
         acceptanceConditions: saved?.acceptanceConditions || invoiceSettings.defaultAcceptanceConditions || prev.acceptanceConditions,
         signatureField: saved?.signatureField ?? invoiceSettings.defaultSignatureField ?? prev.signatureField,
@@ -181,15 +184,30 @@ export default function NewQuotePage() {
         showAcceptanceConditions: saved?.showAcceptanceConditions ?? (!!(invoiceSettings.defaultAcceptanceConditions) || prev.showAcceptanceConditions),
         showFreeField: saved?.showFreeField ?? (!!(invoiceSettings.defaultFreeField) || prev.showFreeField),
         showFooterText: saved?.showFooterText ?? (!!(invoiceSettings.defaultFooterText) || prev.showFooterText),
-        showQuantityColumn: saved?.showQuantityColumn ?? prev.showQuantityColumn,
-        showUnitColumn: saved?.showUnitColumn ?? prev.showUnitColumn,
-        showUnitPriceColumn: saved?.showUnitPriceColumn ?? prev.showUnitPriceColumn,
-        showVatColumn: saved?.showVatColumn ?? prev.showVatColumn,
+        showQuantityColumn: invoiceSettings.defaultShowQuantityColumn ?? saved?.showQuantityColumn ?? prev.showQuantityColumn,
+        showUnitColumn: invoiceSettings.defaultShowUnitColumn ?? saved?.showUnitColumn ?? prev.showUnitColumn,
+        showUnitPriceColumn: invoiceSettings.defaultShowUnitPriceColumn ?? saved?.showUnitPriceColumn ?? prev.showUnitPriceColumn,
+        showVatColumn: invoiceSettings.defaultShowVatColumn ?? saved?.showVatColumn ?? prev.showVatColumn,
         footerMode: saved?.footerMode || invoiceSettings.footerMode || prev.footerMode,
       }))
+      setLines((prev) => {
+        if (prev.length !== 1) return prev
+        const [line] = prev
+        if (
+          line.type !== 'standard' ||
+          line.description ||
+          line.saleType ||
+          line.unit ||
+          line.quantity !== 1 ||
+          line.unitPrice !== 0
+        ) {
+          return prev
+        }
+        return [{ ...line, vatRate: defaultVatRate }]
+      })
       setAccentColor(invoiceSettings.accentColor)
     }
-  }, [settingsLoading, invoiceSettings])
+  }, [defaultVatRate, settingsLoading, invoiceSettings])
 
   useEffect(() => {
     if (loading || settingsLoading) return
@@ -245,10 +263,10 @@ export default function NewQuotePage() {
   const handleAddLine = useCallback((type: 'standard' | 'section') => {
     setLines((prev) => [
       ...prev,
-      { id: generateId(), type, description: '', saleType: '', quantity: 1, unit: '', unitPrice: 0, vatRate: type === 'section' ? 0 : 20 },
+      { id: generateId(), type, description: '', saleType: '', quantity: 1, unit: '', unitPrice: 0, vatRate: type === 'section' ? 0 : defaultVatRate },
     ])
     setIsDirty(true); setValidationErrors([])
-  }, [])
+  }, [defaultVatRate])
 
   const handleRemoveLine = useCallback((index: number) => {
     setLines((prev) => prev.filter((_, i) => i !== index))

@@ -48,6 +48,11 @@ export default class InvoiceSettingsUpdate {
         defaultFreeField: payload.defaultFreeField || null,
         defaultShowNotes: payload.defaultShowNotes ?? true,
         defaultVatExempt: payload.defaultVatExempt ?? false,
+        defaultVatRate: payload.defaultVatRate ?? 20,
+        defaultShowQuantityColumn: payload.defaultShowQuantityColumn ?? true,
+        defaultShowUnitColumn: payload.defaultShowUnitColumn ?? true,
+        defaultShowUnitPriceColumn: payload.defaultShowUnitPriceColumn ?? true,
+        defaultShowVatColumn: payload.defaultShowVatColumn ?? true,
         defaultFooterText: payload.defaultFooterText || null,
         defaultShowDeliveryAddress: payload.defaultShowDeliveryAddress ?? false,
         defaultLanguage: payload.defaultLanguage || 'fr',
@@ -89,6 +94,16 @@ export default class InvoiceSettingsUpdate {
         settings.defaultShowNotes = payload.defaultShowNotes
       if (payload.defaultVatExempt !== undefined)
         settings.defaultVatExempt = payload.defaultVatExempt
+      if (payload.defaultVatRate !== undefined)
+        settings.defaultVatRate = payload.defaultVatRate
+      if (payload.defaultShowQuantityColumn !== undefined)
+        settings.defaultShowQuantityColumn = payload.defaultShowQuantityColumn
+      if (payload.defaultShowUnitColumn !== undefined)
+        settings.defaultShowUnitColumn = payload.defaultShowUnitColumn
+      if (payload.defaultShowUnitPriceColumn !== undefined)
+        settings.defaultShowUnitPriceColumn = payload.defaultShowUnitPriceColumn
+      if (payload.defaultShowVatColumn !== undefined)
+        settings.defaultShowVatColumn = payload.defaultShowVatColumn
       if (payload.defaultFooterText !== undefined)
         settings.defaultFooterText = payload.defaultFooterText || null
       if (payload.defaultShowDeliveryAddress !== undefined)
@@ -132,6 +147,11 @@ export default class InvoiceSettingsUpdate {
         defaultFreeField: settings.defaultFreeField || null,
         defaultShowNotes: settings.defaultShowNotes ?? true,
         defaultVatExempt: settings.defaultVatExempt || false,
+        defaultVatRate: settings.defaultVatRate ?? 20,
+        defaultShowQuantityColumn: settings.defaultShowQuantityColumn ?? true,
+        defaultShowUnitColumn: settings.defaultShowUnitColumn ?? true,
+        defaultShowUnitPriceColumn: settings.defaultShowUnitPriceColumn ?? true,
+        defaultShowVatColumn: settings.defaultShowVatColumn ?? true,
         defaultFooterText: settings.defaultFooterText || null,
         defaultShowDeliveryAddress: settings.defaultShowDeliveryAddress || false,
         defaultLanguage: settings.defaultLanguage || 'fr',

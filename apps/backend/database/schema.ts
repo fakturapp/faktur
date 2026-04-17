@@ -861,7 +861,7 @@ export class InvoicePaymentSchema extends BaseModel {
 }
 
 export class InvoiceSettingSchema extends BaseModel {
-  static $columns = ['accentColor', 'aiApiKeyClaude', 'aiApiKeyGemini', 'aiApiKeyGroq', 'aiCustomApiKey', 'aiEnabled', 'aiKeyMode', 'aiModel', 'aiProvider', 'b2BAccountId', 'b2BEnterpriseSize', 'b2BEreportingEnabled', 'b2BNafCode', 'b2BTypeOperation', 'billingType', 'collaborationEnabled', 'createdAt', 'creditNoteFilenamePattern', 'customPaymentMethod', 'darkMode', 'defaultAcceptanceConditions', 'defaultFooterText', 'defaultFreeField', 'defaultLanguage', 'defaultOperationCategory', 'defaultShowDeliveryAddress', 'defaultShowNotes', 'defaultSignatureField', 'defaultSubject', 'defaultVatExempt', 'documentFont', 'eInvoicingEnabled', 'footerMode', 'id', 'invoiceFilenamePattern', 'logoBorderRadius', 'logoSource', 'logoUrl', 'nextCreditNoteNumber', 'nextInvoiceNumber', 'nextQuoteNumber', 'paymentMethods', 'pdpApiKey', 'pdpProvider', 'pdpSandbox', 'quoteFilenamePattern', 'stripePublishableKey', 'stripeSecretKey', 'stripeWebhookSecret', 'stripeWebhookSecretApp', 'teamId', 'template', 'updatedAt'] as const
+  static $columns = ['accentColor', 'aiApiKeyClaude', 'aiApiKeyGemini', 'aiApiKeyGroq', 'aiCustomApiKey', 'aiEnabled', 'aiKeyMode', 'aiModel', 'aiProvider', 'b2BAccountId', 'b2BEnterpriseSize', 'b2BEreportingEnabled', 'b2BNafCode', 'b2BTypeOperation', 'billingType', 'collaborationEnabled', 'createdAt', 'creditNoteFilenamePattern', 'customPaymentMethod', 'darkMode', 'defaultAcceptanceConditions', 'defaultFooterText', 'defaultFreeField', 'defaultLanguage', 'defaultOperationCategory', 'defaultShowDeliveryAddress', 'defaultShowNotes', 'defaultShowQuantityColumn', 'defaultShowUnitColumn', 'defaultShowUnitPriceColumn', 'defaultShowVatColumn', 'defaultSignatureField', 'defaultSubject', 'defaultVatExempt', 'defaultVatRate', 'documentFont', 'eInvoicingEnabled', 'footerMode', 'id', 'invoiceFilenamePattern', 'logoBorderRadius', 'logoSource', 'logoUrl', 'nextCreditNoteNumber', 'nextInvoiceNumber', 'nextQuoteNumber', 'paymentMethods', 'pdpApiKey', 'pdpProvider', 'pdpSandbox', 'quoteFilenamePattern', 'stripePublishableKey', 'stripeSecretKey', 'stripeWebhookSecret', 'stripeWebhookSecretApp', 'teamId', 'template', 'updatedAt'] as const
   $columns = InvoiceSettingSchema.$columns
   @column()
   declare accentColor: string
@@ -918,11 +918,21 @@ export class InvoiceSettingSchema extends BaseModel {
   @column()
   declare defaultShowNotes: boolean | null
   @column()
+  declare defaultShowQuantityColumn: boolean
+  @column()
+  declare defaultShowUnitColumn: boolean
+  @column()
+  declare defaultShowUnitPriceColumn: boolean
+  @column()
+  declare defaultShowVatColumn: boolean
+  @column()
   declare defaultSignatureField: boolean | null
   @column()
   declare defaultSubject: string | null
   @column()
   declare defaultVatExempt: boolean | null
+  @column()
+  declare defaultVatRate: number
   @column()
   declare documentFont: string | null
   @column()

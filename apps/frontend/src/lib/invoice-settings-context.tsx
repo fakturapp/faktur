@@ -30,6 +30,11 @@ export interface InvoiceSettings {
   defaultFreeField: string | null
   defaultShowNotes: boolean
   defaultVatExempt: boolean
+  defaultVatRate: number
+  defaultShowQuantityColumn: boolean
+  defaultShowUnitColumn: boolean
+  defaultShowUnitPriceColumn: boolean
+  defaultShowVatColumn: boolean
   defaultFooterText: string | null
   defaultShowDeliveryAddress: boolean
   defaultLanguage: string
@@ -79,6 +84,11 @@ const defaultSettings: InvoiceSettings = {
   defaultFreeField: null,
   defaultShowNotes: true,
   defaultVatExempt: false,
+  defaultVatRate: 20,
+  defaultShowQuantityColumn: true,
+  defaultShowUnitColumn: true,
+  defaultShowUnitPriceColumn: true,
+  defaultShowVatColumn: true,
   defaultFooterText: null,
   defaultShowDeliveryAddress: false,
   defaultLanguage: 'fr',
