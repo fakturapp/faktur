@@ -12,6 +12,8 @@ function formatRecoveryKeyInput(value: string): string {
 
 interface CryptoResetModalProps {
   open: boolean
+  canRecoverWithPassword: boolean
+  hasRecoveryKey: boolean
   onRecovered: () => void
   onWiped: () => void
 }
@@ -38,7 +40,13 @@ const contentVariants = {
   exit: { opacity: 0, x: -20, transition: { duration: 0.15, ease: 'easeIn' as const } },
 }
 
-export function CryptoResetModal({ open, onRecovered, onWiped }: CryptoResetModalProps) {
+export function CryptoResetModal({
+  open,
+  canRecoverWithPassword,
+  hasRecoveryKey,
+  onRecovered,
+  onWiped,
+}: CryptoResetModalProps) {
   const [mode, setMode] = useState<'choose' | 'recover' | 'recover-key' | 'wipe'>('choose')
   const [oldPassword, setOldPassword] = useState('')
   const [recoveryKey, setRecoveryKey] = useState('')
@@ -161,7 +169,7 @@ export function CryptoResetModal({ open, onRecovered, onWiped }: CryptoResetModa
                     </motion.div>
                     <div>
                       <h2 className="text-lg font-semibold text-foreground">Donn&eacute;es chiffr&eacute;es</h2>
-                      <p className="text-xs text-muted-foreground">R&eacute;cup&eacute;ration apr&egrave;s r&eacute;initialisation du mot de passe</p>
+                      <p className="text-xs text-muted-foreground">R&eacute;cup&eacute;ration du coffre de donn&eacute;es</p>
                     </div>
                   </div>
                 </motion.div>
@@ -181,39 +189,45 @@ export function CryptoResetModal({ open, onRecovered, onWiped }: CryptoResetModa
                         <div className="space-y-4">
                           <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-3">
                             <p className="text-sm text-amber-200">
-                              Vos donn&eacute;es sont chiffr&eacute;es avec votre ancien mot de passe. Vous devez fournir votre ancien mot de passe pour les r&eacute;cup&eacute;rer, ou recommencer de z&eacute;ro.
+                              {canRecoverWithPassword
+                                ? 'Vos donn&eacute;es sont chiffr&eacute;es avec votre ancien mot de passe. Vous pouvez les r&eacute;cup&eacute;rer avec cet ancien mot de passe, avec votre clef de secours, ou recommencer de z&eacute;ro.'
+                                : 'Les cl&eacute;s de votre coffre ne correspondent plus aux donn&eacute;es chiffr&eacute;es. Utilisez votre clef de secours si vous l&apos;avez, sinon il faudra repartir de z&eacute;ro.'}
                             </p>
                           </div>
 
-                          <motion.button
-                            whileHover={{ scale: 1.01 }}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={() => { setMode('recover'); setError('') }}
-                            className="w-full flex items-center gap-3 p-4 rounded-xl border border-border hover:bg-muted/50 transition-colors text-left"
-                          >
-                            <div className="flex items-center justify-center h-9 w-9 rounded-lg bg-primary/10 shrink-0">
-                              <KeyRound className="h-4 w-4 text-primary" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-foreground">R&eacute;cup&eacute;rer mes donn&eacute;es</p>
-                              <p className="text-xs text-muted-foreground">J&apos;ai mon ancien mot de passe</p>
-                            </div>
-                          </motion.button>
+                          {canRecoverWithPassword && (
+                            <motion.button
+                              whileHover={{ scale: 1.01 }}
+                              whileTap={{ scale: 0.98 }}
+                              onClick={() => { setMode('recover'); setError('') }}
+                              className="w-full flex items-center gap-3 p-4 rounded-xl border border-border hover:bg-muted/50 transition-colors text-left"
+                            >
+                              <div className="flex items-center justify-center h-9 w-9 rounded-lg bg-primary/10 shrink-0">
+                                <KeyRound className="h-4 w-4 text-primary" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-foreground">R&eacute;cup&eacute;rer mes donn&eacute;es</p>
+                                <p className="text-xs text-muted-foreground">J&apos;ai mon ancien mot de passe</p>
+                              </div>
+                            </motion.button>
+                          )}
 
-                          <motion.button
-                            whileHover={{ scale: 1.01 }}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={() => { setMode('recover-key'); setError('') }}
-                            className="w-full flex items-center gap-3 p-4 rounded-xl border border-border hover:bg-muted/50 transition-colors text-left"
-                          >
-                            <div className="flex items-center justify-center h-9 w-9 rounded-lg bg-indigo-500/10 shrink-0">
-                              <Key className="h-4 w-4 text-indigo-400" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-foreground">Utiliser ma clef de secours</p>
-                              <p className="text-xs text-muted-foreground">J&apos;ai ma clef de secours re&ccedil;ue par email</p>
-                            </div>
-                          </motion.button>
+                          {hasRecoveryKey && (
+                            <motion.button
+                              whileHover={{ scale: 1.01 }}
+                              whileTap={{ scale: 0.98 }}
+                              onClick={() => { setMode('recover-key'); setError('') }}
+                              className="w-full flex items-center gap-3 p-4 rounded-xl border border-border hover:bg-muted/50 transition-colors text-left"
+                            >
+                              <div className="flex items-center justify-center h-9 w-9 rounded-lg bg-indigo-500/10 shrink-0">
+                                <Key className="h-4 w-4 text-indigo-400" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-foreground">Utiliser ma clef de secours</p>
+                                <p className="text-xs text-muted-foreground">J&apos;ai ma clef de secours re&ccedil;ue par email</p>
+                              </div>
+                            </motion.button>
+                          )}
 
                           <motion.button
                             whileHover={{ scale: 1.01 }}

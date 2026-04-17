@@ -20,6 +20,7 @@ export default class UserTransformer extends BaseTransformer<User> {
       ]),
       cryptoResetNeeded: this.resource.cryptoResetNeeded || false,
       hasRecoveryKey: this.resource.hasRecoveryKey || false,
+      canRecoverWithPassword: !!this.resource.oldSaltKdf,
     }
   }
 }

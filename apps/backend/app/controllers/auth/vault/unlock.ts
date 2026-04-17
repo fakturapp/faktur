@@ -79,8 +79,29 @@ export default class VaultUnlock {
           .first()
 
         if (teamMember?.encryptedTeamDek) {
-          const teamDek = zeroAccessCryptoService.decryptDEK(teamMember.encryptedTeamDek, kek)
-          keyStore.storeKeys(user.id, kek, user.currentTeamId, teamDek)
+          try {
+            const teamDek = zeroAccessCryptoService.decryptDEK(teamMember.encryptedTeamDek, kek)
+            keyStore.storeKeys(user.id, kek, user.currentTeamId, teamDek)
+          } catch {
+            user.cryptoResetNeeded = true
+            await user.save()
+            keyStore.storeKeys(user.id, kek, '', Buffer.alloc(0))
+
+            const tokenId = user.currentAccessToken.identifier
+            const sessionKey = crypto.randomBytes(32)
+            const layer1 = encryptionService.encryptWithCustomKey(kek.toString('hex'), sessionKey)
+            const layer2 = encryptionService.encrypt(layer1)
+            await db
+              .from('auth_access_tokens')
+              .where('id', String(tokenId))
+              .update({ encrypted_kek: layer2 })
+
+            return response.ok({
+              message: 'Encrypted data requires recovery',
+              vaultKey: sessionKey.toString('hex'),
+              requiresCryptoRecovery: true,
+            })
+          }
         } else {
           keyStore.storeKeys(user.id, kek, '', Buffer.alloc(0))
         }

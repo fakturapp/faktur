@@ -163,8 +163,14 @@ export default class Login {
             .first()
 
           if (teamMember?.encryptedTeamDek) {
-            const teamDek = zeroAccessCryptoService.decryptDEK(teamMember.encryptedTeamDek, kek)
-            keyStore.storeKeys(user.id, kek, user.currentTeamId, teamDek)
+            try {
+              const teamDek = zeroAccessCryptoService.decryptDEK(teamMember.encryptedTeamDek, kek)
+              keyStore.storeKeys(user.id, kek, user.currentTeamId, teamDek)
+            } catch {
+              user.cryptoResetNeeded = true
+              await user.save()
+              keyStore.storeKeys(user.id, kek, '', Buffer.alloc(0))
+            }
           } else {
             keyStore.storeKeys(user.id, kek, '', Buffer.alloc(0))
           }

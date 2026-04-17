@@ -2,6 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import TeamMember from '#models/team/team_member'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import keyStore from '#services/crypto/key_store'
+import keyStoreWarmer from '#services/crypto/key_store_warmer'
 import RecoveryKeyGenerated from '#events/recovery_key_generated'
 
 export default class CryptoRecover {
@@ -18,7 +19,14 @@ export default class CryptoRecover {
       return response.badRequest({ message: 'Old password or recovery key is required' })
     }
 
-    const newKek = keyStore.getKEK(user.id)
+    const newKek =
+      keyStore.getKEK(user.id) ||
+      (await keyStoreWarmer.warmKekFromRequest(
+        user.id,
+        String(user.currentAccessToken.identifier),
+        request.header('X-Vault-Key')
+      ))
+
     if (!newKek) {
       return response.unauthorized({
         code: 'SESSION_EXPIRED',

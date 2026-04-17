@@ -5,13 +5,12 @@ import encryptionService from '#services/encryption/encryption_service'
 import keyStore from '#services/crypto/key_store'
 
 export class KeyStoreWarmer {
-  async warmFromRequest(
+  async warmKekFromRequest(
     userId: string,
-    currentTeamId: string | null,
     tokenIdentifier: string | null,
     sessionKeyHex: string | null | undefined
-  ): Promise<boolean> {
-    if (!sessionKeyHex || !tokenIdentifier) return false
+  ): Promise<Buffer | null> {
+    if (!sessionKeyHex || !tokenIdentifier) return null
 
     try {
       const tokenRow = await db
@@ -20,13 +19,30 @@ export class KeyStoreWarmer {
         .select('encrypted_kek')
         .first()
 
-      if (!tokenRow?.encrypted_kek) return false
+      if (!tokenRow?.encrypted_kek) return null
 
       const sessionKey = Buffer.from(sessionKeyHex, 'hex')
       const layer1 = encryptionService.decrypt(tokenRow.encrypted_kek)
       const kekHex = encryptionService.decryptWithCustomKey(layer1, sessionKey)
       const kek = Buffer.from(kekHex, 'hex')
 
+      keyStore.storeKeys(userId, kek, '', Buffer.alloc(0))
+      return kek
+    } catch {
+      return null
+    }
+  }
+
+  async warmFromRequest(
+    userId: string,
+    currentTeamId: string | null,
+    tokenIdentifier: string | null,
+    sessionKeyHex: string | null | undefined
+  ): Promise<boolean> {
+    const kek = await this.warmKekFromRequest(userId, tokenIdentifier, sessionKeyHex)
+    if (!kek) return false
+
+    try {
       if (currentTeamId) {
         const teamMember = await TeamMember.query()
           .where('teamId', currentTeamId)
@@ -41,7 +57,6 @@ export class KeyStoreWarmer {
         }
       }
 
-      keyStore.storeKeys(userId, kek, '', Buffer.alloc(0))
       return true
     } catch {
       return false

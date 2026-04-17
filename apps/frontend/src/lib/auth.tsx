@@ -19,6 +19,7 @@ interface User {
   lastLoginAt: string | null
   createdAt: string
   cryptoResetNeeded: boolean
+  canRecoverWithPassword: boolean
   hasRecoveryKey: boolean
   hasGoogleProvider: boolean
   hasPasskeys: boolean
@@ -290,6 +291,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       {children}
       <CryptoResetModal
         open={!!user?.cryptoResetNeeded}
+        canRecoverWithPassword={!!user?.canRecoverWithPassword}
+        hasRecoveryKey={!!user?.hasRecoveryKey}
         onRecovered={handleCryptoRecovered}
         onWiped={handleCryptoWiped}
       />

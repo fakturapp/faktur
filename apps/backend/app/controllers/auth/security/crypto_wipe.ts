@@ -4,6 +4,7 @@ import User from '#models/account/user'
 import Team from '#models/team/team'
 import TeamMember from '#models/team/team_member'
 import keyStore from '#services/crypto/key_store'
+import keyStoreWarmer from '#services/crypto/key_store_warmer'
 
 export default class CryptoWipe {
   async handle({ auth, request, response }: HttpContext) {
@@ -30,7 +31,14 @@ export default class CryptoWipe {
       return response.unauthorized({ message: 'Mot de passe incorrect' })
     }
 
-    const newKek = keyStore.getKEK(user.id)
+    const newKek =
+      keyStore.getKEK(user.id) ||
+      (await keyStoreWarmer.warmKekFromRequest(
+        user.id,
+        String(user.currentAccessToken.identifier),
+        request.header('X-Vault-Key')
+      ))
+
     if (!newKek) {
       return response.unauthorized({
         code: 'SESSION_EXPIRED',
