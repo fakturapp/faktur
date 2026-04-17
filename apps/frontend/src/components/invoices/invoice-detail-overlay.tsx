@@ -16,6 +16,7 @@ import { SendEmailModal } from '@/components/shared/send-email-modal'
 import { EmailHistoryModal } from '@/components/shared/email-history-modal'
 import { useTrackFeature } from '@/hooks/use-analytics'
 import { useEmail } from '@/lib/email-context'
+import { getFakturDesktopBridge } from '@/lib/is-desktop'
 import { PaymentLinkModal } from '@/components/invoices/payment-link-modal'
 import { PaymentLinkCard } from '@/components/invoices/payment-link-card'
 import { ConfirmPaymentModal } from '@/components/invoices/confirm-payment-modal'
@@ -350,6 +351,17 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
     const { blob, error } = await api.downloadBlob(`/invoices/${invoiceId}/pdf`)
     setPrinting(false)
     if (error || !blob) { toast(error || 'Erreur', 'error'); return }
+
+    const bridge = getFakturDesktopBridge()
+    if (bridge?.printDocument) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        bridge.printDocument!({ dataUrl: reader.result as string, filename: 'facture.pdf' })
+      }
+      reader.readAsDataURL(blob)
+      return
+    }
+
     const url = URL.createObjectURL(blob)
     const iframe = document.createElement('iframe')
     iframe.style.position = 'fixed'

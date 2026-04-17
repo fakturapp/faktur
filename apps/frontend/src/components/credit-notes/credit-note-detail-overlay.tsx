@@ -15,6 +15,7 @@ import { A4Sheet, type DocumentLine, type ClientInfo, type CompanyInfo } from '@
 import { SendEmailModal } from '@/components/shared/send-email-modal'
 import { EmailHistoryModal } from '@/components/shared/email-history-modal'
 import { useEmail } from '@/lib/email-context'
+import { getFakturDesktopBridge } from '@/lib/is-desktop'
 import {
   X,
   Pencil,
@@ -226,9 +227,33 @@ export function CreditNoteDetailOverlay({ creditNoteId, onClose, onStatusChange,
     const { blob, error } = await api.downloadBlob(`/credit-notes/${creditNote.id}/pdf`)
     setPrinting(false)
     if (error || !blob) { toast(error || 'Erreur', 'error'); return }
+
+    const bridge = getFakturDesktopBridge()
+    if (bridge?.printDocument) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        bridge.printDocument!({ dataUrl: reader.result as string, filename: `${creditNote.creditNoteNumber}.pdf` })
+      }
+      reader.readAsDataURL(blob)
+      return
+    }
+
     const url = URL.createObjectURL(blob)
-    const w = window.open(url)
-    if (w) { w.onload = () => w.print() }
+    const iframe = document.createElement('iframe')
+    iframe.style.position = 'fixed'
+    iframe.style.top = '-10000px'
+    iframe.style.left = '-10000px'
+    iframe.style.width = '0'
+    iframe.style.height = '0'
+    iframe.src = url
+    document.body.appendChild(iframe)
+    iframe.onload = () => {
+      iframe.contentWindow?.print()
+      setTimeout(() => {
+        document.body.removeChild(iframe)
+        URL.revokeObjectURL(url)
+      }, 1000)
+    }
   }
 
   function handleSendEmail() {

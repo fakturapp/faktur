@@ -15,6 +15,7 @@ import { A4Sheet, type DocumentLine, type ClientInfo, type CompanyInfo } from '@
 import { SendEmailModal } from '@/components/shared/send-email-modal'
 import { EmailHistoryModal } from '@/components/shared/email-history-modal'
 import { useEmail } from '@/lib/email-context'
+import { getFakturDesktopBridge } from '@/lib/is-desktop'
 import {
   X,
   Send,
@@ -244,6 +245,17 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
     const { blob, error } = await api.downloadBlob(`/quotes/${quoteId}/pdf`)
     setPrinting(false)
     if (error || !blob) { toast(error || 'Erreur', 'error'); return }
+
+    const bridge = getFakturDesktopBridge()
+    if (bridge?.printDocument) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        bridge.printDocument!({ dataUrl: reader.result as string, filename: 'devis.pdf' })
+      }
+      reader.readAsDataURL(blob)
+      return
+    }
+
     const url = URL.createObjectURL(blob)
     const iframe = document.createElement('iframe')
     iframe.style.position = 'fixed'
