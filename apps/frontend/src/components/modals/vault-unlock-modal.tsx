@@ -61,9 +61,6 @@ export function VaultUnlockModal({ forceOpen = false }: { forceOpen?: boolean })
     }
 
     if (!err) {
-      if (data?.vaultKey) {
-        localStorage.setItem('faktur_vault_key', data.vaultKey)
-      }
       setOpen(false)
       setPassword('')
       setRecoveryKey('')

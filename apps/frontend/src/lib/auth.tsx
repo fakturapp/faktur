@@ -39,8 +39,6 @@ interface AuthContextType {
 }
 
 const AUTH_LOCAL_KEYS = [
-  'faktur_token',
-  'faktur_vault_key',
   'faktur_source',
   'faktur_vault_locked',
   'faktur_last_login',
@@ -84,17 +82,24 @@ const publicPaths = [
 
 const SHORT_CHECKOUT_PATH = /^\/[a-zA-Z0-9_-]{16,}\/pay\/?$/
 
-function consumeDesktopSessionHash(): void {
-  if (typeof window === 'undefined') return
+async function consumeDesktopSessionHash(): Promise<boolean> {
+  if (typeof window === 'undefined') return false
   const hash = window.location.hash
-  if (!hash || !hash.includes('faktur_desktop_session=')) return
+  if (!hash || !hash.includes('faktur_desktop_session=')) return false
 
   try {
     const match = hash.match(/faktur_desktop_session=([^&]+)/)
-    if (!match) return
+    if (!match) return false
     const payload = JSON.parse(atob(match[1].replace(/-/g, '+').replace(/_/g, '/')))
-    if (payload.t) localStorage.setItem('faktur_token', payload.t)
-    if (payload.v) localStorage.setItem('faktur_vault_key', payload.v)
+
+    if (!payload.t) return false
+
+    const { error } = await api.post('/auth/session/bootstrap', {
+      token: payload.t,
+      vaultKey: payload.v,
+    })
+    if (error) return false
+
     if (payload.s) localStorage.setItem('faktur_source', String(payload.s))
     if (payload.l) {
       localStorage.setItem('faktur_vault_locked', '1')
@@ -103,13 +108,11 @@ function consumeDesktopSessionHash(): void {
     }
     const clean = window.location.pathname + window.location.search
     window.history.replaceState({}, '', clean)
+    return true
   } catch (err) {
     console.error('[auth] failed to consume desktop session hash:', err)
+    return false
   }
-}
-
-if (typeof window !== 'undefined') {
-  consumeDesktopSessionHash()
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -123,18 +126,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     SHORT_CHECKOUT_PATH.test(pathname)
 
   const refreshUser = useCallback(async () => {
-    consumeDesktopSessionHash()
-
-    const token = localStorage.getItem('faktur_token')
-    if (!token) {
-      setUser(null)
-      setLoading(false)
-      return
-    }
+    await consumeDesktopSessionHash()
 
     const { data, error } = await api.get<{ user: User }>('/auth/me')
     if (error || !data?.user) {
-      localStorage.removeItem('faktur_token')
       setUser(null)
     } else {
       setUser(data.user)
@@ -198,12 +193,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user, loading, pathname, isPublicPath, router])
 
-  function login(token: string, userData: User, vaultKey?: string) {
-    localStorage.setItem('faktur_token', token)
-    if (vaultKey) {
-      localStorage.setItem('faktur_vault_key', vaultKey)
-    }
-
+  function login(_token: string, userData: User, _vaultKey?: string) {
     try {
       const source = (userData.fullName ?? userData.email).trim()
       const initial = (source[0] ?? '?').toUpperCase()

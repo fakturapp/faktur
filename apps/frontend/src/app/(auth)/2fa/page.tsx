@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldError } from '@/components/ui/field'
 import { Spinner } from '@/components/ui/spinner'
 import { api } from '@/lib/api'
+import { useAuth } from '@/lib/auth'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -23,6 +24,7 @@ const fadeUp = {
 function TwoFactorContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
+  const { login } = useAuth()
   const userId = searchParams.get('userId')
   const [code, setCode] = useState('')
   const [error, setError] = useState('')
@@ -34,7 +36,7 @@ function TwoFactorContent() {
     setError('')
     setLoading(true)
 
-    const { data, error: err } = await api.post<{ token: string }>('/auth/login/2fa', {
+    const { data, error: err } = await api.post<{ token: string; user: any }>('/auth/login/2fa', {
       userId,
       code,
     })
@@ -42,8 +44,8 @@ function TwoFactorContent() {
 
     if (err) return setError(err)
 
-    if (data?.token) {
-      localStorage.setItem('faktur_token', data.token)
+    if (data?.token && data?.user) {
+      login(data.token, data.user)
       router.push('/dashboard')
     }
   }
