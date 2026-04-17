@@ -17,8 +17,6 @@ export default class UpdateOauthApp {
     if (payload.iconUrl !== undefined) app.iconUrl = payload.iconUrl
     if (payload.websiteUrl !== undefined) app.websiteUrl = payload.websiteUrl
     if (payload.redirectUris !== undefined) app.redirectUris = payload.redirectUris
-    if (payload.allowedOrigins !== undefined) app.allowedOrigins = payload.allowedOrigins
-    if (payload.allowAllOrigins !== undefined) app.allowAllOrigins = payload.allowAllOrigins
     if (payload.scopes !== undefined) app.scopes = payload.scopes
     if (payload.webhookUrl !== undefined) app.webhookUrl = payload.webhookUrl
     if (payload.webhookEvents !== undefined) app.webhookEvents = payload.webhookEvents
@@ -37,8 +35,6 @@ export default class UpdateOauthApp {
         websiteUrl: app.websiteUrl,
         clientId: app.clientId,
         redirectUris: app.redirectUris,
-        allowedOrigins: app.allowedOrigins,
-        allowAllOrigins: app.allowAllOrigins,
         scopes: app.scopes,
         webhookUrl: app.webhookUrl,
         webhookEvents: app.webhookEvents,
