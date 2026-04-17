@@ -43,7 +43,16 @@ const corsConfig = defineConfig({
    * Reflect request headers by default. Use a string array to restrict
    * allowed headers.
    */
-  headers: true,
+  headers: [
+    'Content-Type',
+    'Authorization',
+    'Accept',
+    'X-Requested-With',
+    'X-CSRF-Token',
+    'X-Socket-Id',
+    'Baggage',
+    'Sentry-Trace',
+  ],
 
   /**
    * Response headers exposed to the browser.
@@ -58,7 +67,7 @@ const corsConfig = defineConfig({
   /**
    * Cache CORS preflight response for N seconds.
    */
-  maxAge: 90,
+  maxAge: 7200,
 })
 
 export default corsConfig
