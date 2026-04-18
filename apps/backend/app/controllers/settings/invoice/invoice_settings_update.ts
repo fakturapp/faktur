@@ -1,8 +1,9 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import InvoiceSetting from '#models/team/invoice_setting'
-import { updateInvoiceSettingsValidator } from '#validators/invoice_settings_validator'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import { buildDefaultInvoiceSettings } from '#services/settings/default_invoice_settings'
+import { serializeInvoiceSettings } from '#services/settings/serialize_invoice_settings'
+import { updateInvoiceSettingsValidator } from '#validators/invoice_settings_validator'
 
 export default class InvoiceSettingsUpdate {
   async handle(ctx: HttpContext) {
@@ -16,7 +17,6 @@ export default class InvoiceSettingsUpdate {
 
     const payload = await request.validateUsing(updateInvoiceSettingsValidator)
 
-    // Normalize legacy values → 'company_info'
     if (payload.footerMode && !['custom', 'company_info'].includes(payload.footerMode)) {
       payload.footerMode = 'company_info'
     }
@@ -77,99 +77,57 @@ export default class InvoiceSettingsUpdate {
       if (payload.template) settings.template = payload.template
       if (payload.darkMode !== undefined) settings.darkMode = payload.darkMode
       if (payload.documentFont) settings.documentFont = payload.documentFont
-      if (payload.eInvoicingEnabled !== undefined)
-        settings.eInvoicingEnabled = payload.eInvoicingEnabled
-      if (payload.pdpProvider !== undefined)
-        settings.pdpProvider = payload.pdpProvider ?? null
+      if (payload.eInvoicingEnabled !== undefined) settings.eInvoicingEnabled = payload.eInvoicingEnabled
+      if (payload.pdpProvider !== undefined) settings.pdpProvider = payload.pdpProvider ?? null
       if (payload.pdpApiKey && !payload.pdpApiKey.startsWith('••••••••')) {
         settings.pdpApiKey = pdpApiKeyToStore
       }
       if (payload.pdpSandbox !== undefined) settings.pdpSandbox = payload.pdpSandbox
-      if (payload.defaultOperationCategory !== undefined)
+      if (payload.defaultOperationCategory !== undefined) {
         settings.defaultOperationCategory = payload.defaultOperationCategory
-      if (payload.defaultSubject !== undefined)
-        settings.defaultSubject = payload.defaultSubject || null
-      if (payload.defaultAcceptanceConditions !== undefined)
+      }
+      if (payload.defaultSubject !== undefined) settings.defaultSubject = payload.defaultSubject || null
+      if (payload.defaultAcceptanceConditions !== undefined) {
         settings.defaultAcceptanceConditions = payload.defaultAcceptanceConditions || null
-      if (payload.defaultSignatureField !== undefined)
-        settings.defaultSignatureField = payload.defaultSignatureField
-      if (payload.defaultFreeField !== undefined)
-        settings.defaultFreeField = payload.defaultFreeField || null
-      if (payload.defaultShowNotes !== undefined)
-        settings.defaultShowNotes = payload.defaultShowNotes
-      if (payload.defaultVatExempt !== undefined)
-        settings.defaultVatExempt = payload.defaultVatExempt
-      if (payload.defaultVatRate !== undefined)
-        settings.defaultVatRate = payload.defaultVatRate
-      if (payload.defaultShowQuantityColumn !== undefined)
+      }
+      if (payload.defaultSignatureField !== undefined) settings.defaultSignatureField = payload.defaultSignatureField
+      if (payload.defaultFreeField !== undefined) settings.defaultFreeField = payload.defaultFreeField || null
+      if (payload.defaultShowNotes !== undefined) settings.defaultShowNotes = payload.defaultShowNotes
+      if (payload.defaultVatExempt !== undefined) settings.defaultVatExempt = payload.defaultVatExempt
+      if (payload.defaultVatRate !== undefined) settings.defaultVatRate = payload.defaultVatRate
+      if (payload.defaultShowQuantityColumn !== undefined) {
         settings.defaultShowQuantityColumn = payload.defaultShowQuantityColumn
-      if (payload.defaultShowUnitColumn !== undefined)
-        settings.defaultShowUnitColumn = payload.defaultShowUnitColumn
-      if (payload.defaultShowUnitPriceColumn !== undefined)
+      }
+      if (payload.defaultShowUnitColumn !== undefined) settings.defaultShowUnitColumn = payload.defaultShowUnitColumn
+      if (payload.defaultShowUnitPriceColumn !== undefined) {
         settings.defaultShowUnitPriceColumn = payload.defaultShowUnitPriceColumn
-      if (payload.defaultShowVatColumn !== undefined)
-        settings.defaultShowVatColumn = payload.defaultShowVatColumn
-      if (payload.defaultFooterText !== undefined)
-        settings.defaultFooterText = payload.defaultFooterText || null
-      if (payload.defaultShowDeliveryAddress !== undefined)
+      }
+      if (payload.defaultShowVatColumn !== undefined) settings.defaultShowVatColumn = payload.defaultShowVatColumn
+      if (payload.defaultFooterText !== undefined) settings.defaultFooterText = payload.defaultFooterText || null
+      if (payload.defaultShowDeliveryAddress !== undefined) {
         settings.defaultShowDeliveryAddress = payload.defaultShowDeliveryAddress
-      if (payload.defaultLanguage !== undefined)
-        settings.defaultLanguage = payload.defaultLanguage || 'fr'
-      if (payload.quoteFilenamePattern !== undefined)
+      }
+      if (payload.defaultLanguage !== undefined) settings.defaultLanguage = payload.defaultLanguage || 'fr'
+      if (payload.quoteFilenamePattern !== undefined) {
         settings.quoteFilenamePattern = payload.quoteFilenamePattern || 'DEV-{numero}'
-      if (payload.invoiceFilenamePattern !== undefined)
+      }
+      if (payload.invoiceFilenamePattern !== undefined) {
         settings.invoiceFilenamePattern = payload.invoiceFilenamePattern || 'FAC-{numero}'
+      }
       if (payload.footerMode !== undefined) settings.footerMode = payload.footerMode || 'company_info'
-      if (payload.logoBorderRadius !== undefined)
-        settings.logoBorderRadius = payload.logoBorderRadius
+      if (payload.logoBorderRadius !== undefined) settings.logoBorderRadius = payload.logoBorderRadius
       if (payload.collaborationEnabled !== undefined) settings.collaborationEnabled = payload.collaborationEnabled
       if (payload.aiEnabled !== undefined) settings.aiEnabled = payload.aiEnabled
       settings.aiProvider = 'gemini'
-      if (payload.aiModel !== undefined)
+      if (payload.aiModel !== undefined) {
         settings.aiModel = payload.aiModel || 'nvidia/nemotron-3-super-120b-a12b:free'
+      }
       await settings.save()
     }
 
     return response.ok({
       message: 'Invoice settings updated',
-      settings: {
-        billingType: settings.billingType,
-        accentColor: settings.accentColor,
-        logoUrl: settings.logoUrl,
-        logoSource: settings.logoSource || 'custom',
-        paymentMethods: settings.paymentMethods,
-        customPaymentMethod: settings.customPaymentMethod || '',
-        template: settings.template || 'classique',
-        darkMode: settings.darkMode || false,
-        documentFont: settings.documentFont || 'Lexend',
-        eInvoicingEnabled: settings.eInvoicingEnabled || false,
-        pdpProvider: settings.pdpProvider || null,
-        pdpApiKey: settings.pdpApiKey ? '••••••••' : null,
-        pdpSandbox: settings.pdpSandbox ?? true,
-        defaultOperationCategory: settings.defaultOperationCategory || 'service',
-        defaultSubject: settings.defaultSubject || null,
-        defaultAcceptanceConditions: settings.defaultAcceptanceConditions || null,
-        defaultSignatureField: settings.defaultSignatureField || false,
-        defaultFreeField: settings.defaultFreeField || null,
-        defaultShowNotes: settings.defaultShowNotes ?? true,
-        defaultVatExempt: settings.defaultVatExempt || false,
-        defaultVatRate: settings.defaultVatRate ?? 20,
-        defaultShowQuantityColumn: settings.defaultShowQuantityColumn ?? true,
-        defaultShowUnitColumn: settings.defaultShowUnitColumn ?? true,
-        defaultShowUnitPriceColumn: settings.defaultShowUnitPriceColumn ?? true,
-        defaultShowVatColumn: settings.defaultShowVatColumn ?? true,
-        defaultFooterText: settings.defaultFooterText || null,
-        defaultShowDeliveryAddress: settings.defaultShowDeliveryAddress || false,
-        defaultLanguage: settings.defaultLanguage || 'fr',
-        quoteFilenamePattern: settings.quoteFilenamePattern || 'DEV-{numero}',
-        invoiceFilenamePattern: settings.invoiceFilenamePattern || 'FAC-{numero}',
-        footerMode: (['custom', 'company_info'].includes(settings.footerMode) ? settings.footerMode : 'company_info'),
-        logoBorderRadius: settings.logoBorderRadius ?? 0,
-        collaborationEnabled: settings.collaborationEnabled ?? false,
-        aiEnabled: settings.aiEnabled ?? false,
-        aiProvider: 'gemini',
-        aiModel: settings.aiModel || 'nvidia/nemotron-3-super-120b-a12b:free',
-      },
+      settings: serializeInvoiceSettings(settings),
     })
   }
 }
