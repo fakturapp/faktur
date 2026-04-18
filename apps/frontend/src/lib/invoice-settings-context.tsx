@@ -92,8 +92,8 @@ const defaultSettings: InvoiceSettings = {
   defaultFooterText: null,
   defaultShowDeliveryAddress: false,
   defaultLanguage: 'fr',
-  quoteFilenamePattern: 'DEV-{numéro}',
-  invoiceFilenamePattern: 'FAC-{numéro}',
+  quoteFilenamePattern: 'DEV-{numero}',
+  invoiceFilenamePattern: 'FAC-{numero}',
   footerMode: 'company_info',
   logoBorderRadius: 0,
   collaborationEnabled: false,
@@ -135,7 +135,9 @@ export function InvoiceSettingsProvider({ children }: { children: React.ReactNod
   const hasChanges = JSON.stringify(settings) !== JSON.stringify(savedSettings)
 
   const loadSettings = useCallback(async () => {
-    const { data } = await api.get<{ settings: InvoiceSettings; companyLogoUrl: string | null }>('/settings/invoices')
+    const { data } = await api.get<{ settings: InvoiceSettings; companyLogoUrl: string | null }>(
+      '/settings/invoices'
+    )
     if (data?.settings) {
       const resolved = { ...data.settings, logoUrl: resolveLogoUrl(data.settings.logoUrl) }
       setSettings(resolved)
@@ -168,13 +170,10 @@ export function InvoiceSettingsProvider({ children }: { children: React.ReactNod
     setSaveError(null)
   }, [savedSettings])
 
-  const updateSettings = useCallback(
-    (partial: Partial<InvoiceSettings>) => {
-      setSaveError(null)
-      setSettings((prev) => ({ ...prev, ...partial }))
-    },
-    []
-  )
+  const updateSettings = useCallback((partial: Partial<InvoiceSettings>) => {
+    setSaveError(null)
+    setSettings((prev) => ({ ...prev, ...partial }))
+  }, [])
 
   const uploadLogo = useCallback(async (file: File) => {
     const formData = new FormData()
@@ -186,14 +185,31 @@ export function InvoiceSettingsProvider({ children }: { children: React.ReactNod
   }, [])
 
   const refreshCompanyLogo = useCallback(async () => {
-    const { data } = await api.get<{ settings: InvoiceSettings; companyLogoUrl: string | null }>('/settings/invoices')
+    const { data } = await api.get<{ settings: InvoiceSettings; companyLogoUrl: string | null }>(
+      '/settings/invoices'
+    )
     if (data?.companyLogoUrl) {
       setCompanyLogoUrl(resolveLogoUrl(data.companyLogoUrl))
     }
   }, [])
 
   return (
-    <InvoiceSettingsContext.Provider value={{ settings, companyLogoUrl, loading, saving, saveError, hasChanges, updateSettings, save, resetChanges, uploadLogo, refreshCompanyLogo, refreshSettings: loadSettings }}>
+    <InvoiceSettingsContext.Provider
+      value={{
+        settings,
+        companyLogoUrl,
+        loading,
+        saving,
+        saveError,
+        hasChanges,
+        updateSettings,
+        save,
+        resetChanges,
+        uploadLogo,
+        refreshCompanyLogo,
+        refreshSettings: loadSettings,
+      }}
+    >
       {children}
     </InvoiceSettingsContext.Provider>
   )
