@@ -10,7 +10,6 @@ import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/componen
 import { StatusDropdown, quoteStatusOptions } from '@/components/shared/status-dropdown'
 import { useToast } from '@/components/ui/toast'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
-import { useCompanySettings } from '@/lib/company-settings-context'
 import { api } from '@/lib/api'
 import { A4Sheet, type DocumentLine, type ClientInfo, type CompanyInfo } from '@/components/shared/a4-sheet'
 import { SendEmailModal } from '@/components/shared/send-email-modal'
@@ -89,7 +88,6 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
   const router = useRouter()
   const { toast } = useToast()
   const { settings: invoiceSettings, companyLogoUrl } = useInvoiceSettings()
-  const { paymentForm: companyPaymentForm } = useCompanySettings()
   const [loading, setLoading] = useState(true)
   const [quote, setQuote] = useState<QuoteDetail | null>(null)
   const [company, setCompany] = useState<CompanyInfo | null>(null)
@@ -359,8 +357,8 @@ export function QuoteDetailOverlay({ quoteId, onClose, onStatusChange, onDelete 
                   showClientSiren={!!quote.clientSiren}
                   clientVatNumber={quote.clientVatNumber || ''}
                   showClientVatNumber={!!quote.clientVatNumber}
-                  paymentMethods={companyPaymentForm.paymentMethods}
-                  customPaymentMethod={companyPaymentForm.customPaymentMethod}
+              paymentMethods={invoiceSettings.paymentMethods}
+              customPaymentMethod={invoiceSettings.customPaymentMethod}
                   subject={quote.subject || ''}
                   onSubjectChange={noop}
                   template={invoiceSettings.template}
