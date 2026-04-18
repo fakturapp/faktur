@@ -4,6 +4,7 @@ import Quote from '#models/quote/quote'
 import QuoteLine from '#models/quote/quote_line'
 import InvoiceSetting from '#models/team/invoice_setting'
 import { createQuoteValidator } from '#validators/quote_validator'
+import documentNumberingService from '#services/documents/document_numbering_service'
 import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 
 export default class Create {
@@ -23,13 +24,20 @@ export default class Create {
     let quoteNumber: string
 
     if (settings?.nextQuoteNumber) {
-      quoteNumber = settings.nextQuoteNumber
+      quoteNumber = documentNumberingService.normalizePattern(
+        settings.nextQuoteNumber,
+        'DEV-{annee}-{numero}'
+      )
       settings.nextQuoteNumber = null
       await settings.save()
     } else {
-      const pattern = settings?.quoteFilenamePattern || 'DEV-{annee}-{numero}'
       const currentYear = new Date().getFullYear().toString()
-      const prefix = pattern.replace('{annee}', currentYear).replace('{numero}', '')
+      const fallbackPattern = 'DEV-{annee}-{numero}'
+      const prefix = documentNumberingService.buildSequencePrefix(
+        settings?.quoteFilenamePattern,
+        fallbackPattern,
+        currentYear
+      )
 
       const lastQuote = await Quote.query()
         .where('team_id', teamId)
@@ -37,14 +45,12 @@ export default class Create {
         .orderBy('created_at', 'desc')
         .first()
 
-      let nextNum = 1
-      if (lastQuote) {
-        const numStr = lastQuote.quoteNumber.slice(prefix.length)
-        const parsed = Number.parseInt(numStr, 10)
-        if (!Number.isNaN(parsed)) nextNum = parsed + 1
-      }
-
-      quoteNumber = `${prefix}${nextNum.toString().padStart(3, '0')}`
+      quoteNumber = documentNumberingService.buildNextSequentialNumber({
+        pattern: settings?.quoteFilenamePattern,
+        fallbackPattern,
+        currentYear,
+        lastNumber: lastQuote?.quoteNumber,
+      })
     }
 
     // Calculate totals from lines
