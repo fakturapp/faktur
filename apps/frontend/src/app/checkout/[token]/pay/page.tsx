@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import confetti from 'canvas-confetti'
 import { Spinner } from '@/components/ui/spinner'
 import { StripePaymentForm } from '@/components/checkout/stripe-payment-form'
+import { publicApi } from '@/lib/api'
 
 type Step = 'loading' | 'error' | 'expired' | 'password' | 'method' | 'iban' | 'confirm' | 'pending' | 'done' | 'stripe'
 
@@ -28,10 +29,6 @@ interface Iban {
   bic: string | null
   bankName: string | null
 }
-
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333'
-const PFX = process.env.NEXT_PUBLIC_API_PREFIX || ''
-const api = (p: string) => `${API}${PFX}${p}`
 
 const slide = {
   initial: { opacity: 0, y: 20, filter: 'blur(4px)' },
@@ -156,7 +153,8 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
   useEffect(() => {
     (async () => {
       try {
-        const r = await fetch(api(`/checkout/${token}`))
+        const { data: responseData, error, status } = await publicApi.get<Data>(`/checkout/${token}`)
+        const r = { status, ok: !error, json: async () => responseData as Data }
         if (r.status === 404) { setErr('Ce lien de paiement est introuvable ou a été supprimé.'); setStep('error'); return }
         if (r.status === 410) { setStep('expired'); return }
         if (r.status === 429) { setErr('Trop de requêtes. Veuillez patienter quelques minutes avant de réessayer.'); setStep('error'); return }
@@ -174,7 +172,11 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
   async function submitPw() {
     if (!pw) return; setBusy(true); setPwErr('')
     try {
-      const r = await fetch(api(`/checkout/${token}/verify-password`), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pw }) })
+      const { data, error, status } = await publicApi.post<{ sessionToken: string }>(
+        `/checkout/${token}/verify-password`,
+        { password: pw }
+      )
+      const r = { status, ok: !error, json: async () => data as { sessionToken: string } }
       if (r.status === 401) { setPwErr('Mot de passe incorrect'); setBusy(false); return }
       if (r.status === 429) { setPwErr('Trop de tentatives. Réessayez dans quelques minutes.'); setBusy(false); return }
       if (!r.ok) { setPwErr('Erreur'); setBusy(false); return }
@@ -188,9 +190,9 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
     setBusy(true)
     try {
       const h: Record<string, string> = {}; if (sess) h['X-Checkout-Session'] = sess
-      const r = await fetch(api(`/checkout/${token}/iban`), { headers: h })
-      if (!r.ok) { setErr((await r.json().catch(() => ({}))).message || 'Erreur'); setStep('error'); setBusy(false); return }
-      setIb(await r.json()); setStep('iban')
+      const { data, error } = await publicApi.get<Iban>(`/checkout/${token}/iban`, { headers: h })
+      if (error || !data) { setErr(error || 'Erreur'); setStep('error'); setBusy(false); return }
+      setIb(data); setStep('iban')
     } catch { setErr('Erreur de connexion'); setStep('error') }
     setBusy(false)
   }
@@ -198,7 +200,8 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
   async function pay() {
     setBusy(true)
     try {
-      const r = await fetch(api(`/checkout/${token}/mark-paid`), { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+      const { error, status } = await publicApi.post(`/checkout/${token}/mark-paid`)
+      const r = { status, ok: !error }
       if (r.status === 409) { setStep('pending'); setBusy(false); return }
       if (r.status === 429) { setErr('Trop de requêtes. Veuillez patienter quelques minutes.'); setStep('error'); setBusy(false); return }
       if (!r.ok) { setErr('Erreur'); setStep('error'); setBusy(false); return }
@@ -210,7 +213,8 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
   async function dl() {
     setDling(true)
     try {
-      const r = await fetch(api(`/checkout/${token}/pdf`))
+      const { blob } = await publicApi.downloadBlob(`/checkout/${token}/pdf`)
+      const r = { ok: !!blob, blob: async () => blob as Blob }
       if (r.ok) { const b = await r.blob(); const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href = u; a.download = `${d?.invoiceNumber || 'facture'}.pdf`; a.click(); URL.revokeObjectURL(u) }
     } catch { /* */ }
     setDling(false)
