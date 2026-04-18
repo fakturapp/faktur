@@ -172,18 +172,9 @@ export default function AccountPage() {
 
     setAvatarUploading(true)
     try {
-      const token = localStorage.getItem('faktur_token')
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333'
-      const res = await fetch(`${baseUrl}/account/avatar`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        toast(data.message || 'Erreur lors de l\'upload', 'error')
+      const { error } = await api.upload('/account/avatar', formData)
+      if (error) {
+        toast(error || 'Erreur lors de l\'upload', 'error')
       } else {
         await refreshUser()
         toast('Photo de profil mise à jour', 'success')
