@@ -25,8 +25,6 @@ export interface Company {
   bankName: string | null
   paymentConditions: string | null
   currency: string
-  paymentMethods: string[]
-  customPaymentMethod: string | null
 }
 
 export interface BankAccountItem {

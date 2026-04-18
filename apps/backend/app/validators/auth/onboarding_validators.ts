@@ -53,8 +53,6 @@ export const updateCompanyValidator = vine.compile(
     bankName: vine.string().trim().maxLength(100).optional(),
     paymentConditions: vine.string().trim().maxLength(500).optional(),
     currency: vine.string().trim().maxLength(3).optional(),
-    paymentMethods: vine.array(vine.string().trim().maxLength(50)).optional(),
-    customPaymentMethod: vine.string().trim().maxLength(255).optional(),
   })
 )
 
