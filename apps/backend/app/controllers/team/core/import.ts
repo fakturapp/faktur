@@ -30,6 +30,8 @@ import { decryptBuffer } from '#services/team/export_service'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import keyStore from '#services/crypto/key_store'
 import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
+import RecoveryKeyGenerated from '#events/recovery_key_generated'
+import recoveryKeyService from '#services/crypto/recovery_key_service'
 
 export default class Import {
   async handle(ctx: HttpContext) {
@@ -327,6 +329,7 @@ export default class Import {
     })
 
     keyStore.storeDEK(user.id, team.id, teamDek)
+    const rotation = await recoveryKeyService.rotateForUser(user, kek)
 
     const uploadsBase = join(app.tmpPath(), 'uploads')
     const assetDirs = ['team-icons', 'company-logos', 'invoice-logos'] as const
@@ -362,6 +365,7 @@ export default class Import {
     // Switch user to the new team
     user.currentTeamId = team.id
     await user.save()
+    RecoveryKeyGenerated.dispatch(user.email, rotation.recoveryKey, user.fullName ?? undefined)
 
     return response.ok({
       message: 'Équipe importée avec succès',
@@ -369,6 +373,7 @@ export default class Import {
         id: team.id,
         name: team.name,
       },
+      recoveryKey: rotation.formattedRecoveryKey,
     })
   }
 }
