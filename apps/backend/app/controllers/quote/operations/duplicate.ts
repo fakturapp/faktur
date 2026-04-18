@@ -3,6 +3,7 @@ import db from '@adonisjs/lucid/services/db'
 import Quote from '#models/quote/quote'
 import QuoteLine from '#models/quote/quote_line'
 import InvoiceSetting from '#models/team/invoice_setting'
+import documentNumberingService from '#services/documents/document_numbering_service'
 
 export default class Duplicate {
   async handle({ auth, params, response }: HttpContext) {
@@ -27,23 +28,33 @@ export default class Duplicate {
     let quoteNumber: string
 
     if (settings?.nextQuoteNumber) {
-      quoteNumber = settings.nextQuoteNumber
+      quoteNumber = documentNumberingService.normalizePattern(
+        settings.nextQuoteNumber,
+        'DEV-{annee}-{numero}'
+      )
       settings.nextQuoteNumber = null
       await settings.save()
     } else {
+      const currentYear = new Date().getFullYear().toString()
+      const fallbackPattern = 'DEV-{annee}-{numero}'
+      const prefix = documentNumberingService.buildSequencePrefix(
+        settings?.quoteFilenamePattern,
+        fallbackPattern,
+        currentYear
+      )
+
       const lastQuote = await Quote.query()
         .where('team_id', teamId)
+        .where('quote_number', 'like', `${prefix}%`)
         .orderBy('created_at', 'desc')
         .first()
 
-      quoteNumber = 'DEV-001'
-      if (lastQuote) {
-        const match = lastQuote.quoteNumber.match(/^DEV-(\d+)$/)
-        if (match) {
-          const num = Number.parseInt(match[1], 10) + 1
-          quoteNumber = `DEV-${num.toString().padStart(3, '0')}`
-        }
-      }
+      quoteNumber = documentNumberingService.buildNextSequentialNumber({
+        pattern: settings?.quoteFilenamePattern,
+        fallbackPattern,
+        currentYear,
+        lastNumber: lastQuote?.quoteNumber,
+      })
     }
 
     const today = new Date().toISOString().slice(0, 10)
