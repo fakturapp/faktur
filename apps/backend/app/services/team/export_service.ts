@@ -303,6 +303,8 @@ export async function collectTeamData(
           footerMode: settings.footerMode,
           invoiceFilenamePattern: settings.invoiceFilenamePattern,
           quoteFilenamePattern: settings.quoteFilenamePattern,
+          invoiceNumberPattern: settings.invoiceNumberPattern,
+          quoteNumberPattern: settings.quoteNumberPattern,
           nextInvoiceNumber: settings.nextInvoiceNumber,
           nextQuoteNumber: settings.nextQuoteNumber,
         }

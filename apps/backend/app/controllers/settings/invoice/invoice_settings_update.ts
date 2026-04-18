@@ -61,6 +61,8 @@ export default class InvoiceSettingsUpdate {
         defaultLanguage: payload.defaultLanguage || defaultSettings.defaultLanguage,
         quoteFilenamePattern: payload.quoteFilenamePattern || defaultSettings.quoteFilenamePattern,
         invoiceFilenamePattern: payload.invoiceFilenamePattern || defaultSettings.invoiceFilenamePattern,
+        quoteNumberPattern: payload.quoteNumberPattern || defaultSettings.quoteNumberPattern,
+        invoiceNumberPattern: payload.invoiceNumberPattern || defaultSettings.invoiceNumberPattern,
         footerMode: payload.footerMode || defaultSettings.footerMode,
         logoBorderRadius: payload.logoBorderRadius ?? defaultSettings.logoBorderRadius,
         collaborationEnabled: payload.collaborationEnabled ?? defaultSettings.collaborationEnabled,
@@ -113,6 +115,12 @@ export default class InvoiceSettingsUpdate {
       }
       if (payload.invoiceFilenamePattern !== undefined) {
         settings.invoiceFilenamePattern = payload.invoiceFilenamePattern || 'FAC-{numero}'
+      }
+      if (payload.quoteNumberPattern !== undefined) {
+        settings.quoteNumberPattern = payload.quoteNumberPattern || 'DEV-{numero}'
+      }
+      if (payload.invoiceNumberPattern !== undefined) {
+        settings.invoiceNumberPattern = payload.invoiceNumberPattern || 'FAC-{numero}'
       }
       if (payload.footerMode !== undefined) settings.footerMode = payload.footerMode || 'company_info'
       if (payload.logoBorderRadius !== undefined) settings.logoBorderRadius = payload.logoBorderRadius

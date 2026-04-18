@@ -29,6 +29,8 @@ type InvoiceSettingsSource = {
   defaultLanguage?: string | null
   quoteFilenamePattern?: string | null
   invoiceFilenamePattern?: string | null
+  quoteNumberPattern?: string | null
+  invoiceNumberPattern?: string | null
   footerMode?: string | null
   logoBorderRadius?: number | null
   collaborationEnabled?: boolean | null
@@ -68,6 +70,10 @@ export function serializeInvoiceSettings(settings: InvoiceSettingsSource) {
     defaultLanguage: settings.defaultLanguage || 'fr',
     quoteFilenamePattern: settings.quoteFilenamePattern || 'DEV-{numero}',
     invoiceFilenamePattern: settings.invoiceFilenamePattern || 'FAC-{numero}',
+    quoteNumberPattern:
+      settings.quoteNumberPattern || settings.quoteFilenamePattern || 'DEV-{numero}',
+    invoiceNumberPattern:
+      settings.invoiceNumberPattern || settings.invoiceFilenamePattern || 'FAC-{numero}',
     footerMode: ['custom', 'company_info'].includes(settings.footerMode || '')
       ? settings.footerMode
       : 'company_info',

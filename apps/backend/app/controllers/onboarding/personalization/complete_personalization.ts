@@ -54,6 +54,8 @@ export default class CompletePersonalization {
         defaultLanguage: payload.language || defaultSettings.defaultLanguage,
         quoteFilenamePattern: quotePattern || defaultSettings.quoteFilenamePattern,
         invoiceFilenamePattern: invoicePattern || defaultSettings.invoiceFilenamePattern,
+        quoteNumberPattern: quotePattern || defaultSettings.quoteNumberPattern,
+        invoiceNumberPattern: invoicePattern || defaultSettings.invoiceNumberPattern,
       })
     } else {
       if (payload.template) settings.template = payload.template
@@ -65,6 +67,8 @@ export default class CompletePersonalization {
       if (payload.language) settings.defaultLanguage = payload.language
       if (quotePattern) settings.quoteFilenamePattern = quotePattern
       if (invoicePattern) settings.invoiceFilenamePattern = invoicePattern
+      if (quotePattern) settings.quoteNumberPattern = quotePattern
+      if (invoicePattern) settings.invoiceNumberPattern = invoicePattern
       await settings.save()
     }
 

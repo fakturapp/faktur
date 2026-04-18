@@ -31,6 +31,8 @@ export function buildDefaultInvoiceSettings(teamId: string) {
     defaultLanguage: 'fr',
     quoteFilenamePattern: 'DEV-{numero}',
     invoiceFilenamePattern: 'FAC-{numero}',
+    quoteNumberPattern: 'DEV-{numero}',
+    invoiceNumberPattern: 'FAC-{numero}',
     footerMode: 'company_info' as const,
     logoBorderRadius: 0,
     nextInvoiceNumber: null,

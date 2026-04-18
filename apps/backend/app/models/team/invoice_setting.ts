@@ -106,6 +106,12 @@ export default class InvoiceSetting extends BaseModel {
   declare invoiceFilenamePattern: string
 
   @column()
+  declare quoteNumberPattern: string
+
+  @column()
+  declare invoiceNumberPattern: string
+
+  @column()
   declare footerMode: 'company_info' | 'custom'
 
   @column()
