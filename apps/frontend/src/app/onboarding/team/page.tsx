@@ -3,14 +3,14 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, type Variants } from 'framer-motion'
+import { Upload, Users } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Field, FieldGroup, FieldLabel, FieldError } from '@/components/ui/field'
+import { Spinner } from '@/components/ui/spinner'
 import { useAuth } from '@/lib/auth'
 import { api } from '@/lib/api'
-import { Spinner } from '@/components/ui/spinner'
-import { Users } from 'lucide-react'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -40,10 +40,7 @@ export default function OnboardingTeamPage() {
     setError('')
     setLoading(true)
 
-    const { data, error: err } = await api.post<{ recoveryKey: string }>(
-      '/onboarding/team',
-      { name }
-    )
+    const { data, error: err } = await api.post<{ recoveryKey?: string }>('/onboarding/team', { name })
     setLoading(false)
 
     if (err) return setError(err)
@@ -67,9 +64,9 @@ export default function OnboardingTeamPage() {
                   <Users className="h-8 w-8 text-accent" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold">Créez votre équipe</h1>
+                  <h1 className="text-2xl font-bold">Creez votre equipe</h1>
                   <p className="mt-2 text-sm text-muted-foreground">
-                    Donnez un nom à votre espace de travail. Vous pourrez inviter des collaborateurs plus tard.
+                    Donnez un nom a votre espace de travail. Vous pourrez inviter des collaborateurs plus tard.
                   </p>
                 </div>
               </motion.div>
@@ -84,7 +81,7 @@ export default function OnboardingTeamPage() {
 
               <motion.div variants={fadeUp} custom={2}>
                 <Field>
-                  <FieldLabel htmlFor="name">Nom de l&apos;équipe</FieldLabel>
+                  <FieldLabel htmlFor="name">Nom de l&apos;equipe</FieldLabel>
                   <Input
                     id="name"
                     type="text"
@@ -100,10 +97,22 @@ export default function OnboardingTeamPage() {
               <motion.div variants={fadeUp} custom={3}>
                 <Button type="submit" className="w-full" disabled={loading || !name.trim()}>
                   {loading ? (
-                    <><Spinner /> Création...</>
+                    <><Spinner /> Creation...</>
                   ) : (
                     'Continuer'
                   )}
+                </Button>
+              </motion.div>
+
+              <motion.div variants={fadeUp} custom={4}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => router.push('/onboarding/team/import')}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Importer une equipe existante
                 </Button>
               </motion.div>
             </FieldGroup>
