@@ -50,8 +50,8 @@ export class KeyStoreWarmer {
           .where('status', 'active')
           .first()
 
-        if (teamMember?.encryptedTeamDek) {
-          const dek = zeroAccessCryptoService.decryptDEK(teamMember.encryptedTeamDek, kek)
+        const dek = this.decryptTeamDek(teamMember, kek)
+        if (dek) {
           keyStore.storeKeys(userId, kek, currentTeamId, dek)
           return true
         }
@@ -61,6 +61,26 @@ export class KeyStoreWarmer {
     } catch {
       return false
     }
+  }
+
+  private decryptTeamDek(teamMember: TeamMember | null, kek: Buffer): Buffer | null {
+    if (!teamMember) {
+      return null
+    }
+
+    if (teamMember.encryptedTeamDek) {
+      try {
+        return zeroAccessCryptoService.decryptDEK(teamMember.encryptedTeamDek, kek)
+      } catch {}
+    }
+
+    if (teamMember.encryptedTeamDekRecovery) {
+      try {
+        return zeroAccessCryptoService.decryptDEK(teamMember.encryptedTeamDekRecovery, kek)
+      } catch {}
+    }
+
+    return null
   }
 }
 
