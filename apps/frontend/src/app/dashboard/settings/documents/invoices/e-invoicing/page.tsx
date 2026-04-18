@@ -224,13 +224,6 @@ export default function EInvoicingPage() {
           </CardContent>
         </Card>
 
-        {/* Auto-save indicator */}
-        <div className="flex justify-end">
-          <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-            <Check className="h-3.5 w-3.5 text-green-500" />
-            Enregistrement automatique
-          </p>
-        </div>
       </div>
 
       {/* E-Invoicing Confirmation Modal */}

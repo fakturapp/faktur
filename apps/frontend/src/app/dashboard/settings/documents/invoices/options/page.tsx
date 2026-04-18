@@ -339,13 +339,6 @@ export default function InvoiceOptionsPage() {
               </CardContent>
             </Card>
           </motion.div>
-
-          <motion.div variants={fadeUp} custom={4} className="flex justify-end">
-            <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <Check className="h-3.5 w-3.5 text-green-500" />
-              Enregistrement automatique
-            </p>
-          </motion.div>
         </div>
 
         <motion.div variants={fadeUp} custom={1}>
