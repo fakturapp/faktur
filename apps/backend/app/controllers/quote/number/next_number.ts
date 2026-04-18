@@ -25,7 +25,7 @@ export default class NextNumber {
     const currentYear = new Date().getFullYear().toString()
     const fallbackPattern = 'DEV-{annee}-{numero}'
     const prefix = documentNumberingService.buildSequencePrefix(
-      settings?.quoteFilenamePattern,
+      settings?.quoteNumberPattern || settings?.quoteFilenamePattern,
       fallbackPattern,
       currentYear
     )
@@ -37,7 +37,7 @@ export default class NextNumber {
       .first()
 
     const nextNumber = documentNumberingService.buildNextSequentialNumber({
-      pattern: settings?.quoteFilenamePattern,
+      pattern: settings?.quoteNumberPattern || settings?.quoteFilenamePattern,
       fallbackPattern,
       currentYear,
       lastNumber: lastQuote?.quoteNumber,

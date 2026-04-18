@@ -38,7 +38,7 @@ export default class Duplicate {
       const currentYear = new Date().getFullYear().toString()
       const fallbackPattern = 'FAC-{annee}-{numero}'
       const prefix = documentNumberingService.buildSequencePrefix(
-        settings?.invoiceFilenamePattern,
+        settings?.invoiceNumberPattern || settings?.invoiceFilenamePattern,
         fallbackPattern,
         currentYear
       )
@@ -50,7 +50,7 @@ export default class Duplicate {
         .first()
 
       invoiceNumber = documentNumberingService.buildNextSequentialNumber({
-        pattern: settings?.invoiceFilenamePattern,
+        pattern: settings?.invoiceNumberPattern || settings?.invoiceFilenamePattern,
         fallbackPattern,
         currentYear,
         lastNumber: lastInvoice?.invoiceNumber,
