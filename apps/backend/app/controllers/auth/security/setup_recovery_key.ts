@@ -1,10 +1,10 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import vine from '@vinejs/vine'
 import User from '#models/account/user'
-import TeamMember from '#models/team/team_member'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import keyStore from '#services/crypto/key_store'
 import RecoveryKeyGenerated from '#events/recovery_key_generated'
+import recoveryKeyService from '#services/crypto/recovery_key_service'
 
 const setupValidator = vine.compile(
   vine.object({
@@ -37,28 +37,13 @@ export default class SetupRecoveryKey {
       kek = await zeroAccessCryptoService.deriveKEK(password, Buffer.from(user.saltKdf, 'hex'))
     }
 
-    const recoveryKey = zeroAccessCryptoService.generateRecoveryKey()
-    const recoveryKEK = zeroAccessCryptoService.deriveRecoveryKEK(recoveryKey)
+    const rotation = await recoveryKeyService.rotateForUser(user, kek)
 
-    const memberships = await TeamMember.query()
-      .where('userId', user.id)
-      .where('status', 'active')
-      .whereNotNull('encryptedTeamDek')
+    RecoveryKeyGenerated.dispatch(user.email, rotation.recoveryKey, user.fullName ?? undefined)
 
-    for (const membership of memberships) {
-      const teamDek = zeroAccessCryptoService.decryptDEK(membership.encryptedTeamDek!, kek)
-      membership.encryptedTeamDekRecovery = zeroAccessCryptoService.encryptDEK(teamDek, recoveryKEK)
-      await membership.save()
-    }
-
-    user.recoveryKeyHash = zeroAccessCryptoService.hashRecoveryKey(recoveryKey)
-    user.hasRecoveryKey = true
-    await user.save()
-
-    RecoveryKeyGenerated.dispatch(user.email, recoveryKey, user.fullName ?? undefined)
-
-    const formatted = zeroAccessCryptoService.formatRecoveryKey(recoveryKey)
-
-    return response.ok({ message: 'Recovery key sent by email', recoveryKey: formatted })
+    return response.ok({
+      message: 'Recovery key sent by email',
+      recoveryKey: rotation.formattedRecoveryKey,
+    })
   }
 }
