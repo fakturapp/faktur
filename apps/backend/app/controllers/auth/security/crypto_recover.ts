@@ -4,6 +4,7 @@ import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service
 import keyStore from '#services/crypto/key_store'
 import keyStoreWarmer from '#services/crypto/key_store_warmer'
 import RecoveryKeyGenerated from '#events/recovery_key_generated'
+import recoveryKeyService from '#services/crypto/recovery_key_service'
 
 export default class CryptoRecover {
   async handle({ auth, request, response }: HttpContext) {
@@ -38,14 +39,16 @@ export default class CryptoRecover {
       .where('userId', user.id)
       .where('status', 'active')
 
+    let rotatedRecoveryKey: string | null = null
+
     if (recoveryKey) {
       const normalizedKey = recoveryKey.replace(/-/g, '').toUpperCase()
       const recoveryKEK = zeroAccessCryptoService.deriveRecoveryKEK(normalizedKey)
 
-      const membershipsWithRecovery = memberships.filter((m) => m.encryptedTeamDekRecovery)
+      const membershipsWithRecovery = memberships.filter((membership) => membership.encryptedTeamDekRecovery)
       if (membershipsWithRecovery.length === 0) {
         return response.badRequest({
-          message: 'Aucune clef de secours configurée pour ce compte',
+          message: 'Aucune clef de secours configurÃ©e pour ce compte',
         })
       }
 
@@ -55,24 +58,18 @@ export default class CryptoRecover {
             membership.encryptedTeamDekRecovery!,
             recoveryKEK
           )
-          membership.encryptedTeamDek = zeroAccessCryptoService.encryptDEK(teamDek, newKek)
 
-          const newRecoveryKey = zeroAccessCryptoService.generateRecoveryKey()
-          const newRecoveryKEK = zeroAccessCryptoService.deriveRecoveryKEK(newRecoveryKey)
-          membership.encryptedTeamDekRecovery = zeroAccessCryptoService.encryptDEK(
-            teamDek,
-            newRecoveryKEK
-          )
+          membership.encryptedTeamDek = zeroAccessCryptoService.encryptDEK(teamDek, newKek)
           await membership.save()
 
           keyStore.storeDEK(user.id, membership.teamId, teamDek)
-
-          user.recoveryKeyHash = zeroAccessCryptoService.hashRecoveryKey(newRecoveryKey)
-          RecoveryKeyGenerated.dispatch(user.email, newRecoveryKey, user.fullName ?? undefined)
         }
+
+        const rotation = await recoveryKeyService.rotateForUser(user, newKek)
+        rotatedRecoveryKey = rotation.recoveryKey
       } catch {
         return response.unprocessableEntity({
-          message: 'Clef de secours incorrecte. Impossible de déchiffrer vos données.',
+          message: 'Clef de secours incorrecte. Impossible de dÃ©chiffrer vos donnÃ©es.',
         })
       }
     } else {
@@ -90,30 +87,27 @@ export default class CryptoRecover {
         return response.badRequest({ message: 'Failed to derive key from old password' })
       }
 
-      const membershipsWithDek = memberships.filter((m) => m.encryptedTeamDek)
+      const membershipsWithDek = memberships.filter((membership) => membership.encryptedTeamDek)
+      const shouldRotateRecoveryKey =
+        user.hasRecoveryKey ||
+        membershipsWithDek.some((membership) => !!membership.encryptedTeamDekRecovery)
 
       try {
         for (const membership of membershipsWithDek) {
           const teamDek = zeroAccessCryptoService.decryptDEK(membership.encryptedTeamDek!, oldKek)
           membership.encryptedTeamDek = zeroAccessCryptoService.encryptDEK(teamDek, newKek)
-
-          if (membership.encryptedTeamDekRecovery) {
-            const newRecoveryKey = zeroAccessCryptoService.generateRecoveryKey()
-            const newRecoveryKEK = zeroAccessCryptoService.deriveRecoveryKEK(newRecoveryKey)
-            membership.encryptedTeamDekRecovery = zeroAccessCryptoService.encryptDEK(
-              teamDek,
-              newRecoveryKEK
-            )
-            user.recoveryKeyHash = zeroAccessCryptoService.hashRecoveryKey(newRecoveryKey)
-            RecoveryKeyGenerated.dispatch(user.email, newRecoveryKey, user.fullName ?? undefined)
-          }
-
           await membership.save()
+
           keyStore.storeDEK(user.id, membership.teamId, teamDek)
+        }
+
+        if (shouldRotateRecoveryKey) {
+          const rotation = await recoveryKeyService.rotateForUser(user, newKek)
+          rotatedRecoveryKey = rotation.recoveryKey
         }
       } catch {
         return response.unprocessableEntity({
-          message: 'Ancien mot de passe incorrect. Impossible de déchiffrer vos données.',
+          message: 'Ancien mot de passe incorrect. Impossible de dÃ©chiffrer vos donnÃ©es.',
         })
       }
     }
@@ -122,6 +116,10 @@ export default class CryptoRecover {
     user.oldSaltKdf = null
     await user.save()
 
+    if (rotatedRecoveryKey) {
+      RecoveryKeyGenerated.dispatch(user.email, rotatedRecoveryKey, user.fullName ?? undefined)
+    }
+
     if (user.currentTeamId) {
       const dek = keyStore.getDEK(user.id, user.currentTeamId)
       if (dek) {
@@ -129,6 +127,6 @@ export default class CryptoRecover {
       }
     }
 
-    return response.ok({ message: 'Données récupérées avec succès' })
+    return response.ok({ message: 'DonnÃ©es rÃ©cupÃ©rÃ©es avec succÃ¨s' })
   }
 }
