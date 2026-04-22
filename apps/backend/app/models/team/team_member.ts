@@ -44,6 +44,9 @@ export default class TeamMember extends BaseModel {
   @column({ serializeAs: null })
   declare encryptedTeamDekRecovery: string | null
 
+  @column({ serializeAs: null })
+  declare encryptedRecoveryKey: string | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
