@@ -452,22 +452,89 @@ function AddLineDropdown({
   onCatalogClick?: () => void
 }) {
   const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
+  const [menuPos, setMenuPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 })
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!open) return
     const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+      const target = e.target as Node
+      if (
+        !triggerRef.current?.contains(target) &&
+        !menuRef.current?.contains(target)
+      ) {
+        setOpen(false)
+      }
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [open])
 
+  function toggle() {
+    if (!open && triggerRef.current) {
+      const r = triggerRef.current.getBoundingClientRect()
+      setMenuPos({ top: r.bottom + 4, left: r.left })
+    }
+    setOpen((o) => !o)
+  }
+
+  const menuItem = (icon: ReactNode, label: string, onClick: () => void) => (
+    <button
+      onClick={() => { onClick(); setOpen(false) }}
+      className="w-full flex items-center gap-2 px-3 py-2 text-[12px] transition-colors"
+      style={{ color: T.text }}
+      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = `${accentColor}10`)}
+      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+    >
+      {icon} {label}
+    </button>
+  )
+
+  // The menu is portaled to <body> with a high z-index so it is never clipped
+  // by the sheet's overflow-hidden or the CSS-column container.
+  const menu =
+    typeof document === 'undefined'
+      ? null
+      : createPortal(
+          <AnimatePresence>
+            {open && (
+              <motion.div
+                ref={menuRef}
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.15 }}
+                className="fixed z-[10000] rounded-lg overflow-hidden"
+                style={{
+                  top: menuPos.top,
+                  left: menuPos.left,
+                  backgroundColor: T.docBg,
+                  border: `1px solid ${T.borderLight}`,
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.18)',
+                  minWidth: '150px',
+                }}
+              >
+                {menuItem(<Plus className="h-3 w-3" />, 'Ligne simple', () => onAddLine('standard'))}
+                {menuItem(<Type className="h-3 w-3" />, 'Section', () => onAddLine('section'))}
+                {onCatalogClick && (
+                  <>
+                    <div style={{ height: '1px', background: `${T.borderLight}` }} />
+                    {menuItem(<Package className="h-3 w-3" />, 'Depuis le catalogue', onCatalogClick)}
+                  </>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body,
+        )
+
   return (
-    <div className="relative mb-4" ref={ref}>
+    <div className="relative mb-4">
       {isClassique ? (
         <button
-          onClick={() => setOpen(!open)}
+          ref={triggerRef}
+          onClick={toggle}
           className="px-4 py-1.5 rounded-full text-[14px] font-extrabold cursor-pointer transition-all flex items-center gap-2"
           style={{
             border: 'none',
@@ -483,7 +550,8 @@ function AddLineDropdown({
         </button>
       ) : (
         <button
-          onClick={() => setOpen(!open)}
+          ref={triggerRef}
+          onClick={toggle}
           className="px-3.5 py-1.5 rounded-full text-[11px] font-medium cursor-pointer transition-all flex items-center gap-1.5"
           style={{ border: `1px dashed ${accentColor}88`, background: `${accentColor}08`, color: accentColor }}
           onMouseEnter={(e) => (e.currentTarget.style.background = `${accentColor}18`)}
@@ -492,56 +560,7 @@ function AddLineDropdown({
           <Plus className="h-3 w-3" /> {t.addLine} <ChevronDown className={cn('h-3 w-3 transition-transform', open && 'rotate-180')} />
         </button>
       )}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.15 }}
-            className="absolute left-0 top-full mt-1 z-10 rounded-lg overflow-hidden"
-            style={{
-              backgroundColor: T.docBg,
-              border: `1px solid ${T.borderLight}`,
-              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-              minWidth: '150px',
-            }}
-          >
-            <button
-              onClick={() => { onAddLine('standard'); setOpen(false) }}
-              className="w-full flex items-center gap-2 px-3 py-2 text-[12px] transition-colors"
-              style={{ color: T.text }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = `${accentColor}10`)}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-            >
-              <Plus className="h-3 w-3" /> Ligne simple
-            </button>
-            <button
-              onClick={() => { onAddLine('section'); setOpen(false) }}
-              className="w-full flex items-center gap-2 px-3 py-2 text-[12px] transition-colors"
-              style={{ color: T.text }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = `${accentColor}10`)}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-            >
-              <Type className="h-3 w-3" /> Section
-            </button>
-            {onCatalogClick && (
-              <>
-                <div style={{ height: '1px', background: `${T.borderLight}` }} />
-                <button
-                  onClick={() => { onCatalogClick(); setOpen(false) }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-[12px] transition-colors"
-                  style={{ color: T.text }}
-                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = `${accentColor}10`)}
-                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                >
-                  <Package className="h-3 w-3" /> Depuis le catalogue
-                </button>
-              </>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {menu}
     </div>
   )
 }
