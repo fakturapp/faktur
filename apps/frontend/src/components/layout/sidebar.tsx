@@ -222,8 +222,6 @@ function storeExpanded(expanded: string[]) {
   localStorage.setItem(SETTINGS_EXPANDED_KEY, JSON.stringify(expanded))
 }
 
-// Rendered inside a <Link>: shows a spinner while that link's navigation is
-// pending, and notifies the top progress bar that a route change started.
 function LinkStatusIndicator({ className }: { className?: string }) {
   const { pending } = useLinkStatus()
   React.useEffect(() => {
