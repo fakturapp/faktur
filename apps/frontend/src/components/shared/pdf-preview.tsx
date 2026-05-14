@@ -7,20 +7,15 @@ import { ChevronLeft, ChevronRight, FileWarning } from 'lucide-react'
 import { Spinner } from '@/components/ui/spinner'
 import { api } from '@/lib/api'
 
-// pdf.js needs its worker. The new URL(..., import.meta.url) form lets the
-// bundler emit the worker as an asset and resolve it at runtime.
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
   import.meta.url,
 ).href
 
 interface PdfPreviewProps {
-  /** API path that returns the PDF blob, e.g. `/invoices/{id}/pdf`. */
   src: string
 }
 
-// Renders the actual generated PDF (pixel-perfect) page by page on a canvas,
-// with a bottom bar to switch pages.
 export function PdfPreview({ src }: PdfPreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -31,7 +26,6 @@ export function PdfPreview({ src }: PdfPreviewProps) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // ── Load the PDF ──
   useEffect(() => {
     let cancelled = false
     setLoading(true)
@@ -72,7 +66,6 @@ export function PdfPreview({ src }: PdfPreviewProps) {
     }
   }, [src])
 
-  // ── Render the current page, fitted to the container ──
   useEffect(() => {
     const pdf = pdfRef.current
     const container = containerRef.current
@@ -108,7 +101,6 @@ export function PdfPreview({ src }: PdfPreviewProps) {
       try {
         await renderTask.promise
       } catch {
-        /* cancelled — ignore */
       }
     }
 
