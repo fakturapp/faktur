@@ -963,6 +963,9 @@ interface A4SheetProps {
   // When true, a document spanning more than one A4 page is rendered as
   // separate side-by-side sheets instead of a single clipped sheet.
   paginate?: boolean
+  // Current document zoom in percent (the editor's zoom slider). Used to
+  // decide when the two pages should stack vertically.
+  zoom?: number
 }
 
 export function A4Sheet({
@@ -989,6 +992,7 @@ export function A4Sheet({
   showUnitPriceColumn = true,
   showVatColumn = true,
   paginate = false,
+  zoom = 100,
 }: A4SheetProps) {
   const isPreview = mode === 'preview'
   const ed = !isPreview // shorthand: is editable?
@@ -1054,37 +1058,47 @@ export function A4Sheet({
   }, [tooMuchContent, paginate])
 
   // The two-page view fits the available width. When that width gets too
-  // small, the pages stack vertically instead of shrinking side by side.
+  // small (narrow screen, options panel open, or high document zoom), the
+  // pages stack vertically instead of shrinking side by side.
   const splitWrapRef = useRef<HTMLDivElement>(null)
-  const stackSheetRef = useRef<HTMLDivElement>(null)
-  const [splitScale, setSplitScale] = useState(1)
-  const [stackScale, setStackScale] = useState(1)
-  const [stackVertical, setStackVertical] = useState(false)
+  const [availWidth, setAvailWidth] = useState(0)
   const [stackHeight, setStackHeight] = useState(A4_SHEET_H)
 
+  // Measure the width available for the sheets.
   useEffect(() => {
     if (!showSplit) return
-    function fit() {
-      const el = splitWrapRef.current
-      if (!el) return
-      const avail = el.clientWidth
-      if (avail <= 0) return
-      const stack = avail < STACK_THRESHOLD
-      setStackVertical(stack)
-      if (stack) {
-        setStackScale(Math.min(1, avail / A4_SHEET_W))
-        const h = stackSheetRef.current?.offsetHeight
-        if (h && h > 0) setStackHeight(h)
-      } else {
-        setSplitScale(Math.min(1, avail / SPLIT_W))
-      }
-    }
-    fit()
-    const ro = new ResizeObserver(fit)
-    if (splitWrapRef.current) ro.observe(splitWrapRef.current)
-    if (stackSheetRef.current) ro.observe(stackSheetRef.current)
+    const el = splitWrapRef.current
+    if (!el) return
+    const update = () => setAvailWidth(el.clientWidth)
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
     return () => ro.disconnect()
-  }, [showSplit, stackVertical])
+  }, [showSplit])
+
+  // Callback ref on the stacked sheet — wires a ResizeObserver the instant the
+  // node mounts, so its measured height is always in sync (no timing race).
+  const stackRoRef = useRef<ResizeObserver | null>(null)
+  const setStackSheetRef = useCallback((node: HTMLDivElement | null) => {
+    stackRoRef.current?.disconnect()
+    stackRoRef.current = null
+    if (!node) return
+    const measure = () => {
+      if (node.offsetHeight > 0) setStackHeight(node.offsetHeight)
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(node)
+    stackRoRef.current = ro
+  }, [])
+
+  // Derived layout: docZoom shrinks the usable width, so a zoomed-in document
+  // stacks sooner.
+  const zoomFactor = Math.max(zoom / 100, 0.1)
+  const effectiveWidth = availWidth > 0 ? availWidth / zoomFactor : SPLIT_W
+  const stackVertical = showSplit && effectiveWidth < STACK_THRESHOLD
+  const splitScale = Math.min(1, effectiveWidth / SPLIT_W)
+  const stackScale = Math.min(1, effectiveWidth / A4_SHEET_W)
 
   // Dynamically load document font from Google Fonts
   useEffect(() => {
@@ -2069,7 +2083,7 @@ export function A4Sheet({
                 }}
               >
                 <div
-                  ref={stackSheetRef}
+                  ref={setStackSheetRef}
                   className={cn('relative rounded-xl', overflowRing)}
                   style={{ width: A4_SHEET_W, ...sheetSurface }}
                 >
