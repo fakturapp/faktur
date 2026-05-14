@@ -155,9 +155,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (loading) {
     return (
-      <div className="relative h-[calc(100vh-var(--preprod-banner-height,0px))] overflow-hidden bg-background">
+      <div className="relative h-screen overflow-hidden bg-background">
         {}
-        <div className="fixed left-0 top-0 z-40 w-(--sidebar-width) h-[calc(100vh-var(--preprod-banner-height,0px))] rounded-r-[2rem] bg-sidebar border-r border-sidebar-border shadow-2xl flex flex-col overflow-hidden">
+        <div className="fixed left-0 top-0 z-40 w-(--sidebar-width) h-screen rounded-r-[2rem] bg-sidebar border-r border-sidebar-border shadow-2xl flex flex-col overflow-hidden">
           <div className="px-3 pt-3 pb-2">
             <div className="flex items-center gap-2.5 px-2 py-2">
               <Skeleton className="h-7 w-7 rounded-lg" />
@@ -189,7 +189,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </div>
         {}
-        <div className="h-[calc(100vh-var(--preprod-banner-height,0px))] flex flex-col overflow-hidden bg-background pl-(--sidebar-width)">
+        <div className="h-screen flex flex-col overflow-hidden bg-background pl-(--sidebar-width)">
           <div className="h-(--header-height) shrink-0 border-b border-border" />
           <div className="flex-1 p-6 space-y-6">
             <div className="grid gap-4 grid-cols-4">
@@ -208,7 +208,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (IS_ADMIN_ONLY && !user.isAdmin) {
     return (
-      <div className="flex h-[calc(100vh-var(--preprod-banner-height,0px))] items-center justify-center bg-background">
+      <div className="flex h-screen items-center justify-center bg-background">
         <Spinner size="lg" className="text-accent" />
       </div>
     )
@@ -237,7 +237,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <CompanySettingsProvider>
     <EmailProvider>
     <TutorialProvider>
-    <div className="relative h-[calc(100vh-var(--preprod-banner-height,0px))] overflow-hidden bg-background">
+    <div className="relative h-screen overflow-hidden bg-background">
       {/* Dégradés multi-couleurs animés — radial-gradient (net, sans pixelisation) */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
         <div
@@ -288,7 +288,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       <div
         className={cn(
-          'relative flex min-w-0 min-h-0 h-[calc(100vh-var(--preprod-banner-height,0px))] flex-col transition-[padding] duration-300 ease-out overflow-hidden bg-transparent will-change-[padding]',
+          'relative flex min-w-0 min-h-0 h-screen flex-col transition-[padding] duration-300 ease-out overflow-hidden bg-transparent will-change-[padding]',
           sidebarCollapsed ? 'pl-16' : 'pl-(--sidebar-width)',
           switching && 'blur-sm pointer-events-none'
         )}
