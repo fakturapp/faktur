@@ -1,14 +1,5 @@
 'use client'
 
-/**
- * /onboarding root — landing page when the user arrives without a step.
- *
- * Shows a skeleton, computes the correct next step from the user state,
- * then redirects. This avoids the "blank flash" the user experienced when
- * landing on an empty /onboarding route, and also acts as a "resume where
- * you left off" page.
- */
-
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth'
@@ -22,8 +13,6 @@ export default function OnboardingRootPage() {
   useEffect(() => {
     if (loading || !user) return
 
-    // A pending recovery key for the current team always wins: the user must
-    // see and acknowledge it before anything else (survives team switching).
     if (
       user.currentTeamId &&
       sessionStorage.getItem(`faktur_recovery_key_${user.currentTeamId}`)
@@ -32,8 +21,6 @@ export default function OnboardingRootPage() {
       return
     }
 
-    // Step detection — walks the onboarding tree from earliest to latest,
-    // landing on the first one the user hasn't completed yet.
     const target = resolveNextStep(user)
     router.replace(target)
   }, [user, loading, router])
@@ -63,17 +50,13 @@ interface UserShape {
 }
 
 function resolveNextStep(user: UserShape): string {
-  // 1. No team yet → create one
   if (!user.currentTeamId) return '/onboarding/team'
 
-  // 2. Private mode + missing recovery key → security step
   const isPrivate = (user.currentTeamEncryptionMode ?? 'private') === 'private'
   if (isPrivate && !user.hasRecoveryKey) return '/onboarding/recovery-key'
 
-  // 3. Current team already configured → dashboard
   const currentTeam = user.teams?.find((t) => t.id === user.currentTeamId) ?? null
   if (currentTeam && currentTeam.onboardingCompletedAt) return '/dashboard'
 
-  // 4. Default next step in the flow
   return '/onboarding/company'
 }
