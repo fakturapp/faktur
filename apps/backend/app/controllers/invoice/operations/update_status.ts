@@ -38,8 +38,6 @@ export default class UpdateStatus {
       return response.notFound({ message: 'Invoice not found' })
     }
 
-    // An invoice with a live payment link can't go back to draft — the link is
-    // already shared with the client. It must be deleted first.
     if (status === 'draft') {
       const activeLink = await PaymentLink.query()
         .where('invoice_id', invoice.id)
