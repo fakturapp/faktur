@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback, useMemo, type Ref } from 'react'
+import { useState, useRef, useEffect, useCallback, useMemo, type Ref, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
@@ -966,8 +966,7 @@ export function A4Sheet({
   const pageBoxRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const [rawPageCount, setRawPageCount] = useState(1)
-  const [currentPage, setCurrentPage] = useState(0)
-  const [pageHeightPx, setPageHeightPx] = useState(0)
+  const [splitIndex, setSplitIndex] = useState(0)
 
   useEffect(() => {
     function measure() {
@@ -976,8 +975,18 @@ export function A4Sheet({
       if (!box || !content) return
       const ph = box.clientHeight
       if (ph <= 0) return
-      setPageHeightPx(ph)
       setRawPageCount(Math.max(1, Math.ceil((content.scrollHeight - 6) / ph)))
+      // First line row whose bottom spills past page 1 → the page-2 split point.
+      const budget = ph - 40
+      const rows = content.querySelectorAll<HTMLElement>('[data-a4-row]')
+      let split = lines.length
+      for (let i = 0; i < rows.length; i++) {
+        if (rows[i].offsetTop + rows[i].offsetHeight > budget) {
+          split = i
+          break
+        }
+      }
+      setSplitIndex(Math.max(1, Math.min(split, lines.length)))
     }
     const raf = requestAnimationFrame(measure)
     const ro = new ResizeObserver(measure)
@@ -987,16 +996,13 @@ export function A4Sheet({
       cancelAnimationFrame(raf)
       ro.disconnect()
     }
-  }, [])
+  }, [lines.length])
 
   // A document may not span more than 2 A4 pages.
   const tooMuchContent = rawPageCount > 2
   const pageCount = Math.min(rawPageCount, 2)
   const overflows = pageCount > 1
-
-  useEffect(() => {
-    setCurrentPage((p) => Math.min(p, pageCount - 1))
-  }, [pageCount])
+  const showSplit = paginate && pageCount > 1
 
   // Dynamically load document font from Google Fonts
   useEffect(() => {
@@ -1451,6 +1457,7 @@ export function A4Sheet({
                   return (
                     <div
                       key={line.id}
+                      data-a4-row
                       className={cn('items-center', ed && 'group')}
                       style={{
                         display: 'grid',
@@ -1874,6 +1881,34 @@ export function A4Sheet({
     )
   }
 
+  // One A4 page frame wrapping a rendered document body.
+  const renderSheetFrame = (children: ReactNode, key?: string) => (
+    <div
+      key={key}
+      className={cn(
+        'rounded-xl relative overflow-hidden',
+        showSplit ? 'w-[960px] shrink-0' : 'w-full max-w-[960px]',
+        overflows && (tooMuchContent ? 'ring-2 ring-red-500/60' : 'ring-2 ring-amber-500/60'),
+      )}
+      style={{
+        aspectRatio: '210 / 297',
+        background: isClassique
+          ? darkMode
+            ? `linear-gradient(270deg, ${T.docBg}, #161618 23.44%, #161618 77.6%, ${T.docBg})`
+            : 'linear-gradient(270deg, #fafafa, #fff 23.44%, #fff 77.6%, #fafafa)'
+          : T.docBg,
+        boxShadow: isClassique
+          ? 'rgba(71,99,136,0.1) 0px 20px 40px -5px'
+          : '0 4px 24px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.08)',
+        colorScheme: darkMode ? 'dark' : 'light',
+      }}
+    >
+      <div className={cn('absolute inset-0', isPreview ? 'overflow-hidden' : 'overflow-y-auto')}>
+        {children}
+      </div>
+    </div>
+  )
+
   return (
     <div className="flex flex-col items-center gap-2.5">
       {/* ── Page-overflow banner ── */}
@@ -1899,59 +1934,36 @@ export function A4Sheet({
         </div>
       )}
 
+      {/* Hidden measuring instance — full single-page content, off-screen.
+          Drives the real page count + the page-2 split point. */}
       <div
-        className={cn(
-          'w-full max-w-[960px] rounded-xl relative overflow-hidden',
-          overflows && (tooMuchContent ? 'ring-2 ring-red-500/60' : 'ring-2 ring-amber-500/60')
-        )}
-        style={{
-          aspectRatio: '210 / 297',
-          background: isClassique
-            ? darkMode
-              ? `linear-gradient(270deg, ${T.docBg}, #161618 23.44%, #161618 77.6%, ${T.docBg})`
-              : 'linear-gradient(270deg, #fafafa, #fff 23.44%, #fff 77.6%, #fafafa)'
-            : T.docBg,
-          boxShadow: isClassique
-            ? 'rgba(71,99,136,0.1) 0px 20px 40px -5px'
-            : '0 4px 24px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.08)',
-          colorScheme: darkMode ? 'dark' : 'light',
-        }}
+        aria-hidden
+        inert
+        className="pointer-events-none"
+        style={{ position: 'absolute', left: -99999, top: 0, width: 960 }}
       >
-        {/* Scrollable content — flex column so bottom sticks.
-            In preview the inner scrollbar is replaced by page switching. */}
-        <div
-          ref={pageBoxRef}
-          className={cn('absolute inset-0', isPreview ? 'overflow-hidden' : 'overflow-y-auto')}
-        >
-          {renderDocumentBody('single', lines, 0, contentRef)}
-        </div>
-
-        {isPreview && pageCount > 1 && (
-          <div className="absolute bottom-3 right-3 z-20 flex items-center gap-1 rounded-full bg-foreground/85 px-1.5 py-1 shadow-lg backdrop-blur-sm">
-            <button
-              type="button"
-              onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
-              disabled={currentPage === 0}
-              className="flex h-6 w-6 items-center justify-center rounded-full text-background/90 transition-colors hover:bg-background/15 disabled:opacity-30 disabled:hover:bg-transparent"
-              aria-label={lang === 'en' ? 'Previous page' : 'Page précédente'}
-            >
-              <ChevronLeft className="h-3.5 w-3.5" />
-            </button>
-            <span className="px-1.5 text-[11px] font-medium tabular-nums text-background">
-              {currentPage + 1} / {pageCount}
-            </span>
-            <button
-              type="button"
-              onClick={() => setCurrentPage((p) => Math.min(pageCount - 1, p + 1))}
-              disabled={currentPage === pageCount - 1}
-              className="flex h-6 w-6 items-center justify-center rounded-full text-background/90 transition-colors hover:bg-background/15 disabled:opacity-30 disabled:hover:bg-transparent"
-              aria-label={lang === 'en' ? 'Next page' : 'Page suivante'}
-            >
-              <ChevronRight className="h-3.5 w-3.5" />
-            </button>
+        <div className="w-[960px] relative" style={{ aspectRatio: '210 / 297' }}>
+          <div ref={pageBoxRef} className="absolute inset-0 overflow-hidden">
+            {renderDocumentBody('single', lines, 0, contentRef)}
           </div>
-        )}
+        </div>
       </div>
+
+      {/* Visible sheet(s) — one, or two side-by-side when paginated */}
+      {showSplit ? (
+        <div className="flex items-start gap-6">
+          {renderSheetFrame(
+            renderDocumentBody('first', lines.slice(0, splitIndex), 0),
+            'page-1',
+          )}
+          {renderSheetFrame(
+            renderDocumentBody('continuation', lines.slice(splitIndex), splitIndex),
+            'page-2',
+          )}
+        </div>
+      ) : (
+        renderSheetFrame(renderDocumentBody('single', lines, 0))
+      )}
     </div>
   )
 }
