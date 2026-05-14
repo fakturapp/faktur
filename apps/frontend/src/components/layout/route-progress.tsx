@@ -3,11 +3,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
 
-// Navigation progress bar. It starts as soon as a link reports a pending
-// navigation (faktur:route-pending), creeps forward while the route resolves,
-// then snaps to 100% and fades out when the pathname actually changes.
-// A pathname change without a tracked start still produces a quick flash so
-// programmatic navigations stay visible too.
 export function RouteProgressBar() {
   const pathname = usePathname()
   const [progress, setProgress] = useState(0)
