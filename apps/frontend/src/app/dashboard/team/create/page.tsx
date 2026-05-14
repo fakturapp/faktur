@@ -120,8 +120,6 @@ export default function CreateTeamPage() {
     const data = await submitCreate(password)
     if (!data) return
 
-    // Private team: the recovery key must be shown on the dedicated, persistent
-    // onboarding page — never as a transient modal that can be redirected away.
     if (data.recoveryKey) {
       sessionStorage.setItem(`faktur_recovery_key_${data.team.id}`, data.recoveryKey)
       window.location.href = '/onboarding/recovery-key'
@@ -146,8 +144,6 @@ export default function CreateTeamPage() {
     const data = await submitCreate()
     if (!data) return
 
-    // Private team: the recovery key must be shown on the dedicated, persistent
-    // onboarding page — never as a transient modal that can be redirected away.
     if (data.recoveryKey) {
       sessionStorage.setItem(`faktur_recovery_key_${data.team.id}`, data.recoveryKey)
       window.location.href = '/onboarding/recovery-key'
