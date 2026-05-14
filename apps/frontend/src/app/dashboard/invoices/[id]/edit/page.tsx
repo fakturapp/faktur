@@ -740,7 +740,6 @@ function EditInvoiceContent() {
             <A4Sheet
               mode={mode}
               paginate
-              zoom={docZoom}
               logoUrl={logoUrl || (invoiceSettings.logoSource === 'company' ? companyLogoUrl : invoiceSettings.logoUrl) || companyLogoUrl}
               accentColor={accentColor}
               documentTitle={options.documentTitle}
