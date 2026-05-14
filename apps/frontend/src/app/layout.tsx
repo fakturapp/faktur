@@ -7,6 +7,7 @@ import { Agentation } from 'agentation'
 import './globals.css'
 import { Providers } from './providers'
 import { PreprodBanner } from '@/components/layout/preprod-banner'
+import { IS_PREPROD } from '@/lib/app-env'
 
 
 export const metadata: Metadata = {
@@ -76,7 +77,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" suppressHydrationWarning data-scroll-behavior="smooth">
+    <html
+      lang="fr"
+      suppressHydrationWarning
+      data-scroll-behavior="smooth"
+      className={IS_PREPROD ? 'preprod' : undefined}
+    >
       <head>
         <script
           dangerouslySetInnerHTML={{

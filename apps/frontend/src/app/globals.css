@@ -34,6 +34,27 @@
 @import '../styles/components/tooltip.css';
 
 /* ============================================================
+ * Preprod banner — reserve space so the fixed banner never
+ * covers page content (html.preprod is set in the root layout).
+ * ============================================================ */
+
+html.preprod {
+  --preprod-banner-h: 2rem;
+}
+
+html.preprod .h-screen {
+  height: calc(100vh - var(--preprod-banner-h));
+}
+
+html.preprod .min-h-screen {
+  min-height: calc(100vh - var(--preprod-banner-h));
+}
+
+html.preprod body {
+  padding-bottom: var(--preprod-banner-h);
+}
+
+/* ============================================================
  * Faktur Design Tokens — light-mode-first
  * Inspiré de Link by Stripe & Revolut
  * ============================================================ */
