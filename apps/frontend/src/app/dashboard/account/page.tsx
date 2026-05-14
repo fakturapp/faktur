@@ -11,6 +11,7 @@ import { Tabs } from '@/components/ui/tabs'
 import { Avatar } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { SecurityVerificationModal } from '@/components/modals/security-verification-modal'
 import { useAuth } from '@/lib/auth'
@@ -848,7 +849,22 @@ export default function AccountPage() {
                 </Button>
               </div>
 
-              {passkeys.length === 0 ? (
+              {!passkeysLoaded ? (
+                <div className="space-y-3">
+                  {[0, 1].map((i) => (
+                    <div key={i} className="flex items-center justify-between rounded-xl border border-border p-4">
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="h-10 w-10 shrink-0 rounded-xl" />
+                        <div className="space-y-2">
+                          <Skeleton className="h-3.5 w-32" />
+                          <Skeleton className="h-3 w-44" />
+                        </div>
+                      </div>
+                      <Skeleton className="h-8 w-9 shrink-0 rounded-lg" />
+                    </div>
+                  ))}
+                </div>
+              ) : passkeys.length === 0 ? (
                 <div className="flex flex-col items-center text-center gap-3 py-8">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-hover">
                     <KeyRound className="h-6 w-6 text-muted-foreground" />
@@ -870,8 +886,8 @@ export default function AccountPage() {
                           <div className="flex items-center gap-2">
                             <p className="text-sm font-medium text-foreground">{passkey.friendlyName}</p>
                             {passkey.backedUp && (
-                              <Badge variant="default" className="text-[10px]">
-                                <ShieldCheck className="h-3 w-3 mr-0.5" /> Synchronisée
+                              <Badge variant="success" className="text-[10px] shrink-0 whitespace-nowrap">
+                                <ShieldCheck className="h-3 w-3 mr-0.5 shrink-0" /> Synchronisée
                               </Badge>
                             )}
                           </div>
@@ -919,7 +935,18 @@ export default function AccountPage() {
               </div>
 
               {/* Google provider */}
-              {(() => {
+              {!providersLoaded ? (
+                <div className="flex items-center justify-between rounded-xl border border-border p-4">
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="h-10 w-10 shrink-0 rounded-xl" />
+                    <div className="space-y-2">
+                      <Skeleton className="h-3.5 w-20" />
+                      <Skeleton className="h-3 w-32" />
+                    </div>
+                  </div>
+                  <Skeleton className="h-8 w-20 shrink-0 rounded-lg" />
+                </div>
+              ) : (() => {
                 const googleProvider = providers.find((p) => p.provider === 'google')
                 return (
                   <div className="flex items-center justify-between rounded-xl border border-border p-4">

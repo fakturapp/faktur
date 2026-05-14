@@ -7,6 +7,7 @@ import { Separator } from '@/components/ui/separator'
 import { useRef, useState, useEffect } from 'react'
 import { api } from '@/lib/api'
 import { Spinner } from '@/components/ui/spinner'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   Camera, Shield, Calendar, Globe, KeyRound, ShieldCheck,
   Fingerprint, Link2,
@@ -184,9 +185,33 @@ export function AccountPreview() {
         )}
 
         {!loaded && (
-          <div className="flex items-center justify-center py-4">
-            <Spinner className="h-4 w-4" />
-          </div>
+          <>
+            <Separator />
+            <div className="space-y-2">
+              <Skeleton className="h-2.5 w-20" />
+              <div className="flex items-center gap-2.5 rounded-lg border border-border/50 p-2.5">
+                <Skeleton className="h-7 w-7 shrink-0 rounded-lg" />
+                <div className="flex-1 space-y-1.5">
+                  <Skeleton className="h-2.5 w-16" />
+                  <Skeleton className="h-2 w-24" />
+                </div>
+                <Skeleton className="h-3.5 w-8 shrink-0 rounded-full" />
+              </div>
+            </div>
+            <Separator />
+            <div className="space-y-2">
+              <Skeleton className="h-2.5 w-20" />
+              {[0, 1].map((i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <Skeleton className="h-6 w-6 shrink-0 rounded-md" />
+                  <div className="flex-1 space-y-1.5">
+                    <Skeleton className="h-2.5 w-24" />
+                    <Skeleton className="h-2 w-16" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>
