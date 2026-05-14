@@ -97,8 +97,6 @@ interface InvoiceDetailOverlayProps {
   onDelete: (id: string) => void
 }
 
-const noop = () => {}
-
 export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDelete }: InvoiceDetailOverlayProps) {
   const router = useRouter()
   const { toast } = useToast()
@@ -115,7 +113,6 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
   const [downloading, setDownloading] = useState(false)
   const [printing, setPrinting] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-  const [bankAccountInfo, setBankAccountInfo] = useState<{ bankName: string | null; iban: string | null; bic: string | null } | null>(null)
   const [emailModalOpen, setEmailModalOpen] = useState(false)
   const [emailModalMode, setEmailModalMode] = useState<'send' | 'reminder'>('send')
   const [emailHistoryOpen, setEmailHistoryOpen] = useState(false)
@@ -140,7 +137,6 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
     if (!invoiceId) return
     setLoading(true)
     setInvoice(null)
-    setBankAccountInfo(null)
 
     Promise.all([
       api.get<{ invoice: InvoiceDetail & { paymentLink?: any } }>(`/invoices/${invoiceId}`),
@@ -154,13 +150,6 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
           setPaymentLinkInfo(invRes.data.invoice.paymentLink)
         } else {
           setPaymentLinkInfo(null)
-        }
-        // Fetch bank account info if invoice has a linked bank account
-        if (invRes.data.invoice.bankAccountId) {
-          const { data: bankData } = await api.get<{ bankAccount: { bankName: string | null; iban: string | null; bic: string | null } }>(`/company/bank-accounts/${invRes.data.invoice.bankAccountId}`)
-          if (bankData?.bankAccount) {
-            setBankAccountInfo(bankData.bankAccount)
-          }
         }
       }
       if (compRes.data?.company) setCompany(compRes.data.company as CompanyInfo)
