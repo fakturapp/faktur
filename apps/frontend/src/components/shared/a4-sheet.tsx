@@ -1081,7 +1081,10 @@ export function A4Sheet({
     sliceLines: DocumentLine[],
     absStart: number,
     bodyRef?: Ref<HTMLDivElement>,
-  ) => (
+  ) => {
+    const showTop = role !== 'continuation'
+    const showBottom = role !== 'first'
+    return (
           <div
             ref={bodyRef}
             className="flex flex-col min-h-full px-10 py-8"
@@ -1097,6 +1100,13 @@ export function A4Sheet({
                 ═══════════════════════════════════════════ */}
             <div className="flex-1">
 
+              {role === 'continuation' && (
+                <div className="mb-5 text-[11px] font-semibold uppercase tracking-[1px]" style={{ color: T.textMuted }}>
+                  {lang === 'en' ? 'Continued' : 'Suite'}
+                </div>
+              )}
+
+              {showTop && (<>
               {/* ── Banner header for 'banner' layout templates ── */}
               {T.layout === 'banner' && (
                 <div
@@ -1407,6 +1417,7 @@ export function A4Sheet({
                   </div>
                 )
               )}
+              </>)}
 
               {/* ── Lines Table ── */}
               <div className="mb-3" style={(hasError('Désignation') || hasError('Prix')) ? { outline: `2px solid ${errorBorder}`, outlineOffset: '-1px', borderRadius: T.borderRadius } : undefined}>
@@ -1431,7 +1442,8 @@ export function A4Sheet({
                 </div>
 
                 {/* Rows */}
-                {lines.map((line, idx) => {
+                {sliceLines.map((line, i) => {
+                  const idx = absStart + i
                   const isSection = line.type === 'section'
                   const ht = isSection ? 0 : (billingType === 'quick' ? line.unitPrice : line.quantity * line.unitPrice)
                   const rowBg = idx % 2 === 0 ? T.rowEven : T.rowOdd
@@ -1588,8 +1600,8 @@ export function A4Sheet({
                 })}
               </div>
 
-              {/* ── Add line dropdown (edit mode) ── */}
-              {ed && <AddLineDropdown isClassique={isClassique} accentColor={accentColor} T={T} t={t} onAddLine={onAddLine} onCatalogClick={onCatalogClick} />}
+              {/* ── Add line dropdown (edit mode) — last page only ── */}
+              {ed && showBottom && <AddLineDropdown isClassique={isClassique} accentColor={accentColor} T={T} t={t} onAddLine={onAddLine} onCatalogClick={onCatalogClick} />}
 
             </div>
             {/* ═══ END TOP SECTION ═══ */}
@@ -1597,6 +1609,7 @@ export function A4Sheet({
             {/* ═══════════════════════════════════════════
                  BOTTOM SECTION — always sticks to bottom
                 ═══════════════════════════════════════════ */}
+            {showBottom && (
             <div>
 
               {/* ── Totals ── */}
@@ -1854,10 +1867,12 @@ export function A4Sheet({
               )}
 
             </div>
+            )}
             {/* ═══ END BOTTOM SECTION ═══ */}
 
           </div>
-  )
+    )
+  }
 
   return (
     <div className="flex flex-col items-center gap-2.5">
