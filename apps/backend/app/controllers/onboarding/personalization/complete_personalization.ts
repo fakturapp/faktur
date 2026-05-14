@@ -74,7 +74,6 @@ export default class CompletePersonalization {
       await settings.save()
     }
 
-    // Update Company fields (currency, paymentConditions) if provided
     if (payload.currency || payload.paymentConditions) {
       const company = await Company.findBy('teamId', user.currentTeamId)
       if (company) {
