@@ -145,7 +145,6 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
       if (invRes.data?.invoice) {
         setInvoice(invRes.data.invoice)
         setComment(invRes.data.invoice.comment || '')
-        // Load payment link info
         if (invRes.data.invoice.paymentLink) {
           setPaymentLinkInfo(invRes.data.invoice.paymentLink)
         } else {
@@ -156,13 +155,11 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
       setLoading(false)
     })
 
-    // Check Stripe config
     api.get<{ isConfigured: boolean }>('/settings/stripe').then(({ data: stripeData }) => {
       if (stripeData) setHasStripeConfigured(stripeData.isConfigured)
     })
   }, [invoiceId])
 
-  // Convert API lines to DocumentLine format for A4Sheet
   const sheetLines: DocumentLine[] = useMemo(() => {
     if (!invoice?.lines) return []
     return invoice.lines.map((l) => ({
@@ -177,7 +174,6 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
     }))
   }, [invoice?.lines])
 
-  // Calculate tvaBreakdown for A4Sheet
   const { subtotal, taxAmount, discountAmount, total, tvaBreakdown } = useMemo(() => {
     if (!invoice) return { subtotal: 0, taxAmount: 0, discountAmount: 0, total: 0, tvaBreakdown: [] }
     const billingType = invoice.billingType
@@ -226,7 +222,6 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
 
   function handleStatusUpdate(id: string, newStatus: string) {
     if (newStatus === 'paid' && invoice?.status !== 'paid_unconfirmed') {
-      // Show mark-paid info modal when manually setting to paid
       setMarkPaidInfoModalOpen(true)
       return
     }
@@ -266,7 +261,6 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
   async function handlePaymentLinkDeleted() {
     setPaymentLinkInfo(null)
     setPaymentLinkUrl(null)
-    // Re-fetch to get latest state
     const { data } = await api.get<{ paymentLink: any }>(`/invoices/${invoiceId}/payment-link`)
     if (data?.paymentLink) {
       setPaymentLinkInfo(data.paymentLink)
@@ -375,7 +369,6 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
     }
   }
 
-  // Always use current settings logo so preview stays in sync with PDF
   const effectiveLogoUrl = invoiceSettings.logoSource === 'company' ? companyLogoUrl : (invoiceSettings.logoUrl || invoice?.logoUrl || null)
 
   const effectiveClient = useMemo(() => {
@@ -403,7 +396,6 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
         transition={{ duration: 0.25 }}
         className="fixed inset-0 z-50"
       >
-        {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -413,9 +405,7 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
           onClick={onClose}
         />
 
-        {/* Content */}
         <div className="relative z-10 flex h-full items-stretch">
-          {/* Preview area — centered */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -423,7 +413,6 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
             transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
             className="relative flex-1 overflow-hidden py-6 px-4"
           >
-            {/* Download & Print buttons — top-right, outside the sheet */}
             {invoice && !loading && (
               <div className="absolute top-6 right-6 z-10 flex gap-2">
                 <button
@@ -454,7 +443,6 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
             ) : null}
           </motion.div>
 
-          {/* Side panel */}
           <motion.div
             initial={{ x: 320, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
@@ -468,7 +456,6 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
               </div>
             ) : invoice ? (
               <>
-                {/* Header */}
                 <div className="flex items-center justify-between px-5 py-4 border-b border-separator">
                   <h3 className="text-lg font-bold text-foreground">{invoice.invoiceNumber}</h3>
                   <Tooltip content="Fermer">
@@ -483,7 +470,6 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                 </div>
 
                 <div className="flex-1 overflow-y-auto overflow-x-hidden">
-                  {/* Prominent Edit button */}
                   <div className="px-5 pt-4 pb-2 relative group/edit">
                     <Button
                       className="w-full h-11 text-sm font-semibold gap-2"
@@ -505,7 +491,6 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                     )}
                   </div>
 
-                  {/* Status */}
                   <div className="px-5 py-3 border-b border-separator">
                     <StatusDropdown
                       id={invoice.id}
@@ -520,7 +505,6 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                     />
                   </div>
 
-                  {/* Recovery section for overdue */}
                   {invoice.status === 'overdue' && (
                     <div className="px-5 py-4 border-b border-separator">
                       <div className="rounded-lg bg-red-500/10 border border-red-500/20 p-3">
@@ -542,7 +526,6 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                     </div>
                   )}
 
-                  {/* Client */}
                   <div className="px-5 py-4 border-b border-separator">
                     {invoice.client ? (
                       <div className="flex items-center gap-3">
@@ -559,7 +542,6 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                     )}
                   </div>
 
-                  {/* Actions */}
                   <div className="px-5 py-4 border-b border-separator space-y-1">
                     <div className="relative group/send">
                       <button
@@ -606,7 +588,6 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                       <History className="h-4 w-4" /> Historique des emails
                     </button>
 
-                    {/* Plus d'actions */}
                     <Dropdown
                       align="left"
                       trigger={
@@ -629,7 +610,6 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                     </Dropdown>
                   </div>
 
-                  {/* Payment link section */}
                   <PaymentLinkCard
                     invoiceId={invoice.id}
                     invoiceStatus={invoice.status}
@@ -639,7 +619,6 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                     onConfirmClick={() => setConfirmPaymentModalOpen(true)}
                   />
 
-                  {/* Payment link button - show when no active link and not paid */}
                   {!paymentLinkInfo?.isActive && invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
                     <div className="px-5 py-3 border-b border-separator">
                       <button
@@ -651,7 +630,6 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                     </div>
                   )}
 
-                  {/* Comment */}
                   <div className="px-5 py-4">
                     <div className="flex items-center gap-2 mb-2">
                       <MessageSquare className="h-3.5 w-3.5 text-muted-foreground" />
@@ -672,7 +650,6 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
           </motion.div>
         </div>
 
-        {/* Delete confirmation dialog */}
         <Dialog open={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)} className="max-w-sm">
           <DialogTitle>Supprimer la facture</DialogTitle>
           <DialogDescription>
@@ -687,7 +664,6 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
           </DialogFooter>
         </Dialog>
 
-        {/* Send email modal */}
         {invoice && (
           <SendEmailModal
             open={emailModalOpen}
@@ -703,7 +679,6 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
           />
         )}
 
-        {/* Email history modal */}
         {invoice && (
           <EmailHistoryModal
             open={emailHistoryOpen}
@@ -714,7 +689,6 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
           />
         )}
 
-        {/* Payment link modal */}
         {invoice && (
           <PaymentLinkModal
             open={paymentLinkModalOpen}
@@ -738,8 +712,6 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                 expiresAt: link.expiresAt,
               })
               setPaymentLinkUrl(link.url)
-              // The backend promotes a draft invoice to "sent" once a payment
-              // link exists — mirror that locally so the UI stays in sync.
               if (invoice.status === 'draft') {
                 setInvoice({ ...invoice, status: 'sent' })
                 onStatusChange(invoice.id, 'sent')
@@ -748,7 +720,6 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
           />
         )}
 
-        {/* Confirm payment modal */}
         {invoice && (
           <ConfirmPaymentModal
             open={confirmPaymentModalOpen}
@@ -759,7 +730,6 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
           />
         )}
 
-        {/* Mark paid info modal */}
         <MarkPaidInfoModal
           open={markPaidInfoModalOpen}
           onClose={() => setMarkPaidInfoModalOpen(false)}
