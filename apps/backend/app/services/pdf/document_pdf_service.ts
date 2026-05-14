@@ -285,19 +285,23 @@ export async function generateQuotePdf(
     .preload('lines', (q) => q.orderBy('position', 'asc'))
     .firstOrFail()
 
+  const company = await Company.query().where('team_id', teamId).first()
+  const invoiceSettings = await InvoiceSetting.query().where('team_id', teamId).first()
+
+  const docKey = `quote:${quoteId}`
+  const cacheVersion = pdfVersionToken(quote, quote.lines, company, invoiceSettings)
+  const cached = pdfCache.get(docKey, cacheVersion)
+  if (cached) return cached
+
   // Decrypt quote, lines, and client
   decryptModelFields(quote, [...ENCRYPTED_FIELDS.quote], dek)
   decryptModelFieldsArray(quote.lines, [...ENCRYPTED_FIELDS.quoteLine], dek)
   if (quote.client) {
     decryptModelFields(quote.client, [...ENCRYPTED_FIELDS.client], dek)
   }
-
-  const company = await Company.query().where('team_id', teamId).first()
   if (company) {
     decryptModelFields(company, [...ENCRYPTED_FIELDS.company], dek)
   }
-
-  const invoiceSettings = await InvoiceSetting.query().where('team_id', teamId).first()
 
   const settingsData = {
     template: invoiceSettings?.template || 'classique',
@@ -378,7 +382,9 @@ export async function generateQuotePdf(
     entreprise: company?.legalName || company?.tradeName || 'entreprise',
   })
 
-  return { pdfBuffer, filename: `${resolvedName}.pdf` }
+  const result = { pdfBuffer, filename: `${resolvedName}.pdf` }
+  pdfCache.set(docKey, cacheVersion, result.pdfBuffer, result.filename)
+  return result
 }
 
 export async function generateCreditNotePdf(
@@ -393,18 +399,22 @@ export async function generateCreditNotePdf(
     .preload('lines', (q) => q.orderBy('position', 'asc'))
     .firstOrFail()
 
+  const company = await Company.query().where('team_id', teamId).first()
+  const invoiceSettings = await InvoiceSetting.query().where('team_id', teamId).first()
+
+  const docKey = `credit-note:${creditNoteId}`
+  const cacheVersion = pdfVersionToken(creditNote, creditNote.lines, company, invoiceSettings)
+  const cached = pdfCache.get(docKey, cacheVersion)
+  if (cached) return cached
+
   decryptModelFields(creditNote, [...ENCRYPTED_FIELDS.creditNote], dek)
   decryptModelFieldsArray(creditNote.lines, [...ENCRYPTED_FIELDS.creditNoteLine], dek)
   if (creditNote.client) {
     decryptModelFields(creditNote.client, [...ENCRYPTED_FIELDS.client], dek)
   }
-
-  const company = await Company.query().where('team_id', teamId).first()
   if (company) {
     decryptModelFields(company, [...ENCRYPTED_FIELDS.company], dek)
   }
-
-  const invoiceSettings = await InvoiceSetting.query().where('team_id', teamId).first()
 
   const settingsData = {
     template: invoiceSettings?.template || 'classique',
@@ -480,5 +490,7 @@ export async function generateCreditNotePdf(
     entreprise: company?.legalName || company?.tradeName || 'entreprise',
   })
 
-  return { pdfBuffer, filename: `${resolvedName}.pdf` }
+  const result = { pdfBuffer, filename: `${resolvedName}.pdf` }
+  pdfCache.set(docKey, cacheVersion, result.pdfBuffer, result.filename)
+  return result
 }
