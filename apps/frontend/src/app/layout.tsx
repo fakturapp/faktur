@@ -6,6 +6,7 @@ import '@fontsource/sn-pro/700.css'
 import { Agentation } from 'agentation'
 import './globals.css'
 import { Providers } from './providers'
+import { PreprodBanner } from '@/components/layout/preprod-banner'
 
 
 export const metadata: Metadata = {
@@ -85,6 +86,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen antialiased" suppressHydrationWarning>
         <Providers>{children}</Providers>
+        <PreprodBanner />
         {process.env.NODE_ENV === 'development' && <Agentation />}
       </body>
     </html>
