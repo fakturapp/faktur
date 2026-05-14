@@ -151,6 +151,8 @@ export default function AccountPage() {
   const [passkeyAdding, setPasskeyAdding] = useState(false)
   const [passkeyDeleteConfirm, setPasskeyDeleteConfirm] = useState<string | null>(null)
   const [passkeyDeleting, setPasskeyDeleting] = useState(false)
+  // Passkey awaiting deletion once the security verification modal succeeds.
+  const [pendingPasskeyDelete, setPendingPasskeyDelete] = useState<string | null>(null)
 
   function requireSecurity(action: string) {
     setSecurityAction(action)
@@ -171,6 +173,8 @@ export default function AccountPage() {
       executeLinkGoogle()
     } else if (securityAction === 'unlink_google') {
       executeUnlinkGoogle()
+    } else if (securityAction === 'delete_passkey') {
+      executeDeletePasskey()
     }
   }
 
@@ -549,17 +553,27 @@ export default function AccountPage() {
     }
   }
 
-  async function handleDeletePasskey() {
+  // Step 1: confirmation accepted → require a security verification before deleting.
+  function handleDeletePasskey() {
     if (!passkeyDeleteConfirm) return
+    setPendingPasskeyDelete(passkeyDeleteConfirm)
+    setPasskeyDeleteConfirm(null)
+    requireSecurity('delete_passkey')
+  }
+
+  // Step 2: security verification succeeded → actually delete the passkey.
+  async function executeDeletePasskey() {
+    if (!pendingPasskeyDelete) return
     setPasskeyDeleting(true)
-    const { error } = await api.delete(`/account/passkeys/${passkeyDeleteConfirm}`)
+    const { error } = await api.delete(`/account/passkeys/${pendingPasskeyDelete}`)
     setPasskeyDeleting(false)
     if (error) {
-      setPasskeyDeleteConfirm(null)
+      setPendingPasskeyDelete(null)
       return toast(error, 'error')
     }
-    setPasskeys((prev) => prev.filter((p) => p.id !== passkeyDeleteConfirm))
-    setPasskeyDeleteConfirm(null)
+    setPasskeys((prev) => prev.filter((p) => p.id !== pendingPasskeyDelete))
+    setPendingPasskeyDelete(null)
+    setSecurityVerified(false)
     await refreshUser()
     toast('Clé d\'accès supprimée', 'success')
   }
@@ -1150,7 +1164,7 @@ export default function AccountPage() {
       {/* Security Verification Modal */}
       <SecurityVerificationModal
         open={securityOpen}
-        onClose={() => setSecurityOpen(false)}
+        onClose={() => { setSecurityOpen(false); setPendingPasskeyDelete(null) }}
         onVerified={handleSecurityVerified}
         twoFactorEnabled={user?.twoFactorEnabled}
       />
@@ -1412,7 +1426,8 @@ export default function AccountPage() {
         <DialogHeader showClose={false}>
           <DialogTitle>Supprimer cette clé d'accès</DialogTitle>
           <DialogDescription>
-            Vous ne pourrez plus vous connecter avec cette clé d'accès. Cette action est irréversible.
+            Vous ne pourrez plus vous connecter avec cette clé d'accès. Cette action est
+            irréversible et nécessite une vérification de sécurité.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
@@ -1420,7 +1435,7 @@ export default function AccountPage() {
             Annuler
           </Button>
           <Button variant="destructive" onClick={handleDeletePasskey} disabled={passkeyDeleting}>
-            {passkeyDeleting ? <><Spinner size="sm" /> Suppression...</> : 'Supprimer'}
+            Continuer
           </Button>
         </DialogFooter>
       </Dialog>
