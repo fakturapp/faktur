@@ -1956,10 +1956,17 @@ export function A4Sheet({
             renderDocumentBody('first', lines.slice(0, splitIndex), 0),
             'page-1',
           )}
-          {renderSheetFrame(
-            renderDocumentBody('continuation', lines.slice(splitIndex), splitIndex),
-            'page-2',
-          )}
+          <motion.div
+            key="page-2"
+            initial={{ opacity: 0, x: -48, scale: 0.96 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
+            className="shrink-0"
+          >
+            {renderSheetFrame(
+              renderDocumentBody('continuation', lines.slice(splitIndex), splitIndex),
+            )}
+          </motion.div>
         </div>
       ) : (
         renderSheetFrame(renderDocumentBody('single', lines, 0))
