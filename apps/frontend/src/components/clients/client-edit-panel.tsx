@@ -30,6 +30,7 @@ import {
 interface Client {
   id: string
   type: 'company' | 'individual'
+  civility: 'mr' | 'mme' | null
   companyName: string | null
   firstName: string | null
   lastName: string | null
@@ -75,6 +76,7 @@ export function ClientEditPanel({ open, clientId, onClose, onUpdated, onDeleted 
   const [client, setClient] = useState<Client | null>(null)
 
   const [form, setForm] = useState({
+    civility: '' as 'mr' | 'mme' | '',
     companyName: '',
     firstName: '',
     lastName: '',
@@ -106,6 +108,7 @@ export function ClientEditPanel({ open, clientId, onClose, onUpdated, onDeleted 
     if (data?.client) {
       setClient(data.client)
       setForm({
+        civility: data.client.civility || '',
         companyName: data.client.companyName || '',
         firstName: data.client.firstName || '',
         lastName: data.client.lastName || '',
@@ -340,6 +343,31 @@ export function ClientEditPanel({ open, clientId, onClose, onUpdated, onDeleted 
                             <div className="flex items-center gap-2 mb-4">
                               <UserRound className="h-4 w-4 text-primary" />
                               <span className="text-sm font-semibold text-foreground">Informations personnelles</span>
+                            </div>
+
+                            <div>
+                              <label className="text-sm font-medium text-foreground mb-1.5 block">Civilite</label>
+                              <div className="flex gap-2">
+                                {([
+                                  { value: 'mr', label: 'Mr' },
+                                  { value: 'mme', label: 'Mme' },
+                                ] as const).map((opt) => (
+                                  <button
+                                    key={opt.value}
+                                    type="button"
+                                    onClick={() =>
+                                      update('civility', form.civility === opt.value ? '' : opt.value)
+                                    }
+                                    className={`flex-1 rounded-xl border-2 px-4 py-2.5 text-sm font-medium transition-all ${
+                                      form.civility === opt.value
+                                        ? 'border-primary bg-primary/5 text-foreground'
+                                        : 'border-border text-muted-foreground hover:border-muted-foreground/30'
+                                    }`}
+                                  >
+                                    {opt.label}
+                                  </button>
+                                ))}
+                              </div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-3">
