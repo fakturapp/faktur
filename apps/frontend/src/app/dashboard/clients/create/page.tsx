@@ -32,6 +32,7 @@ type ClientType = 'company' | 'individual'
 
 interface ClientForm {
   type: ClientType
+  civility: 'mr' | 'mme' | ''
   companyName: string
   siren: string
   siret: string
@@ -51,6 +52,7 @@ interface ClientForm {
 
 const initialForm: ClientForm = {
   type: 'company',
+  civility: '',
   companyName: '',
   siren: '',
   siret: '',
@@ -175,6 +177,7 @@ function ClientCreateContent() {
     setError('')
     const payload = {
       type: form.type,
+      civility: form.type === 'individual' ? form.civility || null : null,
       companyName: form.type === 'company' ? form.companyName : null,
       siren: form.type === 'company' ? form.siren : null,
       siret: form.type === 'company' ? form.siret : null,
@@ -342,6 +345,18 @@ function ClientCreateContent() {
                   <div>
                     <h3 className="text-base font-semibold text-foreground mb-1">Informations du client</h3>
                     <p className="text-sm text-muted-foreground">Renseignez les informations personnelles</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-1.5 block">Civilite</label>
+                    <FormSelect
+                      value={form.civility}
+                      onChange={(v) => update('civility', v as ClientForm['civility'])}
+                      options={[
+                        { value: '', label: 'Non specifiee' },
+                        { value: 'mr', label: 'Mr' },
+                        { value: 'mme', label: 'Mme' },
+                      ]}
+                    />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
