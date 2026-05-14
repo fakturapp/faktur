@@ -193,7 +193,6 @@ export default function OnboardingBillingPage() {
             </div>
           </motion.div>
 
-          {/* TVA */}
           <motion.div variants={fadeUp} custom={2} className="mb-6">
             <h2 className="text-sm font-semibold text-foreground mb-3">Régime de TVA</h2>
             <Dropdown
@@ -221,7 +220,6 @@ export default function OnboardingBillingPage() {
             </p>
           </motion.div>
 
-          {/* Devise et langue */}
           <motion.div variants={fadeUp} custom={3} className="mb-6 grid grid-cols-2 gap-4">
             <Field>
               <FieldLabel>
@@ -275,7 +273,6 @@ export default function OnboardingBillingPage() {
             </Field>
           </motion.div>
 
-          {/* Préfixes de numérotation */}
           <motion.div variants={fadeUp} custom={4} className="mb-6">
             <h2 className="text-sm font-semibold text-foreground mb-3">
               <span className="flex items-center gap-1.5"><Hash className="h-3.5 w-3.5" /> Numérotation</span>
@@ -308,7 +305,6 @@ export default function OnboardingBillingPage() {
             </div>
           </motion.div>
 
-          {/* Moyens de paiement */}
           <motion.div variants={fadeUp} custom={5} className="mb-6">
             <h2 className="text-sm font-semibold text-foreground mb-3">Moyens de paiement acceptés</h2>
             <div className="grid grid-cols-2 gap-3">
@@ -332,7 +328,6 @@ export default function OnboardingBillingPage() {
             </div>
           </motion.div>
 
-          {/* Conditions de paiement */}
           <motion.div variants={fadeUp} custom={6} className="mb-6">
             <Field>
               <FieldLabel htmlFor="paymentConditions">Conditions de paiement par défaut</FieldLabel>
@@ -348,7 +343,6 @@ export default function OnboardingBillingPage() {
             </Field>
           </motion.div>
 
-          {/* Actions */}
           <motion.div variants={fadeUp} custom={7} className="flex gap-3">
             <Button
               type="button"
