@@ -3,15 +3,10 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 
 interface AutoFitDocumentProps {
-  /** Fixed reference width the child is rendered at (px). */
   baseWidth: number
   children: ReactNode
 }
 
-// Renders its child at a fixed reference width and scales the whole thing down
-// with a CSS transform to fit the available space. The document layout stays
-// pixel-identical to the real PDF whatever the viewport size — so anything that
-// measures the content (page-overflow detection) sees the true A4 dimensions.
 export function AutoFitDocument({ baseWidth, children }: AutoFitDocumentProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const innerRef = useRef<HTMLDivElement>(null)
