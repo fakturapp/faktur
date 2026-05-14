@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
+import { useState, useRef, useEffect, useCallback, useMemo, type Ref } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
@@ -833,6 +833,12 @@ function LogoEditor({
    A4Sheet — main document component
    ═══════════════════════════════════════════════════════════ */
 
+// Which slice of the document a sheet renders:
+//  - single: the whole document on one sheet (default)
+//  - first: header/client/dates + the first slice of lines, no totals/footer
+//  - continuation: a "(suite)" marker + the remaining lines + totals/footer
+type PageRole = 'single' | 'first' | 'continuation'
+
 interface A4SheetProps {
   mode: 'edit' | 'preview'
   logoUrl: string | null
@@ -907,6 +913,9 @@ interface A4SheetProps {
   showUnitColumn?: boolean
   showUnitPriceColumn?: boolean
   showVatColumn?: boolean
+  // When true, a document spanning more than one A4 page is rendered as
+  // separate side-by-side sheets instead of a single clipped sheet.
+  paginate?: boolean
 }
 
 export function A4Sheet({
@@ -932,6 +941,7 @@ export function A4Sheet({
   showUnitColumn = true,
   showUnitPriceColumn = true,
   showVatColumn = true,
+  paginate = false,
 }: A4SheetProps) {
   const isPreview = mode === 'preview'
   const ed = !isPreview // shorthand: is editable?
@@ -1066,70 +1076,19 @@ export function A4Sheet({
       titleText={t.clickToEdit} />
   )
 
-  return (
-    <div className="flex flex-col items-center gap-2.5">
-      {/* ── Page-overflow banner ── */}
-      {overflows && (
-        <div
-          className={cn(
-            'w-full max-w-[960px] flex items-center gap-2 rounded-xl border px-3.5 py-2 text-[12px] font-medium',
-            tooMuchContent
-              ? 'bg-red-500/10 border-red-500/30 text-red-500'
-              : 'bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-500'
-          )}
-        >
-          <AlertTriangle className="h-4 w-4 shrink-0" />
-          <span>
-            {tooMuchContent
-              ? lang === 'en'
-                ? 'This document exceeds 2 pages — remove content to continue.'
-                : 'Cette facture dépasse 2 pages — supprimez du contenu pour continuer.'
-              : lang === 'en'
-                ? 'This document spans 2 pages.'
-                : 'Cette facture s’étend sur 2 pages.'}
-          </span>
-        </div>
-      )}
-
-      <div
-        className={cn(
-          'w-full max-w-[960px] rounded-xl relative overflow-hidden',
-          overflows && (tooMuchContent ? 'ring-2 ring-red-500/60' : 'ring-2 ring-amber-500/60')
-        )}
-        style={{
-          aspectRatio: '210 / 297',
-          background: isClassique
-            ? darkMode
-              ? `linear-gradient(270deg, ${T.docBg}, #161618 23.44%, #161618 77.6%, ${T.docBg})`
-              : 'linear-gradient(270deg, #fafafa, #fff 23.44%, #fff 77.6%, #fafafa)'
-            : T.docBg,
-          boxShadow: isClassique
-            ? 'rgba(71,99,136,0.1) 0px 20px 40px -5px'
-            : '0 4px 24px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.08)',
-          colorScheme: darkMode ? 'dark' : 'light',
-        }}
-      >
-        {/* Scrollable content — flex column so bottom sticks.
-            In preview the inner scrollbar is replaced by page switching. */}
-        <div
-          ref={pageBoxRef}
-          className={cn('absolute inset-0', isPreview ? 'overflow-hidden' : 'overflow-y-auto')}
-        >
+  const renderDocumentBody = (
+    role: PageRole,
+    sliceLines: DocumentLine[],
+    absStart: number,
+    bodyRef?: Ref<HTMLDivElement>,
+  ) => (
           <div
-            ref={contentRef}
+            ref={bodyRef}
             className="flex flex-col min-h-full px-10 py-8"
             style={{
               fontFamily: `'${effectiveFont}', 'Segoe UI', sans-serif`,
               color: T.text,
               letterSpacing: isClassique ? '0.5px' : undefined,
-              transform:
-                isPreview && pageCount > 1
-                  ? `translateY(-${currentPage * pageHeightPx}px)`
-                  : undefined,
-              transition:
-                isPreview && pageCount > 1
-                  ? 'transform 0.35s cubic-bezier(0.32, 0.72, 0, 1)'
-                  : undefined,
             }}
           >
 
@@ -1898,6 +1857,58 @@ export function A4Sheet({
             {/* ═══ END BOTTOM SECTION ═══ */}
 
           </div>
+  )
+
+  return (
+    <div className="flex flex-col items-center gap-2.5">
+      {/* ── Page-overflow banner ── */}
+      {overflows && (
+        <div
+          className={cn(
+            'w-full max-w-[960px] flex items-center gap-2 rounded-xl border px-3.5 py-2 text-[12px] font-medium',
+            tooMuchContent
+              ? 'bg-red-500/10 border-red-500/30 text-red-500'
+              : 'bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-500'
+          )}
+        >
+          <AlertTriangle className="h-4 w-4 shrink-0" />
+          <span>
+            {tooMuchContent
+              ? lang === 'en'
+                ? 'This document exceeds 2 pages — remove content to continue.'
+                : 'Cette facture dépasse 2 pages — supprimez du contenu pour continuer.'
+              : lang === 'en'
+                ? 'This document spans 2 pages.'
+                : 'Cette facture s’étend sur 2 pages.'}
+          </span>
+        </div>
+      )}
+
+      <div
+        className={cn(
+          'w-full max-w-[960px] rounded-xl relative overflow-hidden',
+          overflows && (tooMuchContent ? 'ring-2 ring-red-500/60' : 'ring-2 ring-amber-500/60')
+        )}
+        style={{
+          aspectRatio: '210 / 297',
+          background: isClassique
+            ? darkMode
+              ? `linear-gradient(270deg, ${T.docBg}, #161618 23.44%, #161618 77.6%, ${T.docBg})`
+              : 'linear-gradient(270deg, #fafafa, #fff 23.44%, #fff 77.6%, #fafafa)'
+            : T.docBg,
+          boxShadow: isClassique
+            ? 'rgba(71,99,136,0.1) 0px 20px 40px -5px'
+            : '0 4px 24px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.08)',
+          colorScheme: darkMode ? 'dark' : 'light',
+        }}
+      >
+        {/* Scrollable content — flex column so bottom sticks.
+            In preview the inner scrollbar is replaced by page switching. */}
+        <div
+          ref={pageBoxRef}
+          className={cn('absolute inset-0', isPreview ? 'overflow-hidden' : 'overflow-y-auto')}
+        >
+          {renderDocumentBody('single', lines, 0, contentRef)}
         </div>
 
         {isPreview && pageCount > 1 && (
