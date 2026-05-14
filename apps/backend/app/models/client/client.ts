@@ -15,6 +15,9 @@ export default class Client extends BaseModel {
   declare type: 'company' | 'individual'
 
   @column()
+  declare civility: 'mr' | 'mme' | null
+
+  @column()
   declare companyName: string | null
 
   @column()
@@ -75,6 +78,7 @@ export default class Client extends BaseModel {
     if (this.type === 'company') {
       return this.companyName || ''
     }
-    return `${this.firstName || ''} ${this.lastName || ''}`.trim()
+    const prefix = this.civility === 'mr' ? 'Mr' : this.civility === 'mme' ? 'Mme' : ''
+    return `${prefix} ${this.firstName || ''} ${this.lastName || ''}`.replace(/\s+/g, ' ').trim()
   }
 }
