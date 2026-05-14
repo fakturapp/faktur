@@ -1008,12 +1008,14 @@ export function A4Sheet({
   // Template font override takes precedence
   const effectiveFont = T.font || documentFont
 
-  // A hidden instance renders the document body once at the real column width.
-  // From it we measure: how many A4 pages it spans, and where page 2 starts —
-  // the first block (a line row, else the bottom section) that crosses the
-  // page-1 boundary. The stacked layout then pushes that block down with a
-  // margin so it lands on the second A4 card.
+  // Two hidden measuring instances drive pagination:
+  //  - contentRef: plain block flow at one column's width → total height
+  //    (page count) and each block's flow position (the stack margin).
+  //  - colMeasureRef: the real CSS-column flow (same mechanism as the visible
+  //    side-by-side) → which block actually starts page 2, so the stacked
+  //    layout breaks at exactly the same place as side-by-side.
   const contentRef = useRef<HTMLDivElement>(null)
+  const colMeasureRef = useRef<HTMLDivElement>(null)
   const [rawPageCount, setRawPageCount] = useState(1)
   const [pageBreakKey, setPageBreakKey] = useState<string | null>(null)
   const [pageBreakMargin, setPageBreakMargin] = useState(0)
@@ -1026,30 +1028,37 @@ export function A4Sheet({
       if (h <= 0) return
       setRawPageCount(Math.max(1, Math.ceil((h - 6) / COL_H)))
 
-      // Find the page-1 → page-2 break point.
+      // Which block starts page 2? Read it from the real CSS-column flow so the
+      // stacked layout breaks at exactly the same block as side-by-side.
       let key: string | null = null
-      let off = 0
-      const rows = content.querySelectorAll<HTMLElement>('[data-a4-row]')
-      for (const row of rows) {
-        if (row.offsetTop + row.offsetHeight > COL_H) {
-          key = `row:${row.getAttribute('data-a4-row') || ''}`
-          off = row.offsetTop
-          break
+      const colInst = colMeasureRef.current
+      if (colInst) {
+        const colLeft = colInst.getBoundingClientRect().left
+        const blocks = colInst.querySelectorAll<HTMLElement>('[data-a4-block]')
+        for (const el of blocks) {
+          if (el.getBoundingClientRect().left - colLeft > A4_SHEET_W) {
+            key = el.getAttribute('data-a4-block')
+            break
+          }
         }
       }
-      if (!key) {
-        const bottom = content.querySelector<HTMLElement>('[data-a4-bottom]')
-        if (bottom && bottom.offsetTop + bottom.offsetHeight > COL_H) {
-          key = 'bottom'
-          off = bottom.offsetTop
-        }
+
+      // Where does that block sit in plain block flow? → the margin that pushes
+      // it (and everything after) onto the second A4 card.
+      let margin = 0
+      if (key) {
+        const target = content.querySelector<HTMLElement>(
+          `[data-a4-block="${CSS.escape(key)}"]`
+        )
+        if (target) margin = Math.max(0, A4_SHEET_H + SPLIT_GAP - target.offsetTop)
       }
       setPageBreakKey(key)
-      setPageBreakMargin(key ? Math.max(0, A4_SHEET_H + SPLIT_GAP - off) : 0)
+      setPageBreakMargin(margin)
     }
     const raf = requestAnimationFrame(measure)
     const ro = new ResizeObserver(measure)
     if (contentRef.current) ro.observe(contentRef.current)
+    if (colMeasureRef.current) ro.observe(colMeasureRef.current)
     // Custom fonts load async and change row heights — re-measure once they
     // settle (plus a late safety pass).
     if (typeof document !== 'undefined' && document.fonts?.ready) {
@@ -1571,7 +1580,7 @@ export function A4Sheet({
                   return (
                     <div
                       key={line.id}
-                      data-a4-row={line.id}
+                      data-a4-block={`row:${line.id}`}
                       className={cn('items-center', ed && 'group')}
                       style={{
                         display: 'grid',
@@ -1748,10 +1757,14 @@ export function A4Sheet({
                  BOTTOM SECTION — always sticks to bottom
                 ═══════════════════════════════════════════ */}
             {showBottom && (
-            <div data-a4-bottom style={breakOf('bottom')}>
+            <div>
 
               {/* ── Totals ── */}
-              <div className="flex justify-end mb-5" style={{ breakInside: 'avoid' }}>
+              <div
+                data-a4-block="totals"
+                className="flex justify-end mb-5"
+                style={{ breakInside: 'avoid', ...breakOf('totals') }}
+              >
                 {isClassique ? (
                   <div className="w-[280px] flex flex-col gap-5" style={{ color: accentColor }}>
                     <div className="px-2 flex flex-col gap-3">
@@ -1844,7 +1857,11 @@ export function A4Sheet({
 
               {/* ── Notes (editable, optional) ── */}
               {showNotes && (
-                <div className="pt-3" style={{ borderTop: `1px solid ${T.borderLight}` }}>
+                <div
+                  data-a4-block="notes"
+                  className="pt-3"
+                  style={{ borderTop: `1px solid ${T.borderLight}`, breakInside: 'avoid', ...breakOf('notes') }}
+                >
                   <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1" style={{ color: T.textMuted }}>{t.conditionsAndNotes}</div>
                   {isPreview ? (
                     notes
@@ -1861,7 +1878,11 @@ export function A4Sheet({
               )}
 
               {showAcceptanceConditions && (
-                <div className="mt-2">
+                <div
+                  data-a4-block="acceptance"
+                  className="mt-2"
+                  style={{ breakInside: 'avoid', ...breakOf('acceptance') }}
+                >
                   <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1" style={{ color: hasError("Conditions d'acceptation") ? errorBorder : T.textMuted }}>{t.acceptanceConditions}</div>
                   {ed ? (
                     <RichTextarea
@@ -1879,7 +1900,11 @@ export function A4Sheet({
               )}
 
               {showFreeField && (
-                <div className="mt-2">
+                <div
+                  data-a4-block="freeField"
+                  className="mt-2"
+                  style={{ breakInside: 'avoid', ...breakOf('freeField') }}
+                >
                   <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1" style={{ color: hasError('Champ libre') ? errorBorder : T.textMuted }}>{lang === 'en' ? 'Additional information' : 'Champ libre'}</div>
                   {ed ? (
                     <RichTextarea
@@ -1897,7 +1922,11 @@ export function A4Sheet({
               )}
 
               {signatureField && (
-                <div className="mt-3 flex gap-5">
+                <div
+                  data-a4-block="signature"
+                  className="mt-3 flex gap-5"
+                  style={{ breakInside: 'avoid', ...breakOf('signature') }}
+                >
                   <div className="flex-1">
                     <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1" style={{ color: T.textMuted }}>{t.signatureIssuer}</div>
                     <div className="h-14 rounded-lg border-2 border-dashed" style={{ borderColor: T.signatureBorder }} />
@@ -1911,7 +1940,11 @@ export function A4Sheet({
 
               {/* Payment method + bank account info — invoices only */}
               {isInvoice && paymentMethod && (
-                <div className="mt-3 pt-3" style={{ borderTop: `1px solid ${T.borderLight}` }}>
+                <div
+                  data-a4-block="payment"
+                  className="mt-3 pt-3"
+                  style={{ borderTop: `1px solid ${T.borderLight}`, breakInside: 'avoid', ...breakOf('payment') }}
+                >
                   <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-1.5" style={{ color: T.textMuted }}>
                     {lang === 'en' ? 'Payment method' : 'Moyen de paiement'}
                   </div>
@@ -1938,7 +1971,11 @@ export function A4Sheet({
 
               {/* ── Footer (company info / VAT exempt / custom text) ── */}
               {isClassique ? (
-                <div className="mt-4 pt-3 text-center">
+                <div
+                  data-a4-block="footer"
+                  className="mt-4 pt-3 text-center"
+                  style={{ breakInside: 'avoid', ...breakOf('footer') }}
+                >
                   <div
                     style={{
                       border: `1px dashed ${T.editBorderDashed}`,
@@ -1971,7 +2008,11 @@ export function A4Sheet({
                   </div>
                 </div>
               ) : (
-                <div className="mt-4 pt-3 text-center" style={{ borderTop: `2px solid ${T.footerBorder}` }}>
+                <div
+                  data-a4-block="footer"
+                  className="mt-4 pt-3 text-center"
+                  style={{ borderTop: `2px solid ${T.footerBorder}`, breakInside: 'avoid', ...breakOf('footer') }}
+                >
                   {footerMode === 'custom' ? (
                     ed ? (
                       <RichTextarea
@@ -2067,8 +2108,8 @@ export function A4Sheet({
         </div>
       )}
 
-      {/* Hidden measuring instance — body rendered once at the real column
-          width, off-screen. Its height drives the page count. */}
+      {/* Hidden measuring instances — off-screen.
+          1) block flow at one column's width → page count + block positions. */}
       <div
         aria-hidden
         inert
@@ -2076,6 +2117,31 @@ export function A4Sheet({
         style={{ position: 'absolute', left: -99999, top: 0, width: COL_W }}
       >
         {renderDocumentBody('single', lines, 0, contentRef, true)}
+      </div>
+      {/* 2) the real CSS-column flow → which block starts page 2. */}
+      <div
+        aria-hidden
+        inert
+        className="pointer-events-none"
+        style={{ position: 'absolute', left: -99999, top: 0, width: SPLIT_W, height: A4_SHEET_H }}
+      >
+        <div
+          ref={colMeasureRef}
+          style={{
+            width: SPLIT_W,
+            height: A4_SHEET_H,
+            columnCount: 2,
+            columnGap: COL_GAP,
+            columnFill: 'auto',
+            paddingLeft: PAGE_PAD_X,
+            paddingRight: PAGE_PAD_X,
+            paddingTop: PAGE_PAD_Y,
+            paddingBottom: PAGE_PAD_Y,
+            overflow: 'hidden',
+          }}
+        >
+          {renderDocumentBody('single', lines, 0, undefined, true)}
+        </div>
       </div>
 
       {/* Visible sheet(s). When the document overflows one page the body is
