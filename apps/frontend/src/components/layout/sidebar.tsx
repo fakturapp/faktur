@@ -7,7 +7,6 @@ import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Avatar } from '@/components/ui/avatar'
-import { Spinner } from '@/components/ui/spinner'
 import { Dropdown, DropdownItem, DropdownLabel, DropdownSeparator, DropdownSub } from '@/components/ui/dropdown'
 import { CreateInvoiceModal } from '@/components/invoices/create-invoice-modal'
 import { useTheme } from '@/lib/theme'
@@ -222,15 +221,14 @@ function storeExpanded(expanded: string[]) {
   localStorage.setItem(SETTINGS_EXPANDED_KEY, JSON.stringify(expanded))
 }
 
-function LinkStatusIndicator({ className }: { className?: string }) {
+function LinkStatusIndicator(_props: { className?: string }) {
   const { pending } = useLinkStatus()
   React.useEffect(() => {
     if (pending && typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('faktur:route-pending'))
     }
   }, [pending])
-  if (!pending) return null
-  return <Spinner size="sm" color="accent" className={cn('shrink-0', className)} />
+  return null
 }
 
 function NavLink({ item, pathname, badges, persistKey, collapsed }: { item: NavItem; pathname: string; badges?: Record<string, number>; persistKey?: string; collapsed?: boolean }) {
