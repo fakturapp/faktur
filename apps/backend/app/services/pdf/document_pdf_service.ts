@@ -16,6 +16,28 @@ import {
 } from '#services/crypto/field_encryption_helper'
 import { renderQuoteHtml } from '#services/pdf/html_renderer'
 import { generatePdf } from '#services/pdf/pdf_generator'
+import { pdfCache } from '#services/pdf/pdf_cache'
+
+type Stamped = { updatedAt?: { toMillis(): number } | null }
+
+// A token that changes whenever anything affecting the rendered PDF changes —
+// the document itself, its lines, the company, or the invoice settings.
+function pdfVersionToken(
+  doc: Stamped,
+  lines: Stamped[],
+  company: Stamped | null,
+  settings: Stamped | null
+): string {
+  const ms = (d?: { toMillis(): number } | null) => (d ? d.toMillis() : 0)
+  const linesStamp = lines.reduce((max, l) => Math.max(max, ms(l.updatedAt)), 0)
+  return [
+    ms(doc.updatedAt),
+    lines.length,
+    linesStamp,
+    ms(company?.updatedAt),
+    ms(settings?.updatedAt),
+  ].join('-')
+}
 
 async function resolveLogoToBase64(logoUrl: string | null): Promise<string | null> {
   if (!logoUrl) return null
@@ -118,19 +140,25 @@ export async function generateInvoicePdf(
     .preload('lines', (q) => q.orderBy('position', 'asc'))
     .firstOrFail()
 
+  const company = await Company.query().where('team_id', teamId).first()
+  const invoiceSettings = await InvoiceSetting.query().where('team_id', teamId).first()
+
+  // Serve an unchanged document straight from the in-memory cache — skips the
+  // headless-Chrome render entirely.
+  const docKey = `invoice:${invoiceId}`
+  const cacheVersion = pdfVersionToken(invoice, invoice.lines, company, invoiceSettings)
+  const cached = pdfCache.get(docKey, cacheVersion)
+  if (cached) return cached
+
   // Decrypt invoice, lines, and client
   decryptModelFields(invoice, [...ENCRYPTED_FIELDS.invoice], dek)
   decryptModelFieldsArray(invoice.lines, [...ENCRYPTED_FIELDS.invoiceLine], dek)
   if (invoice.client) {
     decryptModelFields(invoice.client, [...ENCRYPTED_FIELDS.client], dek)
   }
-
-  const company = await Company.query().where('team_id', teamId).first()
   if (company) {
     decryptModelFields(company, [...ENCRYPTED_FIELDS.company], dek)
   }
-
-  const invoiceSettings = await InvoiceSetting.query().where('team_id', teamId).first()
 
   // Use the invoice's specific payment method, not all settings methods
   const invoicePaymentMethods: string[] = invoice.paymentMethod ? [invoice.paymentMethod] : []
@@ -240,7 +268,9 @@ export async function generateInvoicePdf(
     entreprise: company?.legalName || company?.tradeName || 'entreprise',
   })
 
-  return { pdfBuffer, filename: `${resolvedName}.pdf` }
+  const result = { pdfBuffer, filename: `${resolvedName}.pdf` }
+  pdfCache.set(docKey, cacheVersion, result.pdfBuffer, result.filename)
+  return result
 }
 
 export async function generateQuotePdf(
