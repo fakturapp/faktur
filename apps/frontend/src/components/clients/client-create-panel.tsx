@@ -37,6 +37,7 @@ type ClientType = 'company' | 'individual'
 
 interface ClientForm {
   type: ClientType
+  civility: 'mr' | 'mme' | ''
   companyName: string
   siren: string
   siret: string
@@ -56,6 +57,7 @@ interface ClientForm {
 
 const initialForm: ClientForm = {
   type: 'company',
+  civility: '',
   companyName: '',
   siren: '',
   siret: '',
@@ -162,6 +164,7 @@ export function ClientCreatePanel({ open, onClose, onCreated }: ClientCreatePane
 
     const payload = {
       type: form.type,
+      civility: form.type === 'individual' ? form.civility || null : null,
       companyName: form.type === 'company' ? form.companyName : null,
       siren: form.type === 'company' ? form.siren : null,
       siret: form.type === 'company' ? form.siret : null,
@@ -441,6 +444,32 @@ export function ClientCreatePanel({ open, onClose, onCreated }: ClientCreatePane
                       </div>
 
                       <div className="space-y-3">
+                        <div>
+                          <label className="text-sm font-medium text-foreground mb-1.5 block">
+                            Civilite
+                          </label>
+                          <div className="flex gap-2">
+                            {([
+                              { value: 'mr', label: 'Mr' },
+                              { value: 'mme', label: 'Mme' },
+                            ] as const).map((opt) => (
+                              <button
+                                key={opt.value}
+                                type="button"
+                                onClick={() =>
+                                  update('civility', form.civility === opt.value ? '' : opt.value)
+                                }
+                                className={`flex-1 rounded-xl border-2 px-4 py-2.5 text-sm font-medium transition-all ${
+                                  form.civility === opt.value
+                                    ? 'border-primary bg-primary/5 text-foreground'
+                                    : 'border-border text-muted-foreground hover:border-muted-foreground/30'
+                                }`}
+                              >
+                                {opt.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                         <div className="grid grid-cols-2 gap-3">
                           <div>
                             <label className="text-sm font-medium text-foreground mb-1.5 block">
