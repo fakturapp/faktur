@@ -33,6 +33,7 @@ import {
 interface Client {
   id: string
   type: 'company' | 'individual'
+  civility: 'mr' | 'mme' | null
   companyName: string | null
   firstName: string | null
   lastName: string | null
@@ -72,6 +73,7 @@ export default function ClientEditPage() {
   const [client, setClient] = useState<Client | null>(null)
 
   const [form, setForm] = useState({
+    civility: '' as 'mr' | 'mme' | '',
     companyName: '', firstName: '', lastName: '',
     siren: '', siret: '', vatNumber: '',
     email: '', phone: '', includeInEmails: true,
@@ -125,6 +127,7 @@ export default function ClientEditPage() {
     if (data?.client) {
       setClient(data.client)
       setForm({
+        civility: data.client.civility || '',
         companyName: data.client.companyName || '',
         firstName: data.client.firstName || '',
         lastName: data.client.lastName || '',
@@ -312,10 +315,24 @@ export default function ClientEditPage() {
                       </div>
                     </>
                   ) : (
-                    <div className="grid grid-cols-2 gap-3">
-                      <div><label className="text-sm font-medium text-foreground mb-1.5 block">Nom</label><Input value={form.lastName} onChange={(e) => update('lastName', e.target.value)} /></div>
-                      <div><label className="text-sm font-medium text-foreground mb-1.5 block">Prenom</label><Input value={form.firstName} onChange={(e) => update('firstName', e.target.value)} /></div>
-                    </div>
+                    <>
+                      <div>
+                        <label className="text-sm font-medium text-foreground mb-1.5 block">Civilite</label>
+                        <FormSelect
+                          value={form.civility}
+                          onChange={(v) => update('civility', v as typeof form.civility)}
+                          options={[
+                            { value: '', label: 'Non specifiee' },
+                            { value: 'mr', label: 'Mr' },
+                            { value: 'mme', label: 'Mme' },
+                          ]}
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div><label className="text-sm font-medium text-foreground mb-1.5 block">Nom</label><Input value={form.lastName} onChange={(e) => update('lastName', e.target.value)} /></div>
+                        <div><label className="text-sm font-medium text-foreground mb-1.5 block">Prenom</label><Input value={form.firstName} onChange={(e) => update('firstName', e.target.value)} /></div>
+                      </div>
+                    </>
                   )}
                   <div className="h-px bg-border" />
                   <div className="flex items-center gap-2 mb-2"><MapPin className="h-4 w-4 text-primary" /><span className="text-sm font-semibold text-foreground">Adresse</span></div>
