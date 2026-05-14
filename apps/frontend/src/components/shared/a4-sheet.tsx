@@ -20,7 +20,6 @@ import { Spinner } from '@/components/ui/spinner'
 import { DatePicker } from '@/components/ui/date-picker'
 import { getTemplate, type TemplateConfig } from '@/lib/invoice-templates'
 import { getTranslations } from '@/lib/invoice-i18n'
-import { useDocumentOverflow } from '@/hooks/use-text-measure'
 
 
 export interface DocumentLine {
@@ -950,44 +949,44 @@ export function A4Sheet({
   // Template font override takes precedence
   const effectiveFont = T.font || documentFont
 
-  const overflowData = useDocumentOverflow({
-    lines,
-    notes: showNotes ? notes : undefined,
-    acceptanceConditions: showAcceptanceConditions ? acceptanceConditions : undefined,
-    freeField: showFreeField ? freeField : undefined,
-    footerText: footerMode === 'custom' ? footerText : undefined,
-    font: effectiveFont,
-    billingType,
-  })
-
-  // Preview pagination: when the content spills past one A4 page, the preview
-  // shows page-switcher controls instead of an inner scrollbar.
+  // Real DOM measurement of how many A4 pages the rendered content actually
+  // spans — replaces the unreliable height-estimation heuristic. pageBoxRef is
+  // the A4 page frame (its clientHeight = one page); contentRef is the content
+  // flow (its scrollHeight = the full document height).
   const pageBoxRef = useRef<HTMLDivElement>(null)
-  const [pageCount, setPageCount] = useState(1)
+  const contentRef = useRef<HTMLDivElement>(null)
+  const [rawPageCount, setRawPageCount] = useState(1)
   const [currentPage, setCurrentPage] = useState(0)
   const [pageHeightPx, setPageHeightPx] = useState(0)
 
   useEffect(() => {
-    if (!isPreview) return
     function measure() {
-      const el = pageBoxRef.current
-      if (!el) return
-      const ph = el.clientHeight
+      const box = pageBoxRef.current
+      const content = contentRef.current
+      if (!box || !content) return
+      const ph = box.clientHeight
       if (ph <= 0) return
       setPageHeightPx(ph)
-      const pages = Math.max(1, Math.ceil((el.scrollHeight - 6) / ph))
-      setPageCount(pages)
-      setCurrentPage((p) => Math.min(p, pages - 1))
+      setRawPageCount(Math.max(1, Math.ceil((content.scrollHeight - 6) / ph)))
     }
     const raf = requestAnimationFrame(measure)
-    const el = pageBoxRef.current
-    const ro = el ? new ResizeObserver(measure) : null
-    if (el && ro) ro.observe(el)
+    const ro = new ResizeObserver(measure)
+    if (pageBoxRef.current) ro.observe(pageBoxRef.current)
+    if (contentRef.current) ro.observe(contentRef.current)
     return () => {
       cancelAnimationFrame(raf)
-      ro?.disconnect()
+      ro.disconnect()
     }
-  }, [isPreview, overflowData.totalHeight, billingType, effectiveFont])
+  }, [])
+
+  // A document may not span more than 2 A4 pages.
+  const tooMuchContent = rawPageCount > 2
+  const pageCount = Math.min(rawPageCount, 2)
+  const overflows = pageCount > 1
+
+  useEffect(() => {
+    setCurrentPage((p) => Math.min(p, pageCount - 1))
+  }, [pageCount])
 
   // Dynamically load document font from Google Fonts
   useEffect(() => {
@@ -1068,12 +1067,34 @@ export function A4Sheet({
   )
 
   return (
-    <div className="flex justify-center">
-      {}
+    <div className="flex flex-col items-center gap-2.5">
+      {/* ── Page-overflow banner ── */}
+      {overflows && (
+        <div
+          className={cn(
+            'w-full max-w-[960px] flex items-center gap-2 rounded-xl border px-3.5 py-2 text-[12px] font-medium',
+            tooMuchContent
+              ? 'bg-red-500/10 border-red-500/30 text-red-500'
+              : 'bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-500'
+          )}
+        >
+          <AlertTriangle className="h-4 w-4 shrink-0" />
+          <span>
+            {tooMuchContent
+              ? lang === 'en'
+                ? 'This document exceeds 2 pages — remove content to continue.'
+                : 'Cette facture dépasse 2 pages — supprimez du contenu pour continuer.'
+              : lang === 'en'
+                ? 'This document spans 2 pages.'
+                : 'Cette facture s’étend sur 2 pages.'}
+          </span>
+        </div>
+      )}
+
       <div
         className={cn(
           'w-full max-w-[960px] rounded-xl relative overflow-hidden',
-          overflowData.overflows && 'ring-2 ring-amber-500/60'
+          overflows && (tooMuchContent ? 'ring-2 ring-red-500/60' : 'ring-2 ring-amber-500/60')
         )}
         style={{
           aspectRatio: '210 / 297',
@@ -1088,17 +1109,6 @@ export function A4Sheet({
           colorScheme: darkMode ? 'dark' : 'light',
         }}
       >
-        {overflowData.overflows && (
-          <div className="absolute top-2 right-2 z-20">
-            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-500/15 border border-amber-500/30 backdrop-blur-sm">
-              <AlertTriangle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
-              <span className="text-[10px] font-medium text-amber-500">
-                {lang === 'en' ? 'Content overflows page' : 'Contenu dépasse la page'}
-              </span>
-            </div>
-          </div>
-        )}
-
         {/* Scrollable content — flex column so bottom sticks.
             In preview the inner scrollbar is replaced by page switching. */}
         <div
@@ -1106,6 +1116,7 @@ export function A4Sheet({
           className={cn('absolute inset-0', isPreview ? 'overflow-hidden' : 'overflow-y-auto')}
         >
           <div
+            ref={contentRef}
             className="flex flex-col min-h-full px-10 py-8"
             style={{
               fontFamily: `'${effectiveFont}', 'Segoe UI', sans-serif`,
