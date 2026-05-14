@@ -885,6 +885,8 @@ const COL_H = A4_SHEET_H - PAGE_PAD_Y * 2 // 1294 — usable height inside one p
 const COL_GAP = SPLIT_GAP + PAGE_PAD_X * 2 // 104
 // Below this available width the two pages stack vertically instead of shrinking side by side.
 const STACK_THRESHOLD = 1500
+// Total height of the stacked layout: two A4 cards plus the gap between them.
+const STACK_TOTAL_H = A4_SHEET_H * 2 + SPLIT_GAP
 
 interface A4SheetProps {
   mode: 'edit' | 'preview'
@@ -1006,11 +1008,15 @@ export function A4Sheet({
   // Template font override takes precedence
   const effectiveFont = T.font || documentFont
 
-  // A hidden instance renders the document body once at the real column width;
-  // its height ÷ one column's height tells us how many A4 pages it spans.
-  // The actual page split is done natively by the browser via CSS columns.
+  // A hidden instance renders the document body once at the real column width.
+  // From it we measure: how many A4 pages it spans, and where page 2 starts —
+  // the first block (a line row, else the bottom section) that crosses the
+  // page-1 boundary. The stacked layout then pushes that block down with a
+  // margin so it lands on the second A4 card.
   const contentRef = useRef<HTMLDivElement>(null)
   const [rawPageCount, setRawPageCount] = useState(1)
+  const [pageBreakKey, setPageBreakKey] = useState<string | null>(null)
+  const [pageBreakMargin, setPageBreakMargin] = useState(0)
 
   useEffect(() => {
     function measure() {
@@ -1019,6 +1025,27 @@ export function A4Sheet({
       const h = content.scrollHeight
       if (h <= 0) return
       setRawPageCount(Math.max(1, Math.ceil((h - 6) / COL_H)))
+
+      // Find the page-1 → page-2 break point.
+      let key: string | null = null
+      let off = 0
+      const rows = content.querySelectorAll<HTMLElement>('[data-a4-row]')
+      for (const row of rows) {
+        if (row.offsetTop + row.offsetHeight > COL_H) {
+          key = `row:${row.getAttribute('data-a4-row') || ''}`
+          off = row.offsetTop
+          break
+        }
+      }
+      if (!key) {
+        const bottom = content.querySelector<HTMLElement>('[data-a4-bottom]')
+        if (bottom && bottom.offsetTop + bottom.offsetHeight > COL_H) {
+          key = 'bottom'
+          off = bottom.offsetTop
+        }
+      }
+      setPageBreakKey(key)
+      setPageBreakMargin(key ? Math.max(0, A4_SHEET_H + SPLIT_GAP - off) : 0)
     }
     const raf = requestAnimationFrame(measure)
     const ro = new ResizeObserver(measure)
@@ -1056,11 +1083,9 @@ export function A4Sheet({
   // The two-page view fits the available width. When that width gets too
   // small, the pages stack vertically instead of shrinking side by side.
   const splitWrapRef = useRef<HTMLDivElement>(null)
-  const stackSheetRef = useRef<HTMLDivElement>(null)
   const [splitScale, setSplitScale] = useState(1)
   const [stackScale, setStackScale] = useState(1)
   const [stackVertical, setStackVertical] = useState(false)
-  const [stackHeight, setStackHeight] = useState(A4_SHEET_H)
 
   useEffect(() => {
     if (!showSplit) return
@@ -1073,8 +1098,6 @@ export function A4Sheet({
       setStackVertical(stack)
       if (stack) {
         setStackScale(Math.min(1, avail / A4_SHEET_W))
-        const h = stackSheetRef.current?.offsetHeight
-        if (h && h > 0) setStackHeight(h)
       } else {
         setSplitScale(Math.min(1, avail / SPLIT_W))
       }
@@ -1082,9 +1105,8 @@ export function A4Sheet({
     fit()
     const ro = new ResizeObserver(fit)
     if (splitWrapRef.current) ro.observe(splitWrapRef.current)
-    if (stackSheetRef.current) ro.observe(stackSheetRef.current)
     return () => ro.disconnect()
-  }, [showSplit, stackVertical])
+  }, [showSplit])
 
   // Dynamically load document font from Google Fonts
   useEffect(() => {
@@ -1170,9 +1192,15 @@ export function A4Sheet({
     absStart: number,
     bodyRef?: Ref<HTMLDivElement>,
     columnMode = false,
+    breakKey: string | null = null,
+    breakMargin = 0,
   ) => {
     const showTop = role !== 'continuation'
     const showBottom = role !== 'first'
+    // In the stacked layout, the block that starts page 2 is pushed down so it
+    // lands on the second A4 card.
+    const breakOf = (key: string): { marginTop?: number } =>
+      breakKey === key ? { marginTop: breakMargin } : {}
     return (
           <div
             ref={bodyRef}
@@ -1543,7 +1571,7 @@ export function A4Sheet({
                   return (
                     <div
                       key={line.id}
-                      data-a4-row
+                      data-a4-row={line.id}
                       className={cn('items-center', ed && 'group')}
                       style={{
                         display: 'grid',
@@ -1553,6 +1581,7 @@ export function A4Sheet({
                         borderBottom: `1px solid ${T.borderLight}`,
                         transition: 'background-color 0.15s',
                         opacity: draggingLineIndex === idx ? 0.65 : 1,
+                        ...breakOf(`row:${line.id}`),
                       }}
                       onMouseEnter={ed ? (e) => (e.currentTarget.style.backgroundColor = `${accentColor}${T.rowHover}`) : undefined}
                       onMouseLeave={ed ? (e) => (e.currentTarget.style.backgroundColor = rowBg) : undefined}
@@ -1719,7 +1748,7 @@ export function A4Sheet({
                  BOTTOM SECTION — always sticks to bottom
                 ═══════════════════════════════════════════ */}
             {showBottom && (
-            <div>
+            <div data-a4-bottom style={breakOf('bottom')}>
 
               {/* ── Totals ── */}
               <div className="flex justify-end mb-5" style={{ breakInside: 'avoid' }}>
@@ -2056,44 +2085,54 @@ export function A4Sheet({
       {showSplit ? (
         <div ref={splitWrapRef} className="flex w-full justify-center">
           {stackVertical ? (
-            // ── Stacked: one continuous A4-width sheet, page breaks drawn in ──
-            <div style={{ width: A4_SHEET_W * stackScale, height: stackHeight * stackScale }}>
+            // ── Stacked: two A4 cards, one editable body flowing across them ──
+            <div style={{ width: A4_SHEET_W * stackScale, height: STACK_TOTAL_H * stackScale }}>
               <motion.div
                 initial={{ opacity: 0.5 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
+                className="relative"
                 style={{
                   width: A4_SHEET_W,
+                  height: STACK_TOTAL_H,
                   transform: `scale(${stackScale})`,
                   transformOrigin: 'top left',
                 }}
               >
+                {/* the two A4 page cards */}
                 <div
-                  ref={stackSheetRef}
-                  className={cn('relative rounded-xl', overflowRing)}
-                  style={{ width: A4_SHEET_W, ...sheetSurface }}
+                  className={cn('absolute left-0 rounded-xl', overflowRing)}
+                  style={{ top: 0, width: A4_SHEET_W, height: A4_SHEET_H, ...sheetSurface }}
+                />
+                <div
+                  className={cn('absolute left-0 rounded-xl', overflowRing)}
+                  style={{
+                    top: A4_SHEET_H + SPLIT_GAP,
+                    width: A4_SHEET_W,
+                    height: A4_SHEET_H,
+                    ...sheetSurface,
+                  }}
+                />
+                {/* the single editable body — the block that starts page 2 is
+                    pushed down by breakMargin so it lands on the second card */}
+                <div
+                  className="absolute overflow-hidden"
+                  style={{
+                    top: PAGE_PAD_Y,
+                    left: PAGE_PAD_X,
+                    width: COL_W,
+                    height: STACK_TOTAL_H - PAGE_PAD_Y * 2,
+                  }}
                 >
-                  {/* page-break separators every A4 page height */}
-                  <div
-                    className="pointer-events-none absolute z-10 border-t-2 border-dashed border-amber-400/50"
-                    style={{ top: A4_SHEET_H, left: PAGE_PAD_X / 2, right: PAGE_PAD_X / 2 }}
-                  />
-                  {tooMuchContent && (
-                    <div
-                      className="pointer-events-none absolute z-10 border-t-2 border-dashed border-red-400/50"
-                      style={{ top: A4_SHEET_H * 2, left: PAGE_PAD_X / 2, right: PAGE_PAD_X / 2 }}
-                    />
+                  {renderDocumentBody(
+                    'single',
+                    lines,
+                    0,
+                    undefined,
+                    true,
+                    pageBreakKey,
+                    pageBreakMargin,
                   )}
-                  <div
-                    style={{
-                      paddingLeft: PAGE_PAD_X,
-                      paddingRight: PAGE_PAD_X,
-                      paddingTop: PAGE_PAD_Y,
-                      paddingBottom: PAGE_PAD_Y,
-                    }}
-                  >
-                    {renderDocumentBody('single', lines, 0, undefined, true)}
-                  </div>
                 </div>
               </motion.div>
             </div>
