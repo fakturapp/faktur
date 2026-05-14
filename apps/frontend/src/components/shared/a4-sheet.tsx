@@ -1056,9 +1056,11 @@ export function A4Sheet({
   // The two-page view fits the available width. When that width gets too
   // small, the pages stack vertically instead of shrinking side by side.
   const splitWrapRef = useRef<HTMLDivElement>(null)
+  const stackSheetRef = useRef<HTMLDivElement>(null)
   const [splitScale, setSplitScale] = useState(1)
   const [stackScale, setStackScale] = useState(1)
   const [stackVertical, setStackVertical] = useState(false)
+  const [stackHeight, setStackHeight] = useState(A4_SHEET_H)
 
   useEffect(() => {
     if (!showSplit) return
@@ -1071,6 +1073,8 @@ export function A4Sheet({
       setStackVertical(stack)
       if (stack) {
         setStackScale(Math.min(1, avail / A4_SHEET_W))
+        const h = stackSheetRef.current?.offsetHeight
+        if (h && h > 0) setStackHeight(h)
       } else {
         setSplitScale(Math.min(1, avail / SPLIT_W))
       }
@@ -1078,8 +1082,9 @@ export function A4Sheet({
     fit()
     const ro = new ResizeObserver(fit)
     if (splitWrapRef.current) ro.observe(splitWrapRef.current)
+    if (stackSheetRef.current) ro.observe(stackSheetRef.current)
     return () => ro.disconnect()
-  }, [showSplit])
+  }, [showSplit, stackVertical])
 
   // Dynamically load document font from Google Fonts
   useEffect(() => {
@@ -2052,29 +2057,79 @@ export function A4Sheet({
         <div ref={splitWrapRef} className="flex w-full justify-center">
           {stackVertical ? (
             // ── Stacked: one continuous A4-width sheet, page breaks drawn in ──
-            <motion.div
-              initial={{ opacity: 0.5 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.3 }}
-              style={{ zoom: stackScale }}
-            >
-              <div
-                className={cn('relative rounded-xl', overflowRing)}
-                style={{ width: A4_SHEET_W, ...sheetSurface }}
+            <div style={{ width: A4_SHEET_W * stackScale, height: stackHeight * stackScale }}>
+              <motion.div
+                initial={{ opacity: 0.5 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+                style={{
+                  width: A4_SHEET_W,
+                  transform: `scale(${stackScale})`,
+                  transformOrigin: 'top left',
+                }}
               >
-                {/* page-break separators every A4 page height */}
                 <div
-                  className="pointer-events-none absolute z-10 border-t-2 border-dashed border-amber-400/50"
-                  style={{ top: A4_SHEET_H, left: PAGE_PAD_X / 2, right: PAGE_PAD_X / 2 }}
-                />
-                {tooMuchContent && (
+                  ref={stackSheetRef}
+                  className={cn('relative rounded-xl', overflowRing)}
+                  style={{ width: A4_SHEET_W, ...sheetSurface }}
+                >
+                  {/* page-break separators every A4 page height */}
                   <div
-                    className="pointer-events-none absolute z-10 border-t-2 border-dashed border-red-400/50"
-                    style={{ top: A4_SHEET_H * 2, left: PAGE_PAD_X / 2, right: PAGE_PAD_X / 2 }}
+                    className="pointer-events-none absolute z-10 border-t-2 border-dashed border-amber-400/50"
+                    style={{ top: A4_SHEET_H, left: PAGE_PAD_X / 2, right: PAGE_PAD_X / 2 }}
                   />
-                )}
+                  {tooMuchContent && (
+                    <div
+                      className="pointer-events-none absolute z-10 border-t-2 border-dashed border-red-400/50"
+                      style={{ top: A4_SHEET_H * 2, left: PAGE_PAD_X / 2, right: PAGE_PAD_X / 2 }}
+                    />
+                  )}
+                  <div
+                    style={{
+                      paddingLeft: PAGE_PAD_X,
+                      paddingRight: PAGE_PAD_X,
+                      paddingTop: PAGE_PAD_Y,
+                      paddingBottom: PAGE_PAD_Y,
+                    }}
+                  >
+                    {renderDocumentBody('single', lines, 0, undefined, true)}
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          ) : (
+            // ── Side by side: two A4 cards, body flowing across two columns ──
+            <div style={{ width: SPLIT_W * splitScale, height: A4_SHEET_H * splitScale }}>
+              <motion.div
+                initial={{ opacity: 0.4 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
+                className="relative"
+                style={{
+                  width: SPLIT_W,
+                  height: A4_SHEET_H,
+                  transform: `scale(${splitScale})`,
+                  transformOrigin: 'top left',
+                }}
+              >
+                {/* the two A4 page cards */}
+                <div className="absolute inset-0 flex" style={{ gap: SPLIT_GAP }}>
+                  <div
+                    className={cn('h-full rounded-xl', overflowRing)}
+                    style={{ width: A4_SHEET_W, ...sheetSurface }}
+                  />
+                  <div
+                    className={cn('h-full rounded-xl', overflowRing)}
+                    style={{ width: A4_SHEET_W, ...sheetSurface }}
+                  />
+                </div>
+                {/* the document body, flowing across the two columns */}
                 <div
+                  className="absolute inset-0 overflow-hidden"
                   style={{
+                    columnCount: 2,
+                    columnGap: COL_GAP,
+                    columnFill: 'auto',
                     paddingLeft: PAGE_PAD_X,
                     paddingRight: PAGE_PAD_X,
                     paddingTop: PAGE_PAD_Y,
@@ -2083,44 +2138,8 @@ export function A4Sheet({
                 >
                   {renderDocumentBody('single', lines, 0, undefined, true)}
                 </div>
-              </div>
-            </motion.div>
-          ) : (
-            // ── Side by side: two A4 cards, body flowing across two columns ──
-            <motion.div
-              initial={{ opacity: 0.4 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
-              className="relative"
-              style={{ width: SPLIT_W, height: A4_SHEET_H, zoom: splitScale }}
-            >
-              {/* the two A4 page cards */}
-              <div className="absolute inset-0 flex" style={{ gap: SPLIT_GAP }}>
-                <div
-                  className={cn('h-full rounded-xl', overflowRing)}
-                  style={{ width: A4_SHEET_W, ...sheetSurface }}
-                />
-                <div
-                  className={cn('h-full rounded-xl', overflowRing)}
-                  style={{ width: A4_SHEET_W, ...sheetSurface }}
-                />
-              </div>
-              {/* the document body, flowing across the two columns */}
-              <div
-                className="absolute inset-0 overflow-hidden"
-                style={{
-                  columnCount: 2,
-                  columnGap: COL_GAP,
-                  columnFill: 'auto',
-                  paddingLeft: PAGE_PAD_X,
-                  paddingRight: PAGE_PAD_X,
-                  paddingTop: PAGE_PAD_Y,
-                  paddingBottom: PAGE_PAD_Y,
-                }}
-              >
-                {renderDocumentBody('single', lines, 0, undefined, true)}
-              </div>
-            </motion.div>
+              </motion.div>
+            </div>
           )}
         </div>
       ) : (
