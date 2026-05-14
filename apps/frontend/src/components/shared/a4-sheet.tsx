@@ -2023,28 +2023,33 @@ export function A4Sheet({
           className={cn('w-full max-w-[960px] rounded-xl relative', overflowRing)}
           style={{ ...sheetSurface, minHeight: pageHeightPx || undefined }}
         >
+          {/* Page-break bands — a real gap (like the space between pages in
+              Word) that visually cuts the document into separate pages. */}
           {pageHeightPx > 0 &&
-            Array.from({ length: Math.max(0, rawPageCount - 1) }).map((_, i) => (
-              <div
-                key={i}
-                className={cn(
-                  'pointer-events-none absolute inset-x-4 z-10 flex items-center gap-2 border-t-2 border-dashed',
-                  i + 1 >= 2 ? 'border-red-400/60' : 'border-amber-400/60',
-                )}
-                style={{ top: (i + 1) * pageHeightPx }}
-              >
-                <span
-                  className={cn(
-                    'rounded px-1.5 py-0.5 text-[9px] font-semibold -mt-px',
-                    i + 1 >= 2
-                      ? 'bg-red-500/15 text-red-500'
-                      : 'bg-amber-500/15 text-amber-600 dark:text-amber-500',
-                  )}
+            Array.from({ length: Math.max(0, rawPageCount - 1) }).map((_, i) => {
+              const isExtra = i + 1 >= 2
+              return (
+                <div
+                  key={i}
+                  className="pointer-events-none absolute inset-x-0 z-10 flex items-center justify-center bg-muted"
+                  style={{
+                    top: (i + 1) * pageHeightPx,
+                    height: 30,
+                    boxShadow:
+                      'inset 0 11px 11px -11px rgba(0,0,0,0.28), inset 0 -11px 11px -11px rgba(0,0,0,0.28)',
+                  }}
                 >
-                  Page {i + 2}
-                </span>
-              </div>
-            ))}
+                  <span
+                    className={cn(
+                      'rounded-full px-2.5 py-0.5 text-[10px] font-bold text-white shadow',
+                      isExtra ? 'bg-red-500' : 'bg-amber-500',
+                    )}
+                  >
+                    Page {i + 2}
+                  </span>
+                </div>
+              )
+            })}
           {renderDocumentBody('single', lines, 0)}
         </div>
       ) : (
