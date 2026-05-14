@@ -151,7 +151,6 @@ export default function AccountPage() {
   const [passkeyAdding, setPasskeyAdding] = useState(false)
   const [passkeyDeleteConfirm, setPasskeyDeleteConfirm] = useState<string | null>(null)
   const [passkeyDeleting, setPasskeyDeleting] = useState(false)
-  // Passkey awaiting deletion once the security verification modal succeeds.
   const [pendingPasskeyDelete, setPendingPasskeyDelete] = useState<string | null>(null)
 
   function requireSecurity(action: string) {
@@ -553,7 +552,6 @@ export default function AccountPage() {
     }
   }
 
-  // Step 1: confirmation accepted → require a security verification before deleting.
   function handleDeletePasskey() {
     if (!passkeyDeleteConfirm) return
     setPendingPasskeyDelete(passkeyDeleteConfirm)
@@ -561,7 +559,6 @@ export default function AccountPage() {
     requireSecurity('delete_passkey')
   }
 
-  // Step 2: security verification succeeded → actually delete the passkey.
   async function executeDeletePasskey() {
     if (!pendingPasskeyDelete) return
     setPasskeyDeleting(true)

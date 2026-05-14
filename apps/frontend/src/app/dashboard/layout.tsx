@@ -69,8 +69,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     setIsDesktopRuntime(isFakturDesktop())
   }, [])
 
-  // Admin-only instances: non-admin users keep their session but can't use the
-  // dashboard — send them to the restricted-access notice.
   useEffect(() => {
     if (!loading && user && IS_ADMIN_ONLY && !user.isAdmin) {
       router.replace('/restricted')
@@ -208,7 +206,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (!user) return null
 
-  // Redirect handled by the effect above — don't flash dashboard content.
   if (IS_ADMIN_ONLY && !user.isAdmin) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">

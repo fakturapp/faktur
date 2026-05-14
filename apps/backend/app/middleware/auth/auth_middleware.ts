@@ -4,8 +4,6 @@ import type { Authenticators } from '@adonisjs/auth/types'
 import env from '#start/env'
 import { isAdminEmail } from '#services/auth/is_admin'
 
-// Authenticated routes that non-admins must still reach when ADMIN_ONLY is on,
-// so the frontend can identify the user and sign them out.
 const ADMIN_ONLY_ALLOWLIST = ['/auth/me', '/auth/logout']
 
 export default class AuthMiddleware {
@@ -18,7 +16,6 @@ export default class AuthMiddleware {
   ) {
     await ctx.auth.authenticateUsing(options.guards)
 
-    // Admin-only lockdown: applies to everything that requires auth.
     if (env.get('ADMIN_ONLY')) {
       const path = ctx.request.url()
       const allowed = ADMIN_ONLY_ALLOWLIST.some((p) => path.endsWith(p))

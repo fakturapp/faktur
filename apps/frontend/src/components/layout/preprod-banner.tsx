@@ -6,12 +6,6 @@ import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } fr
 import { Button } from '@/components/ui/button'
 import { IS_PREPROD } from '@/lib/app-env'
 
-/**
- * Permanent warning shown on every page when NEXT_PUBLIC_APP_ENV=preprod.
- * Fixed to the bottom of the viewport, always on top. Clicking it opens a
- * modal explaining that this environment is wired to the real production
- * database and that any action here can damage live data.
- */
 export function PreprodBanner() {
   const [open, setOpen] = useState(false)
 

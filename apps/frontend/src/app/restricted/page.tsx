@@ -8,19 +8,12 @@ import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { IS_ADMIN_ONLY } from '@/lib/app-env'
 
-/**
- * Shown when the instance runs in admin-only mode and a non-admin reaches an
- * authenticated area. The user keeps a valid session — they just can't use the
- * app — so the only action offered is signing out.
- */
 export default function RestrictedPage() {
   const { user, loading, logout } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
     if (loading) return
-    // Nothing to restrict if the instance isn't locked down, or the visitor
-    // is an admin, or there's no session at all — send them where they belong.
     if (!IS_ADMIN_ONLY || (user && user.isAdmin)) {
       router.replace('/dashboard')
     } else if (!user) {
