@@ -839,6 +839,12 @@ function LogoEditor({
 //  - continuation: a "(suite)" marker + the remaining lines + totals/footer
 type PageRole = 'single' | 'first' | 'continuation'
 
+// Reference pixel dimensions for the side-by-side split layout.
+const A4_SHEET_W = 960
+const A4_SHEET_H = Math.round(A4_SHEET_W * (297 / 210)) // 1358
+const SPLIT_GAP = 24
+const SPLIT_W = A4_SHEET_W * 2 + SPLIT_GAP // 1944
+
 interface A4SheetProps {
   mode: 'edit' | 'preview'
   logoUrl: string | null
@@ -992,17 +998,43 @@ export function A4Sheet({
     const ro = new ResizeObserver(measure)
     if (pageBoxRef.current) ro.observe(pageBoxRef.current)
     if (contentRef.current) ro.observe(contentRef.current)
+    // Custom document fonts load asynchronously and change row heights — the
+    // split point measured before they settle is wrong, so re-measure once
+    // fonts are ready (plus a late safety pass).
+    if (typeof document !== 'undefined' && document.fonts?.ready) {
+      document.fonts.ready.then(measure).catch(() => {})
+    }
+    const late = setTimeout(measure, 400)
     return () => {
       cancelAnimationFrame(raf)
+      clearTimeout(late)
       ro.disconnect()
     }
-  }, [lines.length])
+  }, [lines.length, effectiveFont])
 
   // A document may not span more than 2 A4 pages.
   const tooMuchContent = rawPageCount > 2
   const pageCount = Math.min(rawPageCount, 2)
   const overflows = pageCount > 1
   const showSplit = paginate && pageCount > 1
+
+  // The two-page split is scaled down to fit the available width — no scrollbar.
+  const splitWrapRef = useRef<HTMLDivElement>(null)
+  const [splitScale, setSplitScale] = useState(1)
+
+  useEffect(() => {
+    if (!showSplit) return
+    function fit() {
+      const el = splitWrapRef.current
+      if (!el) return
+      const avail = el.clientWidth
+      if (avail > 0) setSplitScale(Math.min(1, avail / SPLIT_W))
+    }
+    fit()
+    const ro = new ResizeObserver(fit)
+    if (splitWrapRef.current) ro.observe(splitWrapRef.current)
+    return () => ro.disconnect()
+  }, [showSplit])
 
   // Dynamically load document font from Google Fonts
   useEffect(() => {
@@ -1949,24 +1981,37 @@ export function A4Sheet({
         </div>
       </div>
 
-      {/* Visible sheet(s) — one, or two side-by-side when paginated */}
+      {/* Visible sheet(s) — one, or two side-by-side when paginated.
+          The split row is scaled to fit the available width (no scrollbar). */}
       {showSplit ? (
-        <div className="flex items-start gap-6">
-          {renderSheetFrame(
-            renderDocumentBody('first', lines.slice(0, splitIndex), 0),
-            'page-1',
-          )}
-          <motion.div
-            key="page-2"
-            initial={{ opacity: 0, x: -48, scale: 0.96 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
-            className="shrink-0"
-          >
-            {renderSheetFrame(
-              renderDocumentBody('continuation', lines.slice(splitIndex), splitIndex),
-            )}
-          </motion.div>
+        <div ref={splitWrapRef} className="flex w-full justify-center">
+          <div style={{ width: SPLIT_W * splitScale, height: A4_SHEET_H * splitScale }}>
+            <div
+              className="flex items-start"
+              style={{
+                width: SPLIT_W,
+                gap: SPLIT_GAP,
+                transform: `scale(${splitScale})`,
+                transformOrigin: 'top left',
+              }}
+            >
+              {renderSheetFrame(
+                renderDocumentBody('first', lines.slice(0, splitIndex), 0),
+                'page-1',
+              )}
+              <motion.div
+                key="page-2"
+                initial={{ opacity: 0, x: -48, scale: 0.96 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
+                className="shrink-0"
+              >
+                {renderSheetFrame(
+                  renderDocumentBody('continuation', lines.slice(splitIndex), splitIndex),
+                )}
+              </motion.div>
+            </div>
+          </div>
         </div>
       ) : (
         renderSheetFrame(renderDocumentBody('single', lines, 0))
