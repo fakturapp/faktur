@@ -722,8 +722,8 @@ function EditInvoiceContent() {
 
       {/* Main content */}
       <div className="flex flex-col xl:flex-row gap-5">
-        <motion.div variants={fadeUp} custom={1} className="flex-1 min-w-0 order-1">
-          <div className="rounded-xl relative">
+        <motion.div variants={fadeUp} custom={1} className="flex-1 min-w-0 order-1 overflow-x-auto">
+          <div className="rounded-xl relative w-fit min-w-full">
             <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
               {invoiceSettings.aiEnabled && (
                 <button onClick={() => { setShowOptions(true); setSidebarTab('chat') }} className="p-1.5 rounded-lg border border-border bg-card/80 backdrop-blur-sm text-purple-500 hover:text-purple-400 hover:bg-purple-500/10 transition-colors" title="Faktur AI">
@@ -739,6 +739,7 @@ function EditInvoiceContent() {
             <AiSheetOverlay open={aiProcessing} />
             <A4Sheet
               mode={mode}
+              paginate
               logoUrl={logoUrl || (invoiceSettings.logoSource === 'company' ? companyLogoUrl : invoiceSettings.logoUrl) || companyLogoUrl}
               accentColor={accentColor}
               documentTitle={options.documentTitle}
