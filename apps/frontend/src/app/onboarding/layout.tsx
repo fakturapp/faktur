@@ -64,7 +64,6 @@ export default function OnboardingLayout({ children }: { children: React.ReactNo
       <div className="relative min-h-screen">
         <div className="fixed inset-0 z-0 bg-surface" />
         <div className="fixed inset-0 z-[1] bg-black/10" />
-        {/* Skeleton sidebar */}
         <div className="fixed inset-y-0 left-0 z-10 flex w-[280px] lg:w-[320px] flex-col bg-overlay shadow-overlay rounded-r-[2rem]">
           <div className="px-5 pt-6 pb-4 space-y-2">
             <Skeleton className="h-2 w-16 rounded" />
@@ -89,7 +88,6 @@ export default function OnboardingLayout({ children }: { children: React.ReactNo
             </div>
           </div>
         </div>
-        {/* Skeleton contenu */}
         <div className="fixed inset-y-0 right-0 left-[280px] lg:left-[320px] z-[2] flex items-center justify-center">
           <div className="w-full max-w-2xl px-10 space-y-6">
             <Skeleton className="h-6 w-48 rounded-lg mx-auto" />
@@ -107,21 +105,17 @@ export default function OnboardingLayout({ children }: { children: React.ReactNo
 
   return (
     <div className="relative min-h-screen">
-      {/* Iridescence — couvre TOUTE la page, visible derrière les arrondis de la sidebar */}
       <div className="fixed inset-0 z-0">
         <Iridescence color={[0.4, 0.3, 1]} speed={0.4} amplitude={0.1} />
       </div>
-      {/* Overlay sombre — couvre TOUTE la page (y compris derrière les arrondis) */}
       <div className="fixed inset-0 z-[1] bg-black/25 pointer-events-none" />
 
-      {/* Sidebar gauche — par dessus le background */}
       <motion.aside
         initial={{ opacity: 0, x: -30 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
         className="fixed inset-y-0 left-0 z-10 flex w-[280px] lg:w-[320px] flex-col bg-overlay shadow-overlay rounded-r-[2rem]"
       >
-        {/* Header */}
         <div className="px-5 pt-6 pb-4">
           <p className="text-[10px] font-bold text-muted-secondary uppercase tracking-[0.15em] mb-1">
             Configuration
@@ -136,7 +130,6 @@ export default function OnboardingLayout({ children }: { children: React.ReactNo
 
         <OnboardingTeamSwitcher />
 
-        {/* Progress bar */}
         <div className="mx-5 mb-4">
           <div className="h-1 rounded-full bg-surface overflow-hidden">
             <motion.div
@@ -150,7 +143,6 @@ export default function OnboardingLayout({ children }: { children: React.ReactNo
 
         <div className="mx-5 h-px bg-separator" />
 
-        {/* Steps */}
         <nav className="flex-1 overflow-y-auto px-4 py-3 space-y-0.5">
           {steps.map((step, i) => {
             const Icon = step.icon
@@ -201,7 +193,6 @@ export default function OnboardingLayout({ children }: { children: React.ReactNo
 
         <div className="mx-5 h-px bg-separator" />
 
-        {/* Footer user */}
         <div className="p-4">
           <div className="flex items-center gap-2.5 rounded-xl px-2 py-2">
             <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent text-[10px] font-bold">
@@ -226,10 +217,8 @@ export default function OnboardingLayout({ children }: { children: React.ReactNo
         </div>
       </motion.aside>
 
-      {/* Contenu principal — droite, offset par la sidebar */}
       <main className="fixed inset-y-0 right-0 left-[280px] lg:left-[320px] z-[1] overflow-y-auto">
         <div className="relative h-full">
-        {/* Header avec logo Faktur — centré */}
         <div className="flex items-center justify-center px-8 pt-6 pb-2">
           <Link href="/" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity drop-shadow-md">
             <img src="/logo.svg" alt="Faktur" className="h-7 w-7" />
@@ -237,7 +226,6 @@ export default function OnboardingLayout({ children }: { children: React.ReactNo
           </Link>
         </div>
 
-        {/* Contenu des étapes */}
         <div className="min-h-[calc(100vh-80px)] flex items-center justify-center px-6 md:px-10">
           <AnimatePresence mode="wait">
             <motion.div
