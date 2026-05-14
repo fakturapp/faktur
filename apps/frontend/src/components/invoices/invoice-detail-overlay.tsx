@@ -13,8 +13,8 @@ import { StatusDropdown, invoiceStatusOptions } from '@/components/shared/status
 import { useToast } from '@/components/ui/toast'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { api } from '@/lib/api'
-import { A4Sheet, type DocumentLine, type ClientInfo, type CompanyInfo } from '@/components/shared/a4-sheet'
-import { AutoFitDocument } from '@/components/shared/auto-fit-document'
+import { type DocumentLine, type ClientInfo, type CompanyInfo } from '@/components/shared/a4-sheet'
+import { PdfPreview } from '@/components/shared/pdf-preview'
 import { SendEmailModal } from '@/components/shared/send-email-modal'
 import { EmailHistoryModal } from '@/components/shared/email-history-modal'
 import { useTrackFeature } from '@/hooks/use-analytics'
@@ -432,100 +432,36 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
-            className="flex-1 flex flex-col items-center overflow-hidden py-6 px-4"
+            className="relative flex-1 overflow-hidden py-6 px-4"
           >
+            {/* Download & Print buttons — top-right, outside the sheet */}
+            {invoice && !loading && (
+              <div className="absolute top-6 right-6 z-10 flex gap-2">
+                <button
+                  onClick={handleDownloadPdf}
+                  disabled={downloading}
+                  className="h-9 px-4 rounded-full bg-overlay shadow-overlay flex items-center gap-2 text-sm font-medium transition-colors"
+                >
+                  {downloading ? <Spinner className="h-4 w-4" /> : <Download className="h-4 w-4 text-muted-foreground" />}
+                  <span className="text-foreground">{downloading ? 'Téléchargement...' : 'Télécharger'}</span>
+                </button>
+                <button
+                  onClick={handlePrint}
+                  disabled={printing}
+                  className="h-9 px-4 rounded-full bg-overlay shadow-overlay flex items-center gap-2 text-sm font-medium transition-colors"
+                >
+                  {printing ? <Spinner className="h-4 w-4" /> : <Printer className="h-4 w-4 text-muted-foreground" />}
+                  <span className="text-foreground">{printing ? 'Préparation...' : 'Imprimer'}</span>
+                </button>
+              </div>
+            )}
+
             {loading ? (
-              <div className="flex-1 min-h-0 w-full">
-                <AutoFitDocument baseWidth={960}>
-                  <div className="w-[960px] aspect-[210/297] bg-white rounded-xl shadow-xl flex items-center justify-center">
-                    <Spinner size="lg" />
-                  </div>
-                </AutoFitDocument>
+              <div className="flex h-full items-center justify-center">
+                <Spinner size="lg" />
               </div>
             ) : invoice ? (
-              <>
-              <div className="flex-1 min-h-0 w-full">
-                <AutoFitDocument baseWidth={960}>
-                <A4Sheet
-                  mode="preview"
-                  logoUrl={effectiveLogoUrl}
-                  accentColor={invoice.accentColor || '#6366f1'}
-                  documentTitle={invoice.documentTitle || 'Facture'}
-                  documentType="invoice"
-                  quoteNumber={invoice.invoiceNumber}
-                  onQuoteNumberChange={noop}
-                  issueDate={invoice.issueDate || ''}
-                  validityDate={invoice.dueDate || ''}
-                  billingType={invoice.billingType}
-                  company={effectiveCompany}
-                  onCompanyFieldChange={noop}
-                  client={effectiveClient}
-                  onClientClick={noop}
-                  onClearClient={noop}
-                  onClientFieldChange={noop}
-                  lines={sheetLines}
-                  onUpdateLine={noop}
-                  onAddLine={noop}
-                  onRemoveLine={noop}
-                  subtotal={subtotal}
-                  taxAmount={taxAmount}
-                  discountAmount={discountAmount}
-                  total={total}
-                  tvaBreakdown={tvaBreakdown}
-                  notes={invoice.notes || ''}
-                  onNotesChange={noop}
-                  acceptanceConditions={invoice.acceptanceConditions || ''}
-                  signatureField={invoice.signatureField}
-                  freeField={invoice.freeField || ''}
-                  deliveryAddress={invoice.deliveryAddress || ''}
-                  showDeliveryAddress={!!invoice.deliveryAddress}
-                  clientSiren={invoice.clientSiren || ''}
-                  showClientSiren={!!invoice.clientSiren}
-                  clientVatNumber={invoice.clientVatNumber || ''}
-                  showClientVatNumber={!!invoice.clientVatNumber}
-              paymentMethods={invoiceSettings.paymentMethods}
-              customPaymentMethod={invoiceSettings.customPaymentMethod}
-                  paymentMethod={invoice.paymentMethod}
-                  bankAccountInfo={bankAccountInfo}
-                  subject={invoice.subject || ''}
-                  onSubjectChange={noop}
-                  template={invoiceSettings.template}
-                  darkMode={invoiceSettings.darkMode}
-                  language={invoice.language || 'fr'}
-                  showNotes={!!invoice.notes}
-                  showSubject={!!invoice.subject}
-                  showAcceptanceConditions={!!invoice.acceptanceConditions}
-                  showFreeField={!!invoice.freeField}
-                  showQuantityColumn={invoice.showQuantityColumn !== false}
-                  showUnitColumn={invoice.showUnitColumn !== false}
-                  showUnitPriceColumn={invoice.showUnitPriceColumn !== false}
-                  showVatColumn={invoice.showVatColumn !== false}
-                  footerMode={invoiceSettings.footerMode}
-                  documentFont={invoiceSettings.documentFont}
-                  vatExemptReason={invoice.vatExemptReason || 'none'}
-                />
-                </AutoFitDocument>
-              </div>
-                {/* Download & Print buttons */}
-                <div className="flex justify-center gap-2 mt-3 shrink-0">
-                  <button
-                    onClick={handleDownloadPdf}
-                    disabled={downloading}
-                    className="h-9 px-4 rounded-full bg-overlay shadow-overlay flex items-center gap-2 text-sm font-medium transition-colors"
-                  >
-                    {downloading ? <Spinner className="h-4 w-4" /> : <Download className="h-4 w-4 text-muted-foreground" />}
-                    <span className="text-foreground">{downloading ? 'Téléchargement...' : 'Télécharger'}</span>
-                  </button>
-                  <button
-                    onClick={handlePrint}
-                    disabled={printing}
-                    className="h-9 px-4 rounded-full bg-overlay shadow-overlay flex items-center gap-2 text-sm font-medium transition-colors"
-                  >
-                    {printing ? <Spinner className="h-4 w-4" /> : <Printer className="h-4 w-4 text-muted-foreground" />}
-                    <span className="text-foreground">{printing ? 'Préparation...' : 'Imprimer'}</span>
-                  </button>
-                </div>
-              </>
+              <PdfPreview src={`/invoices/${invoiceId}/pdf`} />
             ) : null}
           </motion.div>
 
