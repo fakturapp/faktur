@@ -20,8 +20,6 @@ import { pdfCache } from '#services/pdf/pdf_cache'
 
 type Stamped = { updatedAt?: { toMillis(): number } | null }
 
-// A token that changes whenever anything affecting the rendered PDF changes —
-// the document itself, its lines, the company, or the invoice settings.
 function pdfVersionToken(
   doc: Stamped,
   lines: Stamped[],
@@ -57,7 +55,6 @@ async function resolveLogoToBase64(logoUrl: string | null): Promise<string | nul
     }
   }
 
-  // Legacy: local filesystem paths
   const match = logoUrl.match(/^\/(invoice-logos|company-logos)\/(.+)$/)
   if (!match) return null
   const filePath = join(app.tmpPath(), 'uploads', match[1], match[2])
@@ -143,14 +140,11 @@ export async function generateInvoicePdf(
   const company = await Company.query().where('team_id', teamId).first()
   const invoiceSettings = await InvoiceSetting.query().where('team_id', teamId).first()
 
-  // Serve an unchanged document straight from the in-memory cache — skips the
-  // headless-Chrome render entirely.
   const docKey = `invoice:${invoiceId}`
   const cacheVersion = pdfVersionToken(invoice, invoice.lines, company, invoiceSettings)
   const cached = pdfCache.get(docKey, cacheVersion)
   if (cached) return cached
 
-  // Decrypt invoice, lines, and client
   decryptModelFields(invoice, [...ENCRYPTED_FIELDS.invoice], dek)
   decryptModelFieldsArray(invoice.lines, [...ENCRYPTED_FIELDS.invoiceLine], dek)
   if (invoice.client) {
@@ -160,7 +154,6 @@ export async function generateInvoicePdf(
     decryptModelFields(company, [...ENCRYPTED_FIELDS.company], dek)
   }
 
-  // Use the invoice's specific payment method, not all settings methods
   const invoicePaymentMethods: string[] = invoice.paymentMethod ? [invoice.paymentMethod] : []
 
   const settingsData = {
@@ -229,7 +222,6 @@ export async function generateInvoicePdf(
     ? JSON.parse(invoice.companySnapshot)
     : buildCompanyData(company)
 
-  // Override bank info from linked bank account
   if (invoice.bankAccountId && companyData) {
     const bankAccount = await BankAccount.find(invoice.bankAccountId)
     if (bankAccount) {
@@ -293,7 +285,6 @@ export async function generateQuotePdf(
   const cached = pdfCache.get(docKey, cacheVersion)
   if (cached) return cached
 
-  // Decrypt quote, lines, and client
   decryptModelFields(quote, [...ENCRYPTED_FIELDS.quote], dek)
   decryptModelFieldsArray(quote.lines, [...ENCRYPTED_FIELDS.quoteLine], dek)
   if (quote.client) {
