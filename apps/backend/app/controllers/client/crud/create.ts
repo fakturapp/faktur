@@ -19,6 +19,7 @@ export default class Create {
 
     const data = request.only([
       'type',
+      'civility',
       'companyName',
       'firstName',
       'lastName',
@@ -39,6 +40,7 @@ export default class Create {
     const clientData: Record<string, any> = {
       teamId,
       type: data.type || 'company',
+      civility: data.civility === 'mr' || data.civility === 'mme' ? data.civility : null,
       companyName: data.companyName || null,
       firstName: data.firstName || null,
       lastName: data.lastName || null,

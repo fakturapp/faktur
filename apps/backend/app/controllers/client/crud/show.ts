@@ -25,6 +25,7 @@ export default class Show {
       client: {
         id: client.id,
         type: client.type,
+        civility: client.civility,
         displayName: client.displayName,
         companyName: client.companyName,
         firstName: client.firstName,

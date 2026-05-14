@@ -20,6 +20,7 @@ export default class Update {
     }
 
     const data = request.only([
+      'civility',
       'companyName',
       'firstName',
       'lastName',
@@ -36,6 +37,10 @@ export default class Update {
       'country',
       'notes',
     ])
+
+    if (data.civility !== undefined) {
+      data.civility = data.civility === 'mr' || data.civility === 'mme' ? data.civility : null
+    }
 
     encryptModelFields(data, [...ENCRYPTED_FIELDS.client], dek)
 
