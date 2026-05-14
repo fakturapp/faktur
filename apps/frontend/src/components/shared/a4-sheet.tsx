@@ -37,6 +37,7 @@ export interface DocumentLine {
 export interface ClientInfo {
   id: string
   type: 'company' | 'individual'
+  civility?: 'mr' | 'mme' | null
   displayName: string
   companyName: string | null
   firstName: string | null
@@ -50,6 +51,14 @@ export interface ClientInfo {
   country: string
   siren: string | null
   vatNumber: string | null
+}
+
+export function clientDisplayName(client?: ClientInfo | null): string {
+  if (!client) return ''
+  const base = (client.displayName || '').replace(/^(Mr|Mme)\s+/i, '').trim()
+  if (client.type === 'company') return client.displayName || base
+  const prefix = client.civility === 'mr' ? 'Mr ' : client.civility === 'mme' ? 'Mme ' : ''
+  return (prefix + base).trim()
 }
 
 export interface CompanyInfo {
@@ -1309,7 +1318,7 @@ export function A4Sheet({
                     {ed ? (
                       <div
                         className="font-semibold text-[13px] cursor-pointer border-b border-dashed transition-colors"
-                        style={{ color: hasError('Client') ? errorBorder : (client?.displayName ? T.text : T.inputPlaceholder), borderBottomColor: hasError('Client') ? errorBorder : T.editBorderDashed }}
+                        style={{ color: hasError('Client') ? errorBorder : (clientDisplayName(client) ? T.text : T.inputPlaceholder), borderBottomColor: hasError('Client') ? errorBorder : T.editBorderDashed }}
                         onClick={onClientClick}
                         onMouseEnter={(e) => (e.currentTarget.style.borderBottomColor = hasError('Client') ? errorBorder : accentColor)}
                         onMouseLeave={(e) => (e.currentTarget.style.borderBottomColor = hasError('Client') ? errorBorder : T.editBorderDashed)}
@@ -1317,12 +1326,12 @@ export function A4Sheet({
                       >
                         <div className="flex items-center gap-1.5">
                           <Search className="h-3 w-3 shrink-0" style={{ color: T.inputPlaceholder }} />
-                          {client?.displayName || (lang === 'en' ? 'Client name' : 'Nom du client')}
+                          {clientDisplayName(client) || (lang === 'en' ? 'Client name' : 'Nom du client')}
                         </div>
                       </div>
                     ) : (
                       <div className="font-semibold text-[13px]" style={{ color: T.text }}>
-                        {client?.displayName || ''}
+                        {clientDisplayName(client)}
                       </div>
                     )}
                     <div>{ie(client?.address || '', (v) => onClientFieldChange('address', v), 'text-[12px]', lang === 'en' ? 'Address' : 'Adresse postale')}</div>

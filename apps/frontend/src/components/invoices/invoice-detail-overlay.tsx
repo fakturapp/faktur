@@ -13,7 +13,7 @@ import { StatusDropdown, invoiceStatusOptions } from '@/components/shared/status
 import { useToast } from '@/components/ui/toast'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { api } from '@/lib/api'
-import { type DocumentLine, type ClientInfo, type CompanyInfo } from '@/components/shared/a4-sheet'
+import { type DocumentLine, type ClientInfo, type CompanyInfo, clientDisplayName } from '@/components/shared/a4-sheet'
 import { PdfPreview } from '@/components/shared/pdf-preview'
 import { SendEmailModal } from '@/components/shared/send-email-modal'
 import { EmailHistoryModal } from '@/components/shared/email-history-modal'
@@ -530,10 +530,10 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
                     {invoice.client ? (
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-xl bg-accent-soft flex items-center justify-center text-accent font-bold text-sm shrink-0">
-                          {invoice.client.displayName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
+                          {clientDisplayName(invoice.client).split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
                         </div>
                         <div className="min-w-0">
-                          <p className="text-sm font-semibold text-foreground truncate">{invoice.client.displayName}</p>
+                          <p className="text-sm font-semibold text-foreground truncate">{clientDisplayName(invoice.client)}</p>
                           {invoice.client.email && <p className="text-xs text-muted-foreground truncate">{invoice.client.email}</p>}
                         </div>
                       </div>
@@ -672,7 +672,7 @@ export function InvoiceDetailOverlay({ invoiceId, onClose, onStatusChange, onDel
             documentId={invoice.id}
             documentNumber={invoice.invoiceNumber}
             clientEmail={invoice.client?.email || null}
-            clientName={invoice.client?.displayName || null}
+            clientName={clientDisplayName(invoice.client) || null}
             total={invoice.total}
             emailType={emailModalMode}
             onSent={handleEmailSent}

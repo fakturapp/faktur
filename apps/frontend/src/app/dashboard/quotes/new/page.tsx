@@ -423,6 +423,7 @@ export default function NewQuotePage() {
       clientSnapshot: selectedClient ? {
         id: selectedClient.id,
         type: selectedClient.type,
+        civility: selectedClient.civility ?? null,
         displayName: selectedClient.displayName,
         companyName: selectedClient.companyName,
         firstName: selectedClient.firstName,
