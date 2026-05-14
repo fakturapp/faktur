@@ -162,7 +162,6 @@ function InlineEdit({
         className={cn('relative inline cursor-text', className)}
         style={{ borderBottom: `1px dashed ${borderDashed}` }}
         onClick={(e) => {
-          // Click on wrapper (hitbox) → focus at nearest edge
           if (e.target === e.currentTarget) {
             const rect = e.currentTarget.getBoundingClientRect()
             const mid = rect.left + rect.width / 2
@@ -170,7 +169,6 @@ function InlineEdit({
           }
         }}
       >
-        {/* Left invisible hitbox — absolute so it doesn't shift content */}
         <span className="absolute -left-2 top-0 bottom-0 w-2" style={{ userSelect: 'none' }}
           onClick={(e) => { e.stopPropagation(); focusAt('start') }}
         />
@@ -199,7 +197,6 @@ function InlineEdit({
           }}
           dangerouslySetInnerHTML={{ __html: value || '' }}
         />
-        {/* Right invisible hitbox — absolute so it doesn't shift content */}
         <span className="absolute -right-2 top-0 bottom-0 w-2" style={{ userSelect: 'none' }}
           onClick={(e) => { e.stopPropagation(); focusAt('end') }}
         />
@@ -224,10 +221,6 @@ function InlineEdit({
     </span>
   )
 }
-
-/* ═══════════════════════════════════════════════════════════
-   InlineDateEdit — shows formatted date, click to open picker
-   ═══════════════════════════════════════════════════════════ */
 
 function InlineDateEdit({
   value, onChange, preview = false, className, lang, accentColor = '#6366f1',
@@ -257,10 +250,6 @@ function InlineDateEdit({
     />
   )
 }
-
-/* ═══════════════════════════════════════════════════════════
-   InlineNumber — click-to-edit number
-   ═══════════════════════════════════════════════════════════ */
 
 function InlineNumber({
   value, onChange, preview = false, className, min = 0, step = 1, accentColor = '#6366f1',
@@ -330,10 +319,6 @@ function InlineNumber({
     </span>
   )
 }
-
-/* ═══════════════════════════════════════════════════════════
-   ClientModal — animated modal for client selection
-   ═══════════════════════════════════════════════════════════ */
 
 export function ClientModal({
   open, onClose, onSelect,
@@ -438,10 +423,6 @@ export function ClientModal({
   )
 }
 
-/* ═══════════════════════════════════════════════════════════
-   AddLineDropdown — single button with dropdown menu
-   ═══════════════════════════════════════════════════════════ */
-
 function AddLineDropdown({
   isClassique, accentColor, T, t, onAddLine, onCatalogClick, disabled = false, onDisabledClick,
 }: {
@@ -498,8 +479,6 @@ function AddLineDropdown({
     </button>
   )
 
-  // The menu is portaled to <body> with a high z-index so it is never clipped
-  // by the sheet's overflow-hidden or the CSS-column container.
   const menu =
     typeof document === 'undefined'
       ? null
@@ -578,10 +557,6 @@ function AddLineDropdown({
   )
 }
 
-/* ═══════════════════════════════════════════════════════════
-   StyledCheckbox — custom animated checkbox
-   ═══════════════════════════════════════════════════════════ */
-
 function StyledCheckbox({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label?: string }) {
   return (
     <label className="flex items-center gap-2.5 text-xs text-muted-foreground cursor-pointer select-none" onClick={(e) => { e.preventDefault(); onChange(!checked) }}>
@@ -605,10 +580,6 @@ function StyledCheckbox({ checked, onChange, label }: { checked: boolean; onChan
     </label>
   )
 }
-
-/* ═══════════════════════════════════════════════════════════
-   LogoImportModal — modal for importing a logo (portaled to body)
-   ═══════════════════════════════════════════════════════════ */
 
 function LogoImportModal({
   open, onClose, companyLogoUrl, onSelectCompanyLogo, onSelectFile,
@@ -672,10 +643,6 @@ function LogoImportModal({
   )
 }
 
-/* ═══════════════════════════════════════════════════════════
-   LogoEditor — interactive logo zone (import, resize, round, delete)
-   ═══════════════════════════════════════════════════════════ */
-
 function LogoEditor({
   logoUrl, logoBorderRadius = 0, accentColor, companyLogoUrl,
   onLogoChange, onLogoBorderRadiusChange, onLogoUpload, T,
@@ -729,7 +696,6 @@ function LogoEditor({
     document.addEventListener('mouseup', onUp)
   }
 
-  /* No logo — placeholder */
   if (!logoUrl) {
     if (variant === 'banner') {
       return (
@@ -766,7 +732,6 @@ function LogoEditor({
     )
   }
 
-  /* Has logo — image with overlay controls */
   return (
     <>
       <div
@@ -779,7 +744,6 @@ function LogoEditor({
           onDoubleClick={() => setImportModalOpen(true)}
         />
 
-        {/* Resize grip — visible on hover */}
         <div className="absolute -bottom-1 -right-1 opacity-0 group-hover/logowrap:opacity-100 transition-opacity pointer-events-none">
           <div className="w-3.5 h-3.5 rounded-sm bg-white/80 shadow-sm flex items-center justify-center">
             <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
@@ -793,13 +757,11 @@ function LogoEditor({
           {(hovered || radiusOpen) && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}
               className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.35)', borderRadius: `${logoBorderRadius}px` }}>
-              {/* Delete — top right */}
               <button className="absolute top-1 right-1 h-5 w-5 rounded-full flex items-center justify-center bg-white/90 hover:bg-white transition-colors"
                 onClick={(e) => { e.stopPropagation(); setDeleteDialogOpen(true) }} title="Supprimer">
                 <X className="h-3 w-3 text-red-500" />
               </button>
 
-              {/* Border-radius — bottom left */}
               <div className="absolute bottom-1 left-1" ref={radiusRef}>
                 <button className="h-5 w-5 rounded-full flex items-center justify-center bg-white/90 hover:bg-white transition-colors"
                   onClick={(e) => { e.stopPropagation(); setRadiusOpen(!radiusOpen) }} title="Arrondi">
@@ -820,7 +782,6 @@ function LogoEditor({
                 </AnimatePresence>
               </div>
 
-              {/* Resize handle — bottom right */}
               <div className="absolute -bottom-1 -right-1 w-6 h-6 cursor-se-resize" onMouseDown={handleResize}>
                 <div className="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-sm bg-white/90 shadow-sm flex items-center justify-center">
                   <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
@@ -834,7 +795,6 @@ function LogoEditor({
         </AnimatePresence>
       </div>
 
-      {/* Delete confirmation — portaled to body */}
       {typeof document !== 'undefined' && createPortal(
         <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} className="max-w-xs">
           <DialogTitle>Supprimer le logo ?</DialogTitle>
@@ -861,31 +821,18 @@ function LogoEditor({
   )
 }
 
-/* ═══════════════════════════════════════════════════════════
-   A4Sheet — main document component
-   ═══════════════════════════════════════════════════════════ */
-
-// Which slice of the document a sheet renders:
-//  - single: the whole document on one sheet (default)
-//  - first: header/client/dates + the first slice of lines, no totals/footer
-//  - continuation: a "(suite)" marker + the remaining lines + totals/footer
 type PageRole = 'single' | 'first' | 'continuation'
 
-// Reference pixel dimensions for the side-by-side split layout.
 const A4_SHEET_W = 960
-const A4_SHEET_H = Math.round(A4_SHEET_W * (297 / 210)) // 1358
-const SPLIT_GAP = 24 // visible gap between the two A4 sheets
-const SPLIT_W = A4_SHEET_W * 2 + SPLIT_GAP // 1944
-// Per-page margins (matches the px-10 / py-8 of the single sheet).
+const A4_SHEET_H = Math.round(A4_SHEET_W * (297 / 210))
+const SPLIT_GAP = 24
+const SPLIT_W = A4_SHEET_W * 2 + SPLIT_GAP
 const PAGE_PAD_X = 40
 const PAGE_PAD_Y = 32
-const COL_W = A4_SHEET_W - PAGE_PAD_X * 2 // 880 — usable width inside one page
-const COL_H = A4_SHEET_H - PAGE_PAD_Y * 2 // 1294 — usable height inside one page
-// CSS column-gap = visible gap + the right margin of page 1 + the left margin of page 2.
-const COL_GAP = SPLIT_GAP + PAGE_PAD_X * 2 // 104
-// Below this available width the two pages stack vertically instead of shrinking side by side.
+const COL_W = A4_SHEET_W - PAGE_PAD_X * 2
+const COL_H = A4_SHEET_H - PAGE_PAD_Y * 2
+const COL_GAP = SPLIT_GAP + PAGE_PAD_X * 2
 const STACK_THRESHOLD = 1500
-// Total height of the stacked layout: two A4 cards plus the gap between them.
 const STACK_TOTAL_H = A4_SHEET_H * 2 + SPLIT_GAP
 
 interface A4SheetProps {
@@ -962,8 +909,6 @@ interface A4SheetProps {
   showUnitColumn?: boolean
   showUnitPriceColumn?: boolean
   showVatColumn?: boolean
-  // When true, a document spanning more than one A4 page is rendered as
-  // separate side-by-side sheets instead of a single clipped sheet.
   paginate?: boolean
 }
 
@@ -993,7 +938,7 @@ export function A4Sheet({
   paginate = false,
 }: A4SheetProps) {
   const isPreview = mode === 'preview'
-  const ed = !isPreview // shorthand: is editable?
+  const ed = !isPreview
   const lang = language || 'fr'
   const [draggingLineIndex, setDraggingLineIndex] = useState<number | null>(null)
   const [dragOverLineIndex, setDragOverLineIndex] = useState<number | null>(null)
@@ -1005,15 +950,8 @@ export function A4Sheet({
   const isCreditNote = documentType === 'credit_note'
   const defaultTitle = isCreditNote ? 'Avoir' : isInvoice ? t.invoice : t.quote
   const validityLabel = isInvoice ? t.dueDate : t.validity
-  // Template font override takes precedence
   const effectiveFont = T.font || documentFont
 
-  // Two hidden measuring instances drive pagination:
-  //  - contentRef: plain block flow at one column's width → total height
-  //    (page count) and each block's flow position (the stack margin).
-  //  - colMeasureRef: the real CSS-column flow (same mechanism as the visible
-  //    side-by-side) → which block actually starts page 2, so the stacked
-  //    layout breaks at exactly the same place as side-by-side.
   const contentRef = useRef<HTMLDivElement>(null)
   const colMeasureRef = useRef<HTMLDivElement>(null)
   const [rawPageCount, setRawPageCount] = useState(1)
@@ -1028,8 +966,6 @@ export function A4Sheet({
       if (h <= 0) return
       setRawPageCount(Math.max(1, Math.ceil((h - 6) / COL_H)))
 
-      // Which block starts page 2? Read it from the real CSS-column flow so the
-      // stacked layout breaks at exactly the same block as side-by-side.
       let key: string | null = null
       const colInst = colMeasureRef.current
       if (colInst) {
@@ -1043,8 +979,6 @@ export function A4Sheet({
         }
       }
 
-      // Where does that block sit in plain block flow? → the margin that pushes
-      // it (and everything after) onto the second A4 card.
       let margin = 0
       if (key) {
         const target = content.querySelector<HTMLElement>(
@@ -1059,8 +993,6 @@ export function A4Sheet({
     const ro = new ResizeObserver(measure)
     if (contentRef.current) ro.observe(contentRef.current)
     if (colMeasureRef.current) ro.observe(colMeasureRef.current)
-    // Custom fonts load async and change row heights — re-measure once they
-    // settle (plus a late safety pass).
     if (typeof document !== 'undefined' && document.fonts?.ready) {
       document.fonts.ready.then(measure).catch(() => {})
     }
@@ -1072,13 +1004,11 @@ export function A4Sheet({
     }
   }, [lines.length, effectiveFont])
 
-  // A document may not span more than 2 A4 pages.
   const tooMuchContent = rawPageCount > 2
   const pageCount = Math.min(rawPageCount, 2)
   const overflows = pageCount > 1
   const showSplit = paginate && pageCount > 1
 
-  // Toast once when the document first overflows the 2-page limit.
   const wasTooMuch = useRef(false)
   useEffect(() => {
     if (tooMuchContent && !wasTooMuch.current && paginate) {
@@ -1089,8 +1019,6 @@ export function A4Sheet({
     wasTooMuch.current = tooMuchContent
   }, [tooMuchContent, paginate])
 
-  // The two-page view fits the available width. When that width gets too
-  // small, the pages stack vertically instead of shrinking side by side.
   const splitWrapRef = useRef<HTMLDivElement>(null)
   const [splitScale, setSplitScale] = useState(1)
   const [stackScale, setStackScale] = useState(1)
@@ -1117,9 +1045,8 @@ export function A4Sheet({
     return () => ro.disconnect()
   }, [showSplit])
 
-  // Dynamically load document font from Google Fonts
   useEffect(() => {
-    if (!effectiveFont || effectiveFont === 'Lexend') return // Lexend already loaded via next/font
+    if (!effectiveFont || effectiveFont === 'Lexend') return
     const id = `gfont-${effectiveFont.replace(/\s/g, '-')}`
     if (document.getElementById(id)) return
     const link = document.createElement('link')
@@ -1206,16 +1133,11 @@ export function A4Sheet({
   ) => {
     const showTop = role !== 'continuation'
     const showBottom = role !== 'first'
-    // In the stacked layout, the block that starts page 2 is pushed down so it
-    // lands on the second A4 card.
     const breakOf = (key: string): { marginTop?: number } =>
       breakKey === key ? { marginTop: breakMargin } : {}
     return (
           <div
             ref={bodyRef}
-            // In column mode the body is plain block flow so the browser can
-            // fragment it across the two A4 columns; padding lives on the
-            // column container so each page gets its own margins.
             className={columnMode ? '' : 'flex flex-col min-h-full px-10 py-8'}
             style={{
               fontFamily: `'${effectiveFont}', 'Segoe UI', sans-serif`,
@@ -1224,9 +1146,6 @@ export function A4Sheet({
             }}
           >
 
-            {/* ═══════════════════════════════════════════
-                 TOP SECTION — grows with content
-                ═══════════════════════════════════════════ */}
             <div className={columnMode ? '' : 'flex-1'}>
 
               {role === 'continuation' && (
@@ -1236,7 +1155,6 @@ export function A4Sheet({
               )}
 
               {showTop && (<>
-              {/* ── Banner header for 'banner' layout templates ── */}
               {T.layout === 'banner' && (
                 <div
                   className="rounded-xl px-6 py-4 mb-6 -mx-4 -mt-2"
@@ -1268,10 +1186,8 @@ export function A4Sheet({
                 </div>
               )}
 
-              {/* ── Header: Company + Devis badge (standard/lateral) ── */}
               {T.layout !== 'banner' && (
                 <div className="flex justify-between items-start mb-5">
-                  {/* Left: Logo + Company (all editable) */}
                   <div className="max-w-[55%]">
                     {ed ? (
                       <LogoEditor logoUrl={logoUrl} logoBorderRadius={logoBorderRadius} accentColor={accentColor}
@@ -1300,7 +1216,6 @@ export function A4Sheet({
                     )}
                   </div>
 
-                  {/* Right: DEVIS badge + quote number */}
                   <div className="text-right">
                     {isClassique ? (
                       <>
@@ -1339,7 +1254,6 @@ export function A4Sheet({
                 </div>
               )}
 
-              {/* ── Company info under banner header (editable) ── */}
               {T.layout === 'banner' && company && (
                 <div className="flex justify-between items-start mb-5">
                   <div className="text-[12px] leading-[1.6]" style={{ color: T.text }}>
@@ -1366,7 +1280,6 @@ export function A4Sheet({
                 </div>
               )}
 
-              {/* ── Subject (inline editable) ── */}
               {showSubject && (
                 isClassique ? (
                   <div className="mb-4">
@@ -1390,11 +1303,9 @@ export function A4Sheet({
                 )
               )}
 
-              {/* ── Client Block (right-aligned, inline editable fields) ── */}
               <div className="flex justify-end mb-5">
                 <div className="relative w-full max-w-[50%] group">
                   <div className="text-[12px] leading-[1.5] space-y-[3px]">
-                    {/* Name — click opens client search */}
                     {ed ? (
                       <div
                         className="font-semibold text-[13px] cursor-pointer border-b border-dashed transition-colors"
@@ -1414,16 +1325,12 @@ export function A4Sheet({
                         {client?.displayName || ''}
                       </div>
                     )}
-                    {/* Address */}
                     <div>{ie(client?.address || '', (v) => onClientFieldChange('address', v), 'text-[12px]', lang === 'en' ? 'Address' : 'Adresse postale')}</div>
-                    {/* Address complement */}
                     <div>{ie(client?.addressComplement || '', (v) => onClientFieldChange('addressComplement', v), 'text-[12px]', lang === 'en' ? 'Address line 2' : "Complement d'adresse")}</div>
-                    {/* Postal code + City */}
                     <div className="flex gap-2">
                       {ie(client?.postalCode || '', (v) => onClientFieldChange('postalCode', v), 'text-[12px]', lang === 'en' ? 'Zip' : 'Code postal')}
                       {ie(client?.city || '', (v) => onClientFieldChange('city', v), 'text-[12px]', lang === 'en' ? 'City' : 'Ville')}
                     </div>
-                    {/* Country */}
                     <div>{ie(client?.country || '', (v) => onClientFieldChange('country', v), 'text-[12px]', lang === 'en' ? 'Country' : 'Pays')}</div>
 
                     {showClientSiren && (
@@ -1438,7 +1345,6 @@ export function A4Sheet({
                       </div>
                     )}
 
-                    {/* ── Delivery address ── */}
                     {showDeliveryAddress && (
                       <div className="mt-2 pt-2" style={{ borderTop: `1px solid ${hasError('Adresse de livraison') ? errorBorder : T.borderLight}` }}>
                         <div className="text-[9px] uppercase tracking-[1px] font-semibold mb-0.5" style={{ color: hasError('Adresse de livraison') ? errorBorder : T.textMuted }}>
@@ -1460,7 +1366,6 @@ export function A4Sheet({
                     )}
                   </div>
 
-                  {/* Clear client button */}
                   {ed && client && (
                     <button
                       onClick={(e) => { e.stopPropagation(); onClearClient() }}
@@ -1475,7 +1380,6 @@ export function A4Sheet({
                 </div>
               </div>
 
-              {/* ── Date/Validity container (above lines table) ── */}
               {(issueDate || validityDate || ed) && (
                 isClassique ? (
                   <div className="flex items-end gap-3 mb-4">
@@ -1548,9 +1452,7 @@ export function A4Sheet({
               )}
               </>)}
 
-              {/* ── Lines Table ── */}
               <div className="mb-3" style={(hasError('Désignation') || hasError('Prix')) ? { outline: `2px solid ${errorBorder}`, outlineOffset: '-1px', borderRadius: T.borderRadius } : undefined}>
-                {/* Header */}
                 <div className="overflow-hidden" style={{ display: 'grid', gridTemplateColumns: cols, breakInside: 'avoid', breakAfter: 'avoid', borderTopLeftRadius: T.borderRadius, borderTopRightRadius: T.borderRadius }}>
                   <div className="px-2 py-2 text-[9px] font-semibold uppercase tracking-[0.5px] truncate"
                     style={{ backgroundColor: accentColor, color: contrastText(accentColor) }}>{t.designation}</div>
@@ -1570,7 +1472,6 @@ export function A4Sheet({
                   {ed && <div className="py-2" style={{ backgroundColor: accentColor }} />}
                 </div>
 
-                {/* Rows */}
                 {sliceLines.map((line, i) => {
                   const idx = absStart + i
                   const isSection = line.type === 'section'
@@ -1732,7 +1633,6 @@ export function A4Sheet({
                 })}
               </div>
 
-              {/* ── Add line dropdown (edit mode) — last page only ── */}
               {ed && showBottom && (
                 <AddLineDropdown
                   isClassique={isClassique}
@@ -1751,15 +1651,10 @@ export function A4Sheet({
               )}
 
             </div>
-            {/* ═══ END TOP SECTION ═══ */}
 
-            {/* ═══════════════════════════════════════════
-                 BOTTOM SECTION — always sticks to bottom
-                ═══════════════════════════════════════════ */}
             {showBottom && (
             <div>
 
-              {/* ── Totals ── */}
               <div
                 data-a4-block="totals"
                 className="flex justify-end mb-5"
@@ -1838,7 +1733,6 @@ export function A4Sheet({
                 )}
               </div>
 
-              {/* ── VAT exempt mention ── */}
               {vatExemptReason !== 'none' && (
                 <div className="mb-3 text-[10px] italic" style={{ color: T.textMuted }}>
                   {vatExemptReason === 'not_subject'
@@ -1855,7 +1749,6 @@ export function A4Sheet({
                 </div>
               )}
 
-              {/* ── Notes (editable, optional) ── */}
               {showNotes && (
                 <div
                   data-a4-block="notes"
@@ -1938,7 +1831,6 @@ export function A4Sheet({
                 </div>
               )}
 
-              {/* Payment method + bank account info — invoices only */}
               {isInvoice && paymentMethod && (
                 <div
                   data-a4-block="payment"
@@ -1969,7 +1861,6 @@ export function A4Sheet({
                 </div>
               )}
 
-              {/* ── Footer (company info / VAT exempt / custom text) ── */}
               {isClassique ? (
                 <div
                   data-a4-block="footer"
@@ -2047,13 +1938,11 @@ export function A4Sheet({
 
             </div>
             )}
-            {/* ═══ END BOTTOM SECTION ═══ */}
 
           </div>
     )
   }
 
-  // Shared visual surface of an A4 page (background gradient, shadow, scheme).
   const sheetSurface = {
     background: isClassique
       ? darkMode
@@ -2071,7 +1960,6 @@ export function A4Sheet({
       : 'ring-2 ring-amber-500/60'
     : ''
 
-  // Single A4 page frame — used when the document fits on one page.
   const renderSheetFrame = (children: ReactNode) => (
     <div
       className={cn('w-full max-w-[960px] rounded-xl relative overflow-hidden', overflowRing)}
@@ -2085,7 +1973,6 @@ export function A4Sheet({
 
   return (
     <div className="flex flex-col items-center gap-2.5">
-      {/* ── Page-overflow banner ── */}
       {overflows && (
         <div
           className={cn(
@@ -2108,8 +1995,6 @@ export function A4Sheet({
         </div>
       )}
 
-      {/* Hidden measuring instances — off-screen.
-          1) block flow at one column's width → page count + block positions. */}
       <div
         aria-hidden
         inert
@@ -2118,7 +2003,6 @@ export function A4Sheet({
       >
         {renderDocumentBody('single', lines, 0, contentRef, true)}
       </div>
-      {/* 2) the real CSS-column flow → which block starts page 2. */}
       <div
         aria-hidden
         inert
@@ -2144,14 +2028,9 @@ export function A4Sheet({
         </div>
       </div>
 
-      {/* Visible sheet(s). When the document overflows one page the body is
-          poured into two A4 pages via native CSS column flow (page 1 fills up,
-          only the overflow continues on page 2). Side by side when there is
-          room, stacked vertically — Word-style — when the width is too small. */}
       {showSplit ? (
         <div ref={splitWrapRef} className="flex w-full justify-center">
           {stackVertical ? (
-            // ── Stacked: two A4 cards, one editable body flowing across them ──
             <div style={{ width: A4_SHEET_W * stackScale, height: STACK_TOTAL_H * stackScale }}>
               <motion.div
                 initial={{ opacity: 0.5 }}
@@ -2165,7 +2044,6 @@ export function A4Sheet({
                   transformOrigin: 'top left',
                 }}
               >
-                {/* the two A4 page cards */}
                 <div
                   className={cn('absolute left-0 rounded-xl', overflowRing)}
                   style={{ top: 0, width: A4_SHEET_W, height: A4_SHEET_H, ...sheetSurface }}
@@ -2179,8 +2057,6 @@ export function A4Sheet({
                     ...sheetSurface,
                   }}
                 />
-                {/* the single editable body — the block that starts page 2 is
-                    pushed down by breakMargin so it lands on the second card */}
                 <div
                   className="absolute overflow-hidden"
                   style={{
@@ -2203,7 +2079,6 @@ export function A4Sheet({
               </motion.div>
             </div>
           ) : (
-            // ── Side by side: two A4 cards, body flowing across two columns ──
             <div style={{ width: SPLIT_W * splitScale, height: A4_SHEET_H * splitScale }}>
               <motion.div
                 initial={{ opacity: 0.4 }}
@@ -2217,7 +2092,6 @@ export function A4Sheet({
                   transformOrigin: 'top left',
                 }}
               >
-                {/* the two A4 page cards */}
                 <div className="absolute inset-0 flex" style={{ gap: SPLIT_GAP }}>
                   <div
                     className={cn('h-full rounded-xl', overflowRing)}
@@ -2228,7 +2102,6 @@ export function A4Sheet({
                     style={{ width: A4_SHEET_W, ...sheetSurface }}
                   />
                 </div>
-                {/* the document body, flowing across the two columns */}
                 <div
                   className="absolute inset-0 overflow-hidden"
                   style={{
