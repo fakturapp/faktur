@@ -873,18 +873,9 @@ type PageRole = 'single' | 'first' | 'continuation'
 
 // Reference pixel dimensions for the side-by-side split layout.
 const A4_SHEET_W = 960
-const A4_SHEET_H = Math.round(A4_SHEET_W * (297 / 210)) // 1358
-const SPLIT_GAP = 24 // visible gap between the two A4 sheets
-const SPLIT_W = A4_SHEET_W * 2 + SPLIT_GAP // 1944
-// Per-page margins (matches the px-10 / py-8 of the single sheet).
-const PAGE_PAD_X = 40
-const PAGE_PAD_Y = 32
-const COL_W = A4_SHEET_W - PAGE_PAD_X * 2 // 880 — usable width inside one page
-const COL_H = A4_SHEET_H - PAGE_PAD_Y * 2 // 1294 — usable height inside one page
-// CSS column-gap = visible gap + the right margin of page 1 + the left margin of page 2.
-const COL_GAP = SPLIT_GAP + PAGE_PAD_X * 2 // 104
-// Below this available width the two pages stack vertically instead of shrinking side by side.
-const STACK_THRESHOLD = 1500
+const A4_SHEET_H = Math.round(A4_SHEET_W * (297 / 210)) // 1358 — one A4 page
+const STACK_GAP = 32 // gap between the two stacked A4 sheets
+const STACK_TOTAL_H = A4_SHEET_H * 2 + STACK_GAP // height of the two-sheet stack
 
 interface A4SheetProps {
   mode: 'edit' | 'preview'
@@ -1010,32 +1001,38 @@ export function A4Sheet({
   // Template font override takes precedence
   const effectiveFont = T.font || documentFont
 
-  // Pagination model — DEAD SIMPLE on purpose:
-  // when `paginate`, the document is rendered as ONE continuous sheet that
-  // grows with its content. We measure the sheet, derive how many A4 pages it
-  // spans from its own width (A4 ratio), and draw a dashed break line at every
-  // page boundary. No scaling, no clipping, no CSS columns — nothing that can
-  // make a page "disappear".
-  const sheetRef = useRef<HTMLDivElement>(null)
-  const [pageHeightPx, setPageHeightPx] = useState(0)
+  // Pagination model: a hidden instance renders the document once at the real
+  // A4 width. We measure where the page-1 boundary falls between the line rows
+  // (data-a4-row) to get the split point, then render two REAL separate A4
+  // sheet cards — page 1 with the rows that fit, page 2 with the rest.
+  const contentRef = useRef<HTMLDivElement>(null)
   const [rawPageCount, setRawPageCount] = useState(1)
+  const [splitIndex, setSplitIndex] = useState(0)
 
   useEffect(() => {
     if (!paginate) return
     function measure() {
-      const el = sheetRef.current
-      if (!el) return
-      const w = el.clientWidth
-      const h = el.scrollHeight
-      if (w <= 0 || h <= 0) return
-      const ph = w * (297 / 210) // height of one A4 page at this width
-      setPageHeightPx(ph)
-      setRawPageCount(Math.max(1, Math.ceil((h - 8) / ph)))
+      const content = contentRef.current
+      if (!content) return
+      const total = content.scrollHeight
+      if (total <= 0) return
+      setRawPageCount(Math.max(1, Math.ceil((total - 8) / A4_SHEET_H)))
+      // First line row whose bottom spills past page 1 → the split point.
+      const budget = A4_SHEET_H - 48
+      const rows = content.querySelectorAll<HTMLElement>('[data-a4-row]')
+      let split = lines.length
+      for (let i = 0; i < rows.length; i++) {
+        if (rows[i].offsetTop + rows[i].offsetHeight > budget) {
+          split = i
+          break
+        }
+      }
+      setSplitIndex(Math.max(1, Math.min(split, lines.length)))
     }
     const raf = requestAnimationFrame(measure)
     const ro = new ResizeObserver(measure)
-    if (sheetRef.current) ro.observe(sheetRef.current)
-    // Custom fonts load async and change heights — re-measure once they settle.
+    if (contentRef.current) ro.observe(contentRef.current)
+    // Custom fonts load async and change row heights — re-measure once ready.
     if (typeof document !== 'undefined' && document.fonts?.ready) {
       document.fonts.ready.then(measure).catch(() => {})
     }
@@ -1061,6 +1058,23 @@ export function A4Sheet({
     }
     wasTooMuch.current = tooMuchContent
   }, [tooMuchContent, paginate])
+
+  // The two stacked sheets are scaled down to fit the available width.
+  const splitWrapRef = useRef<HTMLDivElement>(null)
+  const [stackScale, setStackScale] = useState(1)
+  useEffect(() => {
+    if (!paginate) return
+    const el = splitWrapRef.current
+    if (!el) return
+    const update = () => {
+      const w = el.clientWidth
+      if (w > 0) setStackScale(Math.min(1, w / A4_SHEET_W))
+    }
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [paginate])
 
   // Dynamically load document font from Google Fonts
   useEffect(() => {
@@ -2014,44 +2028,58 @@ export function A4Sheet({
         </div>
       )}
 
-      {/* The document. When `paginate`, it is one continuous sheet that grows
-          with its content, with a dashed break line drawn at every A4-page
-          boundary — nothing is scaled or clipped, so no page can disappear. */}
-      {paginate ? (
-        <div
-          ref={sheetRef}
-          className={cn('w-full max-w-[960px] rounded-xl relative', overflowRing)}
-          style={{ ...sheetSurface, minHeight: pageHeightPx || undefined }}
-        >
-          {/* Page-break bands — a real gap (like the space between pages in
-              Word) that visually cuts the document into separate pages. */}
-          {pageHeightPx > 0 &&
-            Array.from({ length: Math.max(0, rawPageCount - 1) }).map((_, i) => {
-              const isExtra = i + 1 >= 2
-              return (
+      {/* The document. When it overflows one page, it is rendered as TWO real
+          separate A4 sheet cards stacked vertically — page 1 holds the rows
+          that fit, page 2 ('Suite') holds the rest plus the totals/footer.
+          The hidden instance below drives the split-point measurement. */}
+      {paginate && overflows ? (
+        <>
+          {/* hidden measuring instance — full document at real A4 width */}
+          <div
+            aria-hidden
+            inert
+            className="pointer-events-none"
+            style={{ position: 'absolute', left: -99999, top: 0, width: A4_SHEET_W }}
+          >
+            {renderDocumentBody('single', lines, 0, contentRef)}
+          </div>
+
+          <div ref={splitWrapRef} className="flex w-full justify-center">
+            <div style={{ width: A4_SHEET_W * stackScale, height: STACK_TOTAL_H * stackScale }}>
+              <div
+                className="flex flex-col"
+                style={{
+                  width: A4_SHEET_W,
+                  gap: STACK_GAP,
+                  transform: `scale(${stackScale})`,
+                  transformOrigin: 'top left',
+                }}
+              >
+                {/* Page 1 */}
                 <div
-                  key={i}
-                  className="pointer-events-none absolute inset-x-0 z-10 flex items-center justify-center bg-muted"
-                  style={{
-                    top: (i + 1) * pageHeightPx,
-                    height: 30,
-                    boxShadow:
-                      'inset 0 11px 11px -11px rgba(0,0,0,0.28), inset 0 -11px 11px -11px rgba(0,0,0,0.28)',
-                  }}
+                  className={cn('shrink-0 rounded-xl relative overflow-hidden', overflowRing)}
+                  style={{ width: A4_SHEET_W, height: A4_SHEET_H, ...sheetSurface }}
                 >
-                  <span
-                    className={cn(
-                      'rounded-full px-2.5 py-0.5 text-[10px] font-bold text-white shadow',
-                      isExtra ? 'bg-red-500' : 'bg-amber-500',
-                    )}
-                  >
-                    Page {i + 2}
-                  </span>
+                  <div className="absolute inset-0">
+                    {renderDocumentBody('first', lines.slice(0, splitIndex), 0)}
+                  </div>
                 </div>
-              )
-            })}
-          {renderDocumentBody('single', lines, 0)}
-        </div>
+                {/* Page 2 */}
+                <motion.div
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
+                  className={cn('shrink-0 rounded-xl relative overflow-hidden', overflowRing)}
+                  style={{ width: A4_SHEET_W, height: A4_SHEET_H, ...sheetSurface }}
+                >
+                  <div className={cn('absolute inset-0', isPreview ? 'overflow-hidden' : 'overflow-y-auto')}>
+                    {renderDocumentBody('continuation', lines.slice(splitIndex), splitIndex)}
+                  </div>
+                </motion.div>
+              </div>
+            </div>
+          </div>
+        </>
       ) : (
         renderSheetFrame(renderDocumentBody('single', lines, 0))
       )}
