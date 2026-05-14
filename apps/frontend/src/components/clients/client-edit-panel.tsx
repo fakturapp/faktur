@@ -347,27 +347,15 @@ export function ClientEditPanel({ open, clientId, onClose, onUpdated, onDeleted 
 
                             <div>
                               <label className="text-sm font-medium text-foreground mb-1.5 block">Civilite</label>
-                              <div className="flex gap-2">
-                                {([
+                              <FormSelect
+                                value={form.civility}
+                                onChange={(v) => update('civility', v as typeof form.civility)}
+                                options={[
+                                  { value: '', label: 'Non specifiee' },
                                   { value: 'mr', label: 'Mr' },
                                   { value: 'mme', label: 'Mme' },
-                                ] as const).map((opt) => (
-                                  <button
-                                    key={opt.value}
-                                    type="button"
-                                    onClick={() =>
-                                      update('civility', form.civility === opt.value ? '' : opt.value)
-                                    }
-                                    className={`flex-1 rounded-xl border-2 px-4 py-2.5 text-sm font-medium transition-all ${
-                                      form.civility === opt.value
-                                        ? 'border-primary bg-primary/5 text-foreground'
-                                        : 'border-border text-muted-foreground hover:border-muted-foreground/30'
-                                    }`}
-                                  >
-                                    {opt.label}
-                                  </button>
-                                ))}
-                              </div>
+                                ]}
+                              />
                             </div>
 
                             <div className="grid grid-cols-2 gap-3">
