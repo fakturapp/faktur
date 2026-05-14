@@ -21,7 +21,7 @@ export function PreprodBanner() {
       >
         <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
         <span className="tracking-wide uppercase">
-          Environnement de préproduction — données réelles, cliquez pour en savoir plus
+          Environnement de préproduction, cliquez pour en savoir plus
         </span>
         <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
       </button>
