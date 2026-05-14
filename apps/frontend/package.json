@@ -27,6 +27,7 @@
     "lucide-react": "^1.8.0",
     "next": "^16.2.3",
     "ogl": "^1.0.11",
+    "pdfjs-dist": "^5.7.284",
     "react": "^19.2.5",
     "react-aria-components": "^1.16.0",
     "react-dom": "^19.2.5",
