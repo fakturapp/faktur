@@ -329,7 +329,7 @@ export class ClientContactSchema extends BaseModel {
 }
 
 export class ClientSchema extends BaseModel {
-  static $columns = ['address', 'addressComplement', 'b2BContactId', 'city', 'companyName', 'country', 'createdAt', 'email', 'firstName', 'id', 'includeInEmails', 'lastName', 'notes', 'phone', 'postalCode', 'siren', 'siret', 'teamId', 'type', 'updatedAt', 'vatNumber'] as const
+  static $columns = ['address', 'addressComplement', 'b2BContactId', 'city', 'civility', 'companyName', 'country', 'createdAt', 'email', 'firstName', 'id', 'includeInEmails', 'lastName', 'notes', 'phone', 'postalCode', 'siren', 'siret', 'teamId', 'type', 'updatedAt', 'vatNumber'] as const
   $columns = ClientSchema.$columns
   @column()
   declare address: string | null
@@ -339,6 +339,8 @@ export class ClientSchema extends BaseModel {
   declare b2BContactId: number | null
   @column()
   declare city: string | null
+  @column()
+  declare civility: string | null
   @column()
   declare companyName: string | null
   @column()
