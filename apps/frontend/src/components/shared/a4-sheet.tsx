@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
 import { DatePicker } from '@/components/ui/date-picker'
+import { toast } from '@/components/ui/toast'
 import { getTemplate, type TemplateConfig } from '@/lib/invoice-templates'
 import { getTranslations } from '@/lib/invoice-i18n'
 
@@ -442,7 +443,7 @@ export function ClientModal({
    ═══════════════════════════════════════════════════════════ */
 
 function AddLineDropdown({
-  isClassique, accentColor, T, t, onAddLine, onCatalogClick,
+  isClassique, accentColor, T, t, onAddLine, onCatalogClick, disabled = false, onDisabledClick,
 }: {
   isClassique: boolean
   accentColor: string
@@ -450,6 +451,8 @@ function AddLineDropdown({
   t: any
   onAddLine: (type: 'standard' | 'section') => void
   onCatalogClick?: () => void
+  disabled?: boolean
+  onDisabledClick?: () => void
 }) {
   const [open, setOpen] = useState(false)
   const [menuPos, setMenuPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 })
@@ -472,6 +475,10 @@ function AddLineDropdown({
   }, [open])
 
   function toggle() {
+    if (disabled) {
+      onDisabledClick?.()
+      return
+    }
     if (!open && triggerRef.current) {
       const r = triggerRef.current.getBoundingClientRect()
       setMenuPos({ top: r.bottom + 4, left: r.left })
@@ -535,7 +542,10 @@ function AddLineDropdown({
         <button
           ref={triggerRef}
           onClick={toggle}
-          className="px-4 py-1.5 rounded-full text-[14px] font-extrabold cursor-pointer transition-all flex items-center gap-2"
+          className={cn(
+            'px-4 py-1.5 rounded-full text-[14px] font-extrabold cursor-pointer transition-all flex items-center gap-2',
+            disabled && 'opacity-50 cursor-not-allowed',
+          )}
           style={{
             border: 'none',
             background: T.docBg,
@@ -552,7 +562,10 @@ function AddLineDropdown({
         <button
           ref={triggerRef}
           onClick={toggle}
-          className="px-3.5 py-1.5 rounded-full text-[11px] font-medium cursor-pointer transition-all flex items-center gap-1.5"
+          className={cn(
+            'px-3.5 py-1.5 rounded-full text-[11px] font-medium cursor-pointer transition-all flex items-center gap-1.5',
+            disabled && 'opacity-50 cursor-not-allowed',
+          )}
           style={{ border: `1px dashed ${accentColor}88`, background: `${accentColor}08`, color: accentColor }}
           onMouseEnter={(e) => (e.currentTarget.style.background = `${accentColor}18`)}
           onMouseLeave={(e) => (e.currentTarget.style.background = `${accentColor}08`)}
@@ -870,6 +883,8 @@ const COL_W = A4_SHEET_W - PAGE_PAD_X * 2 // 880 — usable width inside one pag
 const COL_H = A4_SHEET_H - PAGE_PAD_Y * 2 // 1294 — usable height inside one page
 // CSS column-gap = visible gap + the right margin of page 1 + the left margin of page 2.
 const COL_GAP = SPLIT_GAP + PAGE_PAD_X * 2 // 104
+// Below this available width the two pages stack vertically instead of shrinking side by side.
+const STACK_THRESHOLD = 1500
 
 interface A4SheetProps {
   mode: 'edit' | 'preview'
@@ -1027,9 +1042,23 @@ export function A4Sheet({
   const overflows = pageCount > 1
   const showSplit = paginate && pageCount > 1
 
-  // The two-page split is scaled down to fit the available width — no scrollbar.
+  // Toast once when the document first overflows the 2-page limit.
+  const wasTooMuch = useRef(false)
+  useEffect(() => {
+    if (tooMuchContent && !wasTooMuch.current && paginate) {
+      toast.warning('Limite de page atteinte', {
+        description: 'Cette facture dépasse 2 pages — supprimez du contenu pour continuer.',
+      })
+    }
+    wasTooMuch.current = tooMuchContent
+  }, [tooMuchContent, paginate])
+
+  // The two-page view fits the available width. When that width gets too
+  // small, the pages stack vertically instead of shrinking side by side.
   const splitWrapRef = useRef<HTMLDivElement>(null)
   const [splitScale, setSplitScale] = useState(1)
+  const [stackScale, setStackScale] = useState(1)
+  const [stackVertical, setStackVertical] = useState(false)
 
   useEffect(() => {
     if (!showSplit) return
@@ -1037,7 +1066,14 @@ export function A4Sheet({
       const el = splitWrapRef.current
       if (!el) return
       const avail = el.clientWidth
-      if (avail > 0) setSplitScale(Math.min(1, avail / SPLIT_W))
+      if (avail <= 0) return
+      const stack = avail < STACK_THRESHOLD
+      setStackVertical(stack)
+      if (stack) {
+        setStackScale(Math.min(1, avail / A4_SHEET_W))
+      } else {
+        setSplitScale(Math.min(1, avail / SPLIT_W))
+      }
     }
     fit()
     const ro = new ResizeObserver(fit)
@@ -1654,7 +1690,22 @@ export function A4Sheet({
               </div>
 
               {/* ── Add line dropdown (edit mode) — last page only ── */}
-              {ed && showBottom && <AddLineDropdown isClassique={isClassique} accentColor={accentColor} T={T} t={t} onAddLine={onAddLine} onCatalogClick={onCatalogClick} />}
+              {ed && showBottom && (
+                <AddLineDropdown
+                  isClassique={isClassique}
+                  accentColor={accentColor}
+                  T={T}
+                  t={t}
+                  onAddLine={onAddLine}
+                  onCatalogClick={onCatalogClick}
+                  disabled={tooMuchContent}
+                  onDisabledClick={() =>
+                    toast.warning('Limite de page atteinte', {
+                      description: 'Supprimez du contenu avant d’ajouter de nouvelles lignes.',
+                    })
+                  }
+                />
+              )}
 
             </div>
             {/* ═══ END TOP SECTION ═══ */}
@@ -1993,24 +2044,55 @@ export function A4Sheet({
         {renderDocumentBody('single', lines, 0, contentRef, true)}
       </div>
 
-      {/* Visible sheet(s). When the document overflows one page, the body is
-          poured into two side-by-side A4 columns (native CSS column flow —
-          page 1 fills up, only the overflow continues on page 2), scaled to
-          fit the available width. */}
+      {/* Visible sheet(s). When the document overflows one page the body is
+          poured into two A4 pages via native CSS column flow (page 1 fills up,
+          only the overflow continues on page 2). Side by side when there is
+          room, stacked vertically — Word-style — when the width is too small. */}
       {showSplit ? (
         <div ref={splitWrapRef} className="flex w-full justify-center">
-          <div style={{ width: SPLIT_W * splitScale, height: A4_SHEET_H * splitScale }}>
+          {stackVertical ? (
+            // ── Stacked: one continuous A4-width sheet, page breaks drawn in ──
+            <motion.div
+              initial={{ opacity: 0.5 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              style={{ zoom: stackScale }}
+            >
+              <div
+                className={cn('relative rounded-xl', overflowRing)}
+                style={{ width: A4_SHEET_W, ...sheetSurface }}
+              >
+                {/* page-break separators every A4 page height */}
+                <div
+                  className="pointer-events-none absolute z-10 border-t-2 border-dashed border-amber-400/50"
+                  style={{ top: A4_SHEET_H, left: PAGE_PAD_X / 2, right: PAGE_PAD_X / 2 }}
+                />
+                {tooMuchContent && (
+                  <div
+                    className="pointer-events-none absolute z-10 border-t-2 border-dashed border-red-400/50"
+                    style={{ top: A4_SHEET_H * 2, left: PAGE_PAD_X / 2, right: PAGE_PAD_X / 2 }}
+                  />
+                )}
+                <div
+                  style={{
+                    paddingLeft: PAGE_PAD_X,
+                    paddingRight: PAGE_PAD_X,
+                    paddingTop: PAGE_PAD_Y,
+                    paddingBottom: PAGE_PAD_Y,
+                  }}
+                >
+                  {renderDocumentBody('single', lines, 0, undefined, true)}
+                </div>
+              </div>
+            </motion.div>
+          ) : (
+            // ── Side by side: two A4 cards, body flowing across two columns ──
             <motion.div
               initial={{ opacity: 0.4 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
               className="relative"
-              style={{
-                width: SPLIT_W,
-                height: A4_SHEET_H,
-                transform: `scale(${splitScale})`,
-                transformOrigin: 'top left',
-              }}
+              style={{ width: SPLIT_W, height: A4_SHEET_H, zoom: splitScale }}
             >
               {/* the two A4 page cards */}
               <div className="absolute inset-0 flex" style={{ gap: SPLIT_GAP }}>
@@ -2039,7 +2121,7 @@ export function A4Sheet({
                 {renderDocumentBody('single', lines, 0, undefined, true)}
               </div>
             </motion.div>
-          </div>
+          )}
         </div>
       ) : (
         renderSheetFrame(renderDocumentBody('single', lines, 0))
