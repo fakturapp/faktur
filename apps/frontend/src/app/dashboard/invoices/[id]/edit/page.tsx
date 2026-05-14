@@ -187,7 +187,6 @@ function EditInvoiceContent() {
         if (inv.paymentMethod) setPaymentMethod(inv.paymentMethod)
         if (inv.bankAccountId) {
           setBankAccountId(inv.bankAccountId)
-          // Load full bank account info for A4Sheet preview
           api.get<{ bankAccount: any }>(`/company/bank-accounts/${inv.bankAccountId}`).then(({ data }) => {
             if (data?.bankAccount) {
               setBankAccountInfo({
@@ -205,7 +204,7 @@ function EditInvoiceContent() {
           setSelectedClient(inv.client)
         }
         if (inv.companySnapshot) {
-          try { setCompany((prev) => ({ ...prev, ...JSON.parse(inv.companySnapshot) })) } catch { /* keep company from API */ }
+          try { setCompany((prev) => ({ ...prev, ...JSON.parse(inv.companySnapshot) })) } catch {  }
         }
 
         if (inv.lines && inv.lines.length > 0) {
@@ -233,11 +232,9 @@ function EditInvoiceContent() {
     init()
   }, [invoiceId])
 
-  // Auto-open preview mode from ?preview=1 query param
   useEffect(() => {
     if (!loading && searchParams.get('preview') === '1') {
       setMode('preview')
-      // Clean URL without re-render/navigation
       window.history.replaceState({}, '', window.location.pathname)
     }
   }, [loading, searchParams])
@@ -261,7 +258,6 @@ function EditInvoiceContent() {
     })
   }, [defaultVatRate, loading, settingsLoading])
 
-  // Handlers
   const handleUpdateLine = useCallback((index: number, partial: Partial<DocumentLine>) => {
     setLines((prev) => prev.map((l, i) => (i === index ? { ...l, ...partial } : l)))
     setIsDirty(true); setValidationErrors([])
@@ -361,7 +357,6 @@ function EditInvoiceContent() {
     }
   }, [])
 
-  // Calculations
   const { subtotal, taxAmount, discountAmount, total, tvaBreakdown } = useMemo(() => {
     let sub = 0, tax = 0
     const tvaMap: Record<number, { base: number; amount: number }> = {}
@@ -399,7 +394,6 @@ function EditInvoiceContent() {
     }
   }, [lines, options.billingType, options.globalDiscountType, options.globalDiscountValue])
 
-  // Save
   async function handleSave() {
     const errors: string[] = []
     if (!selectedClient) errors.push('Client')
@@ -526,7 +520,6 @@ function EditInvoiceContent() {
     toast('Devis délié', 'success')
   }
 
-  // Loading skeleton
   if (loading || settingsLoading) {
     return (
       <div className="space-y-5 px-4 lg:px-6 py-4 md:py-5">
@@ -646,7 +639,6 @@ function EditInvoiceContent() {
       }}
     >
     <motion.div initial="hidden" animate="visible" className="space-y-5 px-4 lg:px-6 py-4 md:py-5">
-      {/* Collaboration sync (only when enabled) */}
       {collabEnabled && <CollaborationReadOnlyBanner />}
       {collabEnabled && <SyncBroadcaster
         notes={notes}
@@ -659,7 +651,6 @@ function EditInvoiceContent() {
         bankAccountId={bankAccountId}
       />}
 
-      {/* Header */}
       <motion.div variants={fadeUp} custom={0} className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => {
@@ -696,7 +687,6 @@ function EditInvoiceContent() {
       </motion.div>
 
 
-      {/* Linked quote */}
       {sourceQuote && (
         <motion.div variants={fadeUp} custom={0.5} className="flex flex-wrap gap-3">
           <div className="flex items-center gap-2.5 rounded-xl border border-border bg-card/50 px-4 py-2.5">
@@ -720,7 +710,6 @@ function EditInvoiceContent() {
         </motion.div>
       )}
 
-      {/* Main content */}
       <div className="flex flex-col xl:flex-row gap-5">
         <motion.div variants={fadeUp} custom={1} className="flex-1 min-w-0 order-1">
           <div className="rounded-xl relative">
@@ -906,7 +895,6 @@ function EditInvoiceContent() {
         </AnimatePresence>
       </div>
 
-      {/* Sticky save bar */}
       <div className="fixed bottom-4 left-0 right-0 z-20 flex flex-col items-center gap-2 pointer-events-none">
         <AnimatePresence>
           {validationErrors.length > 0 && (
