@@ -1,5 +1,4 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import env from '#start/env'
 import AuthProvider from '#models/account/auth_provider'
 import PasskeyCredential from '#models/account/passkey_credential'
 import Team from '#models/team/team'
@@ -7,6 +6,7 @@ import TeamMember from '#models/team/team_member'
 import keyStore from '#services/crypto/key_store'
 import keyStoreWarmer from '#services/crypto/key_store_warmer'
 import UserTransformer from '#transformers/user_transformer'
+import { isAdminEmail } from '#services/auth/is_admin'
 
 export default class Me {
   async handle(ctx: HttpContext) {
@@ -55,11 +55,7 @@ export default class Me {
       }
     }
 
-    const adminEmails = (env.get('ADMIN_EMAILS') || '')
-      .split(/[,;]/)
-      .map((e) => e.trim().toLowerCase())
-      .filter(Boolean)
-    const isAdmin = adminEmails.includes(user.email.toLowerCase())
+    const isAdmin = isAdminEmail(user.email)
 
     const teamsSummary = teams.map((t) => ({
       id: t.id,

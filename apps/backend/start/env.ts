@@ -3,6 +3,14 @@ import { Env } from '@adonisjs/core/env'
 
 export default await Env.create(new URL('../', import.meta.url), {
   NODE_ENV: Env.schema.enum(['development', 'production', 'test'] as const),
+
+  // Deployment environment marker. Independent from NODE_ENV: a preprod server
+  // typically runs NODE_ENV=production but APP_ENV=preprod.
+  APP_ENV: Env.schema.enum.optional(['development', 'preprod', 'production'] as const),
+
+  // When true, only users in ADMIN_EMAILS may use authenticated areas.
+  ADMIN_ONLY: Env.schema.boolean.optional(),
+
   PORT: Env.schema.number(),
   HOST: Env.schema.string({ format: 'host' }),
   LOG_LEVEL: Env.schema.string.optional(),
