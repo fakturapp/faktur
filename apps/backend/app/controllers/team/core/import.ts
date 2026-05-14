@@ -382,7 +382,6 @@ export default class Import {
 
         const newUrl = `/${dir}/${newFileName}`
 
-        // Update the corresponding model's URL
         if (dir === 'team-icons') {
           await Team.query().where('id', team.id).update({ iconUrl: newUrl })
         } else if (dir === 'company-logos') {
@@ -393,7 +392,6 @@ export default class Import {
       }
     }
 
-    // Switch user to the new team
     user.currentTeamId = team.id
     await user.save()
 
