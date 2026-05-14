@@ -157,14 +157,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     refreshUser()
   }, [refreshUser])
 
-  // Onboarding is tracked per-team: the current team needs the wizard when it
-  // has no currentTeamId at all, or its currentTeam row has no
-  // onboardingCompletedAt. A currentTeamId pointing to a team absent from the
-  // list is treated as "no onboarding needed" to avoid trapping the user.
   const currentTeam = user?.teams?.find((t) => t.id === user.currentTeamId) ?? null
-  // A freshly created private team keeps its recovery key in sessionStorage
-  // until the user acknowledges it on the recovery-key step. While it is
-  // pending, the user must stay in the onboarding flow.
   const hasPendingRecoveryKey =
     typeof window !== 'undefined' &&
     !!user?.currentTeamId &&
@@ -178,8 +171,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (loading) return
 
-    // A logged-in user whose teams[] hasn't loaded yet (light login payload,
-    // /auth/me still in flight) — wait before deciding any onboarding redirect.
     if (user && user.teams === undefined) return
 
     if (!user && !isPublicPath) {
@@ -195,9 +186,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     if (user && isPublicPath) {
-      // Let these pages handle their own "already logged in" state.
-      // /register is included so it can honor its own ?redirect=
-      // param (Faktur Desktop → /register?redirect=/oauth/authorize…).
       if (
         pathname === '/login' ||
         pathname === '/register' ||
@@ -252,19 +240,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch {}
 
     setUser(userData)
-    // The login/passkey/oauth payloads are lighter than /auth/me and may omit
-    // teams[] — pull the full profile so the team switcher and the per-team
-    // onboarding guard have the data they need.
     void refreshUser()
   }
 
   async function logout(options: LogoutOptions = {}) {
     const wipeAll = options.wipeAll === true
 
-    // ---------- Selective vs full localStorage wipe ----------
-    // Both modes ALWAYS preserve the keys in ALWAYS_PRESERVE_KEYS so
-    // that the cookie consent banner and the "what's new" modal don't
-    // pop up again after every reconnection.
     function clearLocalStorageState() {
       try {
         if (wipeAll) {
@@ -276,7 +257,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           try {
             sessionStorage.clear()
           } catch {
-            /* ignore */
           }
         } else {
           for (const key of AUTH_LOCAL_KEYS) {
@@ -284,16 +264,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         }
       } catch {
-        /* ignore */
       }
     }
 
-    // ---------- Faktur Desktop path ----------
-    // Delegate to the Electron main process so it can nuke OAuth
-    // tokens (and optionally cookies/cache for the wipeAll case)
-    // before swapping to the login window. Calling this FIRST
-    // prevents the navigation guard in shell_window.js from triggering
-    // a session_expired loop.
     const desktopBridge =
       typeof window !== 'undefined' ? (window as any).fakturDesktop : null
     if (desktopBridge?.logout) {
@@ -301,12 +274,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         await desktopBridge.logout({ wipeAll })
       } catch {
-        /* ignore */
       }
       return
     }
 
-    // ---------- Web path ----------
     await api.post('/auth/logout', {})
     clearLocalStorageState()
     setUser(null)
