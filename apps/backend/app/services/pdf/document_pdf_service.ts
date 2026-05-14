@@ -86,6 +86,7 @@ function buildClientData(client: any) {
   if (!client) return null
   return {
     type: client.type,
+    civility: client.civility ?? null,
     displayName: client.displayName,
     companyName: client.companyName,
     firstName: client.firstName,

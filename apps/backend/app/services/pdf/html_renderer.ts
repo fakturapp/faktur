@@ -45,6 +45,7 @@ interface LineData {
 
 interface ClientData {
   type: string
+  civility?: 'mr' | 'mme' | null
   displayName: string
   companyName: string | null
   firstName: string | null
@@ -58,6 +59,13 @@ interface ClientData {
   country: string
   siren: string | null
   vatNumber: string | null
+}
+
+function clientDisplayName(client: ClientData): string {
+  const base = (client.displayName || '').replace(/^(Mr|Mme)\s+/i, '').trim()
+  if (client.type === 'company') return client.displayName || base
+  const prefix = client.civility === 'mr' ? 'Mr ' : client.civility === 'mme' ? 'Mme ' : ''
+  return (prefix + base).trim()
 }
 
 interface CompanyData {
@@ -863,7 +871,7 @@ function renderClientBlock(
   if (!client) return ''
 
   let html = '<div class="client-block"><div class="client-card">'
-  html += `<div class="client-name">${esc(client.displayName)}</div>`
+  html += `<div class="client-name">${esc(clientDisplayName(client))}</div>`
   if (client.address) html += `<div class="client-line">${esc(client.address)}</div>`
   if (client.addressComplement)
     html += `<div class="client-line">${esc(client.addressComplement)}</div>`
@@ -1165,7 +1173,7 @@ function renderLateral(
   // Client only
   if (client) {
     main += `<div style="margin-bottom:20px"><div class="address-label">${i.recipient}</div><div class="address-content">`
-    main += `<div class="address-name">${esc(client.displayName)}</div>`
+    main += `<div class="address-name">${esc(clientDisplayName(client))}</div>`
     if (client.address) main += `<div class="address-line">${esc(client.address)}</div>`
     if (client.postalCode || client.city)
       main += `<div class="address-line">${esc(client.postalCode || '')} ${esc(client.city || '')}</div>`
