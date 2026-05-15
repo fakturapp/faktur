@@ -196,7 +196,7 @@ export default function InvoiceDefaultsPage() {
                         },
                         {
                           id: 'custom' as const,
-                          label: 'Texte personnalis&eacute;',
+                          label: 'Texte personnalisé',
                           desc: 'Saisissez votre propre texte de pied de page',
                         },
                       ]).map((opt) => (
