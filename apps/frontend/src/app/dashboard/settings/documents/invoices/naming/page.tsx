@@ -161,6 +161,48 @@ function PatternPreview({ pattern }: { pattern: string }) {
   )
 }
 
+function EditablePatternPreview({ pattern, onChange }: { pattern: string; onChange: (next: string) => void }) {
+  const tokens = tokenize(pattern)
+
+  const removeVar = (varName: VarName) => {
+    const next = tokens
+      .filter((t) => !(t.type === 'var' && t.name === varName))
+      .map((t) => (t.type === 'text' ? t.value : `{${t.name}}`))
+      .join('')
+    onChange(next)
+  }
+
+  if (tokens.length === 0) {
+    return <span className="text-xs text-muted-foreground italic">Cliquez sur une variable ci-dessous</span>
+  }
+
+  return (
+    <span className="inline-flex items-center flex-wrap gap-1 font-mono text-sm text-foreground/90">
+      {tokens.map((t, i) =>
+        t.type === 'text' ? (
+          <span key={i} className="whitespace-pre">{t.value}</span>
+        ) : (
+          <span
+            key={i}
+            className="inline-flex items-center h-6 pl-2 pr-1 rounded-md bg-accent/15 text-accent text-[11px] font-medium font-sans gap-0.5 group/badge"
+          >
+            {VAR_DEFS.find((v) => v.name === t.name)?.label ?? t.name}
+            <button
+              type="button"
+              onClick={() => removeVar(t.name)}
+              className="inline-flex h-4 w-4 items-center justify-center rounded-sm text-accent/70 hover:bg-accent/20 hover:text-accent transition-colors"
+              aria-label={`Retirer ${t.name}`}
+              title="Retirer"
+            >
+              <X className="h-2.5 w-2.5" />
+            </button>
+          </span>
+        )
+      )}
+    </span>
+  )
+}
+
 interface PatternEditorProps {
   open: boolean
   title: string
@@ -191,15 +233,6 @@ function PatternEditor({ open, title, initialValue, fallback, kind, onClose, onS
     })
   }, [])
 
-  const removeLastToken = useCallback(() => {
-    setValue((v) => {
-      const tokens = tokenize(v)
-      if (tokens.length === 0) return v
-      tokens.pop()
-      return tokens.map((t) => (t.type === 'text' ? t.value : `{${t.name}}`)).join('')
-    })
-  }, [])
-
   const preview = resolvePreview(value || fallback)
 
   return (
@@ -217,7 +250,7 @@ function PatternEditor({ open, title, initialValue, fallback, kind, onClose, onS
             Structure
           </label>
           <div className="rounded-lg border border-border bg-muted/30 p-3 min-h-[44px] flex items-center">
-            <PatternPreview pattern={value} />
+            <EditablePatternPreview pattern={value} onChange={setValue} />
           </div>
         </div>
 
@@ -237,16 +270,13 @@ function PatternEditor({ open, title, initialValue, fallback, kind, onClose, onS
           <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">
             Aperçu en direct
           </label>
-          <div className="grid grid-cols-[1fr_120px] gap-3">
-            <div className="space-y-3">
-              <FilePreviewCard pattern={value} fallback={fallback} kind={kind} />
-              <div className="rounded-lg border border-accent/30 bg-accent/5 p-3 flex items-center justify-center">
-                <span className="font-mono text-base font-semibold text-foreground tracking-wide">
-                  {preview || <span className="text-muted-foreground/60 text-xs font-normal italic">Aucun format</span>}
-                </span>
-              </div>
+          <div className="space-y-2">
+            <FilePreviewCard pattern={value} fallback={fallback} kind={kind} />
+            <div className="rounded-lg border border-accent/30 bg-accent/5 p-3 flex items-center justify-center">
+              <span className="font-mono text-base font-semibold text-foreground tracking-wide">
+                {preview || <span className="text-muted-foreground/60 text-xs font-normal italic">Aucun format</span>}
+              </span>
             </div>
-            <SheetPreview pattern={value} fallback={fallback} kind={kind} />
           </div>
         </div>
 
@@ -270,13 +300,6 @@ function PatternEditor({ open, title, initialValue, fallback, kind, onClose, onS
                 </button>
               )
             })}
-            <button
-              type="button"
-              onClick={removeLastToken}
-              className="inline-flex items-center gap-1 h-7 px-2.5 rounded-md bg-muted text-muted-foreground text-[12px] font-medium hover:bg-muted/70 transition-colors ml-auto"
-            >
-              <X className="h-3 w-3" /> Retirer le dernier
-            </button>
           </div>
         </div>
       </div>
