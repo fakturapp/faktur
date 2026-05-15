@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -16,7 +16,7 @@ import { Textarea } from '@/components/ui/textarea'
 import {
   Mail, Plus, Server, Zap, Send, Eye, EyeOff, Key, Star, Trash2,
   ArrowLeft, ArrowRight, X, CheckCircle2, XCircle, Check, MoreHorizontal,
-  FileText, Receipt, FileMinus2,
+  FileText, Receipt, FileMinus2, ExternalLink,
 } from 'lucide-react'
 
 const fadeUp = {
@@ -40,6 +40,7 @@ const providerMeta: Record<string, { label: string; color: string; bgColor: stri
 function EmailSettingsContent() {
   const { toast } = useToast()
   const searchParams = useSearchParams()
+  const router = useRouter()
   const { accounts, loading, refreshAccounts } = useEmail()
 
   const [deletingId, setDeletingId] = useState<string | null>(null)
@@ -450,13 +451,23 @@ function EmailSettingsContent() {
                             </Button>
                           </div>
                         ) : (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setEditingTemplate(item.type)}
-                          >
-                            Modifier
-                          </Button>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setEditingTemplate(item.type)}
+                            >
+                              Modifier
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => router.push(`/dashboard/settings/email/templates/${item.type}`)}
+                              className="gap-1.5"
+                            >
+                              Voir plus <ExternalLink className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
                         )}
                       </div>
 
