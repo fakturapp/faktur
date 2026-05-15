@@ -404,16 +404,6 @@ function EmailSettingsContent() {
           </Card>
         </motion.div>
 
-        {/* Info card */}
-        <motion.div variants={fadeUp} custom={2} className="mt-4">
-          <div className="rounded-lg border border-border/50 bg-muted/10 p-4">
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              <strong className="text-foreground">Sécurité</strong> — Vos identifiants sont chiffrés avant stockage et ne sont jamais accessibles en clair.
-              Les connexions Gmail utilisent OAuth 2.0, aucun mot de passe n&apos;est stocké.
-            </p>
-          </div>
-        </motion.div>
-
         {/* Email Templates */}
         <motion.div variants={fadeUp} custom={3} className="mt-6">
           <Card className="overflow-hidden border-border/50">
