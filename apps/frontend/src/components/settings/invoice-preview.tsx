@@ -18,7 +18,7 @@ export function InvoicePreview() {
           { key: 'vat', width: 'w-10', visible: settings.defaultShowVatColumn },
         ].filter((column) => column.visible)
       : []
-  const previewRowCount = settings.billingType === 'detailed' ? 4 : 3
+  const previewRowCount = settings.billingType === 'detailed' ? 3 : 2
   const previewVatRate = Number(settings.defaultVatRate ?? 20)
 
   return (
@@ -44,7 +44,7 @@ export function InvoicePreview() {
                 border: settings.darkMode ? '1px solid #3f3f46' : '1px solid #e5e7eb',
               }}
             >
-              <div className="flex h-full flex-col p-5">
+              <div className="flex h-full flex-col p-4">
                 {currentTemplate.layout === 'banner' && (
                   <div
                     className="-mx-2 -mt-2 mb-4 rounded-lg px-4 py-3"
@@ -67,7 +67,7 @@ export function InvoicePreview() {
                 )}
 
                 {currentTemplate.layout !== 'banner' && (
-                  <div className="mb-5 flex items-start justify-between">
+                  <div className="mb-3 flex items-start justify-between">
                     <div className="space-y-2">
                       {effectiveLogoUrl ? (
                         <img
@@ -91,7 +91,6 @@ export function InvoicePreview() {
                       <div className="space-y-0.5">
                         <div className="h-2 w-24 rounded-full" style={{ backgroundColor: currentTemplate.borderLight }} />
                         <div className="h-1.5 w-32 rounded-full" style={{ backgroundColor: currentTemplate.borderLight, opacity: 0.6 }} />
-                        <div className="h-1.5 w-28 rounded-full" style={{ backgroundColor: currentTemplate.borderLight, opacity: 0.6 }} />
                       </div>
                     </div>
                     <div className="space-y-1 text-right">
@@ -108,16 +107,15 @@ export function InvoicePreview() {
                   </div>
                 )}
 
-                <div className="mb-5 h-[2px] rounded-full" style={{ backgroundColor: settings.accentColor }} />
+                <div className="mb-3 h-[2px] rounded-full" style={{ backgroundColor: settings.accentColor }} />
 
-                <div className="mb-6 grid grid-cols-2 gap-6">
+                <div className="mb-3 grid grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <p className="text-[9px] font-semibold uppercase tracking-wider" style={{ color: settings.accentColor }}>
                       Emetteur
                     </p>
                     <div className="space-y-0.5">
                       <div className="h-2 w-28 rounded-full" style={{ backgroundColor: currentTemplate.borderLight }} />
-                      <div className="h-1.5 w-36 rounded-full" style={{ backgroundColor: currentTemplate.borderLight, opacity: 0.6 }} />
                       <div className="h-1.5 w-24 rounded-full" style={{ backgroundColor: currentTemplate.borderLight, opacity: 0.6 }} />
                     </div>
                   </div>
@@ -127,7 +125,6 @@ export function InvoicePreview() {
                     </p>
                     <div className="space-y-0.5">
                       <div className="h-2 w-24 rounded-full" style={{ backgroundColor: currentTemplate.borderLight }} />
-                      <div className="h-1.5 w-32 rounded-full" style={{ backgroundColor: currentTemplate.borderLight, opacity: 0.6 }} />
                       <div className="h-1.5 w-28 rounded-full" style={{ backgroundColor: currentTemplate.borderLight, opacity: 0.6 }} />
                     </div>
                   </div>
@@ -159,7 +156,7 @@ export function InvoicePreview() {
                   {[...Array(previewRowCount)].map((_, i) => (
                     <div
                       key={i}
-                      className="flex items-center px-3 py-2.5"
+                      className="flex items-center px-3 py-2"
                       style={{
                         backgroundColor: i % 2 === 0 ? currentTemplate.rowEven : currentTemplate.rowOdd,
                         borderBottom:
@@ -191,7 +188,7 @@ export function InvoicePreview() {
                   ))}
                 </div>
 
-                <div className="mb-4 mt-4 flex justify-end">
+                <div className="mb-2 mt-3 flex justify-end">
                   <div className="w-48 space-y-1.5">
                     {settings.billingType === 'detailed' && (
                       <>
