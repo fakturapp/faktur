@@ -61,6 +61,7 @@ import {
   Paintbrush,
   Settings2,
   ClipboardList,
+  Hash,
   FileCheck,
   Sparkles,
   Download,
@@ -166,6 +167,11 @@ const settingsNav: NavItem[] = [
         href: '/dashboard/settings/documents/invoices/defaults',
         label: 'Valeurs par défaut',
         icon: ClipboardList,
+      },
+      {
+        href: '/dashboard/settings/documents/invoices/naming',
+        label: 'Nommage',
+        icon: Hash,
       },
       {
         href: '/dashboard/settings/documents/invoices/e-invoicing',
