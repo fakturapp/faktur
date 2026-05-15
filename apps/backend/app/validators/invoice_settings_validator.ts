@@ -50,6 +50,8 @@ export const updateInvoiceSettingsValidator = vine.compile(
     invoiceFilenamePattern: vine.string().trim().maxLength(255).optional(),
     quoteNumberPattern: vine.string().trim().maxLength(255).optional(),
     invoiceNumberPattern: vine.string().trim().maxLength(255).optional(),
+    nextQuoteNumber: vine.string().trim().maxLength(255).optional().nullable(),
+    nextInvoiceNumber: vine.string().trim().maxLength(255).optional().nullable(),
     footerMode: vine.enum(FOOTER_MODES).optional(),
     logoBorderRadius: vine.number().min(0).max(50).optional(),
     collaborationEnabled: looseBool.clone(),

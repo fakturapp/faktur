@@ -64,6 +64,8 @@ export default class InvoiceSettingsUpdate {
         invoiceFilenamePattern: payload.invoiceFilenamePattern || defaultSettings.invoiceFilenamePattern,
         quoteNumberPattern: payload.quoteNumberPattern || defaultSettings.quoteNumberPattern,
         invoiceNumberPattern: payload.invoiceNumberPattern || defaultSettings.invoiceNumberPattern,
+        nextQuoteNumber: payload.nextQuoteNumber?.trim() || null,
+        nextInvoiceNumber: payload.nextInvoiceNumber?.trim() || null,
         footerMode: payload.footerMode || defaultSettings.footerMode,
         logoBorderRadius: payload.logoBorderRadius ?? defaultSettings.logoBorderRadius,
         collaborationEnabled: payload.collaborationEnabled ?? defaultSettings.collaborationEnabled,
@@ -123,6 +125,12 @@ export default class InvoiceSettingsUpdate {
       }
       if (payload.invoiceNumberPattern !== undefined) {
         settings.invoiceNumberPattern = payload.invoiceNumberPattern || 'FAC-{numero}'
+      }
+      if (payload.nextQuoteNumber !== undefined) {
+        settings.nextQuoteNumber = payload.nextQuoteNumber?.trim() || null
+      }
+      if (payload.nextInvoiceNumber !== undefined) {
+        settings.nextInvoiceNumber = payload.nextInvoiceNumber?.trim() || null
       }
       if (payload.footerMode !== undefined) settings.footerMode = payload.footerMode || 'company_info'
       if (payload.logoBorderRadius !== undefined) settings.logoBorderRadius = payload.logoBorderRadius

@@ -32,6 +32,8 @@ type InvoiceSettingsSource = {
   invoiceFilenamePattern?: string | null
   quoteNumberPattern?: string | null
   invoiceNumberPattern?: string | null
+  nextQuoteNumber?: string | null
+  nextInvoiceNumber?: string | null
   footerMode?: string | null
   logoBorderRadius?: number | null
   collaborationEnabled?: boolean | null
@@ -76,6 +78,8 @@ export function serializeInvoiceSettings(settings: InvoiceSettingsSource) {
       settings.quoteNumberPattern || settings.quoteFilenamePattern || 'DEV-{numero}',
     invoiceNumberPattern:
       settings.invoiceNumberPattern || settings.invoiceFilenamePattern || 'FAC-{numero}',
+    nextQuoteNumber: settings.nextQuoteNumber || null,
+    nextInvoiceNumber: settings.nextInvoiceNumber || null,
     footerMode: ['custom', 'company_info'].includes(settings.footerMode || '')
       ? settings.footerMode
       : 'company_info',
