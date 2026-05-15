@@ -101,8 +101,17 @@ function PatternEditor({ open, title, initialValue, fallback, onClose, onSave }:
     if (open) setValue(initialValue || fallback)
   }, [open, initialValue, fallback])
 
+  const usedVars = useMemo(() => {
+    const set = new Set<VarName>()
+    tokenize(value).forEach((t) => { if (t.type === 'var') set.add(t.name) })
+    return set
+  }, [value])
+
   const insertVariable = useCallback((name: VarName) => {
-    setValue((v) => v + `{${name}}`)
+    setValue((v) => {
+      if (tokenize(v).some((t) => t.type === 'var' && t.name === name)) return v
+      return v + `{${name}}`
+    })
   }, [])
 
   const removeLastToken = useCallback(() => {
@@ -128,7 +137,7 @@ function PatternEditor({ open, title, initialValue, fallback, onClose, onSave }:
       <div className="px-6 py-4 space-y-4">
         <div>
           <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">
-            Aperçu visuel
+            Structure
           </label>
           <div className="rounded-lg border border-border bg-muted/30 p-3 min-h-[44px] flex items-center">
             <PatternPreview pattern={value} />
@@ -145,9 +154,17 @@ function PatternEditor({ open, title, initialValue, fallback, onClose, onSave }:
             placeholder={fallback}
             className="text-sm font-mono"
           />
-          <p className="mt-1.5 text-[11px] text-muted-foreground">
-            Aperçu&nbsp;: <span className="font-mono text-foreground/80">{preview}</span>
-          </p>
+        </div>
+
+        <div>
+          <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">
+            Aperçu en direct
+          </label>
+          <div className="rounded-lg border border-accent/30 bg-accent/5 p-4 flex items-center justify-center">
+            <span className="font-mono text-lg font-semibold text-foreground tracking-wide">
+              {preview || <span className="text-muted-foreground/60 text-sm font-normal italic">Aucun format</span>}
+            </span>
+          </div>
         </div>
 
         <div>
@@ -155,16 +172,21 @@ function PatternEditor({ open, title, initialValue, fallback, onClose, onSave }:
             Insérer une variable
           </label>
           <div className="flex flex-wrap gap-1.5">
-            {VAR_DEFS.map((v) => (
-              <button
-                key={v.name}
-                type="button"
-                onClick={() => insertVariable(v.name)}
-                className="inline-flex items-center gap-1 h-7 px-2.5 rounded-md bg-accent/10 text-accent text-[12px] font-medium hover:bg-accent/20 transition-colors"
-              >
-                <Plus className="h-3 w-3" /> {v.label}
-              </button>
-            ))}
+            {VAR_DEFS.map((v) => {
+              const used = usedVars.has(v.name)
+              return (
+                <button
+                  key={v.name}
+                  type="button"
+                  onClick={() => insertVariable(v.name)}
+                  disabled={used}
+                  title={used ? 'Déjà ajouté' : undefined}
+                  className="inline-flex items-center gap-1 h-7 px-2.5 rounded-md bg-accent/10 text-accent text-[12px] font-medium hover:bg-accent/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-accent/10"
+                >
+                  <Plus className="h-3 w-3" /> {v.label}
+                </button>
+              )
+            })}
             <button
               type="button"
               onClick={removeLastToken}
