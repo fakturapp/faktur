@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, type Variants } from 'framer-motion'
-import { ClipboardList, FileText, Check, Hash } from 'lucide-react'
+import { ClipboardList, Check } from 'lucide-react'
 import { InvoicePreview } from '@/components/settings/invoice-preview'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -247,126 +247,6 @@ export default function InvoiceDefaultsPage() {
             </Card>
           </motion.div>
 
-          <motion.div variants={fadeUp} custom={2}>
-            <Card className="overflow-hidden border-border/50">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
-                    <Hash className="h-4.5 w-4.5 text-accent" />
-                  </div>
-                  <div>
-                    <h2 className="text-base font-semibold text-foreground">Num&eacute;rotation des documents</h2>
-                    <p className="text-xs text-muted-foreground">
-                      Pattern utilis&eacute; pour g&eacute;n&eacute;rer les num&eacute;ros l&eacute;gaux
-                    </p>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">
-                      Num&eacute;ro des devis
-                    </label>
-                    <Input
-                      placeholder="DEV-{numero}"
-                      value={settings.quoteNumberPattern}
-                      onChange={(e) => updateSettings({ quoteNumberPattern: e.target.value })}
-                      className="text-sm font-mono"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">
-                      Num&eacute;ro des factures
-                    </label>
-                    <Input
-                      placeholder="FAC-{numero}"
-                      value={settings.invoiceNumberPattern}
-                      onChange={(e) => updateSettings({ invoiceNumberPattern: e.target.value })}
-                      className="text-sm font-mono"
-                    />
-                  </div>
-
-                  <div className="rounded-lg border border-border p-3 space-y-2">
-                    <p className="text-xs font-medium text-foreground mb-2">Variables disponibles</p>
-                    {[
-                      { var: '{numero}', desc: 'Compteur incr&eacute;ment&eacute; du document' },
-                      { var: '{annee}', desc: 'Ann&eacute;e courante (ex: 2026)' },
-                      { var: '{mois}', desc: 'Mois courant sur 2 chiffres (ex: 04)' },
-                    ].map((v) => (
-                      <div key={v.var} className="flex items-center gap-2">
-                        <code className="text-[11px] font-mono bg-muted px-1.5 py-0.5 rounded text-accent">
-                          {v.var}
-                        </code>
-                        <span className="text-[11px] text-muted-foreground">{v.desc}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div variants={fadeUp} custom={3}>
-            <Card className="overflow-hidden border-border/50">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
-                    <FileText className="h-4.5 w-4.5 text-accent" />
-                  </div>
-                  <div>
-                    <h2 className="text-base font-semibold text-foreground">Nommage des fichiers PDF</h2>
-                    <p className="text-xs text-muted-foreground">
-                      Format du nom de fichier utilis&eacute; uniquement &agrave; l&apos;export
-                    </p>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">
-                      Nom de fichier des devis
-                    </label>
-                    <Input
-                      placeholder="DEV-{numero}"
-                      value={settings.quoteFilenamePattern}
-                      onChange={(e) => updateSettings({ quoteFilenamePattern: e.target.value })}
-                      className="text-sm font-mono"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">
-                      Nom de fichier des factures
-                    </label>
-                    <Input
-                      placeholder="FAC-{numero}"
-                      value={settings.invoiceFilenamePattern}
-                      onChange={(e) => updateSettings({ invoiceFilenamePattern: e.target.value })}
-                      className="text-sm font-mono"
-                    />
-                  </div>
-
-                  <div className="rounded-lg border border-border p-3 space-y-2">
-                    <p className="text-xs font-medium text-foreground mb-2">Variables disponibles</p>
-                    {[
-                      { var: '{numero}', desc: 'Num&eacute;ro final du document (ex: DEV-001)' },
-                      { var: '{date}', desc: "Date d'&eacute;mission (ex: 2026-03-15)" },
-                      { var: '{client}', desc: 'Nom du client' },
-                      { var: '{entreprise}', desc: 'Nom de votre soci&eacute;t&eacute;' },
-                    ].map((v) => (
-                      <div key={v.var} className="flex items-center gap-2">
-                        <code className="text-[11px] font-mono bg-muted px-1.5 py-0.5 rounded text-accent">
-                          {v.var}
-                        </code>
-                        <span className="text-[11px] text-muted-foreground">{v.desc}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
         </div>
 
         <motion.div variants={fadeUp} custom={2}>
