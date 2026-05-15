@@ -8,6 +8,7 @@ import {
   ClipboardList,
   FileCheck,
   Sparkles,
+  Hash,
   Mail,
   Bell,
 } from 'lucide-react'
@@ -74,10 +75,18 @@ export const settingsSearchIndex: SettingsSearchItem[] = [
   {
     href: '/dashboard/settings/documents/invoices/defaults',
     label: 'Valeurs par défaut',
-    description: 'Objet, conditions, pied de page, langue, nommage',
+    description: 'Objet, conditions, pied de page, langue',
     section: 'Facturation',
     icon: ClipboardList,
-    keywords: ['défaut', 'objet', 'conditions', 'footer', 'langue', 'signature', 'fichier', 'nommage'],
+    keywords: ['défaut', 'objet', 'conditions', 'footer', 'langue', 'signature'],
+  },
+  {
+    href: '/dashboard/settings/documents/invoices/naming',
+    label: 'Nommage',
+    description: 'Format du numéro et prochain numéro de devis et facture',
+    section: 'Facturation',
+    icon: Hash,
+    keywords: ['nommage', 'numéro', 'numerotation', 'pattern', 'format', 'fichier', 'nom', 'pdf', 'prochain', 'compteur', 'séquence'],
   },
   {
     href: '/dashboard/settings/documents/invoices/e-invoicing',
