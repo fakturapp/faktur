@@ -13,6 +13,7 @@ import { InvoicePreview } from '@/components/settings/invoice-preview'
 import { TemplateModal } from '@/components/settings/template-modal'
 import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/toast'
+import { FormSelect } from '@/components/ui/dropdown'
 import {
   ImagePlus,
   Palette,
@@ -385,32 +386,40 @@ export default function InvoiceAppearancePage() {
                     <p className="text-xs text-muted-foreground">Police utilisee sur les factures, devis et PDF</p>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { id: 'Lexend', label: 'Lexend', desc: 'Par defaut' },
-                    { id: 'Inter', label: 'Inter', desc: 'Geometrique' },
-                    { id: 'Poppins', label: 'Poppins', desc: 'Moderne' },
-                    { id: 'Roboto', label: 'Roboto', desc: 'Classique' },
-                    { id: 'Open Sans', label: 'Open Sans', desc: 'Lisible' },
-                    { id: 'Lato', label: 'Lato', desc: 'Elegante' },
-                    { id: 'Montserrat', label: 'Montserrat', desc: 'Professionnel' },
-                    { id: 'Nunito', label: 'Nunito', desc: 'Arrondie' },
-                  ].map((font) => (
-                    <button key={font.id} onClick={() => updateSettings({ documentFont: font.id })}
-                      className={`flex items-center gap-3 rounded-xl border-2 p-3 text-left transition-all ${
-                        settings.documentFont === font.id ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/30'
-                      }`}>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-foreground" style={{ fontFamily: `'${font.id}', sans-serif` }}>{font.label}</p>
-                        <p className="text-[10px] text-muted-foreground">{font.desc}</p>
-                      </div>
-                      {settings.documentFont === font.id && (
-                        <div className="h-5 w-5 rounded-md border-2 border-primary bg-primary flex items-center justify-center shrink-0">
-                          <Check className="h-3 w-3 text-accent-foreground" />
-                        </div>
-                      )}
-                    </button>
-                  ))}
+                <div className="space-y-3">
+                  <div
+                    className="rounded-xl border border-border bg-muted/30 p-5 flex items-center justify-between gap-4"
+                    style={{ fontFamily: `'${settings.documentFont}', sans-serif` }}
+                  >
+                    <div className="min-w-0">
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1">
+                        Aperçu
+                      </p>
+                      <p className="text-2xl font-semibold text-foreground leading-tight truncate">
+                        FAC-2026-001
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1 truncate">
+                        Faktur · Solde à payer · 1 234,56 €
+                      </p>
+                    </div>
+                    <p className="text-[40px] font-bold text-accent leading-none shrink-0 tabular-nums">
+                      Aa
+                    </p>
+                  </div>
+                  <FormSelect
+                    value={settings.documentFont}
+                    onChange={(v) => updateSettings({ documentFont: v })}
+                    options={[
+                      { value: 'Lexend', label: 'Lexend (par défaut)' },
+                      { value: 'Inter', label: 'Inter (géométrique)' },
+                      { value: 'Poppins', label: 'Poppins (moderne)' },
+                      { value: 'Roboto', label: 'Roboto (classique)' },
+                      { value: 'Open Sans', label: 'Open Sans (lisible)' },
+                      { value: 'Lato', label: 'Lato (élégante)' },
+                      { value: 'Montserrat', label: 'Montserrat (professionnel)' },
+                      { value: 'Nunito', label: 'Nunito (arrondie)' },
+                    ]}
+                  />
                 </div>
               </CardContent>
             </Card>
