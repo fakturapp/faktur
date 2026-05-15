@@ -388,22 +388,23 @@ export default function InvoiceAppearancePage() {
                 </div>
                 <div className="space-y-3">
                   <div
-                    className="rounded-xl border border-border bg-muted/30 p-5 flex items-center justify-between gap-4"
+                    className="rounded-xl border border-border bg-muted/30 p-5"
                     style={{ fontFamily: `'${settings.documentFont}', sans-serif` }}
                   >
-                    <div className="min-w-0">
-                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1">
-                        Aperçu
-                      </p>
-                      <p className="text-2xl font-semibold text-foreground leading-tight truncate">
-                        FAC-2026-001
-                      </p>
-                      <p className="text-sm text-muted-foreground mt-1 truncate">
-                        Faktur · Solde à payer · 1 234,56 €
-                      </p>
-                    </div>
-                    <p className="text-[40px] font-bold text-accent leading-none shrink-0 tabular-nums">
-                      Aa
+                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-2">
+                      Aperçu
+                    </p>
+                    <p className="text-[34px] font-bold text-foreground leading-tight tracking-tight">
+                      Aa Bb Cc
+                    </p>
+                    <p className="text-[20px] text-foreground/80 leading-tight mt-0.5">
+                      abcdefghijklmnopqrstuvwxyz
+                    </p>
+                    <p className="text-[20px] text-foreground/80 leading-tight">
+                      ABCDEFGHIJKLMNOPQRSTUVWXYZ
+                    </p>
+                    <p className="text-[20px] text-foreground/80 leading-tight tabular-nums">
+                      0123456789 — €$£¥&amp;@#%
                     </p>
                   </div>
                   <FormSelect
