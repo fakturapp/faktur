@@ -18,7 +18,7 @@ export function TemplateThumbnail({
 }) {
   const T = tpl
   const isLg = size === 'lg'
-  const p = isLg ? 'p-3.5' : 'p-2'
+  const p = isLg ? 'p-3.5' : 'p-1.5'
   const contrastCol = '#ffffff'
 
   const Wrapper = onClick ? 'button' : 'div'
