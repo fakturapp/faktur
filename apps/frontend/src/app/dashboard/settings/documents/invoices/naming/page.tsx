@@ -67,6 +67,82 @@ function TokenBadge({ name }: { name: VarName }) {
   )
 }
 
+function PdfIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 64 64" className={className} aria-hidden="true">
+      <path d="M14 4h28l12 12v40a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4z" fill="#fff" stroke="#e2e8f0" strokeWidth="1.5" />
+      <path d="M42 4v12h12" fill="none" stroke="#e2e8f0" strokeWidth="1.5" />
+      <rect x="6" y="32" width="44" height="20" rx="3" fill="#dc2626" />
+      <text x="28" y="46" textAnchor="middle" fontFamily="Arial, sans-serif" fontSize="11" fontWeight="700" fill="#fff">PDF</text>
+    </svg>
+  )
+}
+
+function fakeSize(pattern: string): string {
+  const seed = (pattern || '').length * 37 + 197
+  const kb = 180 + (seed % 240)
+  return `${kb} KB`
+}
+
+function formatFrenchDate(d: Date): string {
+  const months = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juill.', 'août', 'sept.', 'oct.', 'nov.', 'déc.']
+  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`
+}
+
+function FilePreviewCard({ pattern, fallback, kind }: { pattern: string; fallback: string; kind: 'devis' | 'facture' }) {
+  const resolved = resolvePreview(pattern || fallback)
+  const filename = `${resolved || fallback.replace(/[{}]/g, '')}.pdf`
+  const today = new Date()
+  return (
+    <div className="rounded-xl border border-border bg-background p-3 flex items-center gap-3 shadow-sm">
+      <div className="shrink-0 w-10 h-12">
+        <PdfIcon className="w-full h-full" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
+          {kind === 'devis' ? 'Devis' : 'Facture'}
+        </p>
+        <p className="text-sm font-semibold text-foreground truncate font-mono" title={filename}>
+          {filename}
+        </p>
+        <p className="text-[11px] text-muted-foreground mt-0.5">
+          {formatFrenchDate(today)} · {fakeSize(pattern || fallback)}
+        </p>
+      </div>
+    </div>
+  )
+}
+
+function SheetPreview({ pattern, fallback, kind }: { pattern: string; fallback: string; kind: 'devis' | 'facture' }) {
+  const resolved = resolvePreview(pattern || fallback) || '—'
+  const titleLabel = kind === 'devis' ? 'DEVIS' : 'FACTURE'
+  return (
+    <div className="rounded-xl border border-border bg-white dark:bg-zinc-50 p-4 shadow-sm aspect-[210/297] flex flex-col text-zinc-900 select-none">
+      <div className="flex items-start justify-between mb-3">
+        <div>
+          <div className="h-2 w-16 bg-zinc-300 rounded mb-1.5" />
+          <div className="h-1.5 w-12 bg-zinc-200 rounded" />
+        </div>
+        <div className="h-6 w-6 rounded bg-accent/30" />
+      </div>
+      <div className="mt-2">
+        <p className="text-[10px] font-bold tracking-widest text-zinc-500">{titleLabel}</p>
+        <p className="text-sm font-bold text-zinc-900 font-mono truncate">{resolved}</p>
+      </div>
+      <div className="mt-3 space-y-1">
+        <div className="h-1.5 w-3/4 bg-zinc-200 rounded" />
+        <div className="h-1.5 w-2/3 bg-zinc-200 rounded" />
+        <div className="h-1.5 w-1/2 bg-zinc-200 rounded" />
+      </div>
+      <div className="mt-auto space-y-1">
+        <div className="h-1 w-full bg-zinc-100 rounded" />
+        <div className="h-1 w-full bg-zinc-100 rounded" />
+        <div className="h-1 w-2/3 bg-zinc-100 rounded" />
+      </div>
+    </div>
+  )
+}
+
 function PatternPreview({ pattern }: { pattern: string }) {
   const tokens = tokenize(pattern)
   if (tokens.length === 0) {
@@ -90,11 +166,12 @@ interface PatternEditorProps {
   title: string
   initialValue: string
   fallback: string
+  kind: 'devis' | 'facture'
   onClose: () => void
   onSave: (next: string) => void
 }
 
-function PatternEditor({ open, title, initialValue, fallback, onClose, onSave }: PatternEditorProps) {
+function PatternEditor({ open, title, initialValue, fallback, kind, onClose, onSave }: PatternEditorProps) {
   const [value, setValue] = useState(initialValue)
 
   useEffect(() => {
@@ -160,10 +237,16 @@ function PatternEditor({ open, title, initialValue, fallback, onClose, onSave }:
           <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">
             Aperçu en direct
           </label>
-          <div className="rounded-lg border border-accent/30 bg-accent/5 p-4 flex items-center justify-center">
-            <span className="font-mono text-lg font-semibold text-foreground tracking-wide">
-              {preview || <span className="text-muted-foreground/60 text-sm font-normal italic">Aucun format</span>}
-            </span>
+          <div className="grid grid-cols-[1fr_120px] gap-3">
+            <div className="space-y-3">
+              <FilePreviewCard pattern={value} fallback={fallback} kind={kind} />
+              <div className="rounded-lg border border-accent/30 bg-accent/5 p-3 flex items-center justify-center">
+                <span className="font-mono text-base font-semibold text-foreground tracking-wide">
+                  {preview || <span className="text-muted-foreground/60 text-xs font-normal italic">Aucun format</span>}
+                </span>
+              </div>
+            </div>
+            <SheetPreview pattern={value} fallback={fallback} kind={kind} />
           </div>
         </div>
 
@@ -210,10 +293,11 @@ interface PatternRowProps {
   label: string
   pattern: string
   fallback: string
+  kind: 'devis' | 'facture'
   onChange: (next: string) => void
 }
 
-function PatternRow({ label, pattern, fallback, onChange }: PatternRowProps) {
+function PatternRow({ label, pattern, fallback, kind, onChange }: PatternRowProps) {
   const [editing, setEditing] = useState(false)
   return (
     <div>
@@ -242,6 +326,7 @@ function PatternRow({ label, pattern, fallback, onChange }: PatternRowProps) {
         title={`Modifier — ${label}`}
         initialValue={pattern}
         fallback={fallback}
+        kind={kind}
         onClose={() => setEditing(false)}
         onSave={onChange}
       />
@@ -387,7 +472,8 @@ export default function NamingSettingsPage() {
         </p>
       </motion.div>
 
-      <div className="space-y-6 max-w-3xl">
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px] gap-6">
+       <div className="space-y-6 min-w-0">
         <motion.div variants={fadeUp} custom={1}>
           <Card className="overflow-hidden border-border/50">
             <CardContent className="p-6">
@@ -408,12 +494,14 @@ export default function NamingSettingsPage() {
                   label="Nom du devis"
                   pattern={settings.quoteNumberPattern}
                   fallback="DEV-{numero}"
+                  kind="devis"
                   onChange={(next) => updateSettings({ quoteNumberPattern: next })}
                 />
                 <PatternRow
                   label="Nom de la facture"
                   pattern={settings.invoiceNumberPattern}
                   fallback="FAC-{numero}"
+                  kind="facture"
                   onChange={(next) => updateSettings({ invoiceNumberPattern: next })}
                 />
               </div>
@@ -455,6 +543,35 @@ export default function NamingSettingsPage() {
             </CardContent>
           </Card>
         </motion.div>
+       </div>
+
+       <motion.div variants={fadeUp} custom={3} className="space-y-4 xl:sticky xl:top-6 xl:self-start">
+        <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+          Aperçu
+        </p>
+        <FilePreviewCard
+          pattern={settings.quoteNumberPattern}
+          fallback="DEV-{numero}"
+          kind="devis"
+        />
+        <FilePreviewCard
+          pattern={settings.invoiceNumberPattern}
+          fallback="FAC-{numero}"
+          kind="facture"
+        />
+        <div className="grid grid-cols-2 gap-3">
+          <SheetPreview
+            pattern={settings.quoteNumberPattern}
+            fallback="DEV-{numero}"
+            kind="devis"
+          />
+          <SheetPreview
+            pattern={settings.invoiceNumberPattern}
+            fallback="FAC-{numero}"
+            kind="facture"
+          />
+        </div>
+       </motion.div>
       </div>
     </motion.div>
   )
