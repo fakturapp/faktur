@@ -43,6 +43,8 @@ export interface InvoiceSettings {
   invoiceFilenamePattern: string
   quoteNumberPattern: string
   invoiceNumberPattern: string
+  nextQuoteNumber: string | null
+  nextInvoiceNumber: string | null
   footerMode: 'company_info' | 'custom'
   logoBorderRadius: number
   collaborationEnabled: boolean
@@ -100,6 +102,8 @@ const defaultSettings: InvoiceSettings = {
   invoiceFilenamePattern: 'FAC-{numero}',
   quoteNumberPattern: 'DEV-{numero}',
   invoiceNumberPattern: 'FAC-{numero}',
+  nextQuoteNumber: null,
+  nextInvoiceNumber: null,
   footerMode: 'company_info',
   logoBorderRadius: 0,
   collaborationEnabled: false,
