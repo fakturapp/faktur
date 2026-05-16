@@ -1,0 +1,47 @@
+# Faktur API V2
+
+> Faktur is a French invoicing SaaS. The V2 public API lets developers automate
+> invoices, quotes, clients, products, and more.
+
+Base URL: https://api.fakturapp.cc/api/v2
+Authentication: Authorization: Bearer fk_live_<32 chars>
+Versioning: URL path /api/v2/
+Doc portal: https://developers.fakturapp.cc
+
+## Key facts
+- API requires team encryption mode = "standard". Private (E2E) teams cannot use the API.
+- Scopes are formatted as resource:action (e.g. invoices:read).
+- Wildcards: resource:* grants all actions on a resource, * grants everything.
+- Response envelope: { "data": ... } on success, { "error": { "code", "message", ... } } on failure.
+- Pagination is cursor-based: ?limit=50&cursor=…
+- All POSTs accept Faktur-Idempotency-Key for replay safety (24h TTL).
+- Rate limit: default 60 req/min, 1000 req/h. Headers X-RateLimit-Limit / -Remaining / -Reset.
+- Webhooks: HMAC-SHA256 signed via X-Faktur-Signature: t=<unix>,v1=<hex>.
+
+## Resources
+- invoices, quotes, credit_notes, recurring_invoices
+- clients (+ contacts), products, expenses
+- reminders, payment_links, bank_accounts
+- company, team, email, einvoicing, files, webhooks, ai
+
+## Useful files
+- /openapi.json — full OpenAPI 3.1 spec
+- /quickstart — first-call guide
+- /concepts/authentication — keys, scopes, errors
+- /concepts/webhooks — signature verification
+- /resources/<name> — endpoint reference per resource
+
+## Common operations
+- List invoices: GET /api/v2/invoices?limit=50&status=paid
+- Create invoice: POST /api/v2/invoices { client_id, issue_date, due_date, lines: [...] }
+- Send invoice: POST /api/v2/invoices/:id/send { to: [...], subject, body }
+- Mark paid: POST /api/v2/invoices/:id/mark-paid { amount_cents, paid_at, payment_method }
+- Submit to Chorus Pro: POST /api/v2/einvoicing/submit { invoice_id, target }
+
+## Error codes
+- 401 invalid_token, token_expired, token_revoked
+- 403 insufficient_scope, ip_not_allowed, team_mode_private
+- 404 resource_not_found
+- 409 conflict, idempotency_replay
+- 422 validation_failed, business_rule_violation
+- 429 rate_limited, quota_exceeded
