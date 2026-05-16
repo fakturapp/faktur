@@ -7,6 +7,7 @@ import Team from '#models/team/team'
 import TeamMember from '#models/team/team_member'
 import teamEncryptionService from '#services/crypto/team_encryption_service'
 import keyStore from '#services/crypto/key_store'
+import featureFlag from '#services/api/api_v2_feature_flag'
 
 export default class ApiKeyMiddleware {
   async handle(ctx: HttpContext, next: NextFn) {
@@ -69,6 +70,15 @@ export default class ApiKeyMiddleware {
         ctx.response,
         'team_mode_private',
         'The Faktur API is not available for teams in Private encryption mode. Switch this team to Standard mode in your account settings.',
+        ctx.requestId
+      )
+    }
+
+    if (!featureFlag.isEnabled(team.id)) {
+      return apiResponse.forbidden(
+        ctx.response,
+        'team_inactive',
+        'The Faktur API is not enabled for this team yet. Contact support to join the beta.',
         ctx.requestId
       )
     }
