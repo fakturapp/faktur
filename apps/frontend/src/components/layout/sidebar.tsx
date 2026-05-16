@@ -795,7 +795,6 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
                     <p className="text-[14px] font-medium text-foreground truncate leading-tight">
                       {user.fullName || user.email}
                     </p>
-                    <p className="text-[12px] text-muted-foreground truncate">{user.email}</p>
                   </motion.div>
 
                   <motion.button
