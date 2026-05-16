@@ -1,0 +1,385 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Faktur API",
+    "description": "Public V2 API to automate Faktur — invoices, quotes, clients, webhooks. Only available for teams in Standard encryption mode.",
+    "version": "2.0.0-beta.1",
+    "contact": {
+      "name": "Faktur Developers",
+      "url": "https://developers.fakturapp.cc"
+    },
+    "license": { "name": "Proprietary" }
+  },
+  "servers": [
+    { "url": "https://api.fakturapp.cc/api/v2", "description": "Production" }
+  ],
+  "security": [{ "bearerAuth": [] }],
+  "tags": [
+    { "name": "Meta" },
+    { "name": "Invoices" },
+    { "name": "Quotes" },
+    { "name": "Credit notes" },
+    { "name": "Recurring invoices" },
+    { "name": "Clients" },
+    { "name": "Products" },
+    { "name": "Expenses" },
+    { "name": "Bank accounts" },
+    { "name": "Company" },
+    { "name": "Team" }
+  ],
+  "paths": {
+    "/ping": {
+      "get": {
+        "tags": ["Meta"],
+        "summary": "Authenticated health check",
+        "responses": {
+          "200": { "description": "Returns the authenticated identity and rate limit tier" }
+        }
+      }
+    },
+    "/invoices": {
+      "get": {
+        "tags": ["Invoices"],
+        "summary": "List invoices",
+        "x-required-scope": "invoices:read",
+        "parameters": [
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 200, "default": 50 } },
+          { "name": "cursor", "in": "query", "schema": { "type": "string" } },
+          { "name": "status", "in": "query", "schema": { "type": "string" }, "description": "Comma-separated statuses" },
+          { "name": "client_id", "in": "query", "schema": { "type": "string" } },
+          { "name": "issue_date_after", "in": "query", "schema": { "type": "string", "format": "date" } },
+          { "name": "issue_date_before", "in": "query", "schema": { "type": "string", "format": "date" } },
+          { "name": "q", "in": "query", "schema": { "type": "string" } },
+          { "name": "sort", "in": "query", "schema": { "type": "string", "enum": ["created_at", "-created_at", "issue_date", "-issue_date"] } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of invoices",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/InvoiceListResponse" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "429": { "$ref": "#/components/responses/RateLimited" }
+        }
+      },
+      "post": {
+        "tags": ["Invoices"],
+        "summary": "Create an invoice",
+        "x-required-scope": "invoices:write",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/InvoiceCreate" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/InvoiceWrapped" }
+              }
+            }
+          },
+          "422": { "$ref": "#/components/responses/ValidationFailed" }
+        }
+      }
+    },
+    "/invoices/{id}": {
+      "get": {
+        "tags": ["Invoices"],
+        "summary": "Get an invoice",
+        "x-required-scope": "invoices:read",
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/InvoiceWrapped" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "delete": {
+        "tags": ["Invoices"],
+        "summary": "Delete a draft invoice",
+        "x-required-scope": "invoices:delete",
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": { "204": { "description": "Deleted" } }
+      }
+    },
+    "/invoices/{id}/mark-paid": {
+      "post": {
+        "tags": ["Invoices"],
+        "summary": "Mark an invoice as paid",
+        "x-required-scope": "invoices:write",
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amount_cents": { "type": "integer" },
+                  "paid_at": { "type": "string", "format": "date" },
+                  "payment_method": { "type": "string" },
+                  "reference": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/InvoiceWrapped" } } } }
+        }
+      }
+    },
+    "/invoices/{id}/duplicate": {
+      "post": {
+        "tags": ["Invoices"],
+        "summary": "Duplicate an invoice as a new draft",
+        "x-required-scope": "invoices:write",
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": { "201": { "description": "Created" } }
+      }
+    },
+    "/quotes": {
+      "get": { "tags": ["Quotes"], "summary": "List quotes", "x-required-scope": "quotes:read", "responses": { "200": { "description": "OK" } } }
+    },
+    "/quotes/{id}": {
+      "get": { "tags": ["Quotes"], "summary": "Get a quote", "x-required-scope": "quotes:read", "parameters": [{ "$ref": "#/components/parameters/PathId" }], "responses": { "200": { "description": "OK" } } }
+    },
+    "/credit-notes": {
+      "get": { "tags": ["Credit notes"], "summary": "List credit notes", "x-required-scope": "credit_notes:read", "responses": { "200": { "description": "OK" } } }
+    },
+    "/credit-notes/{id}": {
+      "get": { "tags": ["Credit notes"], "summary": "Get a credit note", "x-required-scope": "credit_notes:read", "parameters": [{ "$ref": "#/components/parameters/PathId" }], "responses": { "200": { "description": "OK" } } }
+    },
+    "/recurring-invoices": {
+      "get": { "tags": ["Recurring invoices"], "summary": "List recurring invoices", "x-required-scope": "recurring_invoices:read", "responses": { "200": { "description": "OK" } } }
+    },
+    "/recurring-invoices/{id}": {
+      "get": { "tags": ["Recurring invoices"], "summary": "Get a recurring invoice", "x-required-scope": "recurring_invoices:read", "parameters": [{ "$ref": "#/components/parameters/PathId" }], "responses": { "200": { "description": "OK" } } }
+    },
+    "/recurring-invoices/{id}/pause": {
+      "post": { "tags": ["Recurring invoices"], "summary": "Pause a recurring invoice", "x-required-scope": "recurring_invoices:write", "parameters": [{ "$ref": "#/components/parameters/PathId" }], "responses": { "200": { "description": "OK" } } }
+    },
+    "/recurring-invoices/{id}/resume": {
+      "post": { "tags": ["Recurring invoices"], "summary": "Resume a recurring invoice", "x-required-scope": "recurring_invoices:write", "parameters": [{ "$ref": "#/components/parameters/PathId" }], "responses": { "200": { "description": "OK" } } }
+    },
+    "/clients": {
+      "get": { "tags": ["Clients"], "summary": "List clients", "x-required-scope": "clients:read", "responses": { "200": { "description": "OK" } } },
+      "post": { "tags": ["Clients"], "summary": "Create a client", "x-required-scope": "clients:write", "responses": { "201": { "description": "Created" } } }
+    },
+    "/clients/{id}": {
+      "get": { "tags": ["Clients"], "summary": "Get a client", "x-required-scope": "clients:read", "parameters": [{ "$ref": "#/components/parameters/PathId" }], "responses": { "200": { "description": "OK" } } },
+      "patch": { "tags": ["Clients"], "summary": "Update a client", "x-required-scope": "clients:write", "parameters": [{ "$ref": "#/components/parameters/PathId" }], "responses": { "200": { "description": "OK" } } },
+      "delete": { "tags": ["Clients"], "summary": "Delete a client", "x-required-scope": "clients:delete", "parameters": [{ "$ref": "#/components/parameters/PathId" }], "responses": { "204": { "description": "Deleted" } } }
+    },
+    "/products": {
+      "get": { "tags": ["Products"], "summary": "List products", "x-required-scope": "products:read", "responses": { "200": { "description": "OK" } } },
+      "post": { "tags": ["Products"], "summary": "Create a product", "x-required-scope": "products:write", "responses": { "201": { "description": "Created" } } }
+    },
+    "/products/{id}": {
+      "get": { "tags": ["Products"], "summary": "Get a product", "x-required-scope": "products:read", "parameters": [{ "$ref": "#/components/parameters/PathId" }], "responses": { "200": { "description": "OK" } } },
+      "patch": { "tags": ["Products"], "summary": "Update a product", "x-required-scope": "products:write", "parameters": [{ "$ref": "#/components/parameters/PathId" }], "responses": { "200": { "description": "OK" } } },
+      "delete": { "tags": ["Products"], "summary": "Delete a product", "x-required-scope": "products:delete", "parameters": [{ "$ref": "#/components/parameters/PathId" }], "responses": { "204": { "description": "Deleted" } } }
+    },
+    "/expenses": {
+      "get": { "tags": ["Expenses"], "summary": "List expenses", "x-required-scope": "expenses:read", "responses": { "200": { "description": "OK" } } },
+      "post": { "tags": ["Expenses"], "summary": "Create an expense", "x-required-scope": "expenses:write", "responses": { "201": { "description": "Created" } } }
+    },
+    "/expenses/{id}": {
+      "get": { "tags": ["Expenses"], "summary": "Get an expense", "x-required-scope": "expenses:read", "parameters": [{ "$ref": "#/components/parameters/PathId" }], "responses": { "200": { "description": "OK" } } },
+      "delete": { "tags": ["Expenses"], "summary": "Delete an expense", "x-required-scope": "expenses:delete", "parameters": [{ "$ref": "#/components/parameters/PathId" }], "responses": { "204": { "description": "Deleted" } } }
+    },
+    "/bank-accounts": {
+      "get": { "tags": ["Bank accounts"], "summary": "List bank accounts", "x-required-scope": "bank_accounts:read", "responses": { "200": { "description": "OK" } } }
+    },
+    "/bank-accounts/{id}": {
+      "get": { "tags": ["Bank accounts"], "summary": "Get a bank account", "x-required-scope": "bank_accounts:read", "parameters": [{ "$ref": "#/components/parameters/PathId" }], "responses": { "200": { "description": "OK" } } }
+    },
+    "/company": {
+      "get": { "tags": ["Company"], "summary": "Get the company profile", "x-required-scope": "company:read", "responses": { "200": { "description": "OK" } } }
+    },
+    "/team": {
+      "get": { "tags": ["Team"], "summary": "Get the current team", "x-required-scope": "team:read", "responses": { "200": { "description": "OK" } } }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "fk_live_<32 chars>",
+        "description": "Personal API key issued from Settings → API & Webhooks. Only Standard-mode teams can use the API."
+      }
+    },
+    "parameters": {
+      "PathId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "string" },
+        "description": "Prefixed public ID (e.g. inv_..., clt_..., prd_...)"
+      }
+    },
+    "responses": {
+      "Unauthorized": {
+        "description": "Invalid, expired, or revoked API key",
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+      },
+      "Forbidden": {
+        "description": "Insufficient scope, IP not allowed, or team in Private encryption mode",
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+      },
+      "NotFound": {
+        "description": "Resource not found",
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+      },
+      "ValidationFailed": {
+        "description": "Validation failed — see error.details[]",
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+      },
+      "RateLimited": {
+        "description": "Per-minute or per-hour limit exceeded — see Retry-After header",
+        "headers": {
+          "Retry-After": { "schema": { "type": "integer" } },
+          "X-RateLimit-Remaining": { "schema": { "type": "integer" } }
+        },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "message"],
+            "properties": {
+              "code": { "type": "string" },
+              "message": { "type": "string" },
+              "request_id": { "type": "string" },
+              "doc_url": { "type": "string", "format": "uri" },
+              "details": { "type": "array", "items": { "type": "object" } }
+            }
+          }
+        }
+      },
+      "Pagination": {
+        "type": "object",
+        "required": ["has_more", "next_cursor", "limit"],
+        "properties": {
+          "has_more": { "type": "boolean" },
+          "next_cursor": { "type": "string", "nullable": true },
+          "limit": { "type": "integer" }
+        }
+      },
+      "InvoiceLine": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "position": { "type": "integer" },
+          "description": { "type": "string" },
+          "sale_type": { "type": "string", "nullable": true },
+          "quantity": { "type": "number" },
+          "unit": { "type": "string", "nullable": true },
+          "unit_price_cents": { "type": "integer" },
+          "vat_rate": { "type": "number" },
+          "total_cents": { "type": "integer" }
+        }
+      },
+      "Invoice": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "example": "inv_8KqL2x..." },
+          "number": { "type": "string" },
+          "status": { "type": "string", "enum": ["draft", "sent", "paid", "paid_unconfirmed", "partial", "overdue", "cancelled"] },
+          "subject": { "type": "string", "nullable": true },
+          "issue_date": { "type": "string", "format": "date" },
+          "due_date": { "type": "string", "format": "date", "nullable": true },
+          "paid_date": { "type": "string", "format": "date", "nullable": true },
+          "language": { "type": "string" },
+          "currency": { "type": "string", "enum": ["EUR"] },
+          "client_id": { "type": "string", "nullable": true },
+          "client_name": { "type": "string", "nullable": true },
+          "bank_account_id": { "type": "string", "nullable": true },
+          "source_quote_id": { "type": "string", "nullable": true },
+          "subtotal_cents": { "type": "integer" },
+          "tax_cents": { "type": "integer" },
+          "total_cents": { "type": "integer" },
+          "global_discount_type": { "type": "string", "enum": ["none", "percentage", "fixed"] },
+          "global_discount_value": { "type": "number" },
+          "vat_exempt_reason": { "type": "string" },
+          "vat_on_debits": { "type": "boolean" },
+          "payment_terms": { "type": "string", "nullable": true },
+          "payment_method": { "type": "string", "nullable": true },
+          "notes": { "type": "string", "nullable": true },
+          "comment": { "type": "string", "nullable": true },
+          "delivery_address": { "type": "string", "nullable": true },
+          "operation_category": { "type": "string", "nullable": true, "enum": ["service", "goods", "mixed", null] },
+          "lines": { "type": "array", "items": { "$ref": "#/components/schemas/InvoiceLine" } },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time", "nullable": true }
+        }
+      },
+      "InvoiceWrapped": {
+        "type": "object",
+        "properties": { "data": { "$ref": "#/components/schemas/Invoice" } }
+      },
+      "InvoiceListResponse": {
+        "type": "object",
+        "properties": {
+          "data": { "type": "array", "items": { "$ref": "#/components/schemas/Invoice" } },
+          "pagination": { "$ref": "#/components/schemas/Pagination" }
+        }
+      },
+      "InvoiceCreate": {
+        "type": "object",
+        "required": ["client_id", "issue_date", "lines"],
+        "properties": {
+          "client_id": { "type": "string", "example": "clt_8KqL2x..." },
+          "issue_date": { "type": "string", "format": "date" },
+          "due_date": { "type": "string", "format": "date", "nullable": true },
+          "language": { "type": "string", "enum": ["fr", "en"] },
+          "subject": { "type": "string", "nullable": true },
+          "notes": { "type": "string", "nullable": true },
+          "payment_terms": { "type": "string", "nullable": true },
+          "bank_account_id": { "type": "string", "nullable": true },
+          "source_quote_id": { "type": "string", "nullable": true },
+          "global_discount_type": { "type": "string", "enum": ["none", "percentage", "fixed"] },
+          "global_discount_value": { "type": "number" },
+          "vat_exempt_reason": { "type": "string" },
+          "vat_on_debits": { "type": "boolean" },
+          "operation_category": { "type": "string", "enum": ["service", "goods", "mixed"], "nullable": true },
+          "lines": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["description", "quantity", "unit_price_cents", "vat_rate"],
+              "properties": {
+                "description": { "type": "string" },
+                "quantity": { "type": "number" },
+                "unit": { "type": "string", "nullable": true },
+                "sale_type": { "type": "string", "nullable": true },
+                "unit_price_cents": { "type": "integer" },
+                "vat_rate": { "type": "number" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
