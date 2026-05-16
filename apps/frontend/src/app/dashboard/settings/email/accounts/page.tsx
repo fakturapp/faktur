@@ -12,11 +12,10 @@ import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/toast'
 import { useEmail, type EmailAccountItem } from '@/lib/email-context'
 import { api } from '@/lib/api'
-import { Textarea } from '@/components/ui/textarea'
 import {
   Mail, Plus, Server, Zap, Send, Eye, EyeOff, Key, Star, Trash2,
-  ArrowLeft, ArrowRight, X, CheckCircle2, XCircle, Check, MoreHorizontal,
-  FileText, Receipt, FileMinus2, ExternalLink,
+  ArrowLeft, ArrowRight, CheckCircle2, XCircle, Check,
+  FileText, Receipt, FileMinus2, ArrowUpRight,
 } from 'lucide-react'
 
 const fadeUp = {
@@ -76,16 +75,6 @@ function EmailSettingsContent() {
 
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
 
-  type TemplateType = 'invoice_send' | 'quote_send' | 'credit_note_send'
-  const [templates, setTemplates] = useState<Record<TemplateType, { subject: string; body: string }>>({
-    invoice_send: { subject: '', body: '' },
-    quote_send: { subject: '', body: '' },
-    credit_note_send: { subject: '', body: '' },
-  })
-  const [templatesLoaded, setTemplatesLoaded] = useState(false)
-  const [savingTemplate, setSavingTemplate] = useState<TemplateType | null>(null)
-  const [editingTemplate, setEditingTemplate] = useState<TemplateType | null>(null)
-
   useEffect(() => {
     if (searchParams.get('connected') === 'true') {
       toast('Compte Gmail connecté avec succès', 'success')
@@ -109,35 +98,6 @@ function EmailSettingsContent() {
     window.addEventListener('click', handleClick)
     return () => window.removeEventListener('click', handleClick)
   }, [openMenuId])
-
-  useEffect(() => {
-    async function loadTemplates() {
-      const { data } = await api.get<{ templates: Record<TemplateType, { subject: string; body: string }> }>('/email/templates')
-      if (data?.templates) {
-        setTemplates(data.templates)
-        setTemplatesLoaded(true)
-      }
-    }
-    loadTemplates()
-  }, [])
-
-  async function handleSaveTemplate(type: TemplateType) {
-    setSavingTemplate(type)
-    const tpl = templates[type]
-    const { error } = await api.put('/email/templates', {
-      templateType: type,
-      subject: tpl.subject,
-      body: tpl.body,
-    })
-    setSavingTemplate(null)
-    if (error) { toast(error, 'error'); return }
-    toast('Template enregistré', 'success')
-    setEditingTemplate(null)
-  }
-
-  function updateTemplate(type: TemplateType, field: 'subject' | 'body', value: string) {
-    setTemplates((prev) => ({ ...prev, [type]: { ...prev[type], [field]: value } }))
-  }
 
   function openDialog() {
     setDialogStep('choose')
@@ -414,106 +374,35 @@ function EmailSettingsContent() {
                   Templates d&apos;email
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Personnalisez les messages par défaut. Variables : <code className="text-accent">{'{type}'}</code> <code className="text-accent">{'{numero}'}</code> <code className="text-accent">{'{montant}'}</code> <code className="text-accent">{'{client_name}'}</code>
+                  Personnalisez les messages envoyés avec vos documents.
                 </p>
               </div>
 
-              {templatesLoaded ? (
-                <div className="space-y-3">
-                  {([
-                    { type: 'invoice_send' as TemplateType, label: 'Facture', icon: FileText, color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
-                    { type: 'quote_send' as TemplateType, label: 'Devis', icon: Receipt, color: 'text-orange-500', bgColor: 'bg-orange-500/10' },
-                    { type: 'credit_note_send' as TemplateType, label: 'Avoir', icon: FileMinus2, color: 'text-violet-500', bgColor: 'bg-violet-500/10' },
-                  ]).map((item) => (
-                    <div key={item.type} className="rounded-xl border border-border p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2.5">
-                          <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${item.bgColor}`}>
-                            <item.icon className={`h-4 w-4 ${item.color}`} />
-                          </div>
-                          <p className="text-sm font-semibold text-foreground">Envoi {item.label}</p>
-                        </div>
-                        {editingTemplate === item.type ? (
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setEditingTemplate(null)}
-                            >
-                              Annuler
-                            </Button>
-                            <Button
-                              size="sm"
-                              disabled={savingTemplate === item.type}
-                              onClick={() => handleSaveTemplate(item.type)}
-                            >
-                              {savingTemplate === item.type ? <Spinner className="h-3.5 w-3.5" /> : 'Enregistrer'}
-                            </Button>
-                          </div>
-                        ) : (
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setEditingTemplate(item.type)}
-                            >
-                              Modifier
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => router.push(`/dashboard/settings/email/templates/${item.type}`)}
-                              className="gap-1.5"
-                            >
-                              Voir plus <ExternalLink className="h-3.5 w-3.5" />
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-
-                      {editingTemplate === item.type ? (
-                        <div className="space-y-3">
-                          <div>
-                            <label className="text-xs font-medium text-muted-foreground block mb-1">Objet</label>
-                            <Input
-                              value={templates[item.type].subject}
-                              onChange={(e) => updateTemplate(item.type, 'subject', e.target.value)}
-                              placeholder="Objet de l'email"
-                            />
-                          </div>
-                          <div>
-                            <label className="text-xs font-medium text-muted-foreground block mb-1">Message</label>
-                            <Textarea
-                              value={templates[item.type].body}
-                              onChange={(e) => updateTemplate(item.type, 'body', e.target.value)}
-                              rows={5}
-                              placeholder="Corps de l'email"
-                            />
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="space-y-1.5">
-                          <p className="text-xs text-muted-foreground">
-                            <span className="font-medium text-foreground">Objet :</span> {templates[item.type].subject}
-                          </p>
-                          <p className="text-xs text-muted-foreground line-clamp-2">
-                            <span className="font-medium text-foreground">Message :</span> {templates[item.type].body}
-                          </p>
-                        </div>
-                      )}
+              <div className="space-y-2">
+                {([
+                  { type: 'invoice_send', label: 'Envoi facture', desc: "Email envoyé lors de l'envoi d'une facture.", icon: FileText, color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
+                  { type: 'quote_send', label: 'Envoi devis', desc: "Email envoyé lors de l'envoi d'un devis.", icon: Receipt, color: 'text-orange-500', bgColor: 'bg-orange-500/10' },
+                  { type: 'credit_note_send', label: 'Envoi avoir', desc: "Email envoyé lors de l'envoi d'un avoir.", icon: FileMinus2, color: 'text-violet-500', bgColor: 'bg-violet-500/10' },
+                ] as const).map((item) => (
+                  <button
+                    key={item.type}
+                    onClick={() => router.push(`/dashboard/settings/email/templates/${item.type}`)}
+                    className="group w-full flex items-center gap-3 rounded-xl border border-border hover:border-border/80 hover:bg-surface-hover px-4 py-3 transition-all text-left"
+                  >
+                    <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${item.bgColor}`}>
+                      <item.icon className={`h-4 w-4 ${item.color}`} />
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {[0, 1, 2].map((i) => (
-                    <div key={i} className="rounded-xl border border-border p-4">
-                      <div className="h-4 w-32 rounded bg-muted animate-pulse mb-2" />
-                      <div className="h-3 w-full rounded bg-muted animate-pulse" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-foreground">{item.label}</p>
+                      <p className="text-xs text-muted-foreground truncate">{item.desc}</p>
                     </div>
-                  ))}
-                </div>
-              )}
+                    <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground group-hover:text-foreground transition-colors shrink-0">
+                      Voir plus
+                      <ArrowUpRight className="h-3.5 w-3.5" />
+                    </span>
+                  </button>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </motion.div>
