@@ -70,6 +70,8 @@ import {
   ArrowRight,
   GraduationCap,
   Gift,
+  Key,
+  Webhook,
 } from 'lucide-react'
 import { useTutorialSafe } from '@/lib/tutorial-context'
 
@@ -189,6 +191,14 @@ const settingsNav: NavItem[] = [
     children: [
       { href: '/dashboard/settings/email/accounts', label: 'Comptes email', icon: Mail },
       { href: '/dashboard/settings/reminders', label: 'Relances', icon: Bell },
+    ],
+  },
+  {
+    href: '/dashboard/settings/api-keys',
+    label: 'API & Webhooks',
+    icon: Key,
+    children: [
+      { href: '/dashboard/settings/api-keys', label: 'Clés API', icon: Key },
     ],
   },
 ]
