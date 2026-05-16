@@ -960,6 +960,12 @@ const routes = {
     tokens: [{"old":"/api/v1/email/templates","type":0,"val":"api","end":""},{"old":"/api/v1/email/templates","type":0,"val":"v1","end":""},{"old":"/api/v1/email/templates","type":0,"val":"email","end":""},{"old":"/api/v1/email/templates","type":0,"val":"templates","end":""}],
     types: placeholder as Registry['email_template_update']['types'],
   },
+  'email_template_reset': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/email/templates/:type',
+    tokens: [{"old":"/api/v1/email/templates/:type","type":0,"val":"api","end":""},{"old":"/api/v1/email/templates/:type","type":0,"val":"v1","end":""},{"old":"/api/v1/email/templates/:type","type":0,"val":"email","end":""},{"old":"/api/v1/email/templates/:type","type":0,"val":"templates","end":""},{"old":"/api/v1/email/templates/:type","type":1,"val":"type","end":""}],
+    types: placeholder as Registry['email_template_reset']['types'],
+  },
   'list_email_logs': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/email/logs',

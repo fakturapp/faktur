@@ -238,6 +238,7 @@ export const controllers = {
     templates: {
       List: () => import('#controllers/email/templates/list'),
       Update: () => import('#controllers/email/templates/update'),
+      Reset: () => import('#controllers/email/templates/reset'),
     },
   },
   expense: {

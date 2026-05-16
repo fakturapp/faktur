@@ -163,6 +163,7 @@ export type ScannedRoutes = {
     'send_test_email': { paramsTuple?: []; params?: {} }
     'email_template_list': { paramsTuple?: []; params?: {} }
     'email_template_update': { paramsTuple?: []; params?: {} }
+    'email_template_reset': { paramsTuple: [ParamValue]; params: {'type': ParamValue} }
     'list_email_logs': { paramsTuple?: []; params?: {} }
     'product_list': { paramsTuple?: []; params?: {} }
     'product_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -592,6 +593,7 @@ export type ScannedRoutes = {
     'invoice_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_payment_destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'invoiceId': ParamValue,'id': ParamValue} }
     'email_accounts_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'email_template_reset': { paramsTuple: [ParamValue]; params: {'type': ParamValue} }
     'product_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'credit_note_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recurring_invoice_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

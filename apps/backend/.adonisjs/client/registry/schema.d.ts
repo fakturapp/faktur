@@ -1915,6 +1915,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/email/templates/update').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'email_template_reset': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/email/templates/:type'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { type: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/email/templates/reset').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/email/templates/reset').default['handle']>>>
+    }
+  }
   'list_email_logs': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/email/logs'

@@ -168,6 +168,7 @@ export interface ApiDefinition {
   sendTestEmail: typeof routes['send_test_email']
   emailTemplateList: typeof routes['email_template_list']
   emailTemplateUpdate: typeof routes['email_template_update']
+  emailTemplateReset: typeof routes['email_template_reset']
   listEmailLogs: typeof routes['list_email_logs']
   productList: typeof routes['product_list']
   productShow: typeof routes['product_show']
