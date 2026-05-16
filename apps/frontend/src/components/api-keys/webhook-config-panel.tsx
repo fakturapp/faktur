@@ -2,10 +2,13 @@
 
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Webhook, Check, Send, RefreshCcw, Trash2 } from 'lucide-react'
+import { Send, RefreshCw, Trash2, Check } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
+import { Field, FieldLabel, FieldDescription } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/components/ui/toast'
 import {
   apiKeysClient,
@@ -28,6 +31,8 @@ export function WebhookConfigPanel({ apiKey, webhook, onChanged }: Props) {
   const [catalog, setCatalog] = useState<ScopesCatalog | null>(null)
   const [saving, setSaving] = useState(false)
   const [testing, setTesting] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [rotatingSecret, setRotatingSecret] = useState(false)
   const [revealedSecret, setRevealedSecret] = useState<string | null>(null)
   const [testResult, setTestResult] = useState<{
     delivered: boolean
@@ -56,11 +61,11 @@ export function WebhookConfigPanel({ apiKey, webhook, onChanged }: Props) {
     })
   }
 
-  function toggleCategory(events_in_cat: string[]) {
+  function toggleCategory(eventsInCat: string[]) {
     setEvents((prev) => {
       const next = new Set(prev)
-      const allSelected = events_in_cat.every((e) => next.has(e))
-      events_in_cat.forEach((e) => {
+      const allSelected = eventsInCat.every((e) => next.has(e))
+      eventsInCat.forEach((e) => {
         if (allSelected) next.delete(e)
         else next.add(e)
       })
@@ -70,11 +75,11 @@ export function WebhookConfigPanel({ apiKey, webhook, onChanged }: Props) {
 
   async function handleSave() {
     if (!url.trim()) {
-      toast('URL is required', 'error')
+      toast("L'URL est requise", 'error')
       return
     }
     if (events.size === 0) {
-      toast('Select at least one event', 'error')
+      toast('Sélectionnez au moins un événement', 'error')
       return
     }
     setSaving(true)
@@ -90,7 +95,7 @@ export function WebhookConfigPanel({ apiKey, webhook, onChanged }: Props) {
     if (res.data?.plaintext_secret) {
       setRevealedSecret(res.data.plaintext_secret)
     } else {
-      toast('Webhook saved', 'success')
+      toast('Webhook enregistré', 'success')
     }
     onChanged()
   }
@@ -101,17 +106,22 @@ export function WebhookConfigPanel({ apiKey, webhook, onChanged }: Props) {
     const res = await apiKeysClient.testWebhook(apiKey.id)
     setTesting(false)
     if (res.error || !res.data) {
-      toast(res.error || 'Test failed', 'error')
+      toast(res.error || 'Échec du test', 'error')
       return
     }
     setTestResult(res.data)
   }
 
   async function handleRotateSecret() {
-    if (!confirm('Generate a new signing secret? The old one stops working immediately.')) return
+    if (
+      !confirm("Générer un nouveau secret de signature ? L'ancien cesse de fonctionner immédiatement.")
+    )
+      return
+    setRotatingSecret(true)
     const res = await apiKeysClient.rotateWebhookSecret(apiKey.id)
+    setRotatingSecret(false)
     if (res.error || !res.data?.plaintext_secret) {
-      toast(res.error || 'Failed to rotate', 'error')
+      toast(res.error || 'Échec de la rotation', 'error')
       return
     }
     setRevealedSecret(res.data.plaintext_secret)
@@ -119,178 +129,220 @@ export function WebhookConfigPanel({ apiKey, webhook, onChanged }: Props) {
   }
 
   async function handleDelete() {
-    if (!confirm('Remove this webhook configuration?')) return
+    if (!confirm('Supprimer la configuration du webhook ?')) return
+    setDeleting(true)
     const res = await apiKeysClient.destroyWebhook(apiKey.id)
+    setDeleting(false)
     if (res.error) {
       toast(res.error, 'error')
       return
     }
-    toast('Webhook removed', 'success')
+    toast('Webhook supprimé', 'success')
     setUrl('')
     setEvents(new Set())
     onChanged()
   }
 
   return (
-    <div className="space-y-4">
-      <Card className="p-5">
-        <div className="flex items-center gap-2">
-          <Webhook className="size-4 text-violet-500" />
-          <h2 className="text-base font-semibold">Webhook endpoint</h2>
+    <div className="space-y-6">
+      <div>
+        <div className="flex items-center gap-2 mb-3 px-1">
+          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+            Endpoint
+          </h2>
         </div>
+        <Card className="border-border/50">
+          <CardContent className="p-5 space-y-4">
+            <Field>
+              <FieldLabel htmlFor="webhook-url">URL de destination</FieldLabel>
+              <Input
+                id="webhook-url"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="https://hooks.example.com/faktur"
+              />
+              <FieldDescription>
+                Doit être en HTTPS en production. Faktur signe chaque POST en HMAC-SHA256.
+              </FieldDescription>
+            </Field>
 
-        <div className="mt-4 space-y-4">
-          <div>
-            <label className="text-sm font-medium">Destination URL *</label>
-            <input
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://hooks.example.com/faktur"
-              className="mt-2 w-full rounded-lg border bg-background px-3 py-2 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/40"
-            />
-            <p className="mt-1 text-xs text-muted-foreground">
-              Must be HTTPS in production. Faktur signs every POST with HMAC-SHA256.
-            </p>
-          </div>
-
-          {webhook && (
-            <div className="rounded-lg border bg-muted/30 p-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                    Signing secret
-                  </p>
-                  <p className="mt-1 font-mono text-sm">{webhook.masked_secret}</p>
-                </div>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onPress={handleRotateSecret}
-                  startContent={<RefreshCcw className="size-3.5" />}
-                >
-                  Rotate
-                </Button>
-              </div>
-              {webhook.last_delivery_at && (
-                <p className="mt-2 text-xs text-muted-foreground">
-                  Last delivery {new Date(webhook.last_delivery_at).toLocaleString()} —{' '}
-                  <span
-                    className={
-                      webhook.last_delivery_status === 'delivered'
-                        ? 'text-emerald-600'
-                        : 'text-rose-600'
-                    }
+            {webhook && (
+              <div className="rounded-lg border border-border/50 bg-surface p-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                      Secret de signature
+                    </p>
+                    <p className="mt-1 font-mono text-sm text-foreground">{webhook.masked_secret}</p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleRotateSecret}
+                    disabled={rotatingSecret}
                   >
-                    {webhook.last_delivery_status}
-                  </span>
-                </p>
-              )}
-            </div>
-          )}
-        </div>
-      </Card>
-
-      <Card className="p-5">
-        <h2 className="text-base font-semibold">Events</h2>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Select which events to deliver to your endpoint.
-        </p>
-        {catalog === null ? (
-          <div className="flex items-center justify-center py-10">
-            <Spinner />
-          </div>
-        ) : (
-          <div className="mt-4 space-y-4">
-            {Object.entries(catalog.webhook_event_categories).map(([category, evs]) => {
-              const allSelected = evs.every((e) => events.has(e))
-              return (
-                <div key={category}>
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      {category}
-                    </h4>
-                    <button
-                      type="button"
-                      onClick={() => toggleCategory(evs)}
-                      className="text-xs text-violet-500 hover:underline"
-                    >
-                      {allSelected ? 'Unselect all' : 'Select all'}
-                    </button>
-                  </div>
-                  <div className="mt-2 flex flex-wrap gap-1.5">
-                    {evs.map((event) => {
-                      const active = events.has(event)
-                      return (
-                        <button
-                          key={event}
-                          type="button"
-                          onClick={() => toggleEvent(event)}
-                          className={`rounded-md border px-2 py-1 font-mono text-xs transition-colors ${
-                            active
-                              ? 'border-violet-500/60 bg-violet-500/15'
-                              : 'hover:bg-muted/50'
-                          }`}
-                        >
-                          {active && <Check className="mr-1 inline-block size-3" />}
-                          {event}
-                        </button>
-                      )
-                    })}
-                  </div>
+                    {rotatingSecret ? (
+                      <>
+                        <Spinner />
+                        Rotation...
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+                        Roter
+                      </>
+                    )}
+                  </Button>
                 </div>
-              )
-            })}
-          </div>
-        )}
-      </Card>
+                {webhook.last_delivery_at && (
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Dernière livraison {new Date(webhook.last_delivery_at).toLocaleString()}
+                    {' • '}
+                    <span
+                      className={
+                        webhook.last_delivery_status === 'delivered'
+                          ? 'text-success'
+                          : 'text-danger'
+                      }
+                    >
+                      {webhook.last_delivery_status}
+                    </span>
+                  </p>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
-      <div className="flex items-center justify-between gap-2">
+      <div>
+        <div className="flex items-center gap-2 mb-3 px-1">
+          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+            Événements
+          </h2>
+        </div>
+        <Card className="border-border/50">
+          <CardContent className="p-5">
+            {catalog === null ? (
+              <div className="flex justify-center py-8">
+                <Spinner />
+              </div>
+            ) : (
+              <div className="space-y-5">
+                {Object.entries(catalog.webhook_event_categories).map(([category, evs]) => {
+                  const allSelected = evs.every((e) => events.has(e))
+                  return (
+                    <div key={category}>
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                          {category}
+                        </h4>
+                        <button
+                          type="button"
+                          onClick={() => toggleCategory(evs)}
+                          className="text-xs text-accent hover:underline"
+                        >
+                          {allSelected ? 'Tout déselectionner' : 'Tout sélectionner'}
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {evs.map((event) => {
+                          const active = events.has(event)
+                          return (
+                            <button
+                              key={event}
+                              type="button"
+                              onClick={() => toggleEvent(event)}
+                              className={`rounded-md border px-2 py-1 font-mono text-xs transition-colors ${
+                                active
+                                  ? 'border-accent bg-accent-soft text-foreground'
+                                  : 'border-border/50 hover:bg-surface-hover'
+                              }`}
+                            >
+                              {active && <Check className="mr-1 inline-block h-3 w-3" />}
+                              {event}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           {webhook && (
-            <Button
-              variant="ghost"
-              color="danger"
-              onPress={handleDelete}
-              startContent={<Trash2 className="size-3.5" />}
-            >
-              Remove webhook
+            <Button variant="ghost" onClick={handleDelete} disabled={deleting}>
+              {deleting ? (
+                <>
+                  <Spinner />
+                  Suppression...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4 mr-2 text-danger" />
+                  Supprimer le webhook
+                </>
+              )}
             </Button>
           )}
         </div>
         <div className="flex items-center gap-2">
           {webhook && (
-            <Button
-              variant="outline"
-              onPress={handleTest}
-              isLoading={testing}
-              startContent={<Send className="size-3.5" />}
-            >
-              Send test event
+            <Button variant="outline" onClick={handleTest} disabled={testing}>
+              {testing ? (
+                <>
+                  <Spinner />
+                  Envoi...
+                </>
+              ) : (
+                <>
+                  <Send className="h-4 w-4 mr-2" />
+                  Tester
+                </>
+              )}
             </Button>
           )}
-          <Button onPress={handleSave} isLoading={saving} isDisabled={saving}>
-            {webhook ? 'Save changes' : 'Configure webhook'}
+          <Button onClick={handleSave} disabled={saving}>
+            {saving ? (
+              <>
+                <Spinner />
+                Enregistrement...
+              </>
+            ) : webhook ? (
+              'Enregistrer'
+            ) : (
+              'Configurer le webhook'
+            )}
           </Button>
         </div>
       </div>
 
       {testResult && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={`rounded-lg border p-4 ${
-            testResult.delivered
-              ? 'border-emerald-500/30 bg-emerald-500/5'
-              : 'border-rose-500/30 bg-rose-500/5'
-          }`}
-        >
-          <h3 className="text-sm font-semibold">
-            {testResult.delivered ? '✓ Delivered' : '✗ Failed'} — status{' '}
-            <code>{testResult.status_code ?? 'no_response'}</code> in {testResult.latency_ms}ms
-          </h3>
-          {testResult.error && (
-            <p className="mt-2 font-mono text-xs text-muted-foreground">{testResult.error}</p>
-          )}
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+          <Card
+            className={
+              testResult.delivered
+                ? 'border-success/40 bg-success/5'
+                : 'border-danger/40 bg-danger/5'
+            }
+          >
+            <CardContent className="p-4">
+              <p className="text-sm font-semibold text-foreground">
+                {testResult.delivered ? '✓ Livré' : '✗ Échec'} — HTTP{' '}
+                <code className="font-mono">{testResult.status_code ?? 'aucune réponse'}</code> en{' '}
+                {testResult.latency_ms}ms
+              </p>
+              {testResult.error && (
+                <p className="mt-1 font-mono text-xs text-muted-foreground">{testResult.error}</p>
+              )}
+            </CardContent>
+          </Card>
         </motion.div>
       )}
 
