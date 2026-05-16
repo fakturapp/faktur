@@ -793,7 +793,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
                 <>
                   <motion.div {...labelFade} className="flex-1 min-w-0 text-left">
                     <p className="text-[14px] font-medium text-foreground truncate leading-tight">
-                      {user.fullName || user.email}
+                      {user.fullName || user.email.split('@')[0]}
                     </p>
                   </motion.div>
 
