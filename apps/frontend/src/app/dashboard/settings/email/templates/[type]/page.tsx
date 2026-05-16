@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import {
   ArrowLeft, Download, Save, Sparkles, FileText, Receipt, FileMinus2, RotateCcw,
-  Reply, Forward, Star, MoreHorizontal,
+  Reply, Forward, Star, MoreHorizontal, Wand2, Check,
 } from 'lucide-react'
 import CodeMirror from '@uiw/react-codemirror'
 import { html as htmlLang } from '@codemirror/lang-html'
@@ -66,6 +66,8 @@ export default function EmailTemplateEditorPage() {
   const [saving, setSaving] = useState(false)
   const [resetting, setResetting] = useState(false)
   const [resetOpen, setResetOpen] = useState(false)
+  const [formatting, setFormatting] = useState(false)
+  const [useFakeData, setUseFakeData] = useState(true)
   const [templates, setTemplates] = useState<TemplateMap>(EMPTY)
   const [saved, setSaved] = useState<TemplateMap>(EMPTY)
 
@@ -119,6 +121,30 @@ export default function EmailTemplateEditorPage() {
     setTimeout(() => URL.revokeObjectURL(url), 100)
   }, [current.body, active])
 
+  const handleFormat = useCallback(async () => {
+    if (!current.body.trim()) return
+    setFormatting(true)
+    try {
+      const [{ format }, htmlParser] = await Promise.all([
+        import('prettier/standalone'),
+        import('prettier/plugins/html'),
+      ])
+      const formatted = await format(current.body, {
+        parser: 'html',
+        plugins: [htmlParser.default],
+        printWidth: 100,
+        htmlWhitespaceSensitivity: 'css',
+        tabWidth: 2,
+      })
+      setTemplates((p) => ({ ...p, [active]: { ...p[active], body: formatted.trimEnd() } }))
+      toast('Code formaté', 'success')
+    } catch (e) {
+      toast(e instanceof Error ? e.message : 'Erreur de formatage', 'error')
+    } finally {
+      setFormatting(false)
+    }
+  }, [active, current.body, toast])
+
   const handleReset = useCallback(async () => {
     setResetting(true)
     const { error } = await api.delete(`/email/templates/${active}`)
@@ -140,12 +166,12 @@ export default function EmailTemplateEditorPage() {
   }, [active, toast])
 
   const renderedBody = useMemo(
-    () => resolveVariables(current.body, meta.documentLabel),
-    [current.body, meta.documentLabel]
+    () => (useFakeData ? resolveVariables(current.body, meta.documentLabel) : current.body),
+    [current.body, meta.documentLabel, useFakeData]
   )
   const renderedSubject = useMemo(
-    () => resolveVariables(current.subject, meta.documentLabel),
-    [current.subject, meta.documentLabel]
+    () => (useFakeData ? resolveVariables(current.subject, meta.documentLabel) : current.subject),
+    [current.subject, meta.documentLabel, useFakeData]
   )
 
   const senderName = user?.fullName?.split(' ')[0] ?? 'Faktur'
@@ -259,7 +285,19 @@ export default function EmailTemplateEditorPage() {
                   <span className="h-2.5 w-2.5 rounded-full bg-[#27c93f]" />
                   <span className="ml-2 text-[11px] font-mono text-zinc-400">{active}.html</span>
                 </div>
-                <span className="text-[10px] text-zinc-500 font-mono">HTML · {current.body.length} car.</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] text-zinc-500 font-mono">HTML · {current.body.length} car.</span>
+                  <button
+                    type="button"
+                    onClick={handleFormat}
+                    disabled={formatting || !current.body.trim()}
+                    title="Formater le code (Prettier)"
+                    className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-zinc-300 hover:bg-white/10 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {formatting ? <Spinner className="h-3 w-3" /> : <Wand2 className="h-3 w-3" />}
+                    Formater
+                  </button>
+                </div>
               </div>
               <div className="flex-1 overflow-hidden">
                 <CodeMirror
@@ -283,9 +321,30 @@ export default function EmailTemplateEditorPage() {
 
             {/* Spacemail-style preview */}
             <Card className="overflow-hidden border-border/50 flex flex-col">
-              <div className="border-b border-border bg-muted/30 px-4 py-2.5">
-                <p className="text-xs font-medium text-foreground">Aperçu email</p>
-                <p className="text-[10px] text-muted-foreground">Variables résolues</p>
+              <div className="border-b border-border bg-muted/30 px-4 py-2.5 flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-medium text-foreground">Aperçu email</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    {useFakeData ? 'Variables remplacées par des données fictives' : 'Variables affichées telles quelles'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setUseFakeData((v) => !v)}
+                  className="inline-flex items-center gap-2 select-none cursor-pointer group"
+                  aria-pressed={useFakeData}
+                >
+                  <span
+                    className={`relative h-4 w-4 rounded border transition-colors flex items-center justify-center ${
+                      useFakeData
+                        ? 'bg-accent border-accent'
+                        : 'border-border bg-background group-hover:border-foreground'
+                    }`}
+                  >
+                    {useFakeData && <Check className="h-3 w-3 text-white" strokeWidth={3} />}
+                  </span>
+                  <span className="text-[11px] font-medium text-foreground">Données fictives</span>
+                </button>
               </div>
               <div className="flex-1 bg-[#18191b] p-4 min-h-[640px]">
                 <div className="rounded-2xl bg-[#252628] p-4 text-[#f9f9f9] font-sans">
