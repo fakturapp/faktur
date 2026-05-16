@@ -56,6 +56,10 @@ export default defineConfig({
     () => import('@adonisjs/limiter/limiter_provider'),
     () => import('@adonisjs/mail/mail_provider'),
     () => import('#providers/api_provider'),
+    {
+      file: () => import('#providers/api_v2_webhook_provider'),
+      environment: ['web'],
+    },
   ],
 
   /*
