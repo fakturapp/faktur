@@ -20,6 +20,7 @@
     "@simplewebauthn/browser": "^13.3.0",
     "@stripe/react-stripe-js": "^6.3.0",
     "@stripe/stripe-js": "^9.5.0",
+    "@uiw/codemirror-theme-sublime": "^4.25.9",
     "@uiw/react-codemirror": "^4.25.9",
     "canvas-confetti": "^1.9.4",
     "class-variance-authority": "^0.7.1",
