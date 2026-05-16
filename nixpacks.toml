@@ -2,7 +2,7 @@
 # Backend (AdonisJS) on port 3333 + Frontend (Next.js) on port 3000
 
 [phases.setup]
-aptPkgs = ["libnss3", "libgbm1", "libasound2t64", "libpangocairo-1.0-0", "libgtk-3-0", "libxss1", "libxshmfence1", "libatk1.0-0", "libatk-bridge2.0-0", "libcups2"]
+aptPkgs = ["libnss3", "libgbm1", "libasound2t64", "libpangocairo-1.0-0", "libgtk-3-0", "libxss1", "libxshmfence1", "libatk1.0-0", "libatk-bridge2.0-0", "libcups2", "unzip"]
 
 [phases.build]
 cmds = [
