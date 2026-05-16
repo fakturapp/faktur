@@ -3,58 +3,61 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Spinner } from '@/components/ui/spinner'
+import { Skeleton } from '@/components/ui/skeleton'
+import {
+  Dialog,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import { Field, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import { useToast } from '@/components/ui/toast'
 import {
   Key,
   Plus,
-  Copy,
-  Check,
-  ExternalLink,
-  Globe,
   Trash2,
-  Activity,
-  Webhook,
-  ShieldAlert,
-  Sparkles,
+  Lock,
+  ExternalLink,
+  ChevronRight,
+  AlertTriangle,
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Spinner } from '@/components/ui/spinner'
-import { useToast } from '@/components/ui/toast'
 import { apiKeysClient, type ApiKeyShape } from '@/lib/api-keys-client'
 import { CreateApiKeyDialog } from '@/components/api-keys/create-api-key-dialog'
 import { RevealedKeyDialog } from '@/components/api-keys/revealed-key-dialog'
 import { useAuth } from '@/lib/auth'
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 12 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.05, duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] as const },
-  }),
-}
-
 function formatRelative(iso: string | null): string {
-  if (!iso) return 'never'
+  if (!iso) return 'jamais utilisée'
   const then = new Date(iso).getTime()
   const now = Date.now()
   const diffSec = Math.max(0, Math.floor((now - then) / 1000))
-  if (diffSec < 60) return `${diffSec}s ago`
+  if (diffSec < 60) return `il y a ${diffSec}s`
   const m = Math.floor(diffSec / 60)
-  if (m < 60) return `${m}min ago`
+  if (m < 60) return `il y a ${m} min`
   const h = Math.floor(m / 60)
-  if (h < 24) return `${h}h ago`
+  if (h < 24) return `il y a ${h} h`
   const d = Math.floor(h / 24)
-  if (d < 30) return `${d}d ago`
+  if (d < 30) return `il y a ${d} j`
   return new Date(iso).toLocaleDateString()
 }
 
-function statusBadge(status: ApiKeyShape['status']) {
-  if (status === 'active') return { label: 'Active', tone: 'success' as const }
-  if (status === 'rotating') return { label: 'Rotating', tone: 'warning' as const }
-  if (status === 'expired') return { label: 'Expired', tone: 'default' as const }
-  return { label: 'Revoked', tone: 'destructive' as const }
+function statusInfo(status: ApiKeyShape['status']) {
+  switch (status) {
+    case 'active':
+      return { label: 'Active', variant: 'success' as const }
+    case 'rotating':
+      return { label: 'En rotation', variant: 'warning' as const }
+    case 'expired':
+      return { label: 'Expirée', variant: 'muted' as const }
+    case 'revoked':
+      return { label: 'Révoquée', variant: 'destructive' as const }
+  }
 }
 
 export default function ApiKeysPage() {
@@ -65,6 +68,7 @@ export default function ApiKeysPage() {
   const [revealed, setRevealed] = useState<{ key: ApiKeyShape; plaintext: string } | null>(null)
   const [confirmRevoke, setConfirmRevoke] = useState<ApiKeyShape | null>(null)
   const [revoking, setRevoking] = useState(false)
+  const [confirmText, setConfirmText] = useState('')
 
   const teamEncryptionMode =
     (user as { currentTeamEncryptionMode?: 'private' | 'standard' } | null)
@@ -93,171 +97,203 @@ export default function ApiKeysPage() {
       toast(res.error, 'error')
       return
     }
-    toast('API key revoked', 'success')
+    toast('Clé révoquée', 'success')
     setConfirmRevoke(null)
+    setConfirmText('')
     load()
   }
 
-  return (
-    <div className="space-y-6">
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        custom={0}
-        variants={fadeUp}
-        className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
-      >
+  if (keys === null) {
+    return (
+      <div className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
+        <Card className="border-border/50">
+          <CardContent className="p-6">
+            <Skeleton className="h-6 w-48 mb-2" />
+            <Skeleton className="h-4 w-80" />
+          </CardContent>
+        </Card>
         <div>
-          <div className="flex items-center gap-2">
-            <div className="rounded-xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 p-2">
-              <Key className="size-5 text-violet-500" />
-            </div>
-            <h1 className="text-2xl font-semibold tracking-tight">API & Webhooks</h1>
-            <Badge variant="default" className="ml-2 text-[10px] uppercase tracking-wide">
-              Beta
-            </Badge>
+          <div className="flex items-center gap-2 mb-3 px-1">
+            <Skeleton className="h-4 w-4 rounded" />
+            <Skeleton className="h-3.5 w-16" />
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Automate Faktur from your scripts and applications. Every key has its own scopes, rate
-            limits, and webhook subscriptions.
-          </p>
+          <Card className="border-border/50">
+            <CardContent className="p-0">
+              {[0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between px-5 py-4 border-b border-border/50 last:border-b-0"
+                >
+                  <div className="space-y-2">
+                    <Skeleton className="h-3.5 w-40" />
+                    <Skeleton className="h-3 w-56" />
+                  </div>
+                  <Skeleton className="h-6 w-20 rounded-full" />
+                </div>
+              ))}
+            </CardContent>
+          </Card>
         </div>
-        <div className="flex items-center gap-2">
-          <Link
-            href="https://developers.fakturapp.cc"
-            target="_blank"
-            className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
-          >
-            <ExternalLink className="size-3.5" /> Documentation
-          </Link>
-          <Button
-            onPress={() => setCreating(true)}
-            isDisabled={isPrivateTeam}
-            startContent={<Plus className="size-4" />}
-          >
-            Create key
-          </Button>
-        </div>
-      </motion.div>
+      </div>
+    )
+  }
+
+  const activeCount = keys.filter((k) => k.status === 'active').length
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-6 px-4 lg:px-6 py-4 md:py-6"
+    >
+      <Card className="border-border/50">
+        <CardContent className="p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <h1 className="text-xl font-bold text-foreground">API & Webhooks</h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Automatisez Faktur depuis vos scripts. Chaque clé a ses propres permissions,
+                quotas et événements webhook.
+              </p>
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              <Link
+                href="https://developers.fakturapp.cc"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Button variant="outline" size="sm">
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Documentation
+                </Button>
+              </Link>
+              <Button
+                size="sm"
+                onClick={() => setCreating(true)}
+                disabled={isPrivateTeam}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Nouvelle clé
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {isPrivateTeam && (
-        <motion.div initial="hidden" animate="visible" custom={1} variants={fadeUp}>
-          <Card className="border-amber-500/30 bg-amber-500/5 p-4">
+        <Card className="border-amber-400/40 bg-amber-400/5">
+          <CardContent className="p-5">
             <div className="flex items-start gap-3">
-              <ShieldAlert className="mt-0.5 size-5 shrink-0 text-amber-500" />
+              <AlertTriangle className="h-5 w-5 shrink-0 text-amber-400 mt-0.5" />
               <div>
-                <h3 className="font-medium text-amber-700 dark:text-amber-200">
-                  API is not available in Private encryption mode
+                <h3 className="text-sm font-semibold text-foreground">
+                  API non disponible en mode Privé
                 </h3>
-                <p className="mt-1 text-sm text-amber-700/80 dark:text-amber-200/80">
-                  The Faktur API requires Standard encryption mode. Switch your team in Settings →
-                  Members → Encryption to enable API access.
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Votre équipe utilise le chiffrement de bout en bout. L&apos;API requiert le mode
+                  Standard. Vous pouvez migrer depuis Paramètres &rsaquo; Équipe.
                 </p>
               </div>
             </div>
-          </Card>
-        </motion.div>
+          </CardContent>
+        </Card>
       )}
 
-      {keys === null ? (
-        <div className="flex items-center justify-center py-24">
-          <Spinner />
+      <div>
+        <div className="flex items-center gap-2 mb-3 px-1">
+          <Key className="h-4 w-4 text-muted-foreground" />
+          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+            Clés API
+          </h2>
         </div>
-      ) : keys.length === 0 ? (
-        <motion.div initial="hidden" animate="visible" custom={2} variants={fadeUp}>
-          <Card className="flex flex-col items-center justify-center gap-3 px-8 py-16 text-center">
-            <div className="rounded-2xl bg-gradient-to-br from-violet-500/15 to-fuchsia-500/15 p-4">
-              <Sparkles className="size-7 text-violet-500" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold">No API keys yet</h3>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Create your first key to start automating Faktur — list invoices, create clients,
-                receive webhook events.
-              </p>
-            </div>
-            <Button
-              onPress={() => setCreating(true)}
-              isDisabled={isPrivateTeam}
-              startContent={<Plus className="size-4" />}
-            >
-              Create your first key
-            </Button>
-          </Card>
-        </motion.div>
-      ) : (
-        <div className="space-y-3">
-          <AnimatePresence>
-            {keys.map((key, i) => {
-              const badge = statusBadge(key.status)
-              return (
-                <motion.div
-                  key={key.id}
-                  layout
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2, delay: i * 0.03 }}
-                >
-                  <Card className="group p-4 transition-colors hover:bg-muted/40">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <Link
-                        href={`/dashboard/settings/api-keys/${key.id}`}
-                        className="min-w-0 flex-1"
+
+        <Card className="border-border/50">
+          <CardContent className="p-0">
+            {keys.length === 0 ? (
+              <div className="px-5 py-12 text-center">
+                <Lock className="h-8 w-8 text-muted-foreground/40 mx-auto mb-3" />
+                <p className="text-sm font-medium text-foreground">Aucune clé API</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Créez votre première clé pour commencer à automatiser Faktur.
+                </p>
+                {!isPrivateTeam && (
+                  <Button size="sm" className="mt-4" onClick={() => setCreating(true)}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Créer une clé
+                  </Button>
+                )}
+              </div>
+            ) : (
+              <div className="divide-y divide-border/50">
+                <AnimatePresence>
+                  {keys.map((key, index) => {
+                    const status = statusInfo(key.status)
+                    return (
+                      <motion.div
+                        key={key.id}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ delay: index * 0.03 }}
+                        className="group flex items-center justify-between gap-3 px-5 py-4 hover:bg-surface-hover transition-colors"
                       >
-                        <div className="flex items-center gap-2">
-                          <h3 className="truncate font-medium">{key.name}</h3>
-                          <Badge
-                            variant={badge.tone === 'success' ? 'success' : badge.tone === 'warning' ? 'warning' : badge.tone === 'destructive' ? 'destructive' : 'default'}
-                            className="shrink-0 text-[10px] uppercase tracking-wide"
-                          >
-                            {badge.label}
-                          </Badge>
-                        </div>
-                        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                          <span className="font-mono">{key.masked_token}</span>
-                          <span>·</span>
-                          <span>{key.scopes.length} scopes</span>
-                          <span>·</span>
-                          <span className="inline-flex items-center gap-1">
-                            <Activity className="size-3" />
-                            last call {formatRelative(key.last_used_at)}
-                          </span>
-                          {key.allowed_ips && key.allowed_ips.length > 0 && (
-                            <>
-                              <span>·</span>
-                              <span className="inline-flex items-center gap-1">
-                                <Globe className="size-3" />
-                                {key.allowed_ips.length} IP{key.allowed_ips.length > 1 ? 's' : ''}
-                              </span>
-                            </>
+                        <Link
+                          href={`/dashboard/settings/api-keys/${key.id}`}
+                          className="min-w-0 flex-1"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <span className="truncate text-sm font-semibold text-foreground">
+                              {key.name}
+                            </span>
+                            <Badge variant={status.variant} size="sm">
+                              {status.label}
+                            </Badge>
+                          </div>
+                          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                            <code className="font-mono">{key.masked_token}</code>
+                            <span aria-hidden>•</span>
+                            <span>
+                              {key.scopes.length} permission{key.scopes.length > 1 ? 's' : ''}
+                            </span>
+                            <span aria-hidden>•</span>
+                            <span>{formatRelative(key.last_used_at)}</span>
+                          </div>
+                        </Link>
+                        <div className="flex shrink-0 items-center gap-1">
+                          {key.status === 'active' && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.preventDefault()
+                                setConfirmRevoke(key)
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
                           )}
+                          <Link href={`/dashboard/settings/api-keys/${key.id}`}>
+                            <Button variant="ghost" size="sm">
+                              <ChevronRight className="h-4 w-4" />
+                            </Button>
+                          </Link>
                         </div>
-                      </Link>
-                      <div className="flex items-center gap-2">
-                        {key.status === 'active' && (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onPress={() => setConfirmRevoke(key)}
-                            startContent={<Trash2 className="size-3.5" />}
-                          >
-                            Revoke
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </Card>
-                </motion.div>
-              )
-            })}
-          </AnimatePresence>
-          <p className="text-center text-xs text-muted-foreground">
-            {keys.filter((k) => k.status === 'active').length} active key
-            {keys.filter((k) => k.status === 'active').length !== 1 ? 's' : ''}
+                      </motion.div>
+                    )
+                  })}
+                </AnimatePresence>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {keys.length > 0 && (
+          <p className="mt-3 px-1 text-xs text-muted-foreground">
+            {activeCount} clé{activeCount > 1 ? 's' : ''} active{activeCount > 1 ? 's' : ''} sur{' '}
+            {keys.length}
           </p>
-        </div>
-      )}
+        )}
+      </div>
 
       <CreateApiKeyDialog
         open={creating}
@@ -277,93 +313,75 @@ export default function ApiKeysPage() {
         onClose={() => setRevealed(null)}
       />
 
-      <ConfirmRevokeDialog
+      <Dialog
         open={confirmRevoke !== null}
-        keyName={confirmRevoke?.name ?? ''}
-        loading={revoking}
-        onClose={() => setConfirmRevoke(null)}
-        onConfirm={handleRevoke}
-      />
-    </div>
-  )
-}
-
-function ConfirmRevokeDialog({
-  open,
-  keyName,
-  loading,
-  onClose,
-  onConfirm,
-}: {
-  open: boolean
-  keyName: string
-  loading: boolean
-  onClose: () => void
-  onConfirm: () => void
-}) {
-  const [typed, setTyped] = useState('')
-  useEffect(() => {
-    if (!open) setTyped('')
-  }, [open])
-
-  if (!open) return null
-
-  return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
-        onClick={onClose}
+        onClose={() => {
+          if (!revoking) {
+            setConfirmRevoke(null)
+            setConfirmText('')
+          }
+        }}
       >
-        <motion.div
-          initial={{ opacity: 0, y: 20, scale: 0.96 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 20, scale: 0.96 }}
-          className="w-full max-w-md rounded-2xl border bg-background p-6 shadow-2xl"
-          onClick={(e) => e.stopPropagation()}
+        <DialogHeader
+          onClose={() => {
+            setConfirmRevoke(null)
+            setConfirmText('')
+          }}
         >
-          <div className="flex items-start gap-3">
-            <div className="rounded-full bg-rose-500/15 p-2">
-              <Trash2 className="size-5 text-rose-500" />
-            </div>
-            <div className="flex-1">
-              <h2 className="text-lg font-semibold">Revoke this API key</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                The key will stop working immediately. Any integration using it will fail with a
-                401 response. This cannot be undone.
-              </p>
-            </div>
-          </div>
-          <div className="mt-5">
-            <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Type{' '}
-              <span className="font-mono text-foreground">{keyName}</span> to confirm
-            </label>
-            <input
-              value={typed}
-              onChange={(e) => setTyped(e.target.value)}
-              className="mt-2 w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/40"
-              placeholder={keyName}
+          <DialogTitle>Révoquer la clé</DialogTitle>
+          <DialogDescription>
+            La clé cessera de fonctionner immédiatement. Toute intégration qui l&apos;utilise
+            recevra un 401. Cette action est irréversible.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="mt-4">
+          <Field>
+            <FieldLabel htmlFor="confirm-name">
+              Tapez{' '}
+              <span className="font-mono text-foreground">{confirmRevoke?.name}</span> pour
+              confirmer
+            </FieldLabel>
+            <Input
+              id="confirm-name"
+              value={confirmText}
+              onChange={(e) => setConfirmText(e.target.value)}
+              placeholder={confirmRevoke?.name ?? ''}
               autoFocus
             />
-          </div>
-          <div className="mt-5 flex justify-end gap-2">
-            <Button variant="ghost" onPress={onClose} isDisabled={loading}>
-              Cancel
-            </Button>
-            <Button
-              color="danger"
-              isDisabled={typed.trim() !== keyName.trim() || loading}
-              onPress={onConfirm}
-              isLoading={loading}
-            >
-              Revoke
-            </Button>
-          </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+          </Field>
+        </div>
+
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setConfirmRevoke(null)
+              setConfirmText('')
+            }}
+            disabled={revoking}
+          >
+            Annuler
+          </Button>
+          <Button
+            variant="danger"
+            onClick={handleRevoke}
+            disabled={revoking || confirmText.trim() !== (confirmRevoke?.name ?? '').trim()}
+          >
+            {revoking ? (
+              <>
+                <Spinner />
+                Révocation...
+              </>
+            ) : (
+              <>
+                <Trash2 className="h-4 w-4 mr-2" />
+                Révoquer
+              </>
+            )}
+          </Button>
+        </DialogFooter>
+      </Dialog>
+    </motion.div>
   )
 }
