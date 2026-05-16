@@ -89,6 +89,25 @@ export const controllers = {
     Consent: () => import('#controllers/analytics/consent'),
     Ingest: () => import('#controllers/analytics/ingest'),
   },
+  apiV2: {
+    clients: {
+      Create: () => import('#controllers/api_v2/clients/create'),
+      Destroy: () => import('#controllers/api_v2/clients/destroy'),
+      List: () => import('#controllers/api_v2/clients/list'),
+      Show: () => import('#controllers/api_v2/clients/show'),
+      Update: () => import('#controllers/api_v2/clients/update'),
+    },
+    meta: {
+      Ping: () => import('#controllers/api_v2/meta/ping'),
+    },
+    products: {
+      Create: () => import('#controllers/api_v2/products/create'),
+      Destroy: () => import('#controllers/api_v2/products/destroy'),
+      List: () => import('#controllers/api_v2/products/list'),
+      Show: () => import('#controllers/api_v2/products/show'),
+      Update: () => import('#controllers/api_v2/products/update'),
+    },
+  },
   auth: {
     oauth: {
       GoogleAuthUrl: () => import('#controllers/auth/oauth/google_auth_url'),
@@ -203,6 +222,23 @@ export const controllers = {
     },
   },
   dashboard: {
+    apiKeys: {
+      Create: () => import('#controllers/dashboard/api_keys/create'),
+      DeliveriesList: () => import('#controllers/dashboard/api_keys/deliveries_list'),
+      DeliveriesRetry: () => import('#controllers/dashboard/api_keys/deliveries_retry'),
+      List: () => import('#controllers/dashboard/api_keys/list'),
+      LogsList: () => import('#controllers/dashboard/api_keys/logs_list'),
+      Revoke: () => import('#controllers/dashboard/api_keys/revoke'),
+      Rotate: () => import('#controllers/dashboard/api_keys/rotate'),
+      ScopesCatalog: () => import('#controllers/dashboard/api_keys/scopes_catalog'),
+      Show: () => import('#controllers/dashboard/api_keys/show'),
+      Update: () => import('#controllers/dashboard/api_keys/update'),
+      UsageStats: () => import('#controllers/dashboard/api_keys/usage_stats'),
+      WebhookDestroy: () => import('#controllers/dashboard/api_keys/webhook_destroy'),
+      WebhookRotateSecret: () => import('#controllers/dashboard/api_keys/webhook_rotate_secret'),
+      WebhookSet: () => import('#controllers/dashboard/api_keys/webhook_set'),
+      WebhookTest: () => import('#controllers/dashboard/api_keys/webhook_test'),
+    },
     CashFlow: () => import('#controllers/dashboard/cash_flow'),
     Charts: () => import('#controllers/dashboard/charts'),
     SidebarCounts: () => import('#controllers/dashboard/sidebar_counts'),

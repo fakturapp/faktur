@@ -5,6 +5,9 @@
 
 /// <reference path="./manifest.d.ts" />
 import type { InferData, InferVariants } from '@adonisjs/core/types/transformers'
+import type ApiV2ApiClientTransformer from '#transformers/api_v2/api_client_transformer'
+import type ApiV2ApiProductTransformer from '#transformers/api_v2/api_product_transformer'
+import type ApiApiKeyAdminTransformer from '#transformers/api/api_key_admin_transformer'
 import type AuthProviderTransformer from '#transformers/auth_provider_transformer'
 import type BankAccountTransformer from '#transformers/bank_account_transformer'
 import type ClientContactTransformer from '#transformers/client_contact_transformer'
@@ -31,6 +34,22 @@ import type TeamTransformer from '#transformers/team_transformer'
 import type UserTransformer from '#transformers/user_transformer'
 
 export namespace Data {
+  export namespace ApiV2 {
+    export type ApiClient = InferData<ApiV2ApiClientTransformer>
+    export namespace ApiClient {
+      export type Variants = InferVariants<ApiV2ApiClientTransformer>
+    }
+    export type ApiProduct = InferData<ApiV2ApiProductTransformer>
+    export namespace ApiProduct {
+      export type Variants = InferVariants<ApiV2ApiProductTransformer>
+    }
+  }
+  export namespace Api {
+    export type ApiKeyAdmin = InferData<ApiApiKeyAdminTransformer>
+    export namespace ApiKeyAdmin {
+      export type Variants = InferVariants<ApiApiKeyAdminTransformer>
+    }
+  }
   export type AuthProvider = InferData<AuthProviderTransformer>
   export namespace AuthProvider {
     export type Variants = InferVariants<AuthProviderTransformer>

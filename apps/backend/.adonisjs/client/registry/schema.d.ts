@@ -3031,6 +3031,318 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/oauth/exchange_session').default['handle']>>>
     }
   }
+  'scopes_catalog': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/dashboard/settings/api-keys/scopes-catalog'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/scopes_catalog').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/scopes_catalog').default['handle']>>>
+    }
+  }
+  'keys_list': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/dashboard/settings/api-keys'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/list').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/list').default['handle']>>>
+    }
+  }
+  'keys_create': {
+    methods: ["POST"]
+    pattern: '/api/v1/dashboard/settings/api-keys'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/api/api_key_dashboard_validators').createApiKeyValidator)>|InferInput<(typeof import('#services/api/scope_checker').default)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/api/api_key_dashboard_validators').createApiKeyValidator)>|InferInput<(typeof import('#services/api/scope_checker').default)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/create').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/create').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'keys_show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/dashboard/settings/api-keys/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/show').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/show').default['handle']>>>
+    }
+  }
+  'keys_update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/dashboard/settings/api-keys/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/api/api_key_dashboard_validators').updateApiKeyValidator)>|InferInput<(typeof import('#services/api/scope_checker').default)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/api/api_key_dashboard_validators').updateApiKeyValidator)>|InferInput<(typeof import('#services/api/scope_checker').default)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/update').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/update').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'keys_revoke': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/dashboard/settings/api-keys/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/revoke').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/revoke').default['handle']>>>
+    }
+  }
+  'keys_rotate': {
+    methods: ["POST"]
+    pattern: '/api/v1/dashboard/settings/api-keys/:id/rotate'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/rotate').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/rotate').default['handle']>>>
+    }
+  }
+  'webhook_set': {
+    methods: ["PUT"]
+    pattern: '/api/v1/dashboard/settings/api-keys/:id/webhook'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/api/api_key_dashboard_validators').setWebhookValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/api/api_key_dashboard_validators').setWebhookValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/webhook_set').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/webhook_set').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'webhook_destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/dashboard/settings/api-keys/:id/webhook'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/webhook_destroy').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/webhook_destroy').default['handle']>>>
+    }
+  }
+  'webhook_rotate_secret': {
+    methods: ["POST"]
+    pattern: '/api/v1/dashboard/settings/api-keys/:id/webhook/rotate-secret'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/webhook_rotate_secret').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/webhook_rotate_secret').default['handle']>>>
+    }
+  }
+  'webhook_test': {
+    methods: ["POST"]
+    pattern: '/api/v1/dashboard/settings/api-keys/:id/webhook/test'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/api/api_key_dashboard_validators').testWebhookValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/api/api_key_dashboard_validators').testWebhookValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/webhook_test').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/webhook_test').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'deliveries_list': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/dashboard/settings/api-keys/:id/deliveries'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/deliveries_list').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/deliveries_list').default['handle']>>>
+    }
+  }
+  'deliveries_retry': {
+    methods: ["POST"]
+    pattern: '/api/v1/dashboard/settings/api-keys/:id/deliveries/:deliveryId/retry'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { id: ParamValue; deliveryId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/deliveries_retry').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/deliveries_retry').default['handle']>>>
+    }
+  }
+  'logs_list': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/dashboard/settings/api-keys/:id/logs'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/logs_list').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/logs_list').default['handle']>>>
+    }
+  }
+  'usage_stats': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/dashboard/settings/api-keys/:id/usage-stats'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/usage_stats').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/usage_stats').default['handle']>>>
+    }
+  }
+  'ping': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v2/ping'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/meta/ping').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/meta/ping').default['handle']>>>
+    }
+  }
+  'clients_list': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v2/clients'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/api_v2/client_validators').listClientsValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/clients/list').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/clients/list').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'clients_show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v2/clients/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/clients/show').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/clients/show').default['handle']>>>
+    }
+  }
+  'clients_create': {
+    methods: ["POST"]
+    pattern: '/api/v2/clients'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/api_v2/client_validators').createClientValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/api_v2/client_validators').createClientValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/clients/create').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/clients/create').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'clients_update': {
+    methods: ["PATCH"]
+    pattern: '/api/v2/clients/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/api_v2/client_validators').updateClientValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/api_v2/client_validators').updateClientValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/clients/update').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/clients/update').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'clients_destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v2/clients/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/clients/destroy').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/clients/destroy').default['handle']>>>
+    }
+  }
+  'products_list': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v2/products'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/api_v2/product_validators').listProductsValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/products/list').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/products/list').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'products_show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v2/products/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/products/show').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/products/show').default['handle']>>>
+    }
+  }
+  'products_create': {
+    methods: ["POST"]
+    pattern: '/api/v2/products'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/api_v2/product_validators').createProductValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/api_v2/product_validators').createProductValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/products/create').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/products/create').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'products_update': {
+    methods: ["PATCH"]
+    pattern: '/api/v2/products/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/api_v2/product_validators').updateProductValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/api_v2/product_validators').updateProductValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/products/update').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/products/update').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'products_destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v2/products/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/products/destroy').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/products/destroy').default['handle']>>>
+    }
+  }
   'create_feedback': {
     methods: ["POST"]
     pattern: '/api/v1/feedback'

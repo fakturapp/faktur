@@ -256,6 +256,32 @@ export type ScannedRoutes = {
     'token': { paramsTuple?: []; params?: {} }
     'revoke': { paramsTuple?: []; params?: {} }
     'exchange_session': { paramsTuple?: []; params?: {} }
+    'scopes_catalog': { paramsTuple?: []; params?: {} }
+    'keys_list': { paramsTuple?: []; params?: {} }
+    'keys_create': { paramsTuple?: []; params?: {} }
+    'keys_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'keys_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'keys_revoke': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'keys_rotate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'webhook_set': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'webhook_destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'webhook_rotate_secret': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'webhook_test': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'deliveries_list': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'deliveries_retry': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'deliveryId': ParamValue} }
+    'logs_list': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'usage_stats': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'ping': { paramsTuple?: []; params?: {} }
+    'clients_list': { paramsTuple?: []; params?: {} }
+    'clients_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'clients_create': { paramsTuple?: []; params?: {} }
+    'clients_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'clients_destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'products_list': { paramsTuple?: []; params?: {} }
+    'products_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'products_create': { paramsTuple?: []; params?: {} }
+    'products_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'products_destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'create_feedback': { paramsTuple?: []; params?: {} }
     'my_feedback': { paramsTuple?: []; params?: {} }
     'create_bug_report': { paramsTuple?: []; params?: {} }
@@ -364,6 +390,13 @@ export type ScannedRoutes = {
     'token': { paramsTuple?: []; params?: {} }
     'revoke': { paramsTuple?: []; params?: {} }
     'exchange_session': { paramsTuple?: []; params?: {} }
+    'keys_create': { paramsTuple?: []; params?: {} }
+    'keys_rotate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'webhook_rotate_secret': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'webhook_test': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'deliveries_retry': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'deliveryId': ParamValue} }
+    'clients_create': { paramsTuple?: []; params?: {} }
+    'products_create': { paramsTuple?: []; params?: {} }
     'create_feedback': { paramsTuple?: []; params?: {} }
     'create_bug_report': { paramsTuple?: []; params?: {} }
   }
@@ -459,6 +492,17 @@ export type ScannedRoutes = {
     'checkout_get_iban': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'checkout_download_pdf': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'authorize.show': { paramsTuple?: []; params?: {} }
+    'scopes_catalog': { paramsTuple?: []; params?: {} }
+    'keys_list': { paramsTuple?: []; params?: {} }
+    'keys_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'deliveries_list': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'logs_list': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'usage_stats': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'ping': { paramsTuple?: []; params?: {} }
+    'clients_list': { paramsTuple?: []; params?: {} }
+    'clients_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'products_list': { paramsTuple?: []; params?: {} }
+    'products_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'my_feedback': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
@@ -553,6 +597,17 @@ export type ScannedRoutes = {
     'checkout_get_iban': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'checkout_download_pdf': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'authorize.show': { paramsTuple?: []; params?: {} }
+    'scopes_catalog': { paramsTuple?: []; params?: {} }
+    'keys_list': { paramsTuple?: []; params?: {} }
+    'keys_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'deliveries_list': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'logs_list': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'usage_stats': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'ping': { paramsTuple?: []; params?: {} }
+    'clients_list': { paramsTuple?: []; params?: {} }
+    'clients_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'products_list': { paramsTuple?: []; params?: {} }
+    'products_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'my_feedback': { paramsTuple?: []; params?: {} }
   }
   PUT: {
@@ -576,6 +631,7 @@ export type ScannedRoutes = {
     'reminder_settings_update': { paramsTuple?: []; params?: {} }
     'expense_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'update_oauth_app': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'webhook_set': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   DELETE: {
     'session_revoke': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -603,6 +659,10 @@ export type ScannedRoutes = {
     'share_revoke': { paramsTuple: [ParamValue]; params: {'shareId': ParamValue} }
     'link_destroy': { paramsTuple: [ParamValue]; params: {'linkId': ParamValue} }
     'payment_link_delete': { paramsTuple: [ParamValue]; params: {'invoiceId': ParamValue} }
+    'keys_revoke': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'webhook_destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'clients_destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'products_destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PATCH: {
     'quote_update_status': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -618,6 +678,9 @@ export type ScannedRoutes = {
     'analytics_errors.resolve': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'share_update': { paramsTuple: [ParamValue]; params: {'shareId': ParamValue} }
     'link_update': { paramsTuple: [ParamValue]; params: {'linkId': ParamValue} }
+    'keys_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'clients_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'products_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

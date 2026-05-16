@@ -172,6 +172,161 @@ export class AnalyticsSessionSchema extends BaseModel {
   declare userId: string | null
 }
 
+export class ApiIdempotencyKeySchema extends BaseModel {
+  static $columns = ['apiKeyId', 'bodyHash', 'createdAt', 'expiresAt', 'key', 'method', 'path', 'responseBody', 'responseStatus'] as const
+  $columns = ApiIdempotencyKeySchema.$columns
+  @column()
+  declare apiKeyId: string
+  @column()
+  declare bodyHash: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.dateTime()
+  declare expiresAt: DateTime
+  @column({ isPrimary: true })
+  declare key: string
+  @column()
+  declare method: string
+  @column()
+  declare path: string
+  @column()
+  declare responseBody: string
+  @column()
+  declare responseStatus: number
+}
+
+export class ApiKeyWebhookSchema extends BaseModel {
+  static $columns = ['apiKeyId', 'consecutiveFailures', 'createdAt', 'events', 'id', 'isActive', 'lastDeliveryAt', 'lastDeliveryStatus', 'secretHash', 'secretLast4', 'updatedAt', 'url'] as const
+  $columns = ApiKeyWebhookSchema.$columns
+  @column()
+  declare apiKeyId: string
+  @column()
+  declare consecutiveFailures: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare events: any
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare isActive: boolean
+  @column.dateTime()
+  declare lastDeliveryAt: DateTime | null
+  @column()
+  declare lastDeliveryStatus: string | null
+  @column()
+  declare secretHash: string
+  @column()
+  declare secretLast4: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare url: string
+}
+
+export class ApiKeySchema extends BaseModel {
+  static $columns = ['allowedIps', 'createdAt', 'createdByUserId', 'expiresAt', 'hash', 'id', 'last4', 'lastIp', 'lastUsedAt', 'name', 'prefix', 'rateLimitTier', 'revokedAt', 'revokedReason', 'rotatingToId', 'rotationGraceUntil', 'scopes', 'teamId', 'updatedAt', 'usageCount'] as const
+  $columns = ApiKeySchema.$columns
+  @column()
+  declare allowedIps: any | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare createdByUserId: string | null
+  @column.dateTime()
+  declare expiresAt: DateTime | null
+  @column()
+  declare hash: string
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare last4: string
+  @column()
+  declare lastIp: string | null
+  @column.dateTime()
+  declare lastUsedAt: DateTime | null
+  @column()
+  declare name: string
+  @column()
+  declare prefix: string
+  @column()
+  declare rateLimitTier: string
+  @column.dateTime()
+  declare revokedAt: DateTime | null
+  @column()
+  declare revokedReason: string | null
+  @column()
+  declare rotatingToId: string | null
+  @column.dateTime()
+  declare rotationGraceUntil: DateTime | null
+  @column()
+  declare scopes: any
+  @column()
+  declare teamId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare usageCount: bigint | number
+}
+
+export class ApiRequestLogSchema extends BaseModel {
+  static $columns = ['apiKeyId', 'createdAt', 'errorCode', 'id', 'ip', 'latencyMs', 'method', 'path', 'requestId', 'status'] as const
+  $columns = ApiRequestLogSchema.$columns
+  @column()
+  declare apiKeyId: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare errorCode: string | null
+  @column({ isPrimary: true })
+  declare id: bigint | number
+  @column()
+  declare ip: string
+  @column()
+  declare latencyMs: number
+  @column()
+  declare method: string
+  @column()
+  declare path: string
+  @column()
+  declare requestId: string
+  @column()
+  declare status: number
+}
+
+export class ApiWebhookDeliverySchema extends BaseModel {
+  static $columns = ['apiKeyId', 'attemptCount', 'createdAt', 'deliveredAt', 'encryptedPayload', 'eventId', 'eventType', 'id', 'lastError', 'lastStatusCode', 'nextAttemptAt', 'status', 'updatedAt', 'url'] as const
+  $columns = ApiWebhookDeliverySchema.$columns
+  @column()
+  declare apiKeyId: string
+  @column()
+  declare attemptCount: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.dateTime()
+  declare deliveredAt: DateTime | null
+  @column()
+  declare encryptedPayload: string
+  @column()
+  declare eventId: string
+  @column()
+  declare eventType: string
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare lastError: string | null
+  @column()
+  declare lastStatusCode: number | null
+  @column.dateTime()
+  declare nextAttemptAt: DateTime | null
+  @column()
+  declare status: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare url: string
+}
+
 export class AuditLogSchema extends BaseModel {
   static $columns = ['action', 'createdAt', 'id', 'ipAddress', 'metadata', 'resourceId', 'resourceType', 'severity', 'userAgent', 'userId'] as const
   $columns = AuditLogSchema.$columns
