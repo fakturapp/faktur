@@ -3343,6 +3343,66 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/products/destroy').default['handle']>>>
     }
   }
+  'invoices_list': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v2/invoices'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/api_v2/invoice_validators').listInvoicesValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/invoices/list').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/invoices/list').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'invoices_show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v2/invoices/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/invoices/show').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/invoices/show').default['handle']>>>
+    }
+  }
+  'invoices_mark_paid': {
+    methods: ["POST"]
+    pattern: '/api/v2/invoices/:id/mark-paid'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/api_v2/invoice_validators').markPaidValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/api_v2/invoice_validators').markPaidValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/invoices/mark_paid').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/invoices/mark_paid').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'quotes_list': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v2/quotes'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/api_v2/quote_validators').listQuotesValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/quotes/list').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/quotes/list').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'quotes_show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v2/quotes/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/quotes/show').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/quotes/show').default['handle']>>>
+    }
+  }
   'create_feedback': {
     methods: ["POST"]
     pattern: '/api/v1/feedback'

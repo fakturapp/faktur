@@ -107,6 +107,25 @@ export const controllers = {
       Show: () => import('#controllers/api_v2/products/show'),
       Update: () => import('#controllers/api_v2/products/update'),
     },
+    invoices: {
+      List: () => import('#controllers/api_v2/invoices/list'),
+      Show: () => import('#controllers/api_v2/invoices/show'),
+      MarkPaid: () => import('#controllers/api_v2/invoices/mark_paid'),
+    },
+    quotes: {
+      List: () => import('#controllers/api_v2/quotes/list'),
+      Show: () => import('#controllers/api_v2/quotes/show'),
+    },
+    bankAccounts: {
+      List: () => import('#controllers/api_v2/bank_accounts/list'),
+      Show: () => import('#controllers/api_v2/bank_accounts/show'),
+    },
+    company: {
+      Show: () => import('#controllers/api_v2/company/show'),
+    },
+    team: {
+      Show: () => import('#controllers/api_v2/team/show'),
+    },
   },
   auth: {
     oauth: {

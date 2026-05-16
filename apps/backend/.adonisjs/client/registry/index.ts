@@ -1674,6 +1674,36 @@ const routes = {
     tokens: [{"old":"/api/v2/products/:id","type":0,"val":"api","end":""},{"old":"/api/v2/products/:id","type":0,"val":"v2","end":""},{"old":"/api/v2/products/:id","type":0,"val":"products","end":""},{"old":"/api/v2/products/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['products_destroy']['types'],
   },
+  'invoices_list': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v2/invoices',
+    tokens: [{"old":"/api/v2/invoices","type":0,"val":"api","end":""},{"old":"/api/v2/invoices","type":0,"val":"v2","end":""},{"old":"/api/v2/invoices","type":0,"val":"invoices","end":""}],
+    types: placeholder as Registry['invoices_list']['types'],
+  },
+  'invoices_show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v2/invoices/:id',
+    tokens: [{"old":"/api/v2/invoices/:id","type":0,"val":"api","end":""},{"old":"/api/v2/invoices/:id","type":0,"val":"v2","end":""},{"old":"/api/v2/invoices/:id","type":0,"val":"invoices","end":""},{"old":"/api/v2/invoices/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['invoices_show']['types'],
+  },
+  'invoices_mark_paid': {
+    methods: ["POST"],
+    pattern: '/api/v2/invoices/:id/mark-paid',
+    tokens: [{"old":"/api/v2/invoices/:id/mark-paid","type":0,"val":"api","end":""},{"old":"/api/v2/invoices/:id/mark-paid","type":0,"val":"v2","end":""},{"old":"/api/v2/invoices/:id/mark-paid","type":0,"val":"invoices","end":""},{"old":"/api/v2/invoices/:id/mark-paid","type":1,"val":"id","end":""},{"old":"/api/v2/invoices/:id/mark-paid","type":0,"val":"mark-paid","end":""}],
+    types: placeholder as Registry['invoices_mark_paid']['types'],
+  },
+  'quotes_list': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v2/quotes',
+    tokens: [{"old":"/api/v2/quotes","type":0,"val":"api","end":""},{"old":"/api/v2/quotes","type":0,"val":"v2","end":""},{"old":"/api/v2/quotes","type":0,"val":"quotes","end":""}],
+    types: placeholder as Registry['quotes_list']['types'],
+  },
+  'quotes_show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v2/quotes/:id',
+    tokens: [{"old":"/api/v2/quotes/:id","type":0,"val":"api","end":""},{"old":"/api/v2/quotes/:id","type":0,"val":"v2","end":""},{"old":"/api/v2/quotes/:id","type":0,"val":"quotes","end":""},{"old":"/api/v2/quotes/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['quotes_show']['types'],
+  },
   'create_feedback': {
     methods: ["POST"],
     pattern: '/api/v1/feedback',

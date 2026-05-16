@@ -7,6 +7,10 @@
 import type { InferData, InferVariants } from '@adonisjs/core/types/transformers'
 import type ApiV2ApiClientTransformer from '#transformers/api_v2/api_client_transformer'
 import type ApiV2ApiProductTransformer from '#transformers/api_v2/api_product_transformer'
+import type ApiV2ApiInvoiceTransformer from '#transformers/api_v2/api_invoice_transformer'
+import type ApiV2ApiQuoteTransformer from '#transformers/api_v2/api_quote_transformer'
+import type ApiV2ApiBankAccountTransformer from '#transformers/api_v2/api_bank_account_transformer'
+import type ApiV2ApiCompanyTransformer from '#transformers/api_v2/api_company_transformer'
 import type ApiApiKeyAdminTransformer from '#transformers/api/api_key_admin_transformer'
 import type AuthProviderTransformer from '#transformers/auth_provider_transformer'
 import type BankAccountTransformer from '#transformers/bank_account_transformer'
@@ -42,6 +46,22 @@ export namespace Data {
     export type ApiProduct = InferData<ApiV2ApiProductTransformer>
     export namespace ApiProduct {
       export type Variants = InferVariants<ApiV2ApiProductTransformer>
+    }
+    export type ApiInvoice = InferData<ApiV2ApiInvoiceTransformer>
+    export namespace ApiInvoice {
+      export type Variants = InferVariants<ApiV2ApiInvoiceTransformer>
+    }
+    export type ApiQuote = InferData<ApiV2ApiQuoteTransformer>
+    export namespace ApiQuote {
+      export type Variants = InferVariants<ApiV2ApiQuoteTransformer>
+    }
+    export type ApiBankAccount = InferData<ApiV2ApiBankAccountTransformer>
+    export namespace ApiBankAccount {
+      export type Variants = InferVariants<ApiV2ApiBankAccountTransformer>
+    }
+    export type ApiCompany = InferData<ApiV2ApiCompanyTransformer>
+    export namespace ApiCompany {
+      export type Variants = InferVariants<ApiV2ApiCompanyTransformer>
     }
   }
   export namespace Api {

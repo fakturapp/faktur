@@ -282,6 +282,11 @@ export type ScannedRoutes = {
     'products_create': { paramsTuple?: []; params?: {} }
     'products_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'products_destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoices_list': { paramsTuple?: []; params?: {} }
+    'invoices_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoices_mark_paid': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'quotes_list': { paramsTuple?: []; params?: {} }
+    'quotes_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'create_feedback': { paramsTuple?: []; params?: {} }
     'my_feedback': { paramsTuple?: []; params?: {} }
     'create_bug_report': { paramsTuple?: []; params?: {} }
@@ -397,6 +402,7 @@ export type ScannedRoutes = {
     'deliveries_retry': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'deliveryId': ParamValue} }
     'clients_create': { paramsTuple?: []; params?: {} }
     'products_create': { paramsTuple?: []; params?: {} }
+    'invoices_mark_paid': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'create_feedback': { paramsTuple?: []; params?: {} }
     'create_bug_report': { paramsTuple?: []; params?: {} }
   }
@@ -503,6 +509,10 @@ export type ScannedRoutes = {
     'clients_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'products_list': { paramsTuple?: []; params?: {} }
     'products_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoices_list': { paramsTuple?: []; params?: {} }
+    'invoices_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'quotes_list': { paramsTuple?: []; params?: {} }
+    'quotes_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'my_feedback': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
@@ -608,6 +618,10 @@ export type ScannedRoutes = {
     'clients_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'products_list': { paramsTuple?: []; params?: {} }
     'products_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoices_list': { paramsTuple?: []; params?: {} }
+    'invoices_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'quotes_list': { paramsTuple?: []; params?: {} }
+    'quotes_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'my_feedback': { paramsTuple?: []; params?: {} }
   }
   PUT: {
