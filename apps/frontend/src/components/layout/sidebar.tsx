@@ -704,26 +704,49 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
                     )}
                   </div>
                 }
-                className="min-w-[220px]"
+                className="min-w-[300px]"
               >
+                <DropdownLabel>Nouveau document</DropdownLabel>
                 <DropdownSub
                   trigger={
                     <>
-                      <FileText className="h-4 w-4 text-primary" />
-                      <span className="flex-1 text-left">Facture</span>
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-blue-500">
+                        <FileText className="h-4 w-4" />
+                      </div>
+                      <div className="flex-1 flex flex-col text-left min-w-0">
+                        <span className="text-sm font-medium text-foreground">Facture</span>
+                        <span className="text-[11px] text-muted-foreground">Émettre une facture à un client</span>
+                      </div>
                     </>
                   }
                 >
                   <DropdownItem onClick={() => router.push('/dashboard/invoices/new')}>
-                    <FilePlus className="h-4 w-4 text-primary" /> Facture vierge
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-blue-500/10 text-blue-500">
+                      <FilePlus className="h-3.5 w-3.5" />
+                    </div>
+                    <div className="flex-1 flex flex-col text-left min-w-0">
+                      <span className="text-sm font-medium">Facture vierge</span>
+                      <span className="text-[11px] text-muted-foreground">Repartir d&apos;un document vide</span>
+                    </div>
                   </DropdownItem>
                   <DropdownItem onClick={() => setConvertModalOpen(true)}>
-                    <RefreshCw className="h-4 w-4 text-emerald-500" /> Convertir un devis
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-emerald-500/10 text-emerald-500">
+                      <RefreshCw className="h-3.5 w-3.5" />
+                    </div>
+                    <div className="flex-1 flex flex-col text-left min-w-0">
+                      <span className="text-sm font-medium">Convertir un devis</span>
+                      <span className="text-[11px] text-muted-foreground">Transformer un devis accepté</span>
+                    </div>
                   </DropdownItem>
                 </DropdownSub>
                 <DropdownItem onClick={() => router.push('/dashboard/quotes/new')}>
-                  <Receipt className="h-4 w-4 text-orange-500" />
-                  <span>Devis</span>
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-orange-500/10 text-orange-500">
+                    <Receipt className="h-4 w-4" />
+                  </div>
+                  <div className="flex-1 flex flex-col text-left min-w-0">
+                    <span className="text-sm font-medium text-foreground">Devis</span>
+                    <span className="text-[11px] text-muted-foreground">Proposer un devis à un client</span>
+                  </div>
                 </DropdownItem>
               </Dropdown>
             </div>
@@ -826,39 +849,94 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             </div>
           }
         >
-          <div className="px-3 py-3 border-b border-border mb-1">
-            <div className="flex items-center gap-3">
+          <div className="px-2.5 pt-2.5 pb-2 mb-1">
+            <div className="flex items-center gap-3 px-1">
               <Avatar
                 src={user.avatarUrl}
                 alt={user.fullName || user.email}
                 fallback={initials}
-                size="sm"
+                size="md"
               />
-              <div className="min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold text-foreground truncate leading-tight">
                   {user.fullName || user.email}
                 </p>
-                <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                <p className="text-[11px] text-muted-foreground truncate">{user.email}</p>
               </div>
             </div>
+            {currentTeam && (
+              <div className="mt-2.5 flex items-center gap-2 rounded-lg bg-muted/40 px-2 py-1.5">
+                <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-primary/10 text-[9px] font-bold text-primary overflow-hidden">
+                  {currentTeam.iconUrl ? (
+                    <img src={currentTeam.iconUrl} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    currentTeam.name.charAt(0).toUpperCase()
+                  )}
+                </div>
+                <span className="text-xs font-medium text-foreground truncate flex-1">{currentTeam.name}</span>
+                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-muted-foreground shrink-0">
+                  {roleIcons[currentTeam.role]}
+                  {roleLabels[currentTeam.role] ?? currentTeam.role}
+                </span>
+              </div>
+            )}
           </div>
+
+          <DropdownLabel>Compte</DropdownLabel>
 
           <Link href="/dashboard/account">
             <DropdownItem>
-              <User className="h-4 w-4" /> Mon compte
+              <User className="h-4 w-4 text-muted-foreground" />
+              <span className="flex-1 text-left">Mon compte</span>
+              <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" />
             </DropdownItem>
           </Link>
 
           {isAdmin && (
             <Link href="/dashboard/admin">
               <DropdownItem>
-                <ShieldCheck className="h-4 w-4" /> Panel administrateur
+                <ShieldCheck className="h-4 w-4 text-amber-500" />
+                <span className="flex-1 text-left">Panel administrateur</span>
+                <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" />
               </DropdownItem>
             </Link>
           )}
 
+          {/* Theme picker */}
+          <div
+            className="px-3 pt-2 pb-1"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-1.5">
+              Thème
+            </p>
+            <div className="flex items-center gap-0.5 rounded-lg bg-muted/40 p-0.5">
+              {([
+                { val: 'light', label: 'Clair', icon: Sun },
+                { val: 'dark', label: 'Sombre', icon: Moon },
+                { val: 'system', label: 'Auto', icon: Monitor },
+              ] as const).map((t) => (
+                <button
+                  key={t.val}
+                  type="button"
+                  onClick={() => setTheme(t.val)}
+                  className={cn(
+                    'flex-1 inline-flex items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-[11px] font-medium transition-colors',
+                    theme === t.val
+                      ? 'bg-background text-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
+                  )}
+                  aria-pressed={theme === t.val}
+                >
+                  <t.icon className="h-3 w-3" /> {t.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <DropdownSeparator />
 
+          <DropdownLabel>Espace de travail</DropdownLabel>
           { }
           <DropdownSub
             trigger={
@@ -905,10 +983,11 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
 
           <DropdownSeparator />
 
+          <DropdownLabel>Aide</DropdownLabel>
           <DropdownSub
             trigger={
               <>
-                <Info className="h-4 w-4" />
+                <Info className="h-4 w-4 text-muted-foreground" />
                 <span className="flex-1 text-left">Aide & informations</span>
               </>
             }
