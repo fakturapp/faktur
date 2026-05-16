@@ -26,4 +26,9 @@ export const middleware = router.named({
   onboardingCompleted: () => import('#middleware/auth/onboarding_completed_middleware'),
   vault: () => import('#middleware/crypto/vault_middleware'),
   admin: () => import('#middleware/auth/admin_middleware'),
+  apiKey: () => import('#middleware/api_v2/api_key_middleware'),
+  apiScope: () => import('#middleware/api_v2/api_scope_middleware'),
+  apiRateLimit: () => import('#middleware/api_v2/api_rate_limit_middleware'),
+  apiIdempotency: () => import('#middleware/api_v2/api_idempotency_middleware'),
+  apiRequestLogger: () => import('#middleware/api_v2/api_request_logger_middleware'),
 })
