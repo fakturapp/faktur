@@ -14,6 +14,7 @@ const SendTestEmail = () => import('#controllers/email/send/send_test_email')
 const ListEmailLogs = () => import('#controllers/email/logs/list')
 const EmailTemplateList = () => import('#controllers/email/templates/list')
 const EmailTemplateUpdate = () => import('#controllers/email/templates/update')
+const EmailTemplateReset = () => import('#controllers/email/templates/reset')
 
 router.get(API_PREFIX + '/email/oauth/gmail/callback', [GmailCallback, 'handle'])
 
@@ -37,6 +38,7 @@ router
 
     router.get('/templates', [EmailTemplateList, 'handle'])
     router.put('/templates', [EmailTemplateUpdate, 'handle'])
+    router.delete('/templates/:type', [EmailTemplateReset, 'handle'])
 
     router.get('/logs', [ListEmailLogs, 'handle'])
   })
