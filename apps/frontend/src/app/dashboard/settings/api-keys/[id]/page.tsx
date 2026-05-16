@@ -3,22 +3,18 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import {
   ArrowLeft,
-  Activity,
-  Webhook,
-  ScrollText,
-  BarChart3,
   RotateCw,
   Trash2,
-  Copy,
-  Check,
 } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/components/ui/toast'
 import { apiKeysClient, type ApiKeyShape, type WebhookShape } from '@/lib/api-keys-client'
 import { WebhookConfigPanel } from '@/components/api-keys/webhook-config-panel'
@@ -29,13 +25,26 @@ import { RevealedKeyDialog } from '@/components/api-keys/revealed-key-dialog'
 
 type Tab = 'overview' | 'webhook' | 'deliveries' | 'logs' | 'usage'
 
-const TABS: Array<{ id: Tab; label: string; icon: typeof Activity }> = [
-  { id: 'overview', label: 'Overview', icon: Activity },
-  { id: 'webhook', label: 'Webhook', icon: Webhook },
-  { id: 'deliveries', label: 'Deliveries', icon: ScrollText },
-  { id: 'logs', label: 'Logs', icon: ScrollText },
-  { id: 'usage', label: 'Usage', icon: BarChart3 },
+const TABS: Array<{ id: Tab; label: string }> = [
+  { id: 'overview', label: 'Vue d’ensemble' },
+  { id: 'webhook', label: 'Webhook' },
+  { id: 'deliveries', label: 'Livraisons' },
+  { id: 'logs', label: 'Journaux' },
+  { id: 'usage', label: 'Utilisation' },
 ]
+
+function statusInfo(status: ApiKeyShape['status']) {
+  switch (status) {
+    case 'active':
+      return { label: 'Active', variant: 'success' as const }
+    case 'rotating':
+      return { label: 'En rotation', variant: 'warning' as const }
+    case 'expired':
+      return { label: 'Expirée', variant: 'muted' as const }
+    case 'revoked':
+      return { label: 'Révoquée', variant: 'destructive' as const }
+  }
+}
 
 export default function ApiKeyDetailPage() {
   const params = useParams<{ id: string }>()
@@ -45,6 +54,8 @@ export default function ApiKeyDetailPage() {
   const [key, setKey] = useState<ApiKeyShape | null>(null)
   const [webhook, setWebhook] = useState<WebhookShape | null>(null)
   const [rotated, setRotated] = useState<{ plaintext: string } | null>(null)
+  const [rotating, setRotating] = useState(false)
+  const [revoking, setRevoking] = useState(false)
 
   async function load() {
     const res = await apiKeysClient.show(params.id)
@@ -63,132 +74,143 @@ export default function ApiKeyDetailPage() {
 
   async function handleRotate() {
     if (!key) return
+    setRotating(true)
     const res = await apiKeysClient.rotate(key.id)
+    setRotating(false)
     if (res.error || !res.data?.plaintext) {
-      toast(res.error || 'Rotation failed', 'error')
+      toast(res.error || 'Échec de la rotation', 'error')
       return
     }
-    toast('New key generated — old one stays active 24h', 'success')
+    toast("Nouvelle clé générée — l'ancienne reste active 24h", 'success')
     setRotated({ plaintext: res.data.plaintext })
     load()
   }
 
   async function handleRevoke() {
     if (!key) return
-    if (!confirm(`Revoke ${key.name}? This cannot be undone.`)) return
+    if (!confirm(`Révoquer la clé « ${key.name} » ? Cette action est irréversible.`)) return
+    setRevoking(true)
     const res = await apiKeysClient.revoke(key.id)
+    setRevoking(false)
     if (res.error) {
       toast(res.error, 'error')
       return
     }
-    toast('Key revoked', 'success')
+    toast('Clé révoquée', 'success')
     router.push('/dashboard/settings/api-keys')
   }
 
   if (!key) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <Spinner />
+      <div className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
+        <Card className="border-border/50">
+          <CardContent className="p-6">
+            <Skeleton className="h-6 w-48 mb-2" />
+            <Skeleton className="h-4 w-32" />
+          </CardContent>
+        </Card>
       </div>
     )
   }
 
-  const statusTone =
-    key.status === 'active'
-      ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
-      : key.status === 'rotating'
-        ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300'
-        : key.status === 'expired'
-          ? 'bg-slate-500/15 text-slate-700 dark:text-slate-300'
-          : 'bg-rose-500/15 text-rose-700 dark:text-rose-300'
+  const status = statusInfo(key.status)
+  const isActive = key.status === 'active'
 
   return (
-    <div className="space-y-6">
-      <div>
-        <Link
-          href="/dashboard/settings/api-keys"
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="size-3.5" /> Back to keys
-        </Link>
-      </div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-6 px-4 lg:px-6 py-4 md:py-6"
+    >
+      <Link
+        href="/dashboard/settings/api-keys"
+        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
       >
-        <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-semibold tracking-tight truncate">{key.name}</h1>
-            <span
-              className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${statusTone}`}
-            >
-              {key.status}
-            </span>
+        <ArrowLeft className="h-3.5 w-3.5" />
+        Retour aux clés
+      </Link>
+
+      <Card className="border-border/50">
+        <CardContent className="p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2.5">
+                <h1 className="text-xl font-bold text-foreground truncate">{key.name}</h1>
+                <Badge variant={status.variant} size="sm">
+                  {status.label}
+                </Badge>
+              </div>
+              <p className="mt-1 font-mono text-sm text-muted-foreground">{key.masked_token}</p>
+            </div>
+            {isActive && (
+              <div className="flex shrink-0 items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRotate}
+                  disabled={rotating}
+                >
+                  {rotating ? (
+                    <>
+                      <Spinner />
+                      Rotation...
+                    </>
+                  ) : (
+                    <>
+                      <RotateCw className="h-4 w-4 mr-2" />
+                      Roter
+                    </>
+                  )}
+                </Button>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={handleRevoke}
+                  disabled={revoking}
+                >
+                  {revoking ? (
+                    <>
+                      <Spinner />
+                      Révocation...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Révoquer
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
           </div>
-          <p className="mt-1 font-mono text-sm text-muted-foreground">{key.masked_token}</p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          {key.status === 'active' && (
-            <>
-              <Button
-                size="sm"
-                variant="outline"
-                onPress={handleRotate}
-                startContent={<RotateCw className="size-3.5" />}
-              >
-                Rotate
-              </Button>
-              <Button
-                size="sm"
-                color="danger"
-                variant="outline"
-                onPress={handleRevoke}
-                startContent={<Trash2 className="size-3.5" />}
-              >
-                Revoke
-              </Button>
-            </>
-          )}
-        </div>
-      </motion.div>
+        </CardContent>
+      </Card>
 
-      <div className="border-b">
-        <div className="flex gap-1 overflow-x-auto">
-          {TABS.map((t) => {
-            const Icon = t.icon
-            return (
-              <button
-                key={t.id}
-                onClick={() => setTab(t.id)}
-                className={`relative inline-flex items-center gap-1.5 px-3 py-2.5 text-sm transition-colors ${
-                  tab === t.id ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                <Icon className="size-3.5" />
-                {t.label}
-                {tab === t.id && (
-                  <motion.span
-                    layoutId="tab-indicator"
-                    className="absolute inset-x-0 -bottom-px h-0.5 bg-violet-500"
-                  />
-                )}
-              </button>
-            )
-          })}
+      <div>
+        <div className="flex gap-1 overflow-x-auto border-b border-border/50 px-1">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => setTab(t.id)}
+              className={`relative inline-flex items-center gap-1.5 px-3 py-2.5 text-sm transition-colors ${
+                tab === t.id
+                  ? 'text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {t.label}
+              {tab === t.id && (
+                <motion.span
+                  layoutId="api-key-tab-indicator"
+                  className="absolute inset-x-0 -bottom-px h-0.5 bg-accent"
+                />
+              )}
+            </button>
+          ))}
         </div>
-      </div>
 
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={tab}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.2 }}
-        >
+        <div className="mt-6">
           {tab === 'overview' && <OverviewPanel apiKey={key} webhook={webhook} />}
           {tab === 'webhook' && (
             <WebhookConfigPanel apiKey={key} webhook={webhook} onChanged={load} />
@@ -196,8 +218,8 @@ export default function ApiKeyDetailPage() {
           {tab === 'deliveries' && <DeliveriesPanel apiKey={key} />}
           {tab === 'logs' && <LogsPanel apiKey={key} />}
           {tab === 'usage' && <UsagePanel apiKey={key} />}
-        </motion.div>
-      </AnimatePresence>
+        </div>
+      </div>
 
       <RevealedKeyDialog
         open={rotated !== null}
@@ -206,7 +228,7 @@ export default function ApiKeyDetailPage() {
         kind="api_key"
         onClose={() => setRotated(null)}
       />
-    </div>
+    </motion.div>
   )
 }
 
@@ -223,77 +245,106 @@ function OverviewPanel({
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
-      <Card className="p-5">
-        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          Key details
-        </h3>
-        <dl className="mt-4 space-y-3 text-sm">
-          <Row label="Created at" value={formatDate(apiKey.created_at)} />
-          <Row label="Expires at" value={formatDate(apiKey.expires_at)} />
-          <Row label="Last used" value={formatDate(apiKey.last_used_at)} />
-          <Row label="Last IP" value={apiKey.last_ip ?? '—'} mono />
-          <Row label="Usage count" value={apiKey.usage_count.toLocaleString()} />
-          <Row label="Rate limit tier" value={apiKey.rate_limit_tier} />
-          <Row
-            label="IP allowlist"
-            value={apiKey.allowed_ips?.length ? apiKey.allowed_ips.join(', ') : 'Unrestricted'}
-            mono={Boolean(apiKey.allowed_ips?.length)}
-          />
-        </dl>
-      </Card>
-
-      <Card className="p-5">
-        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          Permissions ({apiKey.scopes.length})
-        </h3>
-        <div className="mt-4 flex flex-wrap gap-1.5">
-          {apiKey.scopes.map((s) => (
-            <code
-              key={s}
-              className="rounded-md border bg-muted/40 px-2 py-1 font-mono text-xs"
-            >
-              {s}
-            </code>
-          ))}
+    <div className="space-y-6">
+      <div>
+        <div className="flex items-center gap-2 mb-3 px-1">
+          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+            Détails de la clé
+          </h2>
         </div>
-      </Card>
+        <Card className="border-border/50">
+          <CardContent className="p-0">
+            <div className="divide-y divide-border/50">
+              <Row label="Créée le" value={formatDate(apiKey.created_at)} />
+              <Row label="Expire le" value={formatDate(apiKey.expires_at)} />
+              <Row label="Dernière utilisation" value={formatDate(apiKey.last_used_at)} />
+              <Row label="Dernière IP" value={apiKey.last_ip ?? '—'} mono />
+              <Row label="Nombre d'appels" value={apiKey.usage_count.toLocaleString()} />
+              <Row label="Plan de quotas" value={apiKey.rate_limit_tier} />
+              <Row
+                label="IPs autorisées"
+                value={
+                  apiKey.allowed_ips?.length
+                    ? apiKey.allowed_ips.join(', ')
+                    : 'Toutes les sources'
+                }
+                mono={Boolean(apiKey.allowed_ips?.length)}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-      <Card className="p-5 md:col-span-2">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+      <div>
+        <div className="flex items-center gap-2 mb-3 px-1">
+          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+            Permissions ({apiKey.scopes.length})
+          </h2>
+        </div>
+        <Card className="border-border/50">
+          <CardContent className="p-5">
+            <div className="flex flex-wrap gap-1.5">
+              {apiKey.scopes.map((s) => (
+                <Badge key={s} variant="soft" size="sm">
+                  {s}
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div>
+        <div className="flex items-center gap-2 mb-3 px-1">
+          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
             Webhook
-          </h3>
-          {webhook ? (
-            <Badge variant={webhook.is_active ? 'success' : 'default'}>
-              {webhook.is_active ? 'Active' : 'Inactive'}
-            </Badge>
-          ) : (
-            <Badge variant="default">Not configured</Badge>
-          )}
+          </h2>
         </div>
-        {webhook ? (
-          <div className="mt-4 space-y-1 text-sm">
-            <p className="truncate font-mono text-xs text-muted-foreground">{webhook.url}</p>
-            <p className="text-xs text-muted-foreground">
-              {webhook.events.length} event{webhook.events.length > 1 ? 's' : ''} subscribed
-            </p>
-          </div>
-        ) : (
-          <p className="mt-4 text-sm text-muted-foreground">
-            No webhook configured. Set one in the Webhook tab to receive event notifications.
-          </p>
-        )}
-      </Card>
+        <Card className="border-border/50">
+          <CardContent className="p-5">
+            {webhook ? (
+              <div>
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="truncate font-mono text-sm text-foreground">{webhook.url}</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {webhook.events.length} événement{webhook.events.length > 1 ? 's' : ''}{' '}
+                      souscrit{webhook.events.length > 1 ? 's' : ''}
+                    </p>
+                  </div>
+                  <Badge variant={webhook.is_active ? 'success' : 'muted'} size="sm">
+                    {webhook.is_active ? 'Active' : 'Inactive'}
+                  </Badge>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Aucun webhook configuré. Ajoutez-en un dans l&apos;onglet Webhook pour recevoir
+                les événements.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }
 
-function Row({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
+function Row({
+  label,
+  value,
+  mono,
+}: {
+  label: string
+  value: string
+  mono?: boolean
+}) {
   return (
-    <div className="flex items-start justify-between gap-3">
-      <dt className="shrink-0 text-xs uppercase tracking-wide text-muted-foreground">{label}</dt>
-      <dd className={`text-right text-sm ${mono ? 'font-mono text-xs' : ''}`}>{value}</dd>
+    <div className="flex items-center justify-between gap-3 px-5 py-3 hover:bg-surface-hover transition-colors">
+      <span className="text-xs uppercase tracking-wider text-muted-foreground">{label}</span>
+      <span className={`text-sm text-foreground text-right ${mono ? 'font-mono text-xs' : ''}`}>
+        {value}
+      </span>
     </div>
   )
 }
