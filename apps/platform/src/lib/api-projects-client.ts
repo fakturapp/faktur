@@ -29,4 +29,27 @@ export const apiProjectsClient = {
     }
   ) => api.patch<{ data: ApiProjectShape }>(`${BASE}/${id}`, body),
   destroy: (id: string) => api.delete<{ message: string }>(`${BASE}/${id}`),
+  auditLogs: (id: string, params?: { limit?: number }) => {
+    const qs = new URLSearchParams()
+    if (params?.limit) qs.set('limit', String(params.limit))
+    const suffix = qs.toString() ? `?${qs}` : ''
+    return api.get<{ data: AuditLogShape[] }>(`${BASE}/${id}/audit-logs${suffix}`)
+  },
+}
+
+export interface AuditLogShape {
+  id: number
+  action: string
+  target_type: string
+  target_id: string | null
+  target_label: string | null
+  actor: {
+    user_id: string | null
+    name: string | null
+    email: string | null
+  }
+  ip: string | null
+  user_agent: string | null
+  metadata: Record<string, unknown>
+  created_at: string
 }
