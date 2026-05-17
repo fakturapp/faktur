@@ -17,6 +17,7 @@ import {
   RefreshCw,
   RotateCw,
   Send,
+  Terminal,
   Trash2,
   Webhook,
   Key,
@@ -50,6 +51,7 @@ const ACTIONS: Record<string, ActionMeta> = {
   'webhook.deleted': { icon: Trash2, label: 'Webhook supprimé', tone: 'danger' },
   'webhook.secret_rotated': { icon: KeyRound, label: 'Secret webhook roté', tone: 'warning' },
   'webhook.tested': { icon: Send, label: 'Webhook testé', tone: 'accent' },
+  'api_explorer.request': { icon: Terminal, label: 'Requête Explorer', tone: 'accent' },
 }
 
 const TONE_RING: Record<ActionMeta['tone'], string> = {
@@ -100,9 +102,18 @@ const CATEGORIES = [
   { id: 'project', label: 'Projet' },
   { id: 'api_key', label: 'Clés' },
   { id: 'webhook', label: 'Webhooks' },
+  { id: 'explorer', label: 'Explorer' },
 ] as const
 
 type Category = (typeof CATEGORIES)[number]['id']
+
+function statusToneText(status: number): string {
+  if (status === 0) return 'text-danger'
+  if (status >= 500) return 'text-danger'
+  if (status >= 400) return 'text-warning'
+  if (status >= 300) return 'text-accent'
+  return 'text-success'
+}
 
 export default function ActivityPage() {
   const params = useParams<{ id: string }>()
@@ -252,10 +263,35 @@ export default function ActivityPage() {
                                 <p className="text-sm font-medium text-foreground">
                                   {meta.label}
                                 </p>
-                                {log.target_label && (
-                                  <Badge variant={TONE_BADGE[meta.tone]} size="sm">
-                                    {log.target_label}
-                                  </Badge>
+                                {log.action === 'api_explorer.request' &&
+                                typeof log.metadata?.method === 'string' &&
+                                typeof log.metadata?.path === 'string' ? (
+                                  <>
+                                    <code className="font-mono text-xs font-semibold text-foreground">
+                                      {String(log.metadata.method)}
+                                    </code>
+                                    <code className="truncate font-mono text-xs text-muted-foreground">
+                                      {String(log.metadata.path)}
+                                    </code>
+                                    {typeof log.metadata?.status === 'number' && (
+                                      <span
+                                        className={`font-mono text-xs font-semibold ${statusToneText(log.metadata.status as number)}`}
+                                      >
+                                        {(log.metadata.status as number) || 'ERR'}
+                                      </span>
+                                    )}
+                                    {typeof log.metadata?.latency_ms === 'number' && (
+                                      <span className="text-[11px] text-muted-foreground">
+                                        {log.metadata.latency_ms as number}ms
+                                      </span>
+                                    )}
+                                  </>
+                                ) : (
+                                  log.target_label && (
+                                    <Badge variant={TONE_BADGE[meta.tone]} size="sm">
+                                      {log.target_label}
+                                    </Badge>
+                                  )
                                 )}
                               </div>
                               <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
