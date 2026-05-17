@@ -193,14 +193,6 @@ const settingsNav: NavItem[] = [
       { href: '/dashboard/settings/reminders', label: 'Relances', icon: Bell },
     ],
   },
-  {
-    href: '/dashboard/settings/api-keys',
-    label: 'API & Webhooks',
-    icon: Key,
-    children: [
-      { href: '/dashboard/settings/api-keys', label: 'Clés API', icon: Key },
-    ],
-  },
 ]
 
 const accountNav: NavItem[] = [
