@@ -1,4 +1,5 @@
 import { EndpointBlock } from '@/components/endpoint-block'
+import { API_V2_BASE_URL } from '@/lib/config'
 
 export const metadata = { title: 'Quotes — Faktur API V2' }
 
@@ -67,7 +68,7 @@ export default function QuotesReference() {
           path="/api/v2/quotes"
           scope="quotes:read"
           description="List quotes. Supports status filter, client filter, date ranges, and sorting."
-          example={`curl 'https://api.fakturapp.cc/api/v2/quotes?status=accepted&limit=50' \\
+          example={`curl '${API_V2_BASE_URL}/quotes?status=accepted&limit=50' \\
   -H "Authorization: Bearer fk_live_..."`}
         />
 

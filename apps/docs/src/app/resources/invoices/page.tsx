@@ -1,4 +1,5 @@
 import { EndpointBlock } from '@/components/endpoint-block'
+import { API_V2_BASE_URL } from '@/lib/config'
 
 export const metadata = { title: 'Invoices — Faktur API V2' }
 
@@ -79,7 +80,7 @@ export default function InvoicesReference() {
           path="/api/v2/invoices"
           scope="invoices:read"
           description="List invoices for the authenticated team. Supports pagination, status filter, date ranges, full-text search, and sorting."
-          example={`curl https://api.fakturapp.cc/api/v2/invoices?status=paid,partial&limit=50 \\
+          example={`curl ${API_V2_BASE_URL}/invoices?status=paid,partial&limit=50 \\
   -H "Authorization: Bearer fk_live_..."`}
         />
 
@@ -121,7 +122,7 @@ export default function InvoicesReference() {
           path="/api/v2/invoices/:id"
           scope="invoices:read"
           description="Retrieve a single invoice with its lines, client snapshot, and totals."
-          example={`curl https://api.fakturapp.cc/api/v2/invoices/inv_8KqL2x... \\
+          example={`curl ${API_V2_BASE_URL}/invoices/inv_8KqL2x... \\
   -H "Authorization: Bearer fk_live_..."`}
         />
 
@@ -130,7 +131,7 @@ export default function InvoicesReference() {
           path="/api/v2/invoices/:id/mark-paid"
           scope="invoices:write"
           description="Mark an invoice as paid (or partially paid). Triggers invoice.paid or invoice.partially_paid webhook."
-          example={`curl https://api.fakturapp.cc/api/v2/invoices/inv_.../mark-paid \\
+          example={`curl ${API_V2_BASE_URL}/invoices/inv_.../mark-paid \\
   -X POST \\
   -H "Authorization: Bearer fk_live_..." \\
   -H "Content-Type: application/json" \\

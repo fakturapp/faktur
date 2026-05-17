@@ -1,4 +1,5 @@
 import { EndpointBlock } from '@/components/endpoint-block'
+import { API_V2_BASE_URL } from '@/lib/config'
 
 export const metadata = { title: 'Clients — Faktur API V2' }
 
@@ -51,7 +52,7 @@ export default function ClientsReference() {
           path="/api/v2/clients"
           scope="clients:read"
           description="List clients for the authenticated team."
-          example={`curl https://api.fakturapp.cc/api/v2/clients?limit=50 \\
+          example={`curl ${API_V2_BASE_URL}/clients?limit=50 \\
   -H "Authorization: Bearer fk_live_..."`}
         />
 
@@ -67,7 +68,7 @@ export default function ClientsReference() {
           path="/api/v2/clients"
           scope="clients:write"
           description="Create a new client. Triggers client.created webhook."
-          example={`curl https://api.fakturapp.cc/api/v2/clients \\
+          example={`curl ${API_V2_BASE_URL}/clients \\
   -X POST \\
   -H "Authorization: Bearer fk_live_..." \\
   -H "Content-Type: application/json" \\

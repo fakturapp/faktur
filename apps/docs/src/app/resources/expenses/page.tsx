@@ -1,4 +1,5 @@
 import { EndpointBlock } from '@/components/endpoint-block'
+import { API_V2_BASE_URL } from '@/lib/config'
 
 export const metadata = { title: 'Expenses — Faktur API V2' }
 
@@ -45,7 +46,7 @@ export default function ExpensesReference() {
           path="/api/v2/expenses"
           scope="expenses:read"
           description="List expenses. Supports date ranges, deductible-only filter, and sorting by created_at or expense_date."
-          example={`curl 'https://api.fakturapp.cc/api/v2/expenses?date_after=2026-01-01&deductible_only=true' \\
+          example={`curl '${API_V2_BASE_URL}/expenses?date_after=2026-01-01&deductible_only=true' \\
   -H "Authorization: Bearer fk_live_..."`}
         />
 
@@ -61,7 +62,7 @@ export default function ExpensesReference() {
           path="/api/v2/expenses"
           scope="expenses:write"
           description="Record a new expense. vat_amount_cents is auto-computed from amount_cents and vat_rate if omitted."
-          example={`curl https://api.fakturapp.cc/api/v2/expenses \\
+          example={`curl ${API_V2_BASE_URL}/expenses \\
   -X POST \\
   -H "Authorization: Bearer fk_live_..." \\
   -H "Content-Type: application/json" \\

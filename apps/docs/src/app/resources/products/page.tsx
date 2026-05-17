@@ -1,4 +1,5 @@
 import { EndpointBlock } from '@/components/endpoint-block'
+import { API_V2_BASE_URL } from '@/lib/config'
 
 export const metadata = { title: 'Products — Faktur API V2' }
 
@@ -41,7 +42,7 @@ export default function ProductsReference() {
           path="/api/v2/products"
           scope="products:read"
           description="List products. Supports archived filter and full-text search on name/description/reference."
-          example={`curl https://api.fakturapp.cc/api/v2/products?archived=false \\
+          example={`curl ${API_V2_BASE_URL}/products?archived=false \\
   -H "Authorization: Bearer fk_live_..."`}
         />
 
@@ -57,7 +58,7 @@ export default function ProductsReference() {
           path="/api/v2/products"
           scope="products:write"
           description="Create a new product."
-          example={`curl https://api.fakturapp.cc/api/v2/products \\
+          example={`curl ${API_V2_BASE_URL}/products \\
   -X POST \\
   -H "Authorization: Bearer fk_live_..." \\
   -H "Content-Type: application/json" \\
