@@ -1,0 +1,162 @@
+@layer components {
+/* ============================================================
+ * Popover — Faktur DA
+ *
+ * Custom @keyframes (no tw-animate-css dependency) for a clean
+ * vertical slide from the trigger direction. Apple fluid easing.
+ * ============================================================ */
+
+.popover {
+  @apply rounded-2xl p-0 text-[14px];
+  background-color: var(--color-overlay);
+  color: var(--color-overlay-foreground);
+  box-shadow: var(--shadow-overlay);
+  transform-origin: top center;
+}
+
+/* ============================================================
+ * Entry / exit animations (manual @keyframes)
+ * ============================================================ */
+.popover[data-entering="true"] {
+  animation: popover-enter-bottom 260ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.popover[data-entering="true"][data-placement="top"] {
+  transform-origin: bottom center;
+  animation: popover-enter-top 260ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.popover[data-entering="true"][data-placement="left"] {
+  transform-origin: center right;
+  animation: popover-enter-left 260ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.popover[data-entering="true"][data-placement="right"] {
+  transform-origin: center left;
+  animation: popover-enter-right 260ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.popover[data-exiting="true"] {
+  animation: popover-exit 140ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .popover[data-entering="true"],
+  .popover[data-exiting="true"] {
+    animation: none;
+  }
+}
+
+/* Entry : default = placement bottom (popover appears below trigger, slides from top) */
+@keyframes popover-enter-bottom {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes popover-enter-top {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes popover-enter-left {
+  0% {
+    opacity: 0;
+    transform: translateX(10px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes popover-enter-right {
+  0% {
+    opacity: 0;
+    transform: translateX(-10px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes popover-exit {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+/* ============================================================
+ * Arrow styling
+ * ============================================================ */
+.popover [data-slot="popover-overlay-arrow"] {
+  fill: var(--color-overlay);
+}
+
+.popover[data-placement="bottom"] [data-slot="popover-overlay-arrow"] {
+  rotate: 180deg;
+}
+
+.popover[data-placement="left"] [data-slot="popover-overlay-arrow"] {
+  rotate: -90deg;
+}
+
+.popover[data-placement="right"] [data-slot="popover-overlay-arrow"] {
+  rotate: 90deg;
+}
+
+/* ============================================================
+ * Sub-elements
+ * ============================================================ */
+.popover__dialog {
+  @apply p-4 outline-none;
+}
+
+.popover__heading {
+  @apply text-[14px] font-semibold text-foreground;
+  letter-spacing: -0.01em;
+}
+
+.popover__trigger {
+  @apply inline-block;
+  cursor: var(--cursor-interactive);
+
+  transition:
+    color 150ms var(--ease-smooth),
+    background-color 150ms var(--ease-smooth),
+    box-shadow 150ms var(--ease-out);
+
+  &:focus-visible:not(:focus),
+  &[data-focus-visible="true"] {
+    @apply status-focused;
+  }
+
+  &:disabled,
+  &[aria-disabled="true"] {
+    @apply status-disabled;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .popover__trigger {
+    transition: none;
+  }
+}
+}

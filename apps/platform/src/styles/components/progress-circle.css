@@ -1,0 +1,73 @@
+@layer components {
+/* Progress Circle — simplified, explicit animation */
+
+.progress-circle {
+  @apply inline-flex items-center justify-center;
+
+  --progress-circle-stroke: var(--color-accent);
+  --progress-circle-track-stroke: var(--color-surface-tertiary);
+}
+
+.progress-circle__track {
+  @apply size-7;
+}
+
+.progress-circle__track-circle {
+  stroke: var(--progress-circle-track-stroke);
+  fill: none;
+}
+
+.progress-circle__fill-circle {
+  stroke: var(--progress-circle-stroke);
+  fill: none;
+  transition: stroke-dashoffset 300ms var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-circle__fill-circle {
+    transition: none;
+  }
+}
+
+.progress-circle[data-indeterminate="true"] .progress-circle__track {
+  animation: spin 1s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-circle[data-indeterminate="true"] .progress-circle__track {
+    animation: none;
+  }
+}
+
+.progress-circle[data-disabled="true"] {
+  @apply status-disabled;
+}
+
+/* Sizes */
+.progress-circle--sm .progress-circle__track {
+  @apply size-5;
+}
+.progress-circle--md {
+  /* default */
+}
+.progress-circle--lg .progress-circle__track {
+  @apply size-9;
+}
+
+/* Colors */
+.progress-circle--default {
+  --progress-circle-stroke: var(--color-default-foreground);
+}
+.progress-circle--accent {
+  --progress-circle-stroke: var(--color-accent);
+}
+.progress-circle--success {
+  --progress-circle-stroke: var(--color-success);
+}
+.progress-circle--warning {
+  --progress-circle-stroke: var(--color-warning);
+}
+.progress-circle--danger {
+  --progress-circle-stroke: var(--color-danger);
+}
+}

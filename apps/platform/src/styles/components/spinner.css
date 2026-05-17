@@ -1,0 +1,43 @@
+@layer components {
+/* Spinner — uses explicit animation (not Tailwind utility) */
+
+.spinner {
+  @apply pointer-events-none relative size-6 origin-center;
+  animation: spin 0.75s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+}
+
+.spinner--sm {
+  @apply size-4;
+}
+.spinner--md {
+  /* default */
+}
+.spinner--lg {
+  @apply size-8;
+}
+.spinner--xl {
+  @apply size-10;
+}
+
+.spinner--current {
+  color: inherit;
+}
+.spinner--accent {
+  color: var(--color-accent);
+}
+.spinner--danger {
+  color: var(--color-danger);
+}
+.spinner--success {
+  color: var(--color-success);
+}
+.spinner--warning {
+  color: var(--color-warning);
+}
+}

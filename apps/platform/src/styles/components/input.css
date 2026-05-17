@@ -1,0 +1,67 @@
+/* Input — adapted from HeroUI v3 */
+
+@layer components {
+  .input {
+    @apply w-full rounded-field bg-field px-4 py-2.5 text-[14px] font-normal text-field-foreground shadow-field outline-none placeholder:text-field-placeholder placeholder:font-normal;
+
+    border-width: var(--border-width-field);
+    border-color: var(--color-field-border);
+    letter-spacing: var(--tracking-ui);
+
+    transition:
+      background-color 150ms var(--ease-smooth),
+      border-color 150ms var(--ease-smooth),
+      box-shadow 150ms var(--ease-out);
+    @apply motion-reduce:transition-none;
+
+    @media (hover: hover) {
+      &:hover:not(:focus):not(:focus-visible),
+      &[data-hovered="true"]:not([data-focused="true"]):not([data-focus-visible="true"]) {
+        @apply bg-field-hover;
+        border-color: var(--color-field-border-hover);
+      }
+    }
+
+    &:focus,
+    &[data-focused="true"] {
+      @apply status-focused-field;
+      border-color: var(--color-field-border-focus);
+      background-color: var(--color-field-focus);
+    }
+
+    &[data-invalid="true"] {
+      @apply status-invalid-field;
+      background-color: var(--color-field-focus);
+    }
+
+    &[data-disabled="true"],
+    &[aria-disabled="true"] {
+      @apply status-disabled;
+    }
+  }
+
+  .input--primary {
+    /* default */
+  }
+
+  .input--secondary {
+    @apply shadow-none;
+    background-color: var(--color-surface);
+
+    @media (hover: hover) {
+      &:hover:not(:focus):not(:focus-visible),
+      &[data-hovered="true"]:not([data-focus-visible="true"]):not([data-focused="true"]) {
+        background-color: var(--color-surface-hover);
+      }
+    }
+
+    &:focus,
+    &[data-focused="true"] {
+      background-color: var(--color-surface);
+    }
+  }
+
+  .input--full-width {
+    @apply w-full;
+  }
+}

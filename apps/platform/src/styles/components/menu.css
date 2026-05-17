@@ -1,0 +1,11 @@
+@layer components {
+/* Menu — Faktur spacing (Revolut-style, generous breathing) */
+
+.menu {
+  @apply relative flex w-full flex-col gap-0.5 overflow-clip p-[6px];
+
+  [data-slot="separator"] {
+    @apply ml-[3%] w-[94%] my-1;
+  }
+}
+}

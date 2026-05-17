@@ -1,0 +1,168 @@
+@layer components {
+/* Select — Faktur DA (clean vertical slide, no origin-anchor zoom) */
+
+.select {
+  @apply flex flex-col gap-1.5;
+
+  &[data-invalid="true"],
+  &[aria-invalid="true"] {
+    [data-slot="description"] {
+      @apply hidden;
+    }
+  }
+
+  [data-slot="label"] {
+    @apply w-fit;
+  }
+
+  [data-slot="description"] {
+    @apply px-0.5;
+  }
+}
+
+.select__trigger {
+  @apply relative isolate inline-flex min-h-10 items-center rounded-field bg-field px-4 py-2.5 text-[14px] text-field-foreground shadow-field outline-none select-none no-highlight;
+
+  transition:
+    background-color 150ms var(--ease-smooth),
+    border-color 150ms var(--ease-smooth),
+    box-shadow 150ms var(--ease-out);
+  @apply motion-reduce:transition-none;
+
+  cursor: var(--cursor-interactive);
+  letter-spacing: var(--tracking-ui);
+
+  border-width: var(--border-width-field);
+  border-color: var(--color-field-border);
+
+  &:has(.select__indicator) {
+    @apply pr-9;
+  }
+
+  @media (hover: hover) {
+    &:hover,
+    &[data-hovered="true"] {
+      @apply bg-field-hover;
+      border-color: var(--color-field-border-hover);
+    }
+  }
+
+  &:focus-visible:not(:focus),
+  &[data-focus-visible="true"] {
+    @apply status-focused-field;
+    border-color: var(--color-field-border-focus);
+    background-color: var(--color-field-focus);
+  }
+
+  .select[data-invalid="true"] &,
+  .select[aria-invalid="true"] & {
+    @apply status-invalid-field;
+    background-color: var(--color-field-focus);
+  }
+
+  &:disabled,
+  &[data-disabled="true"],
+  &[aria-disabled="true"] {
+    @apply status-disabled;
+  }
+}
+
+.select--primary {
+  /* default */
+}
+
+.select--secondary .select__trigger {
+  @apply shadow-none;
+  background-color: var(--color-surface);
+
+  @media (hover: hover) {
+    &:hover,
+    &[data-hovered="true"] {
+      background-color: var(--color-surface-hover);
+    }
+  }
+}
+
+.select__value {
+  @apply flex-1 text-left text-[14px] text-current;
+  word-wrap: break-word;
+
+  &[data-placeholder="true"] {
+    @apply text-field-placeholder;
+  }
+
+  [data-slot="list-box-item-indicator"] {
+    @apply hidden;
+  }
+}
+
+.select__indicator {
+  @apply absolute inset-y-0 right-3 my-auto flex shrink-0 items-center justify-center text-field-placeholder transition duration-150;
+
+  &[data-open="true"] {
+    @apply rotate-180;
+  }
+
+  &[data-slot="select-default-indicator"] {
+    @apply size-4;
+  }
+}
+
+/* ============================================================
+ * Select popover — clean vertical slide, no origin-anchor
+ * ============================================================ */
+.select__popover {
+  @apply min-w-(--trigger-width) scroll-py-1 overflow-y-auto overscroll-contain rounded-2xl p-0 text-[14px];
+  background-color: var(--color-overlay);
+  color: var(--color-overlay-foreground);
+  box-shadow: var(--shadow-overlay);
+
+  &:focus-visible:not(:focus),
+  &[data-focus-visible="true"] {
+    @apply outline-none;
+  }
+
+  &[data-entering="true"] {
+    @apply animate-in fade-in-0 ease-out;
+    animation-duration: 220ms;
+
+    &[data-placement="top"] {
+      @apply slide-in-from-bottom-2;
+    }
+
+    &[data-placement="bottom"] {
+      @apply slide-in-from-top-2;
+    }
+  }
+
+  &[data-exiting="true"] {
+    @apply animate-out fade-out-0 ease-out;
+    animation-duration: 120ms;
+  }
+
+  &[data-exiting="true"],
+  &[data-entering="true"] {
+    @apply will-change-[opacity,transform];
+    @apply motion-reduce:animate-none;
+  }
+
+  [data-slot="list-box"] {
+    @apply p-2 outline-none;
+  }
+
+  [data-slot="list-box"]:not([aria-multiselectable="true"]) [data-slot="list-box-item-indicator"],
+  [data-slot="list-box"]:not([aria-multiselectable="true"])
+    [data-slot="list-box-item-indicator"]
+    [data-slot="list-box-item-indicator--checkmark"] {
+    @apply transition-none;
+  }
+}
+
+.select--full-width {
+  @apply w-full;
+}
+
+.select__trigger--full-width {
+  @apply w-full;
+}
+}
