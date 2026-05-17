@@ -20,24 +20,42 @@ const ScopesCatalog = () => import('#controllers/dashboard/api_keys/scopes_catal
 
 router
   .group(() => {
-    router.get('/api-keys/scopes-catalog', [ScopesCatalog, 'handle'])
-    router.get('/api-keys', [KeysList, 'handle'])
-    router.post('/api-keys', [KeysCreate, 'handle'])
-    router.get('/api-keys/:id', [KeysShow, 'handle'])
-    router.patch('/api-keys/:id', [KeysUpdate, 'handle'])
-    router.delete('/api-keys/:id', [KeysRevoke, 'handle'])
-    router.post('/api-keys/:id/rotate', [KeysRotate, 'handle'])
+    router
+      .get('/api-keys/scopes-catalog', [ScopesCatalog, 'handle'])
+      .as('dashboard.apiKeys.scopesCatalog')
+    router.get('/api-keys', [KeysList, 'handle']).as('dashboard.apiKeys.list')
+    router.post('/api-keys', [KeysCreate, 'handle']).as('dashboard.apiKeys.create')
+    router.get('/api-keys/:id', [KeysShow, 'handle']).as('dashboard.apiKeys.show')
+    router.patch('/api-keys/:id', [KeysUpdate, 'handle']).as('dashboard.apiKeys.update')
+    router.delete('/api-keys/:id', [KeysRevoke, 'handle']).as('dashboard.apiKeys.revoke')
+    router
+      .post('/api-keys/:id/rotate', [KeysRotate, 'handle'])
+      .as('dashboard.apiKeys.rotate')
 
-    router.put('/api-keys/:id/webhook', [WebhookSet, 'handle'])
-    router.delete('/api-keys/:id/webhook', [WebhookDestroy, 'handle'])
-    router.post('/api-keys/:id/webhook/rotate-secret', [WebhookRotateSecret, 'handle'])
-    router.post('/api-keys/:id/webhook/test', [WebhookTest, 'handle'])
+    router
+      .put('/api-keys/:id/webhook', [WebhookSet, 'handle'])
+      .as('dashboard.apiKeys.webhook.set')
+    router
+      .delete('/api-keys/:id/webhook', [WebhookDestroy, 'handle'])
+      .as('dashboard.apiKeys.webhook.destroy')
+    router
+      .post('/api-keys/:id/webhook/rotate-secret', [WebhookRotateSecret, 'handle'])
+      .as('dashboard.apiKeys.webhook.rotateSecret')
+    router
+      .post('/api-keys/:id/webhook/test', [WebhookTest, 'handle'])
+      .as('dashboard.apiKeys.webhook.test')
 
-    router.get('/api-keys/:id/deliveries', [DeliveriesList, 'handle'])
-    router.post('/api-keys/:id/deliveries/:deliveryId/retry', [DeliveriesRetry, 'handle'])
+    router
+      .get('/api-keys/:id/deliveries', [DeliveriesList, 'handle'])
+      .as('dashboard.apiKeys.deliveries.list')
+    router
+      .post('/api-keys/:id/deliveries/:deliveryId/retry', [DeliveriesRetry, 'handle'])
+      .as('dashboard.apiKeys.deliveries.retry')
 
-    router.get('/api-keys/:id/logs', [LogsList, 'handle'])
-    router.get('/api-keys/:id/usage-stats', [UsageStats, 'handle'])
+    router.get('/api-keys/:id/logs', [LogsList, 'handle']).as('dashboard.apiKeys.logs')
+    router
+      .get('/api-keys/:id/usage-stats', [UsageStats, 'handle'])
+      .as('dashboard.apiKeys.usageStats')
   })
   .prefix(API_PREFIX + '/dashboard/settings')
   .use(middleware.auth())
