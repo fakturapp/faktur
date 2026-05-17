@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { DocsNav } from '@/components/docs-nav'
+import { DocsHeader } from '@/components/docs-header'
 import { DocsFooter } from '@/components/docs-footer'
+import { ThemeScript } from './theme-script'
 
 export const metadata: Metadata = {
   title: 'Faktur Developers — API V2',
@@ -25,9 +26,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>
-        <DocsNav />
-        <main className="min-h-screen pt-16">{children}</main>
+      <head>
+        <ThemeScript />
+      </head>
+      <body className="bg-background text-foreground antialiased">
+        <DocsHeader />
+        <div className="pt-14">{children}</div>
         <DocsFooter />
       </body>
     </html>
