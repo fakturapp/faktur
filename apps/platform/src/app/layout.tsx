@@ -22,7 +22,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className="h-full antialiased" suppressHydrationWarning>
-      <body className="flex min-h-full flex-col bg-background text-foreground">
+      <body
+        className="flex min-h-full flex-col bg-background text-foreground"
+        suppressHydrationWarning
+      >
         <AuthProvider>
           <ToastProvider>
             <div className="flex min-h-full flex-1 flex-col">{children}</div>
