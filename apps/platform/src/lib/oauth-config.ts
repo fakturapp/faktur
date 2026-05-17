@@ -37,6 +37,7 @@ export const PLATFORM_URL = requireEnv(
 export const OAUTH_AUTHORIZE_URL = `${DASHBOARD_URL}/oauth/authorize`
 export const OAUTH_TOKEN_URL = `${API_BASE_URL}/oauth/token`
 export const OAUTH_REVOKE_URL = `${API_BASE_URL}/oauth/revoke`
+export const OAUTH_EXCHANGE_SESSION_URL = `${API_BASE_URL}/oauth/exchange-session`
 
 export const STORAGE_KEYS = {
   accessToken: 'faktur_platform_access_token',

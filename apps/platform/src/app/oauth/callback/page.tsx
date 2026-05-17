@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import {
   OAUTH_CLIENT_ID,
+  OAUTH_EXCHANGE_SESSION_URL,
   OAUTH_REDIRECT_URI,
   OAUTH_TOKEN_URL,
   STORAGE_KEYS,
@@ -79,10 +80,27 @@ export default function OAuthCallbackPage() {
           return
         }
 
+        const exchangeRes = await fetch(OAUTH_EXCHANGE_SESSION_URL, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${data.access_token}` },
+        })
+        const exchangeData = await exchangeRes.json().catch(() => ({}))
+        if (cancelled) return
+
+        if (!exchangeRes.ok || !exchangeData.token) {
+          setError(
+            exchangeData.error_description ||
+              exchangeData.error ||
+              'Échec de l’échange OAuth → session.'
+          )
+          setPhase('error')
+          return
+        }
+
         storeTokens({
-          access_token: data.access_token,
+          access_token: exchangeData.token,
           refresh_token: data.refresh_token,
-          expires_in: data.expires_in,
+          expires_in: 24 * 3600,
         })
 
         const next = sessionStorage.getItem('faktur_platform_next')
