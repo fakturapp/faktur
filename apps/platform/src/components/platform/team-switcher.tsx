@@ -112,6 +112,7 @@ function TeamAvatar({
       )}
     >
       {team.iconUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
         <img src={team.iconUrl} alt="" className="h-full w-full object-cover" />
       ) : (
         initials

@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { Field, FieldLabel, FieldDescription } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/components/ui/toast'
 import {
   apiKeysClient,
