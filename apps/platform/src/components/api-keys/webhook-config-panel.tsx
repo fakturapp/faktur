@@ -170,10 +170,12 @@ export function WebhookConfigPanel({ apiKey, webhook, onChanged }: Props) {
               Recevez en temps réel les événements de votre compte Faktur — création de
               factures, paiements, modifications client — directement sur votre serveur.
             </p>
-            <Button size="sm" className="mt-5" onClick={() => setCreateOpen(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Créer un webhook
-            </Button>
+            <div className="mt-5 flex justify-center">
+              <Button size="sm" onClick={() => setCreateOpen(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Créer un webhook
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
