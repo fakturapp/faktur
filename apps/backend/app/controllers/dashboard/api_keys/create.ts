@@ -4,12 +4,14 @@ import Team from '#models/team/team'
 import ApiProject from '#models/api/api_project'
 import apiKeyService from '#services/api/api_key_service'
 import scopeChecker from '#services/api/scope_checker'
+import auditLog from '#services/api/audit_log_service'
 import adminTransformer from '#transformers/api/api_key_admin_transformer'
 import publicIdCodec, { PublicIdParseError } from '#services/api/public_id_codec'
 import { createApiKeyValidator } from '#validators/api/api_key_dashboard_validators'
 
 export default class Create {
-  async handle({ auth, request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, request, response } = ctx
     const user = auth.user!
     const teamId = user.currentTeamId
     if (!teamId) return response.badRequest({ message: 'No team selected' })
@@ -75,6 +77,22 @@ export default class Create {
       rateLimitTier: payload.rate_limit_tier ?? 'default',
       allowedIps: payload.allowed_ips ?? null,
       expiresAt,
+    })
+
+    await auditLog.emit({
+      ctx,
+      teamId: team.id,
+      projectId: project.id,
+      action: 'api_key.created',
+      targetType: 'api_key',
+      targetId: created.record.id,
+      targetLabel: created.record.name,
+      metadata: {
+        scopes: created.record.scopes,
+        rate_limit_tier: created.record.rateLimitTier,
+        expires_at: created.record.expiresAt?.toISO() ?? null,
+        allowed_ips: created.record.allowedIps,
+      },
     })
 
     return response.created({

@@ -1,11 +1,13 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import ApiKey from '#models/api/api_key'
 import apiKeyService from '#services/api/api_key_service'
+import auditLog from '#services/api/audit_log_service'
 import adminTransformer from '#transformers/api/api_key_admin_transformer'
 import publicIdCodec, { PublicIdParseError } from '#services/api/public_id_codec'
 
 export default class Rotate {
-  async handle({ auth, params, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, params, response } = ctx
     const user = auth.user!
     const teamId = user.currentTeamId
     if (!teamId) return response.badRequest({ message: 'No team selected' })
@@ -24,6 +26,18 @@ export default class Rotate {
     if (!key) return response.notFound({ message: 'API key not found' })
 
     const rotated = await apiKeyService.rotate(key.id)
+
+    await auditLog.emit({
+      ctx,
+      teamId,
+      projectId: rotated.record.projectId,
+      action: 'api_key.rotated',
+      targetType: 'api_key',
+      targetId: rotated.record.id,
+      targetLabel: rotated.record.name,
+      metadata: { new_last4: rotated.record.last4 },
+    })
+
     return response.ok({
       data: adminTransformer.transform(rotated.record),
       plaintext: rotated.plaintext,
