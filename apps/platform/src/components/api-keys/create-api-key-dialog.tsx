@@ -20,7 +20,7 @@ import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
 import { apiKeysClient, type ApiKeyShape, type ScopesCatalog } from '@/lib/api-keys-client'
 
 type Step = 'info' | 'permissions'
-type Preset = 'read_only' | 'read_write' | 'full_access' | 'custom'
+type Preset = 'read_only' | 'full_access' | 'custom'
 
 interface Props {
   open: boolean
@@ -34,7 +34,7 @@ export function CreateApiKeyDialog({ open, onClose, onCreated }: Props) {
   const [name, setName] = useState('')
   const [expiration, setExpiration] = useState<'never' | '90d' | '1y'>('never')
   const [allowedIpsRaw, setAllowedIpsRaw] = useState('')
-  const [preset, setPreset] = useState<Preset>('read_write')
+  const [preset, setPreset] = useState<Preset>('read_only')
   const [customScopes, setCustomScopes] = useState<Set<string>>(new Set())
   const [catalog, setCatalog] = useState<ScopesCatalog | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -45,7 +45,7 @@ export function CreateApiKeyDialog({ open, onClose, onCreated }: Props) {
     setName('')
     setExpiration('never')
     setAllowedIpsRaw('')
-    setPreset('read_write')
+    setPreset('read_only')
     setCustomScopes(new Set())
   }, [open])
 
@@ -59,7 +59,6 @@ export function CreateApiKeyDialog({ open, onClose, onCreated }: Props) {
   function resolvedScopes(): string[] {
     if (!catalog) return []
     if (preset === 'read_only') return catalog.presets.read_only
-    if (preset === 'read_write') return catalog.presets.read_write
     if (preset === 'full_access') return catalog.presets.full_access
     return Array.from(customScopes)
   }
@@ -203,28 +202,22 @@ export function CreateApiKeyDialog({ open, onClose, onCreated }: Props) {
             className="space-y-4"
           >
             <Field>
-              <FieldLabel>Préréglage</FieldLabel>
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  { v: 'read_only' as const, label: 'Lecture seule' },
-                  { v: 'read_write' as const, label: 'Lecture + écriture' },
-                  { v: 'full_access' as const, label: 'Accès complet' },
-                  { v: 'custom' as const, label: 'Personnalisé' },
-                ].map((opt) => (
-                  <button
-                    key={opt.v}
-                    type="button"
-                    onClick={() => setPreset(opt.v)}
-                    className={`rounded-lg border px-3 py-2 text-sm transition-colors ${
-                      preset === opt.v
-                        ? 'border-accent bg-accent-soft text-foreground'
-                        : 'border-border/50 hover:bg-surface-hover'
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
+              <FieldLabel htmlFor="preset-select">Préréglage</FieldLabel>
+              <select
+                id="preset-select"
+                value={preset}
+                onChange={(e) => setPreset(e.target.value as Preset)}
+                className="w-full rounded-lg border border-border/50 bg-field px-3 py-2 text-sm text-foreground focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
+              >
+                <option value="read_only">Lecture seule · accès en lecture sur toutes les ressources</option>
+                <option value="full_access">Accès complet · lecture + écriture + suppression</option>
+                <option value="custom">Personnalisé · sélectionner les scopes un par un</option>
+              </select>
+              <FieldDescription>
+                {preset === 'read_only' && 'Idéal pour les intégrations qui consultent vos données sans les modifier (BI, exports).'}
+                {preset === 'full_access' && 'Donnez ces clés uniquement à des intégrations de confiance — elles peuvent tout faire.'}
+                {preset === 'custom' && 'Cochez exactement les permissions dont votre intégration a besoin.'}
+              </FieldDescription>
             </Field>
 
             {catalog === null ? (
