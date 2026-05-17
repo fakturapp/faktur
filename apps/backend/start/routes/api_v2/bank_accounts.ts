@@ -8,9 +8,11 @@ router
   .group(() => {
     router
       .get('/', [BankAccountsList, 'handle'])
+      .as('apiV2.bankAccounts.list')
       .use(apiV2Stack(['bank_accounts:read']))
     router
       .get('/:id', [BankAccountsShow, 'handle'])
+      .as('apiV2.bankAccounts.show')
       .use(apiV2Stack(['bank_accounts:read']))
   })
   .prefix(API_V2_PREFIX + '/bank-accounts')

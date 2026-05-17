@@ -8,9 +8,21 @@ const ExpensesDestroy = () => import('#controllers/api_v2/expenses/destroy')
 
 router
   .group(() => {
-    router.get('/', [ExpensesList, 'handle']).use(apiV2Stack(['expenses:read']))
-    router.get('/:id', [ExpensesShow, 'handle']).use(apiV2Stack(['expenses:read']))
-    router.post('/', [ExpensesCreate, 'handle']).use(apiV2Stack(['expenses:write']))
-    router.delete('/:id', [ExpensesDestroy, 'handle']).use(apiV2Stack(['expenses:delete']))
+    router
+      .get('/', [ExpensesList, 'handle'])
+      .as('apiV2.expenses.list')
+      .use(apiV2Stack(['expenses:read']))
+    router
+      .get('/:id', [ExpensesShow, 'handle'])
+      .as('apiV2.expenses.show')
+      .use(apiV2Stack(['expenses:read']))
+    router
+      .post('/', [ExpensesCreate, 'handle'])
+      .as('apiV2.expenses.create')
+      .use(apiV2Stack(['expenses:write']))
+    router
+      .delete('/:id', [ExpensesDestroy, 'handle'])
+      .as('apiV2.expenses.destroy')
+      .use(apiV2Stack(['expenses:delete']))
   })
   .prefix(API_V2_PREFIX + '/expenses')

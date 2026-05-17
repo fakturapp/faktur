@@ -8,9 +8,11 @@ router
   .group(() => {
     router
       .get('/', [CreditNotesList, 'handle'])
+      .as('apiV2.creditNotes.list')
       .use(apiV2Stack(['credit_notes:read']))
     router
       .get('/:id', [CreditNotesShow, 'handle'])
+      .as('apiV2.creditNotes.show')
       .use(apiV2Stack(['credit_notes:read']))
   })
   .prefix(API_V2_PREFIX + '/credit-notes')

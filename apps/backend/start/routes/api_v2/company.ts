@@ -5,6 +5,9 @@ const CompanyShow = () => import('#controllers/api_v2/company/show')
 
 router
   .group(() => {
-    router.get('/', [CompanyShow, 'handle']).use(apiV2Stack(['company:read']))
+    router
+      .get('/', [CompanyShow, 'handle'])
+      .as('apiV2.company.show')
+      .use(apiV2Stack(['company:read']))
   })
   .prefix(API_V2_PREFIX + '/company')

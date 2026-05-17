@@ -6,7 +6,13 @@ const QuotesShow = () => import('#controllers/api_v2/quotes/show')
 
 router
   .group(() => {
-    router.get('/', [QuotesList, 'handle']).use(apiV2Stack(['quotes:read']))
-    router.get('/:id', [QuotesShow, 'handle']).use(apiV2Stack(['quotes:read']))
+    router
+      .get('/', [QuotesList, 'handle'])
+      .as('apiV2.quotes.list')
+      .use(apiV2Stack(['quotes:read']))
+    router
+      .get('/:id', [QuotesShow, 'handle'])
+      .as('apiV2.quotes.show')
+      .use(apiV2Stack(['quotes:read']))
   })
   .prefix(API_V2_PREFIX + '/quotes')
