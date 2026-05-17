@@ -13,6 +13,7 @@ import {
   FilePlus,
   FolderPlus,
   FolderMinus,
+  Globe,
   Pencil,
   RefreshCw,
   RotateCw,
@@ -52,6 +53,7 @@ const ACTIONS: Record<string, ActionMeta> = {
   'webhook.secret_rotated': { icon: KeyRound, label: 'Secret webhook roté', tone: 'warning' },
   'webhook.tested': { icon: Send, label: 'Webhook testé', tone: 'accent' },
   'api_explorer.request': { icon: Terminal, label: 'Requête Explorer', tone: 'accent' },
+  'api_call.request': { icon: Globe, label: 'Appel API', tone: 'muted' },
 }
 
 const TONE_RING: Record<ActionMeta['tone'], string> = {
@@ -99,10 +101,11 @@ function initials(name: string | null, email: string | null): string {
 
 const CATEGORIES = [
   { id: 'all', label: 'Tous' },
-  { id: 'project', label: 'Projet' },
+  { id: 'api_call', label: 'Appels API' },
+  { id: 'explorer', label: 'Explorer' },
   { id: 'api_key', label: 'Clés' },
   { id: 'webhook', label: 'Webhooks' },
-  { id: 'explorer', label: 'Explorer' },
+  { id: 'project', label: 'Projet' },
 ] as const
 
 type Category = (typeof CATEGORIES)[number]['id']
@@ -263,7 +266,8 @@ export default function ActivityPage() {
                                 <p className="text-sm font-medium text-foreground">
                                   {meta.label}
                                 </p>
-                                {log.action === 'api_explorer.request' &&
+                                {(log.action === 'api_explorer.request' ||
+                                  log.action === 'api_call.request') &&
                                 typeof log.metadata?.method === 'string' &&
                                 typeof log.metadata?.path === 'string' ? (
                                   <>
@@ -299,7 +303,9 @@ export default function ActivityPage() {
                                   <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-accent-soft text-[9px] font-semibold text-accent">
                                     {initials(log.actor.name, log.actor.email)}
                                   </span>
-                                  {log.actor.name ?? log.actor.email ?? 'Système'}
+                                  {log.actor.name ??
+                                    log.actor.email ??
+                                    (log.action === 'api_call.request' ? 'Appel API externe' : 'Système')}
                                 </span>
                                 <span aria-hidden>•</span>
                                 <span title={fmtTime(log.created_at)}>
