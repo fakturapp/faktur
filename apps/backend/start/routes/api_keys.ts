@@ -21,6 +21,10 @@ const WebhookSet = () => import('#controllers/dashboard/api_keys/webhook_set')
 const WebhookDestroy = () => import('#controllers/dashboard/api_keys/webhook_destroy')
 const WebhookRotateSecret = () => import('#controllers/dashboard/api_keys/webhook_rotate_secret')
 const WebhookTest = () => import('#controllers/dashboard/api_keys/webhook_test')
+const WebhookDeliveryConfigShow = () =>
+  import('#controllers/dashboard/api_keys/webhook_delivery_config_show')
+const WebhookDeliveryConfigUpdate = () =>
+  import('#controllers/dashboard/api_keys/webhook_delivery_config_update')
 const DeliveriesList = () => import('#controllers/dashboard/api_keys/deliveries_list')
 const DeliveriesRetry = () => import('#controllers/dashboard/api_keys/deliveries_retry')
 const LogsList = () => import('#controllers/dashboard/api_keys/logs_list')
@@ -68,6 +72,12 @@ router
     router
       .post('/api-keys/:id/webhook/test', [WebhookTest, 'handle'])
       .as('dashboard.apiKeys.webhook.test')
+    router
+      .get('/api-keys/:id/webhook/delivery-config', [WebhookDeliveryConfigShow, 'handle'])
+      .as('dashboard.apiKeys.webhook.deliveryConfig.show')
+    router
+      .put('/api-keys/:id/webhook/delivery-config', [WebhookDeliveryConfigUpdate, 'handle'])
+      .as('dashboard.apiKeys.webhook.deliveryConfig.update')
 
     router
       .get('/api-keys/:id/deliveries', [DeliveriesList, 'handle'])

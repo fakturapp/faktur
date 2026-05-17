@@ -36,6 +36,21 @@ export default class ApiKeyWebhook extends BaseModel {
   @column()
   declare consecutiveFailures: number
 
+  @column()
+  declare deliveryMaxRetries: number
+
+  @column()
+  declare deliveryTimeoutMs: number
+
+  @column()
+  declare deliveryBackoffSeconds: number
+
+  @column({
+    prepare: (v: Record<string, string>) => JSON.stringify(v ?? {}),
+    consume: (v: unknown) => (typeof v === 'string' ? JSON.parse(v) : (v ?? {})),
+  })
+  declare deliveryCustomHeaders: Record<string, string>
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
