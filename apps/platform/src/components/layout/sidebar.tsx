@@ -11,7 +11,6 @@ import {
   Key,
   LogOut,
   Plus,
-  Webhook,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/lib/auth'
@@ -163,16 +162,6 @@ export function Sidebar() {
           <p className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
             Ressources
           </p>
-          <Link
-            href="/webhooks"
-            className={cn(
-              'flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors hover:bg-sidebar-accent',
-              pathname === '/webhooks' && 'bg-sidebar-accent text-sidebar-accent-foreground'
-            )}
-          >
-            <Webhook className="h-4 w-4" />
-            <span className="flex-1 font-medium">Webhooks</span>
-          </Link>
           <a
             href={DOCS_URL}
             target="_blank"
