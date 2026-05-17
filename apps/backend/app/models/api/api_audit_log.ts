@@ -20,8 +20,9 @@ export type AuditAction =
   | 'webhook.deleted'
   | 'webhook.secret_rotated'
   | 'webhook.tested'
+  | 'api_explorer.request'
 
-export type AuditTargetType = 'project' | 'api_key' | 'webhook' | 'team'
+export type AuditTargetType = 'project' | 'api_key' | 'webhook' | 'team' | 'explorer'
 
 export default class ApiAuditLog extends BaseModel {
   public static table = 'api_audit_logs'
