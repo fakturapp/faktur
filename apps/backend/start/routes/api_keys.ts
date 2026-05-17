@@ -26,6 +26,7 @@ const DeliveriesRetry = () => import('#controllers/dashboard/api_keys/deliveries
 const LogsList = () => import('#controllers/dashboard/api_keys/logs_list')
 const UsageStats = () => import('#controllers/dashboard/api_keys/usage_stats')
 const ScopesCatalog = () => import('#controllers/dashboard/api_keys/scopes_catalog')
+const KeysRecentlyUsed = () => import('#controllers/dashboard/api_keys/recently_used')
 
 router
   .group(() => {
@@ -48,6 +49,9 @@ router
       .as('dashboard.apiProjects.explorerEvent')
 
     router.get('/api-keys', [KeysList, 'handle']).as('dashboard.apiKeys.list')
+    router
+      .get('/api-keys/recently-used', [KeysRecentlyUsed, 'handle'])
+      .as('dashboard.apiKeys.recentlyUsed')
     router.post('/api-keys', [KeysCreate, 'handle']).as('dashboard.apiKeys.create')
     router.get('/api-keys/:id', [KeysShow, 'handle']).as('dashboard.apiKeys.show')
     router.patch('/api-keys/:id', [KeysUpdate, 'handle']).as('dashboard.apiKeys.update')
