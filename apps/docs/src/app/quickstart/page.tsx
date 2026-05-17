@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { ArrowRight, Key, Send, Webhook } from 'lucide-react'
+import { API_V2_BASE_URL, PLATFORM_URL } from '@/lib/config'
 
 export const metadata = {
   title: 'Quickstart — Faktur Developers',
@@ -21,7 +22,7 @@ export default function Quickstart() {
         <p>
           Open{' '}
           <Link
-            href="https://fakturapp.cc/dashboard/settings/api-keys"
+            href={`${PLATFORM_URL}/api-keys`}
             className="text-violet-500 underline-offset-2 hover:underline"
           >
             Settings → API & Webhooks
@@ -41,7 +42,7 @@ export default function Quickstart() {
           rate limit tier.
         </p>
         <Code lang="bash">
-          {`curl https://api.fakturapp.cc/api/v2/ping \\
+          {`curl ${API_V2_BASE_URL}/ping \\
   -H "Authorization: Bearer fk_live_..."`}
         </Code>
         <p className="mt-3">Sample response:</p>
@@ -70,7 +71,7 @@ export default function Quickstart() {
       <Step number={3} title="Create a client" icon={ArrowRight}>
         <p>Create a client to attach future invoices to.</p>
         <Code lang="bash">
-          {`curl https://api.fakturapp.cc/api/v2/clients \\
+          {`curl ${API_V2_BASE_URL}/clients \\
   -X POST \\
   -H "Authorization: Bearer fk_live_..." \\
   -H "Content-Type: application/json" \\
@@ -90,7 +91,7 @@ export default function Quickstart() {
       <Step number={4} title="Create an invoice" icon={Send}>
         <p>Use the <code>client_id</code> from step 3 to issue your first invoice.</p>
         <Code lang="bash">
-          {`curl https://api.fakturapp.cc/api/v2/invoices \\
+          {`curl ${API_V2_BASE_URL}/invoices \\
   -X POST \\
   -H "Authorization: Bearer fk_live_..." \\
   -H "Content-Type: application/json" \\
