@@ -3,7 +3,7 @@
 import { useState, type ReactNode } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { RotateCw, Trash2 } from 'lucide-react'
+import { RefreshCw, Trash2, AlertTriangle } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -13,6 +13,13 @@ import { useToast } from '@/components/ui/toast'
 import { apiKeysClient, type ApiKeyShape } from '@/lib/api-keys-client'
 import { ApiKeyProvider, useApiKey } from '@/lib/api-key-context'
 import { RevealedKeyDialog } from '@/components/api-keys/revealed-key-dialog'
+import {
+  Dialog,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog'
 
 function statusInfo(status: ApiKeyShape['status']) {
   switch (status) {
@@ -35,17 +42,19 @@ function KeyHeader() {
   const [rotated, setRotated] = useState<{ plaintext: string } | null>(null)
   const [rotating, setRotating] = useState(false)
   const [revoking, setRevoking] = useState(false)
+  const [resetConfirmOpen, setResetConfirmOpen] = useState(false)
 
-  async function handleRotate() {
+  async function handleReset() {
     if (!apiKey) return
     setRotating(true)
+    setResetConfirmOpen(false)
     const res = await apiKeysClient.rotate(apiKey.id)
     setRotating(false)
     if (res.error || !res.data?.plaintext) {
-      toast(res.error || 'Échec de la rotation', 'error')
+      toast(res.error || 'Échec de la réinitialisation', 'error')
       return
     }
-    toast('Clé rotée — l’ancien secret est invalidé', 'success')
+    toast('Clé réinitialisée — l’ancien secret est invalidé', 'success')
     setRotated({ plaintext: res.data.plaintext })
     reload()
   }
@@ -96,16 +105,21 @@ function KeyHeader() {
             </div>
             {isActive && (
               <div className="flex shrink-0 items-center gap-2">
-                <Button variant="outline" size="sm" onClick={handleRotate} disabled={rotating}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setResetConfirmOpen(true)}
+                  disabled={rotating}
+                >
                   {rotating ? (
                     <>
                       <Spinner />
-                      Rotation...
+                      Réinitialisation...
                     </>
                   ) : (
                     <>
-                      <RotateCw className="h-4 w-4 mr-2" />
-                      Roter
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Réinitialiser la clé
                     </>
                   )}
                 </Button>
@@ -135,6 +149,30 @@ function KeyHeader() {
         kind="api_key"
         onClose={() => setRotated(null)}
       />
+
+      <Dialog open={resetConfirmOpen} onClose={() => setResetConfirmOpen(false)} className="max-w-md">
+        <DialogHeader onClose={() => setResetConfirmOpen(false)}>
+          <DialogTitle className="flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-warning" />
+            Réinitialiser la clé ?
+          </DialogTitle>
+          <DialogDescription>
+            Un nouveau secret sera généré pour <strong>« {apiKey.name} »</strong>.
+            L’ancien secret continuera de fonctionner pendant une courte période de grâce,
+            puis sera définitivement invalidé. Pensez à mettre à jour toutes vos
+            intégrations avec la nouvelle clé.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setResetConfirmOpen(false)}>
+            Annuler
+          </Button>
+          <Button onClick={handleReset}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Réinitialiser
+          </Button>
+        </DialogFooter>
+      </Dialog>
     </>
   )
 }
