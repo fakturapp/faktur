@@ -1560,6 +1560,12 @@ const routes = {
     tokens: [{"old":"/api/v1/dashboard/settings/api-projects/:id/audit-logs","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id/audit-logs","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id/audit-logs","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id/audit-logs","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id/audit-logs","type":0,"val":"api-projects","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id/audit-logs","type":1,"val":"id","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id/audit-logs","type":0,"val":"audit-logs","end":""}],
     types: placeholder as Registry['dashboard.apiProjects.auditLogs']['types'],
   },
+  'dashboard.apiProjects.explorerEvent': {
+    methods: ["POST"],
+    pattern: '/api/v1/dashboard/settings/api-projects/:id/explorer-events',
+    tokens: [{"old":"/api/v1/dashboard/settings/api-projects/:id/explorer-events","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id/explorer-events","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id/explorer-events","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id/explorer-events","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id/explorer-events","type":0,"val":"api-projects","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id/explorer-events","type":1,"val":"id","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id/explorer-events","type":0,"val":"explorer-events","end":""}],
+    types: placeholder as Registry['dashboard.apiProjects.explorerEvent']['types'],
+  },
   'dashboard.apiKeys.list': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/dashboard/settings/api-keys',

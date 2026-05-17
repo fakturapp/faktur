@@ -8,6 +8,8 @@ const ProjectsCreate = () => import('#controllers/dashboard/api_projects/create'
 const ProjectsUpdate = () => import('#controllers/dashboard/api_projects/update')
 const ProjectsDestroy = () => import('#controllers/dashboard/api_projects/destroy')
 const ProjectsAuditLogs = () => import('#controllers/dashboard/api_projects/audit_logs')
+const ProjectsExplorerEvent = () =>
+  import('#controllers/dashboard/api_projects/explorer_event')
 
 const KeysList = () => import('#controllers/dashboard/api_keys/list')
 const KeysShow = () => import('#controllers/dashboard/api_keys/show')
@@ -41,6 +43,9 @@ router
     router
       .get('/api-projects/:id/audit-logs', [ProjectsAuditLogs, 'handle'])
       .as('dashboard.apiProjects.auditLogs')
+    router
+      .post('/api-projects/:id/explorer-events', [ProjectsExplorerEvent, 'handle'])
+      .as('dashboard.apiProjects.explorerEvent')
 
     router.get('/api-keys', [KeysList, 'handle']).as('dashboard.apiKeys.list')
     router.post('/api-keys', [KeysCreate, 'handle']).as('dashboard.apiKeys.create')

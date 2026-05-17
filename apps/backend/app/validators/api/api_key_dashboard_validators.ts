@@ -28,6 +28,19 @@ export const updateProjectValidator = vine.compile(
   })
 )
 
+export const explorerEventValidator = vine.compile(
+  vine.object({
+    method: vine.string().trim().minLength(1).maxLength(10),
+    path: vine.string().trim().minLength(1).maxLength(2000),
+    query: vine.string().trim().maxLength(2000).optional().nullable(),
+    status: vine.number().withoutDecimals(),
+    latency_ms: vine.number().withoutDecimals(),
+    response_size_bytes: vine.number().withoutDecimals().optional(),
+    api_key_id: vine.string().trim().maxLength(64).optional().nullable(),
+    error: vine.string().trim().maxLength(500).optional().nullable(),
+  })
+)
+
 export const updateApiKeyValidator = vine.compile(
   vine.object({
     name: vine.string().trim().minLength(1).maxLength(100).optional(),

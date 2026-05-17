@@ -263,6 +263,7 @@ export type ScannedRoutes = {
     'dashboard.apiProjects.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiProjects.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiProjects.auditLogs': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'dashboard.apiProjects.explorerEvent': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.list': { paramsTuple?: []; params?: {} }
     'dashboard.apiKeys.create': { paramsTuple?: []; params?: {} }
     'dashboard.apiKeys.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -419,6 +420,7 @@ export type ScannedRoutes = {
     'revoke': { paramsTuple?: []; params?: {} }
     'exchange_session': { paramsTuple?: []; params?: {} }
     'dashboard.apiProjects.create': { paramsTuple?: []; params?: {} }
+    'dashboard.apiProjects.explorerEvent': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.create': { paramsTuple?: []; params?: {} }
     'dashboard.apiKeys.rotate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.webhook.rotateSecret': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

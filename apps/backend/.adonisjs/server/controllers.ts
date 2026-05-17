@@ -287,6 +287,7 @@ export const controllers = {
       Update: () => import('#controllers/dashboard/api_projects/update'),
       Destroy: () => import('#controllers/dashboard/api_projects/destroy'),
       AuditLogs: () => import('#controllers/dashboard/api_projects/audit_logs'),
+      ExplorerEvent: () => import('#controllers/dashboard/api_projects/explorer_event'),
     },
   },
   einvoicing: {

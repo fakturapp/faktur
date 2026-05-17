@@ -3115,6 +3115,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_projects/audit_logs').default['handle']>>>
     }
   }
+  'dashboard.apiProjects.explorerEvent': {
+    methods: ["POST"]
+    pattern: '/api/v1/dashboard/settings/api-projects/:id/explorer-events'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/api/api_key_dashboard_validators').explorerEventValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/api/api_key_dashboard_validators').explorerEventValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/api_projects/explorer_event').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_projects/explorer_event').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'dashboard.apiKeys.list': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/dashboard/settings/api-keys'
