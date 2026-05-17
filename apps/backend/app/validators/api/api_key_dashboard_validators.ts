@@ -2,11 +2,29 @@ import vine from '@vinejs/vine'
 
 export const createApiKeyValidator = vine.compile(
   vine.object({
+    project_id: vine.string().trim().minLength(1).maxLength(40),
     name: vine.string().trim().minLength(1).maxLength(100),
     scopes: vine.array(vine.string().trim().minLength(1).maxLength(80)).minLength(1).maxLength(64),
     expires_at: vine.string().trim().optional(),
     allowed_ips: vine.array(vine.string().trim().maxLength(64)).maxLength(32).optional(),
     rate_limit_tier: vine.enum(['default', 'pro', 'business', 'unlimited'] as const).optional(),
+  })
+)
+
+export const createProjectValidator = vine.compile(
+  vine.object({
+    name: vine.string().trim().minLength(1).maxLength(100),
+    description: vine.string().trim().maxLength(2000).optional().nullable(),
+    color: vine.string().trim().maxLength(16).optional().nullable(),
+  })
+)
+
+export const updateProjectValidator = vine.compile(
+  vine.object({
+    name: vine.string().trim().minLength(1).maxLength(100).optional(),
+    description: vine.string().trim().maxLength(2000).optional().nullable(),
+    color: vine.string().trim().maxLength(16).optional().nullable(),
+    is_archived: vine.boolean().optional(),
   })
 )
 

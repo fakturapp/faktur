@@ -16,6 +16,7 @@ export interface GeneratedKey {
 
 export interface CreateApiKeyInput {
   teamId: string
+  projectId: string
   createdByUserId: string | null
   name: string
   scopes: string[]
@@ -70,6 +71,7 @@ class ApiKeyService {
     const gen = this.generate()
     const record = await ApiKey.create({
       teamId: input.teamId,
+      projectId: input.projectId,
       createdByUserId: input.createdByUserId,
       name: input.name.trim(),
       prefix: gen.prefix,

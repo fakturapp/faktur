@@ -2,6 +2,12 @@ import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
 import { API_PREFIX } from '#start/routes/_prefix'
 
+const ProjectsList = () => import('#controllers/dashboard/api_projects/list')
+const ProjectsShow = () => import('#controllers/dashboard/api_projects/show')
+const ProjectsCreate = () => import('#controllers/dashboard/api_projects/create')
+const ProjectsUpdate = () => import('#controllers/dashboard/api_projects/update')
+const ProjectsDestroy = () => import('#controllers/dashboard/api_projects/destroy')
+
 const KeysList = () => import('#controllers/dashboard/api_keys/list')
 const KeysShow = () => import('#controllers/dashboard/api_keys/show')
 const KeysCreate = () => import('#controllers/dashboard/api_keys/create')
@@ -23,6 +29,15 @@ router
     router
       .get('/api-keys/scopes-catalog', [ScopesCatalog, 'handle'])
       .as('dashboard.apiKeys.scopesCatalog')
+
+    router.get('/api-projects', [ProjectsList, 'handle']).as('dashboard.apiProjects.list')
+    router.post('/api-projects', [ProjectsCreate, 'handle']).as('dashboard.apiProjects.create')
+    router.get('/api-projects/:id', [ProjectsShow, 'handle']).as('dashboard.apiProjects.show')
+    router.patch('/api-projects/:id', [ProjectsUpdate, 'handle']).as('dashboard.apiProjects.update')
+    router
+      .delete('/api-projects/:id', [ProjectsDestroy, 'handle'])
+      .as('dashboard.apiProjects.destroy')
+
     router.get('/api-keys', [KeysList, 'handle']).as('dashboard.apiKeys.list')
     router.post('/api-keys', [KeysCreate, 'handle']).as('dashboard.apiKeys.create')
     router.get('/api-keys/:id', [KeysShow, 'handle']).as('dashboard.apiKeys.show')

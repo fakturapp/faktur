@@ -1,9 +1,11 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import Team from '#models/team/team'
+import ApiProject from '#models/api/api_project'
 import apiKeyService from '#services/api/api_key_service'
 import scopeChecker from '#services/api/scope_checker'
 import adminTransformer from '#transformers/api/api_key_admin_transformer'
+import publicIdCodec, { PublicIdParseError } from '#services/api/public_id_codec'
 import { createApiKeyValidator } from '#validators/api/api_key_dashboard_validators'
 
 export default class Create {
@@ -31,6 +33,27 @@ export default class Create {
       })
     }
 
+    let projectInternalId: string
+    try {
+      projectInternalId = publicIdCodec.decode('api_project', payload.project_id)
+    } catch (err) {
+      if (err instanceof PublicIdParseError) {
+        return response.notFound({ message: 'Project not found' })
+      }
+      throw err
+    }
+    const project = await ApiProject.query()
+      .where('id', projectInternalId)
+      .where('team_id', team.id)
+      .first()
+    if (!project) return response.notFound({ message: 'Project not found' })
+    if (project.isArchived) {
+      return response.unprocessableEntity({
+        code: 'project_archived',
+        message: 'Impossible de créer une clé dans un projet archivé.',
+      })
+    }
+
     let expiresAt: DateTime | null = null
     if (payload.expires_at) {
       const parsed = DateTime.fromISO(payload.expires_at)
@@ -45,6 +68,7 @@ export default class Create {
 
     const created = await apiKeyService.create({
       teamId: team.id,
+      projectId: project.id,
       createdByUserId: user.id,
       name: payload.name,
       scopes: payload.scopes,

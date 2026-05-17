@@ -257,6 +257,11 @@ export type ScannedRoutes = {
     'revoke': { paramsTuple?: []; params?: {} }
     'exchange_session': { paramsTuple?: []; params?: {} }
     'dashboard.apiKeys.scopesCatalog': { paramsTuple?: []; params?: {} }
+    'dashboard.apiProjects.list': { paramsTuple?: []; params?: {} }
+    'dashboard.apiProjects.create': { paramsTuple?: []; params?: {} }
+    'dashboard.apiProjects.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'dashboard.apiProjects.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'dashboard.apiProjects.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.list': { paramsTuple?: []; params?: {} }
     'dashboard.apiKeys.create': { paramsTuple?: []; params?: {} }
     'dashboard.apiKeys.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -412,6 +417,7 @@ export type ScannedRoutes = {
     'token': { paramsTuple?: []; params?: {} }
     'revoke': { paramsTuple?: []; params?: {} }
     'exchange_session': { paramsTuple?: []; params?: {} }
+    'dashboard.apiProjects.create': { paramsTuple?: []; params?: {} }
     'dashboard.apiKeys.create': { paramsTuple?: []; params?: {} }
     'dashboard.apiKeys.rotate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.webhook.rotateSecret': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -521,6 +527,8 @@ export type ScannedRoutes = {
     'checkout_download_pdf': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'authorize.show': { paramsTuple?: []; params?: {} }
     'dashboard.apiKeys.scopesCatalog': { paramsTuple?: []; params?: {} }
+    'dashboard.apiProjects.list': { paramsTuple?: []; params?: {} }
+    'dashboard.apiProjects.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.list': { paramsTuple?: []; params?: {} }
     'dashboard.apiKeys.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.deliveries.list': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -640,6 +648,8 @@ export type ScannedRoutes = {
     'checkout_download_pdf': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'authorize.show': { paramsTuple?: []; params?: {} }
     'dashboard.apiKeys.scopesCatalog': { paramsTuple?: []; params?: {} }
+    'dashboard.apiProjects.list': { paramsTuple?: []; params?: {} }
+    'dashboard.apiProjects.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.list': { paramsTuple?: []; params?: {} }
     'dashboard.apiKeys.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.deliveries.list': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -715,6 +725,7 @@ export type ScannedRoutes = {
     'share_revoke': { paramsTuple: [ParamValue]; params: {'shareId': ParamValue} }
     'link_destroy': { paramsTuple: [ParamValue]; params: {'linkId': ParamValue} }
     'payment_link_delete': { paramsTuple: [ParamValue]; params: {'invoiceId': ParamValue} }
+    'dashboard.apiProjects.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.revoke': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.webhook.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'apiV2.clients.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -736,6 +747,7 @@ export type ScannedRoutes = {
     'analytics_errors.resolve': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'share_update': { paramsTuple: [ParamValue]; params: {'shareId': ParamValue} }
     'link_update': { paramsTuple: [ParamValue]; params: {'linkId': ParamValue} }
+    'dashboard.apiProjects.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'apiV2.clients.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'apiV2.products.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

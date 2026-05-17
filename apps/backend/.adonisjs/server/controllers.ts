@@ -280,6 +280,13 @@ export const controllers = {
     Charts: () => import('#controllers/dashboard/charts'),
     SidebarCounts: () => import('#controllers/dashboard/sidebar_counts'),
     Stats: () => import('#controllers/dashboard/stats'),
+    apiProjects: {
+      List: () => import('#controllers/dashboard/api_projects/list'),
+      Show: () => import('#controllers/dashboard/api_projects/show'),
+      Create: () => import('#controllers/dashboard/api_projects/create'),
+      Update: () => import('#controllers/dashboard/api_projects/update'),
+      Destroy: () => import('#controllers/dashboard/api_projects/destroy'),
+    },
   },
   einvoicing: {
     Submit: () => import('#controllers/einvoicing/submit'),

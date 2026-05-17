@@ -6,6 +6,7 @@ import publicIdCodec from '#services/api/public_id_codec'
 
 export interface ApiKeyAdminShape {
   id: string
+  project_id: string
   name: string
   prefix: string
   masked_token: string
@@ -35,6 +36,7 @@ class ApiKeyAdminTransformer {
   transform(key: ApiKey): ApiKeyAdminShape {
     return {
       id: publicIdCodec.encode('api_key', key.id),
+      project_id: publicIdCodec.encode('api_project', key.projectId),
       name: key.name,
       prefix: key.prefix,
       masked_token: `${key.prefix}…${key.last4}`,

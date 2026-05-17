@@ -93,6 +93,13 @@ export interface ApiDefinition {
       logs: typeof routes['dashboard.apiKeys.logs']
       usageStats: typeof routes['dashboard.apiKeys.usageStats']
     }
+    apiProjects: {
+      list: typeof routes['dashboard.apiProjects.list']
+      create: typeof routes['dashboard.apiProjects.create']
+      show: typeof routes['dashboard.apiProjects.show']
+      update: typeof routes['dashboard.apiProjects.update']
+      destroy: typeof routes['dashboard.apiProjects.destroy']
+    }
   }
   serveIcon: typeof routes['serve_icon']
   confirmPrivate: typeof routes['confirm_private']

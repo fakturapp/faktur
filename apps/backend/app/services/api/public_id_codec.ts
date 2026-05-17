@@ -24,6 +24,7 @@ export type ResourceType =
   | 'event'
   | 'request'
   | 'api_key'
+  | 'api_project'
   | 'webhook_delivery'
   | 'idempotency'
 
@@ -53,6 +54,7 @@ export const PREFIX_BY_RESOURCE: Record<ResourceType, string> = {
   event: 'evt',
   request: 'req',
   api_key: 'apk',
+  api_project: 'prj',
   webhook_delivery: 'whd',
   idempotency: 'idem',
 }

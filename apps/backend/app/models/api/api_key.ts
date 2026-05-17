@@ -17,6 +17,9 @@ export default class ApiKey extends BaseModel {
   declare teamId: string
 
   @column()
+  declare projectId: string
+
+  @column()
   declare createdByUserId: string | null
 
   @column()

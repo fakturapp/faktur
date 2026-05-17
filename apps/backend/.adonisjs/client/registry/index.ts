@@ -1524,6 +1524,36 @@ const routes = {
     tokens: [{"old":"/api/v1/dashboard/settings/api-keys/scopes-catalog","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-keys/scopes-catalog","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-keys/scopes-catalog","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-keys/scopes-catalog","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-keys/scopes-catalog","type":0,"val":"api-keys","end":""},{"old":"/api/v1/dashboard/settings/api-keys/scopes-catalog","type":0,"val":"scopes-catalog","end":""}],
     types: placeholder as Registry['dashboard.apiKeys.scopesCatalog']['types'],
   },
+  'dashboard.apiProjects.list': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/dashboard/settings/api-projects',
+    tokens: [{"old":"/api/v1/dashboard/settings/api-projects","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-projects","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-projects","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-projects","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-projects","type":0,"val":"api-projects","end":""}],
+    types: placeholder as Registry['dashboard.apiProjects.list']['types'],
+  },
+  'dashboard.apiProjects.create': {
+    methods: ["POST"],
+    pattern: '/api/v1/dashboard/settings/api-projects',
+    tokens: [{"old":"/api/v1/dashboard/settings/api-projects","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-projects","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-projects","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-projects","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-projects","type":0,"val":"api-projects","end":""}],
+    types: placeholder as Registry['dashboard.apiProjects.create']['types'],
+  },
+  'dashboard.apiProjects.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/dashboard/settings/api-projects/:id',
+    tokens: [{"old":"/api/v1/dashboard/settings/api-projects/:id","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id","type":0,"val":"api-projects","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['dashboard.apiProjects.show']['types'],
+  },
+  'dashboard.apiProjects.update': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/dashboard/settings/api-projects/:id',
+    tokens: [{"old":"/api/v1/dashboard/settings/api-projects/:id","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id","type":0,"val":"api-projects","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['dashboard.apiProjects.update']['types'],
+  },
+  'dashboard.apiProjects.destroy': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/dashboard/settings/api-projects/:id',
+    tokens: [{"old":"/api/v1/dashboard/settings/api-projects/:id","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id","type":0,"val":"api-projects","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['dashboard.apiProjects.destroy']['types'],
+  },
   'dashboard.apiKeys.list': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/dashboard/settings/api-keys',

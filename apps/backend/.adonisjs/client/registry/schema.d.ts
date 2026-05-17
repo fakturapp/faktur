@@ -3043,6 +3043,66 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/scopes_catalog').default['handle']>>>
     }
   }
+  'dashboard.apiProjects.list': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/dashboard/settings/api-projects'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/api_projects/list').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_projects/list').default['handle']>>>
+    }
+  }
+  'dashboard.apiProjects.create': {
+    methods: ["POST"]
+    pattern: '/api/v1/dashboard/settings/api-projects'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/api/api_key_dashboard_validators').createProjectValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/api/api_key_dashboard_validators').createProjectValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/api_projects/create').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_projects/create').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'dashboard.apiProjects.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/dashboard/settings/api-projects/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/api_projects/show').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_projects/show').default['handle']>>>
+    }
+  }
+  'dashboard.apiProjects.update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/dashboard/settings/api-projects/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/api/api_key_dashboard_validators').updateProjectValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/api/api_key_dashboard_validators').updateProjectValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/api_projects/update').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_projects/update').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'dashboard.apiProjects.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/dashboard/settings/api-projects/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/api_projects/destroy').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_projects/destroy').default['handle']>>>
+    }
+  }
   'dashboard.apiKeys.list': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/dashboard/settings/api-keys'
