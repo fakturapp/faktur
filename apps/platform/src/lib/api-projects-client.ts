@@ -35,6 +35,19 @@ export const apiProjectsClient = {
     const suffix = qs.toString() ? `?${qs}` : ''
     return api.get<{ data: AuditLogShape[] }>(`${BASE}/${id}/audit-logs${suffix}`)
   },
+  logExplorerCall: (
+    id: string,
+    body: {
+      method: string
+      path: string
+      query?: string | null
+      status: number
+      latency_ms: number
+      response_size_bytes?: number
+      api_key_id?: string | null
+      error?: string | null
+    }
+  ) => api.post<{ message: string }>(`${BASE}/${id}/explorer-events`, body),
 }
 
 export interface AuditLogShape {
