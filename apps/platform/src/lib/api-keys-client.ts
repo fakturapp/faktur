@@ -85,6 +85,7 @@ export const apiKeysClient = {
     api.get<{ data: ApiKeyShape; webhook: WebhookShape | null }>(`${BASE}/${id}`),
   catalog: () => api.get<{ data: ScopesCatalog }>(`${BASE}/scopes-catalog`),
   create: (body: {
+    project_id: string
     name: string
     scopes: string[]
     expires_at?: string

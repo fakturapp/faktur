@@ -18,6 +18,7 @@ import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/components/ui/toast'
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
 import { apiKeysClient, type ApiKeyShape, type ScopesCatalog } from '@/lib/api-keys-client'
+import { useProjects } from '@/lib/projects-context'
 
 type Step = 'info' | 'permissions'
 type Preset = 'read_only' | 'full_access' | 'custom'
@@ -26,10 +27,12 @@ interface Props {
   open: boolean
   onClose: () => void
   onCreated: (created: { key: ApiKeyShape; plaintext: string }) => void
+  projectId?: string
 }
 
-export function CreateApiKeyDialog({ open, onClose, onCreated }: Props) {
+export function CreateApiKeyDialog({ open, onClose, onCreated, projectId }: Props) {
   const { toast } = useToast()
+  const { projects } = useProjects()
   const [step, setStep] = useState<Step>('info')
   const [name, setName] = useState('')
   const [expiration, setExpiration] = useState<'never' | '90d' | '1y'>('never')
@@ -82,6 +85,14 @@ export function CreateApiKeyDialog({ open, onClose, onCreated }: Props) {
       toast('Sélectionnez au moins une permission', 'error')
       return
     }
+    const effectiveProjectId =
+      projectId ??
+      projects?.find((p) => p.is_default)?.id ??
+      projects?.[0]?.id
+    if (!effectiveProjectId) {
+      toast('Aucun projet disponible. Créez-en un avant de générer une clé.', 'error')
+      return
+    }
     const expiresAt =
       expiration === '90d'
         ? new Date(Date.now() + 90 * 24 * 3600 * 1000).toISOString()
@@ -96,6 +107,7 @@ export function CreateApiKeyDialog({ open, onClose, onCreated }: Props) {
 
     setSubmitting(true)
     const res = await apiKeysClient.create({
+      project_id: effectiveProjectId,
       name: name.trim(),
       scopes,
       expires_at: expiresAt,
