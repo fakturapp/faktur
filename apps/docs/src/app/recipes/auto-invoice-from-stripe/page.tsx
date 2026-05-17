@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { ArrowLeft, CreditCard, Clock } from 'lucide-react'
+import { API_V2_BASE_URL } from '@/lib/config'
 
 export const metadata = {
   title: 'Auto-create invoices from Stripe — Faktur Developers',
@@ -75,13 +76,13 @@ app.post(
         </p>
         <Code>{`async function resolveClient(email: string, name: string | null) {
   const search = await fetch(
-    \`https://api.fakturapp.cc/api/v2/clients?email=\${encodeURIComponent(email)}\`,
+    \`${API_V2_BASE_URL}/clients?email=\${encodeURIComponent(email)}\`,
     { headers: { Authorization: \`Bearer \${process.env.FAKTUR_KEY}\` } }
   ).then((r) => r.json())
 
   if (search.data?.[0]) return search.data[0]
 
-  const created = await fetch('https://api.fakturapp.cc/api/v2/clients', {
+  const created = await fetch('${API_V2_BASE_URL}/clients', {
     method: 'POST',
     headers: {
       Authorization: \`Bearer \${process.env.FAKTUR_KEY}\`,
@@ -113,7 +114,7 @@ app.post(
   const todayIso = new Date().toISOString().slice(0, 10)
 
   const invoiceResp = await fetch(
-    'https://api.fakturapp.cc/api/v2/invoices',
+    '${API_V2_BASE_URL}/invoices',
     {
       method: 'POST',
       headers: {
@@ -138,7 +139,7 @@ app.post(
   ).then((r) => r.json())
 
   await fetch(
-    \`https://api.fakturapp.cc/api/v2/invoices/\${invoiceResp.data.id}/mark-paid\`,
+    \`${API_V2_BASE_URL}/invoices/\${invoiceResp.data.id}/mark-paid\`,
     {
       method: 'POST',
       headers: {
