@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
 import { AlertTriangle, Copy, Check } from 'lucide-react'
+import { API_V2_BASE_URL } from '@/lib/external-urls'
 
 interface Props {
   open: boolean
@@ -99,7 +100,7 @@ export function RevealedKeyDialog({ open, plaintext, keyName, kind, onClose }: P
             Test rapide
           </p>
           <pre className="overflow-x-auto rounded-lg border border-border/50 bg-surface p-3 text-xs leading-relaxed">
-            <code>{`curl https://api.fakturapp.cc/api/v2/ping \\
+            <code>{`curl ${API_V2_BASE_URL}/ping \\
   -H "Authorization: Bearer ${plaintext.slice(0, 16)}..."`}</code>
           </pre>
         </div>

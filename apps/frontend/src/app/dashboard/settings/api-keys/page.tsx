@@ -31,6 +31,7 @@ import { apiKeysClient, type ApiKeyShape } from '@/lib/api-keys-client'
 import { CreateApiKeyDialog } from '@/components/api-keys/create-api-key-dialog'
 import { RevealedKeyDialog } from '@/components/api-keys/revealed-key-dialog'
 import { useAuth } from '@/lib/auth'
+import { DOCS_URL } from '@/lib/external-urls'
 
 function formatRelative(iso: string | null): string {
   if (!iso) return 'jamais utilisée'
@@ -158,7 +159,7 @@ export default function ApiKeysPage() {
             </div>
             <div className="flex shrink-0 items-center gap-2">
               <Link
-                href="https://developers.fakturapp.cc"
+                href={DOCS_URL}
                 target="_blank"
                 rel="noreferrer"
               >
