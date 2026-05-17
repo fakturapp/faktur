@@ -3103,6 +3103,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_projects/destroy').default['handle']>>>
     }
   }
+  'dashboard.apiProjects.auditLogs': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/dashboard/settings/api-projects/:id/audit-logs'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/api_projects/audit_logs').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_projects/audit_logs').default['handle']>>>
+    }
+  }
   'dashboard.apiKeys.list': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/dashboard/settings/api-keys'

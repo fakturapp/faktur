@@ -7,6 +7,7 @@ const ProjectsShow = () => import('#controllers/dashboard/api_projects/show')
 const ProjectsCreate = () => import('#controllers/dashboard/api_projects/create')
 const ProjectsUpdate = () => import('#controllers/dashboard/api_projects/update')
 const ProjectsDestroy = () => import('#controllers/dashboard/api_projects/destroy')
+const ProjectsAuditLogs = () => import('#controllers/dashboard/api_projects/audit_logs')
 
 const KeysList = () => import('#controllers/dashboard/api_keys/list')
 const KeysShow = () => import('#controllers/dashboard/api_keys/show')
@@ -37,6 +38,9 @@ router
     router
       .delete('/api-projects/:id', [ProjectsDestroy, 'handle'])
       .as('dashboard.apiProjects.destroy')
+    router
+      .get('/api-projects/:id/audit-logs', [ProjectsAuditLogs, 'handle'])
+      .as('dashboard.apiProjects.auditLogs')
 
     router.get('/api-keys', [KeysList, 'handle']).as('dashboard.apiKeys.list')
     router.post('/api-keys', [KeysCreate, 'handle']).as('dashboard.apiKeys.create')

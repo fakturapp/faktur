@@ -225,7 +225,7 @@ export class ApiKeyWebhookSchema extends BaseModel {
 }
 
 export class ApiKeySchema extends BaseModel {
-  static $columns = ['allowedIps', 'createdAt', 'createdByUserId', 'expiresAt', 'hash', 'id', 'last4', 'lastIp', 'lastUsedAt', 'name', 'prefix', 'rateLimitTier', 'revokedAt', 'revokedReason', 'rotatingToId', 'rotationGraceUntil', 'scopes', 'teamId', 'updatedAt', 'usageCount'] as const
+  static $columns = ['allowedIps', 'createdAt', 'createdByUserId', 'expiresAt', 'hash', 'id', 'last4', 'lastIp', 'lastUsedAt', 'name', 'prefix', 'projectId', 'rateLimitTier', 'revokedAt', 'revokedReason', 'rotatingToId', 'rotationGraceUntil', 'scopes', 'teamId', 'updatedAt', 'usageCount'] as const
   $columns = ApiKeySchema.$columns
   @column()
   declare allowedIps: any | null
@@ -250,6 +250,8 @@ export class ApiKeySchema extends BaseModel {
   @column()
   declare prefix: string
   @column()
+  declare projectId: string
+  @column()
   declare rateLimitTier: string
   @column.dateTime()
   declare revokedAt: DateTime | null
@@ -267,6 +269,31 @@ export class ApiKeySchema extends BaseModel {
   declare updatedAt: DateTime | null
   @column()
   declare usageCount: bigint | number
+}
+
+export class ApiProjectSchema extends BaseModel {
+  static $columns = ['color', 'createdAt', 'createdByUserId', 'description', 'id', 'isArchived', 'isDefault', 'name', 'teamId', 'updatedAt'] as const
+  $columns = ApiProjectSchema.$columns
+  @column()
+  declare color: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare createdByUserId: string | null
+  @column()
+  declare description: string | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare isArchived: boolean
+  @column()
+  declare isDefault: boolean
+  @column()
+  declare name: string
+  @column()
+  declare teamId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
 }
 
 export class ApiRequestLogSchema extends BaseModel {

@@ -16,6 +16,7 @@ import type ApiV2ApiQuoteTransformer from '#transformers/api_v2/api_quote_transf
 import type ApiV2ApiRecurringInvoiceTransformer from '#transformers/api_v2/api_recurring_invoice_transformer'
 import type ApiApiKeyAdminTransformer from '#transformers/api/api_key_admin_transformer'
 import type ApiApiProjectTransformer from '#transformers/api/api_project_transformer'
+import type ApiApiAuditLogTransformer from '#transformers/api/api_audit_log_transformer'
 import type AuthProviderTransformer from '#transformers/auth_provider_transformer'
 import type BankAccountTransformer from '#transformers/bank_account_transformer'
 import type ClientContactTransformer from '#transformers/client_contact_transformer'
@@ -88,6 +89,10 @@ export namespace Data {
     export type ApiProject = InferData<ApiApiProjectTransformer>
     export namespace ApiProject {
       export type Variants = InferVariants<ApiApiProjectTransformer>
+    }
+    export type ApiAuditLog = InferData<ApiApiAuditLogTransformer>
+    export namespace ApiAuditLog {
+      export type Variants = InferVariants<ApiApiAuditLogTransformer>
     }
   }
   export type AuthProvider = InferData<AuthProviderTransformer>

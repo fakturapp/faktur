@@ -1554,6 +1554,12 @@ const routes = {
     tokens: [{"old":"/api/v1/dashboard/settings/api-projects/:id","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id","type":0,"val":"api-projects","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['dashboard.apiProjects.destroy']['types'],
   },
+  'dashboard.apiProjects.auditLogs': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/dashboard/settings/api-projects/:id/audit-logs',
+    tokens: [{"old":"/api/v1/dashboard/settings/api-projects/:id/audit-logs","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id/audit-logs","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id/audit-logs","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id/audit-logs","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id/audit-logs","type":0,"val":"api-projects","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id/audit-logs","type":1,"val":"id","end":""},{"old":"/api/v1/dashboard/settings/api-projects/:id/audit-logs","type":0,"val":"audit-logs","end":""}],
+    types: placeholder as Registry['dashboard.apiProjects.auditLogs']['types'],
+  },
   'dashboard.apiKeys.list': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/dashboard/settings/api-keys',

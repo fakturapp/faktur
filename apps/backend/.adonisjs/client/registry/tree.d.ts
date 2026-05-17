@@ -99,6 +99,7 @@ export interface ApiDefinition {
       show: typeof routes['dashboard.apiProjects.show']
       update: typeof routes['dashboard.apiProjects.update']
       destroy: typeof routes['dashboard.apiProjects.destroy']
+      auditLogs: typeof routes['dashboard.apiProjects.auditLogs']
     }
   }
   serveIcon: typeof routes['serve_icon']

@@ -262,6 +262,7 @@ export type ScannedRoutes = {
     'dashboard.apiProjects.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiProjects.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiProjects.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'dashboard.apiProjects.auditLogs': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.list': { paramsTuple?: []; params?: {} }
     'dashboard.apiKeys.create': { paramsTuple?: []; params?: {} }
     'dashboard.apiKeys.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -529,6 +530,7 @@ export type ScannedRoutes = {
     'dashboard.apiKeys.scopesCatalog': { paramsTuple?: []; params?: {} }
     'dashboard.apiProjects.list': { paramsTuple?: []; params?: {} }
     'dashboard.apiProjects.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'dashboard.apiProjects.auditLogs': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.list': { paramsTuple?: []; params?: {} }
     'dashboard.apiKeys.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.deliveries.list': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -650,6 +652,7 @@ export type ScannedRoutes = {
     'dashboard.apiKeys.scopesCatalog': { paramsTuple?: []; params?: {} }
     'dashboard.apiProjects.list': { paramsTuple?: []; params?: {} }
     'dashboard.apiProjects.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'dashboard.apiProjects.auditLogs': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.list': { paramsTuple?: []; params?: {} }
     'dashboard.apiKeys.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.deliveries.list': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
