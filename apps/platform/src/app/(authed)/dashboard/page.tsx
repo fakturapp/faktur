@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
@@ -17,6 +18,22 @@ import { Button } from '@/components/ui/button'
 import { useAuth } from '@/lib/auth'
 import { useProjects } from '@/lib/projects-context'
 import { DOCS_URL } from '@/lib/oauth-config'
+import { apiKeysClient, type ApiKeyShape } from '@/lib/api-keys-client'
+
+function formatRelative(iso: string | null): string {
+  if (!iso) return 'jamais utilisée'
+  const then = new Date(iso).getTime()
+  const now = Date.now()
+  const diffSec = Math.max(0, Math.floor((now - then) / 1000))
+  if (diffSec < 60) return `il y a ${diffSec}s`
+  const m = Math.floor(diffSec / 60)
+  if (m < 60) return `il y a ${m} min`
+  const h = Math.floor(m / 60)
+  if (h < 24) return `il y a ${h} h`
+  const d = Math.floor(h / 24)
+  if (d < 30) return `il y a ${d} j`
+  return new Date(iso).toLocaleDateString()
+}
 
 function firstName(user: { fullName: string | null; email: string } | null): string {
   if (!user) return ''
@@ -30,6 +47,14 @@ function firstName(user: { fullName: string | null; email: string } | null): str
 export default function DashboardHomePage() {
   const { user } = useAuth()
   const { projects } = useProjects()
+  const [recentKeys, setRecentKeys] = useState<ApiKeyShape[] | null>(null)
+
+  useEffect(() => {
+    apiKeysClient.recentlyUsed(5).then((res) => {
+      if (res.data?.data) setRecentKeys(res.data.data)
+      else setRecentKeys([])
+    })
+  }, [])
 
   const activeProjects = (projects ?? []).filter((p) => !p.is_archived)
   const recentProjects = activeProjects.slice(0, 5)
@@ -157,6 +182,60 @@ export default function DashboardHomePage() {
           </p>
         </CardContent>
       </Card>
+
+      <div>
+        <div className="flex items-center justify-between mb-3 px-1">
+          <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+            Clés récemment utilisées
+          </h2>
+          <Link
+            href="/projects"
+            className="inline-flex items-center gap-1 text-xs text-accent hover:underline"
+          >
+            Voir tout
+            <ArrowRight className="h-3 w-3" />
+          </Link>
+        </div>
+        <Card className="border-border/50">
+          <CardContent className="p-0">
+            {recentKeys === null ? (
+              <div className="px-5 py-8 text-center text-xs text-muted-foreground">
+                Chargement…
+              </div>
+            ) : recentKeys.length === 0 ? (
+              <div className="px-5 py-8 text-center">
+                <Key className="mx-auto h-7 w-7 text-muted-foreground/40" />
+                <p className="mt-2 text-sm font-medium text-foreground">
+                  Aucune utilisation récente
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Les clés apparaîtront ici dès le premier appel API.
+                </p>
+              </div>
+            ) : (
+              <div className="divide-y divide-border/50">
+                {recentKeys.map((k) => (
+                  <Link
+                    key={k.id}
+                    href={`/projects/${k.project_id}/keys/${k.id}`}
+                    className="flex items-center justify-between gap-3 px-5 py-3 hover:bg-surface-hover transition-colors"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-foreground">{k.name}</p>
+                      <p className="mt-0.5 truncate font-mono text-xs text-muted-foreground">
+                        {k.masked_token}
+                      </p>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {formatRelative(k.last_used_at)}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
       <div>
         <div className="flex items-center justify-between mb-3 px-1">

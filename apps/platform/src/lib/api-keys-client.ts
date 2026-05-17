@@ -82,6 +82,34 @@ const BASE = '/dashboard/settings/api-keys'
 
 export const apiKeysClient = {
   list: () => api.get<{ data: ApiKeyShape[] }>(BASE),
+  recentlyUsed: (limit: number = 5) =>
+    api.get<{ data: ApiKeyShape[] }>(`${BASE}/recently-used?limit=${limit}`),
+  deliveryConfig: (id: string) =>
+    api.get<{
+      data: {
+        delivery_max_retries: number
+        delivery_timeout_ms: number
+        delivery_backoff_seconds: number
+        delivery_custom_headers: Record<string, string>
+      }
+    }>(`${BASE}/${id}/webhook/delivery-config`),
+  updateDeliveryConfig: (
+    id: string,
+    body: {
+      deliveryMaxRetries?: number
+      deliveryTimeoutMs?: number
+      deliveryBackoffSeconds?: number
+      deliveryCustomHeaders?: Record<string, string>
+    }
+  ) =>
+    api.put<{
+      data: {
+        delivery_max_retries: number
+        delivery_timeout_ms: number
+        delivery_backoff_seconds: number
+        delivery_custom_headers: Record<string, string>
+      }
+    }>(`${BASE}/${id}/webhook/delivery-config`, body),
   show: (id: string) =>
     api.get<{ data: ApiKeyShape; webhook: WebhookShape | null }>(`${BASE}/${id}`),
   catalog: () => api.get<{ data: ScopesCatalog }>(`${BASE}/scopes-catalog`),
