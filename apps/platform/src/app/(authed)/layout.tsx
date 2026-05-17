@@ -3,8 +3,9 @@
 import { useEffect, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth'
+import { ApiKeysProvider } from '@/lib/api-keys-context'
+import { Sidebar } from '@/components/layout/sidebar'
 import { Spinner } from '@/components/ui/spinner'
-import { PlatformHeader } from '@/components/platform/platform-header'
 
 export default function AuthedLayout({ children }: { children: ReactNode }) {
   const router = useRouter()
@@ -25,9 +26,13 @@ export default function AuthedLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <>
-      <PlatformHeader />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 sm:px-6">{children}</main>
-    </>
+    <ApiKeysProvider>
+      <div className="relative h-screen overflow-hidden bg-background">
+        <Sidebar />
+        <div className="flex h-screen flex-col overflow-hidden pl-(--sidebar-width)">
+          <main className="flex-1 overflow-y-auto">{children}</main>
+        </div>
+      </div>
+    </ApiKeysProvider>
   )
 }
