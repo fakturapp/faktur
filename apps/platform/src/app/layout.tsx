@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { AuthProvider } from '@/lib/auth'
+import { ThemeProvider } from '@/lib/theme'
 import { PLATFORM_URL } from '@/lib/oauth-config'
 import { ToastProvider } from '@/components/ui/toast'
 
@@ -27,10 +28,12 @@ export default function RootLayout({
         className="flex min-h-full flex-col bg-background text-foreground"
         suppressHydrationWarning
       >
-        <AuthProvider>
-          <div className="flex min-h-full flex-1 flex-col">{children}</div>
-          <ToastProvider placement="top" />
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <div className="flex min-h-full flex-1 flex-col">{children}</div>
+            <ToastProvider placement="top" />
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

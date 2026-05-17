@@ -12,10 +12,14 @@ import {
   Key,
   LayoutDashboard,
   LogOut,
+  Monitor,
+  Moon,
   Plus,
+  Sun,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth, type PlatformTeam } from '@/lib/auth'
+import { useTheme } from '@/lib/theme'
 import { useApiKeys } from '@/lib/api-keys-context'
 import { DASHBOARD_URL, DOCS_URL } from '@/lib/oauth-config'
 import { Avatar } from '@/components/ui/avatar'
@@ -24,6 +28,7 @@ import { Dropdown, DropdownItem, DropdownSeparator } from '@/components/ui/dropd
 export function Sidebar() {
   const pathname = usePathname()
   const { user, teams, currentTeam, selectTeam, signOut } = useAuth()
+  const { theme, setTheme } = useTheme()
   const { keys, loading, openCreate } = useApiKeys()
   const [keysOpen, setKeysOpen] = useState(true)
   const [switching, setSwitching] = useState<string | null>(null)
@@ -262,6 +267,36 @@ export function Sidebar() {
                 </DropdownItem>
               )
             })}
+            <DropdownSeparator />
+            <p className="px-3 pt-1.5 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Apparence
+            </p>
+            <div className="px-2 pb-1.5">
+              <div className="grid grid-cols-3 gap-1 rounded-md bg-surface-secondary p-0.5">
+                {(
+                  [
+                    { id: 'light', icon: Sun, label: 'Clair' },
+                    { id: 'dark', icon: Moon, label: 'Sombre' },
+                    { id: 'system', icon: Monitor, label: 'Auto' },
+                  ] as const
+                ).map(({ id, icon: Icon, label }) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setTheme(id)}
+                    className={cn(
+                      'flex flex-col items-center justify-center gap-0.5 rounded px-2 py-1.5 text-[10px] font-medium transition-colors',
+                      theme === id
+                        ? 'bg-background text-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground'
+                    )}
+                  >
+                    <Icon className="h-3.5 w-3.5" />
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
             <DropdownSeparator />
             <DropdownItem onClick={signOut} className="text-danger">
               <LogOut className="h-3.5 w-3.5" />
