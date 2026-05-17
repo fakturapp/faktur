@@ -26,7 +26,7 @@ export default function LoginPage() {
     }
     if (getStoredAccessToken()) {
       const next = params.get('next')
-      window.location.replace(next && next.startsWith('/') ? next : '/api-keys')
+      window.location.replace(next && next.startsWith('/') ? next : '/dashboard')
     }
   }, [])
 

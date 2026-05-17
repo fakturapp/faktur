@@ -107,7 +107,7 @@ export default function OAuthCallbackPage() {
         sessionStorage.removeItem('faktur_platform_next')
 
         setPhase('done')
-        window.location.replace(next && next.startsWith('/') ? next : '/api-keys')
+        window.location.replace(next && next.startsWith('/') ? next : '/dashboard')
       } catch (err) {
         if (cancelled) return
         setError(err instanceof Error ? err.message : 'Erreur réseau')

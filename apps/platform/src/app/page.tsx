@@ -11,7 +11,7 @@ export default function RootRedirect() {
 
   useEffect(() => {
     if (loading) return
-    if (user) router.replace('/api-keys')
+    if (user) router.replace('/dashboard')
     else router.replace('/login')
   }, [loading, user, router])
 
