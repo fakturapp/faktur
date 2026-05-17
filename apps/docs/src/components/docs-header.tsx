@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Github, Menu, X, ExternalLink as ExternalLinkIcon } from 'lucide-react'
+import { Menu, X, ExternalLink as ExternalLinkIcon } from 'lucide-react'
+import { GithubIcon } from '@/components/icons/github-icon'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { PRIMARY_LINKS, SIDEBAR_SECTIONS } from '@/lib/nav-config'
 import { DASHBOARD_URL } from '@/lib/config'
@@ -86,7 +87,7 @@ export function DocsHeader() {
             aria-label="GitHub"
             className="hidden size-7 items-center justify-center rounded-full border border-border bg-surface text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground md:inline-flex"
           >
-            <Github className="size-3.5" />
+            <GithubIcon className="size-3.5" />
           </Link>
           <ThemeToggle />
           <button
