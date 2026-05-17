@@ -14,16 +14,22 @@ import {
   ExternalLink,
   FileText,
   Folder,
+  Info,
   Key,
   LayoutDashboard,
   ListChecks,
   LogOut,
   Monitor,
   Moon,
+  MoreHorizontal,
+  Palette,
+  Scale,
   ScrollText,
   Settings,
   Sun,
   Terminal,
+  User,
+  Users,
   Webhook,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -33,7 +39,13 @@ import { useProjects } from '@/lib/projects-context'
 import { apiKeysClient, type ApiKeyShape } from '@/lib/api-keys-client'
 import { DASHBOARD_URL, DOCS_URL } from '@/lib/oauth-config'
 import { Avatar } from '@/components/ui/avatar'
-import { Dropdown, DropdownItem, DropdownSeparator } from '@/components/ui/dropdown'
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownLabel,
+  DropdownSeparator,
+  DropdownSub,
+} from '@/components/ui/dropdown'
 
 function matchProjectKey(pathname: string): { projectId: string; keyId: string | null } | null {
   const m = pathname.match(/^\/projects\/([^/]+)(?:\/keys\/([^/]+))?/)
@@ -333,95 +345,197 @@ function UserFooter() {
 
   if (!user) return null
 
+  const initials = (user.fullName ?? user.email).slice(0, 1).toUpperCase()
+  const ThemeIcon = theme === 'system' ? Monitor : theme === 'dark' ? Moon : Sun
+  const themeLabel = theme === 'system' ? 'Système' : theme === 'dark' ? 'Sombre' : 'Clair'
+
   return (
-    <>
-      <div className="mx-3 h-px bg-border" />
-      <div className="p-2">
-        <Dropdown
-          position="above"
-          align="left"
+    <div className="p-2.5">
+      <Dropdown
+        align="left"
+        position="above"
+        sideOffset={4}
+        alignOffset={8}
+        className="min-w-[260px]"
+        trigger={
+          <div className="flex w-full items-center justify-start gap-2.5 rounded-lg px-2 py-2 transition-all duration-200 hover:bg-muted/40 dark:hover:bg-white/[0.04]">
+            <Avatar
+              src={user.avatarUrl ?? undefined}
+              alt={user.fullName ?? user.email}
+              fallback={initials}
+              size="sm"
+            />
+            <div className="min-w-0 flex-1 text-left">
+              <p className="truncate text-[14px] font-medium leading-tight text-foreground">
+                {user.fullName ?? user.email.split('@')[0]}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                const next = theme === 'system' ? 'light' : theme === 'light' ? 'dark' : 'system'
+                setTheme(next)
+              }}
+              className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-black/5 hover:text-foreground dark:hover:bg-white/5"
+              title={themeLabel}
+              aria-label={`Thème : ${themeLabel}`}
+            >
+              <ThemeIcon className="h-4 w-4" />
+            </button>
+            <MoreHorizontal className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+          </div>
+        }
+      >
+        <div className="mb-1 border-b border-border px-3 py-3">
+          <div className="flex items-center gap-3">
+            <Avatar
+              src={user.avatarUrl ?? undefined}
+              alt={user.fullName ?? user.email}
+              fallback={initials}
+              size="sm"
+            />
+            <div className="min-w-0">
+              <p className="truncate text-sm font-medium text-foreground">
+                {user.fullName ?? user.email}
+              </p>
+              <p className="truncate text-xs text-muted-foreground">{user.email}</p>
+            </div>
+          </div>
+        </div>
+
+        <a href={`${DASHBOARD_URL}/dashboard/account`} target="_blank" rel="noreferrer">
+          <DropdownItem>
+            <User className="h-4 w-4 text-violet-500" />
+            Mon compte
+          </DropdownItem>
+        </a>
+
+        <DropdownSeparator />
+
+        <DropdownSub
           trigger={
-            <div className="flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2 py-2 text-left transition-colors hover:bg-sidebar-accent">
-              <Avatar
-                src={user.avatarUrl ?? undefined}
-                fallback={(user.fullName ?? user.email).slice(0, 1).toUpperCase()}
-                size="sm"
-              />
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-xs font-medium text-foreground">
-                  {user.fullName ?? user.email.split('@')[0]}
-                </p>
-                {currentTeam && (
-                  <p className="truncate text-[10px] text-muted-foreground">
-                    {currentTeam.name}
-                  </p>
+            <>
+              <div className="flex h-5 w-5 shrink-0 items-center justify-center overflow-hidden rounded bg-accent-soft text-[9px] font-bold text-accent">
+                {currentTeam?.iconUrl ? (
+                  <img
+                    src={currentTeam.iconUrl}
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  (currentTeam?.name ?? 'E').charAt(0).toUpperCase()
                 )}
               </div>
-              <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-            </div>
+              <span className="max-w-[140px] flex-1 truncate text-left">
+                {currentTeam?.name ?? 'Équipe'}
+              </span>
+            </>
           }
         >
-          <div className="px-3 py-2">
-            <p className="text-xs font-medium text-foreground">
-              {user.fullName ?? user.email.split('@')[0]}
-            </p>
-            <p className="truncate text-[11px] text-muted-foreground">{user.email}</p>
-          </div>
-          <DropdownSeparator />
-          <p className="px-3 pt-1.5 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Équipes
-          </p>
-          {teams.map((t) => {
-            const isCurrent = t.id === currentTeam?.id
-            const isBusy = switching === t.id
+          <DropdownLabel>Vos équipes</DropdownLabel>
+          {teams.map((team) => {
+            const isCurrent = team.id === currentTeam?.id
+            const isBusy = switching === team.id
             return (
-              <DropdownItem key={t.id} onClick={() => handleSelectTeam(t)} disabled={isBusy}>
-                <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-accent-soft text-[10px] font-semibold text-accent">
-                  {t.name.charAt(0).toUpperCase()}
+              <DropdownItem
+                key={team.id}
+                onClick={() => handleSelectTeam(team)}
+                disabled={isBusy}
+              >
+                <div className="flex w-full items-center justify-between gap-2">
+                  <div className="flex min-w-0 items-center gap-2">
+                    <div className="flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-md bg-muted text-[10px] font-semibold text-foreground">
+                      {team.iconUrl ? (
+                        <img
+                          src={team.iconUrl}
+                          alt={team.name}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        team.name.charAt(0).toUpperCase()
+                      )}
+                    </div>
+                    <span className="truncate text-sm">{team.name}</span>
+                  </div>
+                  {isCurrent && <Check className="h-3.5 w-3.5 shrink-0 text-accent" />}
                 </div>
-                <span className="flex-1 truncate">{t.name}</span>
-                {isCurrent && <Check className="h-3.5 w-3.5 text-accent" />}
               </DropdownItem>
             )
           })}
-          <DropdownSeparator />
-          <p className="px-3 pt-1.5 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Apparence
-          </p>
-          <div className="px-2 pb-1.5">
-            <div className="grid grid-cols-3 gap-1 rounded-md bg-surface-secondary p-0.5">
-              {(
-                [
-                  { id: 'light', icon: Sun, label: 'Clair' },
-                  { id: 'dark', icon: Moon, label: 'Sombre' },
-                  { id: 'system', icon: Monitor, label: 'Auto' },
-                ] as const
-              ).map(({ id, icon: Icon, label }) => (
-                <button
-                  key={id}
-                  type="button"
-                  onClick={() => setTheme(id)}
-                  className={cn(
-                    'flex flex-col items-center justify-center gap-0.5 rounded px-2 py-1.5 text-[10px] font-medium transition-colors',
-                    theme === id
-                      ? 'bg-background text-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground'
-                  )}
-                >
-                  <Icon className="h-3.5 w-3.5" />
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
-          <DropdownSeparator />
-          <DropdownItem onClick={signOut} className="text-danger">
-            <LogOut className="h-3.5 w-3.5" />
-            Déconnexion
+        </DropdownSub>
+
+        <DropdownSeparator />
+
+        <DropdownSub
+          trigger={
+            <>
+              <Palette className="h-4 w-4 text-violet-500" />
+              <span className="flex-1 text-left">Apparence</span>
+              <span className="text-[11px] text-muted-foreground">{themeLabel}</span>
+            </>
+          }
+        >
+          <DropdownLabel>Thème</DropdownLabel>
+          <DropdownItem onClick={() => setTheme('light')} selected={theme === 'light'}>
+            <Sun className="h-4 w-4 text-amber-500" />
+            Clair
           </DropdownItem>
-        </Dropdown>
-      </div>
-    </>
+          <DropdownItem onClick={() => setTheme('dark')} selected={theme === 'dark'}>
+            <Moon className="h-4 w-4 text-indigo-400" />
+            Sombre
+          </DropdownItem>
+          <DropdownItem onClick={() => setTheme('system')} selected={theme === 'system'}>
+            <Monitor className="h-4 w-4 text-muted-foreground" />
+            Système
+          </DropdownItem>
+        </DropdownSub>
+
+        <DropdownSeparator />
+
+        <DropdownSub
+          trigger={
+            <>
+              <Info className="h-4 w-4 text-sky-500" />
+              <span className="flex-1 text-left">Aide & informations</span>
+            </>
+          }
+        >
+          <a href={DOCS_URL} target="_blank" rel="noreferrer">
+            <DropdownItem>
+              <Book className="h-4 w-4 text-violet-500" />
+              Documentation
+            </DropdownItem>
+          </a>
+          <a href={DASHBOARD_URL} target="_blank" rel="noreferrer">
+            <DropdownItem>
+              <ExternalLink className="h-4 w-4 text-muted-foreground" />
+              App Faktur
+            </DropdownItem>
+          </a>
+          <DropdownSeparator />
+          <a href={`${DASHBOARD_URL}/about`} target="_blank" rel="noreferrer">
+            <DropdownItem>
+              <Info className="h-4 w-4 text-sky-500" />
+              À propos
+            </DropdownItem>
+          </a>
+          <a href={`${DASHBOARD_URL}/legal`} target="_blank" rel="noreferrer">
+            <DropdownItem>
+              <Scale className="h-4 w-4 text-muted-foreground" />
+              Infos légales
+            </DropdownItem>
+          </a>
+        </DropdownSub>
+
+        <DropdownSeparator />
+
+        <DropdownItem destructive onClick={signOut}>
+          <LogOut className="h-4 w-4" />
+          Déconnexion
+        </DropdownItem>
+      </Dropdown>
+    </div>
   )
 }
 
