@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
 import { Field, FieldLabel, FieldDescription } from '@/components/ui/field'
+import { FormSelect } from '@/components/ui/dropdown'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/toast'
 import { apiKeysClient, type ApiKeyShape } from '@/lib/api-keys-client'
@@ -285,18 +286,18 @@ export default function ExplorerPage() {
           <Field>
             <FieldLabel>Clé d&apos;authentification</FieldLabel>
             <div className="grid gap-2 sm:grid-cols-[1fr,2fr]">
-              <select
+              <FormSelect
                 value={selectedKeyId}
-                onChange={(e) => setSelectedKeyId(e.target.value)}
-                className="w-full rounded-lg border border-border/50 bg-field px-3 py-2 text-sm text-foreground focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
-              >
-                <option value="">Aucune (saisie libre)</option>
-                {keys?.map((k) => (
-                  <option key={k.id} value={k.id}>
-                    {k.name} · {k.masked_token}
-                  </option>
-                ))}
-              </select>
+                onChange={setSelectedKeyId}
+                placeholder="Aucune (saisie libre)"
+                options={[
+                  { value: '', label: 'Aucune (saisie libre)' },
+                  ...(keys?.map((k) => ({
+                    value: k.id,
+                    label: `${k.name} · ${k.masked_token}`,
+                  })) ?? []),
+                ]}
+              />
               <div className="relative">
                 <Input
                   type={showToken ? 'text' : 'password'}
@@ -337,17 +338,12 @@ export default function ExplorerPage() {
           </div>
 
           <div className="grid gap-2 sm:grid-cols-[120px,1fr,auto]">
-            <select
+            <FormSelect
               value={method}
-              onChange={(e) => setMethod(e.target.value as HttpMethod)}
-              className="rounded-lg border border-border/50 bg-field px-3 py-2 text-sm font-mono font-semibold text-foreground focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
-            >
-              {METHODS.map((m) => (
-                <option key={m} value={m}>
-                  {m}
-                </option>
-              ))}
-            </select>
+              onChange={(v) => setMethod(v as HttpMethod)}
+              options={METHODS.map((m) => ({ value: m, label: m }))}
+              className="font-mono font-semibold"
+            />
             <Input
               value={path}
               onChange={(e) => setPath(e.target.value)}
