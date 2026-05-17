@@ -4,13 +4,15 @@ import ApiKey from '#models/api/api_key'
 import ApiKeyWebhook from '#models/api/api_key_webhook'
 import webhookSigner from '#services/api/webhook_signer'
 import encryptionService from '#services/encryption/encryption_service'
+import auditLog from '#services/api/audit_log_service'
 import adminTransformer from '#transformers/api/api_key_admin_transformer'
 import publicIdCodec, { PublicIdParseError } from '#services/api/public_id_codec'
 import { setWebhookValidator } from '#validators/api/api_key_dashboard_validators'
 import { isKnownEvent } from '#services/api/webhook_events'
 
 export default class WebhookSet {
-  async handle({ auth, params, request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, params, request, response } = ctx
     const user = auth.user!
     const teamId = user.currentTeamId
     if (!teamId) return response.badRequest({ message: 'No team selected' })
@@ -63,6 +65,21 @@ export default class WebhookSet {
       webhook.consecutiveFailures = 0
       await webhook.save()
     }
+
+    await auditLog.emit({
+      ctx,
+      teamId,
+      projectId: key.projectId,
+      action: plaintext ? 'webhook.configured' : 'webhook.updated',
+      targetType: 'webhook',
+      targetId: webhook.id,
+      targetLabel: key.name,
+      metadata: {
+        url: webhook.url,
+        events: webhook.events,
+        api_key_id: key.id,
+      },
+    })
 
     return response.ok({
       data: adminTransformer.transformWebhook(webhook),
