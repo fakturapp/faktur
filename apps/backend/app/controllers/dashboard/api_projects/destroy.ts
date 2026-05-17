@@ -1,4 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import hash from '@adonisjs/core/services/hash'
 import ApiProject from '#models/api/api_project'
 import ApiKey from '#models/api/api_key'
 import auditLog from '#services/api/audit_log_service'
@@ -6,10 +7,26 @@ import publicIdCodec, { PublicIdParseError } from '#services/api/public_id_codec
 
 export default class Destroy {
   async handle(ctx: HttpContext) {
-    const { auth, params, response } = ctx
+    const { auth, params, request, response } = ctx
     const user = auth.user!
     const teamId = user.currentTeamId
     if (!teamId) return response.badRequest({ message: 'No team selected' })
+
+    const password = request.input('password')
+    if (typeof password !== 'string' || password.length === 0) {
+      return response.unprocessableEntity({
+        code: 'password_required',
+        message: 'Veuillez entrer votre mot de passe pour confirmer la suppression du projet.',
+      })
+    }
+
+    const valid = await hash.verify(user.password, password)
+    if (!valid) {
+      return response.unprocessableEntity({
+        code: 'invalid_password',
+        message: 'Mot de passe incorrect.',
+      })
+    }
 
     let internalId: string
     try {
