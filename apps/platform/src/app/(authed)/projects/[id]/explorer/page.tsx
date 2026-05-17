@@ -22,6 +22,7 @@ import { Field, FieldLabel, FieldDescription } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/toast'
 import { apiKeysClient, type ApiKeyShape } from '@/lib/api-keys-client'
+import { apiProjectsClient } from '@/lib/api-projects-client'
 import { API_BASE_URL } from '@/lib/oauth-config'
 
 const API_V2_BASE_URL = API_BASE_URL.replace(/\/api\/v1$/, '/api/v2')
@@ -208,6 +209,10 @@ export default function ExplorerPage() {
     }
 
     const t0 = performance.now()
+    let logStatus = 0
+    let logLatency = 0
+    let logSize = 0
+    let logError: string | null = null
     try {
       const res = await fetch(fullUrl, {
         method,
@@ -228,6 +233,9 @@ export default function ExplorerPage() {
         body: pretty || text,
         isJson,
       })
+      logStatus = res.status
+      logLatency = latencyMs
+      logSize = new TextEncoder().encode(text).byteLength
     } catch (err: any) {
       const latencyMs = Math.round(performance.now() - t0)
       setResponse({
@@ -238,8 +246,21 @@ export default function ExplorerPage() {
         body: err?.message ?? String(err),
         isJson: false,
       })
+      logStatus = 0
+      logLatency = latencyMs
+      logError = err?.message ?? String(err)
     } finally {
       setSending(false)
+      void apiProjectsClient.logExplorerCall(params.id, {
+        method,
+        path: path.startsWith('/') ? path : `/${path}`,
+        query: query.trim() || null,
+        status: logStatus,
+        latency_ms: logLatency,
+        response_size_bytes: logSize,
+        api_key_id: selectedKeyId || null,
+        error: logError,
+      })
     }
   }
 
