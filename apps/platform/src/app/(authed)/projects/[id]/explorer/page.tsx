@@ -1,10 +1,12 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import {
   Check,
+  ChevronDown,
+  ChevronRight,
   Copy,
   Eye,
   EyeOff,
@@ -90,6 +92,116 @@ function fmtBody(text: string): { pretty: string; isJson: boolean } {
   }
 }
 
+function highlightJsonNodes(json: string): ReactNode {
+  const pattern =
+    /("(?:\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"\s*:?)|\b(true|false|null)\b|(-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g
+  const nodes: ReactNode[] = []
+  let last = 0
+  let i = 0
+  for (const match of json.matchAll(pattern)) {
+    const idx = match.index ?? 0
+    if (idx > last) nodes.push(json.slice(last, idx))
+    const token = match[0]
+    let cls = 'text-foreground'
+    if (match[1]) {
+      const isKey = /:\s*$/.test(token)
+      cls = isKey ? 'text-accent' : 'text-emerald-600 dark:text-emerald-300'
+    } else if (match[2]) {
+      cls = match[2] === 'null' ? 'text-muted-foreground' : 'text-violet-500'
+    } else if (match[3]) {
+      cls = 'text-amber-600 dark:text-amber-300'
+    }
+    nodes.push(
+      <span key={i} className={cls}>
+        {token}
+      </span>
+    )
+    last = idx + token.length
+    i++
+  }
+  if (last < json.length) nodes.push(json.slice(last))
+  return nodes
+}
+
+function humanizeValue(v: unknown, depth = 0): string {
+  if (v === null) return '∅'
+  if (typeof v === 'string') return v
+  if (typeof v === 'number') return String(v)
+  if (typeof v === 'boolean') return v ? 'oui' : 'non'
+  if (Array.isArray(v)) {
+    if (v.length === 0) return '(liste vide)'
+    if (depth > 1) return `(${v.length} éléments)`
+    return `${v.length} élément${v.length > 1 ? 's' : ''}`
+  }
+  if (typeof v === 'object') {
+    const keys = Object.keys(v as object)
+    if (depth > 1) return `(${keys.length} champs)`
+    return `${keys.length} champ${keys.length > 1 ? 's' : ''}`
+  }
+  return String(v)
+}
+
+interface ReadableEntry {
+  path: string
+  label: string
+  value: string
+}
+
+function humanizeJson(body: string): ReadableEntry[] {
+  try {
+    const parsed = JSON.parse(body)
+    return flatten(parsed, '')
+  } catch {
+    return []
+  }
+}
+
+function flatten(node: unknown, prefix: string): ReadableEntry[] {
+  if (node === null || typeof node !== 'object') {
+    return [
+      {
+        path: prefix || '$',
+        label: prettifyKey(prefix || 'valeur'),
+        value: humanizeValue(node),
+      },
+    ]
+  }
+  if (Array.isArray(node)) {
+    if (node.length === 0) {
+      return [{ path: prefix, label: prettifyKey(prefix), value: '(liste vide)' }]
+    }
+    return node.flatMap((item, i) =>
+      flatten(item, prefix ? `${prefix}[${i}]` : `[${i}]`)
+    )
+  }
+  const out: ReadableEntry[] = []
+  for (const [key, value] of Object.entries(node as Record<string, unknown>)) {
+    const childPath = prefix ? `${prefix}.${key}` : key
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      out.push(...flatten(value, childPath))
+    } else if (Array.isArray(value)) {
+      out.push({ path: childPath, label: prettifyKey(key), value: humanizeValue(value, 1) })
+    } else {
+      out.push({ path: childPath, label: prettifyKey(key), value: humanizeValue(value) })
+    }
+  }
+  return out
+}
+
+function prettifyKey(k: string): string {
+  return (
+    k
+      .replace(/\[\d+\]/g, '')
+      .split('.')
+      .pop()!
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, (c) => c.toUpperCase())
+      .trim() || k
+  )
+}
+
+type ResponseTab = 'pretty' | 'raw' | 'headers' | 'readable'
+
 export default function ExplorerPage() {
   const params = useParams<{ id: string }>()
   const { toast } = useToast()
@@ -107,7 +219,9 @@ export default function ExplorerPage() {
 
   const [sending, setSending] = useState(false)
   const [response, setResponse] = useState<ResponseShape | null>(null)
+  const [responseTab, setResponseTab] = useState<ResponseTab>('pretty')
   const [copied, setCopied] = useState<string | null>(null)
+  const [optionsOpen, setOptionsOpen] = useState(false)
 
   useEffect(() => {
     apiKeysClient.list().then((res) => {
@@ -234,6 +348,7 @@ export default function ExplorerPage() {
         body: pretty || text,
         isJson,
       })
+      setResponseTab(isJson ? 'pretty' : 'raw')
       logStatus = res.status
       logLatency = latencyMs
       logSize = new TextEncoder().encode(text).byteLength
@@ -247,6 +362,7 @@ export default function ExplorerPage() {
         body: err?.message ?? String(err),
         isJson: false,
       })
+      setResponseTab('raw')
       logStatus = 0
       logLatency = latencyMs
       logError = err?.message ?? String(err)
@@ -269,7 +385,7 @@ export default function ExplorerPage() {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-6 px-4 lg:px-6 py-6 max-w-6xl mx-auto w-full"
+      className="space-y-6 px-4 lg:px-6 py-6 max-w-7xl mx-auto w-full"
     >
       <div>
         <div className="flex items-center gap-2">
@@ -281,46 +397,45 @@ export default function ExplorerPage() {
         </p>
       </div>
 
+      <div className="grid gap-6 lg:grid-cols-2">
       <Card className="border-border/50">
         <CardContent className="p-5 space-y-4">
           <Field>
             <FieldLabel>Clé d&apos;authentification</FieldLabel>
-            <div className="grid gap-2 sm:grid-cols-[1fr,2fr]">
-              <FormSelect
-                value={selectedKeyId}
-                onChange={setSelectedKeyId}
-                placeholder="Aucune (saisie libre)"
-                options={[
-                  { value: '', label: 'Aucune (saisie libre)' },
-                  ...(keys?.map((k) => ({
-                    value: k.id,
-                    label: `${k.name} · ${k.masked_token}`,
-                  })) ?? []),
-                ]}
+            <FormSelect
+              value={selectedKeyId}
+              onChange={setSelectedKeyId}
+              placeholder="Aucune (saisie libre)"
+              options={[
+                { value: '', label: 'Aucune (saisie libre)' },
+                ...(keys?.map((k) => ({
+                  value: k.id,
+                  label: `${k.name} · ${k.masked_token}`,
+                })) ?? []),
+              ]}
+            />
+            <div className="relative mt-2">
+              <Input
+                type={showToken ? 'text' : 'password'}
+                value={tokenPlaintext}
+                onChange={(e) => setTokenPlaintext(e.target.value)}
+                placeholder="fk_live_…"
+                autoComplete="off"
+                spellCheck={false}
+                className="pr-10 font-mono"
               />
-              <div className="relative">
-                <Input
-                  type={showToken ? 'text' : 'password'}
-                  value={tokenPlaintext}
-                  onChange={(e) => setTokenPlaintext(e.target.value)}
-                  placeholder="fk_live_…"
-                  autoComplete="off"
-                  spellCheck={false}
-                  className="pr-10 font-mono"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowToken((v) => !v)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  aria-label="Toggle visibility"
-                >
-                  {showToken ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => setShowToken((v) => !v)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                aria-label="Toggle visibility"
+              >
+                {showToken ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
             </div>
             <FieldDescription>
-              Pour des raisons de sécurité, le serveur ne stocke pas le plaintext. Colle la clé
-              que tu as récupérée à la création (ou rote la clé pour en regénérer une).
+              Le serveur ne stocke pas la clé en clair. Colle celle que tu as récupérée à la
+              création (ou réinitialise la clé).
             </FieldDescription>
           </Field>
 
@@ -337,7 +452,7 @@ export default function ExplorerPage() {
             ))}
           </div>
 
-          <div className="grid gap-2 sm:grid-cols-[120px,1fr,auto]">
+          <div className="grid gap-2 grid-cols-[110px_1fr_auto] items-center">
             <FormSelect
               value={method}
               onChange={(v) => setMethod(v as HttpMethod)}
@@ -365,16 +480,104 @@ export default function ExplorerPage() {
             </Button>
           </div>
 
-          <Field>
-            <FieldLabel htmlFor="query-string">Paramètres de requête</FieldLabel>
-            <Input
-              id="query-string"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="?limit=10&status=paid"
-              className="font-mono text-xs"
-            />
-          </Field>
+          <button
+            type="button"
+            onClick={() => setOptionsOpen((v) => !v)}
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-accent hover:underline"
+          >
+            {optionsOpen ? (
+              <ChevronDown className="h-3.5 w-3.5" />
+            ) : (
+              <ChevronRight className="h-3.5 w-3.5" />
+            )}
+            {optionsOpen ? 'Masquer' : 'Afficher plus d’options'}
+          </button>
+
+          {optionsOpen && (
+            <div className="space-y-4 rounded-lg border border-border/40 bg-surface/40 p-4">
+              <Field>
+                <FieldLabel htmlFor="query-string">Paramètres de requête</FieldLabel>
+                <Input
+                  id="query-string"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="?limit=10&status=paid"
+                  className="font-mono text-xs"
+                />
+              </Field>
+
+              <div>
+                <div className="mb-2 flex items-center justify-between px-1">
+                  <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    En-têtes additionnels
+                  </p>
+                  <button
+                    type="button"
+                    onClick={addHeader}
+                    className="inline-flex items-center gap-1 text-xs text-accent hover:underline"
+                  >
+                    <Plus className="h-3 w-3" />
+                    Ajouter
+                  </button>
+                </div>
+                <div className="space-y-1.5">
+                  {headers.map((row) => (
+                    <div key={row.id} className="flex items-center gap-2">
+                      <Input
+                        value={row.key}
+                        onChange={(e) => updateHeader(row.id, 'key', e.target.value)}
+                        placeholder="X-Custom-Header"
+                        className="flex-1 font-mono text-xs"
+                      />
+                      <Input
+                        value={row.value}
+                        onChange={(e) => updateHeader(row.id, 'value', e.target.value)}
+                        placeholder="valeur"
+                        className="flex-[2] font-mono text-xs"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeHeader(row.id)}
+                        className="rounded-md p-1 text-muted-foreground hover:bg-surface-hover hover:text-foreground"
+                        aria-label="Supprimer"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {hasBody && (
+                <div>
+                  <div className="mb-2 flex items-center justify-between px-1">
+                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                      Body (JSON)
+                    </p>
+                    <button
+                      type="button"
+                      onClick={tryFormatBody}
+                      className="text-xs text-accent hover:underline"
+                    >
+                      Formater
+                    </button>
+                  </div>
+                  <textarea
+                    value={body}
+                    onChange={(e) => {
+                      setBody(e.target.value)
+                      setBodyError(null)
+                    }}
+                    rows={8}
+                    spellCheck={false}
+                    placeholder={'{\n  "key": "value"\n}'}
+                    className="w-full rounded-lg border border-border/50 bg-field px-3 py-2 font-mono text-xs text-foreground focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
+                  />
+                  {bodyError && <p className="mt-1 text-xs text-danger">{bodyError}</p>}
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="rounded-lg border border-border/50 bg-surface p-3">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
@@ -383,86 +586,13 @@ export default function ExplorerPage() {
             <p className="mt-1 break-all font-mono text-xs text-foreground">{fullUrl}</p>
           </div>
 
-          <div>
-            <div className="flex items-center justify-between mb-2 px-1">
-              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                En-têtes additionnels
-              </p>
-              <button
-                type="button"
-                onClick={addHeader}
-                className="inline-flex items-center gap-1 text-xs text-accent hover:underline"
-              >
-                <Plus className="h-3 w-3" />
-                Ajouter
-              </button>
-            </div>
-            <div className="space-y-1.5">
-              {headers.map((row) => (
-                <div key={row.id} className="flex items-center gap-2">
-                  <Input
-                    value={row.key}
-                    onChange={(e) => updateHeader(row.id, 'key', e.target.value)}
-                    placeholder="X-Custom-Header"
-                    className="flex-1 font-mono text-xs"
-                  />
-                  <Input
-                    value={row.value}
-                    onChange={(e) => updateHeader(row.id, 'value', e.target.value)}
-                    placeholder="valeur"
-                    className="flex-[2] font-mono text-xs"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeHeader(row.id)}
-                    className="rounded-md p-1 text-muted-foreground hover:bg-surface-hover hover:text-foreground"
-                    aria-label="Supprimer"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {hasBody && (
-            <div>
-              <div className="flex items-center justify-between mb-2 px-1">
-                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Body (JSON)
-                </p>
-                <button
-                  type="button"
-                  onClick={tryFormatBody}
-                  className="text-xs text-accent hover:underline"
-                >
-                  Formater
-                </button>
-              </div>
-              <textarea
-                value={body}
-                onChange={(e) => {
-                  setBody(e.target.value)
-                  setBodyError(null)
-                }}
-                rows={8}
-                spellCheck={false}
-                placeholder={'{\n  "key": "value"\n}'}
-                className="w-full rounded-lg border border-border/50 bg-field px-3 py-2 font-mono text-xs text-foreground focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
-              />
-              {bodyError && (
-                <p className="mt-1 text-xs text-danger">{bodyError}</p>
-              )}
-            </div>
-          )}
-
           <div className="flex flex-wrap items-center gap-2">
             <Button
               variant="outline"
               size="sm"
-              onClick={() => copyText(buildCurl(), 'curl')}
+              onClick={() => copyText(buildCurl(), 'cURL')}
             >
-              {copied === 'curl' ? (
+              {copied === 'cURL' ? (
                 <>
                   <Check className="h-3.5 w-3.5 mr-1.5" />
                   Copié
@@ -470,81 +600,195 @@ export default function ExplorerPage() {
               ) : (
                 <>
                   <Copy className="h-3.5 w-3.5 mr-1.5" />
-                  Copier curl
+                  Copier cURL
                 </>
               )}
             </Button>
             <Button variant="outline" size="sm" onClick={() => copyText(fullUrl, 'URL')}>
-              <Copy className="h-3.5 w-3.5 mr-1.5" />
-              Copier URL
+              {copied === 'URL' ? (
+                <>
+                  <Check className="h-3.5 w-3.5 mr-1.5" />
+                  Copié
+                </>
+              ) : (
+                <>
+                  <Copy className="h-3.5 w-3.5 mr-1.5" />
+                  Copier URL
+                </>
+              )}
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      {response && (
-        <Card className="border-border/50">
-          <CardContent className="p-5 space-y-4">
-            <div className="flex flex-wrap items-center gap-3">
-              <span className={`font-mono text-2xl font-bold ${statusColor(response.status)}`}>
-                {response.status || '—'}
-              </span>
-              <span className="text-sm text-muted-foreground">{response.statusText}</span>
-              <Badge variant="muted" size="sm">
-                {response.latencyMs} ms
-              </Badge>
-              <div className="ml-auto flex items-center gap-1">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => copyText(response.body, 'Réponse')}
-                >
-                  <Copy className="h-3.5 w-3.5 mr-1.5" />
-                  Copier la réponse
-                </Button>
-              </div>
-            </div>
-
-            {response.headers.length > 0 && (
-              <details className="rounded-lg border border-border/50 bg-surface">
-                <summary className="cursor-pointer select-none px-3 py-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  En-têtes de réponse ({response.headers.length})
-                </summary>
-                <div className="border-t border-border/50 px-3 py-2 space-y-0.5 text-xs">
-                  {response.headers.map(([k, v]) => (
-                    <div key={k} className="grid grid-cols-[160px,1fr] gap-2">
-                      <code className="truncate font-mono text-muted-foreground">{k}</code>
-                      <code className="break-all font-mono text-foreground">{v}</code>
-                    </div>
-                  ))}
-                </div>
-              </details>
-            )}
-
-            <div>
-              <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Body
+      <Card className="border-border/50">
+        <CardContent className="p-5">
+          {!response && !sending && (
+            <div className="flex h-full min-h-[300px] flex-col items-center justify-center text-center">
+              <Play className="h-7 w-7 text-muted-foreground/40" />
+              <p className="mt-3 text-sm font-medium text-foreground">Aucune réponse</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Configurez la requête à gauche puis cliquez sur Envoyer.
               </p>
-              <pre className="max-h-[60vh] overflow-auto rounded-lg border border-border/50 bg-surface p-3 text-xs leading-relaxed">
-                <code className={response.isJson ? 'text-foreground' : 'text-muted-foreground'}>
-                  {response.body || '(vide)'}
-                </code>
-              </pre>
             </div>
-          </CardContent>
-        </Card>
+          )}
+          {sending && (
+            <div className="flex h-full min-h-[300px] items-center justify-center">
+              <Spinner />
+            </div>
+          )}
+          {response && (
+            <ResponseView
+              response={response}
+              tab={responseTab}
+              onTab={setResponseTab}
+              onCopy={(text, label) => copyText(text, label)}
+              copied={copied}
+            />
+          )}
+        </CardContent>
+      </Card>
+      </div>
+    </motion.div>
+  )
+}
+
+function ResponseView({
+  response,
+  tab,
+  onTab,
+  onCopy,
+  copied,
+}: {
+  response: ResponseShape
+  tab: ResponseTab
+  onTab: (t: ResponseTab) => void
+  onCopy: (text: string, label: string) => void
+  copied: string | null
+}) {
+  const readable = useMemo(
+    () => (response.isJson ? humanizeJson(response.body) : []),
+    [response.body, response.isJson]
+  )
+  const highlighted = useMemo(
+    () => (response.isJson ? highlightJsonNodes(response.body) : null),
+    [response.body, response.isJson]
+  )
+
+  const tabs: Array<{ id: ResponseTab; label: string; disabled?: boolean }> = [
+    { id: 'pretty', label: 'JSON', disabled: !response.isJson },
+    { id: 'raw', label: 'Brut' },
+    { id: 'headers', label: `En-têtes (${response.headers.length})` },
+    {
+      id: 'readable',
+      label: 'Lisible',
+      disabled: !response.isJson || readable.length === 0,
+    },
+  ]
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-3">
+        <span className={`font-mono text-2xl font-bold ${statusColor(response.status)}`}>
+          {response.status || '—'}
+        </span>
+        <span className="text-sm text-muted-foreground">{response.statusText}</span>
+        <Badge variant="muted" size="sm">
+          {response.latencyMs} ms
+        </Badge>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onCopy(response.body, 'Réponse')}
+          className="ml-auto"
+        >
+          {copied === 'Réponse' ? (
+            <>
+              <Check className="h-3.5 w-3.5 mr-1.5" />
+              Copié
+            </>
+          ) : (
+            <>
+              <Copy className="h-3.5 w-3.5 mr-1.5" />
+              Copier
+            </>
+          )}
+        </Button>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-1 border-b border-border/40">
+        {tabs.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            disabled={t.disabled}
+            onClick={() => onTab(t.id)}
+            className={`-mb-px border-b-2 px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+              tab === t.id
+                ? 'border-accent text-foreground'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {tab === 'pretty' && response.isJson && (
+        <pre className="max-h-[60vh] overflow-auto rounded-lg border border-border/50 bg-surface p-3 text-xs leading-relaxed">
+          <code className="text-foreground">{highlighted}</code>
+        </pre>
       )}
 
-      {!response && !sending && (
-        <Card className="border-dashed border-border/50">
-          <CardContent className="p-6 text-center">
-            <Play className="h-6 w-6 text-muted-foreground/40 mx-auto" />
-            <p className="mt-2 text-sm text-muted-foreground">
-              Configurez la requête puis cliquez sur Envoyer.
-            </p>
-          </CardContent>
-        </Card>
+      {tab === 'raw' && (
+        <pre className="max-h-[60vh] overflow-auto rounded-lg border border-border/50 bg-surface p-3 text-xs leading-relaxed">
+          <code className="text-foreground">{response.body || '(vide)'}</code>
+        </pre>
       )}
-    </motion.div>
+
+      {tab === 'headers' && (
+        <div className="max-h-[60vh] overflow-auto rounded-lg border border-border/50 bg-surface text-xs">
+          {response.headers.length === 0 ? (
+            <p className="px-3 py-4 text-muted-foreground">Aucun en-tête.</p>
+          ) : (
+            <div className="divide-y divide-border/40">
+              {response.headers.map(([k, v]) => (
+                <div key={k} className="grid grid-cols-[180px_1fr] gap-2 px-3 py-1.5">
+                  <code className="truncate font-mono text-muted-foreground">{k}</code>
+                  <code className="break-all font-mono text-foreground">{v}</code>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {tab === 'readable' && (
+        <div className="max-h-[60vh] overflow-auto rounded-lg border border-border/50 bg-surface">
+          {readable.length === 0 ? (
+            <p className="px-3 py-4 text-xs text-muted-foreground">
+              Activez l’onglet sur une réponse JSON valide.
+            </p>
+          ) : (
+            <div className="divide-y divide-border/40 text-xs">
+              {readable.map((row, i) => (
+                <div
+                  key={`${row.path}-${i}`}
+                  className="grid grid-cols-[1fr_auto] items-baseline gap-3 px-4 py-2"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate font-medium text-foreground">{row.label}</p>
+                    <code className="block truncate font-mono text-[10px] text-muted-foreground">
+                      {row.path}
+                    </code>
+                  </div>
+                  <div className="text-right text-foreground">{row.value}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   )
 }
