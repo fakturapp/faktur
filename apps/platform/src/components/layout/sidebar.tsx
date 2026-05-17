@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   Activity,
   ArrowLeft,
@@ -58,13 +58,49 @@ export function Sidebar() {
   const pathname = usePathname()
   const ctx = matchProjectKey(pathname)
 
-  if (ctx?.keyId) {
-    return <KeySidebar projectId={ctx.projectId} keyId={ctx.keyId} pathname={pathname} />
-  }
-  if (ctx?.projectId) {
-    return <ProjectSidebar projectId={ctx.projectId} pathname={pathname} />
-  }
-  return <DefaultSidebar pathname={pathname} />
+  const mode: 'default' | 'project' | 'key' = ctx?.keyId
+    ? 'key'
+    : ctx?.projectId
+      ? 'project'
+      : 'default'
+  const modeKey =
+    mode === 'key'
+      ? `key-${ctx?.projectId}-${ctx?.keyId}`
+      : mode === 'project'
+        ? `project-${ctx?.projectId}`
+        : 'default'
+
+  return (
+    <Shell>
+      <Brand />
+      <div className="mx-3 h-px bg-border" />
+      <div className="relative flex-1 overflow-hidden">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={modeKey}
+            initial={{ opacity: 0, x: mode === 'default' ? -16 : 16 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: mode === 'default' ? 16 : -16 }}
+            transition={{ duration: 0.18, ease: 'easeOut' }}
+            className="absolute inset-0 flex flex-col overflow-hidden"
+          >
+            {mode === 'key' && ctx ? (
+              <KeySidebarBody
+                projectId={ctx.projectId}
+                keyId={ctx.keyId!}
+                pathname={pathname}
+              />
+            ) : mode === 'project' && ctx ? (
+              <ProjectSidebarBody projectId={ctx.projectId} pathname={pathname} />
+            ) : (
+              <DefaultSidebarBody pathname={pathname} />
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+      <UserFooter />
+    </Shell>
+  )
 }
 
 function Shell({ children }: { children: React.ReactNode }) {
@@ -147,12 +183,9 @@ function BackLink({ href, label }: { href: string; label: string }) {
   )
 }
 
-function DefaultSidebar({ pathname }: { pathname: string }) {
+function DefaultSidebarBody({ pathname }: { pathname: string }) {
   return (
-    <Shell>
-      <Brand />
-      <div className="mx-3 h-px bg-border" />
-      <nav className="flex-1 space-y-1.5 overflow-y-auto px-2.5 py-4">
+    <nav className="flex-1 space-y-1.5 overflow-y-auto px-2.5 py-4">
         <p className="px-2 pb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
           Plateforme
         </p>
@@ -186,12 +219,10 @@ function DefaultSidebar({ pathname }: { pathname: string }) {
         </div>
         <ResourcesSection />
       </nav>
-      <UserFooter />
-    </Shell>
   )
 }
 
-function ProjectSidebar({
+function ProjectSidebarBody({
   projectId,
   pathname,
 }: {
@@ -215,42 +246,37 @@ function ProjectSidebar({
   ]
 
   return (
-    <Shell>
-      <Brand />
-      <div className="mx-3 h-px bg-border" />
-      <nav className="flex-1 space-y-1 overflow-y-auto px-2.5 py-4">
-        <BackLink href="/projects" label="Tous les projets" />
-        {project && (
-          <div className="mt-3 mb-2 px-2.5">
-            <div className="flex items-center gap-2">
-              <Folder className="h-3.5 w-3.5 text-accent" />
-              <p className="truncate text-xs font-semibold uppercase tracking-wider text-foreground">
-                {project.name}
-              </p>
-            </div>
+    <nav className="flex-1 space-y-1 overflow-y-auto px-2.5 py-4">
+      <BackLink href="/projects" label="Tous les projets" />
+      {project && (
+        <div className="mt-3 mb-2 px-2.5">
+          <div className="flex items-center gap-2">
+            <Folder className="h-3.5 w-3.5 text-accent" />
+            <p className="truncate text-xs font-semibold uppercase tracking-wider text-foreground">
+              {project.name}
+            </p>
           </div>
-        )}
-        <div className="space-y-1">
-          {items.map((item) => (
-            <NavLink
-              key={item.href}
-              href={item.href}
-              icon={item.icon}
-              label={item.label}
-              groupId={`project-${projectId}`}
-              active={
-                item.exact ? pathname === item.href : pathname.startsWith(item.href)
-              }
-            />
-          ))}
         </div>
-      </nav>
-      <UserFooter />
-    </Shell>
+      )}
+      <div className="space-y-1">
+        {items.map((item) => (
+          <NavLink
+            key={item.href}
+            href={item.href}
+            icon={item.icon}
+            label={item.label}
+            groupId={`project-${projectId}`}
+            active={
+              item.exact ? pathname === item.href : pathname.startsWith(item.href)
+            }
+          />
+        ))}
+      </div>
+    </nav>
   )
 }
 
-function KeySidebar({
+function KeySidebarBody({
   projectId,
   keyId,
   pathname,
@@ -277,10 +303,7 @@ function KeySidebar({
   ]
 
   return (
-    <Shell>
-      <Brand />
-      <div className="mx-3 h-px bg-border" />
-      <nav className="flex-1 space-y-1 overflow-y-auto px-2.5 py-4">
+    <nav className="flex-1 space-y-1 overflow-y-auto px-2.5 py-4">
         <BackLink href={`/projects/${projectId}`} label="Retour au projet" />
         {key && (
           <div className="mt-3 mb-2 px-2.5">
@@ -304,21 +327,19 @@ function KeySidebar({
             </p>
           </div>
         )}
-        <div className="space-y-1">
-          {items.map((item) => (
-            <NavLink
-              key={item.href}
-              href={item.href}
-              icon={item.icon}
-              label={item.label}
-              groupId={`key-${keyId}`}
-              active={item.exact ? pathname === item.href : pathname.startsWith(item.href)}
-            />
-          ))}
-        </div>
-      </nav>
-      <UserFooter />
-    </Shell>
+      <div className="space-y-1">
+        {items.map((item) => (
+          <NavLink
+            key={item.href}
+            href={item.href}
+            icon={item.icon}
+            label={item.label}
+            groupId={`key-${keyId}`}
+            active={item.exact ? pathname === item.href : pathname.startsWith(item.href)}
+          />
+        ))}
+      </div>
+    </nav>
   )
 }
 
