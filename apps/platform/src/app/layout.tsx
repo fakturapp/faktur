@@ -1,13 +1,14 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { AuthProvider } from '@/lib/auth'
+import { PLATFORM_URL } from '@/lib/oauth-config'
 import { ToastProvider } from '@/components/ui/toast'
 
 export const metadata: Metadata = {
   title: 'Faktur Developer Platform',
   description:
-    'Gérez vos clés API et webhooks Faktur depuis un seul endroit. Connexion OAuth, sélection de team, accès à votre compte sur api.fakturapp.cc.',
-  metadataBase: new URL('https://platform.fakturapp.cc'),
+    'Gérez vos clés API et webhooks Faktur depuis un seul endroit. Connexion OAuth, sélection de team, accès à votre compte sur l’API Faktur.',
+  metadataBase: new URL(PLATFORM_URL),
   openGraph: {
     title: 'Faktur Developer Platform',
     description: 'Plateforme développeur Faktur.',

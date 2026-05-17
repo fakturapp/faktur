@@ -3,17 +3,8 @@
 import Link from 'next/link'
 import { LogOut, Book, ExternalLink } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
+import { DASHBOARD_URL, DOCS_URL } from '@/lib/oauth-config'
 import { TeamSwitcher } from './team-switcher'
-
-const DASHBOARD_URL =
-  typeof process !== 'undefined' && process.env.NEXT_PUBLIC_DASHBOARD_URL
-    ? process.env.NEXT_PUBLIC_DASHBOARD_URL
-    : 'https://fakturapp.cc'
-
-const DOCS_URL =
-  typeof process !== 'undefined' && process.env.NEXT_PUBLIC_DOCS_URL
-    ? process.env.NEXT_PUBLIC_DOCS_URL
-    : 'https://developers.fakturapp.cc'
 
 export function PlatformHeader() {
   const { user, signOut } = useAuth()
