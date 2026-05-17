@@ -4,16 +4,17 @@ import './globals.css'
 import { DocsHeader } from '@/components/docs-header'
 import { DocsFooter } from '@/components/docs-footer'
 import { ThemeScript } from './theme-script'
+import { DOCS_URL } from '@/lib/config'
 
 export const metadata: Metadata = {
   title: 'Faktur Developers — API V2',
   description:
     'Automate Faktur — invoices, quotes, clients, and webhooks — with a modern REST API.',
-  metadataBase: new URL('https://developers.fakturapp.cc'),
+  metadataBase: new URL(DOCS_URL),
   openGraph: {
     title: 'Faktur Developers',
     description: 'Build automations on top of Faktur.',
-    url: 'https://developers.fakturapp.cc',
+    url: DOCS_URL,
     siteName: 'Faktur Developers',
     type: 'website',
   },

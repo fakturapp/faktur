@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { DASHBOARD_URL } from '@/lib/config'
 
 export function DocsFooter() {
   return (
@@ -33,7 +34,7 @@ export function DocsFooter() {
             <FooterLink href="/llms.txt">llms.txt</FooterLink>
           </FooterColumn>
           <FooterColumn title="Faktur">
-            <FooterLink href="https://fakturapp.cc">App principale</FooterLink>
+            <FooterLink href={DASHBOARD_URL}>App principale</FooterLink>
             <FooterLink href="https://github.com/fakturapp">GitHub</FooterLink>
           </FooterColumn>
         </div>
