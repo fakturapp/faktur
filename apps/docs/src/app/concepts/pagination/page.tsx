@@ -1,3 +1,5 @@
+import { API_V2_BASE_URL } from '@/lib/config'
+
 export const metadata = { title: 'Pagination — Faktur Developers' }
 
 export default function PaginationPage() {
@@ -45,7 +47,7 @@ export default function PaginationPage() {
         <pre className="mt-3 overflow-x-auto rounded-xl border border-(--border) bg-(--code-bg) p-4 text-xs leading-relaxed">
           <code>{`let cursor = undefined
 do {
-  const url = new URL('https://api.fakturapp.cc/api/v2/invoices')
+  const url = new URL('${API_V2_BASE_URL}/invoices')
   url.searchParams.set('limit', '100')
   if (cursor) url.searchParams.set('cursor', cursor)
 

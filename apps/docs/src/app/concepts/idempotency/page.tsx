@@ -1,3 +1,5 @@
+import { API_V2_BASE_URL } from '@/lib/config'
+
 export const metadata = { title: 'Idempotency — Faktur Developers' }
 
 export default function IdempotencyPage() {
@@ -41,7 +43,7 @@ export default function IdempotencyPage() {
       <section className="mt-10">
         <h2 className="text-2xl font-semibold">Example</h2>
         <pre className="mt-3 overflow-x-auto rounded-xl border border-(--border) bg-(--code-bg) p-4 text-xs leading-relaxed">
-          <code>{`curl https://api.fakturapp.cc/api/v2/clients \\
+          <code>{`curl ${API_V2_BASE_URL}/clients \\
   -X POST \\
   -H "Authorization: Bearer fk_live_..." \\
   -H "Faktur-Idempotency-Key: 6f12b8c9-f3e1-4a91-bdaa-7f8c20a1ff34" \\

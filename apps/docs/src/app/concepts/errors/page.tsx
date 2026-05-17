@@ -1,3 +1,5 @@
+import { DOCS_URL } from '@/lib/config'
+
 export const metadata = { title: 'Errors — Faktur Developers' }
 
 const errors = [
@@ -43,7 +45,7 @@ export default function ErrorsPage() {
     "code": "validation_failed",
     "message": "Some fields are invalid",
     "request_id": "req_8KqL2x...",
-    "doc_url": "https://developers.fakturapp.cc/concepts/errors#validation_failed",
+    "doc_url": "${DOCS_URL}/concepts/errors#validation_failed",
     "details": [
       { "field": "lines[0].unit_price_cents", "code": "required" },
       { "field": "due_date", "code": "invalid_format" }
