@@ -10,6 +10,7 @@ import RecoveryKeyGenerated from '#events/recovery_key_generated'
 import recoveryKeyService from '#services/crypto/recovery_key_service'
 import sessionKekResolver from '#services/crypto/session_kek_resolver'
 import teamEncryptionService from '#services/crypto/team_encryption_service'
+import defaultProjectService from '#services/api/default_project_service'
 
 export default class CreateTeam {
   async handle({ auth, request, response }: HttpContext) {
@@ -82,6 +83,8 @@ export default class CreateTeam {
 
     user.currentTeamId = team.id
     await user.save()
+
+    await defaultProjectService.ensureForTeam(team.id, user.id)
 
     if (encryptionMode === 'private' && kek) {
       keyStore.storeDEK(user.id, team.id, teamDek)

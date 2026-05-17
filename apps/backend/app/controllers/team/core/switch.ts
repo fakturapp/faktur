@@ -4,6 +4,7 @@ import TeamMember from '#models/team/team_member'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import keyStore from '#services/crypto/key_store'
 import sessionKekResolver from '#services/crypto/session_kek_resolver'
+import defaultProjectService from '#services/api/default_project_service'
 
 const switchValidator = vine.compile(
   vine.object({
@@ -36,6 +37,8 @@ export default class Switch {
 
     user.currentTeamId = payload.teamId
     await user.save()
+
+    await defaultProjectService.ensureForTeam(payload.teamId, user.id)
 
     return response.ok({ message: 'Team switched', currentTeamId: payload.teamId })
   }
