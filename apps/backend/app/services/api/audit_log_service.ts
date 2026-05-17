@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import ApiAuditLog, { type AuditAction, type AuditTargetType } from '#models/api/api_audit_log'
 import logger from '@adonisjs/core/services/logger'
+import { realClientIp } from '#services/http/real_client_ip'
 
 interface EmitOptions {
   ctx: HttpContext
@@ -28,7 +29,7 @@ class AuditLogService {
         targetId: opts.targetId ?? null,
         targetLabel: opts.targetLabel ?? null,
         metadata: opts.metadata ?? {},
-        ip: opts.ctx.request.ip(),
+        ip: realClientIp(opts.ctx),
         userAgent: opts.ctx.request.header('user-agent') ?? null,
       })
     } catch (err) {

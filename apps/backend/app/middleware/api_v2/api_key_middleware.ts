@@ -8,13 +8,14 @@ import TeamMember from '#models/team/team_member'
 import teamEncryptionService from '#services/crypto/team_encryption_service'
 import keyStore from '#services/crypto/key_store'
 import featureFlag from '#services/api/api_v2_feature_flag'
+import { realClientIp } from '#services/http/real_client_ip'
 
 export default class ApiKeyMiddleware {
   async handle(ctx: HttpContext, next: NextFn) {
     const startedAt = Date.now()
     ctx.apiStartedAt = startedAt
 
-    const clientIp = ctx.request.ip()
+    const clientIp = realClientIp(ctx)
     ctx.apiClientIp = clientIp
 
     const token = apiKeyService.extractFromHeader(ctx.request.header('authorization'))
