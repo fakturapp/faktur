@@ -9,6 +9,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog'
+import { FormSelect } from '@/components/ui/dropdown'
 import { Button } from '@/components/ui/button'
 import { Field, FieldLabel, FieldDescription } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -215,16 +216,25 @@ export function CreateApiKeyDialog({ open, onClose, onCreated, projectId }: Prop
           >
             <Field>
               <FieldLabel htmlFor="preset-select">Préréglage</FieldLabel>
-              <select
+              <FormSelect
                 id="preset-select"
                 value={preset}
-                onChange={(e) => setPreset(e.target.value as Preset)}
-                className="w-full rounded-lg border border-border/50 bg-field px-3 py-2 text-sm text-foreground focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
-              >
-                <option value="read_only">Lecture seule · accès en lecture sur toutes les ressources</option>
-                <option value="full_access">Accès complet · lecture + écriture + suppression</option>
-                <option value="custom">Personnalisé · sélectionner les scopes un par un</option>
-              </select>
+                onChange={(v) => setPreset(v as Preset)}
+                options={[
+                  {
+                    value: 'read_only',
+                    label: 'Lecture seule · accès en lecture sur toutes les ressources',
+                  },
+                  {
+                    value: 'full_access',
+                    label: 'Accès complet · lecture + écriture + suppression',
+                  },
+                  {
+                    value: 'custom',
+                    label: 'Personnalisé · sélectionner les scopes un par un',
+                  },
+                ]}
+              />
               <FieldDescription>
                 {preset === 'read_only' && 'Idéal pour les intégrations qui consultent vos données sans les modifier (BI, exports).'}
                 {preset === 'full_access' && 'Donnez ces clés uniquement à des intégrations de confiance — elles peuvent tout faire.'}
