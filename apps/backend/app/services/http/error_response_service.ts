@@ -42,7 +42,11 @@ function extractMessage(value: unknown): string | undefined {
   if (typeof value.message === 'string' && value.message.trim()) return value.message
   if (Array.isArray(value.errors)) {
     const firstError = value.errors[0]
-    if (isPlainObject(firstError) && typeof firstError.message === 'string' && firstError.message.trim()) {
+    if (
+      isPlainObject(firstError) &&
+      typeof firstError.message === 'string' &&
+      firstError.message.trim()
+    ) {
       return firstError.message
     }
   }
@@ -81,11 +85,11 @@ function extractExplicitErrorCode(value: unknown): ErrorCode | null {
 
   if (isPlainObject(value.error)) {
     const nestedCode =
-      (isPlainObject(value.error.details) && typeof value.error.details.error_code === 'string'
+      isPlainObject(value.error.details) && typeof value.error.details.error_code === 'string'
         ? value.error.details.error_code
         : typeof value.error.error_code === 'string'
           ? value.error.error_code
-          : null)
+          : null
 
     if (nestedCode && isErrorCode(nestedCode)) return nestedCode
   }
@@ -116,7 +120,9 @@ function extractDetails(value: unknown): PlainObject | null {
 
 function normalizeStructuredBody(ctx: HttpContext, value: PlainObject): StructuredErrorResponse {
   const errorBody = isPlainObject(value.error) ? value.error : {}
-  const explicitCode = extractExplicitErrorCode(value) ?? inferErrorCode(typeof value.status === 'number' ? value.status : 500)
+  const explicitCode =
+    extractExplicitErrorCode(value) ??
+    inferErrorCode(typeof value.status === 'number' ? value.status : 500)
   const errorDetails = isPlainObject(errorBody.details) ? errorBody.details : {}
   const visibility =
     typeof errorDetails.error_visibility === 'string'

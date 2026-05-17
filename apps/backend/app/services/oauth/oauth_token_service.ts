@@ -60,7 +60,11 @@ class OauthTokenService {
     }
   }
 
-  async rotate(current: OauthToken, ip: string | null, userAgent: string | null): Promise<IssuedToken> {
+  async rotate(
+    current: OauthToken,
+    ip: string | null,
+    userAgent: string | null
+  ): Promise<IssuedToken> {
     current.revokedAt = DateTime.now()
     current.revokedReason = 'rotated'
     await current.save()

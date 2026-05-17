@@ -17,10 +17,7 @@ export default class Reset {
       return response.badRequest({ message: 'Invalid template type' })
     }
 
-    await EmailTemplate.query()
-      .where('team_id', teamId)
-      .where('template_type', type)
-      .delete()
+    await EmailTemplate.query().where('team_id', teamId).where('template_type', type).delete()
 
     return response.ok({ message: 'Template réinitialisé' })
   }

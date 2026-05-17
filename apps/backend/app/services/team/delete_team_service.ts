@@ -31,7 +31,10 @@ export async function deleteTeamCascade(teamId: string) {
       .select('id')
     if (creditNoteIds.length > 0) {
       await CreditNoteLine.query({ client: trx })
-        .whereIn('creditNoteId', creditNoteIds.map((cn) => cn.id))
+        .whereIn(
+          'creditNoteId',
+          creditNoteIds.map((cn) => cn.id)
+        )
         .delete()
     }
 
@@ -42,7 +45,10 @@ export async function deleteTeamCascade(teamId: string) {
       .select('id')
     if (recurringIds.length > 0) {
       await RecurringInvoiceLine.query({ client: trx })
-        .whereIn('recurringInvoiceId', recurringIds.map((r) => r.id))
+        .whereIn(
+          'recurringInvoiceId',
+          recurringIds.map((r) => r.id)
+        )
         .delete()
     }
 
@@ -50,27 +56,32 @@ export async function deleteTeamCascade(teamId: string) {
 
     await InvoicePayment.query({ client: trx }).where('teamId', teamId).delete()
 
-    const invoiceIds = await Invoice.query({ client: trx })
-      .where('teamId', teamId)
-      .select('id')
+    const invoiceIds = await Invoice.query({ client: trx }).where('teamId', teamId).select('id')
     if (invoiceIds.length > 0) {
       await PaymentReminder.query({ client: trx })
-        .whereIn('invoiceId', invoiceIds.map((i) => i.id))
+        .whereIn(
+          'invoiceId',
+          invoiceIds.map((i) => i.id)
+        )
         .delete()
     }
 
     if (invoiceIds.length > 0) {
       await InvoiceLine.query({ client: trx })
-        .whereIn('invoiceId', invoiceIds.map((i) => i.id))
+        .whereIn(
+          'invoiceId',
+          invoiceIds.map((i) => i.id)
+        )
         .delete()
     }
 
-    const quoteIds = await Quote.query({ client: trx })
-      .where('teamId', teamId)
-      .select('id')
+    const quoteIds = await Quote.query({ client: trx }).where('teamId', teamId).select('id')
     if (quoteIds.length > 0) {
       await QuoteLine.query({ client: trx })
-        .whereIn('quoteId', quoteIds.map((q) => q.id))
+        .whereIn(
+          'quoteId',
+          quoteIds.map((q) => q.id)
+        )
         .delete()
     }
 

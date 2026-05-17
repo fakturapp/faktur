@@ -34,10 +34,7 @@ async function setActive(ctx: HttpContext, active: boolean, label: string) {
     throw err
   }
 
-  const r = await RecurringInvoice.query()
-    .where('id', internalId)
-    .where('team_id', team.id)
-    .first()
+  const r = await RecurringInvoice.query().where('id', internalId).where('team_id', team.id).first()
   if (!r) {
     return apiResponse.notFound(
       ctx.response,

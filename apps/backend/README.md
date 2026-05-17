@@ -23,17 +23,17 @@ Chaque contrôleur suit le pattern **single action** (une méthode `handle` par 
 
 ## Stack
 
-| | Technologie |
-|---|---|
-| **Framework** | [AdonisJS 7](https://adonisjs.com) · TypeScript 5.9 |
-| **ORM** | [Lucid](https://lucid.adonisjs.com) (PostgreSQL) |
-| **Validation** | [VineJS](https://vinejs.dev) |
-| **Auth** | Bearer tokens · 2FA TOTP ([speakeasy](https://github.com/speakeasyjs/speakeasy)) |
-| **Chiffrement** | AES-256-GCM · Argon2id · HKDF |
-| **PDF** | Puppeteer (Chrome headless) · Factur-X (XML) |
-| **Email** | [Resend](https://resend.com) · Gmail OAuth |
-| **Sécurité** | Helmet · Shield (CSRF) · Rate limiting |
-| **Tests** | [Japa](https://japa.dev) |
+|                 | Technologie                                                                      |
+| --------------- | -------------------------------------------------------------------------------- |
+| **Framework**   | [AdonisJS 7](https://adonisjs.com) · TypeScript 5.9                              |
+| **ORM**         | [Lucid](https://lucid.adonisjs.com) (PostgreSQL)                                 |
+| **Validation**  | [VineJS](https://vinejs.dev)                                                     |
+| **Auth**        | Bearer tokens · 2FA TOTP ([speakeasy](https://github.com/speakeasyjs/speakeasy)) |
+| **Chiffrement** | AES-256-GCM · Argon2id · HKDF                                                    |
+| **PDF**         | Puppeteer (Chrome headless) · Factur-X (XML)                                     |
+| **Email**       | [Resend](https://resend.com) · Gmail OAuth                                       |
+| **Sécurité**    | Helmet · Shield (CSRF) · Rate limiting                                           |
+| **Tests**       | [Japa](https://japa.dev)                                                         |
 
 ---
 
@@ -126,26 +126,26 @@ L'architecture cryptographique est inspirée de [Proton Mail](https://proton.me)
 
 ### Fichiers clés
 
-| Fichier | Rôle |
-|---------|------|
-| `services/crypto/zero_access_crypto_service.ts` | Dérivation KEK, chiffrement/déchiffrement DEK |
-| `services/crypto/field_encryption_helper.ts` | Chiffrement par champ (AES-256-GCM) |
-| `services/crypto/key_store.ts` | Stockage de la DEK déchiffrée en mémoire (par session) |
-| `middleware/crypto/vault.ts` | Middleware qui déchiffre la DEK à chaque requête authentifiée |
-| `controllers/auth/security/crypto_recover.ts` | Récupération crypto après changement de mot de passe |
-| `controllers/auth/security/crypto_wipe.ts` | Suppression complète des données (avec confirmation mot de passe) |
+| Fichier                                         | Rôle                                                              |
+| ----------------------------------------------- | ----------------------------------------------------------------- |
+| `services/crypto/zero_access_crypto_service.ts` | Dérivation KEK, chiffrement/déchiffrement DEK                     |
+| `services/crypto/field_encryption_helper.ts`    | Chiffrement par champ (AES-256-GCM)                               |
+| `services/crypto/key_store.ts`                  | Stockage de la DEK déchiffrée en mémoire (par session)            |
+| `middleware/crypto/vault.ts`                    | Middleware qui déchiffre la DEK à chaque requête authentifiée     |
+| `controllers/auth/security/crypto_recover.ts`   | Récupération crypto après changement de mot de passe              |
+| `controllers/auth/security/crypto_wipe.ts`      | Suppression complète des données (avec confirmation mot de passe) |
 
 ### Scénario de compromission
 
 Même avec un accès complet au serveur, un attaquant obtient :
 
-| Donnée | État |
-|--------|------|
-| Champs sensibles | Chiffrés : `v1:<salt>:<iv>:<ciphertext>` |
-| DEK | Chiffrée avec la KEK (inutilisable sans le mot de passe) |
-| Salt Argon2id | Inutile sans le mot de passe |
-| `APP_KEY` | N'intervient pas dans le chiffrement zero-access |
-| Code source | Ne contient aucun secret cryptographique |
+| Donnée           | État                                                     |
+| ---------------- | -------------------------------------------------------- |
+| Champs sensibles | Chiffrés : `v1:<salt>:<iv>:<ciphertext>`                 |
+| DEK              | Chiffrée avec la KEK (inutilisable sans le mot de passe) |
+| Salt Argon2id    | Inutile sans le mot de passe                             |
+| `APP_KEY`        | N'intervient pas dans le chiffrement zero-access         |
+| Code source      | Ne contient aucun secret cryptographique                 |
 
 ---
 
@@ -153,31 +153,31 @@ Même avec un accès complet au serveur, un attaquant obtient :
 
 ### Authentification
 
-| Méthode | Route | Description |
-|---------|-------|-------------|
-| `POST` | `/auth/sign-up` | Inscription |
-| `POST` | `/auth/verify-email` | Vérification email |
-| `POST` | `/auth/login` | Connexion |
-| `POST` | `/auth/login/2fa` | Vérification 2FA |
-| `POST` | `/auth/password/forgot` | Demande de réinitialisation |
-| `POST` | `/auth/password/reset` | Réinitialisation du mot de passe |
-| `GET` | `/auth/me` | Utilisateur courant |
-| `POST` | `/auth/logout` | Déconnexion |
-| `POST` | `/auth/crypto/recover` | Récupération crypto |
-| `POST` | `/auth/crypto/wipe` | Suppression des données |
+| Méthode | Route                   | Description                      |
+| ------- | ----------------------- | -------------------------------- |
+| `POST`  | `/auth/sign-up`         | Inscription                      |
+| `POST`  | `/auth/verify-email`    | Vérification email               |
+| `POST`  | `/auth/login`           | Connexion                        |
+| `POST`  | `/auth/login/2fa`       | Vérification 2FA                 |
+| `POST`  | `/auth/password/forgot` | Demande de réinitialisation      |
+| `POST`  | `/auth/password/reset`  | Réinitialisation du mot de passe |
+| `GET`   | `/auth/me`              | Utilisateur courant              |
+| `POST`  | `/auth/logout`          | Déconnexion                      |
+| `POST`  | `/auth/crypto/recover`  | Récupération crypto              |
+| `POST`  | `/auth/crypto/wipe`     | Suppression des données          |
 
 ### Ressources
 
-| Domaine | Routes | Description |
-|---------|--------|-------------|
-| Clients | `/clients` | CRUD + recherche SIREN |
-| Devis | `/quotes` | CRUD + export PDF + opérations |
-| Factures | `/invoices` | CRUD + export PDF + conversion + paiement |
-| Équipes | `/teams` | CRUD + invitations + membres |
-| Entreprise | `/company` | Profil entreprise + finances |
-| Paramètres | `/settings` | Configuration documents |
-| Email | `/email` | Comptes + envoi + logs |
-| Dashboard | `/dashboard` | Statistiques + graphiques |
+| Domaine    | Routes       | Description                               |
+| ---------- | ------------ | ----------------------------------------- |
+| Clients    | `/clients`   | CRUD + recherche SIREN                    |
+| Devis      | `/quotes`    | CRUD + export PDF + opérations            |
+| Factures   | `/invoices`  | CRUD + export PDF + conversion + paiement |
+| Équipes    | `/teams`     | CRUD + invitations + membres              |
+| Entreprise | `/company`   | Profil entreprise + finances              |
+| Paramètres | `/settings`  | Configuration documents                   |
+| Email      | `/email`     | Comptes + envoi + logs                    |
+| Dashboard  | `/dashboard` | Statistiques + graphiques                 |
 
 ---
 

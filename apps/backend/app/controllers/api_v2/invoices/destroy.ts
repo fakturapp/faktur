@@ -23,10 +23,7 @@ export default class Destroy {
       throw err
     }
 
-    const invoice = await Invoice.query()
-      .where('id', internalId)
-      .where('team_id', team.id)
-      .first()
+    const invoice = await Invoice.query().where('id', internalId).where('team_id', team.id).first()
     if (!invoice) {
       return apiResponse.notFound(
         ctx.response,

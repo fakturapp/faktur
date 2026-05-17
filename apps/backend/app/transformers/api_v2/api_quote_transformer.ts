@@ -69,7 +69,7 @@ class ApiQuoteTransformer {
       currency: 'EUR',
       client_id: quote.clientId ? publicIdCodec.encode('client', quote.clientId) : null,
       client_name:
-        ((quote as { client?: { displayName?: string } | null }).client?.displayName) ?? null,
+        (quote as { client?: { displayName?: string } | null }).client?.displayName ?? null,
       subtotal_cents: Math.round(Number(quote.subtotal) * 100),
       tax_cents: Math.round(Number(quote.taxAmount) * 100),
       total_cents: Math.round(Number(quote.total) * 100),

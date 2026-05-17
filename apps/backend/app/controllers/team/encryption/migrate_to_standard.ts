@@ -20,8 +20,7 @@ export default class MigrateToStandard {
 
     if (!user.saltKdf) {
       return response.conflict({
-        message:
-          "Votre compte n'a pas de clef utilisateur active. Connectez-vous puis réessayez.",
+        message: "Votre compte n'a pas de clef utilisateur active. Connectez-vous puis réessayez.",
       })
     }
 
@@ -38,7 +37,7 @@ export default class MigrateToStandard {
 
     if (!myMembership || myMembership.role !== 'super_admin') {
       return response.forbidden({
-        message: 'Seul le propriétaire peut migrer le chiffrement de l\'équipe.',
+        message: "Seul le propriétaire peut migrer le chiffrement de l'équipe.",
       })
     }
 

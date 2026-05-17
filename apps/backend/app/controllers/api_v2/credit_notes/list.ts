@@ -1,9 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import CreditNote from '#models/credit_note/credit_note'
-import {
-  decryptModelFieldsArray,
-  ENCRYPTED_FIELDS,
-} from '#services/crypto/field_encryption_helper'
+import { decryptModelFieldsArray, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 import apiResponse from '#services/api/api_response'
 import apiPagination from '#services/api/api_pagination'
 import apiCreditNoteTransformer from '#transformers/api_v2/api_credit_note_transformer'
@@ -33,10 +30,10 @@ export default class List {
     decryptModelFieldsArray(rows, [...ENCRYPTED_FIELDS.creditNote], dek)
 
     const page = apiPagination.buildNext(rows, limit)
-    return apiResponse.list(
-      ctx.response,
-      apiCreditNoteTransformer.transformMany(page.items),
-      { has_more: page.hasMore, next_cursor: page.nextCursor, limit }
-    )
+    return apiResponse.list(ctx.response, apiCreditNoteTransformer.transformMany(page.items), {
+      has_more: page.hasMore,
+      next_cursor: page.nextCursor,
+      limit,
+    })
   }
 }

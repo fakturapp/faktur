@@ -24,8 +24,7 @@ export default class Delete {
     if (paymentLink.pdfStorageKey) {
       try {
         await r2StorageService.delete(paymentLink.pdfStorageKey)
-      } catch {
-      }
+      } catch {}
     }
 
     paymentLink.isActive = false

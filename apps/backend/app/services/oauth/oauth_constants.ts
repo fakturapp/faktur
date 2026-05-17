@@ -1,10 +1,9 @@
-
 export const OAUTH_CODE_TTL_MINUTES = 10
 export const OAUTH_ACCESS_TOKEN_TTL_HOURS = 1
 export const OAUTH_REFRESH_TOKEN_TTL_DAYS = 60
 
 export const OAUTH_SCOPES = {
-  profile: {
+  'profile': {
     id: 'profile',
     label: 'Lire votre profil',
     description: 'Accéder à votre nom, email et photo de profil.',
@@ -40,7 +39,7 @@ export const OAUTH_SCOPES = {
     description: 'Déverrouiller votre coffre-fort pour accéder aux données chiffrées.',
     dangerous: true,
   },
-  offline_access: {
+  'offline_access': {
     id: 'offline_access',
     label: 'Accès hors-ligne',
     description: 'Rester connecté via un refresh token.',

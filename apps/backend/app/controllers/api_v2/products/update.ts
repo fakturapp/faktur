@@ -31,10 +31,7 @@ export default class Update {
       throw err
     }
 
-    const product = await Product.query()
-      .where('id', internalId)
-      .where('team_id', team.id)
-      .first()
+    const product = await Product.query().where('id', internalId).where('team_id', team.id).first()
     if (!product) {
       return apiResponse.notFound(
         ctx.response,

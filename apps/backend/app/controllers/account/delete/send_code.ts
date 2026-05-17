@@ -26,9 +26,7 @@ export default class SendCode {
     user.deletionCodeExpiresAt = DateTime.now().plus({ minutes: 5 })
     await user.save()
 
-    await mail.sendLater(
-      new SecurityCodeNotification(user.email, code, user.fullName || undefined)
-    )
+    await mail.sendLater(new SecurityCodeNotification(user.email, code, user.fullName || undefined))
 
     return response.ok({
       message: 'Code envoyé',

@@ -6,9 +6,7 @@ export default class CheckoutShow {
   async handle({ params, response }: HttpContext) {
     const tokenHash = encryptionService.hash(params.token)
 
-    const paymentLink = await PaymentLink.query()
-      .where('token_hash', tokenHash)
-      .first()
+    const paymentLink = await PaymentLink.query().where('token_hash', tokenHash).first()
 
     response.header('X-Robots-Tag', 'noindex, nofollow')
     response.header('Cache-Control', 'no-store, no-cache, must-revalidate')
@@ -26,7 +24,8 @@ export default class CheckoutShow {
         if (local && domain) {
           const maskedLocal = local[0] + '****'
           const domParts = domain.split('.')
-          const maskedDomain = domParts[0][0] + '**' + (domParts.length > 1 ? '.' + domParts.slice(1).join('.') : '')
+          const maskedDomain =
+            domParts[0][0] + '**' + (domParts.length > 1 ? '.' + domParts.slice(1).join('.') : '')
           maskedEmail = `${maskedLocal}@${maskedDomain}`
         }
       } catch {

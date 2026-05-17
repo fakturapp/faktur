@@ -21,18 +21,14 @@ export default class SearchUsers {
       .whereIn('status', ['active', 'pending'])
       .select('userId', 'invitedEmail')
 
-    const excludeUserIds = existingMembers
-      .map((m) => m.userId)
-      .filter(Boolean)
+    const excludeUserIds = existingMembers.map((m) => m.userId).filter(Boolean)
     const excludeEmails = existingMembers
       .map((m) => m.invitedEmail?.toLowerCase())
       .filter(Boolean) as string[]
 
     const results = await User.query()
       .where((builder) => {
-        builder
-          .whereILike('email', `%${q}%`)
-          .orWhereILike('fullName', `%${q}%`)
+        builder.whereILike('email', `%${q}%`).orWhereILike('fullName', `%${q}%`)
       })
       .whereNotIn('id', excludeUserIds.length > 0 ? excludeUserIds : ['__none__'])
       .where('status', 'active')
@@ -41,9 +37,7 @@ export default class SearchUsers {
       .select('id', 'email', 'fullName', 'avatarUrl')
 
     // Filter out emails already invited
-    const filtered = results.filter(
-      (u) => !excludeEmails.includes(u.email.toLowerCase())
-    )
+    const filtered = results.filter((u) => !excludeEmails.includes(u.email.toLowerCase()))
 
     return response.ok({
       users: filtered.map((u) => ({

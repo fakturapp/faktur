@@ -1,4 +1,4 @@
-import User from '#models/account/user'
+import type User from '#models/account/user'
 import TeamMember from '#models/team/team_member'
 import encryptionService from '#services/encryption/encryption_service'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'

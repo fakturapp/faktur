@@ -12,9 +12,8 @@ export default class CheckAccess {
     const documentId = request.param('documentId') as string
 
     if (teamId) {
-      const { default: DocumentAccessService } = await import(
-        '#services/collaboration/document_access_service'
-      )
+      const { default: DocumentAccessService } =
+        await import('#services/collaboration/document_access_service')
       const accessService = new DocumentAccessService()
       const document = await accessService.getDocument(documentType, documentId, teamId)
       if (document) {

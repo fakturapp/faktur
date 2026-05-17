@@ -184,7 +184,12 @@ Réponds **UNIQUEMENT** avec un objet JSON valide. Aucun texte avant ou après. 
       document.acceptanceConditions =
         typeof document.acceptanceConditions === 'string' ? document.acceptanceConditions : ''
 
-      await AiQuotaService.recordUsage(teamId, user.id, payload.model || 'default', 'generate-document')
+      await AiQuotaService.recordUsage(
+        teamId,
+        user.id,
+        payload.model || 'default',
+        'generate-document'
+      )
       return response.ok({ document })
     } catch (error: any) {
       const msg = error.message || 'Unknown error'

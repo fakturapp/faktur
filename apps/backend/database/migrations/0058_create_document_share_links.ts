@@ -28,7 +28,12 @@ export default class extends BaseSchema {
         .notNullable()
         .defaultTo('viewer')
 
-      table.uuid('created_by_user_id').notNullable().references('id').inTable('users').onDelete('CASCADE')
+      table
+        .uuid('created_by_user_id')
+        .notNullable()
+        .references('id')
+        .inTable('users')
+        .onDelete('CASCADE')
 
       table.boolean('is_active').notNullable().defaultTo(true)
       table.timestamp('expires_at').nullable()
@@ -37,9 +42,7 @@ export default class extends BaseSchema {
       table.timestamp('updated_at').notNullable().defaultTo(this.now())
     })
 
-    this.schema.raw(
-      'CREATE INDEX idx_document_share_links_token ON document_share_links (token)'
-    )
+    this.schema.raw('CREATE INDEX idx_document_share_links_token ON document_share_links (token)')
     this.schema.raw(
       'CREATE INDEX idx_document_share_links_document ON document_share_links (document_type, document_id)'
     )

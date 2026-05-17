@@ -22,11 +22,7 @@ class OauthCryptoService {
 
   verifyPkce(codeVerifier: string, codeChallenge: string, method: string): boolean {
     if (method !== 'S256') return false
-    const hash = crypto
-      .createHash('sha256')
-      .update(codeVerifier)
-      .digest()
-      .toString('base64url')
+    const hash = crypto.createHash('sha256').update(codeVerifier).digest().toString('base64url')
     return this.timingSafeEqual(hash, codeChallenge)
   }
 

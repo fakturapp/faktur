@@ -1,4 +1,3 @@
-
 export interface PdpConfig {
   provider: 'b2brouter' | 'sandbox'
   apiKey: string | null

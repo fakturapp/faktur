@@ -71,21 +71,25 @@ export default class AnalyticsErrors {
         if (top.stackTraceEncrypted) {
           ;(top as any).stackTrace = analyticsEncryption.decrypt(top.stackTraceEncrypted)
         }
-      } catch {
-      }
+      } catch {}
     }
 
-    const output = result.map(({ errorMessageFullEncrypted, stackTraceEncrypted, ids, latestTimestamp, ...rest }, index) => ({
-      ...rest,
-      id: ids[0],
-      timestamp: latestTimestamp,
-      ...(index === 0
-        ? {
-            errorMessageFull: (rest as any).errorMessageFull || null,
-            stackTrace: (rest as any).stackTrace || null,
-          }
-        : {}),
-    }))
+    const output = result.map(
+      (
+        { errorMessageFullEncrypted, stackTraceEncrypted, ids, latestTimestamp, ...rest },
+        index
+      ) => ({
+        ...rest,
+        id: ids[0],
+        timestamp: latestTimestamp,
+        ...(index === 0
+          ? {
+              errorMessageFull: (rest as any).errorMessageFull || null,
+              stackTrace: (rest as any).stackTrace || null,
+            }
+          : {}),
+      })
+    )
 
     return response.ok({ errors: output })
   }

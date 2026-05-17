@@ -1,9 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import RecurringInvoice from '#models/recurring_invoice/recurring_invoice'
-import {
-  decryptModelFieldsArray,
-  ENCRYPTED_FIELDS,
-} from '#services/crypto/field_encryption_helper'
+import { decryptModelFieldsArray, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 import apiResponse from '#services/api/api_response'
 import apiPagination from '#services/api/api_pagination'
 import apiRecurringInvoiceTransformer from '#transformers/api_v2/api_recurring_invoice_transformer'

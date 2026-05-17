@@ -28,7 +28,7 @@ export default class ConfirmPrivate {
 
     if (!membership || membership.role !== 'super_admin') {
       return response.forbidden({
-        message: 'Seul le propriétaire peut configurer le chiffrement de l\'équipe.',
+        message: "Seul le propriétaire peut configurer le chiffrement de l'équipe.",
       })
     }
 

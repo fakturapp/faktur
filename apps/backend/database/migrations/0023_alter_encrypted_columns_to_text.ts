@@ -50,7 +50,6 @@ export default class extends BaseSchema {
       table.text('bank_name').alter()
       table.text('payment_conditions').alter()
     })
-
   }
 
   async down() {

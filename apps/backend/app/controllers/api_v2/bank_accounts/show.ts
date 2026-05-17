@@ -1,9 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import BankAccount from '#models/team/bank_account'
-import {
-  decryptModelFields,
-  ENCRYPTED_FIELDS,
-} from '#services/crypto/field_encryption_helper'
+import { decryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 import apiResponse from '#services/api/api_response'
 import apiBankAccountTransformer from '#transformers/api_v2/api_bank_account_transformer'
 import publicIdCodec, { PublicIdParseError } from '#services/api/public_id_codec'

@@ -44,14 +44,16 @@ export default class CheckoutCreateIntent {
       try {
         const stripe = stripeService.getClient(secretKey)
         const existingPi = await stripe.paymentIntents.retrieve(paymentLink.stripePaymentIntentId)
-        if (existingPi.status === 'requires_payment_method' || existingPi.status === 'requires_action') {
+        if (
+          existingPi.status === 'requires_payment_method' ||
+          existingPi.status === 'requires_action'
+        ) {
           return response.ok({
             clientSecret: existingPi.client_secret,
             publishableKey,
           })
         }
-      } catch {
-      }
+      } catch {}
     }
 
     try {

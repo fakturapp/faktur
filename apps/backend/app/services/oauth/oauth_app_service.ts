@@ -99,10 +99,7 @@ class OauthAppService {
     clientId: string,
     clientSecret: string | null | undefined
   ): Promise<OauthApp | null> {
-    const app = await OauthApp.query()
-      .where('client_id', clientId)
-      .where('is_active', true)
-      .first()
+    const app = await OauthApp.query().where('client_id', clientId).where('is_active', true).first()
     if (!app) return null
 
     if (this.isPublicClient(app)) {

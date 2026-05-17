@@ -19,7 +19,12 @@ export default class DocumentAccessService {
     }
   }
 
-  async isDocumentOwner(documentType: DocumentType, documentId: string, teamId: string, _userId: string): Promise<boolean> {
+  async isDocumentOwner(
+    documentType: DocumentType,
+    documentId: string,
+    teamId: string,
+    _userId: string
+  ): Promise<boolean> {
     const document = await this.getDocument(documentType, documentId, teamId)
     if (!document) return false
     return true

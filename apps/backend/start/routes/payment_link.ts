@@ -1,11 +1,7 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
 import { API_PREFIX } from '#start/routes/_prefix'
-import {
-  checkoutLimiter,
-  checkoutPasswordLimiter,
-  checkoutMarkPaidLimiter,
-} from '#start/limiter'
+import { checkoutLimiter, checkoutPasswordLimiter, checkoutMarkPaidLimiter } from '#start/limiter'
 
 const PaymentLinkCreate = () => import('#controllers/invoice/payment_link/create')
 const PaymentLinkShow = () => import('#controllers/invoice/payment_link/show')
@@ -18,11 +14,9 @@ const CheckoutVerifyPassword = () =>
   import('#controllers/invoice/payment_link/checkout_verify_password')
 const CheckoutGetIban = () => import('#controllers/invoice/payment_link/checkout_get_iban')
 const CheckoutMarkPaid = () => import('#controllers/invoice/payment_link/checkout_mark_paid')
-const CheckoutDownloadPdf = () =>
-  import('#controllers/invoice/payment_link/checkout_download_pdf')
+const CheckoutDownloadPdf = () => import('#controllers/invoice/payment_link/checkout_download_pdf')
 const CheckoutCreateIntent = () =>
   import('#controllers/invoice/payment_link/checkout_create_intent')
-
 
 const paymentLinkGroup = router
   .group(() => {
@@ -36,7 +30,6 @@ const paymentLinkGroup = router
   .use(middleware.auth())
   .use(middleware.vault())
 if (API_PREFIX) paymentLinkGroup.prefix(API_PREFIX)
-
 
 const checkoutGroup = router
   .group(() => {

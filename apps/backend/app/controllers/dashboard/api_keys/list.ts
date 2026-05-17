@@ -8,9 +8,7 @@ export default class List {
     const teamId = user.currentTeamId
     if (!teamId) return response.badRequest({ message: 'No team selected' })
 
-    const keys = await ApiKey.query()
-      .where('team_id', teamId)
-      .orderBy('created_at', 'desc')
+    const keys = await ApiKey.query().where('team_id', teamId).orderBy('created_at', 'desc')
 
     return response.ok({ data: adminTransformer.transformMany(keys) })
   }

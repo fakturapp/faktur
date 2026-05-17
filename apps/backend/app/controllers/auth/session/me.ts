@@ -14,14 +14,8 @@ export default class Me {
     const user = auth.user!
 
     const [googleProvider, passkeyCount] = await Promise.all([
-      AuthProvider.query()
-        .where('userId', user.id)
-        .where('provider', 'google')
-        .first(),
-      PasskeyCredential.query()
-        .where('userId', user.id)
-        .count('* as total')
-        .first(),
+      AuthProvider.query().where('userId', user.id).where('provider', 'google').first(),
+      PasskeyCredential.query().where('userId', user.id).count('* as total').first(),
     ])
 
     const memberships = await TeamMember.query()
@@ -32,7 +26,7 @@ export default class Me {
     const teams = teamIds.length > 0 ? await Team.query().whereIn('id', teamIds) : []
 
     const currentTeam = user.currentTeamId
-      ? teams.find((t) => t.id === user.currentTeamId) ?? null
+      ? (teams.find((t) => t.id === user.currentTeamId) ?? null)
       : null
     const currentTeamEncryptionMode = currentTeam ? currentTeam.encryptionMode : null
 

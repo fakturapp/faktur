@@ -164,8 +164,7 @@ export async function generateInvoicePdf(
     customPaymentMethod: invoiceSettings?.customPaymentMethod || null,
     documentFont: invoiceSettings?.documentFont || 'Lexend',
     documentType: 'invoice' as const,
-    footerMode:
-      (invoiceSettings?.footerMode as 'company_info' | 'custom') || 'company_info',
+    footerMode: (invoiceSettings?.footerMode as 'company_info' | 'custom') || 'company_info',
   }
 
   const logoSource = invoiceSettings?.logoSource || 'custom'
@@ -302,8 +301,7 @@ export async function generateQuotePdf(
     customPaymentMethod: invoiceSettings?.customPaymentMethod || null,
     documentFont: invoiceSettings?.documentFont || 'Lexend',
     documentType: 'quote' as const,
-    footerMode:
-      (invoiceSettings?.footerMode as 'company_info' | 'custom') || 'company_info',
+    footerMode: (invoiceSettings?.footerMode as 'company_info' | 'custom') || 'company_info',
   }
 
   const logoSource = invoiceSettings?.logoSource || 'custom'
@@ -415,8 +413,7 @@ export async function generateCreditNotePdf(
     customPaymentMethod: null as string | null,
     documentFont: invoiceSettings?.documentFont || 'Lexend',
     documentType: 'credit_note' as const,
-    footerMode:
-      (invoiceSettings?.footerMode as 'company_info' | 'custom') || 'company_info',
+    footerMode: (invoiceSettings?.footerMode as 'company_info' | 'custom') || 'company_info',
   }
 
   const logoSource = invoiceSettings?.logoSource || 'custom'

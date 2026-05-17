@@ -39,7 +39,7 @@ export default class Create {
         }
         kek = await zeroAccessCryptoService.deriveKEK(
           payload.confirmPassword,
-          Buffer.from(user.saltKdf, 'hex'),
+          Buffer.from(user.saltKdf, 'hex')
         )
         keyStore.storeKEK(user.id, kek)
       }

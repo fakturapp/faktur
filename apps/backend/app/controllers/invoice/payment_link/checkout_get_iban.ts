@@ -20,7 +20,9 @@ export default class CheckoutGetIban {
     }
 
     if (paymentLink.paidAt) {
-      return response.forbidden({ message: 'Payment already marked as sent, IBAN is no longer accessible' })
+      return response.forbidden({
+        message: 'Payment already marked as sent, IBAN is no longer accessible',
+      })
     }
 
     if (!paymentLink.showIban) {

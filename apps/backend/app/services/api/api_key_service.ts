@@ -87,10 +87,7 @@ class ApiKeyService {
   async findActiveByToken(token: string): Promise<ApiKey | null> {
     if (!this.looksLikeApiKey(token)) return null
     const hash = this.hashToken(token)
-    const key = await ApiKey.query()
-      .where('hash', hash)
-      .whereNull('revoked_at')
-      .first()
+    const key = await ApiKey.query().where('hash', hash).whereNull('revoked_at').first()
     if (!key) return null
     if (key.isExpired) return null
     return key

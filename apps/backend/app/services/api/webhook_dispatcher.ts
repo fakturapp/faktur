@@ -19,9 +19,7 @@ export interface DispatchOutcome {
 
 class WebhookDispatcher {
   async dispatch(delivery: ApiWebhookDelivery): Promise<DispatchOutcome> {
-    const webhook = await ApiKeyWebhook.query()
-      .where('apiKeyId', delivery.apiKeyId)
-      .first()
+    const webhook = await ApiKeyWebhook.query().where('apiKeyId', delivery.apiKeyId).first()
 
     if (!webhook) {
       delivery.status = 'failed_permanent'
@@ -89,7 +87,7 @@ class WebhookDispatcher {
     const ok = statusCode !== null && statusCode >= 200 && statusCode < 300
 
     delivery.lastStatusCode = statusCode
-    delivery.lastError = ok ? null : errorMessage ?? `non_2xx_status_${statusCode}`
+    delivery.lastError = ok ? null : (errorMessage ?? `non_2xx_status_${statusCode}`)
 
     if (ok) {
       delivery.status = 'delivered'
@@ -120,7 +118,12 @@ class WebhookDispatcher {
 
     if (!ok) {
       logger.warn(
-        { delivery_id: delivery.id, attempt: delivery.attemptCount, status: statusCode, error: errorMessage },
+        {
+          delivery_id: delivery.id,
+          attempt: delivery.attemptCount,
+          status: statusCode,
+          error: errorMessage,
+        },
         'api-v2 webhook delivery failed'
       )
     }

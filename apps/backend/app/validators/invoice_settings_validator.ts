@@ -1,11 +1,14 @@
 import vine from '@vinejs/vine'
 
-const looseBool = vine.any().optional().transform((v) => {
-  if (v === undefined || v === null) return undefined
-  if (v === true || v === 1 || v === '1' || v === 'true') return true
-  if (v === false || v === 0 || v === '0' || v === 'false') return false
-  return !!v
-})
+const looseBool = vine
+  .any()
+  .optional()
+  .transform((v) => {
+    if (v === undefined || v === null) return undefined
+    if (v === true || v === 1 || v === '1' || v === 'true') return true
+    if (v === false || v === 0 || v === '0' || v === 'false') return false
+    return !!v
+  })
 
 const BILLING_TYPES = ['quick', 'detailed'] as const
 const LOGO_SOURCES = ['custom', 'company'] as const

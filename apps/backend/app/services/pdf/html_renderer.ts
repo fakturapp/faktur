@@ -98,7 +98,6 @@ interface SettingsData {
   footerMode?: 'company_info' | 'custom'
 }
 
-
 function esc(str: string | null | undefined): string {
   if (!str) return ''
   return str
@@ -128,14 +127,20 @@ function formatText(str: string | null | undefined): string {
     )
     line = line.replace(/\{size:sm\}(.+?)\{\/size\}/g, '<span style="font-size:0.85em">$1</span>')
     line = line.replace(/\{size:lg\}(.+?)\{\/size\}/g, '<span style="font-size:1.3em">$1</span>')
-    line = line.replace(/\{font:([^}]+)\}(.+?)\{\/font\}/g, '<span style="font-family:$1">$2</span>')
+    line = line.replace(
+      /\{font:([^}]+)\}(.+?)\{\/font\}/g,
+      '<span style="font-family:$1">$2</span>'
+    )
     line = line.replace(
       /\[([^\]]+)\]\(([^)]+)\)/g,
       '<a href="$2" style="color:inherit;text-decoration:underline">$1</a>'
     )
 
     if (line.startsWith('## ')) {
-      if (inList) { parts.push('</ul>'); inList = false }
+      if (inList) {
+        parts.push('</ul>')
+        inList = false
+      }
       parts.push(`<strong style="font-size:1.3em">${line.slice(3)}</strong>`)
       if (i < lines.length - 1) parts.push('<br>')
       continue
@@ -143,13 +148,19 @@ function formatText(str: string | null | undefined): string {
 
     // List item
     if (line.startsWith('- ')) {
-      if (!inList) { parts.push('<ul style="margin:0;padding-left:1.2em">'); inList = true }
+      if (!inList) {
+        parts.push('<ul style="margin:0;padding-left:1.2em">')
+        inList = true
+      }
       parts.push(`<li>${line.slice(2)}</li>`)
       continue
     }
 
     // Normal
-    if (inList) { parts.push('</ul>'); inList = false }
+    if (inList) {
+      parts.push('</ul>')
+      inList = false
+    }
     parts.push(line)
     if (i < lines.length - 1) parts.push('<br>')
   }

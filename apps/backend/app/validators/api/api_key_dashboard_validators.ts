@@ -13,7 +13,11 @@ export const createApiKeyValidator = vine.compile(
 export const updateApiKeyValidator = vine.compile(
   vine.object({
     name: vine.string().trim().minLength(1).maxLength(100).optional(),
-    scopes: vine.array(vine.string().trim().minLength(1).maxLength(80)).minLength(1).maxLength(64).optional(),
+    scopes: vine
+      .array(vine.string().trim().minLength(1).maxLength(80))
+      .minLength(1)
+      .maxLength(64)
+      .optional(),
     allowed_ips: vine.array(vine.string().trim().maxLength(64)).maxLength(32).nullable().optional(),
   })
 )

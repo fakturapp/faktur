@@ -27,9 +27,7 @@ export default class ApiV2WebhookProvider {
     if (this.#running) return
     this.#running = true
     try {
-      const { default: webhookDispatcher } = await import(
-        '#services/api/webhook_dispatcher'
-      )
+      const { default: webhookDispatcher } = await import('#services/api/webhook_dispatcher')
       const processed = await webhookDispatcher.dispatchPending(25)
       if (processed > 0) {
         logger.debug({ processed }, '[api-v2] webhook batch dispatched')

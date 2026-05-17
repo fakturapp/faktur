@@ -31,6 +31,8 @@ export const listExpensesValidator = vine.compile(
     date_after: vine.string().trim().maxLength(20).optional(),
     date_before: vine.string().trim().maxLength(20).optional(),
     deductible_only: vine.boolean().optional(),
-    sort: vine.enum(['created_at', '-created_at', 'expense_date', '-expense_date'] as const).optional(),
+    sort: vine
+      .enum(['created_at', '-created_at', 'expense_date', '-expense_date'] as const)
+      .optional(),
   })
 )

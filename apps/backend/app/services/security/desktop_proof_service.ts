@@ -1,7 +1,6 @@
 import crypto from 'node:crypto'
 import env from '#start/env'
 
-
 const PROOF_TTL_MS = 5 * 60 * 1000
 const NONCE_CACHE_MAX = 10_000
 

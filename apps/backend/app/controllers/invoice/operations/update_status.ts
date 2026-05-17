@@ -29,7 +29,9 @@ export default class UpdateStatus {
     }
 
     if (status === 'paid_unconfirmed') {
-      return response.forbidden({ message: 'This status can only be set through the payment link flow' })
+      return response.forbidden({
+        message: 'This status can only be set through the payment link flow',
+      })
     }
 
     const invoice = await Invoice.query().where('id', params.id).where('team_id', teamId).first()

@@ -16,12 +16,7 @@ export default class extends BaseSchema {
         .references('id')
         .inTable('oauth_apps')
         .onDelete('CASCADE')
-      table
-        .uuid('user_id')
-        .notNullable()
-        .references('id')
-        .inTable('users')
-        .onDelete('CASCADE')
+      table.uuid('user_id').notNullable().references('id').inTable('users').onDelete('CASCADE')
 
       table.specificType('scopes', 'text[]').notNullable()
 

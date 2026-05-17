@@ -32,9 +32,17 @@ export function computePricing(
   }
 
   let discountCents = 0
-  if (options.discount_type === 'percentage' && options.discount_value && options.discount_value > 0) {
+  if (
+    options.discount_type === 'percentage' &&
+    options.discount_value &&
+    options.discount_value > 0
+  ) {
     discountCents = Math.round(subtotalCents * (options.discount_value / 100))
-  } else if (options.discount_type === 'fixed' && options.discount_value && options.discount_value > 0) {
+  } else if (
+    options.discount_type === 'fixed' &&
+    options.discount_value &&
+    options.discount_value > 0
+  ) {
     discountCents = Math.round(options.discount_value * 100)
   }
 

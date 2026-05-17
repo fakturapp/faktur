@@ -31,7 +31,9 @@ export default class StripeSettingsShow {
 
     return response.ok({
       isConfigured: true,
-      publishableKeyMasked: settings.stripePublishableKey ? maskKey(settings.stripePublishableKey) : null,
+      publishableKeyMasked: settings.stripePublishableKey
+        ? maskKey(settings.stripePublishableKey)
+        : null,
       secretKeyMasked: settings.stripeSecretKey ? maskKey(settings.stripeSecretKey) : null,
       hasWebhookSecret: !!settings.stripeWebhookSecret,
       webhookUrl,

@@ -17,9 +17,19 @@ export default class extends BaseSchema {
         .notNullable()
       table.uuid('document_id').notNullable()
 
-      table.uuid('shared_by_user_id').notNullable().references('id').inTable('users').onDelete('CASCADE')
+      table
+        .uuid('shared_by_user_id')
+        .notNullable()
+        .references('id')
+        .inTable('users')
+        .onDelete('CASCADE')
 
-      table.uuid('shared_with_user_id').nullable().references('id').inTable('users').onDelete('CASCADE')
+      table
+        .uuid('shared_with_user_id')
+        .nullable()
+        .references('id')
+        .inTable('users')
+        .onDelete('CASCADE')
       table.string('shared_with_email', 255).nullable()
 
       table
@@ -44,9 +54,7 @@ export default class extends BaseSchema {
       table.timestamp('updated_at').notNullable().defaultTo(this.now())
     })
 
-    this.schema.raw(
-      'CREATE INDEX idx_document_shares_team ON document_shares (team_id)'
-    )
+    this.schema.raw('CREATE INDEX idx_document_shares_team ON document_shares (team_id)')
     this.schema.raw(
       'CREATE INDEX idx_document_shares_document ON document_shares (document_type, document_id)'
     )

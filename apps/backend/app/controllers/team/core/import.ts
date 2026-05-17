@@ -41,9 +41,12 @@ export default class Import {
     const { auth, request, response } = ctx
     const user = auth.user!
 
-    const encryptionMode = request.input('encryptionMode', 'standard') === 'private' ? 'private' : 'standard'
-    const ackDataLoss = request.input('ackDataLoss') === true || request.input('ackDataLoss') === 'true'
-    const ackNotResponsible = request.input('ackNotResponsible') === true || request.input('ackNotResponsible') === 'true'
+    const encryptionMode =
+      request.input('encryptionMode', 'standard') === 'private' ? 'private' : 'standard'
+    const ackDataLoss =
+      request.input('ackDataLoss') === true || request.input('ackDataLoss') === 'true'
+    const ackNotResponsible =
+      request.input('ackNotResponsible') === true || request.input('ackNotResponsible') === 'true'
 
     if (encryptionMode === 'private' && (!ackDataLoss || !ackNotResponsible)) {
       return response.unprocessableEntity({

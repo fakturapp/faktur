@@ -1,4 +1,3 @@
-
 interface FacturXSeller {
   name: string
   siren?: string | null

@@ -28,7 +28,12 @@ export default class AnalyticsPerformance {
         }
 
         const value = p75Row ? Number(p75Row.p75) : null
-        if (value === null && distribution.good === 0 && distribution.needsImprovement === 0 && distribution.poor === 0) {
+        if (
+          value === null &&
+          distribution.good === 0 &&
+          distribution.needsImprovement === 0 &&
+          distribution.poor === 0
+        ) {
           return null
         }
 
@@ -40,7 +45,10 @@ export default class AnalyticsPerformance {
     const deviceBreakdown = deviceRows.map((row: any) => ({
       device: row.device_type || 'unknown',
       count: Number(row.count),
-      percentage: totalDeviceCount > 0 ? Math.round((Number(row.count) / totalDeviceCount) * 100 * 10) / 10 : 0,
+      percentage:
+        totalDeviceCount > 0
+          ? Math.round((Number(row.count) / totalDeviceCount) * 100 * 10) / 10
+          : 0,
     }))
 
     return response.ok({ webVitals, slowestPages, deviceBreakdown })

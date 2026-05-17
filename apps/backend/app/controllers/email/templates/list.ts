@@ -52,7 +52,7 @@ const DEFAULTS: Record<string, { subject: string; body: string }> = {
       headerColor: '#3b82f6',
       badge: 'Nouvelle {type}',
       intro:
-        "Vous trouverez ci-joint votre {type} <strong style=\"color:#0f172a\">{numero}</strong>. Le règlement peut être effectué selon les modalités indiquées sur le document.",
+        'Vous trouverez ci-joint votre {type} <strong style="color:#0f172a">{numero}</strong>. Le règlement peut être effectué selon les modalités indiquées sur le document.',
       closing: "N'hésitez pas à nous contacter pour toute question concernant cette {type}.",
       amountLabel: 'Montant TTC',
     }),
@@ -63,8 +63,9 @@ const DEFAULTS: Record<string, { subject: string; body: string }> = {
       headerColor: '#f97316',
       badge: 'Votre {type}',
       intro:
-        "Veuillez trouver ci-joint le {type} <strong style=\"color:#0f172a\">{numero}</strong> correspondant à votre demande. Ce devis est valable selon les modalités indiquées sur le document.",
-      closing: "Pour valider ce {type} ou nous transmettre vos remarques, il vous suffit de répondre à cet email.",
+        'Veuillez trouver ci-joint le {type} <strong style="color:#0f172a">{numero}</strong> correspondant à votre demande. Ce devis est valable selon les modalités indiquées sur le document.',
+      closing:
+        'Pour valider ce {type} ou nous transmettre vos remarques, il vous suffit de répondre à cet email.',
       amountLabel: 'Montant TTC estimé',
     }),
   },
@@ -72,10 +73,11 @@ const DEFAULTS: Record<string, { subject: string; body: string }> = {
     subject: '{type} {numero}',
     body: buildTemplate({
       headerColor: '#8b5cf6',
-      badge: "Votre {type}",
+      badge: 'Votre {type}',
       intro:
-        "Vous trouverez ci-joint l'{type} <strong style=\"color:#0f172a\">{numero}</strong> émis suite à votre demande.",
-      closing: 'Cet avoir sera déduit de votre prochaine facture ou remboursé selon les modalités convenues.',
+        'Vous trouverez ci-joint l\'{type} <strong style="color:#0f172a">{numero}</strong> émis suite à votre demande.',
+      closing:
+        'Cet avoir sera déduit de votre prochaine facture ou remboursé selon les modalités convenues.',
       amountLabel: "Montant de l'avoir",
     }),
   },

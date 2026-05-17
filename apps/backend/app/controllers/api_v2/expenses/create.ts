@@ -19,7 +19,9 @@ export default class Create {
     const vatRate = payload.vat_rate ?? 20
     const amount = payload.amount_cents / 100
     const vatAmount =
-      payload.vat_amount_cents !== undefined ? payload.vat_amount_cents / 100 : amount * (vatRate / 100)
+      payload.vat_amount_cents !== undefined
+        ? payload.vat_amount_cents / 100
+        : amount * (vatRate / 100)
 
     const data: Record<string, any> = {
       teamId: team.id,

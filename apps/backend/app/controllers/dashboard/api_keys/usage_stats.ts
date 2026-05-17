@@ -26,47 +26,39 @@ export default class UsageStats {
 
     const since = DateTime.now().minus({ days: 30 }).toSQL()!
 
-    const dailyRaw = await db
-      .connection()
-      .rawQuery(
-        `SELECT DATE(created_at) AS day, COUNT(*)::int AS count
+    const dailyRaw = await db.connection().rawQuery(
+      `SELECT DATE(created_at) AS day, COUNT(*)::int AS count
          FROM api_request_logs
          WHERE api_key_id = ? AND created_at >= ?
          GROUP BY day ORDER BY day ASC`,
-        [key.id, since]
-      )
+      [key.id, since]
+    )
 
-    const topEndpointsRaw = await db
-      .connection()
-      .rawQuery(
-        `SELECT method, path, COUNT(*)::int AS count
+    const topEndpointsRaw = await db.connection().rawQuery(
+      `SELECT method, path, COUNT(*)::int AS count
          FROM api_request_logs
          WHERE api_key_id = ? AND created_at >= ?
          GROUP BY method, path
          ORDER BY count DESC
          LIMIT 10`,
-        [key.id, since]
-      )
+      [key.id, since]
+    )
 
-    const statusDistRaw = await db
-      .connection()
-      .rawQuery(
-        `SELECT (status / 100) AS bucket, COUNT(*)::int AS count
+    const statusDistRaw = await db.connection().rawQuery(
+      `SELECT (status / 100) AS bucket, COUNT(*)::int AS count
          FROM api_request_logs
          WHERE api_key_id = ? AND created_at >= ?
          GROUP BY bucket
          ORDER BY bucket ASC`,
-        [key.id, since]
-      )
+      [key.id, since]
+    )
 
-    const totalThisMonthRaw = await db
-      .connection()
-      .rawQuery(
-        `SELECT COUNT(*)::int AS count
+    const totalThisMonthRaw = await db.connection().rawQuery(
+      `SELECT COUNT(*)::int AS count
          FROM api_request_logs
          WHERE api_key_id = ? AND created_at >= date_trunc('month', NOW())`,
-        [key.id]
-      )
+      [key.id]
+    )
 
     const dailyRows = (dailyRaw.rows ?? dailyRaw) as Array<{ day: string; count: number }>
     const topRows = (topEndpointsRaw.rows ?? topEndpointsRaw) as Array<{
@@ -78,8 +70,7 @@ export default class UsageStats {
       bucket: number
       count: number
     }>
-    const totalThisMonth =
-      ((totalThisMonthRaw.rows ?? totalThisMonthRaw)[0]?.count ?? 0) as number
+    const totalThisMonth = ((totalThisMonthRaw.rows ?? totalThisMonthRaw)[0]?.count ?? 0) as number
 
     return response.ok({
       data: {

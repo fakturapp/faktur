@@ -117,7 +117,7 @@ export default class AnalyticsOverview {
     const rows = await db
       .from('analytics_events')
       .where('timestamp', '>=', startDate.toSQL()!)
-      .select(db.raw("DATE(timestamp) as date"))
+      .select(db.raw('DATE(timestamp) as date'))
       .count('* as count')
       .groupByRaw('DATE(timestamp)')
       .orderBy('date', 'asc')

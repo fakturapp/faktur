@@ -23,7 +23,8 @@ export default class Update {
 
     const key = await ApiKey.query().where('id', internalId).where('team_id', teamId).first()
     if (!key) return response.notFound({ message: 'API key not found' })
-    if (key.revokedAt) return response.unprocessableEntity({ message: 'Cannot update a revoked key' })
+    if (key.revokedAt)
+      return response.unprocessableEntity({ message: 'Cannot update a revoked key' })
 
     const payload = await updateApiKeyValidator.validate(request.body())
 

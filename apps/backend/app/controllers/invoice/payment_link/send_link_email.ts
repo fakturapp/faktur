@@ -3,7 +3,11 @@ import Invoice from '#models/invoice/invoice'
 import PaymentLink from '#models/invoice/payment_link'
 import EmailAccount from '#models/email/email_account'
 import EmailLog from '#models/email/email_log'
-import { decryptModelFields, encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
+import {
+  decryptModelFields,
+  encryptModelFields,
+  ENCRYPTED_FIELDS,
+} from '#services/crypto/field_encryption_helper'
 import { generateInvoicePdf } from '#services/pdf/document_pdf_service'
 import GmailOAuthService from '#services/email/gmail_oauth_service'
 import ResendUserService from '#services/email/resend_user_service'
@@ -61,7 +65,11 @@ export default class SendLinkEmail {
       return response.badRequest({ message: 'No email account configured' })
     }
 
-    decryptModelFields(emailAccount, ['accessToken', 'refreshToken', 'smtpHost', 'smtpUsername', 'smtpPassword'] as any, dek)
+    decryptModelFields(
+      emailAccount,
+      ['accessToken', 'refreshToken', 'smtpHost', 'smtpUsername', 'smtpPassword'] as any,
+      dek
+    )
 
     const token = request.input('token')
     if (!token) {
@@ -123,7 +131,12 @@ export default class SendLinkEmail {
           attachments,
         })
       } else if (emailAccount.provider === 'smtp') {
-        if (!emailAccount.smtpHost || !emailAccount.smtpPort || !emailAccount.smtpUsername || !emailAccount.smtpPassword) {
+        if (
+          !emailAccount.smtpHost ||
+          !emailAccount.smtpPort ||
+          !emailAccount.smtpUsername ||
+          !emailAccount.smtpPassword
+        ) {
           throw new Error('SMTP config incomplete')
         }
         await SmtpService.sendEmail({

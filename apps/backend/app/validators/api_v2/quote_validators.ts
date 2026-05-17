@@ -9,8 +9,6 @@ export const listQuotesValidator = vine.compile(
     issue_date_after: vine.string().trim().maxLength(20).optional(),
     issue_date_before: vine.string().trim().maxLength(20).optional(),
     q: vine.string().trim().maxLength(200).optional(),
-    sort: vine
-      .enum(['created_at', '-created_at', 'issue_date', '-issue_date'] as const)
-      .optional(),
+    sort: vine.enum(['created_at', '-created_at', 'issue_date', '-issue_date'] as const).optional(),
   })
 )

@@ -1,9 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import {
-  KNOWN_RESOURCES,
-  ACTIONS_BY_RESOURCE,
-  allKnownScopes,
-} from '#services/api/scope_checker'
+import { KNOWN_RESOURCES, ACTIONS_BY_RESOURCE, allKnownScopes } from '#services/api/scope_checker'
 import { WEBHOOK_EVENT_CATEGORIES, WEBHOOK_EVENT_TYPES } from '#services/api/webhook_events'
 
 export default class ScopesCatalog {
@@ -20,9 +16,7 @@ export default class ScopesCatalog {
         webhook_event_categories: WEBHOOK_EVENT_CATEGORIES,
         presets: {
           read_only: allKnownScopes().filter((s) => s.endsWith(':read')),
-          read_write: allKnownScopes().filter(
-            (s) => s.endsWith(':read') || s.endsWith(':write')
-          ),
+          read_write: allKnownScopes().filter((s) => s.endsWith(':read') || s.endsWith(':write')),
           full_access: ['*'],
         },
       },

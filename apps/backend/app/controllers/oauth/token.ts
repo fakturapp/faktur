@@ -35,12 +35,7 @@ export default class Token {
     })
   }
 
-  private async handleAuthorizationCode(
-    payload: any,
-    app: any,
-    request: any,
-    response: any
-  ) {
+  private async handleAuthorizationCode(payload: any, app: any, request: any, response: any) {
     if (!payload.code || !payload.redirect_uri) {
       return response.badRequest({
         error: OAUTH_ERRORS.invalid_request,

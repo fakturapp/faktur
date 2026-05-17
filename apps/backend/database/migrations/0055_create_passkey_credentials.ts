@@ -11,7 +11,7 @@ export default class extends BaseSchema {
       table.text('public_key').notNullable()
       table.bigInteger('counter').notNullable().defaultTo(0)
       table.text('transports').nullable()
-      table.string('friendly_name', 255).notNullable().defaultTo('Clé d\'accès')
+      table.string('friendly_name', 255).notNullable().defaultTo("Clé d'accès")
       table.boolean('backed_up').notNullable().defaultTo(false)
       table.text('encrypted_kek').nullable()
       table.timestamp('last_used_at').nullable()
@@ -19,9 +19,7 @@ export default class extends BaseSchema {
       table.timestamp('updated_at').notNullable().defaultTo(this.now())
     })
 
-    this.schema.raw(
-      'CREATE INDEX idx_passkey_credentials_user ON passkey_credentials (user_id)'
-    )
+    this.schema.raw('CREATE INDEX idx_passkey_credentials_user ON passkey_credentials (user_id)')
   }
 
   async down() {

@@ -1,9 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Expense from '#models/expense/expense'
-import {
-  decryptModelFieldsArray,
-  ENCRYPTED_FIELDS,
-} from '#services/crypto/field_encryption_helper'
+import { decryptModelFieldsArray, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 import apiResponse from '#services/api/api_response'
 import apiPagination from '#services/api/api_pagination'
 import apiExpenseTransformer from '#transformers/api_v2/api_expense_transformer'
@@ -38,8 +35,7 @@ export default class List {
 
     const sortKey = payload.sort ?? '-created_at'
     if (sortKey === 'created_at') query.orderBy('created_at', 'asc').orderBy('id', 'asc')
-    else if (sortKey === 'expense_date')
-      query.orderBy('expense_date', 'asc').orderBy('id', 'asc')
+    else if (sortKey === 'expense_date') query.orderBy('expense_date', 'asc').orderBy('id', 'asc')
     else if (sortKey === '-expense_date')
       query.orderBy('expense_date', 'desc').orderBy('id', 'desc')
     else query.orderBy('created_at', 'desc').orderBy('id', 'desc')

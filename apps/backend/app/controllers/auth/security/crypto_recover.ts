@@ -117,8 +117,7 @@ export default class CryptoRecover {
         }
       } catch {
         return response.unprocessableEntity({
-          message:
-            'Ancien mot de passe incorrect. Impossible de d\u00e9chiffrer vos donn\u00e9es.',
+          message: 'Ancien mot de passe incorrect. Impossible de d\u00e9chiffrer vos donn\u00e9es.',
         })
       }
     }

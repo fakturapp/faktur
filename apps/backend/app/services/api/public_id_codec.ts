@@ -61,8 +61,7 @@ const RESOURCE_BY_PREFIX: Record<string, ResourceType> = Object.fromEntries(
   Object.entries(PREFIX_BY_RESOURCE).map(([k, v]) => [v, k as ResourceType])
 ) as Record<string, ResourceType>
 
-const UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 export class PublicIdCodec {
   encode(resource: ResourceType, internalId: string): string {

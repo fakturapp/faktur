@@ -77,7 +77,7 @@ class ApiInvoiceTransformer {
       currency: 'EUR',
       client_id: invoice.clientId ? publicIdCodec.encode('client', invoice.clientId) : null,
       client_name:
-        ((invoice as { client?: { displayName?: string } | null }).client?.displayName) ?? null,
+        (invoice as { client?: { displayName?: string } | null }).client?.displayName ?? null,
       bank_account_id: invoice.bankAccountId
         ? publicIdCodec.encode('bank_account', invoice.bankAccountId)
         : null,

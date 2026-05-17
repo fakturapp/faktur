@@ -2,7 +2,10 @@ import vine from '@vinejs/vine'
 
 const baseClientFields = {
   type: vine.enum(['company', 'individual'] as const).optional(),
-  civility: vine.enum(['mr', 'mme'] as const).nullable().optional(),
+  civility: vine
+    .enum(['mr', 'mme'] as const)
+    .nullable()
+    .optional(),
   company_name: vine.string().trim().maxLength(255).nullable().optional(),
   first_name: vine.string().trim().maxLength(100).nullable().optional(),
   last_name: vine.string().trim().maxLength(100).nullable().optional(),

@@ -44,24 +44,31 @@ export default class InvoiceSettingsUpdate {
         pdpProvider: payload.pdpProvider ?? defaultSettings.pdpProvider,
         pdpApiKey: pdpApiKeyToStore,
         pdpSandbox: payload.pdpSandbox ?? defaultSettings.pdpSandbox,
-        defaultOperationCategory: payload.defaultOperationCategory ?? defaultSettings.defaultOperationCategory,
+        defaultOperationCategory:
+          payload.defaultOperationCategory ?? defaultSettings.defaultOperationCategory,
         defaultSubject: payload.defaultSubject || null,
         defaultAcceptanceConditions: payload.defaultAcceptanceConditions || null,
-        defaultSignatureField: payload.defaultSignatureField ?? defaultSettings.defaultSignatureField,
+        defaultSignatureField:
+          payload.defaultSignatureField ?? defaultSettings.defaultSignatureField,
         defaultFreeField: payload.defaultFreeField || null,
         defaultShowNotes: payload.defaultShowNotes ?? defaultSettings.defaultShowNotes,
         defaultVatExempt: payload.defaultVatExempt ?? defaultSettings.defaultVatExempt,
         defaultVatRate: payload.defaultVatRate ?? defaultSettings.defaultVatRate,
         defaultVatOnDebits: payload.defaultVatOnDebits ?? defaultSettings.defaultVatOnDebits,
-        defaultShowQuantityColumn: payload.defaultShowQuantityColumn ?? defaultSettings.defaultShowQuantityColumn,
-        defaultShowUnitColumn: payload.defaultShowUnitColumn ?? defaultSettings.defaultShowUnitColumn,
-        defaultShowUnitPriceColumn: payload.defaultShowUnitPriceColumn ?? defaultSettings.defaultShowUnitPriceColumn,
+        defaultShowQuantityColumn:
+          payload.defaultShowQuantityColumn ?? defaultSettings.defaultShowQuantityColumn,
+        defaultShowUnitColumn:
+          payload.defaultShowUnitColumn ?? defaultSettings.defaultShowUnitColumn,
+        defaultShowUnitPriceColumn:
+          payload.defaultShowUnitPriceColumn ?? defaultSettings.defaultShowUnitPriceColumn,
         defaultShowVatColumn: payload.defaultShowVatColumn ?? defaultSettings.defaultShowVatColumn,
         defaultFooterText: payload.defaultFooterText || null,
-        defaultShowDeliveryAddress: payload.defaultShowDeliveryAddress ?? defaultSettings.defaultShowDeliveryAddress,
+        defaultShowDeliveryAddress:
+          payload.defaultShowDeliveryAddress ?? defaultSettings.defaultShowDeliveryAddress,
         defaultLanguage: payload.defaultLanguage || defaultSettings.defaultLanguage,
         quoteFilenamePattern: payload.quoteFilenamePattern || defaultSettings.quoteFilenamePattern,
-        invoiceFilenamePattern: payload.invoiceFilenamePattern || defaultSettings.invoiceFilenamePattern,
+        invoiceFilenamePattern:
+          payload.invoiceFilenamePattern || defaultSettings.invoiceFilenamePattern,
         quoteNumberPattern: payload.quoteNumberPattern || defaultSettings.quoteNumberPattern,
         invoiceNumberPattern: payload.invoiceNumberPattern || defaultSettings.invoiceNumberPattern,
         nextQuoteNumber: payload.nextQuoteNumber?.trim() || null,
@@ -82,7 +89,8 @@ export default class InvoiceSettingsUpdate {
       if (payload.template) settings.template = payload.template
       if (payload.darkMode !== undefined) settings.darkMode = payload.darkMode
       if (payload.documentFont) settings.documentFont = payload.documentFont
-      if (payload.eInvoicingEnabled !== undefined) settings.eInvoicingEnabled = payload.eInvoicingEnabled
+      if (payload.eInvoicingEnabled !== undefined)
+        settings.eInvoicingEnabled = payload.eInvoicingEnabled
       if (payload.pdpProvider !== undefined) settings.pdpProvider = payload.pdpProvider ?? null
       if (payload.pdpApiKey && !payload.pdpApiKey.startsWith('••••••••')) {
         settings.pdpApiKey = pdpApiKeyToStore
@@ -91,29 +99,39 @@ export default class InvoiceSettingsUpdate {
       if (payload.defaultOperationCategory !== undefined) {
         settings.defaultOperationCategory = payload.defaultOperationCategory
       }
-      if (payload.defaultSubject !== undefined) settings.defaultSubject = payload.defaultSubject || null
+      if (payload.defaultSubject !== undefined)
+        settings.defaultSubject = payload.defaultSubject || null
       if (payload.defaultAcceptanceConditions !== undefined) {
         settings.defaultAcceptanceConditions = payload.defaultAcceptanceConditions || null
       }
-      if (payload.defaultSignatureField !== undefined) settings.defaultSignatureField = payload.defaultSignatureField
-      if (payload.defaultFreeField !== undefined) settings.defaultFreeField = payload.defaultFreeField || null
-      if (payload.defaultShowNotes !== undefined) settings.defaultShowNotes = payload.defaultShowNotes
-      if (payload.defaultVatExempt !== undefined) settings.defaultVatExempt = payload.defaultVatExempt
+      if (payload.defaultSignatureField !== undefined)
+        settings.defaultSignatureField = payload.defaultSignatureField
+      if (payload.defaultFreeField !== undefined)
+        settings.defaultFreeField = payload.defaultFreeField || null
+      if (payload.defaultShowNotes !== undefined)
+        settings.defaultShowNotes = payload.defaultShowNotes
+      if (payload.defaultVatExempt !== undefined)
+        settings.defaultVatExempt = payload.defaultVatExempt
       if (payload.defaultVatRate !== undefined) settings.defaultVatRate = payload.defaultVatRate
-      if (payload.defaultVatOnDebits !== undefined) settings.defaultVatOnDebits = payload.defaultVatOnDebits
+      if (payload.defaultVatOnDebits !== undefined)
+        settings.defaultVatOnDebits = payload.defaultVatOnDebits
       if (payload.defaultShowQuantityColumn !== undefined) {
         settings.defaultShowQuantityColumn = payload.defaultShowQuantityColumn
       }
-      if (payload.defaultShowUnitColumn !== undefined) settings.defaultShowUnitColumn = payload.defaultShowUnitColumn
+      if (payload.defaultShowUnitColumn !== undefined)
+        settings.defaultShowUnitColumn = payload.defaultShowUnitColumn
       if (payload.defaultShowUnitPriceColumn !== undefined) {
         settings.defaultShowUnitPriceColumn = payload.defaultShowUnitPriceColumn
       }
-      if (payload.defaultShowVatColumn !== undefined) settings.defaultShowVatColumn = payload.defaultShowVatColumn
-      if (payload.defaultFooterText !== undefined) settings.defaultFooterText = payload.defaultFooterText || null
+      if (payload.defaultShowVatColumn !== undefined)
+        settings.defaultShowVatColumn = payload.defaultShowVatColumn
+      if (payload.defaultFooterText !== undefined)
+        settings.defaultFooterText = payload.defaultFooterText || null
       if (payload.defaultShowDeliveryAddress !== undefined) {
         settings.defaultShowDeliveryAddress = payload.defaultShowDeliveryAddress
       }
-      if (payload.defaultLanguage !== undefined) settings.defaultLanguage = payload.defaultLanguage || 'fr'
+      if (payload.defaultLanguage !== undefined)
+        settings.defaultLanguage = payload.defaultLanguage || 'fr'
       if (payload.quoteFilenamePattern !== undefined) {
         settings.quoteFilenamePattern = payload.quoteFilenamePattern || 'DEV-{numero}'
       }
@@ -132,9 +150,12 @@ export default class InvoiceSettingsUpdate {
       if (payload.nextInvoiceNumber !== undefined) {
         settings.nextInvoiceNumber = payload.nextInvoiceNumber?.trim() || null
       }
-      if (payload.footerMode !== undefined) settings.footerMode = payload.footerMode || 'company_info'
-      if (payload.logoBorderRadius !== undefined) settings.logoBorderRadius = payload.logoBorderRadius
-      if (payload.collaborationEnabled !== undefined) settings.collaborationEnabled = payload.collaborationEnabled
+      if (payload.footerMode !== undefined)
+        settings.footerMode = payload.footerMode || 'company_info'
+      if (payload.logoBorderRadius !== undefined)
+        settings.logoBorderRadius = payload.logoBorderRadius
+      if (payload.collaborationEnabled !== undefined)
+        settings.collaborationEnabled = payload.collaborationEnabled
       if (payload.aiEnabled !== undefined) settings.aiEnabled = payload.aiEnabled
       settings.aiProvider = 'gemini'
       if (payload.aiModel !== undefined) {

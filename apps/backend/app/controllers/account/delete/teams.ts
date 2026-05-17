@@ -12,9 +12,7 @@ export default class Teams {
     const error = validateDeletionSession(user, token)
     if (error) return response.badRequest({ message: error })
 
-    const memberships = await TeamMember.query()
-      .where('userId', user.id)
-      .where('status', 'active')
+    const memberships = await TeamMember.query().where('userId', user.id).where('status', 'active')
 
     const teams: {
       id: string

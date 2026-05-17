@@ -4,6 +4,7 @@ export default class UploadValidator {
   private static readonly DANGEROUS_PATTERNS = [
     /\.\./,
     /[<>:"|?*]/, // Windows reserved chars
+    // eslint-disable-next-line no-control-regex
     /[\x00-\x1f]/,
     /^\.+$/,
     /\s{2,}/,

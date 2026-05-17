@@ -5,7 +5,6 @@ import env from '#start/env'
 import User from '#models/account/user'
 import type { SharePermission } from '#models/collaboration/document_share'
 
-
 export interface CollaboratorInfo {
   userId: string
   fullName: string | null
@@ -30,12 +29,18 @@ export interface DocumentChange {
   timestamp: number
 }
 
-
 const CURSOR_COLORS = [
-  '#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4',
-  '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6', '#f43f5e',
+  '#ef4444',
+  '#f97316',
+  '#eab308',
+  '#22c55e',
+  '#06b6d4',
+  '#3b82f6',
+  '#8b5cf6',
+  '#ec4899',
+  '#14b8a6',
+  '#f43f5e',
 ]
-
 
 interface RoomPresence {
   collaborators: Map<string, CollaboratorInfo & { socketId: string }>
@@ -58,7 +63,19 @@ function getOrCreateRoom(roomKey: string): RoomPresence {
 /**
  * Returns a map of documentId → list of active editors for a given type + team.
  */
-export function getActiveEditors(documentType: string, _teamId: string): Record<string, { userId: string; fullName: string | null; email: string; avatarUrl: string | null; color: string }[]> {
+export function getActiveEditors(
+  documentType: string,
+  _teamId: string
+): Record<
+  string,
+  {
+    userId: string
+    fullName: string | null
+    email: string
+    avatarUrl: string | null
+    color: string
+  }[]
+> {
   const result: Record<string, any[]> = {}
   for (const [roomKey, room] of rooms) {
     const [type, docId] = roomKey.split(':')
@@ -163,10 +180,7 @@ export function initWebSocket(httpServer: HttpServer) {
 
     // ── Join a document room ──────────────────────────────────────────
 
-    socket.on('join-document', async (data: {
-      documentType: string
-      documentId: string
-    }) => {
+    socket.on('join-document', async (data: { documentType: string; documentId: string }) => {
       const { documentType, documentId } = data
 
       // Validate input
@@ -187,9 +201,8 @@ export function initWebSocket(httpServer: HttpServer) {
       let isOwner = false
 
       // Import dynamically to avoid circular dependencies
-      const { default: DocumentAccessService } = await import(
-        '#services/collaboration/document_access_service'
-      )
+      const { default: DocumentAccessService } =
+        await import('#services/collaboration/document_access_service')
       const accessService = new DocumentAccessService()
 
       // Check if user is team owner
@@ -241,7 +254,9 @@ export function initWebSocket(httpServer: HttpServer) {
       ;(socket as any).currentRoom = roomKey
 
       // Send current collaborators to the joining user
-      const collaborators = Array.from(room.collaborators.values()).map(({ socketId: _, ...c }) => c)
+      const collaborators = Array.from(room.collaborators.values()).map(
+        ({ socketId: _, ...c }) => c
+      )
       socket.emit('room-joined', {
         permission,
         isOwner,
@@ -365,16 +380,18 @@ async function handleLeaveRoom(socket: Socket, userId: string) {
       // Auto-expire share links created by this user
       const [docType, docId] = roomKey.split(':')
       if (docType && docId) {
-        import('#models/collaboration/document_share_link').then(({ default: DocumentShareLink }) => {
-          DocumentShareLink.query()
-            .where('document_type', docType)
-            .where('document_id', docId)
-            .where('created_by_user_id', userId)
-            .where('auto_expire', true)
-            .where('is_active', true)
-            .update({ isActive: false })
-            .catch(() => {})
-        })
+        import('#models/collaboration/document_share_link').then(
+          ({ default: DocumentShareLink }) => {
+            DocumentShareLink.query()
+              .where('document_type', docType)
+              .where('document_id', docId)
+              .where('created_by_user_id', userId)
+              .where('auto_expire', true)
+              .where('is_active', true)
+              .update({ isActive: false })
+              .catch(() => {})
+          }
+        )
       }
 
       if (room.collaborators.size === 0) {
@@ -387,10 +404,7 @@ async function handleLeaveRoom(socket: Socket, userId: string) {
 /**
  * Broadcast that a document was deleted — all collaborators should leave.
  */
-export function broadcastDocumentDeleted(
-  documentType: string,
-  documentId: string,
-) {
+export function broadcastDocumentDeleted(documentType: string, documentId: string) {
   if (!io) return
 
   const roomKey = getRoomKey(documentType, documentId)

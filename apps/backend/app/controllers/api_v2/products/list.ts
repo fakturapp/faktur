@@ -1,9 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Product from '#models/product/product'
-import {
-  decryptModelFieldsArray,
-  ENCRYPTED_FIELDS,
-} from '#services/crypto/field_encryption_helper'
+import { decryptModelFieldsArray, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 import apiResponse from '#services/api/api_response'
 import apiPagination from '#services/api/api_pagination'
 import apiProductTransformer from '#transformers/api_v2/api_product_transformer'
@@ -45,7 +42,10 @@ export default class List {
     if (payload.q) {
       const needle = payload.q.toLowerCase()
       filtered = filtered.filter((p) => {
-        const haystack = [p.name, p.description, p.reference].filter(Boolean).join(' ').toLowerCase()
+        const haystack = [p.name, p.description, p.reference]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase()
         return haystack.includes(needle)
       })
     }

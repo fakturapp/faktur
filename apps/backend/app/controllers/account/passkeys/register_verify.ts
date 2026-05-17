@@ -15,7 +15,7 @@ export default class RegisterVerify {
       return response.badRequest({ message: 'Missing credential response' })
     }
 
-    const name = (friendlyName || '').trim() || 'Clé d\'accès'
+    const name = (friendlyName || '').trim() || "Clé d'accès"
 
     try {
       const { credential, verified } = await passkeyService.verifyRegistration(

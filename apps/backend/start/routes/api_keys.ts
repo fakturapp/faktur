@@ -28,13 +28,9 @@ router
     router.get('/api-keys/:id', [KeysShow, 'handle']).as('dashboard.apiKeys.show')
     router.patch('/api-keys/:id', [KeysUpdate, 'handle']).as('dashboard.apiKeys.update')
     router.delete('/api-keys/:id', [KeysRevoke, 'handle']).as('dashboard.apiKeys.revoke')
-    router
-      .post('/api-keys/:id/rotate', [KeysRotate, 'handle'])
-      .as('dashboard.apiKeys.rotate')
+    router.post('/api-keys/:id/rotate', [KeysRotate, 'handle']).as('dashboard.apiKeys.rotate')
 
-    router
-      .put('/api-keys/:id/webhook', [WebhookSet, 'handle'])
-      .as('dashboard.apiKeys.webhook.set')
+    router.put('/api-keys/:id/webhook', [WebhookSet, 'handle']).as('dashboard.apiKeys.webhook.set')
     router
       .delete('/api-keys/:id/webhook', [WebhookDestroy, 'handle'])
       .as('dashboard.apiKeys.webhook.destroy')

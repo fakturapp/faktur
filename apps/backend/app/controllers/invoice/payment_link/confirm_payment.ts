@@ -64,8 +64,7 @@ export default class ConfirmPayment {
     if (paymentLink.pdfStorageKey) {
       try {
         await r2StorageService.delete(paymentLink.pdfStorageKey)
-      } catch {
-      }
+      } catch {}
     }
 
     paymentLink.encryptedIban = null
@@ -77,12 +76,15 @@ export default class ConfirmPayment {
     await paymentLink.save()
 
     const linkId = paymentLink.id
-    setTimeout(async () => {
-      try {
-        const link = await PaymentLink.find(linkId)
-        if (link) await link.delete()
-      } catch { }
-    }, 5 * 60 * 1000)
+    setTimeout(
+      async () => {
+        try {
+          const link = await PaymentLink.find(linkId)
+          if (link) await link.delete()
+        } catch {}
+      },
+      5 * 60 * 1000
+    )
 
     if (payload.notifyClient && paymentLink.clientEmail) {
       try {
@@ -91,14 +93,12 @@ export default class ConfirmPayment {
         if (paymentLink.clientName) {
           try {
             clientName = encryptionService.decrypt(paymentLink.clientName)
-          } catch {
-          }
+          } catch {}
         }
         await mail.send(
           new PaymentConfirmedNotification(clientEmail, paymentLink.invoiceNumber, clientName)
         )
-      } catch {
-      }
+      } catch {}
     }
 
     broadcastDocumentSaved('invoice', invoice.id, user.id)

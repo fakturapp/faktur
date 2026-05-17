@@ -3,8 +3,7 @@ import { API_V2_PREFIX, apiV2Stack } from '#start/routes/api_v2/_pipeline'
 
 const RecurringInvoicesList = () => import('#controllers/api_v2/recurring_invoices/list')
 const RecurringInvoicesShow = () => import('#controllers/api_v2/recurring_invoices/show')
-const RecurringInvoicesToggle = () =>
-  import('#controllers/api_v2/recurring_invoices/toggle_active')
+const RecurringInvoicesToggle = () => import('#controllers/api_v2/recurring_invoices/toggle_active')
 
 router
   .group(() => {

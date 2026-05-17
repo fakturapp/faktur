@@ -4,7 +4,6 @@ import Expense from '#models/expense/expense'
 import Company from '#models/team/company'
 import { decryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 
-
 const FEC_HEADER = [
   'JournalCode',
   'JournalLib',

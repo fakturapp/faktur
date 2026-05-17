@@ -3,9 +3,7 @@ import Feedback from '#models/admin/feedback'
 
 export default class Feedbacks {
   async handle({ response }: HttpContext) {
-    const feedbacks = await Feedback.query()
-      .preload('user')
-      .orderBy('createdAt', 'desc')
+    const feedbacks = await Feedback.query().preload('user').orderBy('createdAt', 'desc')
 
     return response.ok({
       feedbacks: feedbacks.map((f) => ({

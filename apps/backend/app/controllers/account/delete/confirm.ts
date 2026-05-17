@@ -33,7 +33,8 @@ export default class Confirm {
 
     if (ownedTeams.length > 0) {
       return response.badRequest({
-        message: 'Vous possédez encore des équipes. Supprimez-les ou transférez-les avant de continuer.',
+        message:
+          'Vous possédez encore des équipes. Supprimez-les ou transférez-les avant de continuer.',
       })
     }
 

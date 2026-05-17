@@ -28,11 +28,7 @@ export default class Revoke {
     await share.save()
 
     if (share.sharedWithUserId) {
-      await disconnectUserFromDocument(
-        share.documentType,
-        share.documentId,
-        share.sharedWithUserId
-      )
+      await disconnectUserFromDocument(share.documentType, share.documentId, share.sharedWithUserId)
     }
 
     return response.ok({

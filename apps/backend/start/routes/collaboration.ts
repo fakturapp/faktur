@@ -17,7 +17,6 @@ const ValidateLink = () => import('#controllers/collaboration/access/validate_li
 const CheckAccess = () => import('#controllers/collaboration/access/check_access')
 const ActiveEditors = () => import('#controllers/collaboration/access/active_editors')
 
-
 const collabGroup = router
   .group(() => {
     router.get('/shares/:documentType/:documentId', [ShareList, 'handle'])
@@ -37,7 +36,6 @@ const collabGroup = router
   .prefix('/collaboration')
   .use(middleware.auth())
 if (API_PREFIX) collabGroup.prefix(API_PREFIX)
-
 
 const validateGroup = router
   .group(() => {

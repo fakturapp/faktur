@@ -122,9 +122,7 @@ class PasskeyService {
       credentialId: credential.id,
       publicKey: Buffer.from(credential.publicKey).toString('base64url'),
       counter: credential.counter,
-      transports: credential.transports
-        ? JSON.stringify(credential.transports)
-        : null,
+      transports: credential.transports ? JSON.stringify(credential.transports) : null,
       friendlyName,
       backedUp: credentialBackedUp,
     })
@@ -133,7 +131,9 @@ class PasskeyService {
   }
 
   async generateAuthenticationOptions(email?: string) {
-    let allowCredentials: { id: string; type: 'public-key'; transports?: AuthenticatorTransportFuture[] }[] | undefined
+    let allowCredentials:
+      | { id: string; type: 'public-key'; transports?: AuthenticatorTransportFuture[] }[]
+      | undefined
 
     if (email) {
       const { default: User } = await import('#models/account/user')
@@ -167,9 +167,7 @@ class PasskeyService {
     return options
   }
 
-  async verifyAuthentication(
-    response: AuthenticationResponseJSON
-  ): Promise<{
+  async verifyAuthentication(response: AuthenticationResponseJSON): Promise<{
     verified: boolean
     credential: PasskeyCredential | null
     error?: string
@@ -255,9 +253,7 @@ class PasskeyService {
 
   derivePasskeyKey(credentialId: string): Buffer {
     const ikm = Buffer.from(credentialId, 'base64url')
-    return Buffer.from(
-      crypto.hkdfSync('sha256', ikm, Buffer.alloc(0), 'factorpro-passkey-kek', 32)
-    )
+    return Buffer.from(crypto.hkdfSync('sha256', ikm, Buffer.alloc(0), 'factorpro-passkey-kek', 32))
   }
 
   encryptKekForPasskey(kek: Buffer, credentialId: string): string {
@@ -271,9 +267,7 @@ class PasskeyService {
   }
 
   async cleanupExpiredChallenges() {
-    await PasskeyChallenge.query()
-      .where('expiresAt', '<', DateTime.now().toSQL()!)
-      .delete()
+    await PasskeyChallenge.query().where('expiresAt', '<', DateTime.now().toSQL()!).delete()
   }
 }
 

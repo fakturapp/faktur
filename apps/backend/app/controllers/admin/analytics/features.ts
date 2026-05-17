@@ -23,7 +23,9 @@ export default class AnalyticsFeatures {
       const currentCount = Number(row.count)
       const previousCount = previousMap.get(row.event_name) || 0
       const trendPercentage =
-        previousCount > 0 ? Math.round(((currentCount - previousCount) / previousCount) * 100) : null
+        previousCount > 0
+          ? Math.round(((currentCount - previousCount) / previousCount) * 100)
+          : null
 
       return {
         name: row.event_name,

@@ -3,12 +3,7 @@ import { BaseModel, column, belongsTo } from '@adonisjs/lucid/orm'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import ApiKey from '#models/api/api_key'
 
-export type DeliveryStatus =
-  | 'pending'
-  | 'in_flight'
-  | 'delivered'
-  | 'failed'
-  | 'failed_permanent'
+export type DeliveryStatus = 'pending' | 'in_flight' | 'delivered' | 'failed' | 'failed_permanent'
 
 export default class ApiWebhookDelivery extends BaseModel {
   public static table = 'api_webhook_deliveries'

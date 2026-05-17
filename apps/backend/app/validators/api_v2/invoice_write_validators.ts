@@ -25,7 +25,10 @@ const baseFields = {
     .enum(['none', 'not_subject', 'france_no_vat', 'outside_france'] as const)
     .optional(),
   vat_on_debits: vine.boolean().optional(),
-  operation_category: vine.enum(['service', 'goods', 'mixed'] as const).nullable().optional(),
+  operation_category: vine
+    .enum(['service', 'goods', 'mixed'] as const)
+    .nullable()
+    .optional(),
   delivery_address: vine.string().trim().nullable().optional(),
 }
 

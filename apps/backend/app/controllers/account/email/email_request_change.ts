@@ -18,7 +18,8 @@ export default class EmailRequestChange {
     const isDisposable = await EmailBlacklistService.isDisposableEmail(newEmail)
     if (isDisposable) {
       return response.unprocessableEntity({
-        message: 'Les adresses email temporaires ne sont pas autorisées. Veuillez utiliser une adresse email permanente ou contacter support@fakturapp.cc pour faire whitelister votre domaine.',
+        message:
+          'Les adresses email temporaires ne sont pas autorisées. Veuillez utiliser une adresse email permanente ou contacter support@fakturapp.cc pour faire whitelister votre domaine.',
         code: 'DISPOSABLE_EMAIL',
       })
     }

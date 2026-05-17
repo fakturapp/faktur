@@ -11,8 +11,7 @@ export default class AnalyticsConsent {
     try {
       await auth.use('api').check()
       userId = auth.use('api').user?.id || null
-    } catch {
-    }
+    } catch {}
 
     const ip = request.ip()
     const userAgent = request.header('user-agent') || ''

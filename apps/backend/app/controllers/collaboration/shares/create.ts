@@ -18,7 +18,11 @@ export default class Create {
     const payload = await request.validateUsing(createShareValidator)
 
     const accessService = new DocumentAccessService()
-    const document = await accessService.getDocument(payload.documentType, payload.documentId, teamId)
+    const document = await accessService.getDocument(
+      payload.documentType,
+      payload.documentId,
+      teamId
+    )
     if (!document) {
       return response.notFound({ message: 'Document not found' })
     }

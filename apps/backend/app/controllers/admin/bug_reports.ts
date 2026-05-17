@@ -3,9 +3,7 @@ import BugReport from '#models/admin/bug_report'
 
 export default class BugReports {
   async index({ response }: HttpContext) {
-    const bugReports = await BugReport.query()
-      .preload('user')
-      .orderBy('createdAt', 'desc')
+    const bugReports = await BugReport.query().preload('user').orderBy('createdAt', 'desc')
 
     return response.ok({
       bugReports: bugReports.map((b) => ({

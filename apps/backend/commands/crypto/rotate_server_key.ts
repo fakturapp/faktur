@@ -66,9 +66,7 @@ export default class CryptoRotateServerKey extends BaseCommand {
     }
 
     const standardTeams = await Team.query().where('encryptionMode', 'standard')
-    this.logger.info(
-      `Found ${standardTeams.length} standard-mode team(s). Rewrapping team DEKs...`
-    )
+    this.logger.info(`Found ${standardTeams.length} standard-mode team(s). Rewrapping team DEKs...`)
 
     let rotated = 0
     let skipped = 0

@@ -64,10 +64,7 @@ export default class ExchangeSession {
     const existingKek = keyStore.getKEK(user.id)
     if (existingKek) {
       const sessionKey = crypto.randomBytes(32)
-      const layer1 = encryptionService.encryptWithCustomKey(
-        existingKek.toString('hex'),
-        sessionKey
-      )
+      const layer1 = encryptionService.encryptWithCustomKey(existingKek.toString('hex'), sessionKey)
       const layer2 = encryptionService.encrypt(layer1)
       await db
         .from('auth_access_tokens')

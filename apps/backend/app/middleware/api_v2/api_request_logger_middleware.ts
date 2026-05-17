@@ -28,9 +28,7 @@ export default class ApiRequestLoggerMiddleware {
         })
 
         if (status < 500) {
-          apiKeyService
-            .touchUsage(apiKey.id, ctx.apiClientIp ?? ctx.request.ip())
-            .catch(() => {})
+          apiKeyService.touchUsage(apiKey.id, ctx.apiClientIp ?? ctx.request.ip()).catch(() => {})
         }
       }
     }

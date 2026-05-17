@@ -51,7 +51,9 @@ export default class CompletePersonalization {
         template: payload.template || defaultSettings.template,
         accentColor: payload.accentColor || defaultSettings.accentColor,
         billingType: payload.billingType || defaultSettings.billingType,
-        paymentMethods: payload.paymentMethods?.length ? payload.paymentMethods : defaultSettings.paymentMethods,
+        paymentMethods: payload.paymentMethods?.length
+          ? payload.paymentMethods
+          : defaultSettings.paymentMethods,
         defaultVatExempt: payload.vatExemptReason === 'not_subject',
         defaultLanguage: payload.language || defaultSettings.defaultLanguage,
         quoteFilenamePattern: quotePattern || defaultSettings.quoteFilenamePattern,

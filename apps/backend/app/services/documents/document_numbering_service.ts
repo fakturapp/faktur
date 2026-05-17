@@ -26,7 +26,11 @@ class DocumentNumberingService {
       .replace(YEAR_PLACEHOLDER_REGEX, '{annee}')
   }
 
-  buildSequencePrefix(pattern: string | null | undefined, fallbackPattern: string, currentYear?: string) {
+  buildSequencePrefix(
+    pattern: string | null | undefined,
+    fallbackPattern: string,
+    currentYear?: string
+  ) {
     return this.normalizePattern(pattern, fallbackPattern)
       .replace(/\{annee\}/gi, currentYear || new Date().getFullYear().toString())
       .replace(/\{numero\}/gi, '')
@@ -53,7 +57,11 @@ class DocumentNumberingService {
     return `${prefix}${nextNumber.toString().padStart(padding, '0')}`
   }
 
-  resolvePattern(pattern: string | null | undefined, fallbackPattern: string, vars: ResolvePatternVariables) {
+  resolvePattern(
+    pattern: string | null | undefined,
+    fallbackPattern: string,
+    vars: ResolvePatternVariables
+  ) {
     return this.normalizePattern(pattern, fallbackPattern)
       .replace(/\{numero\}/gi, vars.numero)
       .replace(/\{date\}/gi, vars.date || '')

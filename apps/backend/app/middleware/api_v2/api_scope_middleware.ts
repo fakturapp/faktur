@@ -4,11 +4,7 @@ import scopeChecker from '#services/api/scope_checker'
 import apiResponse from '#services/api/api_response'
 
 export default class ApiScopeMiddleware {
-  async handle(
-    ctx: HttpContext,
-    next: NextFn,
-    options?: string[] | { scopes?: string[] }
-  ) {
+  async handle(ctx: HttpContext, next: NextFn, options?: string[] | { scopes?: string[] }) {
     const required = Array.isArray(options)
       ? options
       : Array.isArray(options?.scopes)

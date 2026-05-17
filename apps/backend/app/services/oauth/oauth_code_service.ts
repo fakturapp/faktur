@@ -54,7 +54,9 @@ class OauthCodeService {
   }
 
   async purgeExpired(): Promise<number> {
-    const result = await OauthCode.query().where('expires_at', '<', DateTime.now().toSQL()!).delete()
+    const result = await OauthCode.query()
+      .where('expires_at', '<', DateTime.now().toSQL()!)
+      .delete()
     return Number(result[0] ?? 0)
   }
 }

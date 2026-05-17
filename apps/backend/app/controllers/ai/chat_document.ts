@@ -40,7 +40,6 @@ const chatDocumentValidator = vine.compile(
   })
 )
 
-
 interface ClientCtx {
   name?: string
   siren?: string
@@ -218,7 +217,6 @@ L'utilisateur te donne une instruction libre. Tu dois l'exécuter avec créativi
 8. **Langue** : Tout en français, vocabulaire professionnel
 9. **JSON uniquement** : Aucun texte hors du JSON`
 }
-
 
 export default class ChatDocument {
   async handle(ctx: HttpContext) {

@@ -1,9 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Quote from '#models/quote/quote'
-import {
-  decryptModelFieldsArray,
-  ENCRYPTED_FIELDS,
-} from '#services/crypto/field_encryption_helper'
+import { decryptModelFieldsArray, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 import apiResponse from '#services/api/api_response'
 import apiPagination from '#services/api/api_pagination'
 import apiQuoteTransformer from '#transformers/api_v2/api_quote_transformer'
@@ -26,7 +23,10 @@ export default class List {
       .limit(limit + 1)
 
     if (payload.status) {
-      const statuses = payload.status.split(',').map((s) => s.trim()).filter(Boolean)
+      const statuses = payload.status
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean)
       if (statuses.length > 0) query.whereIn('status', statuses)
     }
     if (payload.client_id) {

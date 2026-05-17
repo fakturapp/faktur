@@ -1,6 +1,5 @@
 import limiter from '@adonisjs/limiter/services/main'
 
-
 export const loginLimiter = limiter.define('login', (ctx) => {
   return limiter
     .allowRequests(5)

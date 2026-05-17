@@ -152,9 +152,7 @@ export default class Login {
       severity: 'info',
     })
 
-    const memberships = await TeamMember.query()
-      .where('userId', user.id)
-      .where('status', 'active')
+    const memberships = await TeamMember.query().where('userId', user.id).where('status', 'active')
 
     const teamIds = memberships.map((m) => m.teamId)
     const teams = teamIds.length > 0 ? await Team.query().whereIn('id', teamIds) : []

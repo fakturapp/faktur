@@ -21,11 +21,9 @@ test.group('teamEncryptionService.wrapDekForTeam + unwrapDekForMembership', () =
     const wrap = teamEncryptionService.wrapDekForTeam(team, dek, { userKek: kek })
     assert.match(wrap, /^[0-9a-f]+:[0-9a-f]+:[0-9a-f]+$/)
 
-    const unwrapped = teamEncryptionService.unwrapDekForMembership(
-      team,
-      fakeMember(wrap),
-      { userKek: kek }
-    )
+    const unwrapped = teamEncryptionService.unwrapDekForMembership(team, fakeMember(wrap), {
+      userKek: kek,
+    })
     assert.isNotNull(unwrapped)
     assert.equal(unwrapped!.toString('hex'), dek.toString('hex'))
   })

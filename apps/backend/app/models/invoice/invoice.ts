@@ -22,7 +22,14 @@ export default class Invoice extends BaseModel {
   declare invoiceNumber: string
 
   @column()
-  declare status: 'draft' | 'sent' | 'paid' | 'paid_unconfirmed' | 'partial' | 'overdue' | 'cancelled'
+  declare status:
+    | 'draft'
+    | 'sent'
+    | 'paid'
+    | 'paid_unconfirmed'
+    | 'partial'
+    | 'overdue'
+    | 'cancelled'
 
   @column()
   declare subject: string | null

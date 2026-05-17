@@ -17,10 +17,7 @@ export default class ApiRateLimitMiddleware {
       'X-RateLimit-Reset',
       String(Math.floor(Date.now() / 1000) + outcome.resetSeconds)
     )
-    ctx.response.header(
-      'X-RateLimit-Policy',
-      `${tier.perMinute};w=60, ${tier.perHour};w=3600`
-    )
+    ctx.response.header('X-RateLimit-Policy', `${tier.perMinute};w=60, ${tier.perHour};w=3600`)
 
     if (!outcome.allowed) {
       return apiResponse.rateLimited(
@@ -29,8 +26,9 @@ export default class ApiRateLimitMiddleware {
         {
           limit: outcome.limit,
           window: outcome.window,
-          reset_at: new Date((Math.floor(Date.now() / 1000) + outcome.resetSeconds) * 1000)
-            .toISOString(),
+          reset_at: new Date(
+            (Math.floor(Date.now() / 1000) + outcome.resetSeconds) * 1000
+          ).toISOString(),
         },
         ctx.requestId
       )

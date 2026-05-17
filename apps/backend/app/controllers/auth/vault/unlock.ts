@@ -38,7 +38,9 @@ export default class VaultUnlock {
           .first()
 
         if (!teamMember?.encryptedTeamDekRecovery) {
-          return response.badRequest({ message: 'Aucune clef de secours configurée pour ce compte' })
+          return response.badRequest({
+            message: 'Aucune clef de secours configurée pour ce compte',
+          })
         }
 
         try {

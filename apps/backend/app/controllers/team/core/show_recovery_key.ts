@@ -30,7 +30,9 @@ export default class ShowRecoveryKey {
     }
 
     try {
-      const recoveryKey = recoveryKeyService.decryptStoredRecoveryKey(membership.encryptedRecoveryKey)
+      const recoveryKey = recoveryKeyService.decryptStoredRecoveryKey(
+        membership.encryptedRecoveryKey
+      )
 
       return response.ok({
         recoveryKey: zeroAccessCryptoService.formatRecoveryKey(recoveryKey),

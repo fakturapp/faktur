@@ -33,7 +33,11 @@ export default class HttpExceptionHandler extends ExceptionHandler {
   }
 
   async report(error: unknown, ctx: HttpContext) {
-    if (error instanceof ApiError && error.visibility === 'user_facing' && (error.status ?? 0) < 500) {
+    if (
+      error instanceof ApiError &&
+      error.visibility === 'user_facing' &&
+      (error.status ?? 0) < 500
+    ) {
       return
     }
 
@@ -52,7 +56,10 @@ export default class HttpExceptionHandler extends ExceptionHandler {
     return super.report(error, ctx)
   }
 
-  private serializeError(error: unknown, ctx: HttpContext): {
+  private serializeError(
+    error: unknown,
+    ctx: HttpContext
+  ): {
     status: number
     errorCode: ErrorCode
     body: ReturnType<typeof buildStructuredErrorResponse>
@@ -180,9 +187,7 @@ export default class HttpExceptionHandler extends ExceptionHandler {
     }
   }
 
-  private isObjectWithStatus(
-    value: unknown
-  ): value is {
+  private isObjectWithStatus(value: unknown): value is {
     status?: number
     code?: string
     message?: string

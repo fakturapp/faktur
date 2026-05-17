@@ -20,7 +20,8 @@ export default class Show {
       .firstOrFail()
 
     const currentMember = team.members.find((member) => member.userId === user.id)
-    const canAccessRecoveryKey = !!currentMember && ['super_admin', 'admin'].includes(currentMember.role)
+    const canAccessRecoveryKey =
+      !!currentMember && ['super_admin', 'admin'].includes(currentMember.role)
     const serializedTeam = await ctx.serialize.withoutWrapping(TeamTransformer.transform(team))
 
     return response.ok({

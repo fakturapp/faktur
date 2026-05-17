@@ -1,7 +1,7 @@
 import crypto from 'node:crypto'
 import { DateTime } from 'luxon'
 import ApiKey from '#models/api/api_key'
-import ApiKeyWebhook from '#models/api/api_key_webhook'
+import type ApiKeyWebhook from '#models/api/api_key_webhook'
 import ApiWebhookDelivery from '#models/api/api_webhook_delivery'
 import encryptionService from '#services/encryption/encryption_service'
 import { isKnownEvent, type WebhookEventType } from '#services/api/webhook_events'

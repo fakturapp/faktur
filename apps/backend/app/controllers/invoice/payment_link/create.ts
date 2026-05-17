@@ -5,7 +5,11 @@ import PaymentLink from '#models/invoice/payment_link'
 import BankAccount from '#models/team/bank_account'
 import InvoiceSetting from '#models/team/invoice_setting'
 import { createPaymentLinkValidator } from '#validators/payment_link_validator'
-import { encryptModelFields, decryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
+import {
+  encryptModelFields,
+  decryptModelFields,
+  ENCRYPTED_FIELDS,
+} from '#services/crypto/field_encryption_helper'
 import encryptionService from '#services/encryption/encryption_service'
 import { generateInvoicePdf } from '#services/pdf/document_pdf_service'
 import r2StorageService from '#services/storage/r2_storage_service'
@@ -32,9 +36,7 @@ export default class Create {
       return response.notFound({ message: 'Invoice not found' })
     }
 
-    const existingLink = await PaymentLink.query()
-      .where('invoice_id', invoice.id)
-      .first()
+    const existingLink = await PaymentLink.query().where('invoice_id', invoice.id).first()
 
     if (existingLink) {
       if (existingLink.isActive) {
@@ -107,8 +109,7 @@ export default class Create {
       try {
         const snap = JSON.parse(invoice.companySnapshot!)
         companyName = snap.legalName || snap.companyName || null
-      } catch {
-      }
+      } catch {}
     }
 
     let appEncryptedClientEmail: string | null = null
@@ -151,13 +152,19 @@ export default class Create {
     if (payload.paymentMethod === 'stripe') {
       const invoiceSettings = await InvoiceSetting.query().where('team_id', teamId).first()
       if (!invoiceSettings?.stripePublishableKey || !invoiceSettings?.stripeSecretKey) {
-        return response.badRequest({ message: 'Stripe is not configured. Set up your Stripe keys in settings.' })
+        return response.badRequest({
+          message: 'Stripe is not configured. Set up your Stripe keys in settings.',
+        })
       }
 
       decryptModelFields(invoiceSettings, [...ENCRYPTED_FIELDS.invoiceSetting], dek)
 
-      linkData.encryptedStripePublishableKey = encryptionService.encrypt(invoiceSettings.stripePublishableKey!)
-      linkData.encryptedStripeSecretKey = encryptionService.encrypt(invoiceSettings.stripeSecretKey!)
+      linkData.encryptedStripePublishableKey = encryptionService.encrypt(
+        invoiceSettings.stripePublishableKey!
+      )
+      linkData.encryptedStripeSecretKey = encryptionService.encrypt(
+        invoiceSettings.stripeSecretKey!
+      )
       linkData.showIban = false
     }
 
@@ -182,8 +189,7 @@ export default class Create {
         )
         paymentLink.pdfStorageKey = pdfUrl
         await paymentLink.save()
-      } catch {
-      }
+      } catch {}
     }
 
     const fullUrl = buildCheckoutUrl(rawToken)

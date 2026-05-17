@@ -9,9 +9,7 @@ export default class CheckoutDownloadPdf {
 
     const tokenHash = encryptionService.hash(params.token)
 
-    const paymentLink = await PaymentLink.query()
-      .where('token_hash', tokenHash)
-      .first()
+    const paymentLink = await PaymentLink.query().where('token_hash', tokenHash).first()
 
     if (!paymentLink) {
       return response.notFound({ message: 'Payment link not found' })

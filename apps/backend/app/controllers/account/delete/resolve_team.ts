@@ -42,7 +42,9 @@ export default class ResolveTeam {
 
     if (payload.action === 'leave') {
       if (membership.role === 'super_admin') {
-        return response.forbidden({ message: 'Le propriétaire ne peut pas quitter. Transférez ou supprimez.' })
+        return response.forbidden({
+          message: 'Le propriétaire ne peut pas quitter. Transférez ou supprimez.',
+        })
       }
       await membership.delete()
       return response.ok({ message: "Vous avez quitté l'équipe" })

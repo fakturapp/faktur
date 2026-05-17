@@ -12,7 +12,11 @@ class OauthWebhookService {
   private static RETRY_BACKOFF_SECONDS = [30, 120, 600, 3600, 10_800]
   private static MAX_ATTEMPTS = 5
 
-  async enqueue(app: OauthApp, event: OauthWebhookEvent, payload: Record<string, unknown>): Promise<void> {
+  async enqueue(
+    app: OauthApp,
+    event: OauthWebhookEvent,
+    payload: Record<string, unknown>
+  ): Promise<void> {
     if (!app.subscribesTo(event)) return
     if (!app.webhookUrl) return
 
@@ -125,7 +129,10 @@ class OauthWebhookService {
       delivery.nextAttemptAt = null
       return
     }
-    const idx = Math.min(delivery.attemptCount - 1, OauthWebhookService.RETRY_BACKOFF_SECONDS.length - 1)
+    const idx = Math.min(
+      delivery.attemptCount - 1,
+      OauthWebhookService.RETRY_BACKOFF_SECONDS.length - 1
+    )
     const wait = OauthWebhookService.RETRY_BACKOFF_SECONDS[idx]
     delivery.status = 'failed'
     delivery.nextAttemptAt = DateTime.now().plus({ seconds: wait })

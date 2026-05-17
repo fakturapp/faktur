@@ -92,9 +92,7 @@ export default class ApiKeyMiddleware {
     const dekOwnerId = apiKey.createdByUserId ?? team.ownerId
     let dek = keyStore.getDEK(dekOwnerId, team.id)
     if (!dek) {
-      const decrypted = member
-        ? teamEncryptionService.unwrapDekForMembership(team, member)
-        : null
+      const decrypted = member ? teamEncryptionService.unwrapDekForMembership(team, member) : null
       if (!decrypted) {
         return apiResponse.error(ctx.response, 500, {
           code: 'internal_error',

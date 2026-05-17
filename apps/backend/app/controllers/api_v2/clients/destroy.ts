@@ -23,10 +23,7 @@ export default class Destroy {
       throw err
     }
 
-    const client = await Client.query()
-      .where('id', internalId)
-      .where('team_id', team.id)
-      .first()
+    const client = await Client.query().where('id', internalId).where('team_id', team.id).first()
     if (!client) {
       return apiResponse.notFound(
         ctx.response,

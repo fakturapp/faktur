@@ -56,8 +56,7 @@ export default class Create {
     return response.created({
       data: adminTransformer.transform(created.record),
       plaintext: created.plaintext,
-      message:
-        'Copy this API key now. For security reasons, it will not be shown again.',
+      message: 'Copy this API key now. For security reasons, it will not be shown again.',
     })
   }
 }

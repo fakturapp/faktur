@@ -29,7 +29,11 @@ export default class StripeSettingsSave {
       stripeWebhookSecret: payload.webhookSecret,
     }
 
-    encryptModelFields(data, ['stripePublishableKey', 'stripeSecretKey', 'stripeWebhookSecret'] as any, dek)
+    encryptModelFields(
+      data,
+      ['stripePublishableKey', 'stripeSecretKey', 'stripeWebhookSecret'] as any,
+      dek
+    )
 
     settings.stripePublishableKey = data.stripePublishableKey
     settings.stripeSecretKey = data.stripeSecretKey

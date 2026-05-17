@@ -55,9 +55,7 @@ class WebhookSigner {
     return crypto.timingSafeEqual(a, b)
   }
 
-  parseSignatureHeader(
-    header: string
-  ): { timestamp: number; v1: string } | null {
+  parseSignatureHeader(header: string): { timestamp: number; v1: string } | null {
     const parts = header.split(',').map((p) => p.trim())
     let timestamp: number | null = null
     let v1: string | null = null

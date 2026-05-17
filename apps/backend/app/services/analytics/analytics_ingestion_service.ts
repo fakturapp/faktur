@@ -8,10 +8,7 @@ import { parseUserAgent } from '#services/analytics/user_agent_parser'
 import { getGeoFromIp } from '#services/analytics/geo_cache'
 
 function sanitizePath(path: string): string {
-  return path.replace(
-    /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi,
-    '[id]'
-  )
+  return path.replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, '[id]')
 }
 
 interface IngestPayload {
@@ -96,9 +93,7 @@ export async function ingestAnalytics(
       eventType: e.eventType,
       eventName: e.eventName,
       pagePath: e.pagePath ? sanitizePath(e.pagePath) : null,
-      pagePathFullEncrypted: e.pagePathFull
-        ? analyticsEncryption.encrypt(e.pagePathFull)
-        : null,
+      pagePathFullEncrypted: e.pagePathFull ? analyticsEncryption.encrypt(e.pagePathFull) : null,
       metadata: e.metadata || null,
       metadataEncrypted: e.metadataSensitive
         ? analyticsEncryption.encrypt(JSON.stringify(e.metadataSensitive))
@@ -112,9 +107,7 @@ export async function ingestAnalytics(
     session.pageCount += pageViews
     session.eventCount += payload.events.length
 
-    const lastPageView = [...payload.events]
-      .reverse()
-      .find((e) => e.eventType === 'page_view')
+    const lastPageView = [...payload.events].reverse().find((e) => e.eventType === 'page_view')
     if (lastPageView?.pagePath) {
       session.exitPage = sanitizePath(lastPageView.pagePath)
     }
@@ -139,9 +132,7 @@ export async function ingestAnalytics(
           errorMessageFullEncrypted: err.errorMessageFull
             ? analyticsEncryption.encrypt(err.errorMessageFull)
             : null,
-          stackTraceEncrypted: err.stackTrace
-            ? analyticsEncryption.encrypt(err.stackTrace)
-            : null,
+          stackTraceEncrypted: err.stackTrace ? analyticsEncryption.encrypt(err.stackTrace) : null,
           pagePath: err.pagePath ? sanitizePath(err.pagePath) : null,
           browser: parsed.browser,
           os: parsed.os,
@@ -174,9 +165,7 @@ export async function ingestAnalytics(
   // Update session timing
   session.endedAt = DateTime.now()
   if (session.startedAt) {
-    session.durationSeconds = Math.round(
-      session.endedAt.diff(session.startedAt, 'seconds').seconds
-    )
+    session.durationSeconds = Math.round(session.endedAt.diff(session.startedAt, 'seconds').seconds)
   }
   await session.save()
 }

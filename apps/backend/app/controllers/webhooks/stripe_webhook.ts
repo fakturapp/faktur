@@ -57,7 +57,11 @@ export default class StripeWebhook {
 
     let event: any
     try {
-      event = stripeService.constructWebhookEvent(rawBody as string | Buffer, signature, webhookSecret)
+      event = stripeService.constructWebhookEvent(
+        rawBody as string | Buffer,
+        signature,
+        webhookSecret
+      )
     } catch {
       return response.badRequest({ message: 'Invalid signature' })
     }
@@ -92,7 +96,9 @@ export default class StripeWebhook {
     paymentLink.encryptedBankName = null
 
     if (paymentLink.pdfStorageKey) {
-      try { await r2StorageService.delete(paymentLink.pdfStorageKey) } catch { }
+      try {
+        await r2StorageService.delete(paymentLink.pdfStorageKey)
+      } catch {}
       paymentLink.pdfStorageKey = null
     }
     paymentLink.pdfData = null
@@ -100,12 +106,15 @@ export default class StripeWebhook {
     await paymentLink.save()
 
     const linkId = paymentLink.id
-    setTimeout(async () => {
-      try {
-        const link = await PaymentLink.find(linkId)
-        if (link) await link.delete()
-      } catch { }
-    }, 5 * 60 * 1000)
+    setTimeout(
+      async () => {
+        try {
+          const link = await PaymentLink.find(linkId)
+          if (link) await link.delete()
+        } catch {}
+      },
+      5 * 60 * 1000
+    )
 
     const invoice = await Invoice.find(paymentLink.invoiceId)
     if (invoice) {
@@ -130,7 +139,9 @@ export default class StripeWebhook {
           )
         )
       }
-    } catch { /* */ }
+    } catch {
+      /* */
+    }
 
     // Send email to Abel (client)
     if (paymentLink.clientEmail) {
@@ -138,12 +149,18 @@ export default class StripeWebhook {
         const clientEmail = encryptionService.decrypt(paymentLink.clientEmail)
         let clientName: string | undefined
         if (paymentLink.clientName) {
-          try { clientName = encryptionService.decrypt(paymentLink.clientName) } catch { /* */ }
+          try {
+            clientName = encryptionService.decrypt(paymentLink.clientName)
+          } catch {
+            /* */
+          }
         }
         await mail.send(
           new StripePaymentToClient(clientEmail, paymentLink.invoiceNumber, clientName)
         )
-      } catch { /* */ }
+      } catch {
+        /* */
+      }
     }
   }
 

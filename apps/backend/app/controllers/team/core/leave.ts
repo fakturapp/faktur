@@ -23,7 +23,8 @@ export default class Leave {
 
     if (membership.role === 'super_admin') {
       return response.forbidden({
-        message: "Le propriétaire ne peut pas quitter l'équipe. Transférez la propriété ou supprimez l'équipe.",
+        message:
+          "Le propriétaire ne peut pas quitter l'équipe. Transférez la propriété ou supprimez l'équipe.",
       })
     }
 

@@ -1,9 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Company from '#models/team/company'
-import {
-  decryptModelFields,
-  ENCRYPTED_FIELDS,
-} from '#services/crypto/field_encryption_helper'
+import { decryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 import apiResponse from '#services/api/api_response'
 import apiCompanyTransformer from '#transformers/api_v2/api_company_transformer'
 

@@ -6,7 +6,8 @@ import teamEncryptionService from '#services/crypto/team_encryption_service'
 
 export default class CryptoDoctor extends BaseCommand {
   static commandName = 'crypto:doctor'
-  static description = 'Inspect every team and verify that DEK wraps match the declared encryption mode.'
+  static description =
+    'Inspect every team and verify that DEK wraps match the declared encryption mode.'
 
   static options: CommandOptions = {
     startApp: true,
@@ -66,7 +67,9 @@ export default class CryptoDoctor extends BaseCommand {
       if (teamOk) {
         ok++
         if (team.encryptionMode === 'standard' && dekResolved) {
-          this.logger.info(`team=${team.id} mode=standard ✓ DEK resolves (${members.length} members)`)
+          this.logger.info(
+            `team=${team.id} mode=standard ✓ DEK resolves (${members.length} members)`
+          )
         } else {
           this.logger.info(`team=${team.id} mode=${team.encryptionMode} ✓ wraps look valid`)
         }
