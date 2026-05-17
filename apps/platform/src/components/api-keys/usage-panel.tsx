@@ -4,11 +4,35 @@ import { useEffect, useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/toast'
-import { apiKeysClient, type ApiKeyShape, type UsageStats } from '@/lib/api-keys-client'
+import {
+  apiKeysClient,
+  type ApiKeyShape,
+  type RequestLogShape,
+  type UsageStats,
+} from '@/lib/api-keys-client'
+
+function fmtRelative(iso: string): string {
+  const then = new Date(iso).getTime()
+  const diff = Math.max(0, Math.floor((Date.now() - then) / 1000))
+  if (diff < 60) return `${diff}s`
+  const m = Math.floor(diff / 60)
+  if (m < 60) return `${m} min`
+  const h = Math.floor(m / 60)
+  if (h < 24) return `${h} h`
+  return `${Math.floor(h / 24)} j`
+}
+
+function statusTone(status: number): string {
+  if (status >= 500) return 'text-danger'
+  if (status >= 400) return 'text-warning'
+  if (status >= 300) return 'text-accent'
+  return 'text-success'
+}
 
 export function UsagePanel({ apiKey }: { apiKey: ApiKeyShape }) {
   const { toast } = useToast()
   const [stats, setStats] = useState<UsageStats | null>(null)
+  const [recent, setRecent] = useState<RequestLogShape[] | null>(null)
 
   useEffect(() => {
     apiKeysClient.usageStats(apiKey.id).then((res) => {
@@ -17,6 +41,10 @@ export function UsagePanel({ apiKey }: { apiKey: ApiKeyShape }) {
         return
       }
       setStats(res.data?.data ?? null)
+    })
+    apiKeysClient.logs(apiKey.id, { limit: 20 }).then((res) => {
+      if (res.error) return
+      setRecent(res.data?.data ?? [])
     })
   }, [apiKey.id])
 
@@ -124,6 +152,60 @@ export function UsagePanel({ apiKey }: { apiKey: ApiKeyShape }) {
                     </div>
                     <span className="w-12 shrink-0 text-right text-xs tabular-nums text-muted-foreground">
                       {e.count}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <div>
+        <div className="flex items-center gap-2 mb-3 px-1">
+          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+            Requêtes récentes
+          </h2>
+        </div>
+        <Card className="border-border/50">
+          <CardContent className="p-0">
+            {recent === null ? (
+              <div className="flex justify-center py-8">
+                <Spinner />
+              </div>
+            ) : recent.length === 0 ? (
+              <p className="px-5 py-8 text-center text-sm text-muted-foreground">
+                Aucune requête enregistrée pour le moment.
+              </p>
+            ) : (
+              <div className="divide-y divide-border/40">
+                {recent.map((r) => (
+                  <div
+                    key={r.id}
+                    className="grid grid-cols-[60px_1fr_60px_70px_90px] items-start gap-3 px-5 py-2.5 text-xs hover:bg-surface-hover transition-colors"
+                  >
+                    <code className="font-mono font-semibold text-foreground">{r.method}</code>
+                    <div className="min-w-0">
+                      <code className="block truncate font-mono text-muted-foreground">
+                        {r.path}
+                      </code>
+                      {r.ip && (
+                        <code className="mt-0.5 block truncate font-mono text-[10px] text-muted-foreground/70">
+                          {r.ip}
+                        </code>
+                      )}
+                    </div>
+                    <code className={`text-right font-mono font-semibold ${statusTone(r.status)}`}>
+                      {r.status || 'ERR'}
+                    </code>
+                    <span className="text-right tabular-nums text-muted-foreground">
+                      {r.latency_ms}ms
+                    </span>
+                    <span
+                      className="text-right text-muted-foreground"
+                      title={new Date(r.created_at).toLocaleString()}
+                    >
+                      il y a {fmtRelative(r.created_at)}
                     </span>
                   </div>
                 ))}
