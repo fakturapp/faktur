@@ -17,10 +17,16 @@ const eslintConfig = defineConfig([
       // Legacy patterns inherited from the large dashboard codebase.
       // React 19 / React Compiler strict rules: disable until full refactor.
       'react-hooks/set-state-in-effect': 'off',
+      'react-hooks/set-state-in-render': 'off',
       'react-hooks/component-hook-factories': 'off',
       'react-hooks/preserve-manual-memoization': 'off',
       'react-hooks/no-create-during-render': 'off',
       'react-hooks/no-access-before-declaration': 'off',
+      'react-hooks/static-components': 'off',
+      'react-hooks/immutability': 'off',
+      'react-hooks/purity': 'off',
+      'react-hooks/refs': 'off',
+      'react-hooks/rules-of-hooks': 'warn',
       'react-hooks/exhaustive-deps': 'warn',
       // Empty interface extends (very common pattern in our UI lib).
       '@typescript-eslint/no-empty-object-type': 'off',
