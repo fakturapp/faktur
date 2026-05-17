@@ -27,9 +27,8 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <AuthProvider>
-          <ToastProvider>
-            <div className="flex min-h-full flex-1 flex-col">{children}</div>
-          </ToastProvider>
+          <div className="flex min-h-full flex-1 flex-col">{children}</div>
+          <ToastProvider placement="top" />
         </AuthProvider>
       </body>
     </html>
