@@ -41,7 +41,6 @@ export default function LoginPage() {
       sessionStorage.setItem(STORAGE_KEYS.pkceVerifier, verifier)
       sessionStorage.setItem(STORAGE_KEYS.oauthState, state)
 
-      // Remember the requested page so /oauth/callback can return there.
       const params = new URLSearchParams(window.location.search)
       const next = params.get('next')
       if (next && next.startsWith('/')) {

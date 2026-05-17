@@ -50,8 +50,6 @@ export function storeTokens(tokens: {
   }
   const expiresAt = Date.now() + ttl * 1000
   localStorage.setItem(STORAGE_KEYS.expiresAt, String(expiresAt))
-  // Mirror presence to a cookie so the Next.js middleware can gate routes
-  // server-side (no token contents in the cookie — just a presence flag).
   setAuthCookie(ttl)
 }
 

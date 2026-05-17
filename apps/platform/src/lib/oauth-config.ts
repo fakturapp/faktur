@@ -34,10 +34,6 @@ export const PLATFORM_URL = requireEnv(
   'NEXT_PUBLIC_PLATFORM_URL'
 )
 
-// The /oauth/authorize URL is the dashboard's consent page (HTML), not the
-// API endpoint. The dashboard handles login, renders the consent UI, calls
-// the backend, then redirects to OAUTH_REDIRECT_URI with ?code=...
-// /token and /revoke are direct API calls from this app.
 export const OAUTH_AUTHORIZE_URL = `${DASHBOARD_URL}/oauth/authorize`
 export const OAUTH_TOKEN_URL = `${API_BASE_URL}/oauth/token`
 export const OAUTH_REVOKE_URL = `${API_BASE_URL}/oauth/revoke`

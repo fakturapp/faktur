@@ -31,6 +31,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Skip API routes, _next internals, and static assets.
   matcher: ['/((?!_next/|api/|favicon.ico|.*\\..*).*)'],
 }
