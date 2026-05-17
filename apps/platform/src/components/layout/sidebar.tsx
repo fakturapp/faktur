@@ -10,18 +10,15 @@ import {
   CreditCard,
   ExternalLink,
   Folder,
-  Key,
   LayoutDashboard,
   LogOut,
   Monitor,
   Moon,
-  Plus,
   Sun,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth, type PlatformTeam } from '@/lib/auth'
 import { useTheme } from '@/lib/theme'
-import { useApiKeys } from '@/lib/api-keys-context'
 import { DASHBOARD_URL, DOCS_URL } from '@/lib/oauth-config'
 import { Avatar } from '@/components/ui/avatar'
 import { Dropdown, DropdownItem, DropdownSeparator } from '@/components/ui/dropdown'
@@ -30,13 +27,10 @@ export function Sidebar() {
   const pathname = usePathname()
   const { user, teams, currentTeam, selectTeam, signOut } = useAuth()
   const { theme, setTheme } = useTheme()
-  const { keys, loading, openCreate } = useApiKeys()
-  const [keysOpen, setKeysOpen] = useState(true)
   const [switching, setSwitching] = useState<string | null>(null)
 
   const isOnDashboard = pathname === '/dashboard'
   const isOnProjects = pathname === '/projects' || pathname.startsWith('/projects/')
-  const isOnKeys = pathname === '/api-keys' || pathname.startsWith('/api-keys/')
   const isOnCredits = pathname === '/credits'
 
   async function handleSelectTeam(team: PlatformTeam) {
@@ -94,96 +88,6 @@ export function Sidebar() {
           <span className="flex-1 font-medium">Projets</span>
         </Link>
 
-        <div>
-          <div className="flex items-center">
-            <Link
-              href="/api-keys"
-              className={cn(
-                'flex flex-1 items-center gap-2.5 rounded-l-lg px-2.5 py-2 text-sm transition-colors hover:bg-sidebar-accent',
-                isOnKeys && 'bg-sidebar-accent text-sidebar-accent-foreground'
-              )}
-            >
-              <Key className="h-4 w-4" />
-              <span className="flex-1 text-left font-medium">Clés API</span>
-              {keys && (
-                <span className="text-[11px] text-muted-foreground">{keys.length}</span>
-              )}
-            </Link>
-            <button
-              type="button"
-              onClick={() => setKeysOpen((v) => !v)}
-              aria-label={keysOpen ? 'Replier' : 'Déplier'}
-              className={cn(
-                'flex h-8 w-7 items-center justify-center rounded-r-lg transition-colors hover:bg-sidebar-accent',
-                isOnKeys && 'bg-sidebar-accent'
-              )}
-            >
-              <ChevronDown
-                className={cn(
-                  'h-3.5 w-3.5 text-muted-foreground transition-transform',
-                  !keysOpen && '-rotate-90'
-                )}
-              />
-            </button>
-          </div>
-
-          {keysOpen && (
-            <div className="ml-3.5 mt-0.5 mb-1 space-y-0.5 border-l border-border pl-2.5">
-              {loading && keys === null ? (
-                <div className="py-2 space-y-1">
-                  {[0, 1].map((i) => (
-                    <div
-                      key={i}
-                      className="h-6 animate-pulse rounded-md bg-surface-secondary/40"
-                    />
-                  ))}
-                </div>
-              ) : keys && keys.length === 0 ? (
-                <p className="px-2.5 py-1.5 text-[11px] italic text-muted-foreground">
-                  Aucune clé
-                </p>
-              ) : (
-                keys?.map((k) => {
-                  const active = pathname === `/api-keys/${k.id}`
-                  return (
-                    <Link
-                      key={k.id}
-                      href={`/api-keys/${k.id}`}
-                      className={cn(
-                        'group flex items-center gap-2 rounded-md px-2 py-1.5 text-xs transition-colors hover:bg-sidebar-accent',
-                        active &&
-                          'bg-sidebar-accent font-medium text-sidebar-accent-foreground'
-                      )}
-                    >
-                      <span
-                        className={cn(
-                          'h-1.5 w-1.5 shrink-0 rounded-full',
-                          k.status === 'active'
-                            ? 'bg-success'
-                            : k.status === 'revoked'
-                              ? 'bg-danger'
-                              : k.status === 'rotating'
-                                ? 'bg-warning'
-                                : 'bg-muted-secondary'
-                        )}
-                      />
-                      <span className="truncate">{k.name}</span>
-                    </Link>
-                  )
-                })
-              )}
-
-              <button
-                type="button"
-                onClick={openCreate}
-                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground"
-              >
-                <Plus className="h-3 w-3" />
-                Nouvelle clé
-              </button>
-            </div>
-          )}
-        </div>
 
         <Link
           href="/credits"

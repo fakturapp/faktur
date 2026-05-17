@@ -17,7 +17,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/components/ui/toast'
 import { apiKeysClient, type ApiKeyShape, type WebhookShape } from '@/lib/api-keys-client'
-import { useApiKeys } from '@/lib/api-keys-context'
 import { WebhookConfigPanel } from '@/components/api-keys/webhook-config-panel'
 import { DeliveriesPanel } from '@/components/api-keys/deliveries-panel'
 import { LogsPanel } from '@/components/api-keys/logs-panel'
@@ -48,10 +47,9 @@ function statusInfo(status: ApiKeyShape['status']) {
 }
 
 export default function ApiKeyDetailPage() {
-  const params = useParams<{ id: string }>()
+  const params = useParams<{ id: string; keyId: string }>()
   const router = useRouter()
   const { toast } = useToast()
-  const { reload: reloadList } = useApiKeys()
   const [tab, setTab] = useState<Tab>('overview')
   const [key, setKey] = useState<ApiKeyShape | null>(null)
   const [webhook, setWebhook] = useState<WebhookShape | null>(null)
@@ -60,10 +58,10 @@ export default function ApiKeyDetailPage() {
   const [revoking, setRevoking] = useState(false)
 
   async function load() {
-    const res = await apiKeysClient.show(params.id)
+    const res = await apiKeysClient.show(params.keyId)
     if (res.error) {
       toast(res.error, 'error')
-      router.push('/api-keys')
+      router.push(`/projects/${params.id}`)
       return
     }
     setKey(res.data?.data ?? null)
@@ -72,7 +70,7 @@ export default function ApiKeyDetailPage() {
 
   useEffect(() => {
     load()
-  }, [params.id])
+  }, [params.keyId])
 
   async function handleRotate() {
     if (!key) return
@@ -86,7 +84,7 @@ export default function ApiKeyDetailPage() {
     toast("Nouvelle clé générée — l'ancienne reste active 24h", 'success')
     setRotated({ plaintext: res.data.plaintext })
     load()
-    reloadList()
+
   }
 
   async function handleRevoke() {
@@ -100,8 +98,8 @@ export default function ApiKeyDetailPage() {
       return
     }
     toast('Clé révoquée', 'success')
-    reloadList()
-    router.push('/api-keys')
+
+    router.push(`/projects/${params.id}`)
   }
 
   if (!key) {
@@ -127,11 +125,11 @@ export default function ApiKeyDetailPage() {
       className="space-y-6 px-4 lg:px-6 py-4 md:py-6"
     >
       <Link
-        href="/api-keys"
+        href={`/projects/${params.id}`}
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
-        Retour aux clés
+        Retour au projet
       </Link>
 
       <Card className="border-border/50">

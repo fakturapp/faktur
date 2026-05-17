@@ -2,6 +2,7 @@ import { api } from '@/lib/api'
 
 export interface ApiKeyShape {
   id: string
+  project_id: string
   name: string
   prefix: string
   masked_token: string
