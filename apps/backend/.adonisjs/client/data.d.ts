@@ -5,12 +5,15 @@
 
 /// <reference path="./manifest.d.ts" />
 import type { InferData, InferVariants } from '@adonisjs/core/types/transformers'
-import type ApiV2ApiClientTransformer from '#transformers/api_v2/api_client_transformer'
-import type ApiV2ApiProductTransformer from '#transformers/api_v2/api_product_transformer'
-import type ApiV2ApiInvoiceTransformer from '#transformers/api_v2/api_invoice_transformer'
-import type ApiV2ApiQuoteTransformer from '#transformers/api_v2/api_quote_transformer'
 import type ApiV2ApiBankAccountTransformer from '#transformers/api_v2/api_bank_account_transformer'
+import type ApiV2ApiClientTransformer from '#transformers/api_v2/api_client_transformer'
 import type ApiV2ApiCompanyTransformer from '#transformers/api_v2/api_company_transformer'
+import type ApiV2ApiCreditNoteTransformer from '#transformers/api_v2/api_credit_note_transformer'
+import type ApiV2ApiExpenseTransformer from '#transformers/api_v2/api_expense_transformer'
+import type ApiV2ApiInvoiceTransformer from '#transformers/api_v2/api_invoice_transformer'
+import type ApiV2ApiProductTransformer from '#transformers/api_v2/api_product_transformer'
+import type ApiV2ApiQuoteTransformer from '#transformers/api_v2/api_quote_transformer'
+import type ApiV2ApiRecurringInvoiceTransformer from '#transformers/api_v2/api_recurring_invoice_transformer'
 import type ApiApiKeyAdminTransformer from '#transformers/api/api_key_admin_transformer'
 import type AuthProviderTransformer from '#transformers/auth_provider_transformer'
 import type BankAccountTransformer from '#transformers/bank_account_transformer'
@@ -39,29 +42,41 @@ import type UserTransformer from '#transformers/user_transformer'
 
 export namespace Data {
   export namespace ApiV2 {
+    export type ApiBankAccount = InferData<ApiV2ApiBankAccountTransformer>
+    export namespace ApiBankAccount {
+      export type Variants = InferVariants<ApiV2ApiBankAccountTransformer>
+    }
     export type ApiClient = InferData<ApiV2ApiClientTransformer>
     export namespace ApiClient {
       export type Variants = InferVariants<ApiV2ApiClientTransformer>
     }
-    export type ApiProduct = InferData<ApiV2ApiProductTransformer>
-    export namespace ApiProduct {
-      export type Variants = InferVariants<ApiV2ApiProductTransformer>
+    export type ApiCompany = InferData<ApiV2ApiCompanyTransformer>
+    export namespace ApiCompany {
+      export type Variants = InferVariants<ApiV2ApiCompanyTransformer>
+    }
+    export type ApiCreditNote = InferData<ApiV2ApiCreditNoteTransformer>
+    export namespace ApiCreditNote {
+      export type Variants = InferVariants<ApiV2ApiCreditNoteTransformer>
+    }
+    export type ApiExpense = InferData<ApiV2ApiExpenseTransformer>
+    export namespace ApiExpense {
+      export type Variants = InferVariants<ApiV2ApiExpenseTransformer>
     }
     export type ApiInvoice = InferData<ApiV2ApiInvoiceTransformer>
     export namespace ApiInvoice {
       export type Variants = InferVariants<ApiV2ApiInvoiceTransformer>
     }
+    export type ApiProduct = InferData<ApiV2ApiProductTransformer>
+    export namespace ApiProduct {
+      export type Variants = InferVariants<ApiV2ApiProductTransformer>
+    }
     export type ApiQuote = InferData<ApiV2ApiQuoteTransformer>
     export namespace ApiQuote {
       export type Variants = InferVariants<ApiV2ApiQuoteTransformer>
     }
-    export type ApiBankAccount = InferData<ApiV2ApiBankAccountTransformer>
-    export namespace ApiBankAccount {
-      export type Variants = InferVariants<ApiV2ApiBankAccountTransformer>
-    }
-    export type ApiCompany = InferData<ApiV2ApiCompanyTransformer>
-    export namespace ApiCompany {
-      export type Variants = InferVariants<ApiV2ApiCompanyTransformer>
+    export type ApiRecurringInvoice = InferData<ApiV2ApiRecurringInvoiceTransformer>
+    export namespace ApiRecurringInvoice {
+      export type Variants = InferVariants<ApiV2ApiRecurringInvoiceTransformer>
     }
   }
   export namespace Api {

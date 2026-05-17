@@ -90,12 +90,37 @@ export const controllers = {
     Ingest: () => import('#controllers/analytics/ingest'),
   },
   apiV2: {
+    bankAccounts: {
+      List: () => import('#controllers/api_v2/bank_accounts/list'),
+      Show: () => import('#controllers/api_v2/bank_accounts/show'),
+    },
     clients: {
       Create: () => import('#controllers/api_v2/clients/create'),
       Destroy: () => import('#controllers/api_v2/clients/destroy'),
       List: () => import('#controllers/api_v2/clients/list'),
       Show: () => import('#controllers/api_v2/clients/show'),
       Update: () => import('#controllers/api_v2/clients/update'),
+    },
+    company: {
+      Show: () => import('#controllers/api_v2/company/show'),
+    },
+    creditNotes: {
+      List: () => import('#controllers/api_v2/credit_notes/list'),
+      Show: () => import('#controllers/api_v2/credit_notes/show'),
+    },
+    expenses: {
+      Create: () => import('#controllers/api_v2/expenses/create'),
+      Destroy: () => import('#controllers/api_v2/expenses/destroy'),
+      List: () => import('#controllers/api_v2/expenses/list'),
+      Show: () => import('#controllers/api_v2/expenses/show'),
+    },
+    invoices: {
+      Create: () => import('#controllers/api_v2/invoices/create'),
+      Destroy: () => import('#controllers/api_v2/invoices/destroy'),
+      Duplicate: () => import('#controllers/api_v2/invoices/duplicate'),
+      List: () => import('#controllers/api_v2/invoices/list'),
+      MarkPaid: () => import('#controllers/api_v2/invoices/mark_paid'),
+      Show: () => import('#controllers/api_v2/invoices/show'),
     },
     meta: {
       Ping: () => import('#controllers/api_v2/meta/ping'),
@@ -107,21 +132,14 @@ export const controllers = {
       Show: () => import('#controllers/api_v2/products/show'),
       Update: () => import('#controllers/api_v2/products/update'),
     },
-    invoices: {
-      List: () => import('#controllers/api_v2/invoices/list'),
-      Show: () => import('#controllers/api_v2/invoices/show'),
-      MarkPaid: () => import('#controllers/api_v2/invoices/mark_paid'),
-    },
     quotes: {
       List: () => import('#controllers/api_v2/quotes/list'),
       Show: () => import('#controllers/api_v2/quotes/show'),
     },
-    bankAccounts: {
-      List: () => import('#controllers/api_v2/bank_accounts/list'),
-      Show: () => import('#controllers/api_v2/bank_accounts/show'),
-    },
-    company: {
-      Show: () => import('#controllers/api_v2/company/show'),
+    recurringInvoices: {
+      List: () => import('#controllers/api_v2/recurring_invoices/list'),
+      Show: () => import('#controllers/api_v2/recurring_invoices/show'),
+      ToggleActive: () => import('#controllers/api_v2/recurring_invoices/toggle_active'),
     },
     team: {
       Show: () => import('#controllers/api_v2/team/show'),
