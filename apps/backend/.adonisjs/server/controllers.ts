@@ -144,6 +144,7 @@ export const controllers = {
     team: {
       Show: () => import('#controllers/api_v2/team/show'),
     },
+    NotFound: () => import('#controllers/api_v2/not_found'),
   },
   auth: {
     oauth: {
