@@ -3031,7 +3031,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/oauth/exchange_session').default['handle']>>>
     }
   }
-  'scopes_catalog': {
+  'dashboard.apiKeys.scopesCatalog': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/dashboard/settings/api-keys/scopes-catalog'
     types: {
@@ -3043,7 +3043,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/scopes_catalog').default['handle']>>>
     }
   }
-  'keys_list': {
+  'dashboard.apiKeys.list': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/dashboard/settings/api-keys'
     types: {
@@ -3055,7 +3055,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/list').default['handle']>>>
     }
   }
-  'keys_create': {
+  'dashboard.apiKeys.create': {
     methods: ["POST"]
     pattern: '/api/v1/dashboard/settings/api-keys'
     types: {
@@ -3067,7 +3067,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/create').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
-  'keys_show': {
+  'dashboard.apiKeys.show': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/dashboard/settings/api-keys/:id'
     types: {
@@ -3079,7 +3079,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/show').default['handle']>>>
     }
   }
-  'keys_update': {
+  'dashboard.apiKeys.update': {
     methods: ["PATCH"]
     pattern: '/api/v1/dashboard/settings/api-keys/:id'
     types: {
@@ -3091,7 +3091,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/update').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
-  'keys_revoke': {
+  'dashboard.apiKeys.revoke': {
     methods: ["DELETE"]
     pattern: '/api/v1/dashboard/settings/api-keys/:id'
     types: {
@@ -3103,7 +3103,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/revoke').default['handle']>>>
     }
   }
-  'keys_rotate': {
+  'dashboard.apiKeys.rotate': {
     methods: ["POST"]
     pattern: '/api/v1/dashboard/settings/api-keys/:id/rotate'
     types: {
@@ -3115,7 +3115,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/rotate').default['handle']>>>
     }
   }
-  'webhook_set': {
+  'dashboard.apiKeys.webhook.set': {
     methods: ["PUT"]
     pattern: '/api/v1/dashboard/settings/api-keys/:id/webhook'
     types: {
@@ -3127,7 +3127,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/webhook_set').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
-  'webhook_destroy': {
+  'dashboard.apiKeys.webhook.destroy': {
     methods: ["DELETE"]
     pattern: '/api/v1/dashboard/settings/api-keys/:id/webhook'
     types: {
@@ -3139,7 +3139,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/webhook_destroy').default['handle']>>>
     }
   }
-  'webhook_rotate_secret': {
+  'dashboard.apiKeys.webhook.rotateSecret': {
     methods: ["POST"]
     pattern: '/api/v1/dashboard/settings/api-keys/:id/webhook/rotate-secret'
     types: {
@@ -3151,7 +3151,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/webhook_rotate_secret').default['handle']>>>
     }
   }
-  'webhook_test': {
+  'dashboard.apiKeys.webhook.test': {
     methods: ["POST"]
     pattern: '/api/v1/dashboard/settings/api-keys/:id/webhook/test'
     types: {
@@ -3163,7 +3163,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/webhook_test').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
-  'deliveries_list': {
+  'dashboard.apiKeys.deliveries.list': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/dashboard/settings/api-keys/:id/deliveries'
     types: {
@@ -3175,7 +3175,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/deliveries_list').default['handle']>>>
     }
   }
-  'deliveries_retry': {
+  'dashboard.apiKeys.deliveries.retry': {
     methods: ["POST"]
     pattern: '/api/v1/dashboard/settings/api-keys/:id/deliveries/:deliveryId/retry'
     types: {
@@ -3187,7 +3187,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/deliveries_retry').default['handle']>>>
     }
   }
-  'logs_list': {
+  'dashboard.apiKeys.logs': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/dashboard/settings/api-keys/:id/logs'
     types: {
@@ -3199,7 +3199,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/logs_list').default['handle']>>>
     }
   }
-  'usage_stats': {
+  'dashboard.apiKeys.usageStats': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/dashboard/settings/api-keys/:id/usage-stats'
     types: {
@@ -3211,7 +3211,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/usage_stats').default['handle']>>>
     }
   }
-  'ping': {
+  'apiV2.meta.ping': {
     methods: ["GET","HEAD"]
     pattern: '/api/v2/ping'
     types: {
@@ -3223,7 +3223,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/meta/ping').default['handle']>>>
     }
   }
-  'clients_list': {
+  'apiV2.clients.list': {
     methods: ["GET","HEAD"]
     pattern: '/api/v2/clients'
     types: {
@@ -3235,7 +3235,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/clients/list').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
-  'clients_show': {
+  'apiV2.clients.show': {
     methods: ["GET","HEAD"]
     pattern: '/api/v2/clients/:id'
     types: {
@@ -3247,7 +3247,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/clients/show').default['handle']>>>
     }
   }
-  'clients_create': {
+  'apiV2.clients.create': {
     methods: ["POST"]
     pattern: '/api/v2/clients'
     types: {
@@ -3259,7 +3259,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/clients/create').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
-  'clients_update': {
+  'apiV2.clients.update': {
     methods: ["PATCH"]
     pattern: '/api/v2/clients/:id'
     types: {
@@ -3271,7 +3271,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/clients/update').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
-  'clients_destroy': {
+  'apiV2.clients.destroy': {
     methods: ["DELETE"]
     pattern: '/api/v2/clients/:id'
     types: {
@@ -3283,7 +3283,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/clients/destroy').default['handle']>>>
     }
   }
-  'products_list': {
+  'apiV2.products.list': {
     methods: ["GET","HEAD"]
     pattern: '/api/v2/products'
     types: {
@@ -3295,7 +3295,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/products/list').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
-  'products_show': {
+  'apiV2.products.show': {
     methods: ["GET","HEAD"]
     pattern: '/api/v2/products/:id'
     types: {
@@ -3307,7 +3307,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/products/show').default['handle']>>>
     }
   }
-  'products_create': {
+  'apiV2.products.create': {
     methods: ["POST"]
     pattern: '/api/v2/products'
     types: {
@@ -3319,7 +3319,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/products/create').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
-  'products_update': {
+  'apiV2.products.update': {
     methods: ["PATCH"]
     pattern: '/api/v2/products/:id'
     types: {
@@ -3331,7 +3331,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/products/update').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
-  'products_destroy': {
+  'apiV2.products.destroy': {
     methods: ["DELETE"]
     pattern: '/api/v2/products/:id'
     types: {
@@ -3343,7 +3343,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/products/destroy').default['handle']>>>
     }
   }
-  'invoices_list': {
+  'apiV2.invoices.list': {
     methods: ["GET","HEAD"]
     pattern: '/api/v2/invoices'
     types: {
@@ -3355,7 +3355,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/invoices/list').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
-  'invoices_show': {
+  'apiV2.invoices.show': {
     methods: ["GET","HEAD"]
     pattern: '/api/v2/invoices/:id'
     types: {
@@ -3367,7 +3367,19 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/invoices/show').default['handle']>>>
     }
   }
-  'invoices_mark_paid': {
+  'apiV2.invoices.create': {
+    methods: ["POST"]
+    pattern: '/api/v2/invoices'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/api_v2/invoice_write_validators').createInvoiceV2Validator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/api_v2/invoice_write_validators').createInvoiceV2Validator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/invoices/create').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/invoices/create').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'apiV2.invoices.markPaid': {
     methods: ["POST"]
     pattern: '/api/v2/invoices/:id/mark-paid'
     types: {
@@ -3379,7 +3391,31 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/invoices/mark_paid').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
-  'quotes_list': {
+  'apiV2.invoices.duplicate': {
+    methods: ["POST"]
+    pattern: '/api/v2/invoices/:id/duplicate'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/invoices/duplicate').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/invoices/duplicate').default['handle']>>>
+    }
+  }
+  'apiV2.invoices.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v2/invoices/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/invoices/destroy').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/invoices/destroy').default['handle']>>>
+    }
+  }
+  'apiV2.quotes.list': {
     methods: ["GET","HEAD"]
     pattern: '/api/v2/quotes'
     types: {
@@ -3391,7 +3427,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/quotes/list').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
-  'quotes_show': {
+  'apiV2.quotes.show': {
     methods: ["GET","HEAD"]
     pattern: '/api/v2/quotes/:id'
     types: {
@@ -3401,6 +3437,174 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/quotes/show').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/quotes/show').default['handle']>>>
+    }
+  }
+  'apiV2.bankAccounts.list': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v2/bank-accounts'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/bank_accounts/list').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/bank_accounts/list').default['handle']>>>
+    }
+  }
+  'apiV2.bankAccounts.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v2/bank-accounts/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/bank_accounts/show').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/bank_accounts/show').default['handle']>>>
+    }
+  }
+  'apiV2.company.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v2/company'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/company/show').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/company/show').default['handle']>>>
+    }
+  }
+  'apiV2.team.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v2/team'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/team/show').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/team/show').default['handle']>>>
+    }
+  }
+  'apiV2.expenses.list': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v2/expenses'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/api_v2/expense_validators').listExpensesValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/expenses/list').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/expenses/list').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'apiV2.expenses.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v2/expenses/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/expenses/show').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/expenses/show').default['handle']>>>
+    }
+  }
+  'apiV2.expenses.create': {
+    methods: ["POST"]
+    pattern: '/api/v2/expenses'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/api_v2/expense_validators').createExpenseValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/api_v2/expense_validators').createExpenseValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/expenses/create').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/expenses/create').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'apiV2.expenses.destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v2/expenses/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/expenses/destroy').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/expenses/destroy').default['handle']>>>
+    }
+  }
+  'apiV2.creditNotes.list': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v2/credit-notes'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/credit_notes/list').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/credit_notes/list').default['handle']>>>
+    }
+  }
+  'apiV2.creditNotes.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v2/credit-notes/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/credit_notes/show').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/credit_notes/show').default['handle']>>>
+    }
+  }
+  'apiV2.recurringInvoices.list': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v2/recurring-invoices'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/recurring_invoices/list').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/recurring_invoices/list').default['handle']>>>
+    }
+  }
+  'apiV2.recurringInvoices.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v2/recurring-invoices/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/recurring_invoices/show').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/recurring_invoices/show').default['handle']>>>
+    }
+  }
+  'apiV2.recurringInvoices.pause': {
+    methods: ["POST"]
+    pattern: '/api/v2/recurring-invoices/:id/pause'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/recurring_invoices/toggle_active').default['Pause']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/recurring_invoices/toggle_active').default['Pause']>>>
+    }
+  }
+  'apiV2.recurringInvoices.resume': {
+    methods: ["POST"]
+    pattern: '/api/v2/recurring-invoices/:id/resume'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/recurring_invoices/toggle_active').default['Resume']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/recurring_invoices/toggle_active').default['Resume']>>>
     }
   }
   'create_feedback': {

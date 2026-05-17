@@ -72,6 +72,27 @@ export interface ApiDefinition {
       micro: typeof routes['dashboard.charts.micro']
     }
     cashFlow: typeof routes['dashboard.cashFlow']
+    apiKeys: {
+      scopesCatalog: typeof routes['dashboard.apiKeys.scopesCatalog']
+      list: typeof routes['dashboard.apiKeys.list']
+      create: typeof routes['dashboard.apiKeys.create']
+      show: typeof routes['dashboard.apiKeys.show']
+      update: typeof routes['dashboard.apiKeys.update']
+      revoke: typeof routes['dashboard.apiKeys.revoke']
+      rotate: typeof routes['dashboard.apiKeys.rotate']
+      webhook: {
+        set: typeof routes['dashboard.apiKeys.webhook.set']
+        destroy: typeof routes['dashboard.apiKeys.webhook.destroy']
+        rotateSecret: typeof routes['dashboard.apiKeys.webhook.rotateSecret']
+        test: typeof routes['dashboard.apiKeys.webhook.test']
+      }
+      deliveries: {
+        list: typeof routes['dashboard.apiKeys.deliveries.list']
+        retry: typeof routes['dashboard.apiKeys.deliveries.retry']
+      }
+      logs: typeof routes['dashboard.apiKeys.logs']
+      usageStats: typeof routes['dashboard.apiKeys.usageStats']
+    }
   }
   serveIcon: typeof routes['serve_icon']
   confirmPrivate: typeof routes['confirm_private']
@@ -266,37 +287,63 @@ export interface ApiDefinition {
   token: typeof routes['token']
   revoke: typeof routes['revoke']
   exchangeSession: typeof routes['exchange_session']
-  scopesCatalog: typeof routes['scopes_catalog']
-  keysList: typeof routes['keys_list']
-  keysCreate: typeof routes['keys_create']
-  keysShow: typeof routes['keys_show']
-  keysUpdate: typeof routes['keys_update']
-  keysRevoke: typeof routes['keys_revoke']
-  keysRotate: typeof routes['keys_rotate']
-  webhookSet: typeof routes['webhook_set']
-  webhookDestroy: typeof routes['webhook_destroy']
-  webhookRotateSecret: typeof routes['webhook_rotate_secret']
-  webhookTest: typeof routes['webhook_test']
-  deliveriesList: typeof routes['deliveries_list']
-  deliveriesRetry: typeof routes['deliveries_retry']
-  logsList: typeof routes['logs_list']
-  usageStats: typeof routes['usage_stats']
-  ping: typeof routes['ping']
-  clientsList: typeof routes['clients_list']
-  clientsShow: typeof routes['clients_show']
-  clientsCreate: typeof routes['clients_create']
-  clientsUpdate: typeof routes['clients_update']
-  clientsDestroy: typeof routes['clients_destroy']
-  productsList: typeof routes['products_list']
-  productsShow: typeof routes['products_show']
-  productsCreate: typeof routes['products_create']
-  productsUpdate: typeof routes['products_update']
-  productsDestroy: typeof routes['products_destroy']
-  invoicesList: typeof routes['invoices_list']
-  invoicesShow: typeof routes['invoices_show']
-  invoicesMarkPaid: typeof routes['invoices_mark_paid']
-  quotesList: typeof routes['quotes_list']
-  quotesShow: typeof routes['quotes_show']
+  apiV2: {
+    meta: {
+      ping: typeof routes['apiV2.meta.ping']
+    }
+    clients: {
+      list: typeof routes['apiV2.clients.list']
+      show: typeof routes['apiV2.clients.show']
+      create: typeof routes['apiV2.clients.create']
+      update: typeof routes['apiV2.clients.update']
+      destroy: typeof routes['apiV2.clients.destroy']
+    }
+    products: {
+      list: typeof routes['apiV2.products.list']
+      show: typeof routes['apiV2.products.show']
+      create: typeof routes['apiV2.products.create']
+      update: typeof routes['apiV2.products.update']
+      destroy: typeof routes['apiV2.products.destroy']
+    }
+    invoices: {
+      list: typeof routes['apiV2.invoices.list']
+      show: typeof routes['apiV2.invoices.show']
+      create: typeof routes['apiV2.invoices.create']
+      markPaid: typeof routes['apiV2.invoices.markPaid']
+      duplicate: typeof routes['apiV2.invoices.duplicate']
+      destroy: typeof routes['apiV2.invoices.destroy']
+    }
+    quotes: {
+      list: typeof routes['apiV2.quotes.list']
+      show: typeof routes['apiV2.quotes.show']
+    }
+    bankAccounts: {
+      list: typeof routes['apiV2.bankAccounts.list']
+      show: typeof routes['apiV2.bankAccounts.show']
+    }
+    company: {
+      show: typeof routes['apiV2.company.show']
+    }
+    team: {
+      show: typeof routes['apiV2.team.show']
+    }
+    expenses: {
+      list: typeof routes['apiV2.expenses.list']
+      show: typeof routes['apiV2.expenses.show']
+      create: typeof routes['apiV2.expenses.create']
+      destroy: typeof routes['apiV2.expenses.destroy']
+    }
+    creditNotes: {
+      list: typeof routes['apiV2.creditNotes.list']
+      show: typeof routes['apiV2.creditNotes.show']
+    }
+    recurringInvoices: {
+      list: typeof routes['apiV2.recurringInvoices.list']
+      show: typeof routes['apiV2.recurringInvoices.show']
+      pause: typeof routes['apiV2.recurringInvoices.pause']
+      resume: typeof routes['apiV2.recurringInvoices.resume']
+    }
+  }
   createFeedback: typeof routes['create_feedback']
   myFeedback: typeof routes['my_feedback']
   createBugReport: typeof routes['create_bug_report']

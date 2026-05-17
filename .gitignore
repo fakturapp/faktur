@@ -5,6 +5,10 @@ node_modules
 build
 dist
 .turbo
+cache
+.next/
+docs/.next/*
+apps/*/.next/
 
 # Secrets
 .env

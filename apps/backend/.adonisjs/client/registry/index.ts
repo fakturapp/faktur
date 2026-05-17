@@ -1518,191 +1518,293 @@ const routes = {
     tokens: [{"old":"/api/v1/oauth/exchange-session","type":0,"val":"api","end":""},{"old":"/api/v1/oauth/exchange-session","type":0,"val":"v1","end":""},{"old":"/api/v1/oauth/exchange-session","type":0,"val":"oauth","end":""},{"old":"/api/v1/oauth/exchange-session","type":0,"val":"exchange-session","end":""}],
     types: placeholder as Registry['exchange_session']['types'],
   },
-  'scopes_catalog': {
+  'dashboard.apiKeys.scopesCatalog': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/dashboard/settings/api-keys/scopes-catalog',
     tokens: [{"old":"/api/v1/dashboard/settings/api-keys/scopes-catalog","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-keys/scopes-catalog","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-keys/scopes-catalog","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-keys/scopes-catalog","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-keys/scopes-catalog","type":0,"val":"api-keys","end":""},{"old":"/api/v1/dashboard/settings/api-keys/scopes-catalog","type":0,"val":"scopes-catalog","end":""}],
-    types: placeholder as Registry['scopes_catalog']['types'],
+    types: placeholder as Registry['dashboard.apiKeys.scopesCatalog']['types'],
   },
-  'keys_list': {
+  'dashboard.apiKeys.list': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/dashboard/settings/api-keys',
     tokens: [{"old":"/api/v1/dashboard/settings/api-keys","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-keys","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-keys","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-keys","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-keys","type":0,"val":"api-keys","end":""}],
-    types: placeholder as Registry['keys_list']['types'],
+    types: placeholder as Registry['dashboard.apiKeys.list']['types'],
   },
-  'keys_create': {
+  'dashboard.apiKeys.create': {
     methods: ["POST"],
     pattern: '/api/v1/dashboard/settings/api-keys',
     tokens: [{"old":"/api/v1/dashboard/settings/api-keys","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-keys","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-keys","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-keys","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-keys","type":0,"val":"api-keys","end":""}],
-    types: placeholder as Registry['keys_create']['types'],
+    types: placeholder as Registry['dashboard.apiKeys.create']['types'],
   },
-  'keys_show': {
+  'dashboard.apiKeys.show': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/dashboard/settings/api-keys/:id',
     tokens: [{"old":"/api/v1/dashboard/settings/api-keys/:id","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id","type":0,"val":"api-keys","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['keys_show']['types'],
+    types: placeholder as Registry['dashboard.apiKeys.show']['types'],
   },
-  'keys_update': {
+  'dashboard.apiKeys.update': {
     methods: ["PATCH"],
     pattern: '/api/v1/dashboard/settings/api-keys/:id',
     tokens: [{"old":"/api/v1/dashboard/settings/api-keys/:id","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id","type":0,"val":"api-keys","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['keys_update']['types'],
+    types: placeholder as Registry['dashboard.apiKeys.update']['types'],
   },
-  'keys_revoke': {
+  'dashboard.apiKeys.revoke': {
     methods: ["DELETE"],
     pattern: '/api/v1/dashboard/settings/api-keys/:id',
     tokens: [{"old":"/api/v1/dashboard/settings/api-keys/:id","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id","type":0,"val":"api-keys","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['keys_revoke']['types'],
+    types: placeholder as Registry['dashboard.apiKeys.revoke']['types'],
   },
-  'keys_rotate': {
+  'dashboard.apiKeys.rotate': {
     methods: ["POST"],
     pattern: '/api/v1/dashboard/settings/api-keys/:id/rotate',
     tokens: [{"old":"/api/v1/dashboard/settings/api-keys/:id/rotate","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/rotate","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/rotate","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/rotate","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/rotate","type":0,"val":"api-keys","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/rotate","type":1,"val":"id","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/rotate","type":0,"val":"rotate","end":""}],
-    types: placeholder as Registry['keys_rotate']['types'],
+    types: placeholder as Registry['dashboard.apiKeys.rotate']['types'],
   },
-  'webhook_set': {
+  'dashboard.apiKeys.webhook.set': {
     methods: ["PUT"],
     pattern: '/api/v1/dashboard/settings/api-keys/:id/webhook',
     tokens: [{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook","type":0,"val":"api-keys","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook","type":1,"val":"id","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook","type":0,"val":"webhook","end":""}],
-    types: placeholder as Registry['webhook_set']['types'],
+    types: placeholder as Registry['dashboard.apiKeys.webhook.set']['types'],
   },
-  'webhook_destroy': {
+  'dashboard.apiKeys.webhook.destroy': {
     methods: ["DELETE"],
     pattern: '/api/v1/dashboard/settings/api-keys/:id/webhook',
     tokens: [{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook","type":0,"val":"api-keys","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook","type":1,"val":"id","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook","type":0,"val":"webhook","end":""}],
-    types: placeholder as Registry['webhook_destroy']['types'],
+    types: placeholder as Registry['dashboard.apiKeys.webhook.destroy']['types'],
   },
-  'webhook_rotate_secret': {
+  'dashboard.apiKeys.webhook.rotateSecret': {
     methods: ["POST"],
     pattern: '/api/v1/dashboard/settings/api-keys/:id/webhook/rotate-secret',
     tokens: [{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/rotate-secret","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/rotate-secret","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/rotate-secret","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/rotate-secret","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/rotate-secret","type":0,"val":"api-keys","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/rotate-secret","type":1,"val":"id","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/rotate-secret","type":0,"val":"webhook","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/rotate-secret","type":0,"val":"rotate-secret","end":""}],
-    types: placeholder as Registry['webhook_rotate_secret']['types'],
+    types: placeholder as Registry['dashboard.apiKeys.webhook.rotateSecret']['types'],
   },
-  'webhook_test': {
+  'dashboard.apiKeys.webhook.test': {
     methods: ["POST"],
     pattern: '/api/v1/dashboard/settings/api-keys/:id/webhook/test',
     tokens: [{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/test","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/test","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/test","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/test","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/test","type":0,"val":"api-keys","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/test","type":1,"val":"id","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/test","type":0,"val":"webhook","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/test","type":0,"val":"test","end":""}],
-    types: placeholder as Registry['webhook_test']['types'],
+    types: placeholder as Registry['dashboard.apiKeys.webhook.test']['types'],
   },
-  'deliveries_list': {
+  'dashboard.apiKeys.deliveries.list': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/dashboard/settings/api-keys/:id/deliveries',
     tokens: [{"old":"/api/v1/dashboard/settings/api-keys/:id/deliveries","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/deliveries","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/deliveries","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/deliveries","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/deliveries","type":0,"val":"api-keys","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/deliveries","type":1,"val":"id","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/deliveries","type":0,"val":"deliveries","end":""}],
-    types: placeholder as Registry['deliveries_list']['types'],
+    types: placeholder as Registry['dashboard.apiKeys.deliveries.list']['types'],
   },
-  'deliveries_retry': {
+  'dashboard.apiKeys.deliveries.retry': {
     methods: ["POST"],
     pattern: '/api/v1/dashboard/settings/api-keys/:id/deliveries/:deliveryId/retry',
     tokens: [{"old":"/api/v1/dashboard/settings/api-keys/:id/deliveries/:deliveryId/retry","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/deliveries/:deliveryId/retry","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/deliveries/:deliveryId/retry","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/deliveries/:deliveryId/retry","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/deliveries/:deliveryId/retry","type":0,"val":"api-keys","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/deliveries/:deliveryId/retry","type":1,"val":"id","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/deliveries/:deliveryId/retry","type":0,"val":"deliveries","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/deliveries/:deliveryId/retry","type":1,"val":"deliveryId","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/deliveries/:deliveryId/retry","type":0,"val":"retry","end":""}],
-    types: placeholder as Registry['deliveries_retry']['types'],
+    types: placeholder as Registry['dashboard.apiKeys.deliveries.retry']['types'],
   },
-  'logs_list': {
+  'dashboard.apiKeys.logs': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/dashboard/settings/api-keys/:id/logs',
     tokens: [{"old":"/api/v1/dashboard/settings/api-keys/:id/logs","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/logs","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/logs","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/logs","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/logs","type":0,"val":"api-keys","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/logs","type":1,"val":"id","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/logs","type":0,"val":"logs","end":""}],
-    types: placeholder as Registry['logs_list']['types'],
+    types: placeholder as Registry['dashboard.apiKeys.logs']['types'],
   },
-  'usage_stats': {
+  'dashboard.apiKeys.usageStats': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/dashboard/settings/api-keys/:id/usage-stats',
     tokens: [{"old":"/api/v1/dashboard/settings/api-keys/:id/usage-stats","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/usage-stats","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/usage-stats","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/usage-stats","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/usage-stats","type":0,"val":"api-keys","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/usage-stats","type":1,"val":"id","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/usage-stats","type":0,"val":"usage-stats","end":""}],
-    types: placeholder as Registry['usage_stats']['types'],
+    types: placeholder as Registry['dashboard.apiKeys.usageStats']['types'],
   },
-  'ping': {
+  'apiV2.meta.ping': {
     methods: ["GET","HEAD"],
     pattern: '/api/v2/ping',
     tokens: [{"old":"/api/v2/ping","type":0,"val":"api","end":""},{"old":"/api/v2/ping","type":0,"val":"v2","end":""},{"old":"/api/v2/ping","type":0,"val":"ping","end":""}],
-    types: placeholder as Registry['ping']['types'],
+    types: placeholder as Registry['apiV2.meta.ping']['types'],
   },
-  'clients_list': {
+  'apiV2.clients.list': {
     methods: ["GET","HEAD"],
     pattern: '/api/v2/clients',
     tokens: [{"old":"/api/v2/clients","type":0,"val":"api","end":""},{"old":"/api/v2/clients","type":0,"val":"v2","end":""},{"old":"/api/v2/clients","type":0,"val":"clients","end":""}],
-    types: placeholder as Registry['clients_list']['types'],
+    types: placeholder as Registry['apiV2.clients.list']['types'],
   },
-  'clients_show': {
+  'apiV2.clients.show': {
     methods: ["GET","HEAD"],
     pattern: '/api/v2/clients/:id',
     tokens: [{"old":"/api/v2/clients/:id","type":0,"val":"api","end":""},{"old":"/api/v2/clients/:id","type":0,"val":"v2","end":""},{"old":"/api/v2/clients/:id","type":0,"val":"clients","end":""},{"old":"/api/v2/clients/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['clients_show']['types'],
+    types: placeholder as Registry['apiV2.clients.show']['types'],
   },
-  'clients_create': {
+  'apiV2.clients.create': {
     methods: ["POST"],
     pattern: '/api/v2/clients',
     tokens: [{"old":"/api/v2/clients","type":0,"val":"api","end":""},{"old":"/api/v2/clients","type":0,"val":"v2","end":""},{"old":"/api/v2/clients","type":0,"val":"clients","end":""}],
-    types: placeholder as Registry['clients_create']['types'],
+    types: placeholder as Registry['apiV2.clients.create']['types'],
   },
-  'clients_update': {
+  'apiV2.clients.update': {
     methods: ["PATCH"],
     pattern: '/api/v2/clients/:id',
     tokens: [{"old":"/api/v2/clients/:id","type":0,"val":"api","end":""},{"old":"/api/v2/clients/:id","type":0,"val":"v2","end":""},{"old":"/api/v2/clients/:id","type":0,"val":"clients","end":""},{"old":"/api/v2/clients/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['clients_update']['types'],
+    types: placeholder as Registry['apiV2.clients.update']['types'],
   },
-  'clients_destroy': {
+  'apiV2.clients.destroy': {
     methods: ["DELETE"],
     pattern: '/api/v2/clients/:id',
     tokens: [{"old":"/api/v2/clients/:id","type":0,"val":"api","end":""},{"old":"/api/v2/clients/:id","type":0,"val":"v2","end":""},{"old":"/api/v2/clients/:id","type":0,"val":"clients","end":""},{"old":"/api/v2/clients/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['clients_destroy']['types'],
+    types: placeholder as Registry['apiV2.clients.destroy']['types'],
   },
-  'products_list': {
+  'apiV2.products.list': {
     methods: ["GET","HEAD"],
     pattern: '/api/v2/products',
     tokens: [{"old":"/api/v2/products","type":0,"val":"api","end":""},{"old":"/api/v2/products","type":0,"val":"v2","end":""},{"old":"/api/v2/products","type":0,"val":"products","end":""}],
-    types: placeholder as Registry['products_list']['types'],
+    types: placeholder as Registry['apiV2.products.list']['types'],
   },
-  'products_show': {
+  'apiV2.products.show': {
     methods: ["GET","HEAD"],
     pattern: '/api/v2/products/:id',
     tokens: [{"old":"/api/v2/products/:id","type":0,"val":"api","end":""},{"old":"/api/v2/products/:id","type":0,"val":"v2","end":""},{"old":"/api/v2/products/:id","type":0,"val":"products","end":""},{"old":"/api/v2/products/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['products_show']['types'],
+    types: placeholder as Registry['apiV2.products.show']['types'],
   },
-  'products_create': {
+  'apiV2.products.create': {
     methods: ["POST"],
     pattern: '/api/v2/products',
     tokens: [{"old":"/api/v2/products","type":0,"val":"api","end":""},{"old":"/api/v2/products","type":0,"val":"v2","end":""},{"old":"/api/v2/products","type":0,"val":"products","end":""}],
-    types: placeholder as Registry['products_create']['types'],
+    types: placeholder as Registry['apiV2.products.create']['types'],
   },
-  'products_update': {
+  'apiV2.products.update': {
     methods: ["PATCH"],
     pattern: '/api/v2/products/:id',
     tokens: [{"old":"/api/v2/products/:id","type":0,"val":"api","end":""},{"old":"/api/v2/products/:id","type":0,"val":"v2","end":""},{"old":"/api/v2/products/:id","type":0,"val":"products","end":""},{"old":"/api/v2/products/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['products_update']['types'],
+    types: placeholder as Registry['apiV2.products.update']['types'],
   },
-  'products_destroy': {
+  'apiV2.products.destroy': {
     methods: ["DELETE"],
     pattern: '/api/v2/products/:id',
     tokens: [{"old":"/api/v2/products/:id","type":0,"val":"api","end":""},{"old":"/api/v2/products/:id","type":0,"val":"v2","end":""},{"old":"/api/v2/products/:id","type":0,"val":"products","end":""},{"old":"/api/v2/products/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['products_destroy']['types'],
+    types: placeholder as Registry['apiV2.products.destroy']['types'],
   },
-  'invoices_list': {
+  'apiV2.invoices.list': {
     methods: ["GET","HEAD"],
     pattern: '/api/v2/invoices',
     tokens: [{"old":"/api/v2/invoices","type":0,"val":"api","end":""},{"old":"/api/v2/invoices","type":0,"val":"v2","end":""},{"old":"/api/v2/invoices","type":0,"val":"invoices","end":""}],
-    types: placeholder as Registry['invoices_list']['types'],
+    types: placeholder as Registry['apiV2.invoices.list']['types'],
   },
-  'invoices_show': {
+  'apiV2.invoices.show': {
     methods: ["GET","HEAD"],
     pattern: '/api/v2/invoices/:id',
     tokens: [{"old":"/api/v2/invoices/:id","type":0,"val":"api","end":""},{"old":"/api/v2/invoices/:id","type":0,"val":"v2","end":""},{"old":"/api/v2/invoices/:id","type":0,"val":"invoices","end":""},{"old":"/api/v2/invoices/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['invoices_show']['types'],
+    types: placeholder as Registry['apiV2.invoices.show']['types'],
   },
-  'invoices_mark_paid': {
+  'apiV2.invoices.create': {
+    methods: ["POST"],
+    pattern: '/api/v2/invoices',
+    tokens: [{"old":"/api/v2/invoices","type":0,"val":"api","end":""},{"old":"/api/v2/invoices","type":0,"val":"v2","end":""},{"old":"/api/v2/invoices","type":0,"val":"invoices","end":""}],
+    types: placeholder as Registry['apiV2.invoices.create']['types'],
+  },
+  'apiV2.invoices.markPaid': {
     methods: ["POST"],
     pattern: '/api/v2/invoices/:id/mark-paid',
     tokens: [{"old":"/api/v2/invoices/:id/mark-paid","type":0,"val":"api","end":""},{"old":"/api/v2/invoices/:id/mark-paid","type":0,"val":"v2","end":""},{"old":"/api/v2/invoices/:id/mark-paid","type":0,"val":"invoices","end":""},{"old":"/api/v2/invoices/:id/mark-paid","type":1,"val":"id","end":""},{"old":"/api/v2/invoices/:id/mark-paid","type":0,"val":"mark-paid","end":""}],
-    types: placeholder as Registry['invoices_mark_paid']['types'],
+    types: placeholder as Registry['apiV2.invoices.markPaid']['types'],
   },
-  'quotes_list': {
+  'apiV2.invoices.duplicate': {
+    methods: ["POST"],
+    pattern: '/api/v2/invoices/:id/duplicate',
+    tokens: [{"old":"/api/v2/invoices/:id/duplicate","type":0,"val":"api","end":""},{"old":"/api/v2/invoices/:id/duplicate","type":0,"val":"v2","end":""},{"old":"/api/v2/invoices/:id/duplicate","type":0,"val":"invoices","end":""},{"old":"/api/v2/invoices/:id/duplicate","type":1,"val":"id","end":""},{"old":"/api/v2/invoices/:id/duplicate","type":0,"val":"duplicate","end":""}],
+    types: placeholder as Registry['apiV2.invoices.duplicate']['types'],
+  },
+  'apiV2.invoices.destroy': {
+    methods: ["DELETE"],
+    pattern: '/api/v2/invoices/:id',
+    tokens: [{"old":"/api/v2/invoices/:id","type":0,"val":"api","end":""},{"old":"/api/v2/invoices/:id","type":0,"val":"v2","end":""},{"old":"/api/v2/invoices/:id","type":0,"val":"invoices","end":""},{"old":"/api/v2/invoices/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['apiV2.invoices.destroy']['types'],
+  },
+  'apiV2.quotes.list': {
     methods: ["GET","HEAD"],
     pattern: '/api/v2/quotes',
     tokens: [{"old":"/api/v2/quotes","type":0,"val":"api","end":""},{"old":"/api/v2/quotes","type":0,"val":"v2","end":""},{"old":"/api/v2/quotes","type":0,"val":"quotes","end":""}],
-    types: placeholder as Registry['quotes_list']['types'],
+    types: placeholder as Registry['apiV2.quotes.list']['types'],
   },
-  'quotes_show': {
+  'apiV2.quotes.show': {
     methods: ["GET","HEAD"],
     pattern: '/api/v2/quotes/:id',
     tokens: [{"old":"/api/v2/quotes/:id","type":0,"val":"api","end":""},{"old":"/api/v2/quotes/:id","type":0,"val":"v2","end":""},{"old":"/api/v2/quotes/:id","type":0,"val":"quotes","end":""},{"old":"/api/v2/quotes/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['quotes_show']['types'],
+    types: placeholder as Registry['apiV2.quotes.show']['types'],
+  },
+  'apiV2.bankAccounts.list': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v2/bank-accounts',
+    tokens: [{"old":"/api/v2/bank-accounts","type":0,"val":"api","end":""},{"old":"/api/v2/bank-accounts","type":0,"val":"v2","end":""},{"old":"/api/v2/bank-accounts","type":0,"val":"bank-accounts","end":""}],
+    types: placeholder as Registry['apiV2.bankAccounts.list']['types'],
+  },
+  'apiV2.bankAccounts.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v2/bank-accounts/:id',
+    tokens: [{"old":"/api/v2/bank-accounts/:id","type":0,"val":"api","end":""},{"old":"/api/v2/bank-accounts/:id","type":0,"val":"v2","end":""},{"old":"/api/v2/bank-accounts/:id","type":0,"val":"bank-accounts","end":""},{"old":"/api/v2/bank-accounts/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['apiV2.bankAccounts.show']['types'],
+  },
+  'apiV2.company.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v2/company',
+    tokens: [{"old":"/api/v2/company","type":0,"val":"api","end":""},{"old":"/api/v2/company","type":0,"val":"v2","end":""},{"old":"/api/v2/company","type":0,"val":"company","end":""}],
+    types: placeholder as Registry['apiV2.company.show']['types'],
+  },
+  'apiV2.team.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v2/team',
+    tokens: [{"old":"/api/v2/team","type":0,"val":"api","end":""},{"old":"/api/v2/team","type":0,"val":"v2","end":""},{"old":"/api/v2/team","type":0,"val":"team","end":""}],
+    types: placeholder as Registry['apiV2.team.show']['types'],
+  },
+  'apiV2.expenses.list': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v2/expenses',
+    tokens: [{"old":"/api/v2/expenses","type":0,"val":"api","end":""},{"old":"/api/v2/expenses","type":0,"val":"v2","end":""},{"old":"/api/v2/expenses","type":0,"val":"expenses","end":""}],
+    types: placeholder as Registry['apiV2.expenses.list']['types'],
+  },
+  'apiV2.expenses.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v2/expenses/:id',
+    tokens: [{"old":"/api/v2/expenses/:id","type":0,"val":"api","end":""},{"old":"/api/v2/expenses/:id","type":0,"val":"v2","end":""},{"old":"/api/v2/expenses/:id","type":0,"val":"expenses","end":""},{"old":"/api/v2/expenses/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['apiV2.expenses.show']['types'],
+  },
+  'apiV2.expenses.create': {
+    methods: ["POST"],
+    pattern: '/api/v2/expenses',
+    tokens: [{"old":"/api/v2/expenses","type":0,"val":"api","end":""},{"old":"/api/v2/expenses","type":0,"val":"v2","end":""},{"old":"/api/v2/expenses","type":0,"val":"expenses","end":""}],
+    types: placeholder as Registry['apiV2.expenses.create']['types'],
+  },
+  'apiV2.expenses.destroy': {
+    methods: ["DELETE"],
+    pattern: '/api/v2/expenses/:id',
+    tokens: [{"old":"/api/v2/expenses/:id","type":0,"val":"api","end":""},{"old":"/api/v2/expenses/:id","type":0,"val":"v2","end":""},{"old":"/api/v2/expenses/:id","type":0,"val":"expenses","end":""},{"old":"/api/v2/expenses/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['apiV2.expenses.destroy']['types'],
+  },
+  'apiV2.creditNotes.list': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v2/credit-notes',
+    tokens: [{"old":"/api/v2/credit-notes","type":0,"val":"api","end":""},{"old":"/api/v2/credit-notes","type":0,"val":"v2","end":""},{"old":"/api/v2/credit-notes","type":0,"val":"credit-notes","end":""}],
+    types: placeholder as Registry['apiV2.creditNotes.list']['types'],
+  },
+  'apiV2.creditNotes.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v2/credit-notes/:id',
+    tokens: [{"old":"/api/v2/credit-notes/:id","type":0,"val":"api","end":""},{"old":"/api/v2/credit-notes/:id","type":0,"val":"v2","end":""},{"old":"/api/v2/credit-notes/:id","type":0,"val":"credit-notes","end":""},{"old":"/api/v2/credit-notes/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['apiV2.creditNotes.show']['types'],
+  },
+  'apiV2.recurringInvoices.list': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v2/recurring-invoices',
+    tokens: [{"old":"/api/v2/recurring-invoices","type":0,"val":"api","end":""},{"old":"/api/v2/recurring-invoices","type":0,"val":"v2","end":""},{"old":"/api/v2/recurring-invoices","type":0,"val":"recurring-invoices","end":""}],
+    types: placeholder as Registry['apiV2.recurringInvoices.list']['types'],
+  },
+  'apiV2.recurringInvoices.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v2/recurring-invoices/:id',
+    tokens: [{"old":"/api/v2/recurring-invoices/:id","type":0,"val":"api","end":""},{"old":"/api/v2/recurring-invoices/:id","type":0,"val":"v2","end":""},{"old":"/api/v2/recurring-invoices/:id","type":0,"val":"recurring-invoices","end":""},{"old":"/api/v2/recurring-invoices/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['apiV2.recurringInvoices.show']['types'],
+  },
+  'apiV2.recurringInvoices.pause': {
+    methods: ["POST"],
+    pattern: '/api/v2/recurring-invoices/:id/pause',
+    tokens: [{"old":"/api/v2/recurring-invoices/:id/pause","type":0,"val":"api","end":""},{"old":"/api/v2/recurring-invoices/:id/pause","type":0,"val":"v2","end":""},{"old":"/api/v2/recurring-invoices/:id/pause","type":0,"val":"recurring-invoices","end":""},{"old":"/api/v2/recurring-invoices/:id/pause","type":1,"val":"id","end":""},{"old":"/api/v2/recurring-invoices/:id/pause","type":0,"val":"pause","end":""}],
+    types: placeholder as Registry['apiV2.recurringInvoices.pause']['types'],
+  },
+  'apiV2.recurringInvoices.resume': {
+    methods: ["POST"],
+    pattern: '/api/v2/recurring-invoices/:id/resume',
+    tokens: [{"old":"/api/v2/recurring-invoices/:id/resume","type":0,"val":"api","end":""},{"old":"/api/v2/recurring-invoices/:id/resume","type":0,"val":"v2","end":""},{"old":"/api/v2/recurring-invoices/:id/resume","type":0,"val":"recurring-invoices","end":""},{"old":"/api/v2/recurring-invoices/:id/resume","type":1,"val":"id","end":""},{"old":"/api/v2/recurring-invoices/:id/resume","type":0,"val":"resume","end":""}],
+    types: placeholder as Registry['apiV2.recurringInvoices.resume']['types'],
   },
   'create_feedback': {
     methods: ["POST"],
