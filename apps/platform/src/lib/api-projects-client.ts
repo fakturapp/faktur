@@ -28,7 +28,8 @@ export const apiProjectsClient = {
       is_archived?: boolean
     }
   ) => api.patch<{ data: ApiProjectShape }>(`${BASE}/${id}`, body),
-  destroy: (id: string) => api.delete<{ message: string }>(`${BASE}/${id}`),
+  destroy: (id: string, password?: string) =>
+    api.delete<{ message: string }>(`${BASE}/${id}`, password ? { password } : undefined),
   auditLogs: (id: string, params?: { limit?: number }) => {
     const qs = new URLSearchParams()
     if (params?.limit) qs.set('limit', String(params.limit))

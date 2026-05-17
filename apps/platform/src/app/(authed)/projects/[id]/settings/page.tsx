@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Settings, Trash2 } from 'lucide-react'
+import { Settings, Trash2, AlertTriangle } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
@@ -32,6 +32,8 @@ export default function ProjectSettingsPage() {
   const [saving, setSaving] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [confirmText, setConfirmText] = useState('')
+  const [password, setPassword] = useState('')
 
   useEffect(() => {
     apiProjectsClient.show(params.id).then((res) => {
@@ -62,16 +64,30 @@ export default function ProjectSettingsPage() {
 
   async function handleDelete() {
     if (!project) return
+    if (!password) {
+      toast('Mot de passe requis', 'error')
+      return
+    }
     setDeleting(true)
-    const res = await apiProjectsClient.destroy(project.id)
+    const res = await apiProjectsClient.destroy(project.id, password)
     setDeleting(false)
     if (res.error) {
       toast(res.error, 'error')
       return
     }
     toast('Projet supprimé', 'success')
+    setConfirmDelete(false)
+    setPassword('')
+    setConfirmText('')
     reloadProjects()
     router.replace('/projects')
+  }
+
+  function closeDeleteModal() {
+    if (deleting) return
+    setConfirmDelete(false)
+    setPassword('')
+    setConfirmText('')
   }
 
   if (!project) {
@@ -163,18 +179,56 @@ export default function ProjectSettingsPage() {
         </Card>
       )}
 
-      <Dialog open={confirmDelete} onClose={() => !deleting && setConfirmDelete(false)}>
+      <Dialog open={confirmDelete} onClose={closeDeleteModal} className="max-w-md">
         <DialogHeader showClose={false}>
-          <DialogTitle>Supprimer « {project.name} » ?</DialogTitle>
+          <DialogTitle className="flex items-center gap-2 text-danger">
+            <AlertTriangle className="h-5 w-5" />
+            Supprimer « {project.name} » ?
+          </DialogTitle>
           <DialogDescription>
-            Cette action est irréversible. Le projet doit être vide pour pouvoir être supprimé.
+            Cette action est <strong>définitive</strong>. Toutes les références au projet
+            seront perdues. Le projet doit être vide (aucune clé active) pour pouvoir être supprimé.
           </DialogDescription>
         </DialogHeader>
+        <div className="space-y-4 px-1">
+          <Field>
+            <FieldLabel htmlFor="confirm-name">
+              Tape <strong>« {project.name} »</strong> pour confirmer
+            </FieldLabel>
+            <Input
+              id="confirm-name"
+              value={confirmText}
+              onChange={(e) => setConfirmText(e.target.value)}
+              placeholder={project.name}
+              disabled={deleting}
+              autoFocus
+            />
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="confirm-password">Mot de passe Faktur</FieldLabel>
+            <Input
+              id="confirm-password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              disabled={deleting}
+              autoComplete="current-password"
+            />
+            <FieldDescription>
+              Pour des raisons de sécurité, votre mot de passe est requis.
+            </FieldDescription>
+          </Field>
+        </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => setConfirmDelete(false)} disabled={deleting}>
+          <Button variant="outline" onClick={closeDeleteModal} disabled={deleting}>
             Annuler
           </Button>
-          <Button variant="danger" onClick={handleDelete} disabled={deleting}>
+          <Button
+            variant="danger"
+            onClick={handleDelete}
+            disabled={deleting || confirmText !== project.name || !password}
+          >
             {deleting ? (
               <>
                 <Spinner />
@@ -183,7 +237,7 @@ export default function ProjectSettingsPage() {
             ) : (
               <>
                 <Trash2 className="h-4 w-4 mr-2" />
-                Supprimer
+                Supprimer définitivement
               </>
             )}
           </Button>
