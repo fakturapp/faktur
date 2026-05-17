@@ -6,8 +6,21 @@ export interface StoredTokens {
   expiresAt: number
 }
 
+const AUTH_COOKIE = 'faktur_platform_authed'
+
 function isBrowser() {
   return typeof window !== 'undefined'
+}
+
+function setAuthCookie(expiresInSeconds: number) {
+  if (!isBrowser()) return
+  const max = Math.max(60, Math.floor(expiresInSeconds))
+  document.cookie = `${AUTH_COOKIE}=1; path=/; max-age=${max}; SameSite=Lax`
+}
+
+function clearAuthCookie() {
+  if (!isBrowser()) return
+  document.cookie = `${AUTH_COOKIE}=; path=/; max-age=0; SameSite=Lax`
 }
 
 export function getStoredAccessToken(): string | null {
@@ -30,13 +43,16 @@ export function storeTokens(tokens: {
   expires_in?: number
 }): void {
   if (!isBrowser()) return
+  const ttl = tokens.expires_in ?? 3600
   localStorage.setItem(STORAGE_KEYS.accessToken, tokens.access_token)
   if (tokens.refresh_token) {
     localStorage.setItem(STORAGE_KEYS.refreshToken, tokens.refresh_token)
   }
-  const expiresAt =
-    Date.now() + (tokens.expires_in ?? 3600) * 1000
+  const expiresAt = Date.now() + ttl * 1000
   localStorage.setItem(STORAGE_KEYS.expiresAt, String(expiresAt))
+  // Mirror presence to a cookie so the Next.js middleware can gate routes
+  // server-side (no token contents in the cookie — just a presence flag).
+  setAuthCookie(ttl)
 }
 
 export function clearTokens(): void {
@@ -45,6 +61,7 @@ export function clearTokens(): void {
   localStorage.removeItem(STORAGE_KEYS.refreshToken)
   localStorage.removeItem(STORAGE_KEYS.expiresAt)
   localStorage.removeItem(STORAGE_KEYS.currentTeamId)
+  clearAuthCookie()
 }
 
 export function getCurrentTeamId(): string | null {
@@ -61,3 +78,5 @@ export function setCurrentTeamId(id: string | null): void {
 export function isTokenExpired(stored: StoredTokens, leewaySeconds = 60): boolean {
   return Date.now() >= stored.expiresAt - leewaySeconds * 1000
 }
+
+export { AUTH_COOKIE }
