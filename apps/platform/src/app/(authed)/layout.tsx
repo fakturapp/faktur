@@ -4,6 +4,7 @@ import { useEffect, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth'
 import { ApiKeysProvider } from '@/lib/api-keys-context'
+import { ProjectsProvider } from '@/lib/projects-context'
 import { Sidebar } from '@/components/layout/sidebar'
 import { Spinner } from '@/components/ui/spinner'
 
@@ -26,13 +27,15 @@ export default function AuthedLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <ApiKeysProvider>
-      <div className="relative h-screen overflow-hidden bg-background">
-        <Sidebar />
-        <div className="flex h-screen flex-col overflow-hidden pl-(--sidebar-width)">
-          <main className="flex-1 overflow-y-auto">{children}</main>
+    <ProjectsProvider>
+      <ApiKeysProvider>
+        <div className="relative h-screen overflow-hidden bg-background">
+          <Sidebar />
+          <div className="flex h-screen flex-col overflow-hidden pl-(--sidebar-width)">
+            <main className="flex-1 overflow-y-auto">{children}</main>
+          </div>
         </div>
-      </div>
-    </ApiKeysProvider>
+      </ApiKeysProvider>
+    </ProjectsProvider>
   )
 }

@@ -9,6 +9,7 @@ import {
   ChevronDown,
   CreditCard,
   ExternalLink,
+  Folder,
   Key,
   LayoutDashboard,
   LogOut,
@@ -34,6 +35,7 @@ export function Sidebar() {
   const [switching, setSwitching] = useState<string | null>(null)
 
   const isOnDashboard = pathname === '/dashboard'
+  const isOnProjects = pathname === '/projects' || pathname.startsWith('/projects/')
   const isOnKeys = pathname === '/api-keys' || pathname.startsWith('/api-keys/')
   const isOnCredits = pathname === '/credits'
 
@@ -79,6 +81,17 @@ export function Sidebar() {
         >
           <LayoutDashboard className="h-4 w-4" />
           <span className="flex-1 font-medium">Dashboard</span>
+        </Link>
+
+        <Link
+          href="/projects"
+          className={cn(
+            'flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors hover:bg-sidebar-accent',
+            isOnProjects && 'bg-sidebar-accent text-sidebar-accent-foreground'
+          )}
+        >
+          <Folder className="h-4 w-4" />
+          <span className="flex-1 font-medium">Projets</span>
         </Link>
 
         <div>
