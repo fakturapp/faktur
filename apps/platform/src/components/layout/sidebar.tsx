@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { motion } from 'framer-motion'
 import {
   Activity,
   ArrowLeft,
@@ -99,6 +100,7 @@ function NavLink({
   active,
   badge,
   trailing,
+  groupId,
 }: {
   href: string
   icon: React.ElementType
@@ -106,19 +108,29 @@ function NavLink({
   active: boolean
   badge?: React.ReactNode
   trailing?: React.ReactNode
+  groupId: string
 }) {
   return (
     <Link
       href={href}
       className={cn(
-        'flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors hover:bg-sidebar-accent',
-        active && 'bg-sidebar-accent text-sidebar-accent-foreground'
+        'relative flex items-center gap-2.5 rounded-lg px-2.5 py-2.5 text-sm transition-colors',
+        active
+          ? 'text-sidebar-accent-foreground'
+          : 'text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground'
       )}
     >
-      <Icon className="h-4 w-4" />
-      <span className="flex-1 truncate font-medium">{label}</span>
-      {badge}
-      {trailing}
+      {active && (
+        <motion.span
+          layoutId={`sidebar-active-${groupId}`}
+          className="absolute inset-0 -z-0 rounded-lg bg-sidebar-accent shadow-sm"
+          transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+        />
+      )}
+      <Icon className="relative z-10 h-4 w-4" />
+      <span className="relative z-10 flex-1 truncate font-medium">{label}</span>
+      {badge && <span className="relative z-10">{badge}</span>}
+      {trailing && <span className="relative z-10">{trailing}</span>}
     </Link>
   )
 }
@@ -140,33 +152,38 @@ function DefaultSidebar({ pathname }: { pathname: string }) {
     <Shell>
       <Brand />
       <div className="mx-3 h-px bg-border" />
-      <nav className="flex-1 space-y-0.5 overflow-y-auto px-2 py-3">
-        <p className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+      <nav className="flex-1 space-y-1.5 overflow-y-auto px-2.5 py-4">
+        <p className="px-2 pb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
           Plateforme
         </p>
-        <NavLink
-          href="/dashboard"
-          icon={LayoutDashboard}
-          label="Dashboard"
-          active={pathname === '/dashboard'}
-        />
-        <NavLink
-          href="/projects"
-          icon={Folder}
-          label="Projets"
-          active={pathname === '/projects'}
-        />
-        <NavLink
-          href="/credits"
-          icon={CreditCard}
-          label="Crédits"
-          active={pathname === '/credits'}
-          trailing={
-            <span className="rounded border border-border px-1 py-px text-[9px] font-medium uppercase tracking-wider text-muted-foreground">
-              Bientôt
-            </span>
-          }
-        />
+        <div className="space-y-1">
+          <NavLink
+            href="/dashboard"
+            icon={LayoutDashboard}
+            label="Dashboard"
+            active={pathname === '/dashboard'}
+            groupId="default"
+          />
+          <NavLink
+            href="/projects"
+            icon={Folder}
+            label="Projets"
+            active={pathname === '/projects'}
+            groupId="default"
+          />
+          <NavLink
+            href="/credits"
+            icon={CreditCard}
+            label="Crédits"
+            active={pathname === '/credits'}
+            groupId="default"
+            trailing={
+              <span className="rounded border border-border px-1 py-px text-[9px] font-medium uppercase tracking-wider text-muted-foreground">
+                Bientôt
+              </span>
+            }
+          />
+        </div>
         <ResourcesSection />
       </nav>
       <UserFooter />
@@ -201,10 +218,10 @@ function ProjectSidebar({
     <Shell>
       <Brand />
       <div className="mx-3 h-px bg-border" />
-      <nav className="flex-1 space-y-0.5 overflow-y-auto px-2 py-3">
+      <nav className="flex-1 space-y-1 overflow-y-auto px-2.5 py-4">
         <BackLink href="/projects" label="Tous les projets" />
         {project && (
-          <div className="mt-2 mb-2 px-2.5">
+          <div className="mt-3 mb-2 px-2.5">
             <div className="flex items-center gap-2">
               <Folder className="h-3.5 w-3.5 text-accent" />
               <p className="truncate text-xs font-semibold uppercase tracking-wider text-foreground">
@@ -213,17 +230,20 @@ function ProjectSidebar({
             </div>
           </div>
         )}
-        {items.map((item) => (
-          <NavLink
-            key={item.href}
-            href={item.href}
-            icon={item.icon}
-            label={item.label}
-            active={
-              item.exact ? pathname === item.href : pathname.startsWith(item.href)
-            }
-          />
-        ))}
+        <div className="space-y-1">
+          {items.map((item) => (
+            <NavLink
+              key={item.href}
+              href={item.href}
+              icon={item.icon}
+              label={item.label}
+              groupId={`project-${projectId}`}
+              active={
+                item.exact ? pathname === item.href : pathname.startsWith(item.href)
+              }
+            />
+          ))}
+        </div>
       </nav>
       <UserFooter />
     </Shell>
@@ -260,10 +280,10 @@ function KeySidebar({
     <Shell>
       <Brand />
       <div className="mx-3 h-px bg-border" />
-      <nav className="flex-1 space-y-0.5 overflow-y-auto px-2 py-3">
+      <nav className="flex-1 space-y-1 overflow-y-auto px-2.5 py-4">
         <BackLink href={`/projects/${projectId}`} label="Retour au projet" />
         {key && (
-          <div className="mt-2 mb-2 px-2.5">
+          <div className="mt-3 mb-2 px-2.5">
             <div className="flex items-center gap-2">
               <span
                 className={cn(
@@ -284,15 +304,18 @@ function KeySidebar({
             </p>
           </div>
         )}
-        {items.map((item) => (
-          <NavLink
-            key={item.href}
-            href={item.href}
-            icon={item.icon}
-            label={item.label}
-            active={item.exact ? pathname === item.href : pathname.startsWith(item.href)}
-          />
-        ))}
+        <div className="space-y-1">
+          {items.map((item) => (
+            <NavLink
+              key={item.href}
+              href={item.href}
+              icon={item.icon}
+              label={item.label}
+              groupId={`key-${keyId}`}
+              active={item.exact ? pathname === item.href : pathname.startsWith(item.href)}
+            />
+          ))}
+        </div>
       </nav>
       <UserFooter />
     </Shell>
@@ -301,29 +324,31 @@ function KeySidebar({
 
 function ResourcesSection() {
   return (
-    <div className="pt-4">
-      <p className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+    <div className="pt-5">
+      <p className="px-2 pb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
         Ressources
       </p>
-      <a
-        href={DOCS_URL}
-        target="_blank"
-        rel="noreferrer"
-        className="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground"
-      >
-        <Book className="h-4 w-4" />
-        <span className="flex-1 font-medium">Documentation</span>
-        <ExternalLink className="h-3 w-3 opacity-60" />
-      </a>
-      <a
-        href={DASHBOARD_URL}
-        target="_blank"
-        rel="noreferrer"
-        className="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground"
-      >
-        <ExternalLink className="h-4 w-4" />
-        <span className="flex-1 font-medium">App Faktur</span>
-      </a>
+      <div className="space-y-1">
+        <a
+          href={DOCS_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="flex items-center gap-2.5 rounded-lg px-2.5 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent/60 hover:text-foreground"
+        >
+          <Book className="h-4 w-4" />
+          <span className="flex-1 font-medium">Documentation</span>
+          <ExternalLink className="h-3 w-3 opacity-60" />
+        </a>
+        <a
+          href={DASHBOARD_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="flex items-center gap-2.5 rounded-lg px-2.5 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent/60 hover:text-foreground"
+        >
+          <ExternalLink className="h-4 w-4" />
+          <span className="flex-1 font-medium">App Faktur</span>
+        </a>
+      </div>
     </div>
   )
 }
