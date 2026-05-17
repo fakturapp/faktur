@@ -85,8 +85,11 @@ export default function OAuthCallbackPage() {
           expires_in: data.expires_in,
         })
 
+        const next = sessionStorage.getItem('faktur_platform_next')
+        sessionStorage.removeItem('faktur_platform_next')
+
         setPhase('done')
-        window.location.replace('/api-keys')
+        window.location.replace(next && next.startsWith('/') ? next : '/api-keys')
       } catch (err) {
         if (cancelled) return
         setError(err instanceof Error ? err.message : 'Erreur réseau')

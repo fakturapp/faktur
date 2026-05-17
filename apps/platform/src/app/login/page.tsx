@@ -25,7 +25,8 @@ export default function LoginPage() {
       setError(params.get('error_description') || params.get('error'))
     }
     if (getStoredAccessToken()) {
-      window.location.replace('/api-keys')
+      const next = params.get('next')
+      window.location.replace(next && next.startsWith('/') ? next : '/api-keys')
     }
   }, [])
 
@@ -39,6 +40,15 @@ export default function LoginPage() {
 
       sessionStorage.setItem(STORAGE_KEYS.pkceVerifier, verifier)
       sessionStorage.setItem(STORAGE_KEYS.oauthState, state)
+
+      // Remember the requested page so /oauth/callback can return there.
+      const params = new URLSearchParams(window.location.search)
+      const next = params.get('next')
+      if (next && next.startsWith('/')) {
+        sessionStorage.setItem('faktur_platform_next', next)
+      } else {
+        sessionStorage.removeItem('faktur_platform_next')
+      }
 
       const url = new URL(OAUTH_AUTHORIZE_URL)
       url.searchParams.set('client_id', OAUTH_CLIENT_ID)
