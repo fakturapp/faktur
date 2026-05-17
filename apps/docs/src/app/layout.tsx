@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Agentation } from "agentation";
 import './globals.css'
 import { DocsHeader } from '@/components/docs-header'
 import { DocsFooter } from '@/components/docs-footer'
@@ -29,10 +30,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <ThemeScript />
       </head>
-      <body className="bg-background text-foreground antialiased">
+      <body className="bg-background text-foreground antialiased" suppressHydrationWarning>
         <DocsHeader />
         <div className="pt-14">{children}</div>
         <DocsFooter />
+        {process.env.NODE_ENV === "development" && <Agentation />}
       </body>
     </html>
   )
