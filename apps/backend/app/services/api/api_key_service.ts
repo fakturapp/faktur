@@ -93,30 +93,21 @@ class ApiKeyService {
     return key
   }
 
-  async rotate(apiKeyId: string, graceHours = 24): Promise<{ record: ApiKey; plaintext: string }> {
+  async rotate(apiKeyId: string): Promise<{ record: ApiKey; plaintext: string }> {
     const existing = await ApiKey.findOrFail(apiKeyId)
     if (existing.isRevoked) throw new ApiKeyValidationError('Cannot rotate a revoked key')
 
     const gen = this.generate()
-    const replacement = await ApiKey.create({
-      teamId: existing.teamId,
-      createdByUserId: existing.createdByUserId,
-      name: existing.name,
-      prefix: gen.prefix,
-      last4: gen.last4,
-      hash: gen.hash,
-      scopes: existing.scopes,
-      rateLimitTier: existing.rateLimitTier,
-      allowedIps: existing.allowedIps,
-      expiresAt: existing.expiresAt,
-      usageCount: 0,
-    })
-
-    existing.rotatingToId = replacement.id
-    existing.rotationGraceUntil = DateTime.now().plus({ hours: graceHours })
+    existing.prefix = gen.prefix
+    existing.last4 = gen.last4
+    existing.hash = gen.hash
+    existing.rotatingToId = null
+    existing.rotationGraceUntil = null
+    existing.lastUsedAt = null
+    existing.lastIp = null
     await existing.save()
 
-    return { record: replacement, plaintext: gen.plaintext }
+    return { record: existing, plaintext: gen.plaintext }
   }
 
   async revoke(apiKeyId: string, reason = 'manual'): Promise<ApiKey> {

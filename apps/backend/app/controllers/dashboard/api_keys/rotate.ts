@@ -24,11 +24,11 @@ export default class Rotate {
     if (!key) return response.notFound({ message: 'API key not found' })
 
     const rotated = await apiKeyService.rotate(key.id)
-    return response.created({
+    return response.ok({
       data: adminTransformer.transform(rotated.record),
       plaintext: rotated.plaintext,
-      grace_until: key.rotationGraceUntil?.toISO() ?? null,
-      message: 'New API key generated. The previous key remains active for 24 hours.',
+      grace_until: null,
+      message: 'API key rotated. The previous secret is now invalid.',
     })
   }
 }
