@@ -9,6 +9,7 @@ cache
 .next/
 docs/.next/*
 apps/*/.next/
+*.tsbuildinfo
 
 # Secrets
 .env
