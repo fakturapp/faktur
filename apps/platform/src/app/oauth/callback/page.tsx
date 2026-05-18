@@ -12,6 +12,8 @@ import { storeTokens } from '@/lib/oauth-storage'
 import { Spinner } from '@/components/ui/spinner'
 import { AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
+import { FakturLogoMark } from '@/components/brand/faktur-logo'
+import DotField from '@/components/effects/DotField'
 
 export default function OAuthCallbackPage() {
   const [phase, setPhase] = useState<'exchanging' | 'error' | 'done'>('exchanging')
@@ -123,15 +125,36 @@ export default function OAuthCallbackPage() {
   }, [])
 
   return (
-    <div className="flex min-h-[100svh] items-center justify-center bg-background px-4">
-      <div className="w-full max-w-sm rounded-2xl border border-border bg-overlay p-8 text-center shadow-overlay">
+    <div className="relative isolate flex min-h-[100svh] items-center justify-center overflow-hidden bg-background px-4">
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <DotField
+          dotRadius={1.5}
+          dotSpacing={14}
+          bulgeStrength={67}
+          glowRadius={160}
+          sparkle={false}
+          waveAmplitude={0}
+          cursorRadius={500}
+          cursorForce={0.1}
+          bulgeOnly
+          gradientFrom="#A855F7"
+          gradientTo="#B497CF"
+          glowColor="#120F17"
+        />
+      </div>
+
+      <div className="relative w-full max-w-sm rounded-2xl border border-border/60 bg-overlay/90 p-8 text-center shadow-overlay backdrop-blur-md">
+        <div className="mb-5 flex justify-center">
+          <FakturLogoMark size={44} />
+        </div>
+
         {phase === 'exchanging' && (
           <>
             <div className="mx-auto flex size-10 items-center justify-center">
               <Spinner />
             </div>
             <h1 className="mt-4 text-base font-semibold text-foreground">
-              Connexion en cours...
+              Connexion en cours…
             </h1>
             <p className="mt-1 text-xs text-muted-foreground">
               Échange du code OAuth avec api.fakturapp.cc
@@ -144,7 +167,7 @@ export default function OAuthCallbackPage() {
             <div className="mx-auto flex size-10 items-center justify-center">
               <Spinner />
             </div>
-            <h1 className="mt-4 text-base font-semibold text-foreground">Redirection...</h1>
+            <h1 className="mt-4 text-base font-semibold text-foreground">Redirection…</h1>
           </>
         )}
 
