@@ -28,21 +28,34 @@ import { apiKeysClient, type ApiKeyShape } from '@/lib/api-keys-client'
 import { apiProjectsClient } from '@/lib/api-projects-client'
 import { API_BASE_URL } from '@/lib/oauth-config'
 
-const API_PLATFORM_BASE_URL = API_BASE_URL.replace(/\/api\/v1$/, '/api/platform')
+const API_HOST_BASE = API_BASE_URL.replace(/\/api\/v1$/, '')
+
+type ApiPrefix = 'platform' | 'v1'
+const PREFIX_PATHS: Record<ApiPrefix, string> = {
+  platform: '/api/platform',
+  v1: '/api/v1',
+}
 
 const METHODS = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'] as const
 type HttpMethod = (typeof METHODS)[number]
 
-const PRESETS: Array<{ label: string; method: HttpMethod; path: string; body?: string }> = [
-  { label: 'GET /clients', method: 'GET', path: '/clients' },
-  { label: 'GET /invoices', method: 'GET', path: '/invoices' },
-  { label: 'GET /products', method: 'GET', path: '/products' },
-  { label: 'GET /expenses', method: 'GET', path: '/expenses' },
-  { label: 'GET /quotes', method: 'GET', path: '/quotes' },
+const PRESETS: Array<{
+  label: string
+  method: HttpMethod
+  path: string
+  prefix: ApiPrefix
+  body?: string
+}> = [
+  { label: 'GET /v1/clients', method: 'GET', path: '/clients', prefix: 'v1' },
+  { label: 'GET /v1/invoices', method: 'GET', path: '/invoices', prefix: 'v1' },
+  { label: 'GET /v1/products', method: 'GET', path: '/products', prefix: 'v1' },
+  { label: 'GET /v1/expenses', method: 'GET', path: '/expenses', prefix: 'v1' },
+  { label: 'GET /v1/quotes', method: 'GET', path: '/quotes', prefix: 'v1' },
   {
-    label: 'POST /clients',
+    label: 'POST /v1/clients',
     method: 'POST',
     path: '/clients',
+    prefix: 'v1',
     body: JSON.stringify(
       {
         type: 'company',
@@ -53,6 +66,9 @@ const PRESETS: Array<{ label: string; method: HttpMethod; path: string; body?: s
       2
     ),
   },
+  { label: 'GET /platform/ping', method: 'GET', path: '/ping', prefix: 'platform' },
+  { label: 'GET /platform/session', method: 'GET', path: '/session', prefix: 'platform' },
+  { label: 'GET /platform/usage', method: 'GET', path: '/usage', prefix: 'platform' },
 ]
 
 interface HeaderRow {
@@ -211,6 +227,7 @@ export default function ExplorerPage() {
   const [showToken, setShowToken] = useState(false)
 
   const [method, setMethod] = useState<HttpMethod>('GET')
+  const [prefix, setPrefix] = useState<ApiPrefix>('v1')
   const [path, setPath] = useState('/clients')
   const [query, setQuery] = useState('')
   const [headers, setHeaders] = useState<HeaderRow[]>([newRow()])
@@ -236,13 +253,15 @@ export default function ExplorerPage() {
   const fullUrl = useMemo(() => {
     const p = path.startsWith('/') ? path : `/${path}`
     const qs = query.trim()
-    return `${API_PLATFORM_BASE_URL}${p}${qs ? (qs.startsWith('?') ? qs : `?${qs}`) : ''}`
-  }, [path, query])
+    const base = `${API_HOST_BASE}${PREFIX_PATHS[prefix]}`
+    return `${base}${p}${qs ? (qs.startsWith('?') ? qs : `?${qs}`) : ''}`
+  }, [prefix, path, query])
 
   const hasBody = method !== 'GET' && method !== 'DELETE'
 
   function applyPreset(p: (typeof PRESETS)[number]) {
     setMethod(p.method)
+    setPrefix(p.prefix)
     setPath(p.path)
     setBody(p.body ?? '')
     setQuery('')
@@ -452,12 +471,21 @@ export default function ExplorerPage() {
             ))}
           </div>
 
-          <div className="grid gap-2 grid-cols-[110px_1fr_auto] items-center">
+          <div className="grid gap-2 grid-cols-[110px_140px_1fr_auto] items-center">
             <FormSelect
               value={method}
               onChange={(v) => setMethod(v as HttpMethod)}
               options={METHODS.map((m) => ({ value: m, label: m }))}
               className="font-mono font-semibold"
+            />
+            <FormSelect
+              value={prefix}
+              onChange={(v) => setPrefix(v as ApiPrefix)}
+              options={[
+                { value: 'v1', label: '/api/v1' },
+                { value: 'platform', label: '/api/platform' },
+              ]}
+              className="font-mono"
             />
             <Input
               value={path}
@@ -479,6 +507,11 @@ export default function ExplorerPage() {
               )}
             </Button>
           </div>
+          <p className="-mt-1 text-[11px] text-muted-foreground">
+            {prefix === 'v1'
+              ? 'Endpoints métier : clients, invoices, products, expenses, quotes, …'
+              : 'Méta : ping, session, usage (gratuits, ne décomptent pas de crédit)'}
+          </p>
 
           <button
             type="button"
