@@ -28,5 +28,5 @@ router
     router.delete('/:clientId/contacts/:id', [ClientContactDestroy, 'handle'])
   })
   .prefix(API_PREFIX + '/clients')
-  .use(middleware.auth())
+  .use(middleware.authOrApiKey())
   .use(middleware.vault())
