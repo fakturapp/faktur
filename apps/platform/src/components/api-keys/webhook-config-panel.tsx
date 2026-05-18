@@ -85,7 +85,6 @@ export function WebhookConfigPanel({ apiKey, webhook, onChanged }: Props) {
   useEffect(() => {
     if (!catalog) return
     setPreset(detectPreset(Array.from(events), catalog.webhook_events))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [catalog])
 
   function changePreset(next: string) {
@@ -525,8 +524,6 @@ function CreateWebhookDialog({
     </Dialog>
   )
 }
-
-/* ─────────────────────────── Event picker (shared) ─────────────────────────── */
 
 interface WebhookEventPickerProps {
   catalog: ScopesCatalog | null

@@ -221,8 +221,6 @@ export default function Quickstart() {
   )
 }
 
-/* ─────────────────────────── Step ─────────────────────────── */
-
 type Accent = 'violet' | 'indigo' | 'sky' | 'emerald' | 'amber'
 
 const ACCENT_CLASSES: Record<
@@ -277,7 +275,6 @@ function Step({
   const acc = ACCENT_CLASSES[accent]
   return (
     <section className="relative mt-14 grid grid-cols-[3rem_1fr] gap-x-5">
-      {/* Left column: big icon badge + vertical line */}
       <div className="relative row-span-2 flex flex-col items-center">
         <span
           className={`relative z-10 inline-flex size-12 shrink-0 items-center justify-center rounded-2xl ring-4 ring-(--background) ${acc.badge} ${acc.badgeText}`}
@@ -286,20 +283,16 @@ function Step({
         </span>
         <span aria-hidden className={`mt-1 w-px flex-1 ${acc.line}`} />
       </div>
-      {/* Right column: heading */}
       <div>
         <p className={`text-[11px] font-semibold uppercase tracking-[0.16em] ${acc.badgeText}`}>
           Étape {number}
         </p>
         <h2 className="m-0 mt-1 text-2xl font-semibold tracking-tight leading-tight">{title}</h2>
       </div>
-      {/* Right column: body */}
       <div className="pb-2 pt-4 space-y-3 text-sm leading-relaxed">{children}</div>
     </section>
   )
 }
-
-/* ─────────────────────────── Callout ─────────────────────────── */
 
 function Callout({
   tone,
@@ -332,8 +325,6 @@ function Callout({
   )
 }
 
-/* ─────────────────────────── Safari preview ─────────────────────────── */
-
 function BrowserPreview({ url, children }: { url: string; children: React.ReactNode }) {
   return (
     <div className="mt-4 overflow-hidden rounded-xl border border-(--border) bg-(--muted)/20">
@@ -348,8 +339,6 @@ function BrowserPreview({ url, children }: { url: string; children: React.ReactN
     </div>
   )
 }
-
-/* ─────────────────────────── NextStepCard ─────────────────────────── */
 
 const TONE_CARDS: Record<
   Accent,

@@ -9,14 +9,10 @@ interface Props {
   filename?: string
   children: ReactNode
   className?: string
-  /** Hide the Mac-style traffic lights. */
+  
   noChrome?: boolean
 }
 
-/**
- * Mac-style code window with traffic lights, filename, and copy button.
- * Light syntax highlighting for JSON/bash/TS/Node when children is a plain string.
- */
 export function CodeWindow({ language, filename, children, className, noChrome }: Props) {
   const [copied, setCopied] = useState(false)
   const lang = (language ?? filename ?? '').toLowerCase()
@@ -42,7 +38,6 @@ export function CodeWindow({ language, filename, children, className, noChrome }
       setCopied(true)
       setTimeout(() => setCopied(false), 1800)
     } catch {
-      // ignore
     }
   }
 
@@ -93,8 +88,6 @@ export function CodeWindow({ language, filename, children, className, noChrome }
     </div>
   )
 }
-
-/* ─────────────────────────── tokenizer ─────────────────────────── */
 
 const C = {
   key: 'text-violet-300',

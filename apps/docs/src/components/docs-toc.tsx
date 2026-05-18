@@ -37,11 +37,7 @@ export function DocsTOC({ contentSelector = '#docs-content' }: { contentSelector
 
     if (nodes.length === 0) return
 
-    /**
-     * Mintlify-style scrollspy: pick the last heading whose top has
-     * crossed the trigger line (96px from top of viewport). Falls back
-     * to the first heading when the page is scrolled above all of them.
-     */
+    
     const TRIGGER_OFFSET = 96
 
     let rafId: number | null = null
@@ -59,8 +55,6 @@ export function DocsTOC({ contentSelector = '#docs-content' }: { contentSelector
           break
         }
       }
-
-      // If user scrolled to the very bottom, force-select the last heading.
       const scrollBottom = window.innerHeight + window.scrollY
       const docHeight = document.documentElement.scrollHeight
       if (docHeight - scrollBottom < 64) {

@@ -192,7 +192,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           body: new URLSearchParams({ token }).toString(),
         })
       } catch {
-        /* ignore network failure on logout */
+        
       }
     }
     clearTokens()

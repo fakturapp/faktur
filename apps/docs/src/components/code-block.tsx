@@ -9,10 +9,6 @@ interface CodeBlockProps {
   filename?: string
 }
 
-/**
- * Mintlify-style code block. Dark surface, language pill, copy button,
- * lightweight syntax highlighting for JSON and shell.
- */
 export function CodeBlock({ children, lang = 'text', filename }: CodeBlockProps) {
   const [copied, setCopied] = useState(false)
 
@@ -30,7 +26,6 @@ export function CodeBlock({ children, lang = 'text', filename }: CodeBlockProps)
       setCopied(true)
       setTimeout(() => setCopied(false), 1800)
     } catch {
-      // ignore
     }
   }
 
@@ -74,8 +69,6 @@ export function CodeBlock({ children, lang = 'text', filename }: CodeBlockProps)
     </div>
   )
 }
-
-/* ─────────────────────────── highlighters ─────────────────────────── */
 
 const C = {
   key: 'text-violet-300',
@@ -126,7 +119,6 @@ function highlightJson(src: string): ReactNode {
 }
 
 function highlightBash(src: string): ReactNode {
-  // Split per line for cleaner styling of multi-line curl.
   const lines = src.split('\n')
   return lines.map((line, lineIdx) => {
     const parts: { value: string; cls?: string }[] = []

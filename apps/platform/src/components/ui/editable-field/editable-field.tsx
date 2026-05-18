@@ -24,7 +24,7 @@ interface EditableFieldProps {
   modalTitle?: string
   modalDescription?: ReactNode
   required?: boolean
-  /** Returns the new value on success, or throws / returns null on failure. */
+  
   onSave: (next: string) => Promise<boolean | void>
   type?: 'text' | 'textarea'
 }

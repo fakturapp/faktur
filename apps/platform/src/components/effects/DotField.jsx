@@ -33,7 +33,6 @@ const DotField = memo(({
   const propsRef = useRef({});
   propsRef.current = { dotRadius, dotSpacing, cursorRadius, cursorForce, bulgeOnly, bulgeStrength, sparkle, waveAmplitude, gradientFrom, gradientTo };
   const rebuildRef = useRef(null);
-  // useId is hydration-safe (same value on server and client) — replaces the original Math.random()
   const reactId = useId();
   const glowId = `dot-field-glow-${reactId.replace(/[:]/g, '')}`;
 
@@ -226,7 +225,6 @@ const DotField = memo(({
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', onMouseMove);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

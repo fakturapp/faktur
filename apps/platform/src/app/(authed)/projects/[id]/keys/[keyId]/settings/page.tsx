@@ -373,8 +373,6 @@ export default function ApiKeySettingsPage() {
   )
 }
 
-/* ─────────────────────────── helpers ─────────────────────────── */
-
 function ReadOnlyField({
   label,
   description,
@@ -440,8 +438,6 @@ function ActionRow({
     </div>
   )
 }
-
-/* ─────────────────────────── Scopes editor ─────────────────────────── */
 
 function EditScopesDialog({
   open,
@@ -583,8 +579,6 @@ function EditScopesDialog({
     </Dialog>
   )
 }
-
-/* ─────────────────────────── IPs editor ─────────────────────────── */
 
 function EditIpsDialog({
   open,
@@ -741,8 +735,6 @@ function EditIpsDialog({
     </Dialog>
   )
 }
-
-/* ─────────────────────────── Destroy dialog ─────────────────────────── */
 
 function ConfirmDestroyDialog({
   open,

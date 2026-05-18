@@ -87,7 +87,6 @@ export function CreateApiKeyDialog({ open, onClose, onCreated, projectId }: Prop
   function isValidIpOrCidr(input: string): boolean {
     const value = input.trim()
     if (!value) return false
-    // Allow IPv4 or IPv4/CIDR or IPv6 short form (loose check)
     const ipv4 = /^(?:(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d?\d)(?:\/(3[0-2]|[12]?\d))?$/
     const ipv6 = /^[0-9a-fA-F:]+(\/\d{1,3})?$/
     return ipv4.test(value) || (ipv6.test(value) && value.includes(':'))
