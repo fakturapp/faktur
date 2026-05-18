@@ -284,41 +284,10 @@ export type ScannedRoutes = {
     'dashboard.apiKeys.logs': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.usageStats': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.credits.usage': { paramsTuple?: []; params?: {} }
-    'apiV2.meta.ping': { paramsTuple?: []; params?: {} }
-    'apiV2.meta.session': { paramsTuple?: []; params?: {} }
-    'apiV2.clients.list': { paramsTuple?: []; params?: {} }
-    'apiV2.clients.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.clients.create': { paramsTuple?: []; params?: {} }
-    'apiV2.clients.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.clients.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.products.list': { paramsTuple?: []; params?: {} }
-    'apiV2.products.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.products.create': { paramsTuple?: []; params?: {} }
-    'apiV2.products.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.products.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.invoices.list': { paramsTuple?: []; params?: {} }
-    'apiV2.invoices.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.invoices.create': { paramsTuple?: []; params?: {} }
-    'apiV2.invoices.markPaid': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.invoices.duplicate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.invoices.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.quotes.list': { paramsTuple?: []; params?: {} }
-    'apiV2.quotes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.bankAccounts.list': { paramsTuple?: []; params?: {} }
-    'apiV2.bankAccounts.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.company.show': { paramsTuple?: []; params?: {} }
-    'apiV2.team.show': { paramsTuple?: []; params?: {} }
-    'apiV2.expenses.list': { paramsTuple?: []; params?: {} }
-    'apiV2.expenses.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.expenses.create': { paramsTuple?: []; params?: {} }
-    'apiV2.expenses.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.creditNotes.list': { paramsTuple?: []; params?: {} }
-    'apiV2.creditNotes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.recurringInvoices.list': { paramsTuple?: []; params?: {} }
-    'apiV2.recurringInvoices.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.recurringInvoices.pause': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.recurringInvoices.resume': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.notFound': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
+    'apiPlatform.meta.ping': { paramsTuple?: []; params?: {} }
+    'apiPlatform.meta.session': { paramsTuple?: []; params?: {} }
+    'apiPlatform.meta.usage': { paramsTuple?: []; params?: {} }
+    'apiPlatform.notFound': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
     'create_feedback': { paramsTuple?: []; params?: {} }
     'my_feedback': { paramsTuple?: []; params?: {} }
     'create_bug_report': { paramsTuple?: []; params?: {} }
@@ -435,15 +404,7 @@ export type ScannedRoutes = {
     'dashboard.apiKeys.webhook.rotateSecret': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.webhook.test': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.deliveries.retry': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'deliveryId': ParamValue} }
-    'apiV2.clients.create': { paramsTuple?: []; params?: {} }
-    'apiV2.products.create': { paramsTuple?: []; params?: {} }
-    'apiV2.invoices.create': { paramsTuple?: []; params?: {} }
-    'apiV2.invoices.markPaid': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.invoices.duplicate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.expenses.create': { paramsTuple?: []; params?: {} }
-    'apiV2.recurringInvoices.pause': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.recurringInvoices.resume': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.notFound': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
+    'apiPlatform.notFound': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
     'create_feedback': { paramsTuple?: []; params?: {} }
     'create_bug_report': { paramsTuple?: []; params?: {} }
   }
@@ -552,27 +513,10 @@ export type ScannedRoutes = {
     'dashboard.apiKeys.logs': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.usageStats': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.credits.usage': { paramsTuple?: []; params?: {} }
-    'apiV2.meta.ping': { paramsTuple?: []; params?: {} }
-    'apiV2.meta.session': { paramsTuple?: []; params?: {} }
-    'apiV2.clients.list': { paramsTuple?: []; params?: {} }
-    'apiV2.clients.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.products.list': { paramsTuple?: []; params?: {} }
-    'apiV2.products.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.invoices.list': { paramsTuple?: []; params?: {} }
-    'apiV2.invoices.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.quotes.list': { paramsTuple?: []; params?: {} }
-    'apiV2.quotes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.bankAccounts.list': { paramsTuple?: []; params?: {} }
-    'apiV2.bankAccounts.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.company.show': { paramsTuple?: []; params?: {} }
-    'apiV2.team.show': { paramsTuple?: []; params?: {} }
-    'apiV2.expenses.list': { paramsTuple?: []; params?: {} }
-    'apiV2.expenses.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.creditNotes.list': { paramsTuple?: []; params?: {} }
-    'apiV2.creditNotes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.recurringInvoices.list': { paramsTuple?: []; params?: {} }
-    'apiV2.recurringInvoices.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.notFound': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
+    'apiPlatform.meta.ping': { paramsTuple?: []; params?: {} }
+    'apiPlatform.meta.session': { paramsTuple?: []; params?: {} }
+    'apiPlatform.meta.usage': { paramsTuple?: []; params?: {} }
+    'apiPlatform.notFound': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
     'my_feedback': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
@@ -680,27 +624,10 @@ export type ScannedRoutes = {
     'dashboard.apiKeys.logs': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.usageStats': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.credits.usage': { paramsTuple?: []; params?: {} }
-    'apiV2.meta.ping': { paramsTuple?: []; params?: {} }
-    'apiV2.meta.session': { paramsTuple?: []; params?: {} }
-    'apiV2.clients.list': { paramsTuple?: []; params?: {} }
-    'apiV2.clients.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.products.list': { paramsTuple?: []; params?: {} }
-    'apiV2.products.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.invoices.list': { paramsTuple?: []; params?: {} }
-    'apiV2.invoices.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.quotes.list': { paramsTuple?: []; params?: {} }
-    'apiV2.quotes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.bankAccounts.list': { paramsTuple?: []; params?: {} }
-    'apiV2.bankAccounts.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.company.show': { paramsTuple?: []; params?: {} }
-    'apiV2.team.show': { paramsTuple?: []; params?: {} }
-    'apiV2.expenses.list': { paramsTuple?: []; params?: {} }
-    'apiV2.expenses.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.creditNotes.list': { paramsTuple?: []; params?: {} }
-    'apiV2.creditNotes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.recurringInvoices.list': { paramsTuple?: []; params?: {} }
-    'apiV2.recurringInvoices.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.notFound': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
+    'apiPlatform.meta.ping': { paramsTuple?: []; params?: {} }
+    'apiPlatform.meta.session': { paramsTuple?: []; params?: {} }
+    'apiPlatform.meta.usage': { paramsTuple?: []; params?: {} }
+    'apiPlatform.notFound': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
     'my_feedback': { paramsTuple?: []; params?: {} }
   }
   PUT: {
@@ -726,7 +653,7 @@ export type ScannedRoutes = {
     'update_oauth_app': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.webhook.set': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.webhook.deliveryConfig.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.notFound': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
+    'apiPlatform.notFound': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
   }
   DELETE: {
     'session_revoke': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -757,11 +684,7 @@ export type ScannedRoutes = {
     'dashboard.apiProjects.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.revoke': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.webhook.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.clients.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.products.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.invoices.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.expenses.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.notFound': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
+    'apiPlatform.notFound': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
   }
   PATCH: {
     'quote_update_status': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -779,12 +702,10 @@ export type ScannedRoutes = {
     'link_update': { paramsTuple: [ParamValue]; params: {'linkId': ParamValue} }
     'dashboard.apiProjects.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.clients.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.products.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'apiV2.notFound': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
+    'apiPlatform.notFound': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
   }
   OPTIONS: {
-    'apiV2.notFound': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
+    'apiPlatform.notFound': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
   }
 }
 declare module '@adonisjs/core/types/http' {

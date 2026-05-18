@@ -92,64 +92,6 @@ export const controllers = {
     Consent: () => import('#controllers/analytics/consent'),
     Ingest: () => import('#controllers/analytics/ingest'),
   },
-  apiV2: {
-    bankAccounts: {
-      List: () => import('#controllers/api_v2/bank_accounts/list'),
-      Show: () => import('#controllers/api_v2/bank_accounts/show'),
-    },
-    clients: {
-      Create: () => import('#controllers/api_v2/clients/create'),
-      Destroy: () => import('#controllers/api_v2/clients/destroy'),
-      List: () => import('#controllers/api_v2/clients/list'),
-      Show: () => import('#controllers/api_v2/clients/show'),
-      Update: () => import('#controllers/api_v2/clients/update'),
-    },
-    company: {
-      Show: () => import('#controllers/api_v2/company/show'),
-    },
-    creditNotes: {
-      List: () => import('#controllers/api_v2/credit_notes/list'),
-      Show: () => import('#controllers/api_v2/credit_notes/show'),
-    },
-    expenses: {
-      Create: () => import('#controllers/api_v2/expenses/create'),
-      Destroy: () => import('#controllers/api_v2/expenses/destroy'),
-      List: () => import('#controllers/api_v2/expenses/list'),
-      Show: () => import('#controllers/api_v2/expenses/show'),
-    },
-    invoices: {
-      Create: () => import('#controllers/api_v2/invoices/create'),
-      Destroy: () => import('#controllers/api_v2/invoices/destroy'),
-      Duplicate: () => import('#controllers/api_v2/invoices/duplicate'),
-      List: () => import('#controllers/api_v2/invoices/list'),
-      MarkPaid: () => import('#controllers/api_v2/invoices/mark_paid'),
-      Show: () => import('#controllers/api_v2/invoices/show'),
-    },
-    meta: {
-      Ping: () => import('#controllers/api_v2/meta/ping'),
-      Session: () => import('#controllers/api_v2/meta/session'),
-    },
-    NotFound: () => import('#controllers/api_v2/not_found'),
-    products: {
-      Create: () => import('#controllers/api_v2/products/create'),
-      Destroy: () => import('#controllers/api_v2/products/destroy'),
-      List: () => import('#controllers/api_v2/products/list'),
-      Show: () => import('#controllers/api_v2/products/show'),
-      Update: () => import('#controllers/api_v2/products/update'),
-    },
-    quotes: {
-      List: () => import('#controllers/api_v2/quotes/list'),
-      Show: () => import('#controllers/api_v2/quotes/show'),
-    },
-    recurringInvoices: {
-      List: () => import('#controllers/api_v2/recurring_invoices/list'),
-      Show: () => import('#controllers/api_v2/recurring_invoices/show'),
-      ToggleActive: () => import('#controllers/api_v2/recurring_invoices/toggle_active'),
-    },
-    team: {
-      Show: () => import('#controllers/api_v2/team/show'),
-    },
-  },
   auth: {
     oauth: {
       GoogleAuthUrl: () => import('#controllers/auth/oauth/google_auth_url'),
@@ -525,5 +467,13 @@ export const controllers = {
   },
   webhooks: {
     StripeWebhook: () => import('#controllers/webhooks/stripe_webhook'),
+  },
+  apiPlatform: {
+    meta: {
+      Ping: () => import('#controllers/api_platform/meta/ping'),
+      Session: () => import('#controllers/api_platform/meta/session'),
+      Usage: () => import('#controllers/api_platform/meta/usage'),
+    },
+    NotFound: () => import('#controllers/api_platform/not_found'),
   },
 }

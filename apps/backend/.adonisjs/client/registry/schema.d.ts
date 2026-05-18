@@ -3367,424 +3367,52 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/credits/usage').default['handle']>>>
     }
   }
-  'apiV2.meta.ping': {
+  'apiPlatform.meta.ping': {
     methods: ["GET","HEAD"]
-    pattern: '/api/v2/ping'
+    pattern: '/api/platform/ping'
     types: {
       body: {}
       paramsTuple: []
       params: {}
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/meta/ping').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/meta/ping').default['handle']>>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_platform/meta/ping').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_platform/meta/ping').default['handle']>>>
     }
   }
-  'apiV2.meta.session': {
+  'apiPlatform.meta.session': {
     methods: ["GET","HEAD"]
-    pattern: '/api/v2/session'
+    pattern: '/api/platform/session'
     types: {
       body: {}
       paramsTuple: []
       params: {}
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/meta/session').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/meta/session').default['handle']>>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_platform/meta/session').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_platform/meta/session').default['handle']>>>
     }
   }
-  'apiV2.clients.list': {
+  'apiPlatform.meta.usage': {
     methods: ["GET","HEAD"]
-    pattern: '/api/v2/clients'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: ExtractQueryForGet<InferInput<(typeof import('#validators/api_v2/client_validators').listClientsValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/clients/list').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/clients/list').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'apiV2.clients.show': {
-    methods: ["GET","HEAD"]
-    pattern: '/api/v2/clients/:id'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/clients/show').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/clients/show').default['handle']>>>
-    }
-  }
-  'apiV2.clients.create': {
-    methods: ["POST"]
-    pattern: '/api/v2/clients'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/api_v2/client_validators').createClientValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/api_v2/client_validators').createClientValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/clients/create').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/clients/create').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'apiV2.clients.update': {
-    methods: ["PATCH"]
-    pattern: '/api/v2/clients/:id'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/api_v2/client_validators').updateClientValidator)>>
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/api_v2/client_validators').updateClientValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/clients/update').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/clients/update').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'apiV2.clients.destroy': {
-    methods: ["DELETE"]
-    pattern: '/api/v2/clients/:id'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/clients/destroy').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/clients/destroy').default['handle']>>>
-    }
-  }
-  'apiV2.products.list': {
-    methods: ["GET","HEAD"]
-    pattern: '/api/v2/products'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: ExtractQueryForGet<InferInput<(typeof import('#validators/api_v2/product_validators').listProductsValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/products/list').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/products/list').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'apiV2.products.show': {
-    methods: ["GET","HEAD"]
-    pattern: '/api/v2/products/:id'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/products/show').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/products/show').default['handle']>>>
-    }
-  }
-  'apiV2.products.create': {
-    methods: ["POST"]
-    pattern: '/api/v2/products'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/api_v2/product_validators').createProductValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/api_v2/product_validators').createProductValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/products/create').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/products/create').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'apiV2.products.update': {
-    methods: ["PATCH"]
-    pattern: '/api/v2/products/:id'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/api_v2/product_validators').updateProductValidator)>>
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/api_v2/product_validators').updateProductValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/products/update').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/products/update').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'apiV2.products.destroy': {
-    methods: ["DELETE"]
-    pattern: '/api/v2/products/:id'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/products/destroy').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/products/destroy').default['handle']>>>
-    }
-  }
-  'apiV2.invoices.list': {
-    methods: ["GET","HEAD"]
-    pattern: '/api/v2/invoices'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: ExtractQueryForGet<InferInput<(typeof import('#validators/api_v2/invoice_validators').listInvoicesValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/invoices/list').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/invoices/list').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'apiV2.invoices.show': {
-    methods: ["GET","HEAD"]
-    pattern: '/api/v2/invoices/:id'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/invoices/show').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/invoices/show').default['handle']>>>
-    }
-  }
-  'apiV2.invoices.create': {
-    methods: ["POST"]
-    pattern: '/api/v2/invoices'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/api_v2/invoice_write_validators').createInvoiceV2Validator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/api_v2/invoice_write_validators').createInvoiceV2Validator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/invoices/create').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/invoices/create').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'apiV2.invoices.markPaid': {
-    methods: ["POST"]
-    pattern: '/api/v2/invoices/:id/mark-paid'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/api_v2/invoice_validators').markPaidValidator)>>
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/api_v2/invoice_validators').markPaidValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/invoices/mark_paid').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/invoices/mark_paid').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'apiV2.invoices.duplicate': {
-    methods: ["POST"]
-    pattern: '/api/v2/invoices/:id/duplicate'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/invoices/duplicate').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/invoices/duplicate').default['handle']>>>
-    }
-  }
-  'apiV2.invoices.destroy': {
-    methods: ["DELETE"]
-    pattern: '/api/v2/invoices/:id'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/invoices/destroy').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/invoices/destroy').default['handle']>>>
-    }
-  }
-  'apiV2.quotes.list': {
-    methods: ["GET","HEAD"]
-    pattern: '/api/v2/quotes'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: ExtractQueryForGet<InferInput<(typeof import('#validators/api_v2/quote_validators').listQuotesValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/quotes/list').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/quotes/list').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'apiV2.quotes.show': {
-    methods: ["GET","HEAD"]
-    pattern: '/api/v2/quotes/:id'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/quotes/show').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/quotes/show').default['handle']>>>
-    }
-  }
-  'apiV2.bankAccounts.list': {
-    methods: ["GET","HEAD"]
-    pattern: '/api/v2/bank-accounts'
+    pattern: '/api/platform/usage'
     types: {
       body: {}
       paramsTuple: []
       params: {}
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/bank_accounts/list').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/bank_accounts/list').default['handle']>>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_platform/meta/usage').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_platform/meta/usage').default['handle']>>>
     }
   }
-  'apiV2.bankAccounts.show': {
-    methods: ["GET","HEAD"]
-    pattern: '/api/v2/bank-accounts/:id'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/bank_accounts/show').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/bank_accounts/show').default['handle']>>>
-    }
-  }
-  'apiV2.company.show': {
-    methods: ["GET","HEAD"]
-    pattern: '/api/v2/company'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/company/show').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/company/show').default['handle']>>>
-    }
-  }
-  'apiV2.team.show': {
-    methods: ["GET","HEAD"]
-    pattern: '/api/v2/team'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/team/show').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/team/show').default['handle']>>>
-    }
-  }
-  'apiV2.expenses.list': {
-    methods: ["GET","HEAD"]
-    pattern: '/api/v2/expenses'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: ExtractQueryForGet<InferInput<(typeof import('#validators/api_v2/expense_validators').listExpensesValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/expenses/list').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/expenses/list').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'apiV2.expenses.show': {
-    methods: ["GET","HEAD"]
-    pattern: '/api/v2/expenses/:id'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/expenses/show').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/expenses/show').default['handle']>>>
-    }
-  }
-  'apiV2.expenses.create': {
-    methods: ["POST"]
-    pattern: '/api/v2/expenses'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/api_v2/expense_validators').createExpenseValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/api_v2/expense_validators').createExpenseValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/expenses/create').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/expenses/create').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'apiV2.expenses.destroy': {
-    methods: ["DELETE"]
-    pattern: '/api/v2/expenses/:id'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/expenses/destroy').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/expenses/destroy').default['handle']>>>
-    }
-  }
-  'apiV2.creditNotes.list': {
-    methods: ["GET","HEAD"]
-    pattern: '/api/v2/credit-notes'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/credit_notes/list').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/credit_notes/list').default['handle']>>>
-    }
-  }
-  'apiV2.creditNotes.show': {
-    methods: ["GET","HEAD"]
-    pattern: '/api/v2/credit-notes/:id'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/credit_notes/show').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/credit_notes/show').default['handle']>>>
-    }
-  }
-  'apiV2.recurringInvoices.list': {
-    methods: ["GET","HEAD"]
-    pattern: '/api/v2/recurring-invoices'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/recurring_invoices/list').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/recurring_invoices/list').default['handle']>>>
-    }
-  }
-  'apiV2.recurringInvoices.show': {
-    methods: ["GET","HEAD"]
-    pattern: '/api/v2/recurring-invoices/:id'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/recurring_invoices/show').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/recurring_invoices/show').default['handle']>>>
-    }
-  }
-  'apiV2.recurringInvoices.pause': {
-    methods: ["POST"]
-    pattern: '/api/v2/recurring-invoices/:id/pause'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/recurring_invoices/toggle_active').default['Pause']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/recurring_invoices/toggle_active').default['Pause']>>>
-    }
-  }
-  'apiV2.recurringInvoices.resume': {
-    methods: ["POST"]
-    pattern: '/api/v2/recurring-invoices/:id/resume'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { id: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/recurring_invoices/toggle_active').default['Resume']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/recurring_invoices/toggle_active').default['Resume']>>>
-    }
-  }
-  'apiV2.notFound': {
+  'apiPlatform.notFound': {
     methods: ["HEAD","OPTIONS","GET","POST","PUT","PATCH","DELETE"]
-    pattern: '/api/v2/*'
+    pattern: '/api/platform/*'
     types: {
       body: {}
       paramsTuple: [ParamValue]
       params: { '*': ParamValue[] }
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/not_found').default['handle']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/not_found').default['handle']>>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_platform/not_found').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_platform/not_found').default['handle']>>>
     }
   }
   'create_feedback': {
