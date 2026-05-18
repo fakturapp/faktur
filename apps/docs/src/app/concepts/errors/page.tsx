@@ -13,17 +13,17 @@ const errors = [
   { code: 'resource_not_found', http: 404, when: 'ID unknown or owned by another team' },
   { code: 'route_not_found', http: 404, when: 'No endpoint matches the request' },
   { code: 'method_not_allowed', http: 405, when: 'Verb not supported on this endpoint' },
-  { code: 'conflict', http: 409, when: 'State mismatch (e.g. paying an already-paid invoice)' },
+  { code: 'conflict', http: 409, when: 'State mismatch (e.g, paying an already-paid invoice)' },
   { code: 'idempotency_replay', http: 409, when: 'Idempotency key reused with a different body' },
-  { code: 'validation_failed', http: 422, when: 'Validation errors. see details[]' },
+  { code: 'validation_failed', http: 422, when: 'Validation errors, see details[]' },
   {
     code: 'business_rule_violation',
     http: 422,
-    when: 'Logical rule broken (e.g. deleting a sent invoice)',
+    when: 'Logical rule broken (e.g, deleting a sent invoice)',
   },
   { code: 'rate_limited', http: 429, when: 'Per-minute or per-hour window exhausted' },
   { code: 'quota_exceeded', http: 429, when: 'Monthly quota (PDF, emails, etc.) reached' },
-  { code: 'internal_error', http: 500, when: 'Server bug. include request_id in support tickets' },
+  { code: 'internal_error', http: 500, when: 'Server bug, include request_id in support tickets' },
   { code: 'service_unavailable', http: 503, when: 'Maintenance or downstream outage' },
 ]
 
@@ -93,19 +93,19 @@ export default function ErrorsPage() {
         <h2 className="text-2xl font-semibold">Retry strategy</h2>
         <ul className="mt-3 space-y-2 text-sm text-(--muted-foreground)">
           <li>
-            <strong className="text-(--foreground)">401 / 403</strong>. fix credentials, do not
+            <strong className="text-(--foreground)">401 / 403</strong>, fix credentials, do not
             retry automatically.
           </li>
           <li>
-            <strong className="text-(--foreground)">422 / 409</strong>. fix the request payload,
+            <strong className="text-(--foreground)">422 / 409</strong>, fix the request payload,
             no retry.
           </li>
           <li>
-            <strong className="text-(--foreground)">429</strong>. respect{' '}
+            <strong className="text-(--foreground)">429</strong>, respect{' '}
             <code>Retry-After</code> and back off exponentially.
           </li>
           <li>
-            <strong className="text-(--foreground)">5xx</strong>. retry up to 3 times with
+            <strong className="text-(--foreground)">5xx</strong>, retry up to 3 times with
             jittered exponential backoff (1s, 2s, 4s).
           </li>
         </ul>

@@ -66,7 +66,7 @@ export default function AuthenticationPage() {
         <h2 className="text-2xl font-semibold">Encryption mode requirement</h2>
         <p className="mt-3 text-sm">
           The API is only available for teams in <strong>Standard encryption mode</strong>. Teams
-          in Private (E2E) mode cannot create or use API keys. the server would have no way to
+          in Private (E2E) mode cannot create or use API keys, the server would have no way to
           decrypt your data without your password.
         </p>
         <p className="mt-3 text-sm">

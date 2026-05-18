@@ -59,7 +59,7 @@ export default function IdempotencyPage() {
       <section className="mt-10">
         <h2 className="text-2xl font-semibold">Rules &amp; limits</h2>
         <ul className="mt-3 space-y-2 text-sm text-(--muted-foreground)">
-          <li>Keys are scoped per API key. collisions across keys are impossible.</li>
+          <li>Keys are scoped per API key, collisions across keys are impossible.</li>
           <li>The body hash must match exactly. Whitespace and field order are ignored.</li>
           <li>TTL is 24 hours from first use. After that, the key is reusable.</li>
           <li>Successful responses (2xx) are stored. 4xx/5xx are not replayed.</li>
@@ -70,7 +70,7 @@ export default function IdempotencyPage() {
       <section className="mt-10">
         <h2 className="text-2xl font-semibold">When to use it</h2>
         <ul className="mt-3 space-y-2 text-sm text-(--muted-foreground)">
-          <li>Webhook handlers that POST into Faktur. guarantees no duplicates.</li>
+          <li>Webhook handlers that POST into Faktur, guarantees no duplicates.</li>
           <li>Cron jobs that might fire twice in rare cases.</li>
           <li>Mobile clients on flaky connections.</li>
           <li>Any retry loop where you can&apos;t tell if the previous attempt landed.</li>

@@ -6,7 +6,7 @@ export default function RateLimitsPage() {
       <p className="text-xs font-semibold uppercase tracking-wider text-violet-500">Concept</p>
       <h1 className="mt-2 text-4xl font-semibold tracking-tight">Rate limits</h1>
       <p className="mt-4 text-(--muted-foreground)">
-        Faktur enforces two windows on each API key. per minute and per hour. Standard headers
+        Faktur enforces two windows on each API key, per minute and per hour. Standard headers
         let you implement clean backoff.
       </p>
 
@@ -82,7 +82,7 @@ Retry-After: 18
             (±10%).
           </li>
           <li>
-            Never burst all your tokens at once. spread requests over the window when possible.
+            Never burst all your tokens at once, spread requests over the window when possible.
           </li>
         </ul>
       </section>

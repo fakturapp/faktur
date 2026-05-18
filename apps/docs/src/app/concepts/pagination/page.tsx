@@ -19,10 +19,10 @@ export default function PaginationPage() {
         </pre>
         <ul className="mt-4 space-y-1.5 text-sm text-(--muted-foreground)">
           <li>
-            <code>limit</code>. items per page, 1–200, default 50.
+            <code>limit</code>, items per page, 1–200, default 50.
           </li>
           <li>
-            <code>cursor</code>. opaque base64url token from a previous response. Omit to start
+            <code>cursor</code>, opaque base64url token from a previous response. Omit to start
             from the beginning.
           </li>
         </ul>
@@ -66,7 +66,7 @@ do {
       <section className="mt-10">
         <h2 className="text-2xl font-semibold">Sorting and filters</h2>
         <p className="mt-3 text-sm text-(--muted-foreground)">
-          Filters and sorting compose freely with pagination. the cursor encodes whatever order
+          Filters and sorting compose freely with pagination, the cursor encodes whatever order
           you requested:
         </p>
         <pre className="mt-3 overflow-x-auto rounded-xl border border-(--border) bg-(--code-bg) p-4 text-xs">

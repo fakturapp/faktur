@@ -100,7 +100,7 @@ export default function QuotesReference() {
             <code>quote.accepted</code>, <code>quote.rejected</code>, <code>quote.expired</code>
           </li>
           <li>
-            <code>quote.converted</code>. fires when a quote becomes an invoice
+            <code>quote.converted</code>, fires when a quote becomes an invoice
           </li>
         </ul>
       </section>

@@ -25,7 +25,7 @@ const resources = [
   {
     name: 'clients',
     title: 'Clients',
-    description: 'Manage your contact book. companies, individuals, and their contacts.',
+    description: 'Manage your contact book, companies, individuals, and their contacts.',
     href: '/resources/clients',
   },
   {
@@ -67,7 +67,7 @@ const resources = [
   {
     name: 'company',
     title: 'Company',
-    description: 'Your legal entity. name, SIREN, address, logo.',
+    description: 'Your legal entity, name, SIREN, address, logo.',
     href: '/resources/company',
   },
   {

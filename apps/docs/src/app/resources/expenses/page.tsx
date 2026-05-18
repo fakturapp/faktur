@@ -61,7 +61,7 @@ export default function ExpensesReference() {
           method="POST"
           path="/api/v2/expenses"
           scope="expenses:write"
-          description="Record a new expense. vat_amount_cents is auto-computed from amount_cents and vat_rate if omitted."
+          description="Record a new expense, vat_amount_cents is auto-computed from amount_cents and vat_rate if omitted."
           example={`curl ${API_V2_BASE_URL}/expenses \\
   -X POST \\
   -H "Authorization: Bearer fk_live_..." \\

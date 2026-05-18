@@ -47,7 +47,7 @@ const FEATURES: Array<{
     icon: Code2,
     title: 'Idempotent POSTs',
     description:
-      'Send Faktur-Idempotency-Key once and retry safely. network blips no longer produce duplicates.',
+      'Send Faktur-Idempotency-Key once and retry safely, network blips no longer produce duplicates.',
   },
   {
     icon: ShieldCheck,
@@ -69,7 +69,7 @@ export default function Landing() {
           </h1>
           <p className="mt-5 max-w-2xl text-balance text-[15px] text-muted-foreground sm:text-base">
             REST moderne pour factures, devis, clients, produits, dépenses et webhooks. Bearer
-            tokens, scopes resource:action, cursor pagination, idempotency. pensé pour les
+            tokens, scopes resource:action, cursor pagination, idempotency, pensé pour les
             développeurs qui scriptent leur propre compte ou intègrent Faktur dans un produit
             tiers.
           </p>
@@ -189,7 +189,7 @@ export default function Landing() {
             </div>
             <div>
               <CodeWindow filename="node.ts">
-                {`// Exemple Node. lister les factures payées du mois
+                {`// Exemple Node, lister les factures payées du mois
 import fetch from 'node-fetch'
 
 const res = await fetch(
