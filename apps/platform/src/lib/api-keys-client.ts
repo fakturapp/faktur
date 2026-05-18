@@ -129,6 +129,7 @@ export const apiKeysClient = {
       {}
     ),
   revoke: (id: string) => api.delete<{ message: string }>(`${BASE}/${id}`),
+  destroy: (id: string) => api.post<{ message: string }>(`${BASE}/${id}/destroy`, {}),
   setWebhook: (id: string, body: { url: string; events: string[] }) =>
     api.put<{
       data: WebhookShape

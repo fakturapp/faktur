@@ -17,6 +17,7 @@ const KeysCreate = () => import('#controllers/dashboard/api_keys/create')
 const KeysUpdate = () => import('#controllers/dashboard/api_keys/update')
 const KeysRotate = () => import('#controllers/dashboard/api_keys/rotate')
 const KeysRevoke = () => import('#controllers/dashboard/api_keys/revoke')
+const KeysDestroy = () => import('#controllers/dashboard/api_keys/destroy')
 const WebhookSet = () => import('#controllers/dashboard/api_keys/webhook_set')
 const WebhookDestroy = () => import('#controllers/dashboard/api_keys/webhook_destroy')
 const WebhookRotateSecret = () => import('#controllers/dashboard/api_keys/webhook_rotate_secret')
@@ -60,6 +61,9 @@ router
     router.get('/api-keys/:id', [KeysShow, 'handle']).as('dashboard.apiKeys.show')
     router.patch('/api-keys/:id', [KeysUpdate, 'handle']).as('dashboard.apiKeys.update')
     router.delete('/api-keys/:id', [KeysRevoke, 'handle']).as('dashboard.apiKeys.revoke')
+    router
+      .post('/api-keys/:id/destroy', [KeysDestroy, 'handle'])
+      .as('dashboard.apiKeys.destroy')
     router.post('/api-keys/:id/rotate', [KeysRotate, 'handle']).as('dashboard.apiKeys.rotate')
 
     router.put('/api-keys/:id/webhook', [WebhookSet, 'handle']).as('dashboard.apiKeys.webhook.set')

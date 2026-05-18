@@ -15,6 +15,7 @@ export type AuditAction =
   | 'api_key.rotated'
   | 'api_key.updated'
   | 'api_key.revoked'
+  | 'api_key.deleted'
   | 'webhook.configured'
   | 'webhook.updated'
   | 'webhook.deleted'
