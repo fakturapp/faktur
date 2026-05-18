@@ -9,11 +9,14 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import {
+  CheckboxRoot,
+  CheckboxControl,
+  CheckboxIndicator,
+  CheckboxContent,
+} from '@/components/ui/checkbox'
 import { useToast } from '@/components/ui/toast'
 import { AlertTriangle, Copy, Check } from 'lucide-react'
-import { API_BASE_URL } from '@/lib/oauth-config'
-
-const API_V2_BASE_URL = API_BASE_URL.replace(/\/api\/v1$/, '/api/v2')
 
 interface Props {
   open: boolean
@@ -96,29 +99,18 @@ export function RevealedKeyDialog({ open, plaintext, keyName, kind, onClose }: P
         </div>
       </div>
 
-      {isApiKey && (
-        <div className="mt-4">
-          <p className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            Test rapide
-          </p>
-          <pre className="overflow-x-auto rounded-lg border border-border/50 bg-surface p-3 text-xs leading-relaxed">
-            <code>{`curl ${API_V2_BASE_URL}/clients \\
-  -H "Authorization: Bearer ${plaintext.slice(0, 16)}..."`}</code>
-          </pre>
-        </div>
-      )}
-
-      <label className="mt-4 flex cursor-pointer items-start gap-2 rounded-lg border border-border/50 p-3 hover:bg-surface-hover transition-colors">
-        <input
-          type="checkbox"
-          checked={confirmed}
-          onChange={(e) => setConfirmed(e.target.checked)}
-          className="mt-0.5 h-4 w-4 cursor-pointer accent-accent"
-        />
-        <span className="text-sm text-foreground">
-          J&apos;ai copié {isApiKey ? 'la clé' : 'le secret'} et l&apos;ai stocké en lieu sûr.
-        </span>
-      </label>
+      <CheckboxRoot
+        isSelected={confirmed}
+        onChange={(checked) => setConfirmed(!!checked)}
+        className="mt-4 flex cursor-pointer items-start gap-3 rounded-lg border border-border/50 p-3 hover:bg-surface-hover transition-colors"
+      >
+        <CheckboxControl className="mt-0.5">
+          <CheckboxIndicator />
+        </CheckboxControl>
+        <CheckboxContent className="text-sm text-foreground leading-tight">
+          J&apos;ai copié {isApiKey ? 'la clé' : 'le secret'} et je l&apos;ai stocké{isApiKey ? 'e' : ''} en lieu sûr.
+        </CheckboxContent>
+      </CheckboxRoot>
 
       <DialogFooter>
         <Button onClick={onClose} disabled={!confirmed}>
