@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { API_V2_BASE_URL, PLATFORM_URL } from '@/lib/config'
 import { Safari } from '@/components/safari-mockup'
+import { CodeBlock } from '@/components/code-block'
 
 export const metadata = {
   title: 'Quickstart · Faktur Developers',
@@ -79,12 +80,12 @@ export default function Quickstart() {
           tier de rate limit. C&apos;est l&apos;endpoint le plus rapide pour confirmer que ta
           clé fonctionne avant de passer à la production.
         </p>
-        <Code lang="bash">
+        <CodeBlock lang="bash">
           {`curl ${API_V2_BASE_URL}/ping \\
   -H "Authorization: Bearer fk_live_..."`}
-        </Code>
+        </CodeBlock>
         <p>Réponse type :</p>
-        <Code lang="json">
+        <CodeBlock lang="json">
           {`{
   "data": {
     "api_version": "v2",
@@ -103,7 +104,7 @@ export default function Quickstart() {
     "timestamp": "2026-05-16T14:32:11Z"
   }
 }`}
-        </Code>
+        </CodeBlock>
       </Step>
 
       <Step number={3} title="Créer un client" accent="sky" icon={ArrowRight}>
@@ -111,7 +112,7 @@ export default function Quickstart() {
           Tu ne peux pas émettre de facture sans client associé. Voici une création minimale
           pour une société française avec son SIREN.
         </p>
-        <Code lang="bash">
+        <CodeBlock lang="bash">
           {`curl ${API_V2_BASE_URL}/clients \\
   -X POST \\
   -H "Authorization: Bearer fk_live_..." \\
@@ -122,7 +123,7 @@ export default function Quickstart() {
     "email": "contact@acme.com",
     "siren": "123456789"
   }'`}
-        </Code>
+        </CodeBlock>
         <p>
           La réponse contient un ID public stable comme <code>clt_8KqL2x…</code>. Conserve le, tu
           en auras besoin à l&apos;étape suivante pour rattacher la facture.
@@ -134,7 +135,7 @@ export default function Quickstart() {
           Reprends le <code>client_id</code> obtenu à l&apos;étape 3 et émets une facture avec
           une ligne unique. Les montants sont en centimes, la TVA en pourcentage.
         </p>
-        <Code lang="bash">
+        <CodeBlock lang="bash">
           {`curl ${API_V2_BASE_URL}/invoices \\
   -X POST \\
   -H "Authorization: Bearer fk_live_..." \\
@@ -152,7 +153,7 @@ export default function Quickstart() {
       }
     ]
   }'`}
-        </Code>
+        </CodeBlock>
         <p>
           Faktur calcule automatiquement les totaux HT, TVA et TTC. La facture sort en statut
           brouillon. Pour la finaliser et déclencher l&apos;envoi par email au client, appelle
@@ -275,38 +276,26 @@ function Step({
 }) {
   const acc = ACCENT_CLASSES[accent]
   return (
-    <section className="relative mt-12 pl-12">
-      <span aria-hidden className={`absolute left-[14px] top-9 bottom-0 w-px ${acc.line}`} />
-      <div className="relative flex items-center gap-3">
+    <section className="relative mt-14 grid grid-cols-[3rem_1fr] gap-x-5">
+      {/* Left column: big icon badge + vertical line */}
+      <div className="relative row-span-2 flex flex-col items-center">
         <span
-          className={`absolute -left-12 inline-flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ring-4 ring-(--background) ${acc.badge} ${acc.badgeText}`}
+          className={`relative z-10 inline-flex size-12 shrink-0 items-center justify-center rounded-2xl ring-4 ring-(--background) ${acc.badge} ${acc.badgeText}`}
         >
-          {number}
+          <Icon className="size-6" strokeWidth={2.25} />
         </span>
-        <h2 className="m-0 text-xl font-semibold leading-tight">{title}</h2>
-        <span className={`inline-flex size-5 items-center justify-center ${acc.badgeText}`}>
-          <Icon className="size-4" />
-        </span>
+        <span aria-hidden className={`mt-1 w-px flex-1 ${acc.line}`} />
       </div>
-      <div className="mt-3 space-y-3 text-sm leading-relaxed">{children}</div>
+      {/* Right column: heading */}
+      <div>
+        <p className={`text-[11px] font-semibold uppercase tracking-[0.16em] ${acc.badgeText}`}>
+          Étape {number}
+        </p>
+        <h2 className="m-0 mt-1 text-2xl font-semibold tracking-tight leading-tight">{title}</h2>
+      </div>
+      {/* Right column: body */}
+      <div className="pb-2 pt-4 space-y-3 text-sm leading-relaxed">{children}</div>
     </section>
-  )
-}
-
-/* ─────────────────────────── Code ─────────────────────────── */
-
-function Code({ children, lang }: { children: string; lang: string }) {
-  return (
-    <div className="mt-3 overflow-hidden rounded-xl border border-(--border) bg-(--code-bg)">
-      <div className="flex items-center justify-between border-b border-(--border) bg-(--muted)/40 px-3 py-1.5">
-        <span className="text-[10px] font-medium uppercase tracking-wider text-(--muted-foreground)">
-          {lang}
-        </span>
-      </div>
-      <pre className="overflow-x-auto p-4 text-xs leading-relaxed">
-        <code>{children}</code>
-      </pre>
-    </div>
   )
 }
 
