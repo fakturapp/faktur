@@ -39,33 +39,48 @@
   height: 1.25rem; /* 20px */
   width: 2.25rem; /* 36px */
 
+  /* Fallback variables so the legacy <Switch> (no .switch parent) still styles correctly */
+  --switch-control-bg: var(--color-surface-tertiary);
+  --switch-control-bg-hover: color-mix(in oklab, var(--switch-control-bg), var(--color-foreground) 8%);
+  --switch-control-bg-pressed: var(--switch-control-bg-hover);
+  --switch-control-bg-checked: var(--color-accent);
+  --switch-control-bg-checked-hover: var(--color-accent-hover);
+
   background-color: var(--switch-control-bg);
+  cursor: var(--cursor-interactive);
 
   transition:
     background-color 250ms var(--ease-smooth),
     box-shadow 150ms var(--ease-out);
   @apply motion-reduce:transition-none;
 
+  &:focus-visible,
   .switch:focus-visible &,
   .switch[data-focus-visible="true"] & {
     @apply status-focused;
   }
 
+  &:hover,
   .switch:hover &,
   .switch[data-hovered="true"] & {
     background-color: var(--switch-control-bg-hover);
   }
 
+  &:active,
   .switch:active &,
   .switch[data-pressed="true"] & {
     background-color: var(--switch-control-bg-pressed);
   }
 
+  &[aria-checked="true"],
+  &[data-selected="true"],
   .switch[aria-checked="true"] &,
   .switch[data-selected="true"] & {
     background-color: var(--switch-control-bg-checked);
   }
 
+  &[aria-checked="true"]:hover,
+  &[data-selected="true"]:hover,
   .switch[aria-checked="true"]:hover &,
   .switch[data-selected="true"]:hover &,
   .switch[aria-checked="true"][data-hovered="true"] &,
@@ -73,11 +88,19 @@
     background-color: var(--switch-control-bg-checked-hover);
   }
 
+  &[aria-checked="true"]:active,
+  &[data-selected="true"]:active,
   .switch[aria-checked="true"]:active &,
   .switch[data-selected="true"]:active &,
   .switch[aria-checked="true"][data-pressed="true"] &,
   .switch[data-selected="true"][data-pressed="true"] & {
     background-color: var(--switch-control-bg-checked-hover);
+  }
+
+  &:disabled,
+  &[data-disabled="true"],
+  &[aria-disabled="true"] {
+    @apply status-disabled;
   }
 }
 
@@ -113,6 +136,8 @@
     background-color 200ms var(--ease-out);
   @apply motion-reduce:transition-none;
 
+  .switch__control[aria-checked="true"] &,
+  .switch__control[data-selected="true"] &,
   .switch[aria-checked="true"] &,
   .switch[data-selected="true"] & {
     @apply ms-[calc(100%-1.125rem)];
