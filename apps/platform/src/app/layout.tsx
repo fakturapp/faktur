@@ -24,6 +24,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className="h-full antialiased" suppressHydrationWarning>
+      <head>
+        <script src="/theme-init.js" />
+      </head>
       <body
         className="flex min-h-full flex-col bg-background text-foreground"
         suppressHydrationWarning
