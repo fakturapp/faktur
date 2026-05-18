@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import {
   AlertTriangle,
+  Ban,
   Pencil,
   Plus,
   RefreshCw,
@@ -266,7 +267,7 @@ export default function ApiKeySettingsPage() {
               onClick={() => setConfirmRevoke(true)}
               disabled={isRevoked || revoking}
             >
-              {revoking ? <Spinner /> : <X className="h-3.5 w-3.5 mr-1.5" />}
+              {revoking ? <Spinner /> : <Ban className="h-3.5 w-3.5 mr-1.5" />}
               Révoquer
             </Button>
           </ActionRow>
@@ -347,7 +348,7 @@ export default function ApiKeySettingsPage() {
             Annuler
           </Button>
           <Button variant="danger" onClick={handleRevoke} disabled={revoking}>
-            <X className="h-4 w-4 mr-2" />
+            <Ban className="h-4 w-4 mr-2" />
             Révoquer
           </Button>
         </DialogFooter>

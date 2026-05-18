@@ -4,20 +4,11 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronRight, Key, Lock, Plus, Trash2 } from 'lucide-react'
+import { ChevronRight, Key, Lock, Plus } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
-import {
-  Dialog,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from '@/components/ui/dialog'
-import { Field, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/toast'
 import { apiKeysClient, type ApiKeyShape } from '@/lib/api-keys-client'
 import { CreateApiKeyDialog } from '@/components/api-keys/create-api-key-dialog'
@@ -60,9 +51,6 @@ export default function ProjectApiKeysPage() {
   const [revealed, setRevealed] = useState<{ key: ApiKeyShape; plaintext: string } | null>(
     null
   )
-  const [confirmRevoke, setConfirmRevoke] = useState<ApiKeyShape | null>(null)
-  const [revokeText, setRevokeText] = useState('')
-  const [revoking, setRevoking] = useState(false)
 
   async function load() {
     const res = await apiKeysClient.list()
@@ -77,21 +65,6 @@ export default function ProjectApiKeysPage() {
   useEffect(() => {
     load()
   }, [params.id])
-
-  async function handleRevoke() {
-    if (!confirmRevoke) return
-    setRevoking(true)
-    const res = await apiKeysClient.revoke(confirmRevoke.id)
-    setRevoking(false)
-    if (res.error) {
-      toast(res.error, 'error')
-      return
-    }
-    toast('Clé révoquée', 'success')
-    setConfirmRevoke(null)
-    setRevokeText('')
-    load()
-  }
 
   return (
     <motion.div
@@ -170,18 +143,6 @@ export default function ProjectApiKeysPage() {
                         </div>
                       </Link>
                       <div className="flex shrink-0 items-center gap-1">
-                        {k.status === 'active' && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                              e.preventDefault()
-                              setConfirmRevoke(k)
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        )}
                         <Link href={`/projects/${params.id}/keys/${k.id}`}>
                           <Button variant="ghost" size="sm">
                             <ChevronRight className="h-4 w-4" />
@@ -221,62 +182,6 @@ export default function ProjectApiKeysPage() {
           }
         }}
       />
-
-      <Dialog
-        open={confirmRevoke !== null}
-        onClose={() => {
-          if (!revoking) {
-            setConfirmRevoke(null)
-            setRevokeText('')
-          }
-        }}
-      >
-        <DialogHeader showClose={false}>
-          <DialogTitle>Révoquer la clé</DialogTitle>
-          <DialogDescription>
-            La clé cessera de fonctionner immédiatement. Action irréversible.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="mt-4">
-          <Field>
-            <FieldLabel htmlFor="rev-name">
-              Tapez <span className="font-mono">{confirmRevoke?.name}</span>
-            </FieldLabel>
-            <Input
-              id="rev-name"
-              value={revokeText}
-              onChange={(e) => setRevokeText(e.target.value)}
-              autoFocus
-            />
-          </Field>
-        </div>
-        <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => {
-              setConfirmRevoke(null)
-              setRevokeText('')
-            }}
-            disabled={revoking}
-          >
-            Annuler
-          </Button>
-          <Button
-            variant="danger"
-            onClick={handleRevoke}
-            disabled={revoking || revokeText.trim() !== (confirmRevoke?.name ?? '').trim()}
-          >
-            {revoking ? (
-              <>
-                <Spinner />
-                Révocation...
-              </>
-            ) : (
-              'Révoquer'
-            )}
-          </Button>
-        </DialogFooter>
-      </Dialog>
     </motion.div>
   )
 }
