@@ -23,7 +23,7 @@ import {
   CheckboxIndicator,
 } from '@/components/ui/checkbox'
 import { useToast } from '@/components/ui/toast'
-import { ArrowLeft, ArrowRight, Plus, Search, X } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, ChevronRight, Plus, Search, ShieldCheck, Tag, X } from 'lucide-react'
 import { humanizeScope } from '@/lib/scopes-humanizer'
 import { apiKeysClient, type ApiKeyShape, type ScopesCatalog } from '@/lib/api-keys-client'
 import { useProjects } from '@/lib/projects-context'
@@ -188,12 +188,43 @@ export function CreateApiKeyDialog({ open, onClose, onCreated, projectId }: Prop
         </DialogDescription>
       </DialogHeader>
 
-      <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
-        <span className={step === 'info' ? 'text-foreground font-medium' : ''}>1. Infos</span>
-        <span aria-hidden>›</span>
-        <span className={step === 'permissions' ? 'text-foreground font-medium' : ''}>
-          2. Permissions
-        </span>
+      <div className="mt-4 mb-2 flex items-center justify-center gap-1">
+        {[
+          { id: 'info' as const, label: 'Informations', icon: Tag, num: 1 },
+          { id: 'permissions' as const, label: 'Permissions', icon: ShieldCheck, num: 2 },
+        ].map((s, i, arr) => {
+          const isActive = step === s.id
+          const isDone = step === 'permissions' && s.id === 'info'
+          return (
+            <div key={s.id} className="flex items-center">
+              <div className="flex items-center gap-2">
+                <div
+                  className={
+                    'flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-semibold transition-all duration-300 ' +
+                    (isActive
+                      ? 'bg-accent text-accent-foreground scale-110'
+                      : isDone
+                        ? 'bg-accent-soft text-accent'
+                        : 'bg-muted text-muted-foreground')
+                  }
+                >
+                  {isDone ? <Check className="h-3.5 w-3.5" /> : s.num}
+                </div>
+                <span
+                  className={
+                    'text-sm font-medium hidden sm:block transition-colors ' +
+                    (isActive ? 'text-foreground' : 'text-muted-foreground')
+                  }
+                >
+                  {s.label}
+                </span>
+              </div>
+              {i < arr.length - 1 && (
+                <ChevronRight className="mx-2 h-3.5 w-3.5 text-muted-foreground/40" />
+              )}
+            </div>
+          )
+        })}
       </div>
 
       <Separator className="my-4" />
