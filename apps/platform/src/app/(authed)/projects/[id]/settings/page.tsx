@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dialog'
 import { Field, FieldLabel, FieldDescription } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { EditableField } from '@/components/ui/editable-field'
 import { useToast } from '@/components/ui/toast'
 import { apiProjectsClient, type ApiProjectShape } from '@/lib/api-projects-client'
 import { useProjects } from '@/lib/projects-context'
@@ -27,9 +28,6 @@ export default function ProjectSettingsPage() {
   const { reload: reloadProjects } = useProjects()
 
   const [project, setProject] = useState<ApiProjectShape | null>(null)
-  const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
-  const [saving, setSaving] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [confirmText, setConfirmText] = useState('')
@@ -39,27 +37,21 @@ export default function ProjectSettingsPage() {
     apiProjectsClient.show(params.id).then((res) => {
       if (res.data?.data) {
         setProject(res.data.data)
-        setName(res.data.data.name)
-        setDescription(res.data.data.description ?? '')
       }
     })
   }, [params.id])
 
-  async function handleSave() {
-    if (!project) return
-    setSaving(true)
-    const res = await apiProjectsClient.update(project.id, {
-      name: name.trim(),
-      description: description.trim() || null,
-    })
-    setSaving(false)
+  async function saveField(patch: { name?: string; description?: string | null }): Promise<boolean> {
+    if (!project) return false
+    const res = await apiProjectsClient.update(project.id, patch)
     if (res.error || !res.data?.data) {
       toast(res.error || 'Échec de la mise à jour', 'error')
-      return
+      return false
     }
     setProject(res.data.data)
     reloadProjects()
     toast('Projet mis à jour', 'success')
+    return true
   }
 
   async function handleDelete() {
@@ -116,43 +108,24 @@ export default function ProjectSettingsPage() {
 
       <Card className="border-border/50">
         <CardContent className="p-5 space-y-4">
-          <Field>
-            <FieldLabel htmlFor="proj-name">Nom</FieldLabel>
-            <Input
-              id="proj-name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              disabled={project.is_default}
-            />
-            {project.is_default && (
-              <FieldDescription>
-                Le projet par défaut ne peut pas être renommé.
-              </FieldDescription>
-            )}
-          </Field>
-
-          <Field>
-            <FieldLabel htmlFor="proj-desc">Description</FieldLabel>
-            <Input
-              id="proj-desc"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Optionnel"
-            />
-          </Field>
-
-          <div className="flex justify-end">
-            <Button onClick={handleSave} disabled={saving || !name.trim()}>
-              {saving ? (
-                <>
-                  <Spinner />
-                  Enregistrement...
-                </>
-              ) : (
-                'Enregistrer'
-              )}
-            </Button>
-          </div>
+          <EditableField
+            label="Nom"
+            value={project.name}
+            required
+            disabled={project.is_default}
+            disabledHint="Le projet par défaut ne peut pas être renommé."
+            modalTitle="Renommer le projet"
+            placeholder="Production app mobile"
+            onSave={(next) => saveField({ name: next })}
+          />
+          <EditableField
+            label="Description"
+            value={project.description ?? null}
+            placeholder="Aucune description"
+            modalTitle="Modifier la description"
+            type="textarea"
+            onSave={(next) => saveField({ description: next || null })}
+          />
         </CardContent>
       </Card>
 
