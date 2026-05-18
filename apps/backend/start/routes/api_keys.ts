@@ -32,6 +32,7 @@ const LogsList = () => import('#controllers/dashboard/api_keys/logs_list')
 const UsageStats = () => import('#controllers/dashboard/api_keys/usage_stats')
 const ScopesCatalog = () => import('#controllers/dashboard/api_keys/scopes_catalog')
 const KeysRecentlyUsed = () => import('#controllers/dashboard/api_keys/recently_used')
+const CreditsUsage = () => import('#controllers/dashboard/credits/usage')
 
 router
   .group(() => {
@@ -94,6 +95,8 @@ router
     router
       .get('/api-keys/:id/usage-stats', [UsageStats, 'handle'])
       .as('dashboard.apiKeys.usageStats')
+
+    router.get('/credits/usage', [CreditsUsage, 'handle']).as('dashboard.credits.usage')
   })
   .prefix(API_PREFIX + '/dashboard/settings')
   .use(middleware.auth())

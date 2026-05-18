@@ -41,6 +41,8 @@ const ListUserOauthApps = () => import('#controllers/account/oauth_apps/list')
 const RevokeUserOauthApp = () => import('#controllers/account/oauth_apps/revoke_app')
 const RevokeUserOauthSession = () => import('#controllers/account/oauth_apps/revoke_session')
 
+const ApiUsageShow = () => import('#controllers/account/api_usage/show')
+
 router.get(API_PREFIX + '/avatars/:filename', [ServeAvatar, 'handle'])
 
 router
@@ -84,6 +86,8 @@ router
     router.get('/oauth-apps', [ListUserOauthApps, 'handle'])
     router.post('/oauth-apps/:authorizationId/revoke', [RevokeUserOauthApp, 'handle'])
     router.post('/oauth-apps/sessions/:tokenId/revoke', [RevokeUserOauthSession, 'handle'])
+
+    router.get('/api-usage', [ApiUsageShow, 'handle'])
   })
   .prefix(API_PREFIX + '/account')
   .use(middleware.auth())
