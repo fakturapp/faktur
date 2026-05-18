@@ -15,6 +15,7 @@ export function apiV2Stack(scopes: string[]) {
     middleware.apiKey(),
     middleware.apiRequestLogger(),
     middleware.apiRateLimit(),
+    middleware.apiCredit(),
     middleware.apiIdempotency(),
     middleware.apiScope(scopes),
   ]
@@ -25,6 +26,7 @@ export function apiV2StackNoScope() {
     middleware.apiKey(),
     middleware.apiRequestLogger(),
     middleware.apiRateLimit(),
+    middleware.apiCredit(),
     middleware.apiIdempotency(),
   ]
 }

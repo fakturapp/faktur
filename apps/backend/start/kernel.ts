@@ -28,6 +28,7 @@ export const middleware = router.named({
   apiKey: () => import('#middleware/api_v2/api_key_middleware'),
   apiScope: () => import('#middleware/api_v2/api_scope_middleware'),
   apiRateLimit: () => import('#middleware/api_v2/api_rate_limit_middleware'),
+  apiCredit: () => import('#middleware/api_v2/api_credit_middleware'),
   apiIdempotency: () => import('#middleware/api_v2/api_idempotency_middleware'),
   apiRequestLogger: () => import('#middleware/api_v2/api_request_logger_middleware'),
 })
