@@ -7,15 +7,25 @@ import {
   OAUTH_REDIRECT_URI,
   OAUTH_SCOPES,
   STORAGE_KEYS,
+  DASHBOARD_URL,
 } from '@/lib/oauth-config'
 import { computeChallenge, generateState, generateVerifier } from '@/lib/pkce'
 import { getStoredAccessToken } from '@/lib/oauth-storage'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
+import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldSeparator,
+} from '@/components/ui/field'
 import { ArrowRight, Key, ShieldCheck, Webhook } from 'lucide-react'
+import { DotField } from '@/components/effects/dot-field'
+
+type AuthPhase = 'idle' | 'auto_redirect' | 'starting'
 
 export default function LoginPage() {
-  const [starting, setStarting] = useState(false)
+  const [phase, setPhase] = useState<AuthPhase>('idle')
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -25,13 +35,16 @@ export default function LoginPage() {
       setError(params.get('error_description') || params.get('error'))
     }
     if (getStoredAccessToken()) {
+      setPhase('auto_redirect')
       const next = params.get('next')
-      window.location.replace(next && next.startsWith('/') ? next : '/dashboard')
+      const target = next && next.startsWith('/') ? next : '/dashboard'
+      const timer = setTimeout(() => window.location.replace(target), 600)
+      return () => clearTimeout(timer)
     }
   }, [])
 
   async function startOAuth() {
-    setStarting(true)
+    setPhase('starting')
     setError(null)
     try {
       const verifier = generateVerifier(64)
@@ -60,67 +73,96 @@ export default function LoginPage() {
 
       window.location.assign(url.toString())
     } catch (err) {
-      setStarting(false)
+      setPhase('idle')
       setError(err instanceof Error ? err.message : 'Erreur inattendue')
     }
   }
 
   return (
-    <div className="flex min-h-[100svh] items-center justify-center bg-background px-4 py-10">
-      <div className="w-full max-w-md">
-        <div className="mb-8 flex items-center justify-center gap-2">
-          <FakturBadge />
-          <span className="text-sm font-semibold tracking-tight text-foreground">
-            Faktur Platform
-          </span>
-        </div>
+    <div className="relative isolate flex min-h-[100svh] items-center justify-center overflow-hidden bg-background px-4 py-10">
+      <DotField
+        className="pointer-events-none -z-10"
+        glowColor="var(--color-accent)"
+        gradientFrom="rgba(168, 85, 247, 0.28)"
+        gradientTo="rgba(180, 151, 207, 0.18)"
+      />
 
-        <div className="rounded-2xl border border-border bg-overlay p-8 shadow-overlay">
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-            Plateforme développeur
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Connecte-toi avec ton compte Faktur pour gérer tes clés API et tes webhooks.
-          </p>
-
-          {error && (
-            <div className="mt-5 rounded-xl border border-danger/30 bg-danger/5 px-3 py-2 text-xs text-danger">
-              {error}
-            </div>
-          )}
-
-          <Button
-            className="mt-6 w-full"
-            onClick={startOAuth}
-            disabled={starting}
-            fullWidth
+      <div className="relative w-full max-w-md">
+        <div className="flex flex-col gap-6">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              if (phase === 'idle') startOAuth()
+            }}
+            className="rounded-2xl border border-border/60 bg-overlay/90 p-8 shadow-overlay backdrop-blur-md"
           >
-            {starting ? (
-              <>
-                <Spinner />
-                Redirection...
-              </>
-            ) : (
-              <>
-                Continuer avec Faktur
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </>
-            )}
-          </Button>
+            <FieldGroup>
+              <div className="flex flex-col items-center gap-3 text-center">
+                <span className="flex size-12 items-center justify-center rounded-xl bg-accent/10">
+                  <FakturBadge />
+                </span>
+                <h1 className="text-xl font-bold tracking-tight text-foreground">
+                  Bienvenue sur Faktur Platform
+                </h1>
+                <FieldDescription>
+                  Pas encore de compte&nbsp;?{' '}
+                  <a href={`${DASHBOARD_URL}/register`}>Créer un compte Faktur</a>
+                </FieldDescription>
+              </div>
 
-          <p className="mt-4 text-center text-[11px] text-muted-foreground">
-            Tu seras redirigé vers fakturapp.cc pour confirmer l&apos;accès.
-          </p>
+              {error && (
+                <div className="rounded-xl border border-danger/30 bg-danger/5 px-3 py-2 text-xs text-danger">
+                  {error}
+                </div>
+              )}
+
+              {phase === 'auto_redirect' ? (
+                <Field>
+                  <Button type="button" disabled fullWidth>
+                    <Spinner />
+                    Connexion en attente…
+                  </Button>
+                  <FieldDescription className="text-center">
+                    Vous êtes déjà connecté, redirection vers le dashboard…
+                  </FieldDescription>
+                </Field>
+              ) : (
+                <Field>
+                  <Button type="submit" disabled={phase === 'starting'} fullWidth>
+                    {phase === 'starting' ? (
+                      <>
+                        <Spinner />
+                        Redirection…
+                      </>
+                    ) : (
+                      <>
+                        Se connecter avec Faktur
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </>
+                    )}
+                  </Button>
+                </Field>
+              )}
+
+              <FieldSeparator>Pourquoi ?</FieldSeparator>
+
+              <ul className="space-y-3 text-xs text-muted-foreground">
+                <Bullet icon={Key} text="Créer et révoquer des clés API team-owned" />
+                <Bullet icon={Webhook} text="Configurer un webhook signé HMAC par clé" />
+                <Bullet
+                  icon={ShieldCheck}
+                  text="Logs API + statistiques d'utilisation 30 jours"
+                />
+              </ul>
+            </FieldGroup>
+          </form>
+
+          <FieldDescription className="px-6 text-center">
+            En continuant, vous acceptez les{' '}
+            <a href={`${DASHBOARD_URL}/legal/terms`}>Conditions d&apos;utilisation</a> et la{' '}
+            <a href={`${DASHBOARD_URL}/legal/privacy`}>Politique de confidentialité</a> de Faktur.
+          </FieldDescription>
         </div>
-
-        <ul className="mt-8 space-y-3 text-xs text-muted-foreground">
-          <Bullet icon={Key} text="Créer et révoquer des clés API team-owned" />
-          <Bullet icon={Webhook} text="Configurer un webhook signé HMAC par clé" />
-          <Bullet
-            icon={ShieldCheck}
-            text="Logs API + statistiques d'utilisation 30 jours"
-          />
-        </ul>
       </div>
     </div>
   )
