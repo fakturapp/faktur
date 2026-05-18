@@ -23,6 +23,7 @@ import { useProjects } from '@/lib/projects-context'
 
 type Step = 'info' | 'permissions'
 type Preset = 'read_only' | 'full_access' | 'custom'
+type Expiration = 'never' | '90d' | '1y' | 'custom'
 
 interface Props {
   open: boolean
@@ -36,7 +37,8 @@ export function CreateApiKeyDialog({ open, onClose, onCreated, projectId }: Prop
   const { projects } = useProjects()
   const [step, setStep] = useState<Step>('info')
   const [name, setName] = useState('')
-  const [expiration, setExpiration] = useState<'never' | '90d' | '1y'>('never')
+  const [expiration, setExpiration] = useState<Expiration>('never')
+  const [customExpiry, setCustomExpiry] = useState('')
   const [allowedIpsRaw, setAllowedIpsRaw] = useState('')
   const [preset, setPreset] = useState<Preset>('read_only')
   const [customScopes, setCustomScopes] = useState<Set<string>>(new Set())
@@ -48,6 +50,7 @@ export function CreateApiKeyDialog({ open, onClose, onCreated, projectId }: Prop
     setStep('info')
     setName('')
     setExpiration('never')
+    setCustomExpiry('')
     setAllowedIpsRaw('')
     setPreset('read_only')
     setCustomScopes(new Set())
@@ -94,12 +97,23 @@ export function CreateApiKeyDialog({ open, onClose, onCreated, projectId }: Prop
       toast('Aucun projet disponible. Créez-en un avant de générer une clé.', 'error')
       return
     }
-    const expiresAt =
-      expiration === '90d'
-        ? new Date(Date.now() + 90 * 24 * 3600 * 1000).toISOString()
-        : expiration === '1y'
-          ? new Date(Date.now() + 365 * 24 * 3600 * 1000).toISOString()
-          : undefined
+    let expiresAt: string | undefined
+    if (expiration === '90d') {
+      expiresAt = new Date(Date.now() + 90 * 24 * 3600 * 1000).toISOString()
+    } else if (expiration === '1y') {
+      expiresAt = new Date(Date.now() + 365 * 24 * 3600 * 1000).toISOString()
+    } else if (expiration === 'custom') {
+      if (!customExpiry) {
+        toast("Date d'expiration requise", 'error')
+        return
+      }
+      const d = new Date(customExpiry)
+      if (Number.isNaN(d.getTime()) || d.getTime() <= Date.now()) {
+        toast("La date d'expiration doit être future", 'error')
+        return
+      }
+      expiresAt = d.toISOString()
+    }
 
     const allowedIps = allowedIpsRaw
       .split(',')
@@ -168,27 +182,29 @@ export function CreateApiKeyDialog({ open, onClose, onCreated, projectId }: Prop
             </Field>
 
             <Field>
-              <FieldLabel>Expiration</FieldLabel>
-              <div className="grid grid-cols-3 gap-2">
-                {[
-                  { v: 'never' as const, label: 'Jamais' },
-                  { v: '90d' as const, label: '90 jours' },
-                  { v: '1y' as const, label: '1 an' },
-                ].map((opt) => (
-                  <button
-                    key={opt.v}
-                    type="button"
-                    onClick={() => setExpiration(opt.v)}
-                    className={`rounded-lg border px-3 py-2 text-sm transition-colors ${
-                      expiration === opt.v
-                        ? 'border-accent bg-accent-soft text-foreground'
-                        : 'border-border/50 hover:bg-surface-hover'
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
+              <FieldLabel htmlFor="expiration-select">Expiration</FieldLabel>
+              <FormSelect
+                id="expiration-select"
+                value={expiration}
+                onChange={(v) => setExpiration(v as Expiration)}
+                options={[
+                  { value: 'never', label: 'Jamais' },
+                  { value: '90d', label: '90 jours' },
+                  { value: '1y', label: '1 an' },
+                  { value: 'custom', label: 'Personnalisé…' },
+                ]}
+              />
+              {expiration === 'custom' && (
+                <div className="mt-2">
+                  <Input
+                    type="date"
+                    value={customExpiry}
+                    min={new Date(Date.now() + 24 * 3600 * 1000).toISOString().slice(0, 10)}
+                    onChange={(e) => setCustomExpiry(e.target.value)}
+                  />
+                  <FieldDescription>Choisissez la date d&apos;expiration de la clé.</FieldDescription>
+                </div>
+              )}
             </Field>
 
             <Field>
