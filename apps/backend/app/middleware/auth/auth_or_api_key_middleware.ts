@@ -2,6 +2,8 @@ import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
 import type { Authenticators } from '@adonisjs/auth/types'
 import apiKeyService from '#services/api/api_key_service'
+import apiCreditService, { CREDIT_LIMITS } from '#services/api/api_credit_service'
+import apiResponse from '#services/api/api_response'
 import User from '#models/account/user'
 import env from '#start/env'
 import { isAdminEmail } from '#services/auth/is_admin'
@@ -41,6 +43,37 @@ export default class AuthOrApiKeyMiddleware {
       await user.save()
       ;(ctx.auth as unknown as { user: User }).user = user
       ctx.apiKey = apiKey
+
+      const check = await apiCreditService.check(apiKey.teamId, user.id)
+      ctx.response.header('X-Credits-Session-Limit', String(CREDIT_LIMITS.PER_SESSION))
+      ctx.response.header('X-Credits-Session-Window-Hours', String(CREDIT_LIMITS.SESSION_HOURS))
+      ctx.response.header('X-Credits-Weekly-Limit', String(CREDIT_LIMITS.PER_WEEK))
+      ctx.response.header('X-Credits-Per-Minute-Limit', String(CREDIT_LIMITS.PER_MINUTE))
+
+      if (!check.ok) {
+        ctx.response.header('Retry-After', String(check.retry_after_seconds))
+        return apiResponse.rateLimited(
+          ctx.response,
+          check.retry_after_seconds,
+          {
+            reason: check.reason,
+            retry_after_seconds: check.retry_after_seconds,
+            limits: {
+              per_minute: CREDIT_LIMITS.PER_MINUTE,
+              per_session: CREDIT_LIMITS.PER_SESSION,
+              session_hours: CREDIT_LIMITS.SESSION_HOURS,
+              per_week: CREDIT_LIMITS.PER_WEEK,
+            },
+          },
+          ctx.requestId
+        )
+      }
+
+      ctx.response.header('X-Credits-Session-Remaining', String(check.session_remaining))
+      ctx.response.header('X-Credits-Weekly-Remaining', String(check.weekly_remaining))
+      ctx.response.header('X-Credits-Minute-Remaining', String(check.minute_remaining))
+
+      await apiCreditService.charge(apiKey.teamId, user.id, 1)
       return next()
     }
 
