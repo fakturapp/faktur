@@ -1,5 +1,5 @@
 import { EndpointBlock } from '@/components/endpoint-block'
-import { API_V2_BASE_URL } from '@/lib/config'
+import { API_PLATFORM_BASE_URL } from '@/lib/config'
 
 export const metadata = { title: 'Clients · Faktur API V2' }
 
@@ -49,26 +49,26 @@ export default function ClientsReference() {
 
         <EndpointBlock
           method="GET"
-          path="/api/v2/clients"
+          path="/api/platform/clients"
           scope="clients:read"
           description="List clients for the authenticated team."
-          example={`curl ${API_V2_BASE_URL}/clients?limit=50 \\
+          example={`curl ${API_PLATFORM_BASE_URL}/clients?limit=50 \\
   -H "Authorization: Bearer fk_live_..."`}
         />
 
         <EndpointBlock
           method="GET"
-          path="/api/v2/clients/:id"
+          path="/api/platform/clients/:id"
           scope="clients:read"
           description="Retrieve a single client."
         />
 
         <EndpointBlock
           method="POST"
-          path="/api/v2/clients"
+          path="/api/platform/clients"
           scope="clients:write"
           description="Create a new client. Triggers client.created webhook."
-          example={`curl ${API_V2_BASE_URL}/clients \\
+          example={`curl ${API_PLATFORM_BASE_URL}/clients \\
   -X POST \\
   -H "Authorization: Bearer fk_live_..." \\
   -H "Content-Type: application/json" \\
@@ -86,14 +86,14 @@ export default function ClientsReference() {
 
         <EndpointBlock
           method="PATCH"
-          path="/api/v2/clients/:id"
+          path="/api/platform/clients/:id"
           scope="clients:write"
           description="Update fields on an existing client. Send only the fields you want to change. Triggers client.updated webhook."
         />
 
         <EndpointBlock
           method="DELETE"
-          path="/api/v2/clients/:id"
+          path="/api/platform/clients/:id"
           scope="clients:delete"
           description="Delete a client. Triggers client.deleted webhook. Returns 204 No Content."
         />
@@ -103,14 +103,14 @@ export default function ClientsReference() {
         <h2 className="text-2xl font-semibold">Related webhooks</h2>
         <ul className="mt-3 space-y-1.5 text-sm text-(--muted-foreground)">
           <li>
-            <code>client.created</code>. POST /api/v2/clients
+            <code>client.created</code>. POST /api/platform/clients
           </li>
           <li>
-            <code>client.updated</code>. PATCH /api/v2/clients/:id (includes{' '}
+            <code>client.updated</code>. PATCH /api/platform/clients/:id (includes{' '}
             <code>previous_data</code>)
           </li>
           <li>
-            <code>client.deleted</code>. DELETE /api/v2/clients/:id
+            <code>client.deleted</code>. DELETE /api/platform/clients/:id
           </li>
         </ul>
       </section>

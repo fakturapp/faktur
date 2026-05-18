@@ -9,7 +9,7 @@ import {
   Globe,
 } from 'lucide-react'
 import { CodeWindow } from '@/components/code-window'
-import { API_V2_BASE_URL } from '@/lib/config'
+import { API_PLATFORM_BASE_URL } from '@/lib/config'
 
 export const dynamic = 'force-static'
 export const revalidate = false
@@ -92,7 +92,7 @@ export default function Landing() {
 
           <div className="mt-12 w-full max-w-2xl">
             <CodeWindow filename="curl" className="text-left">
-              {`curl ${API_V2_BASE_URL}/invoices \\
+              {`curl ${API_PLATFORM_BASE_URL}/invoices \\
   -H "Authorization: Bearer fk_live_..." \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -193,7 +193,7 @@ export default function Landing() {
 import fetch from 'node-fetch'
 
 const res = await fetch(
-  '${API_V2_BASE_URL}/invoices?status=paid&limit=100',
+  '${API_PLATFORM_BASE_URL}/invoices?status=paid&limit=100',
   { headers: { Authorization: \`Bearer \${process.env.FAKTUR_KEY}\` } }
 )
 const { data, pagination } = await res.json()

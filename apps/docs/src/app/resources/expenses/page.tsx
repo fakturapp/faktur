@@ -1,5 +1,5 @@
 import { EndpointBlock } from '@/components/endpoint-block'
-import { API_V2_BASE_URL } from '@/lib/config'
+import { API_PLATFORM_BASE_URL } from '@/lib/config'
 
 export const metadata = { title: 'Expenses · Faktur API V2' }
 
@@ -43,26 +43,26 @@ export default function ExpensesReference() {
 
         <EndpointBlock
           method="GET"
-          path="/api/v2/expenses"
+          path="/api/platform/expenses"
           scope="expenses:read"
           description="List expenses. Supports date ranges, deductible-only filter, and sorting by created_at or expense_date."
-          example={`curl '${API_V2_BASE_URL}/expenses?date_after=2026-01-01&deductible_only=true' \\
+          example={`curl '${API_PLATFORM_BASE_URL}/expenses?date_after=2026-01-01&deductible_only=true' \\
   -H "Authorization: Bearer fk_live_..."`}
         />
 
         <EndpointBlock
           method="GET"
-          path="/api/v2/expenses/:id"
+          path="/api/platform/expenses/:id"
           scope="expenses:read"
           description="Retrieve a single expense."
         />
 
         <EndpointBlock
           method="POST"
-          path="/api/v2/expenses"
+          path="/api/platform/expenses"
           scope="expenses:write"
           description="Record a new expense, vat_amount_cents is auto-computed from amount_cents and vat_rate if omitted."
-          example={`curl ${API_V2_BASE_URL}/expenses \\
+          example={`curl ${API_PLATFORM_BASE_URL}/expenses \\
   -X POST \\
   -H "Authorization: Bearer fk_live_..." \\
   -H "Content-Type: application/json" \\
@@ -79,7 +79,7 @@ export default function ExpensesReference() {
 
         <EndpointBlock
           method="DELETE"
-          path="/api/v2/expenses/:id"
+          path="/api/platform/expenses/:id"
           scope="expenses:delete"
           description="Delete an expense. Triggers expense.deleted webhook."
         />

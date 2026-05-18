@@ -1,5 +1,5 @@
 import { EndpointBlock } from '@/components/endpoint-block'
-import { API_V2_BASE_URL } from '@/lib/config'
+import { API_PLATFORM_BASE_URL } from '@/lib/config'
 
 export const metadata = { title: 'Invoices · Faktur API V2' }
 
@@ -77,10 +77,10 @@ export default function InvoicesReference() {
 
         <EndpointBlock
           method="GET"
-          path="/api/v2/invoices"
+          path="/api/platform/invoices"
           scope="invoices:read"
           description="List invoices for the authenticated team. Supports pagination, status filter, date ranges, full-text search, and sorting."
-          example={`curl ${API_V2_BASE_URL}/invoices?status=paid,partial&limit=50 \\
+          example={`curl ${API_PLATFORM_BASE_URL}/invoices?status=paid,partial&limit=50 \\
   -H "Authorization: Bearer fk_live_..."`}
         />
 
@@ -119,19 +119,19 @@ export default function InvoicesReference() {
 
         <EndpointBlock
           method="GET"
-          path="/api/v2/invoices/:id"
+          path="/api/platform/invoices/:id"
           scope="invoices:read"
           description="Retrieve a single invoice with its lines, client snapshot, and totals."
-          example={`curl ${API_V2_BASE_URL}/invoices/inv_8KqL2x... \\
+          example={`curl ${API_PLATFORM_BASE_URL}/invoices/inv_8KqL2x... \\
   -H "Authorization: Bearer fk_live_..."`}
         />
 
         <EndpointBlock
           method="POST"
-          path="/api/v2/invoices/:id/mark-paid"
+          path="/api/platform/invoices/:id/mark-paid"
           scope="invoices:write"
           description="Mark an invoice as paid (or partially paid). Triggers invoice.paid or invoice.partially_paid webhook."
-          example={`curl ${API_V2_BASE_URL}/invoices/inv_.../mark-paid \\
+          example={`curl ${API_PLATFORM_BASE_URL}/invoices/inv_.../mark-paid \\
   -X POST \\
   -H "Authorization: Bearer fk_live_..." \\
   -H "Content-Type: application/json" \\
@@ -168,11 +168,11 @@ export default function InvoicesReference() {
         <div className="mt-8 rounded-xl border border-(--border) bg-(--muted)/30 p-4">
           <p className="text-sm font-semibold">Coming in V1.1</p>
           <p className="mt-1 text-xs text-(--muted-foreground)">
-            <code>POST /api/v2/invoices</code> (create), <code>PATCH /api/v2/invoices/:id</code>{' '}
-            (update), <code>POST /api/v2/invoices/:id/send</code>,{' '}
-            <code>GET /api/v2/invoices/:id/pdf</code>, <code>DELETE /api/v2/invoices/:id</code>.
+            <code>POST /api/platform/invoices</code> (create), <code>PATCH /api/platform/invoices/:id</code>{' '}
+            (update), <code>POST /api/platform/invoices/:id/send</code>,{' '}
+            <code>GET /api/platform/invoices/:id/pdf</code>, <code>DELETE /api/platform/invoices/:id</code>.
             All routes are reserved and will preserve the same shape as the existing
-            <code>{' '}/api/v2/invoices</code> response envelope.
+            <code>{' '}/api/platform/invoices</code> response envelope.
           </p>
         </div>
       </section>

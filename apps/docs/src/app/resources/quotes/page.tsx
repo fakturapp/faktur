@@ -1,5 +1,5 @@
 import { EndpointBlock } from '@/components/endpoint-block'
-import { API_V2_BASE_URL } from '@/lib/config'
+import { API_PLATFORM_BASE_URL } from '@/lib/config'
 
 export const metadata = { title: 'Quotes · Faktur API V2' }
 
@@ -65,16 +65,16 @@ export default function QuotesReference() {
 
         <EndpointBlock
           method="GET"
-          path="/api/v2/quotes"
+          path="/api/platform/quotes"
           scope="quotes:read"
           description="List quotes. Supports status filter, client filter, date ranges, and sorting."
-          example={`curl '${API_V2_BASE_URL}/quotes?status=accepted&limit=50' \\
+          example={`curl '${API_PLATFORM_BASE_URL}/quotes?status=accepted&limit=50' \\
   -H "Authorization: Bearer fk_live_..."`}
         />
 
         <EndpointBlock
           method="GET"
-          path="/api/v2/quotes/:id"
+          path="/api/platform/quotes/:id"
           scope="quotes:read"
           description="Retrieve a single quote with its lines."
         />
@@ -82,9 +82,9 @@ export default function QuotesReference() {
         <div className="mt-8 rounded-xl border border-(--border) bg-(--muted)/30 p-4">
           <p className="text-sm font-semibold">Coming next</p>
           <p className="mt-1 text-xs text-(--muted-foreground)">
-            <code>POST /api/v2/quotes</code> (create), <code>PATCH /api/v2/quotes/:id</code>,{' '}
-            <code>POST /api/v2/quotes/:id/send</code>,{' '}
-            <code>POST /api/v2/quotes/:id/accept</code>, <code>...&#47;reject</code>, and{' '}
+            <code>POST /api/platform/quotes</code> (create), <code>PATCH /api/platform/quotes/:id</code>,{' '}
+            <code>POST /api/platform/quotes/:id/send</code>,{' '}
+            <code>POST /api/platform/quotes/:id/accept</code>, <code>...&#47;reject</code>, and{' '}
             <code>...&#47;convert-to-invoice</code>.
           </p>
         </div>

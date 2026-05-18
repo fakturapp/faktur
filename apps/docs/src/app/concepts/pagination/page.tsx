@@ -1,4 +1,4 @@
-import { API_V2_BASE_URL } from '@/lib/config'
+import { API_PLATFORM_BASE_URL } from '@/lib/config'
 
 export const metadata = { title: 'Pagination · Faktur Developers' }
 
@@ -15,7 +15,7 @@ export default function PaginationPage() {
       <section className="mt-10">
         <h2 className="text-2xl font-semibold">Query parameters</h2>
         <pre className="mt-3 overflow-x-auto rounded-xl border border-(--border) bg-(--code-bg) p-4 text-xs">
-          <code>{`GET /api/v2/invoices?limit=50&cursor=eyJpZCI6Imludl8uLi4iLCJjcmVhdGVkX2F0IjoiMjAyNi0wNS0xNlQxNDozMjoxMVoifQ`}</code>
+          <code>{`GET /api/platform/invoices?limit=50&cursor=eyJpZCI6Imludl8uLi4iLCJjcmVhdGVkX2F0IjoiMjAyNi0wNS0xNlQxNDozMjoxMVoifQ`}</code>
         </pre>
         <ul className="mt-4 space-y-1.5 text-sm text-(--muted-foreground)">
           <li>
@@ -47,7 +47,7 @@ export default function PaginationPage() {
         <pre className="mt-3 overflow-x-auto rounded-xl border border-(--border) bg-(--code-bg) p-4 text-xs leading-relaxed">
           <code>{`let cursor = undefined
 do {
-  const url = new URL('${API_V2_BASE_URL}/invoices')
+  const url = new URL('${API_PLATFORM_BASE_URL}/invoices')
   url.searchParams.set('limit', '100')
   if (cursor) url.searchParams.set('cursor', cursor)
 
@@ -70,7 +70,7 @@ do {
           you requested:
         </p>
         <pre className="mt-3 overflow-x-auto rounded-xl border border-(--border) bg-(--code-bg) p-4 text-xs">
-          <code>{`GET /api/v2/invoices?status=paid,partial&sort=-issue_date&limit=100`}</code>
+          <code>{`GET /api/platform/invoices?status=paid,partial&sort=-issue_date&limit=100`}</code>
         </pre>
       </section>
     </div>

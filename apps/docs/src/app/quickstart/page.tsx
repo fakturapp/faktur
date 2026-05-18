@@ -11,7 +11,7 @@ import {
   Sparkles,
   Webhook,
 } from 'lucide-react'
-import { API_V2_BASE_URL, PLATFORM_URL } from '@/lib/config'
+import { API_PLATFORM_BASE_URL, PLATFORM_URL } from '@/lib/config'
 import { Safari } from '@/components/safari-mockup'
 import { CodeBlock } from '@/components/code-block'
 
@@ -76,12 +76,12 @@ export default function Quickstart() {
 
       <Step number={2} title="Vérifier tes identifiants" accent="indigo" icon={ShieldCheck}>
         <p>
-          L&apos;endpoint <code>/api/v2/ping</code> retourne ton identité, tes scopes et ton
+          L&apos;endpoint <code>/api/platform/ping</code> retourne ton identité, tes scopes et ton
           tier de rate limit. C&apos;est l&apos;endpoint le plus rapide pour confirmer que ta
           clé fonctionne avant de passer à la production.
         </p>
         <CodeBlock lang="bash">
-          {`curl ${API_V2_BASE_URL}/ping \\
+          {`curl ${API_PLATFORM_BASE_URL}/ping \\
   -H "Authorization: Bearer fk_live_..."`}
         </CodeBlock>
         <p>Réponse type :</p>
@@ -113,7 +113,7 @@ export default function Quickstart() {
           pour une société française avec son SIREN.
         </p>
         <CodeBlock lang="bash">
-          {`curl ${API_V2_BASE_URL}/clients \\
+          {`curl ${API_PLATFORM_BASE_URL}/clients \\
   -X POST \\
   -H "Authorization: Bearer fk_live_..." \\
   -H "Content-Type: application/json" \\
@@ -136,7 +136,7 @@ export default function Quickstart() {
           une ligne unique. Les montants sont en centimes, la TVA en pourcentage.
         </p>
         <CodeBlock lang="bash">
-          {`curl ${API_V2_BASE_URL}/invoices \\
+          {`curl ${API_PLATFORM_BASE_URL}/invoices \\
   -X POST \\
   -H "Authorization: Bearer fk_live_..." \\
   -H "Content-Type: application/json" \\

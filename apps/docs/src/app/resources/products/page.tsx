@@ -1,5 +1,5 @@
 import { EndpointBlock } from '@/components/endpoint-block'
-import { API_V2_BASE_URL } from '@/lib/config'
+import { API_PLATFORM_BASE_URL } from '@/lib/config'
 
 export const metadata = { title: 'Products · Faktur API V2' }
 
@@ -39,26 +39,26 @@ export default function ProductsReference() {
 
         <EndpointBlock
           method="GET"
-          path="/api/v2/products"
+          path="/api/platform/products"
           scope="products:read"
           description="List products. Supports archived filter and full-text search on name/description/reference."
-          example={`curl ${API_V2_BASE_URL}/products?archived=false \\
+          example={`curl ${API_PLATFORM_BASE_URL}/products?archived=false \\
   -H "Authorization: Bearer fk_live_..."`}
         />
 
         <EndpointBlock
           method="GET"
-          path="/api/v2/products/:id"
+          path="/api/platform/products/:id"
           scope="products:read"
           description="Retrieve a single product."
         />
 
         <EndpointBlock
           method="POST"
-          path="/api/v2/products"
+          path="/api/platform/products"
           scope="products:write"
           description="Create a new product."
-          example={`curl ${API_V2_BASE_URL}/products \\
+          example={`curl ${API_PLATFORM_BASE_URL}/products \\
   -X POST \\
   -H "Authorization: Bearer fk_live_..." \\
   -H "Content-Type: application/json" \\
@@ -73,14 +73,14 @@ export default function ProductsReference() {
 
         <EndpointBlock
           method="PATCH"
-          path="/api/v2/products/:id"
+          path="/api/platform/products/:id"
           scope="products:write"
           description="Update fields. Send only the fields you want to change."
         />
 
         <EndpointBlock
           method="DELETE"
-          path="/api/v2/products/:id"
+          path="/api/platform/products/:id"
           scope="products:delete"
           description="Delete a product. Existing invoices that referenced it keep their snapshot."
         />
