@@ -75,16 +75,22 @@ export interface ApiDefinition {
     apiKeys: {
       scopesCatalog: typeof routes['dashboard.apiKeys.scopesCatalog']
       list: typeof routes['dashboard.apiKeys.list']
+      recentlyUsed: typeof routes['dashboard.apiKeys.recentlyUsed']
       create: typeof routes['dashboard.apiKeys.create']
       show: typeof routes['dashboard.apiKeys.show']
       update: typeof routes['dashboard.apiKeys.update']
       revoke: typeof routes['dashboard.apiKeys.revoke']
+      destroy: typeof routes['dashboard.apiKeys.destroy']
       rotate: typeof routes['dashboard.apiKeys.rotate']
       webhook: {
         set: typeof routes['dashboard.apiKeys.webhook.set']
         destroy: typeof routes['dashboard.apiKeys.webhook.destroy']
         rotateSecret: typeof routes['dashboard.apiKeys.webhook.rotateSecret']
         test: typeof routes['dashboard.apiKeys.webhook.test']
+        deliveryConfig: {
+          show: typeof routes['dashboard.apiKeys.webhook.deliveryConfig.show']
+          update: typeof routes['dashboard.apiKeys.webhook.deliveryConfig.update']
+        }
       }
       deliveries: {
         list: typeof routes['dashboard.apiKeys.deliveries.list']
@@ -352,6 +358,7 @@ export interface ApiDefinition {
       pause: typeof routes['apiV2.recurringInvoices.pause']
       resume: typeof routes['apiV2.recurringInvoices.resume']
     }
+    notFound: typeof routes['apiV2.notFound']
   }
   createFeedback: typeof routes['create_feedback']
   myFeedback: typeof routes['my_feedback']

@@ -3139,6 +3139,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/list').default['handle']>>>
     }
   }
+  'dashboard.apiKeys.recentlyUsed': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/dashboard/settings/api-keys/recently-used'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/recently_used').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/recently_used').default['handle']>>>
+    }
+  }
   'dashboard.apiKeys.create': {
     methods: ["POST"]
     pattern: '/api/v1/dashboard/settings/api-keys'
@@ -3185,6 +3197,18 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/revoke').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/revoke').default['handle']>>>
+    }
+  }
+  'dashboard.apiKeys.destroy': {
+    methods: ["POST"]
+    pattern: '/api/v1/dashboard/settings/api-keys/:id/destroy'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/destroy').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/destroy').default['handle']>>>
     }
   }
   'dashboard.apiKeys.rotate': {
@@ -3245,6 +3269,30 @@ export interface Registry {
       query: ExtractQuery<InferInput<(typeof import('#validators/api/api_key_dashboard_validators').testWebhookValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/webhook_test').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/webhook_test').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'dashboard.apiKeys.webhook.deliveryConfig.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/dashboard/settings/api-keys/:id/webhook/delivery-config'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/webhook_delivery_config_show').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/webhook_delivery_config_show').default['handle']>>>
+    }
+  }
+  'dashboard.apiKeys.webhook.deliveryConfig.update': {
+    methods: ["PUT"]
+    pattern: '/api/v1/dashboard/settings/api-keys/:id/webhook/delivery-config'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/webhook_delivery_config_update').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/webhook_delivery_config_update').default['handle']>>>
     }
   }
   'dashboard.apiKeys.deliveries.list': {
@@ -3689,6 +3737,18 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/recurring_invoices/toggle_active').default['Resume']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/recurring_invoices/toggle_active').default['Resume']>>>
+    }
+  }
+  'apiV2.notFound': {
+    methods: ["HEAD","OPTIONS","GET","POST","PUT","PATCH","DELETE"]
+    pattern: '/api/v2/*'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { '*': ParamValue[] }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/not_found').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/not_found').default['handle']>>>
     }
   }
   'create_feedback': {

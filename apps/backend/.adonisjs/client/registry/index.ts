@@ -1572,6 +1572,12 @@ const routes = {
     tokens: [{"old":"/api/v1/dashboard/settings/api-keys","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-keys","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-keys","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-keys","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-keys","type":0,"val":"api-keys","end":""}],
     types: placeholder as Registry['dashboard.apiKeys.list']['types'],
   },
+  'dashboard.apiKeys.recentlyUsed': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/dashboard/settings/api-keys/recently-used',
+    tokens: [{"old":"/api/v1/dashboard/settings/api-keys/recently-used","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-keys/recently-used","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-keys/recently-used","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-keys/recently-used","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-keys/recently-used","type":0,"val":"api-keys","end":""},{"old":"/api/v1/dashboard/settings/api-keys/recently-used","type":0,"val":"recently-used","end":""}],
+    types: placeholder as Registry['dashboard.apiKeys.recentlyUsed']['types'],
+  },
   'dashboard.apiKeys.create': {
     methods: ["POST"],
     pattern: '/api/v1/dashboard/settings/api-keys',
@@ -1595,6 +1601,12 @@ const routes = {
     pattern: '/api/v1/dashboard/settings/api-keys/:id',
     tokens: [{"old":"/api/v1/dashboard/settings/api-keys/:id","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id","type":0,"val":"api-keys","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['dashboard.apiKeys.revoke']['types'],
+  },
+  'dashboard.apiKeys.destroy': {
+    methods: ["POST"],
+    pattern: '/api/v1/dashboard/settings/api-keys/:id/destroy',
+    tokens: [{"old":"/api/v1/dashboard/settings/api-keys/:id/destroy","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/destroy","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/destroy","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/destroy","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/destroy","type":0,"val":"api-keys","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/destroy","type":1,"val":"id","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/destroy","type":0,"val":"destroy","end":""}],
+    types: placeholder as Registry['dashboard.apiKeys.destroy']['types'],
   },
   'dashboard.apiKeys.rotate': {
     methods: ["POST"],
@@ -1625,6 +1637,18 @@ const routes = {
     pattern: '/api/v1/dashboard/settings/api-keys/:id/webhook/test',
     tokens: [{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/test","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/test","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/test","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/test","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/test","type":0,"val":"api-keys","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/test","type":1,"val":"id","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/test","type":0,"val":"webhook","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/test","type":0,"val":"test","end":""}],
     types: placeholder as Registry['dashboard.apiKeys.webhook.test']['types'],
+  },
+  'dashboard.apiKeys.webhook.deliveryConfig.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/dashboard/settings/api-keys/:id/webhook/delivery-config',
+    tokens: [{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/delivery-config","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/delivery-config","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/delivery-config","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/delivery-config","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/delivery-config","type":0,"val":"api-keys","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/delivery-config","type":1,"val":"id","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/delivery-config","type":0,"val":"webhook","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/delivery-config","type":0,"val":"delivery-config","end":""}],
+    types: placeholder as Registry['dashboard.apiKeys.webhook.deliveryConfig.show']['types'],
+  },
+  'dashboard.apiKeys.webhook.deliveryConfig.update': {
+    methods: ["PUT"],
+    pattern: '/api/v1/dashboard/settings/api-keys/:id/webhook/delivery-config',
+    tokens: [{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/delivery-config","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/delivery-config","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/delivery-config","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/delivery-config","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/delivery-config","type":0,"val":"api-keys","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/delivery-config","type":1,"val":"id","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/delivery-config","type":0,"val":"webhook","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/webhook/delivery-config","type":0,"val":"delivery-config","end":""}],
+    types: placeholder as Registry['dashboard.apiKeys.webhook.deliveryConfig.update']['types'],
   },
   'dashboard.apiKeys.deliveries.list': {
     methods: ["GET","HEAD"],
@@ -1847,6 +1871,12 @@ const routes = {
     pattern: '/api/v2/recurring-invoices/:id/resume',
     tokens: [{"old":"/api/v2/recurring-invoices/:id/resume","type":0,"val":"api","end":""},{"old":"/api/v2/recurring-invoices/:id/resume","type":0,"val":"v2","end":""},{"old":"/api/v2/recurring-invoices/:id/resume","type":0,"val":"recurring-invoices","end":""},{"old":"/api/v2/recurring-invoices/:id/resume","type":1,"val":"id","end":""},{"old":"/api/v2/recurring-invoices/:id/resume","type":0,"val":"resume","end":""}],
     types: placeholder as Registry['apiV2.recurringInvoices.resume']['types'],
+  },
+  'apiV2.notFound': {
+    methods: ["HEAD","OPTIONS","GET","POST","PUT","PATCH","DELETE"],
+    pattern: '/api/v2/*',
+    tokens: [{"old":"/api/v2/*","type":0,"val":"api","end":""},{"old":"/api/v2/*","type":0,"val":"v2","end":""},{"old":"/api/v2/*","type":2,"val":"*","end":""}],
+    types: placeholder as Registry['apiV2.notFound']['types'],
   },
   'create_feedback': {
     methods: ["POST"],
