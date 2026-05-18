@@ -16,8 +16,9 @@ import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+import { Switch } from '@/components/ui/switch'
 import { useToast } from '@/components/ui/toast'
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, Plus, X } from 'lucide-react'
 import { apiKeysClient, type ApiKeyShape, type ScopesCatalog } from '@/lib/api-keys-client'
 import { useProjects } from '@/lib/projects-context'
 
@@ -39,7 +40,10 @@ export function CreateApiKeyDialog({ open, onClose, onCreated, projectId }: Prop
   const [name, setName] = useState('')
   const [expiration, setExpiration] = useState<Expiration>('never')
   const [customExpiry, setCustomExpiry] = useState('')
-  const [allowedIpsRaw, setAllowedIpsRaw] = useState('')
+  const [ipsEnabled, setIpsEnabled] = useState(false)
+  const [allowedIps, setAllowedIps] = useState<string[]>([])
+  const [ipDraft, setIpDraft] = useState('')
+  const [ipError, setIpError] = useState<string | null>(null)
   const [preset, setPreset] = useState<Preset>('read_only')
   const [customScopes, setCustomScopes] = useState<Set<string>>(new Set())
   const [catalog, setCatalog] = useState<ScopesCatalog | null>(null)
@@ -51,7 +55,10 @@ export function CreateApiKeyDialog({ open, onClose, onCreated, projectId }: Prop
     setName('')
     setExpiration('never')
     setCustomExpiry('')
-    setAllowedIpsRaw('')
+    setIpsEnabled(false)
+    setAllowedIps([])
+    setIpDraft('')
+    setIpError(null)
     setPreset('read_only')
     setCustomScopes(new Set())
   }, [open])
@@ -68,6 +75,35 @@ export function CreateApiKeyDialog({ open, onClose, onCreated, projectId }: Prop
     if (preset === 'read_only') return catalog.presets.read_only
     if (preset === 'full_access') return catalog.presets.full_access
     return Array.from(customScopes)
+  }
+
+  function isValidIpOrCidr(input: string): boolean {
+    const value = input.trim()
+    if (!value) return false
+    // Allow IPv4 or IPv4/CIDR or IPv6 short form (loose check)
+    const ipv4 = /^(?:(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d?\d)(?:\/(3[0-2]|[12]?\d))?$/
+    const ipv6 = /^[0-9a-fA-F:]+(\/\d{1,3})?$/
+    return ipv4.test(value) || (ipv6.test(value) && value.includes(':'))
+  }
+
+  function addIp() {
+    const v = ipDraft.trim()
+    if (!v) return
+    if (!isValidIpOrCidr(v)) {
+      setIpError("Format IP/CIDR invalide")
+      return
+    }
+    if (allowedIps.includes(v)) {
+      setIpError('Cette IP est déjà dans la liste')
+      return
+    }
+    setAllowedIps((prev) => [...prev, v])
+    setIpDraft('')
+    setIpError(null)
+  }
+
+  function removeIp(ip: string) {
+    setAllowedIps((prev) => prev.filter((x) => x !== ip))
   }
 
   function toggleScope(scope: string) {
@@ -115,10 +151,7 @@ export function CreateApiKeyDialog({ open, onClose, onCreated, projectId }: Prop
       expiresAt = d.toISOString()
     }
 
-    const allowedIps = allowedIpsRaw
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean)
+    const effectiveIps = ipsEnabled ? allowedIps : []
 
     setSubmitting(true)
     const res = await apiKeysClient.create({
@@ -126,7 +159,7 @@ export function CreateApiKeyDialog({ open, onClose, onCreated, projectId }: Prop
       name: name.trim(),
       scopes,
       expires_at: expiresAt,
-      allowed_ips: allowedIps.length > 0 ? allowedIps : undefined,
+      allowed_ips: effectiveIps.length > 0 ? effectiveIps : undefined,
     })
     setSubmitting(false)
     if (res.error || !res.data?.data) {
@@ -208,17 +241,72 @@ export function CreateApiKeyDialog({ open, onClose, onCreated, projectId }: Prop
             </Field>
 
             <Field>
-              <FieldLabel htmlFor="ip-allowlist">Liste d&apos;IPs autorisées</FieldLabel>
-              <Input
-                id="ip-allowlist"
-                value={allowedIpsRaw}
-                onChange={(e) => setAllowedIpsRaw(e.target.value)}
-                placeholder="12.34.56.0/24, 78.90.12.34"
-              />
-              <FieldDescription>
-                Optionnel. Séparées par des virgules. Laisser vide pour autoriser toutes les
-                sources.
-              </FieldDescription>
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <FieldLabel>Restreindre par IP</FieldLabel>
+                  <FieldDescription>
+                    Limiter l&apos;usage de cette clé à certaines IP ou plages CIDR.
+                  </FieldDescription>
+                </div>
+                <div className="pt-1 shrink-0">
+                  <Switch
+                    checked={ipsEnabled}
+                    onChange={(v) => {
+                      setIpsEnabled(v)
+                      if (!v) {
+                        setAllowedIps([])
+                        setIpDraft('')
+                        setIpError(null)
+                      }
+                    }}
+                  />
+                </div>
+              </div>
+              {ipsEnabled && (
+                <div className="mt-3 space-y-2">
+                  <div className="flex gap-2">
+                    <Input
+                      value={ipDraft}
+                      onChange={(e) => {
+                        setIpDraft(e.target.value)
+                        if (ipError) setIpError(null)
+                      }}
+                      placeholder="192.168.1.0/24"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                          addIp()
+                        }
+                      }}
+                    />
+                    <Button type="button" variant="outline" onClick={addIp} disabled={!ipDraft.trim()}>
+                      <Plus className="h-4 w-4 mr-1.5" />
+                      Ajouter
+                    </Button>
+                  </div>
+                  {ipError && <p className="text-xs text-danger">{ipError}</p>}
+                  {allowedIps.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 rounded-lg border border-border/50 bg-surface p-2.5">
+                      {allowedIps.map((ip) => (
+                        <span
+                          key={ip}
+                          className="inline-flex items-center gap-1.5 rounded-md border border-border/50 bg-field px-2 py-1 font-mono text-xs text-foreground"
+                        >
+                          {ip}
+                          <button
+                            type="button"
+                            onClick={() => removeIp(ip)}
+                            aria-label={`Retirer ${ip}`}
+                            className="rounded p-0.5 text-muted-foreground hover:bg-surface-hover hover:text-foreground"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </Field>
           </motion.div>
         ) : (
