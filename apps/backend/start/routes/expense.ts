@@ -25,5 +25,5 @@ router
     router.post('/parse-receipt', [ParseReceipt, 'handle'])
   })
   .prefix(API_PREFIX + '/expenses')
-  .use(middleware.auth())
+  .use(middleware.authOrApiKey())
   .use(middleware.vault())
