@@ -29,7 +29,7 @@ import '#start/routes/payment_link'
 import '#start/routes/webhook'
 import '#start/routes/oauth'
 import '#start/routes/api_keys'
-import '#start/routes/api_v2/index'
+import '#start/routes/api_platform/index'
 
 const CreateFeedback = () => import('#controllers/feedback/create')
 const MyFeedback = () => import('#controllers/feedback/mine')
