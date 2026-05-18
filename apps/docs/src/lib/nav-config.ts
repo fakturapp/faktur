@@ -36,8 +36,8 @@ export const SIDEBAR_SECTIONS: NavSection[] = [
     label: 'Concepts',
     links: [
       { label: 'Authentication', href: '/concepts/authentication' },
+      { label: 'Rate limits & quotas', href: '/concepts/rate-limits' },
       { label: 'Errors', href: '/concepts/errors' },
-      { label: 'Rate limits', href: '/concepts/rate-limits' },
       { label: 'Pagination', href: '/concepts/pagination' },
       { label: 'Idempotency', href: '/concepts/idempotency' },
       { label: 'Webhooks', href: '/concepts/webhooks' },
