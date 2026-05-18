@@ -8,7 +8,16 @@ export default class Request {
   async handle({ request, response }: HttpContext) {
     const data = await request.validateUsing(passwordResetRequestValidator)
 
-    const user = await User.findBy('email', data.email)
+    // Vine.normalizeEmail() strips Gmail dots and "+suffix", which means
+    // OAuth-registered users (whose email comes verbatim from the provider)
+    // cannot be found with the normalized form. Try the normalized form first,
+    // then fall back to a case-insensitive match on the raw input.
+    const rawEmail = String(request.input('email', '')).trim().toLowerCase()
+
+    let user = await User.query().whereRaw('LOWER(email) = ?', [data.email]).first()
+    if (!user && rawEmail && rawEmail !== data.email.toLowerCase()) {
+      user = await User.query().whereRaw('LOWER(email) = ?', [rawEmail]).first()
+    }
 
     if (!user) {
       return response.ok({
