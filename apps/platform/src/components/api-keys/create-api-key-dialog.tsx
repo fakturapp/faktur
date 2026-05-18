@@ -14,7 +14,6 @@ import { Button } from '@/components/ui/button'
 import { Field, FieldLabel, FieldDescription } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
-import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
 import {
@@ -389,107 +388,106 @@ export function CreateApiKeyDialog({ open, onClose, onCreated, projectId }: Prop
               <div className="flex justify-center py-8">
                 <Spinner />
               </div>
-            ) : preset === 'custom' ? (
-              <div className="space-y-2">
-                <div className="relative">
-                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    value={scopeSearch}
-                    onChange={(e) => setScopeSearch(e.target.value)}
-                    placeholder="Rechercher (devis, clients:read…)"
-                    className="pl-9"
-                  />
-                </div>
-                <div className="flex items-center justify-between px-1 text-xs text-muted-foreground">
-                  <span>
-                    {customScopes.size} sélectionnée{customScopes.size > 1 ? 's' : ''}
-                  </span>
-                  {customScopes.size > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => setCustomScopes(new Set())}
-                      className="text-accent hover:underline"
-                    >
-                      Tout désélectionner
-                    </button>
-                  )}
-                </div>
-                <div className="max-h-80 overflow-y-auto rounded-lg border border-border/50 bg-surface">
-                  {(() => {
-                    const q = scopeSearch.trim().toLowerCase()
-                    const filtered = catalog.resources
-                      .map((res) => {
-                        const scopes = res.scopes.filter((scope) => {
-                          if (!q) return true
-                          const { label } = humanizeScope(scope)
-                          return (
-                            scope.toLowerCase().includes(q) ||
-                            label.toLowerCase().includes(q)
-                          )
-                        })
-                        return { ...res, scopes }
-                      })
-                      .filter((res) => res.scopes.length > 0)
-                    if (filtered.length === 0) {
+            ) : (
+              (() => {
+                const locked = preset !== 'custom'
+                const activeSet = locked ? new Set(resolvedScopes()) : customScopes
+                const q = scopeSearch.trim().toLowerCase()
+                const filtered = catalog.resources
+                  .map((res) => ({
+                    ...res,
+                    scopes: res.scopes.filter((scope) => {
+                      if (!q) return true
+                      const { label } = humanizeScope(scope)
                       return (
+                        scope.toLowerCase().includes(q) ||
+                        label.toLowerCase().includes(q)
+                      )
+                    }),
+                  }))
+                  .filter((r) => r.scopes.length > 0)
+
+                return (
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        value={scopeSearch}
+                        onChange={(e) => setScopeSearch(e.target.value)}
+                        placeholder="Rechercher (devis, clients:read…)"
+                        className="pl-9"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between px-1 text-xs text-muted-foreground">
+                      <span>
+                        {activeSet.size} sélectionnée{activeSet.size > 1 ? 's' : ''}
+                        {locked && ' (verrouillé par le préréglage)'}
+                      </span>
+                      {!locked && customScopes.size > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => setCustomScopes(new Set())}
+                          className="text-accent hover:underline"
+                        >
+                          Tout désélectionner
+                        </button>
+                      )}
+                    </div>
+                    <div
+                      className={
+                        'max-h-80 overflow-y-auto rounded-lg border border-border/50 bg-surface ' +
+                        (locked ? 'opacity-70' : '')
+                      }
+                    >
+                      {filtered.length === 0 ? (
                         <p className="px-4 py-6 text-center text-xs text-muted-foreground">
                           Aucune permission ne correspond à « {scopeSearch} ».
                         </p>
-                      )
-                    }
-                    return filtered.map((res) => (
-                      <div key={res.name} className="border-b border-border/40 last:border-0">
-                        <div className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-field/60">
-                          {humanizeScope(`${res.name}:read`).resource}
-                        </div>
-                        <div className="divide-y divide-border/30">
-                          {res.scopes.map((scope) => {
-                            const active = customScopes.has(scope)
-                            const { action } = humanizeScope(scope)
-                            return (
-                              <CheckboxRoot
-                                key={scope}
-                                isSelected={active}
-                                onChange={() => toggleScope(scope)}
-                                className="flex w-full cursor-pointer items-center gap-3 px-3 py-2.5 transition-colors hover:bg-surface-hover"
-                              >
-                                <CheckboxControl>
-                                  <CheckboxIndicator />
-                                </CheckboxControl>
-                                <span className="min-w-0 flex-1 text-sm text-foreground">
-                                  {action || scope}
-                                </span>
-                                <code className="shrink-0 font-mono text-[11px] text-muted-foreground">
-                                  {scope}
-                                </code>
-                              </CheckboxRoot>
-                            )
-                          })}
-                        </div>
-                      </div>
-                    ))
-                  })()}
-                </div>
-              </div>
-            ) : (
-              <div className="rounded-lg border border-border/50 bg-surface p-3">
-                <p className="mb-2 text-xs font-medium text-foreground">
-                  {resolvedScopes().length} permission{resolvedScopes().length > 1 ? 's' : ''}{' '}
-                  accordée{resolvedScopes().length > 1 ? 's' : ''}
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {resolvedScopes().slice(0, 12).map((s) => (
-                    <Badge key={s} variant="soft" size="sm">
-                      {s}
-                    </Badge>
-                  ))}
-                  {resolvedScopes().length > 12 && (
-                    <span className="text-xs text-muted-foreground">
-                      +{resolvedScopes().length - 12} autres
-                    </span>
-                  )}
-                </div>
-              </div>
+                      ) : (
+                        filtered.map((res) => (
+                          <div key={res.name} className="border-b border-border/40 last:border-0">
+                            <div className="bg-field/60 px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                              {humanizeScope(`${res.name}:read`).resource}
+                            </div>
+                            <div className="divide-y divide-border/30">
+                              {res.scopes.map((scope) => {
+                                const active = activeSet.has(scope)
+                                const { action } = humanizeScope(scope)
+                                return (
+                                  <CheckboxRoot
+                                    key={scope}
+                                    isSelected={active}
+                                    isDisabled={locked}
+                                    onChange={
+                                      locked ? undefined : () => toggleScope(scope)
+                                    }
+                                    className={
+                                      'flex w-full items-center gap-3 px-3 py-2.5 transition-colors ' +
+                                      (locked
+                                        ? 'cursor-not-allowed'
+                                        : 'cursor-pointer hover:bg-surface-hover')
+                                    }
+                                  >
+                                    <CheckboxControl>
+                                      <CheckboxIndicator />
+                                    </CheckboxControl>
+                                    <span className="min-w-0 flex-1 text-sm text-foreground">
+                                      {action || scope}
+                                    </span>
+                                    <code className="shrink-0 font-mono text-[11px] text-muted-foreground">
+                                      {scope}
+                                    </code>
+                                  </CheckboxRoot>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )
+              })()
             )}
           </motion.div>
         )}
