@@ -17,5 +17,5 @@ router
     router.delete('/:id', [ProductDelete, 'handle'])
   })
   .prefix(API_PREFIX + '/products')
-  .use(middleware.auth())
+  .use(middleware.authOrApiKey())
   .use(middleware.vault())
