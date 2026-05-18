@@ -12,7 +12,7 @@ import { storeTokens } from '@/lib/oauth-storage'
 import { Spinner } from '@/components/ui/spinner'
 import { AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
-import { FakturLogoMark } from '@/components/brand/faktur-logo'
+import { FakturDeveloperLogo } from '@/components/brand/faktur-logo'
 import DotField from '@/components/effects/DotField'
 
 export default function OAuthCallbackPage() {
@@ -145,7 +145,7 @@ export default function OAuthCallbackPage() {
 
       <div className="relative w-full max-w-sm rounded-2xl border border-border/60 bg-overlay/90 p-8 text-center shadow-overlay backdrop-blur-md">
         <div className="mb-5 flex justify-center">
-          <FakturLogoMark size={44} />
+          <FakturDeveloperLogo size={64} />
         </div>
 
         {phase === 'exchanging' && (

@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/field'
 import { ArrowRight } from 'lucide-react'
 import DotField from '@/components/effects/DotField'
-import { FakturLogoMark } from '@/components/brand/faktur-logo'
+import { FakturDeveloperLogo } from '@/components/brand/faktur-logo'
 
 type AuthPhase = 'idle' | 'auto_redirect' | 'starting'
 
@@ -108,7 +108,7 @@ export default function LoginPage() {
           >
             <FieldGroup>
               <div className="flex flex-col items-center gap-3 text-center">
-                <FakturLogoMark size={56} />
+                <FakturDeveloperLogo size={84} />
                 <h1 className="text-xl font-bold tracking-tight text-foreground">
                   Bienvenue sur Faktur Platform
                 </h1>
