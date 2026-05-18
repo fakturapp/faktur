@@ -4,14 +4,13 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
+  Activity,
   ArrowRight,
   Book,
-  Coins,
   Folder,
+  Gauge,
   Key,
   Plus,
-  TrendingUp,
-  Zap,
 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -19,6 +18,7 @@ import { useAuth } from '@/lib/auth'
 import { useProjects } from '@/lib/projects-context'
 import { DOCS_URL } from '@/lib/oauth-config'
 import { apiKeysClient, type ApiKeyShape } from '@/lib/api-keys-client'
+import { creditsClient, type CreditsUsage } from '@/lib/credits-client'
 
 function formatRelative(iso: string | null): string {
   if (!iso) return 'jamais utilisée'
@@ -35,6 +35,20 @@ function formatRelative(iso: string | null): string {
   return new Date(iso).toLocaleDateString()
 }
 
+function fmtCompact(iso: string | null): string {
+  if (!iso) return '—'
+  const target = new Date(iso).getTime()
+  const diff = Math.max(0, Math.floor((target - Date.now()) / 1000))
+  if (diff <= 0) return 'maintenant'
+  const d = Math.floor(diff / 86400)
+  const h = Math.floor((diff % 86400) / 3600)
+  const m = Math.floor((diff % 3600) / 60)
+  if (d > 0) return `${d}j ${h}h${m.toString().padStart(2, '0')}m`
+  if (h > 0) return `${h}h${m.toString().padStart(2, '0')}m`
+  if (m > 0) return `${m}m`
+  return `${diff}s`
+}
+
 function firstName(user: { fullName: string | null; email: string } | null): string {
   if (!user) return ''
   if (user.fullName) {
@@ -48,16 +62,27 @@ export default function DashboardHomePage() {
   const { user } = useAuth()
   const { projects } = useProjects()
   const [recentKeys, setRecentKeys] = useState<ApiKeyShape[] | null>(null)
+  const [usage, setUsage] = useState<CreditsUsage | null>(null)
 
   useEffect(() => {
     apiKeysClient.recentlyUsed(5).then((res) => {
       if (res.data?.data) setRecentKeys(res.data.data)
       else setRecentKeys([])
     })
+    creditsClient.usage().then((res) => {
+      if (res.data?.data) setUsage(res.data.data)
+    })
   }, [])
 
   const activeProjects = (projects ?? []).filter((p) => !p.is_archived)
   const recentProjects = activeProjects.slice(0, 5)
+
+  const sessionPct = usage
+    ? Math.round((usage.session.used / usage.session.limit) * 100)
+    : 0
+  const weeklyPct = usage
+    ? Math.round((usage.weekly.used / usage.weekly.limit) * 100)
+    : 0
 
   return (
     <motion.div
@@ -85,23 +110,21 @@ export default function DashboardHomePage() {
                 Gérer mes projets
               </h3>
               <p className="mt-1 text-xs text-muted-foreground">
-                Créer, organiser, supprimer
+                Créer, organiser, archiver
               </p>
             </CardContent>
           </Card>
         </Link>
 
-        <Link href="/projects" className="block">
+        <Link href="/usage" className="block">
           <Card className="border-border/50 transition-colors hover:border-accent/40 hover:bg-surface-hover">
             <CardContent className="p-5">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft text-accent">
-                <Plus className="h-4 w-4" />
+                <Activity className="h-4 w-4" />
               </div>
-              <h3 className="mt-3 text-sm font-semibold text-foreground">
-                Nouveau projet
-              </h3>
+              <h3 className="mt-3 text-sm font-semibold text-foreground">Usage</h3>
               <p className="mt-1 text-xs text-muted-foreground">
-                Démarrer une intégration
+                Quotas, sessions, hebdo
               </p>
             </CardContent>
           </Card>
@@ -124,64 +147,51 @@ export default function DashboardHomePage() {
         </a>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div>
+        <div className="flex items-center justify-between mb-3 px-1">
+          <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+            Usage en ce moment
+          </h2>
+          <Link
+            href="/usage"
+            className="inline-flex items-center gap-1 text-xs text-accent hover:underline"
+          >
+            Voir tout
+            <ArrowRight className="h-3 w-3" />
+          </Link>
+        </div>
         <Card className="border-border/50">
-          <CardContent className="p-5">
-            <div className="flex items-center gap-2">
-              <Coins className="h-4 w-4 text-muted-foreground" />
-              <p className="text-xs uppercase tracking-wider text-muted-foreground">
-                Solde
-              </p>
+          <CardContent className="p-5 space-y-6">
+            <UsageLine
+              label="Tous les appels API"
+              subtitle={
+                usage?.session.active
+                  ? `réinitialise dans ${fmtCompact(usage.session.reset_at)}`
+                  : 'Démarre dès ta première requête'
+              }
+              pct={sessionPct}
+              loaded={usage !== null}
+            />
+            <UsageLine
+              label="Limite hebdomadaire"
+              subtitle={
+                usage?.weekly.active
+                  ? `réinitialise dans ${fmtCompact(usage.weekly.reset_at)}`
+                  : 'Démarre dès ta première requête'
+              }
+              pct={weeklyPct}
+              loaded={usage !== null}
+            />
+            <div className="flex items-center justify-between border-t border-border/40 pt-4 text-xs text-muted-foreground">
+              <span className="inline-flex items-center gap-1.5">
+                <Gauge className="h-3.5 w-3.5" />
+                Burst protection {usage?.per_minute.limit ?? 3} req/min
+              </span>
+              <span className="italic">Crédits payants arrivent bientôt</span>
             </div>
-            <p className="mt-3 text-2xl font-bold tracking-tight text-foreground">
-              10 000
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">crédits disponibles</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/50">
-          <CardContent className="p-5">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-              <p className="text-xs uppercase tracking-wider text-muted-foreground">
-                Dépensé ce mois
-              </p>
-            </div>
-            <p className="mt-3 text-2xl font-bold tracking-tight text-foreground">
-              1 247
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">crédits utilisés</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/50">
-          <CardContent className="p-5">
-            <div className="flex items-center gap-2">
-              <Zap className="h-4 w-4 text-muted-foreground" />
-              <p className="text-xs uppercase tracking-wider text-muted-foreground">
-                Volume tokens
-              </p>
-            </div>
-            <p className="mt-3 text-2xl font-bold tracking-tight text-foreground">
-              4.2k
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">requêtes ce mois</p>
           </CardContent>
         </Card>
       </div>
-
-      <Card className="border-amber-400/30 bg-amber-400/5">
-        <CardContent className="p-4">
-          <p className="text-xs text-muted-foreground">
-            <span className="font-semibold text-amber-600 dark:text-amber-400">
-              Données de démo :
-            </span>{' '}
-            la facturation à l&apos;usage arrive bientôt. Les compteurs ci-dessus sont
-            statiques pour le moment.
-          </p>
-        </CardContent>
-      </Card>
 
       <div>
         <div className="flex items-center justify-between mb-3 px-1">
@@ -296,5 +306,48 @@ export default function DashboardHomePage() {
         </Card>
       </div>
     </motion.div>
+  )
+}
+
+function UsageLine({
+  label,
+  subtitle,
+  pct,
+  loaded,
+}: {
+  label: string
+  subtitle: string
+  pct: number
+  loaded: boolean
+}) {
+  const pctClamped = Math.min(100, Math.max(0, pct))
+  const tone = pct >= 90 ? 'bg-danger' : pct >= 70 ? 'bg-warning' : 'bg-accent'
+  return (
+    <div className="flex w-full flex-row flex-wrap items-center justify-between gap-x-8 gap-y-2">
+      <div className="flex w-52 shrink-0 flex-col gap-1">
+        <span className="text-sm font-medium text-foreground">{label}</span>
+        <span className="text-xs text-muted-foreground whitespace-nowrap">{subtitle}</span>
+      </div>
+      <div className="flex flex-1 items-center gap-4 pl-6 md:max-w-xl">
+        <div className="min-w-[160px] flex-1">
+          <div
+            className="relative h-2 w-full overflow-hidden rounded-full bg-surface"
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={pctClamped}
+            aria-label={label}
+          >
+            <div
+              className={`h-full rounded-full transition-all duration-300 ${tone}`}
+              style={{ width: `${Math.max(1, pctClamped)}%` }}
+            />
+          </div>
+        </div>
+        <span className="min-w-[3rem] whitespace-nowrap text-right text-base font-semibold text-foreground tabular-nums">
+          {loaded ? `${pct}%` : '—'}
+        </span>
+      </div>
+    </div>
   )
 }
