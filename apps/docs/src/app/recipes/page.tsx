@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { ArrowRight, RefreshCw, CreditCard, BarChart3, FileText, Bell, Upload } from 'lucide-react'
 
-export const metadata = { title: 'Recipes — Faktur Developers' }
+export const metadata = { title: 'Recipes · Faktur Developers' }
 
 const recipes = [
   {

@@ -1,13 +1,11 @@
 import Link from 'next/link'
 import {
   ArrowRight,
-  ArrowUpRight,
   Lock,
   Zap,
   Webhook,
   Code2,
   ShieldCheck,
-  Sparkles,
   Globe,
 } from 'lucide-react'
 import { CodeWindow } from '@/components/code-window'
@@ -49,7 +47,7 @@ const FEATURES: Array<{
     icon: Code2,
     title: 'Idempotent POSTs',
     description:
-      'Send Faktur-Idempotency-Key once and retry safely — network blips no longer produce duplicates.',
+      'Send Faktur-Idempotency-Key once and retry safely. network blips no longer produce duplicates.',
   },
   {
     icon: ShieldCheck,
@@ -65,24 +63,13 @@ export default function Landing() {
       <section className="relative overflow-hidden">
         <div className="docs-grid pointer-events-none absolute inset-0 -z-10" />
         <div className="mx-auto flex max-w-5xl flex-col items-center px-4 pb-16 pt-20 text-center sm:px-6 sm:pt-28">
-          <Link
-            href="/changelog"
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 text-[11px] text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground"
-          >
-            <Sparkles className="size-3 text-accent" />
-            <span className="font-medium text-foreground">v2.0.0 beta.1</span>
-            <span className="text-muted-secondary">·</span>
-            <span>API publique disponible</span>
-            <ArrowUpRight className="size-3" />
-          </Link>
-
-          <h1 className="mt-6 text-balance text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+          <h1 className="text-balance text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
             L&apos;API pour automatiser{' '}
             <span className="text-muted-foreground">votre facturation.</span>
           </h1>
           <p className="mt-5 max-w-2xl text-balance text-[15px] text-muted-foreground sm:text-base">
             REST moderne pour factures, devis, clients, produits, dépenses et webhooks. Bearer
-            tokens, scopes resource:action, cursor pagination, idempotency — pensé pour les
+            tokens, scopes resource:action, cursor pagination, idempotency. pensé pour les
             développeurs qui scriptent leur propre compte ou intègrent Faktur dans un produit
             tiers.
           </p>
@@ -202,7 +189,7 @@ export default function Landing() {
             </div>
             <div>
               <CodeWindow filename="node.ts">
-                {`// Exemple Node — lister les factures payées du mois
+                {`// Exemple Node. lister les factures payées du mois
 import fetch from 'node-fetch'
 
 const res = await fetch(

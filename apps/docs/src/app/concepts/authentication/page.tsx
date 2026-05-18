@@ -1,5 +1,5 @@
 export const metadata = {
-  title: 'Authentication — Faktur Developers',
+  title: 'Authentication · Faktur Developers',
 }
 
 export default function AuthenticationPage() {
@@ -29,7 +29,7 @@ export default function AuthenticationPage() {
           <code>{`Authorization: Bearer fk_live_8KqL2xNvR4mT7pYbA1cE9hZdW6sJfG3u`}</code>
         </pre>
         <p className="mt-3 text-sm text-(--muted-foreground)">
-          The API rejects requests over plain HTTP — always use HTTPS.
+          The API rejects requests over plain HTTP. always use HTTPS.
         </p>
       </section>
 
@@ -66,7 +66,7 @@ export default function AuthenticationPage() {
         <h2 className="text-2xl font-semibold">Encryption mode requirement</h2>
         <p className="mt-3 text-sm">
           The API is only available for teams in <strong>Standard encryption mode</strong>. Teams
-          in Private (E2E) mode cannot create or use API keys — the server would have no way to
+          in Private (E2E) mode cannot create or use API keys. the server would have no way to
           decrypt your data without your password.
         </p>
         <p className="mt-3 text-sm">

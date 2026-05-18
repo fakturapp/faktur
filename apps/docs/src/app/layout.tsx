@@ -7,9 +7,9 @@ import { ThemeScript } from './theme-script'
 import { DOCS_URL } from '@/lib/config'
 
 export const metadata: Metadata = {
-  title: 'Faktur Developers — API V2',
+  title: 'Faktur Developers · API V2',
   description:
-    'Automate Faktur — invoices, quotes, clients, and webhooks — with a modern REST API.',
+    'Automate Faktur: invoices, quotes, clients, and webhooks, with a modern REST API.',
   metadataBase: new URL(DOCS_URL),
   openGraph: {
     title: 'Faktur Developers',

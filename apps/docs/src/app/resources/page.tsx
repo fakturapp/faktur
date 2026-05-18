@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 
-export const metadata = { title: 'Resources — Faktur Developers' }
+export const metadata = { title: 'Resources · Faktur Developers' }
 
 const resources = [
   {
@@ -25,7 +25,7 @@ const resources = [
   {
     name: 'clients',
     title: 'Clients',
-    description: 'Manage your contact book — companies, individuals, and their contacts.',
+    description: 'Manage your contact book. companies, individuals, and their contacts.',
     href: '/resources/clients',
   },
   {
@@ -67,7 +67,7 @@ const resources = [
   {
     name: 'company',
     title: 'Company',
-    description: 'Your legal entity — name, SIREN, address, logo.',
+    description: 'Your legal entity. name, SIREN, address, logo.',
     href: '/resources/company',
   },
   {

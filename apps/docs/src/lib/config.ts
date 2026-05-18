@@ -1,7 +1,7 @@
 function requireEnv(raw: string | undefined, key: string): string {
   if (!raw || !raw.trim()) {
     throw new Error(
-      `[docs] missing env var ${key} — set it in apps/docs/.env (see .env.example)`
+      `[docs] missing env var ${key}. set it in apps/docs/.env (see .env.example)`
     )
   }
   return raw.trim().replace(/\/+$/, '')

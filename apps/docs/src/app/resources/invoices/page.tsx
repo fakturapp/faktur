@@ -1,7 +1,7 @@
 import { EndpointBlock } from '@/components/endpoint-block'
 import { API_V2_BASE_URL } from '@/lib/config'
 
-export const metadata = { title: 'Invoices — Faktur API V2' }
+export const metadata = { title: 'Invoices · Faktur API V2' }
 
 export default function InvoicesReference() {
   return (
@@ -90,28 +90,28 @@ export default function InvoicesReference() {
           </p>
           <ul className="space-y-1.5">
             <li>
-              <code>limit</code> — 1–200, default 50
+              <code>limit</code>. 1–200, default 50
             </li>
             <li>
-              <code>cursor</code> — pagination token
+              <code>cursor</code>. pagination token
             </li>
             <li>
-              <code>status</code> — comma-separated (e.g. <code>paid,partial</code>)
+              <code>status</code>. comma-separated (e.g. <code>paid,partial</code>)
             </li>
             <li>
-              <code>client_id</code> — <code>clt_</code> prefixed
+              <code>client_id</code>. <code>clt_</code> prefixed
             </li>
             <li>
-              <code>issue_date_after</code>, <code>issue_date_before</code> — ISO date
+              <code>issue_date_after</code>, <code>issue_date_before</code>. ISO date
             </li>
             <li>
-              <code>due_date_after</code>, <code>due_date_before</code> — ISO date
+              <code>due_date_after</code>, <code>due_date_before</code>. ISO date
             </li>
             <li>
-              <code>q</code> — searches number, subject, notes
+              <code>q</code>. searches number, subject, notes
             </li>
             <li>
-              <code>sort</code> — <code>created_at</code>, <code>-created_at</code>,{' '}
+              <code>sort</code>. <code>created_at</code>, <code>-created_at</code>,{' '}
               <code>issue_date</code>, <code>-issue_date</code>
             </li>
           </ul>
@@ -149,18 +149,18 @@ export default function InvoicesReference() {
           </p>
           <ul className="space-y-1.5">
             <li>
-              <code>amount_cents</code> — optional, defaults to <code>total_cents</code>. If less,
+              <code>amount_cents</code>. optional, defaults to <code>total_cents</code>. If less,
               status becomes <code>partial</code>.
             </li>
             <li>
-              <code>paid_at</code> — ISO date, defaults to today.
+              <code>paid_at</code>. ISO date, defaults to today.
             </li>
             <li>
-              <code>payment_method</code> — optional free string (e.g. <code>bank_transfer</code>,{' '}
+              <code>payment_method</code>. optional free string (e.g. <code>bank_transfer</code>,{' '}
               <code>card</code>, <code>cash</code>).
             </li>
             <li>
-              <code>reference</code> — your internal transaction reference.
+              <code>reference</code>. your internal transaction reference.
             </li>
           </ul>
         </div>
@@ -184,7 +184,7 @@ export default function InvoicesReference() {
             <code>invoice.created</code>, <code>invoice.updated</code>, <code>invoice.deleted</code>
           </li>
           <li>
-            <code>invoice.sent</code> — after a delivery succeeds
+            <code>invoice.sent</code>. after a delivery succeeds
           </li>
           <li>
             <code>invoice.paid</code>, <code>invoice.partially_paid</code>,{' '}

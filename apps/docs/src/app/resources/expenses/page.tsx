@@ -1,7 +1,7 @@
 import { EndpointBlock } from '@/components/endpoint-block'
 import { API_V2_BASE_URL } from '@/lib/config'
 
-export const metadata = { title: 'Expenses — Faktur API V2' }
+export const metadata = { title: 'Expenses · Faktur API V2' }
 
 export default function ExpensesReference() {
   return (

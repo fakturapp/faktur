@@ -1,7 +1,7 @@
 import { EndpointBlock } from '@/components/endpoint-block'
 import { API_V2_BASE_URL } from '@/lib/config'
 
-export const metadata = { title: 'Quotes — Faktur API V2' }
+export const metadata = { title: 'Quotes · Faktur API V2' }
 
 export default function QuotesReference() {
   return (
@@ -100,7 +100,7 @@ export default function QuotesReference() {
             <code>quote.accepted</code>, <code>quote.rejected</code>, <code>quote.expired</code>
           </li>
           <li>
-            <code>quote.converted</code> — fires when a quote becomes an invoice
+            <code>quote.converted</code>. fires when a quote becomes an invoice
           </li>
         </ul>
       </section>

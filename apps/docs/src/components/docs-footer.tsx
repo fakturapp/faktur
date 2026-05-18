@@ -8,11 +8,11 @@ export function DocsFooter() {
         <div className="max-w-sm">
           <p className="text-sm font-semibold text-foreground">Faktur Developers</p>
           <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-            API V2 publique pour Faktur — facturation, devis, clients, webhooks. Conçue pour les
+            API V2 publique pour Faktur. facturation, devis, clients, webhooks. Conçue pour les
             développeurs.
           </p>
           <p className="mt-4 text-[11px] text-muted-foreground">
-            © {new Date().getFullYear()} Faktur — Build with confidence.
+            © {new Date().getFullYear()} Faktur. Build with confidence.
           </p>
         </div>
         <div className="grid grid-cols-2 gap-8 text-xs sm:grid-cols-4">

@@ -3,7 +3,7 @@ import { ArrowLeft, CreditCard, Clock } from 'lucide-react'
 import { API_V2_BASE_URL } from '@/lib/config'
 
 export const metadata = {
-  title: 'Auto-create invoices from Stripe — Faktur Developers',
+  title: 'Auto-create invoices from Stripe · Faktur Developers',
 }
 
 export default function Recipe() {
@@ -167,7 +167,7 @@ app.post(
           <li>Faktur dashboard shows the new invoice with status <code>paid</code>.</li>
           <li>Re-firing the same event creates no duplicate (idempotency).</li>
           <li>
-            The Faktur webhook <code>invoice.paid</code> fires — your own internal systems can
+            The Faktur webhook <code>invoice.paid</code> fires. your own internal systems can
             react.
           </li>
         </ul>
@@ -176,13 +176,13 @@ app.post(
       <Step number={5} title="Production checklist">
         <ul className="mt-3 space-y-1.5 text-sm text-(--muted-foreground)">
           <li>Store <code>FAKTUR_KEY</code> in your secret manager, never in code.</li>
-          <li>Enable IP allowlist on the key — only your webhook handler hosts.</li>
+          <li>Enable IP allowlist on the key. only your webhook handler hosts.</li>
           <li>
             Use distinct keys for Stripe / your CRM / scripts so revocations stay surgical.
           </li>
           <li>
             Monitor <code>X-RateLimit-Remaining</code>. Stripe burst events can be heavy on Black
-            Friday — request the Pro tier if needed.
+            Friday. request the Pro tier if needed.
           </li>
         </ul>
       </Step>
@@ -195,21 +195,21 @@ app.post(
             <Link href="/concepts/idempotency" className="text-violet-500 hover:underline">
               Idempotency
             </Link>{' '}
-            — never produce duplicate invoices on retries
+           . never produce duplicate invoices on retries
           </li>
           <li>
             →{' '}
             <Link href="/resources/invoices" className="text-violet-500 hover:underline">
               Invoices reference
             </Link>{' '}
-            — full payload shape
+           . full payload shape
           </li>
           <li>
             →{' '}
             <Link href="/concepts/webhooks" className="text-violet-500 hover:underline">
               Webhooks
             </Link>{' '}
-            — react to <code>invoice.paid</code> in your other systems
+           . react to <code>invoice.paid</code> in your other systems
           </li>
         </ul>
       </div>

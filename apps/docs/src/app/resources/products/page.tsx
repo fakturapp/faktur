@@ -1,7 +1,7 @@
 import { EndpointBlock } from '@/components/endpoint-block'
 import { API_V2_BASE_URL } from '@/lib/config'
 
-export const metadata = { title: 'Products — Faktur API V2' }
+export const metadata = { title: 'Products · Faktur API V2' }
 
 export default function ProductsReference() {
   return (
@@ -11,7 +11,7 @@ export default function ProductsReference() {
       </p>
       <h1 className="mt-2 text-4xl font-semibold tracking-tight">Products</h1>
       <p className="mt-4 text-(--muted-foreground)">
-        Products are reusable catalog items — services or goods — that can be added to invoices
+        Products are reusable catalog items. services or goods. that can be added to invoices
         and quotes. Prices are stored in cents.
       </p>
 

@@ -9,7 +9,7 @@ export interface SafariProps extends SVGProps<SVGSVGElement> {
 
 /**
  * Safari (macOS) browser window mockup. Use as a frame around screenshots.
- * Source: shadcn/ui mockup library — adapted for the docs theme.
+ * Source: shadcn/ui mockup library. adapted for the docs theme.
  */
 export function Safari({
   src,

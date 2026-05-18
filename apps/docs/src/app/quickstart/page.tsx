@@ -15,7 +15,7 @@ import { API_V2_BASE_URL, PLATFORM_URL } from '@/lib/config'
 import { Safari } from '@/components/safari-mockup'
 
 export const metadata = {
-  title: 'Quickstart — Faktur Developers',
+  title: 'Quickstart · Faktur Developers',
   description: 'Make your first Faktur API call in under 2 minutes.',
 }
 

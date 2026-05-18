@@ -1,7 +1,7 @@
 import { EndpointBlock } from '@/components/endpoint-block'
 import { API_V2_BASE_URL } from '@/lib/config'
 
-export const metadata = { title: 'Clients — Faktur API V2' }
+export const metadata = { title: 'Clients · Faktur API V2' }
 
 export default function ClientsReference() {
   return (
@@ -103,14 +103,14 @@ export default function ClientsReference() {
         <h2 className="text-2xl font-semibold">Related webhooks</h2>
         <ul className="mt-3 space-y-1.5 text-sm text-(--muted-foreground)">
           <li>
-            <code>client.created</code> — POST /api/v2/clients
+            <code>client.created</code>. POST /api/v2/clients
           </li>
           <li>
-            <code>client.updated</code> — PATCH /api/v2/clients/:id (includes{' '}
+            <code>client.updated</code>. PATCH /api/v2/clients/:id (includes{' '}
             <code>previous_data</code>)
           </li>
           <li>
-            <code>client.deleted</code> — DELETE /api/v2/clients/:id
+            <code>client.deleted</code>. DELETE /api/v2/clients/:id
           </li>
         </ul>
       </section>

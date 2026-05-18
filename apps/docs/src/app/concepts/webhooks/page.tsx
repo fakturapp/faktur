@@ -1,4 +1,4 @@
-export const metadata = { title: 'Webhooks — Faktur Developers' }
+export const metadata = { title: 'Webhooks · Faktur Developers' }
 
 export default function WebhooksPage() {
   return (

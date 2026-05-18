@@ -1,4 +1,4 @@
-export const metadata = { title: 'Changelog — Faktur Developers' }
+export const metadata = { title: 'Changelog · Faktur Developers' }
 
 const entries = [
   {
