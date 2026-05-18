@@ -41,7 +41,33 @@ export default class AuthOrApiKeyMiddleware {
 
       user.currentTeamId = apiKey.teamId
       await user.save()
-      ;(ctx.auth as unknown as { user: User }).user = user
+
+      const guard = ctx.auth.use('api') as unknown as Record<string, unknown>
+      Object.defineProperty(guard, 'user', {
+        value: user,
+        writable: true,
+        configurable: true,
+      })
+      Object.defineProperty(guard, 'isAuthenticated', {
+        value: true,
+        writable: true,
+        configurable: true,
+      })
+      Object.defineProperty(guard, 'isLoggedOut', {
+        value: false,
+        writable: true,
+        configurable: true,
+      })
+      Object.defineProperty(guard, 'authenticationAttempted', {
+        value: true,
+        writable: true,
+        configurable: true,
+      })
+      Object.defineProperty(ctx.auth, 'user', {
+        value: user,
+        writable: true,
+        configurable: true,
+      })
       ctx.apiKey = apiKey
 
       const check = await apiCreditService.check(apiKey.teamId, user.id)
