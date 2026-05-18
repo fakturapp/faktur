@@ -7,7 +7,7 @@ import Team from '#models/team/team'
 import TeamMember from '#models/team/team_member'
 import teamEncryptionService from '#services/crypto/team_encryption_service'
 import keyStore from '#services/crypto/key_store'
-import featureFlag from '#services/api/api_v2_feature_flag'
+import featureFlag from '#services/api/api_platform_feature_flag'
 import { realClientIp } from '#services/http/real_client_ip'
 
 export default class ApiKeyMiddleware {
