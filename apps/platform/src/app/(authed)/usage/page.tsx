@@ -79,7 +79,7 @@ export default function UsagePage() {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-8 px-4 lg:px-6 pt-16 md:pt-20 pb-12 max-w-3xl mx-auto w-full"
+      className="space-y-12 px-4 lg:px-6 pt-16 md:pt-20 pb-12 max-w-3xl mx-auto w-full"
     >
       <div>
         <div className="flex items-center gap-2">
@@ -98,13 +98,13 @@ export default function UsagePage() {
         </p>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-10">
         <UsageRow
           title="Tous les appels API"
           subtitle={
             usage.session.active
               ? `réinitialise dans ${fmtCompact(usage.session.reset_at)}`
-              : 'Démarre dès ta première requête. Ping, docs et /session ne comptent pas.'
+              : 'Démarre dès ta première requête.'
           }
           pct={sessionPct}
         />
@@ -114,7 +114,7 @@ export default function UsagePage() {
           subtitle={
             usage.weekly.active
               ? `réinitialise dans ${fmtCompact(usage.weekly.reset_at)}`
-              : 'Démarre dès ta première requête. Ping, docs et /session ne comptent pas.'
+              : 'Démarre dès ta première requête.'
           }
           tooltip={`Plafond global de ${usage.weekly.limit.toLocaleString()} requêtes par fenêtre glissante de 7 jours.`}
           pct={weeklyPct}
@@ -170,10 +170,10 @@ function UsageRow({
   const barTone = pct >= 90 ? 'bg-danger' : pct >= 70 ? 'bg-warning' : 'bg-accent'
 
   return (
-    <div className="flex w-full flex-row flex-wrap items-center justify-between gap-x-7 gap-y-2">
-      <div className="flex w-52 shrink-0 flex-col gap-1">
+    <div className="flex w-full flex-row flex-wrap items-center justify-between gap-x-10 gap-y-3">
+      <div className="flex w-56 shrink-0 flex-col gap-2">
         <div className="flex items-center gap-1.5">
-          <span className="text-sm text-foreground">{title}</span>
+          <span className="text-base font-medium text-foreground">{title}</span>
           {tooltip && (
             <span title={tooltip} className="cursor-help text-muted-foreground">
               <Info className="h-3.5 w-3.5" />
@@ -182,10 +182,10 @@ function UsageRow({
         </div>
         <span className="text-xs text-muted-foreground whitespace-nowrap">{subtitle}</span>
       </div>
-      <div className="flex flex-1 items-center gap-3 pl-6 md:max-w-xl">
+      <div className="flex flex-1 items-center gap-5 pl-6 md:max-w-xl">
         <div className="min-w-[200px] flex-1">
           <div
-            className="relative h-2 w-full overflow-hidden rounded-full bg-surface"
+            className="relative h-2.5 w-full overflow-hidden rounded-full bg-surface"
             role="progressbar"
             aria-valuemin={0}
             aria-valuemax={100}
@@ -198,7 +198,7 @@ function UsageRow({
             />
           </div>
         </div>
-        <span className="min-w-[3rem] whitespace-nowrap text-right text-xs text-muted-foreground tabular-nums">
+        <span className="min-w-[3.5rem] whitespace-nowrap text-right text-lg font-semibold text-foreground tabular-nums">
           {pct}%
         </span>
       </div>
