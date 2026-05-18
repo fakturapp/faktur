@@ -42,5 +42,5 @@ router
     router.delete('/:invoiceId/payments/:id', [InvoicePaymentDestroy, 'handle'])
   })
   .prefix(API_PREFIX + '/invoices')
-  .use(middleware.auth())
+  .use(middleware.authOrApiKey())
   .use(middleware.vault())
