@@ -9,7 +9,9 @@ export default function AuthenticationPage() {
       <h1 className="mt-2 text-4xl font-semibold tracking-tight">Authentication</h1>
       <p className="mt-4 text-(--muted-foreground)">
         Every Faktur API call is authenticated with a personal API key sent as a Bearer token.
-        Keys are team-owned and scoped per <code>resource:action</code>.
+        Keys are team-owned and scoped per <code>resource:action</code>. Business resources live
+        under <code>/api/v1/*</code> (clients, invoices, products, …); meta endpoints live under{' '}
+        <code>/api/platform/*</code> (ping, session, usage, free of charge).
       </p>
 
       <section className="mt-10">
