@@ -20,6 +20,7 @@ router.use([
 
 export const middleware = router.named({
   auth: () => import('#middleware/auth/auth_middleware'),
+  authOrApiKey: () => import('#middleware/auth/auth_or_api_key_middleware'),
   emailVerified: () => import('#middleware/auth/email_verified_middleware'),
   twoFactorVerified: () => import('#middleware/auth/two_factor_verified_middleware'),
   onboardingCompleted: () => import('#middleware/auth/onboarding_completed_middleware'),
