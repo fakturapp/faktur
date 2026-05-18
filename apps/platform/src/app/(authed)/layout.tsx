@@ -3,6 +3,7 @@
 import { useEffect, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth'
+import { Agentation } from "agentation";
 import { ProjectsProvider } from '@/lib/projects-context'
 import { Sidebar } from '@/components/layout/sidebar'
 import { DashboardGradient } from '@/components/layout/dashboard-gradient'
@@ -35,6 +36,7 @@ export default function AuthedLayout({ children }: { children: ReactNode }) {
           <main className="flex-1 overflow-y-auto">{children}</main>
         </div>
       </div>
+      {process.env.NODE_ENV === "development" && <Agentation />}
     </ProjectsProvider>
   )
 }
