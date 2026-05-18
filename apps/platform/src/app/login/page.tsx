@@ -17,10 +17,9 @@ import {
   Field,
   FieldDescription,
   FieldGroup,
-  FieldSeparator,
 } from '@/components/ui/field'
-import { ArrowRight, Key, ShieldCheck, Webhook } from 'lucide-react'
-import { DotField } from '@/components/effects/dot-field'
+import { ArrowRight } from 'lucide-react'
+import DotField from '@/components/effects/DotField'
 
 type AuthPhase = 'idle' | 'auto_redirect' | 'starting'
 
@@ -80,12 +79,22 @@ export default function LoginPage() {
 
   return (
     <div className="relative isolate flex min-h-[100svh] items-center justify-center overflow-hidden bg-background px-4 py-10">
-      <DotField
-        className="pointer-events-none -z-10"
-        glowColor="var(--color-accent)"
-        gradientFrom="rgba(168, 85, 247, 0.28)"
-        gradientTo="rgba(180, 151, 207, 0.18)"
-      />
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <DotField
+          dotRadius={1.5}
+          dotSpacing={14}
+          bulgeStrength={67}
+          glowRadius={160}
+          sparkle={false}
+          waveAmplitude={0}
+          cursorRadius={500}
+          cursorForce={0.1}
+          bulgeOnly
+          gradientFrom="#A855F7"
+          gradientTo="#B497CF"
+          glowColor="#120F17"
+        />
+      </div>
 
       <div className="relative w-full max-w-md">
         <div className="flex flex-col gap-6">
@@ -143,17 +152,6 @@ export default function LoginPage() {
                   </Button>
                 </Field>
               )}
-
-              <FieldSeparator>Pourquoi ?</FieldSeparator>
-
-              <ul className="space-y-3 text-xs text-muted-foreground">
-                <Bullet icon={Key} text="Créer et révoquer des clés API team-owned" />
-                <Bullet icon={Webhook} text="Configurer un webhook signé HMAC par clé" />
-                <Bullet
-                  icon={ShieldCheck}
-                  text="Logs API + statistiques d'utilisation 30 jours"
-                />
-              </ul>
             </FieldGroup>
           </form>
 
@@ -165,21 +163,6 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
-  )
-}
-
-function Bullet({
-  icon: Icon,
-  text,
-}: {
-  icon: typeof Key
-  text: string
-}) {
-  return (
-    <li className="flex items-start gap-2">
-      <Icon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
-      <span>{text}</span>
-    </li>
   )
 }
 
