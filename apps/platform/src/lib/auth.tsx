@@ -138,6 +138,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => off()
   }, [])
 
+  useEffect(() => {
+    if (!user) return
+
+    const HEARTBEAT_MS = 30_000
+
+    async function ping() {
+      if (!getStoredAccessToken()) return
+      const res = await api.get('/auth/me')
+      if (res.errorCode === 'invalid_token' || res.errorCode === 'token_revoked') {
+        setUser(null)
+        setTeams([])
+      }
+    }
+
+    const interval = window.setInterval(ping, HEARTBEAT_MS)
+
+    function onVisibility() {
+      if (document.visibilityState === 'visible') {
+        ping()
+      }
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+    window.addEventListener('focus', ping)
+
+    return () => {
+      window.clearInterval(interval)
+      document.removeEventListener('visibilitychange', onVisibility)
+      window.removeEventListener('focus', ping)
+    }
+  }, [user])
+
   const selectTeam = useCallback(
     async (teamId: string) => {
       persistCurrentTeamId(teamId)
