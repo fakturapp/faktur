@@ -1,6 +1,18 @@
 import Link from 'next/link'
-import { ArrowRight, Key, Send, Webhook } from 'lucide-react'
+import {
+  AlertTriangle,
+  ArrowRight,
+  BookOpen,
+  ChevronRight,
+  CodeXml,
+  Compass,
+  Key,
+  ShieldCheck,
+  Sparkles,
+  Webhook,
+} from 'lucide-react'
 import { API_V2_BASE_URL, PLATFORM_URL } from '@/lib/config'
+import { Safari } from '@/components/safari-mockup'
 
 export const metadata = {
   title: 'Quickstart — Faktur Developers',
@@ -13,39 +25,65 @@ export default function Quickstart() {
       <p className="text-xs font-semibold uppercase tracking-wider text-violet-500">Quickstart</p>
       <h1 className="mt-2 text-4xl font-semibold tracking-tight">First call in 2 minutes</h1>
       <p className="mt-4 text-(--muted-foreground)">
-        This guide walks you from zero to your first authenticated API call. You&apos;ll need a
-        Faktur account with a team in <strong>Standard encryption mode</strong> — the API is not
-        available in Private mode.
+        Bienvenue. Ce guide t&apos;amène de zéro à ton premier appel API authentifié. Tu vas
+        générer une clé, vérifier ton identité, créer un client, puis émettre une facture. Tout se
+        fait en 5 étapes, sans installer de SDK.
       </p>
 
-      <Step number={1} title="Generate an API key" icon={Key}>
+      <Callout tone="warning" icon={AlertTriangle} title="Mode de chiffrement">
+        L&apos;API publique fonctionne uniquement avec une équipe en{' '}
+        <strong>chiffrement Standard</strong>. Si ton équipe est en mode Privé, l&apos;accès est
+        intentionnellement bloqué côté serveur car la DEK n&apos;est jamais déchiffrable sans ton
+        mot de passe. Bascule en mode Standard depuis les paramètres de ton équipe pour
+        continuer.
+      </Callout>
+
+      <Step number={1} title="Générer une clé API" accent="violet" icon={Key}>
         <p>
-          Open{' '}
+          Ouvre la{' '}
           <Link
-            href={`${PLATFORM_URL}/api-keys`}
+            href={`${PLATFORM_URL}/projects`}
             className="text-violet-500 underline-offset-2 hover:underline"
           >
-            Settings → API & Webhooks
-          </Link>{' '}
-          in your Faktur account and click <strong>Create key</strong>. Pick a name, choose the{' '}
-          <em>Read + write</em> preset, and finish the wizard.
+            plateforme développeur Faktur
+          </Link>
+          , sélectionne ton projet, puis clique sur <strong>Nouvelle clé</strong>. Donne lui un
+          nom parlant comme <code>Production Zapier</code>, choisis un préréglage
+          (Lecture seule, Accès complet, ou Personnalisé), puis valide.
         </p>
-        <p className="mt-3">
-          The key appears once and looks like <code>fk_live_…</code>. Copy it to a safe place — it
-          cannot be retrieved again.
+        <p>
+          La clé apparaît une seule fois sous la forme <code>fk_live_…</code>. Copie la dans un
+          gestionnaire de secrets immédiatement. Si tu la perds, tu peux la réinitialiser depuis
+          la page Paramètres de la clé. Aucune action ne peut la récupérer telle quelle.
         </p>
+
+        <BrowserPreview url="platform.fakturapp.cc/projects/prj_…/api-keys">
+          <div className="flex h-full flex-col items-center justify-center gap-3 p-8 text-center">
+            <span className="inline-flex size-10 items-center justify-center rounded-xl bg-violet-500/15 text-violet-500">
+              <Key className="size-5" />
+            </span>
+            <p className="text-sm font-semibold text-(--foreground)">Production Zapier</p>
+            <code className="rounded-md border border-(--border) bg-(--code-bg) px-3 py-1.5 font-mono text-xs text-(--muted-foreground)">
+              fk_live_•••••••••••••••AoOY
+            </code>
+            <p className="max-w-md text-xs text-(--muted-foreground)">
+              4 permissions accordées. Active. Aucune restriction IP.
+            </p>
+          </div>
+        </BrowserPreview>
       </Step>
 
-      <Step number={2} title="Verify your credentials" icon={Send}>
+      <Step number={2} title="Vérifier tes identifiants" accent="indigo" icon={ShieldCheck}>
         <p>
-          The <code>/api/v2/ping</code> endpoint returns your authenticated identity, scopes, and
-          rate limit tier.
+          L&apos;endpoint <code>/api/v2/ping</code> retourne ton identité, tes scopes et ton
+          tier de rate limit. C&apos;est l&apos;endpoint le plus rapide pour confirmer que ta
+          clé fonctionne avant de passer à la production.
         </p>
         <Code lang="bash">
           {`curl ${API_V2_BASE_URL}/ping \\
   -H "Authorization: Bearer fk_live_..."`}
         </Code>
-        <p className="mt-3">Sample response:</p>
+        <p>Réponse type :</p>
         <Code lang="json">
           {`{
   "data": {
@@ -68,8 +106,11 @@ export default function Quickstart() {
         </Code>
       </Step>
 
-      <Step number={3} title="Create a client" icon={ArrowRight}>
-        <p>Create a client to attach future invoices to.</p>
+      <Step number={3} title="Créer un client" accent="sky" icon={ArrowRight}>
+        <p>
+          Tu ne peux pas émettre de facture sans client associé. Voici une création minimale
+          pour une société française avec son SIREN.
+        </p>
         <Code lang="bash">
           {`curl ${API_V2_BASE_URL}/clients \\
   -X POST \\
@@ -82,14 +123,17 @@ export default function Quickstart() {
     "siren": "123456789"
   }'`}
         </Code>
-        <p className="mt-3">
-          Response includes a public ID like <code>clt_8KqL2x…</code>. Save it — you&apos;ll need it
-          for the next step.
+        <p>
+          La réponse contient un ID public stable comme <code>clt_8KqL2x…</code>. Conserve le, tu
+          en auras besoin à l&apos;étape suivante pour rattacher la facture.
         </p>
       </Step>
 
-      <Step number={4} title="Create an invoice" icon={Send}>
-        <p>Use the <code>client_id</code> from step 3 to issue your first invoice.</p>
+      <Step number={4} title="Émettre ta première facture" accent="emerald" icon={CodeXml}>
+        <p>
+          Reprends le <code>client_id</code> obtenu à l&apos;étape 3 et émets une facture avec
+          une ligne unique. Les montants sont en centimes, la TVA en pourcentage.
+        </p>
         <Code lang="bash">
           {`curl ${API_V2_BASE_URL}/invoices \\
   -X POST \\
@@ -109,84 +153,147 @@ export default function Quickstart() {
     ]
   }'`}
         </Code>
-      </Step>
-
-      <Step number={5} title="Listen to webhooks (optional)" icon={Webhook}>
         <p>
-          Configure a webhook endpoint to receive events when invoices are sent, paid, or
-          overdue. From the dashboard, go to your key&apos;s detail page → Webhook tab → enter
-          your URL → select events → save.
-        </p>
-        <p className="mt-3">
-          Every delivery is HMAC-SHA256 signed and includes anti-replay timestamps. See the{' '}
-          <Link href="/concepts/webhooks" className="text-violet-500 hover:underline">
-            webhooks guide
-          </Link>{' '}
-          for verification code.
+          Faktur calcule automatiquement les totaux HT, TVA et TTC. La facture sort en statut
+          brouillon. Pour la finaliser et déclencher l&apos;envoi par email au client, appelle
+          ensuite <code>POST /invoices/:id/finalize</code>.
         </p>
       </Step>
 
-      <div className="mt-12 rounded-2xl border border-(--border) bg-(--muted)/40 p-6">
-        <h2 className="text-lg font-semibold">Next steps</h2>
-        <ul className="mt-3 space-y-2 text-sm">
-          <li>
-            →{' '}
-            <Link href="/resources/invoices" className="text-violet-500 hover:underline">
-              Browse the full reference
-            </Link>{' '}
-            for every endpoint
-          </li>
-          <li>
-            →{' '}
-            <Link href="/concepts/authentication" className="text-violet-500 hover:underline">
-              Authentication deep dive
-            </Link>{' '}
-            (scopes, IP allowlists, rotation)
-          </li>
-          <li>
-            →{' '}
-            <Link href="/recipes" className="text-violet-500 hover:underline">
-              Recipes
-            </Link>{' '}
-            — auto-create invoices from Stripe, sync CRM, weekly reports
-          </li>
-          <li>
-            →{' '}
-            <Link href="/concepts/errors" className="text-violet-500 hover:underline">
-              Error handling
-            </Link>{' '}
-            and the full code catalog
-          </li>
-        </ul>
+      <Step number={5} title="Écouter les webhooks (optionnel)" accent="amber" icon={Webhook}>
+        <p>
+          Pour réagir en temps réel aux événements (facture envoyée, payée, en retard),
+          configure un webhook sur ta clé. Depuis la plateforme, ouvre la page de ta clé puis
+          l&apos;onglet <strong>Webhook</strong>. Saisis l&apos;URL HTTPS de ton endpoint,
+          choisis les événements avec le sélecteur Stripe-style, puis enregistre.
+        </p>
+        <p>
+          Chaque livraison est signée en HMAC-SHA256 avec ton secret et inclut un horodatage
+          anti-rejeu. Tu peux personnaliser le nombre de tentatives, le timeout, le backoff
+          et les en-têtes HTTP custom depuis la section{' '}
+          <em>Configuration de livraison</em>. Voir le guide{' '}
+          <Link href="/concepts/webhooks" className="text-violet-500 hover:underline">
+            Webhooks
+          </Link>{' '}
+          pour le code de vérification de signature.
+        </p>
+      </Step>
+
+      <h2 id="next-steps" className="mt-16 text-2xl font-semibold tracking-tight">
+        Et après ?
+      </h2>
+      <p className="mt-2 text-(--muted-foreground)">
+        Tu as les fondations. Voici les guides à parcourir maintenant pour aller plus loin.
+      </p>
+
+      <div className="mt-6 grid gap-3 sm:grid-cols-2">
+        <NextStepCard
+          href="/resources/invoices"
+          icon={BookOpen}
+          title="Référence API complète"
+          description="Chaque endpoint, chaque champ, chaque code d'erreur."
+          tone="violet"
+        />
+        <NextStepCard
+          href="/concepts/authentication"
+          icon={ShieldCheck}
+          title="Authentification en profondeur"
+          description="Scopes, restrictions IP, rotation, clés de grâce."
+          tone="indigo"
+        />
+        <NextStepCard
+          href="/recipes"
+          icon={Sparkles}
+          title="Recettes"
+          description="Sync Stripe vers Faktur, exports CRM, rapports hebdo."
+          tone="emerald"
+        />
+        <NextStepCard
+          href="/concepts/errors"
+          icon={Compass}
+          title="Gestion des erreurs"
+          description="Catalogue complet des codes et stratégies de retry."
+          tone="amber"
+        />
       </div>
     </div>
   )
+}
+
+/* ─────────────────────────── Step ─────────────────────────── */
+
+type Accent = 'violet' | 'indigo' | 'sky' | 'emerald' | 'amber'
+
+const ACCENT_CLASSES: Record<
+  Accent,
+  { border: string; badge: string; badgeText: string; line: string }
+> = {
+  violet: {
+    border: 'border-violet-500/30',
+    badge: 'bg-violet-500/15',
+    badgeText: 'text-violet-500',
+    line: 'bg-violet-500/30',
+  },
+  indigo: {
+    border: 'border-indigo-500/30',
+    badge: 'bg-indigo-500/15',
+    badgeText: 'text-indigo-500',
+    line: 'bg-indigo-500/30',
+  },
+  sky: {
+    border: 'border-sky-500/30',
+    badge: 'bg-sky-500/15',
+    badgeText: 'text-sky-500',
+    line: 'bg-sky-500/30',
+  },
+  emerald: {
+    border: 'border-emerald-500/30',
+    badge: 'bg-emerald-500/15',
+    badgeText: 'text-emerald-500',
+    line: 'bg-emerald-500/30',
+  },
+  amber: {
+    border: 'border-amber-500/30',
+    badge: 'bg-amber-500/15',
+    badgeText: 'text-amber-500',
+    line: 'bg-amber-500/30',
+  },
 }
 
 function Step({
   number,
   title,
   icon: Icon,
+  accent = 'violet',
   children,
 }: {
   number: number
   title: string
   icon: typeof Key
+  accent?: Accent
   children: React.ReactNode
 }) {
+  const acc = ACCENT_CLASSES[accent]
   return (
-    <section className="mt-10 border-l-2 border-violet-500/30 pl-6">
-      <div className="flex items-center gap-3">
-        <span className="inline-flex size-7 items-center justify-center rounded-full bg-violet-500/15 text-xs font-semibold text-violet-500">
+    <section className="relative mt-12 pl-12">
+      <span aria-hidden className={`absolute left-[14px] top-9 bottom-0 w-px ${acc.line}`} />
+      <div className="relative flex items-center gap-3">
+        <span
+          className={`absolute -left-12 inline-flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ring-4 ring-(--background) ${acc.badge} ${acc.badgeText}`}
+        >
           {number}
         </span>
-        <h2 className="text-xl font-semibold">{title}</h2>
-        <Icon className="size-4 text-(--muted-foreground)" />
+        <h2 className="m-0 text-xl font-semibold leading-tight">{title}</h2>
+        <span className={`inline-flex size-5 items-center justify-center ${acc.badgeText}`}>
+          <Icon className="size-4" />
+        </span>
       </div>
-      <div className="mt-4 space-y-3 text-sm leading-relaxed">{children}</div>
+      <div className="mt-3 space-y-3 text-sm leading-relaxed">{children}</div>
     </section>
   )
 }
+
+/* ─────────────────────────── Code ─────────────────────────── */
 
 function Code({ children, lang }: { children: string; lang: string }) {
   return (
@@ -200,5 +307,119 @@ function Code({ children, lang }: { children: string; lang: string }) {
         <code>{children}</code>
       </pre>
     </div>
+  )
+}
+
+/* ─────────────────────────── Callout ─────────────────────────── */
+
+function Callout({
+  tone,
+  icon: Icon,
+  title,
+  children,
+}: {
+  tone: 'warning' | 'info'
+  icon: typeof Key
+  title: string
+  children: React.ReactNode
+}) {
+  const styles =
+    tone === 'warning'
+      ? 'border-amber-500/30 bg-amber-500/5'
+      : 'border-sky-500/30 bg-sky-500/5'
+  const iconColor = tone === 'warning' ? 'text-amber-500' : 'text-sky-500'
+  return (
+    <div className={`mt-6 rounded-xl border ${styles} p-4`}>
+      <div className="flex items-start gap-3">
+        <span className={`mt-0.5 inline-flex size-5 shrink-0 items-center justify-center ${iconColor}`}>
+          <Icon className="size-4" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold text-(--foreground)">{title}</p>
+          <div className="mt-1 text-sm text-(--muted-foreground)">{children}</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ─────────────────────────── Safari preview ─────────────────────────── */
+
+function BrowserPreview({ url, children }: { url: string; children: React.ReactNode }) {
+  return (
+    <div className="mt-4 overflow-hidden rounded-xl border border-(--border) bg-(--muted)/20">
+      <Safari url={url} width={1203} height={400} className="block h-auto w-full" />
+      <div className="-mt-[348px] mb-4 px-1">
+        <div className="mx-auto max-w-3xl">
+          <div className="rounded-xl bg-(--background) shadow-sm ring-1 ring-(--border)">
+            {children}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ─────────────────────────── NextStepCard ─────────────────────────── */
+
+const TONE_CARDS: Record<
+  Accent,
+  { iconBg: string; iconText: string; hover: string }
+> = {
+  violet: {
+    iconBg: 'bg-violet-500/15',
+    iconText: 'text-violet-500',
+    hover: 'hover:border-violet-500/50 hover:bg-violet-500/5',
+  },
+  indigo: {
+    iconBg: 'bg-indigo-500/15',
+    iconText: 'text-indigo-500',
+    hover: 'hover:border-indigo-500/50 hover:bg-indigo-500/5',
+  },
+  sky: {
+    iconBg: 'bg-sky-500/15',
+    iconText: 'text-sky-500',
+    hover: 'hover:border-sky-500/50 hover:bg-sky-500/5',
+  },
+  emerald: {
+    iconBg: 'bg-emerald-500/15',
+    iconText: 'text-emerald-500',
+    hover: 'hover:border-emerald-500/50 hover:bg-emerald-500/5',
+  },
+  amber: {
+    iconBg: 'bg-amber-500/15',
+    iconText: 'text-amber-500',
+    hover: 'hover:border-amber-500/50 hover:bg-amber-500/5',
+  },
+}
+
+function NextStepCard({
+  href,
+  icon: Icon,
+  title,
+  description,
+  tone,
+}: {
+  href: string
+  icon: typeof Key
+  title: string
+  description: string
+  tone: Accent
+}) {
+  const t = TONE_CARDS[tone]
+  return (
+    <Link
+      href={href}
+      className={`group relative flex items-start gap-3 rounded-xl border border-(--border) bg-(--background) p-4 transition-colors ${t.hover}`}
+    >
+      <span className={`inline-flex size-9 shrink-0 items-center justify-center rounded-lg ${t.iconBg} ${t.iconText}`}>
+        <Icon className="size-4" />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-semibold text-(--foreground)">{title}</p>
+        <p className="mt-0.5 text-xs text-(--muted-foreground)">{description}</p>
+      </div>
+      <ChevronRight className="size-4 shrink-0 text-(--muted-foreground) transition-transform group-hover:translate-x-0.5" />
+    </Link>
   )
 }
