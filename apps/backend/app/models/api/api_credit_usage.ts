@@ -37,6 +37,9 @@ export default class ApiCreditUsage extends BaseModel {
   @column()
   declare sessionCount: number
 
+  @column.dateTime()
+  declare weeklyStartedAt: DateTime | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
