@@ -74,7 +74,7 @@ export default function ProjectOverviewPage() {
 
   if (!project) {
     return (
-      <div className="space-y-6 px-4 lg:px-6 py-6 max-w-5xl mx-auto">
+      <div className="space-y-6 px-4 lg:px-6 pt-16 md:pt-20 pb-12 max-w-5xl mx-auto">
         <Skeleton className="h-6 w-48" />
         <Skeleton className="h-32 w-full" />
       </div>
@@ -94,7 +94,7 @@ export default function ProjectOverviewPage() {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-6 px-4 lg:px-6 py-6 max-w-5xl mx-auto w-full"
+      className="space-y-6 px-4 lg:px-6 pt-16 md:pt-20 pb-12 max-w-5xl mx-auto w-full"
     >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">

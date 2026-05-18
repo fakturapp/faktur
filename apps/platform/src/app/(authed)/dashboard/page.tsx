@@ -63,7 +63,7 @@ export default function DashboardHomePage() {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-8 px-4 lg:px-6 py-6 md:py-8 max-w-5xl mx-auto w-full"
+      className="space-y-8 px-4 lg:px-6 pt-16 md:pt-20 pb-12 max-w-5xl mx-auto w-full"
     >
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-foreground">

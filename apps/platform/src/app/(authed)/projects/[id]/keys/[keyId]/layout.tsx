@@ -83,7 +83,7 @@ export default function ApiKeyLayout({ children }: { children: ReactNode }) {
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="space-y-6 px-4 lg:px-6 py-6 max-w-5xl mx-auto w-full"
+        className="space-y-6 px-4 lg:px-6 pt-16 md:pt-20 pb-12 max-w-5xl mx-auto w-full"
       >
         <KeyHeader />
         {children}
