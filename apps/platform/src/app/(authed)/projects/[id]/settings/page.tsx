@@ -156,28 +156,27 @@ export default function ProjectSettingsPage() {
         </CardContent>
       </Card>
 
-      {!project.is_default && (
-        <Card className="border-danger/30 bg-danger/5">
-          <CardContent className="p-5">
-            <h2 className="text-sm font-semibold text-foreground">Zone dangereuse</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              La suppression est définitive. Le projet doit être vide (aucune clé active) pour
-              pouvoir être supprimé.
-            </p>
-            <div className="mt-4">
-              <Button
-                variant="danger"
-                size="sm"
-                onClick={() => setConfirmDelete(true)}
-                disabled={deleting}
-              >
-                <Trash2 className="h-3.5 w-3.5 mr-1.5" />
-                Supprimer le projet
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      <Card className={project.is_default ? 'border-border/50' : 'border-danger/30 bg-danger/5'}>
+        <CardContent className="p-5">
+          <h2 className="text-sm font-semibold text-foreground">Zone dangereuse</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {project.is_default
+              ? 'Ce projet ne peut pas être supprimé car il s’agit du projet par défaut de votre équipe.'
+              : 'La suppression est définitive. Le projet doit être vide (aucune clé active) pour pouvoir être supprimé.'}
+          </p>
+          <div className="mt-4">
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={() => setConfirmDelete(true)}
+              disabled={deleting || project.is_default}
+            >
+              <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+              Supprimer le projet
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       <Dialog open={confirmDelete} onClose={closeDeleteModal} className="max-w-md">
         <DialogHeader showClose={false}>
