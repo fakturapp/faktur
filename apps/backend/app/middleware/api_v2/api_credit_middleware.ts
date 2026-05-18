@@ -3,7 +3,15 @@ import type { NextFn } from '@adonisjs/core/types/http'
 import apiCreditService, { CREDIT_LIMITS } from '#services/api/api_credit_service'
 import apiResponse from '#services/api/api_response'
 
-const SKIP_PATH_SUFFIXES = ['/ping', '/openapi.json', '/openapi.yaml', '/docs']
+const SKIP_PATH_SUFFIXES = [
+  '/ping',
+  '/session',
+  '/openapi.json',
+  '/openapi.yaml',
+  '/openapi',
+  '/docs',
+  '/health',
+]
 
 export default class ApiCreditMiddleware {
   async handle(ctx: HttpContext, next: NextFn) {
