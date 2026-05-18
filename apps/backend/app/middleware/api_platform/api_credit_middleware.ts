@@ -6,6 +6,7 @@ import apiResponse from '#services/api/api_response'
 const SKIP_PATH_SUFFIXES = [
   '/ping',
   '/session',
+  '/usage',
   '/openapi.json',
   '/openapi.yaml',
   '/openapi',
