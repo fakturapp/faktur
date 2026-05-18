@@ -20,7 +20,8 @@ export default class ApiCreditMiddleware {
 
     const check = await apiCreditService.check(teamId, userId)
 
-    ctx.response.header('X-Credits-Daily-Limit', String(CREDIT_LIMITS.PER_DAY))
+    ctx.response.header('X-Credits-Session-Limit', String(CREDIT_LIMITS.PER_SESSION))
+    ctx.response.header('X-Credits-Session-Window-Hours', String(CREDIT_LIMITS.SESSION_HOURS))
     ctx.response.header('X-Credits-Weekly-Limit', String(CREDIT_LIMITS.PER_WEEK))
     ctx.response.header('X-Credits-Per-Minute-Limit', String(CREDIT_LIMITS.PER_MINUTE))
 
@@ -34,7 +35,8 @@ export default class ApiCreditMiddleware {
           retry_after_seconds: check.retry_after_seconds,
           limits: {
             per_minute: CREDIT_LIMITS.PER_MINUTE,
-            per_day: CREDIT_LIMITS.PER_DAY,
+            per_session: CREDIT_LIMITS.PER_SESSION,
+            session_hours: CREDIT_LIMITS.SESSION_HOURS,
             per_week: CREDIT_LIMITS.PER_WEEK,
           },
         },
@@ -42,7 +44,7 @@ export default class ApiCreditMiddleware {
       )
     }
 
-    ctx.response.header('X-Credits-Daily-Remaining', String(check.daily_remaining))
+    ctx.response.header('X-Credits-Session-Remaining', String(check.session_remaining))
     ctx.response.header('X-Credits-Weekly-Remaining', String(check.weekly_remaining))
     ctx.response.header('X-Credits-Minute-Remaining', String(check.minute_remaining))
 

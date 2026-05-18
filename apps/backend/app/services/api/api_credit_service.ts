@@ -3,13 +3,23 @@ import ApiCreditUsage from '#models/api/api_credit_usage'
 
 export const CREDIT_LIMITS = {
   PER_MINUTE: 3,
-  PER_DAY: 100,
+  SESSION_HOURS: 5,
+  PER_SESSION: 100,
   PER_WEEK: 1000,
 } as const
 
 export type CreditCheckResult =
-  | { ok: true; daily_remaining: number; weekly_remaining: number; minute_remaining: number }
-  | { ok: false; reason: 'rate_limit_minute' | 'quota_daily' | 'quota_weekly'; retry_after_seconds: number }
+  | {
+      ok: true
+      session_remaining: number
+      weekly_remaining: number
+      minute_remaining: number
+    }
+  | {
+      ok: false
+      reason: 'rate_limit_minute' | 'quota_session' | 'quota_weekly'
+      retry_after_seconds: number
+    }
 
 function isoWeekStart(now: DateTime): DateTime {
   return now.toUTC().startOf('week')
@@ -19,8 +29,17 @@ function isoDay(now: DateTime): DateTime {
   return now.toUTC().startOf('day')
 }
 
+function sessionExpired(startedAt: DateTime | null, now: DateTime): boolean {
+  if (!startedAt) return true
+  return now.diff(startedAt, 'hours').hours >= CREDIT_LIMITS.SESSION_HOURS
+}
+
 class ApiCreditService {
-  async getOrCreateRow(teamId: string, userId: string | null, now: DateTime): Promise<ApiCreditUsage> {
+  async getOrCreateRow(
+    teamId: string,
+    userId: string | null,
+    now: DateTime
+  ): Promise<ApiCreditUsage> {
     const day = isoDay(now)
     const weekStart = isoWeekStart(now)
 
@@ -51,6 +70,8 @@ class ApiCreditService {
       weeklyCount,
       lastMinuteAt: null,
       minuteCount: 0,
+      sessionStartedAt: null,
+      sessionCount: 0,
     })
     return row
   }
@@ -61,8 +82,27 @@ class ApiCreditService {
       .where('weekStart', weekStart.toSQLDate()!)
       .sum('daily_count as total')
       .first()
-    const raw = (result as unknown as { $extras?: { total?: string | number } } | null)?.$extras?.total
+    const raw = (result as unknown as { $extras?: { total?: string | number } } | null)?.$extras
+      ?.total
     return raw ? Number(raw) : 0
+  }
+
+  async findActiveSession(
+    teamId: string,
+    now: DateTime
+  ): Promise<{ startedAt: DateTime; count: number; row: ApiCreditUsage } | null> {
+    const cutoff = now.minus({ hours: CREDIT_LIMITS.SESSION_HOURS })
+    const recent = await ApiCreditUsage.query()
+      .where('teamId', teamId)
+      .whereNotNull('sessionStartedAt')
+      .where('sessionStartedAt', '>=', cutoff.toSQL()!)
+      .orderBy('sessionStartedAt', 'desc')
+      .first()
+
+    if (!recent || !recent.sessionStartedAt) return null
+    if (sessionExpired(recent.sessionStartedAt, now)) return null
+
+    return { startedAt: recent.sessionStartedAt, count: recent.sessionCount, row: recent }
   }
 
   async check(teamId: string, userId: string | null): Promise<CreditCheckResult> {
@@ -76,12 +116,14 @@ class ApiCreditService {
       }
     }
 
-    if (row.dailyCount >= CREDIT_LIMITS.PER_DAY) {
-      const tomorrow = isoDay(now).plus({ days: 1 })
+    const session = await this.findActiveSession(teamId, now)
+    const sessionCount = session?.count ?? 0
+    if (sessionCount >= CREDIT_LIMITS.PER_SESSION) {
+      const expiresAt = session!.startedAt.plus({ hours: CREDIT_LIMITS.SESSION_HOURS })
       return {
         ok: false,
-        reason: 'quota_daily',
-        retry_after_seconds: Math.max(1, Math.floor(tomorrow.diff(now, 'seconds').seconds)),
+        reason: 'quota_session',
+        retry_after_seconds: Math.max(1, Math.floor(expiresAt.diff(now, 'seconds').seconds)),
       }
     }
 
@@ -96,7 +138,7 @@ class ApiCreditService {
 
     return {
       ok: true,
-      daily_remaining: Math.max(0, CREDIT_LIMITS.PER_DAY - row.dailyCount),
+      session_remaining: Math.max(0, CREDIT_LIMITS.PER_SESSION - sessionCount),
       weekly_remaining: Math.max(0, CREDIT_LIMITS.PER_WEEK - row.weeklyCount),
       minute_remaining: Math.max(
         0,
@@ -117,6 +159,18 @@ class ApiCreditService {
 
     row.minuteCount = withinMinute ? row.minuteCount + amount : amount
     row.lastMinuteAt = now
+
+    const activeSession = await this.findActiveSession(teamId, now)
+    if (activeSession && activeSession.row.id === row.id) {
+      row.sessionCount += amount
+    } else if (activeSession) {
+      activeSession.row.sessionCount += amount
+      await activeSession.row.save()
+    } else {
+      row.sessionStartedAt = now
+      row.sessionCount = amount
+    }
+
     row.dailyCount += amount
     row.weeklyCount += amount
     if (userId && !row.userId) row.userId = userId
@@ -124,28 +178,39 @@ class ApiCreditService {
   }
 
   async getUsage(teamId: string): Promise<{
-    daily: { used: number; limit: number; remaining: number; reset_at: string }
+    session: {
+      used: number
+      limit: number
+      remaining: number
+      started_at: string | null
+      reset_at: string | null
+      hours_window: number
+      active: boolean
+    }
     weekly: { used: number; limit: number; remaining: number; reset_at: string }
     per_minute: { limit: number }
   }> {
     const now = DateTime.utc()
-    const day = isoDay(now)
     const weekStart = isoWeekStart(now)
 
-    const todayRow = await ApiCreditUsage.query()
-      .where('teamId', teamId)
-      .where('day', day.toSQLDate()!)
-      .first()
+    const session = await this.findActiveSession(teamId, now)
+    const sessionUsed = session?.count ?? 0
+    const sessionStartedAt = session?.startedAt ?? null
+    const sessionResetAt = sessionStartedAt
+      ? sessionStartedAt.plus({ hours: CREDIT_LIMITS.SESSION_HOURS })
+      : null
+
     const weekly = await this.recomputeWeeklyTotal(teamId, weekStart)
 
-    const dailyUsed = todayRow?.dailyCount ?? 0
-
     return {
-      daily: {
-        used: dailyUsed,
-        limit: CREDIT_LIMITS.PER_DAY,
-        remaining: Math.max(0, CREDIT_LIMITS.PER_DAY - dailyUsed),
-        reset_at: day.plus({ days: 1 }).toISO()!,
+      session: {
+        used: sessionUsed,
+        limit: CREDIT_LIMITS.PER_SESSION,
+        remaining: Math.max(0, CREDIT_LIMITS.PER_SESSION - sessionUsed),
+        started_at: sessionStartedAt ? sessionStartedAt.toISO() : null,
+        reset_at: sessionResetAt ? sessionResetAt.toISO() : null,
+        hours_window: CREDIT_LIMITS.SESSION_HOURS,
+        active: Boolean(sessionStartedAt),
       },
       weekly: {
         used: weekly,
