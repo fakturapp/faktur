@@ -31,6 +31,12 @@ export default class ApiCreditUsage extends BaseModel {
   @column()
   declare minuteCount: number
 
+  @column.dateTime()
+  declare sessionStartedAt: DateTime | null
+
+  @column()
+  declare sessionCount: number
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
