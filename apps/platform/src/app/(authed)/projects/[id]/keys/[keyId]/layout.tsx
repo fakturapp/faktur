@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, type ReactNode } from 'react'
+import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { RefreshCw, Trash2, AlertTriangle } from 'lucide-react'
+import { RefreshCw, Settings, Trash2, AlertTriangle } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -103,41 +104,49 @@ function KeyHeader() {
                 {apiKey.masked_token}
               </p>
             </div>
-            {isActive && (
-              <div className="flex shrink-0 items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setResetConfirmOpen(true)}
-                  disabled={rotating}
-                >
-                  {rotating ? (
-                    <>
-                      <Spinner />
-                      Réinitialisation...
-                    </>
-                  ) : (
-                    <>
-                      <RefreshCw className="h-4 w-4 mr-2" />
-                      Réinitialiser la clé
-                    </>
-                  )}
+            <div className="flex shrink-0 items-center gap-2">
+              {isActive && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setResetConfirmOpen(true)}
+                    disabled={rotating}
+                  >
+                    {rotating ? (
+                      <>
+                        <Spinner />
+                        Réinitialisation...
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                        Réinitialiser
+                      </>
+                    )}
+                  </Button>
+                  <Button variant="danger" size="sm" onClick={handleRevoke} disabled={revoking}>
+                    {revoking ? (
+                      <>
+                        <Spinner />
+                        Révocation...
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Révoquer
+                      </>
+                    )}
+                  </Button>
+                </>
+              )}
+              <Link href={`/projects/${params.id}/keys/${params.keyId}/settings`}>
+                <Button variant="outline" size="sm">
+                  <Settings className="h-4 w-4 mr-2" />
+                  Paramètres
                 </Button>
-                <Button variant="danger" size="sm" onClick={handleRevoke} disabled={revoking}>
-                  {revoking ? (
-                    <>
-                      <Spinner />
-                      Révocation...
-                    </>
-                  ) : (
-                    <>
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Révoquer
-                    </>
-                  )}
-                </Button>
-              </div>
-            )}
+              </Link>
+            </div>
           </div>
         </CardContent>
       </Card>
