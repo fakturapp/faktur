@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import {
   Archive,
@@ -52,6 +53,7 @@ function formatRelative(iso: string | null): string {
 }
 
 export default function ProjectsPage() {
+  const router = useRouter()
   const { toast } = useToast()
   const { projects, loading, reload } = useProjects()
   const [createOpen, setCreateOpen] = useState(false)
@@ -93,15 +95,17 @@ export default function ProjectsPage() {
       description: description.trim() || null,
     })
     setSubmitting(false)
-    if (res.error) {
-      toast(res.error, 'error')
+    if (res.error || !res.data?.data) {
+      toast(res.error || 'Échec de la création', 'error')
       return
     }
     toast('Projet créé', 'success')
+    const created = res.data.data
     setCreateOpen(false)
     setName('')
     setDescription('')
-    reload()
+    await reload()
+    router.push(`/projects/${created.id}`)
   }
 
   function openContextMenu(e: React.MouseEvent, project: ApiProjectShape) {
