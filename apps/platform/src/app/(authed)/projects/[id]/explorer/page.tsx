@@ -28,7 +28,7 @@ import { apiKeysClient, type ApiKeyShape } from '@/lib/api-keys-client'
 import { apiProjectsClient } from '@/lib/api-projects-client'
 import { API_BASE_URL } from '@/lib/oauth-config'
 
-const API_V2_BASE_URL = API_BASE_URL.replace(/\/api\/v1$/, '/api/v2')
+const API_PLATFORM_BASE_URL = API_BASE_URL.replace(/\/api\/v1$/, '/api/platform')
 
 const METHODS = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'] as const
 type HttpMethod = (typeof METHODS)[number]
@@ -236,7 +236,7 @@ export default function ExplorerPage() {
   const fullUrl = useMemo(() => {
     const p = path.startsWith('/') ? path : `/${path}`
     const qs = query.trim()
-    return `${API_V2_BASE_URL}${p}${qs ? (qs.startsWith('?') ? qs : `?${qs}`) : ''}`
+    return `${API_PLATFORM_BASE_URL}${p}${qs ? (qs.startsWith('?') ? qs : `?${qs}`) : ''}`
   }, [path, query])
 
   const hasBody = method !== 'GET' && method !== 'DELETE'
