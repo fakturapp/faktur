@@ -1,13 +1,19 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Send, RefreshCw, Trash2, Check, Webhook, Plus, ArrowLeft } from 'lucide-react'
+import { Send, RefreshCw, Trash2, Webhook, Plus, ArrowLeft, Search } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { Field, FieldLabel, FieldDescription } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { FormSelect } from '@/components/ui/dropdown'
+import {
+  CheckboxRoot,
+  CheckboxControl,
+  CheckboxIndicator,
+} from '@/components/ui/checkbox'
 import {
   Dialog,
   DialogHeader,
@@ -23,6 +29,11 @@ import {
   type ScopesCatalog,
 } from '@/lib/api-keys-client'
 import { RevealedKeyDialog } from '@/components/api-keys/revealed-key-dialog'
+import {
+  WEBHOOK_PRESETS,
+  humanizeWebhookEvent,
+  resolveWebhookPreset,
+} from '@/lib/webhook-events-humanizer'
 
 interface Props {
   apiKey: ApiKeyShape
@@ -59,6 +70,31 @@ export function WebhookConfigPanel({ apiKey, webhook, onChanged }: Props) {
     setEvents(new Set(webhook?.events ?? []))
   }, [webhook])
 
+  const [preset, setPreset] = useState<string>('custom')
+
+  function detectPreset(currentEvents: string[], allEvents: string[]): string {
+    for (const p of WEBHOOK_PRESETS) {
+      if (p.id === 'custom') continue
+      const target = resolveWebhookPreset(allEvents, p.id).sort().join(',')
+      const actual = [...currentEvents].sort().join(',')
+      if (target && target === actual) return p.id
+    }
+    return 'custom'
+  }
+
+  useEffect(() => {
+    if (!catalog) return
+    setPreset(detectPreset(Array.from(events), catalog.webhook_events))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [catalog])
+
+  function changePreset(next: string) {
+    setPreset(next)
+    if (!catalog) return
+    if (next === 'custom') return
+    setEvents(new Set(resolveWebhookPreset(catalog.webhook_events, next)))
+  }
+
   function toggleEvent(e: string) {
     setEvents((prev) => {
       const next = new Set(prev)
@@ -66,18 +102,7 @@ export function WebhookConfigPanel({ apiKey, webhook, onChanged }: Props) {
       else next.add(e)
       return next
     })
-  }
-
-  function toggleCategory(eventsInCat: string[]) {
-    setEvents((prev) => {
-      const next = new Set(prev)
-      const allSelected = eventsInCat.every((e) => next.has(e))
-      eventsInCat.forEach((e) => {
-        if (allSelected) next.delete(e)
-        else next.add(e)
-      })
-      return next
-    })
+    setPreset('custom')
   }
 
   async function handleSave(payload: { url: string; events: string[] }) {
@@ -283,54 +308,14 @@ export function WebhookConfigPanel({ apiKey, webhook, onChanged }: Props) {
           </h2>
         </div>
         <Card className="border-border/50">
-          <CardContent className="p-5">
-            {catalog === null ? (
-              <div className="flex justify-center py-8">
-                <Spinner />
-              </div>
-            ) : (
-              <div className="space-y-5">
-                {Object.entries(catalog.webhook_event_categories).map(([category, evs]) => {
-                  const allSelected = evs.every((e) => events.has(e))
-                  return (
-                    <div key={category}>
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                          {category}
-                        </h4>
-                        <button
-                          type="button"
-                          onClick={() => toggleCategory(evs)}
-                          className="text-xs text-accent hover:underline"
-                        >
-                          {allSelected ? 'Tout déselectionner' : 'Tout sélectionner'}
-                        </button>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5">
-                        {evs.map((event) => {
-                          const active = events.has(event)
-                          return (
-                            <button
-                              key={event}
-                              type="button"
-                              onClick={() => toggleEvent(event)}
-                              className={`rounded-md border px-2 py-1 font-mono text-xs transition-colors ${
-                                active
-                                  ? 'border-accent bg-accent-soft text-foreground'
-                                  : 'border-border/50 hover:bg-surface-hover'
-                              }`}
-                            >
-                              {active && <Check className="mr-1 inline-block h-3 w-3" />}
-                              {event}
-                            </button>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
+          <CardContent className="p-5 space-y-4">
+            <WebhookEventPicker
+              catalog={catalog}
+              preset={preset}
+              onPresetChange={changePreset}
+              selectedEvents={events}
+              onToggleEvent={toggleEvent}
+            />
           </CardContent>
         </Card>
       </div>
@@ -434,14 +419,27 @@ function CreateWebhookDialog({
   const [step, setStep] = useState<1 | 2>(1)
   const [url, setUrl] = useState('')
   const [events, setEvents] = useState<Set<string>>(new Set())
+  const [preset, setPreset] = useState<string>('all')
 
   useEffect(() => {
     if (!open) {
       setStep(1)
       setUrl('')
       setEvents(new Set())
+      setPreset('all')
+      return
     }
-  }, [open])
+    if (catalog) {
+      setEvents(new Set(resolveWebhookPreset(catalog.webhook_events, 'all')))
+    }
+  }, [open, catalog])
+
+  function changePreset(next: string) {
+    setPreset(next)
+    if (!catalog) return
+    if (next === 'custom') return
+    setEvents(new Set(resolveWebhookPreset(catalog.webhook_events, next)))
+  }
 
   function toggleEvent(e: string) {
     setEvents((prev) => {
@@ -450,26 +448,13 @@ function CreateWebhookDialog({
       else next.add(e)
       return next
     })
-  }
-
-  function toggleCategory(eventsInCat: string[]) {
-    setEvents((prev) => {
-      const next = new Set(prev)
-      const allSelected = eventsInCat.every((e) => next.has(e))
-      eventsInCat.forEach((e) => {
-        if (allSelected) next.delete(e)
-        else next.add(e)
-      })
-      return next
-    })
+    setPreset('custom')
   }
 
   return (
     <Dialog open={open} onClose={onClose} className="max-w-2xl">
       <DialogHeader onClose={onClose}>
-        <DialogTitle>
-          Nouveau webhook · Étape {step}/2
-        </DialogTitle>
+        <DialogTitle>Nouveau webhook · Étape {step}/2</DialogTitle>
         <DialogDescription>
           {step === 1
             ? "Saisissez l'URL de destination."
@@ -496,54 +481,14 @@ function CreateWebhookDialog({
       )}
 
       {step === 2 && (
-        <div className="mt-4 max-h-[60vh] overflow-y-auto pr-1">
-          {catalog === null ? (
-            <div className="flex justify-center py-8">
-              <Spinner />
-            </div>
-          ) : (
-            <div className="space-y-5">
-              {Object.entries(catalog.webhook_event_categories).map(([category, evs]) => {
-                const allSelected = evs.every((e) => events.has(e))
-                return (
-                  <div key={category}>
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                        {category}
-                      </h4>
-                      <button
-                        type="button"
-                        onClick={() => toggleCategory(evs)}
-                        className="text-xs text-accent hover:underline"
-                      >
-                        {allSelected ? 'Tout déselectionner' : 'Tout sélectionner'}
-                      </button>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {evs.map((event) => {
-                        const active = events.has(event)
-                        return (
-                          <button
-                            key={event}
-                            type="button"
-                            onClick={() => toggleEvent(event)}
-                            className={`rounded-md border px-2 py-1 font-mono text-xs transition-colors ${
-                              active
-                                ? 'border-accent bg-accent-soft text-foreground'
-                                : 'border-border/50 hover:bg-surface-hover'
-                            }`}
-                          >
-                            {active && <Check className="mr-1 inline-block h-3 w-3" />}
-                            {event}
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          )}
+        <div className="mt-4">
+          <WebhookEventPicker
+            catalog={catalog}
+            preset={preset}
+            onPresetChange={changePreset}
+            selectedEvents={events}
+            onToggleEvent={toggleEvent}
+          />
         </div>
       )}
 
@@ -578,5 +523,135 @@ function CreateWebhookDialog({
         )}
       </DialogFooter>
     </Dialog>
+  )
+}
+
+/* ─────────────────────────── Event picker (shared) ─────────────────────────── */
+
+interface WebhookEventPickerProps {
+  catalog: ScopesCatalog | null
+  preset: string
+  onPresetChange: (next: string) => void
+  selectedEvents: Set<string>
+  onToggleEvent: (event: string) => void
+}
+
+function WebhookEventPicker({
+  catalog,
+  preset,
+  onPresetChange,
+  selectedEvents,
+  onToggleEvent,
+}: WebhookEventPickerProps) {
+  const [search, setSearch] = useState('')
+
+  const locked = preset !== 'custom'
+
+  const filtered = useMemo(() => {
+    if (!catalog) return [] as Array<{ category: string; events: string[] }>
+    const q = search.trim().toLowerCase()
+    return Object.entries(catalog.webhook_event_categories)
+      .map(([category, evs]) => ({
+        category,
+        events: evs.filter((e) => {
+          if (!q) return true
+          const { label } = humanizeWebhookEvent(e)
+          return e.toLowerCase().includes(q) || label.toLowerCase().includes(q)
+        }),
+      }))
+      .filter((c) => c.events.length > 0)
+  }, [catalog, search])
+
+  if (catalog === null) {
+    return (
+      <div className="flex justify-center py-8">
+        <Spinner />
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-3">
+      <Field>
+        <FieldLabel htmlFor="webhook-preset-select">Préréglage</FieldLabel>
+        <FormSelect
+          id="webhook-preset-select"
+          value={preset}
+          onChange={onPresetChange}
+          options={WEBHOOK_PRESETS.map((p) => ({ value: p.id, label: p.label }))}
+        />
+        <FieldDescription>
+          {WEBHOOK_PRESETS.find((p) => p.id === preset)?.description}
+        </FieldDescription>
+      </Field>
+
+      <div className="relative">
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Rechercher (invoice.created, paiement…)"
+          className="pl-9"
+        />
+      </div>
+
+      <div className="flex items-center justify-between px-1 text-xs text-muted-foreground">
+        <span>
+          {selectedEvents.size} événement{selectedEvents.size > 1 ? 's' : ''} sélectionné
+          {selectedEvents.size > 1 ? 's' : ''}
+          {locked && ' (verrouillé par le préréglage)'}
+        </span>
+      </div>
+
+      <div
+        className={
+          'max-h-[60vh] overflow-y-auto rounded-lg border border-border/50 bg-surface ' +
+          (locked ? 'opacity-70' : '')
+        }
+      >
+        {filtered.length === 0 ? (
+          <p className="px-4 py-6 text-center text-xs text-muted-foreground">
+            Aucun événement ne correspond à « {search} ».
+          </p>
+        ) : (
+          filtered.map(({ category, events: evs }) => (
+            <div key={category} className="border-b border-border/40 last:border-0">
+              <div className="bg-field/60 px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                {category}
+              </div>
+              <div className="divide-y divide-border/30">
+                {evs.map((event) => {
+                  const active = selectedEvents.has(event)
+                  const { label, icon: Icon, toneClass } = humanizeWebhookEvent(event)
+                  return (
+                    <CheckboxRoot
+                      key={event}
+                      isSelected={active}
+                      isDisabled={locked}
+                      onChange={locked ? undefined : () => onToggleEvent(event)}
+                      className={
+                        'flex w-full items-center gap-3 px-3 py-2.5 transition-colors ' +
+                        (locked
+                          ? 'cursor-not-allowed'
+                          : 'cursor-pointer hover:bg-surface-hover')
+                      }
+                    >
+                      <CheckboxControl>
+                        <CheckboxIndicator />
+                      </CheckboxControl>
+                      <Icon className={`h-4 w-4 shrink-0 ${toneClass}`} />
+                      <span className="min-w-0 flex-1 text-sm text-foreground">{label}</span>
+                      <code className="shrink-0 font-mono text-[11px] text-muted-foreground">
+                        {event}
+                      </code>
+                    </CheckboxRoot>
+                  )
+                })}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
   )
 }
