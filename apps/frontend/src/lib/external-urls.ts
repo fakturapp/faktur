@@ -13,6 +13,7 @@
 
 const DEFAULT_DOCS_URL = 'https://developers.fakturapp.cc'
 const DEFAULT_API_V2_BASE_URL = 'https://api.fakturapp.cc/api/v2'
+const DEFAULT_PLATFORM_URL = 'https://platform.fakturapp.cc'
 
 export const DOCS_URL: string =
   typeof process !== 'undefined' && process.env.NEXT_PUBLIC_DOCS_URL
@@ -23,6 +24,11 @@ export const API_V2_BASE_URL: string =
   typeof process !== 'undefined' && process.env.NEXT_PUBLIC_API_V2_BASE_URL
     ? process.env.NEXT_PUBLIC_API_V2_BASE_URL.replace(/\/+$/, '')
     : DEFAULT_API_V2_BASE_URL
+
+export const PLATFORM_URL: string =
+  typeof process !== 'undefined' && process.env.NEXT_PUBLIC_PLATFORM_URL
+    ? process.env.NEXT_PUBLIC_PLATFORM_URL.replace(/\/+$/, '')
+    : DEFAULT_PLATFORM_URL
 
 export function docsPath(path: string): string {
   const normalized = path.startsWith('/') ? path : `/${path}`

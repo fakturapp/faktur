@@ -44,7 +44,10 @@ import {
   AlertTriangle,
   Lock,
   Cloud,
+  Code2,
+  ExternalLink,
 } from 'lucide-react'
+import { PLATFORM_URL } from '@/lib/external-urls'
 import { TeamEncryptionMigrationModal } from '@/components/team/team-encryption-migration-modal'
 
 interface TeamMember {
@@ -517,6 +520,19 @@ export default function TeamPage() {
                         )}
                       </>
                     )}
+                    <Tooltip content="Gérer les clés API et webhooks de cette équipe sur la plateforme développeur">
+                      <a
+                        href={PLATFORM_URL}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex"
+                      >
+                        <Button variant="outline" size="sm" type="button">
+                          <Code2 className="h-4 w-4 mr-2" /> API
+                          <ExternalLink className="h-3 w-3 ml-1.5 opacity-60" />
+                        </Button>
+                      </a>
+                    </Tooltip>
                     <Button size="sm" onClick={() => setInviteOpen(true)}>
                       <UserPlus className="h-4 w-4 mr-2" /> Inviter
                     </Button>
