@@ -175,9 +175,9 @@ function BackLink({ href, label }: { href: string; label: string }) {
   return (
     <Link
       href={href}
-      className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground"
+      className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-sidebar-accent"
     >
-      <ArrowLeft className="h-3 w-3" />
+      <ArrowLeft className="h-4 w-4" />
       {label}
     </Link>
   )
@@ -246,33 +246,46 @@ function ProjectSidebarBody({
   ]
 
   return (
-    <nav className="flex-1 space-y-1 overflow-y-auto px-2.5 py-4">
-      <BackLink href="/projects" label="Tous les projets" />
-      {project && (
-        <div className="mt-3 mb-2 px-2.5">
-          <div className="flex items-center gap-2">
-            <Folder className="h-3.5 w-3.5 text-accent" />
-            <p className="truncate text-xs font-semibold uppercase tracking-wider text-foreground">
-              {project.name}
-            </p>
-          </div>
+    <div className="flex flex-1 flex-col min-h-0">
+      <nav className="flex-1 space-y-1 overflow-y-auto px-2.5 py-4">
+        <div className="space-y-1">
+          {items.map((item) => (
+            <NavLink
+              key={item.href}
+              href={item.href}
+              icon={item.icon}
+              label={item.label}
+              groupId={`project-${projectId}`}
+              active={
+                item.exact ? pathname === item.href : pathname.startsWith(item.href)
+              }
+            />
+          ))}
         </div>
-      )}
-      <div className="space-y-1">
-        {items.map((item) => (
-          <NavLink
-            key={item.href}
-            href={item.href}
-            icon={item.icon}
-            label={item.label}
-            groupId={`project-${projectId}`}
-            active={
-              item.exact ? pathname === item.href : pathname.startsWith(item.href)
-            }
-          />
-        ))}
+      </nav>
+      <div className="shrink-0 border-t border-sidebar-border px-2.5 pt-3 pb-2">
+        {project && (
+          <div className="mb-2 flex items-center gap-2 rounded-lg px-2.5 py-1.5">
+            <Folder className="h-4 w-4 shrink-0 text-accent" />
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-xs font-semibold text-foreground">
+                {project.name}
+              </p>
+              <p className="text-[10px] leading-tight text-muted-foreground">
+                Projet actif
+              </p>
+            </div>
+          </div>
+        )}
+        <Link
+          href="/projects"
+          className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          <span className="flex-1">Changer de projet</span>
+        </Link>
       </div>
-    </nav>
+    </div>
   )
 }
 
@@ -303,10 +316,24 @@ function KeySidebarBody({
   ]
 
   return (
-    <nav className="flex-1 space-y-1 overflow-y-auto px-2.5 py-4">
-        <BackLink href={`/projects/${projectId}`} label="Retour au projet" />
+    <div className="flex flex-1 flex-col min-h-0">
+      <nav className="flex-1 space-y-1 overflow-y-auto px-2.5 py-4">
+        <div className="space-y-1">
+          {items.map((item) => (
+            <NavLink
+              key={item.href}
+              href={item.href}
+              icon={item.icon}
+              label={item.label}
+              groupId={`key-${keyId}`}
+              active={item.exact ? pathname === item.href : pathname.startsWith(item.href)}
+            />
+          ))}
+        </div>
+      </nav>
+      <div className="shrink-0 border-t border-sidebar-border px-2.5 pt-3 pb-2">
         {key && (
-          <div className="mt-3 mb-2 px-2.5">
+          <div className="mb-2 rounded-lg px-2.5 py-1.5">
             <div className="flex items-center gap-2">
               <span
                 className={cn(
@@ -327,19 +354,9 @@ function KeySidebarBody({
             </p>
           </div>
         )}
-      <div className="space-y-1">
-        {items.map((item) => (
-          <NavLink
-            key={item.href}
-            href={item.href}
-            icon={item.icon}
-            label={item.label}
-            groupId={`key-${keyId}`}
-            active={item.exact ? pathname === item.href : pathname.startsWith(item.href)}
-          />
-        ))}
+        <BackLink href={`/projects/${projectId}`} label="Retour au projet" />
       </div>
-    </nav>
+    </div>
   )
 }
 
