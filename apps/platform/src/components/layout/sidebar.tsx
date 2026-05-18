@@ -11,7 +11,6 @@ import {
   Book,
   Check,
   ChevronDown,
-  CreditCard,
   ExternalLink,
   FileText,
   Folder,
@@ -205,10 +204,10 @@ function DefaultSidebarBody({ pathname }: { pathname: string }) {
             groupId="default"
           />
           <NavLink
-            href="/credits"
-            icon={CreditCard}
-            label="Crédits"
-            active={pathname === '/credits'}
+            href="/usage"
+            icon={Activity}
+            label="Usage"
+            active={pathname === '/usage' || pathname === '/credits'}
             groupId="default"
           />
         </div>
