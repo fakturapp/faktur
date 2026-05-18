@@ -34,5 +34,5 @@ router
     router.delete('/:id', [QuoteDelete, 'handle'])
   })
   .prefix(API_PREFIX + '/quotes')
-  .use(middleware.auth())
+  .use(middleware.authOrApiKey())
   .use(middleware.vault())
