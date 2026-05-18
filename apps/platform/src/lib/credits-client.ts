@@ -10,7 +10,15 @@ export interface CreditsUsage {
     hours_window: number
     active: boolean
   }
-  weekly: { used: number; limit: number; remaining: number; reset_at: string }
+  weekly: {
+    used: number
+    limit: number
+    remaining: number
+    started_at: string | null
+    reset_at: string | null
+    days_window: number
+    active: boolean
+  }
   per_minute: { limit: number }
 }
 
