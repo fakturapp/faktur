@@ -14,7 +14,11 @@
 }
 
 .badge__label {
-  @apply px-0;
+  @apply inline-flex items-center gap-1 px-0;
+}
+
+.badge__label > svg {
+  @apply inline-block shrink-0;
 }
 
 .badge-anchor {
