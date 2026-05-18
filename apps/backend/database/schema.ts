@@ -172,6 +172,39 @@ export class AnalyticsSessionSchema extends BaseModel {
   declare userId: string | null
 }
 
+export class ApiAuditLogSchema extends BaseModel {
+  static $columns = ['action', 'actorEmail', 'actorName', 'actorUserId', 'createdAt', 'id', 'ip', 'metadata', 'projectId', 'targetId', 'targetLabel', 'targetType', 'teamId', 'userAgent'] as const
+  $columns = ApiAuditLogSchema.$columns
+  @column()
+  declare action: string
+  @column()
+  declare actorEmail: string | null
+  @column()
+  declare actorName: string | null
+  @column()
+  declare actorUserId: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: bigint | number
+  @column()
+  declare ip: string | null
+  @column()
+  declare metadata: any
+  @column()
+  declare projectId: string | null
+  @column()
+  declare targetId: string | null
+  @column()
+  declare targetLabel: string | null
+  @column()
+  declare targetType: string
+  @column()
+  declare teamId: string
+  @column()
+  declare userAgent: string | null
+}
+
 export class ApiIdempotencyKeySchema extends BaseModel {
   static $columns = ['apiKeyId', 'bodyHash', 'createdAt', 'expiresAt', 'key', 'method', 'path', 'responseBody', 'responseStatus'] as const
   $columns = ApiIdempotencyKeySchema.$columns
