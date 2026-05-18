@@ -210,11 +210,6 @@ function DefaultSidebarBody({ pathname }: { pathname: string }) {
             label="Crédits"
             active={pathname === '/credits'}
             groupId="default"
-            trailing={
-              <span className="rounded border border-border px-1 py-px text-[9px] font-medium uppercase tracking-wider text-muted-foreground">
-                Bientôt
-              </span>
-            }
           />
         </div>
         <ResourcesSection />
