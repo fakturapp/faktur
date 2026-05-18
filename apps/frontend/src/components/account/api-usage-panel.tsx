@@ -1,49 +1,76 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Calendar, CalendarDays, Code2, ExternalLink, Gauge, Zap } from 'lucide-react'
+import { Code2, ExternalLink, Info, RefreshCw } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
+import { Switch } from '@/components/ui/switch'
+import { Tooltip } from '@/components/ui/tooltip'
 import { api } from '@/lib/api'
 import { PLATFORM_URL } from '@/lib/external-urls'
 
 interface ApiUsage {
-  daily: { used: number; limit: number; remaining: number; reset_at: string }
+  session: {
+    used: number
+    limit: number
+    remaining: number
+    started_at: string | null
+    reset_at: string | null
+    hours_window: number
+    active: boolean
+  }
   weekly: { used: number; limit: number; remaining: number; reset_at: string }
   per_minute: { limit: number }
 }
 
-function fmtReset(iso: string): string {
+function fmtCountdown(iso: string | null): string {
+  if (!iso) return 'pas encore commencé'
   const target = new Date(iso).getTime()
   const diff = Math.max(0, Math.floor((target - Date.now()) / 1000))
-  if (diff < 60) return `dans ${diff}s`
+  if (diff <= 0) return 'expiré'
+  const h = Math.floor(diff / 3600)
+  const m = Math.floor((diff % 3600) / 60)
+  const s = diff % 60
+  if (h > 0) return `${h}h ${m.toString().padStart(2, '0')}min`
+  if (m > 0) return `${m} min ${s.toString().padStart(2, '0')}s`
+  return `${s}s`
+}
+
+function fmtRelative(date: Date): string {
+  const diff = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000))
+  if (diff < 30) return "à l'instant"
+  if (diff < 60) return `il y a ${diff}s`
   const m = Math.floor(diff / 60)
-  if (m < 60) return `dans ${m} min`
+  if (m < 60) return `il y a ${m} min`
   const h = Math.floor(m / 60)
-  if (h < 24) return `dans ${h} h`
-  return `dans ${Math.floor(h / 24)} j`
+  if (h < 24) return `il y a ${h}h`
+  return date.toLocaleString()
 }
 
 export function ApiUsagePanel() {
   const [usage, setUsage] = useState<ApiUsage | null>(null)
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
+  const [lastFetched, setLastFetched] = useState<Date | null>(null)
+  const [, force] = useState(0)
+
+  async function load(manual = false) {
+    if (manual) setRefreshing(true)
+    const { data } = await api.get<{ data: ApiUsage }>('/account/api-usage')
+    setUsage(data?.data ?? null)
+    setLastFetched(new Date())
+    setLoading(false)
+    if (manual) setRefreshing(false)
+  }
 
   useEffect(() => {
-    let cancelled = false
-
-    async function load() {
-      const { data } = await api.get<{ data: ApiUsage }>('/account/api-usage')
-      if (cancelled) return
-      setUsage(data?.data ?? null)
-      setLoading(false)
-    }
-
     load()
-    const t = window.setInterval(load, 15_000)
+    const refetch = window.setInterval(() => load(), 30_000)
+    const tick = window.setInterval(() => force((n) => n + 1), 1000)
     return () => {
-      cancelled = true
-      window.clearInterval(t)
+      window.clearInterval(refetch)
+      window.clearInterval(tick)
     }
   }, [])
 
@@ -59,7 +86,7 @@ export function ApiUsagePanel() {
     )
   }
 
-  const dailyPct = Math.round((usage.daily.used / usage.daily.limit) * 100)
+  const sessionPct = Math.round((usage.session.used / usage.session.limit) * 100)
   const weeklyPct = Math.round((usage.weekly.used / usage.weekly.limit) * 100)
 
   return (
@@ -74,13 +101,13 @@ export function ApiUsagePanel() {
               <div>
                 <h3 className="text-sm font-semibold text-foreground">Plateforme développeur</h3>
                 <p className="text-xs text-muted-foreground">
-                  Gérez vos clés API et webhooks depuis platform.fakturapp.cc
+                  Gérez vos clés API et webhooks sur platform.fakturapp.cc
                 </p>
               </div>
             </div>
             <a href={PLATFORM_URL} target="_blank" rel="noreferrer">
               <Button variant="outline" size="sm">
-                Ouvrir la plateforme
+                Ouvrir
                 <ExternalLink className="h-3 w-3 ml-1.5" />
               </Button>
             </a>
@@ -88,61 +115,84 @@ export function ApiUsagePanel() {
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <UsageGauge
-          icon={Calendar}
-          label="Aujourd'hui"
-          used={usage.daily.used}
-          limit={usage.daily.limit}
-          remaining={usage.daily.remaining}
-          pct={dailyPct}
-          resetIso={usage.daily.reset_at}
-        />
-        <UsageGauge
-          icon={CalendarDays}
-          label="Cette semaine"
-          used={usage.weekly.used}
-          limit={usage.weekly.limit}
-          remaining={usage.weekly.remaining}
-          pct={weeklyPct}
-          resetIso={usage.weekly.reset_at}
-        />
-      </div>
-
       <Card>
-        <CardContent className="p-5">
-          <div className="flex items-start gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent-soft">
-              <Gauge className="h-4 w-4 text-accent" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <h3 className="text-sm font-semibold text-foreground">Burst protection</h3>
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                {usage.per_minute.limit} requêtes par minute maximum. Anti-abus appliqué par
-                équipe et par compte, non modifiable.
-              </p>
-            </div>
-            <span className="text-lg font-bold tabular-nums text-foreground">
-              {usage.per_minute.limit}
-              <span className="ml-1 text-xs font-normal text-muted-foreground">/min</span>
+        <CardContent className="p-6">
+          <div className="text-xs text-muted-foreground mb-5">
+            <a
+              href="https://developers.fakturapp.cc/concepts/rate-limits"
+              target="_blank"
+              rel="noreferrer"
+              className="text-accent underline-offset-[3px] hover:underline"
+            >
+              En savoir plus sur les limites d&apos;utilisation
+            </a>
+          </div>
+
+          <UsageRow
+            title="Tous les appels API"
+            subtitle={
+              usage.session.active
+                ? `Fenêtre de ${usage.session.hours_window}h ouverte`
+                : `Commence dès la première requête (fenêtre de ${usage.session.hours_window}h)`
+            }
+            used={usage.session.used}
+            limit={usage.session.limit}
+            pct={sessionPct}
+            resetIn={
+              usage.session.active
+                ? `réinitialise dans ${fmtCountdown(usage.session.reset_at)}`
+                : null
+            }
+          />
+
+          <div className="my-5 h-px bg-border/60" />
+
+          <UsageRow
+            title="Limite hebdomadaire"
+            subtitle="Compteur cumulé sur 7 jours"
+            tooltip={`Plafond global de ${usage.weekly.limit.toLocaleString()} requêtes par semaine et par équipe.`}
+            used={usage.weekly.used}
+            limit={usage.weekly.limit}
+            pct={weeklyPct}
+            resetIn={`réinitialise dans ${fmtCountdown(usage.weekly.reset_at)}`}
+          />
+
+          <div className="mt-6 flex items-center justify-between border-t border-border/60 pt-4 text-xs text-muted-foreground">
+            <span>
+              Dernière mise à jour&nbsp;:{' '}
+              {lastFetched ? fmtRelative(lastFetched) : '…'}
             </span>
+            <button
+              type="button"
+              onClick={() => load(true)}
+              disabled={refreshing}
+              className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground disabled:opacity-50"
+              aria-label="Rafraîchir"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+              Rafraîchir
+            </button>
           </div>
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="opacity-70">
         <CardContent className="p-5">
           <div className="flex items-start gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent-soft">
-              <Zap className="h-4 w-4 text-accent" />
-            </div>
             <div className="min-w-0 flex-1">
-              <h3 className="text-sm font-semibold text-foreground">Crédits payants</h3>
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                Abonnement Pro, pay-as-you-go et features IA payantes arrivent prochainement.
-                Pour l&apos;instant, tous les quotas ci-dessus sont gratuits.
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-foreground">Usage supplémentaire</h3>
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Acheter des crédits supplémentaires en pay-as-you-go quand les quotas sont
+                atteints. Désactivé pour l&apos;instant, arrivera bientôt avec les abonnements Pro.
               </p>
             </div>
+            <Tooltip content="Désactivé pour le moment">
+              <span className="inline-flex pt-0.5">
+                <Switch checked={false} onChange={() => {}} disabled />
+              </span>
+            </Tooltip>
           </div>
         </CardContent>
       </Card>
@@ -150,53 +200,60 @@ export function ApiUsagePanel() {
   )
 }
 
-function UsageGauge({
-  icon: Icon,
-  label,
+function UsageRow({
+  title,
+  subtitle,
   used,
   limit,
-  remaining,
   pct,
-  resetIso,
+  resetIn,
+  tooltip,
 }: {
-  icon: typeof Calendar
-  label: string
+  title: string
+  subtitle: string
   used: number
   limit: number
-  remaining: number
   pct: number
-  resetIso: string
+  resetIn: string | null
+  tooltip?: string
 }) {
-  const tone = pct >= 90 ? 'bg-destructive' : pct >= 70 ? 'bg-warning' : 'bg-accent'
+  const pctClamped = Math.min(100, Math.max(0, pct))
+  const barTone = pct >= 90 ? 'bg-destructive' : pct >= 70 ? 'bg-warning' : 'bg-accent'
+
   return (
-    <Card>
-      <CardContent className="p-5">
-        <div className="flex items-center gap-2 mb-3">
-          <Icon className="h-4 w-4 text-muted-foreground" />
-          <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            {label}
-          </h3>
+    <div className="flex w-full flex-row flex-wrap items-center justify-between gap-x-7 gap-y-3">
+      <div className="flex w-52 shrink-0 flex-col gap-1">
+        <div className="flex items-center gap-1.5">
+          <span className="text-sm text-foreground">{title}</span>
+          {tooltip && (
+            <Tooltip content={tooltip}>
+              <Info className="h-3.5 w-3.5 text-muted-foreground" />
+            </Tooltip>
+          )}
         </div>
-        <div className="flex items-baseline justify-between gap-2">
-          <p className="text-2xl font-bold tracking-tight text-foreground">
-            {used.toLocaleString()}
-            <span className="ml-1 text-sm font-normal text-muted-foreground">
-              / {limit.toLocaleString()}
-            </span>
-          </p>
-          <p className="text-sm font-medium text-foreground">{pct}%</p>
-        </div>
-        <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted">
+        <span className="text-xs text-muted-foreground whitespace-nowrap">{subtitle}</span>
+      </div>
+      <div className="flex flex-1 items-center gap-3 pl-6 md:max-w-xl">
+        <div className="min-w-[200px] flex-1">
           <div
-            className={`h-full rounded-full transition-all ${tone}`}
-            style={{ width: `${Math.min(100, pct)}%` }}
-          />
+            className="relative h-2 w-full overflow-hidden rounded-full bg-muted"
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={pctClamped}
+            aria-label={title}
+          >
+            <div
+              className={`h-full rounded-full transition-all duration-300 ${barTone}`}
+              style={{ width: `${Math.max(1, pctClamped)}%` }}
+            />
+          </div>
         </div>
-        <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
-          <span>{remaining.toLocaleString()} restantes</span>
-          <span>réinitialise {fmtReset(resetIso)}</span>
+        <div className="min-w-[6rem] whitespace-nowrap text-right text-xs text-muted-foreground">
+          <p>{pct}% utilisés</p>
+          {resetIn && <p className="text-[11px] text-muted-foreground/70">{resetIn}</p>}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }
