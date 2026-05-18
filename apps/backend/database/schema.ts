@@ -205,6 +205,39 @@ export class ApiAuditLogSchema extends BaseModel {
   declare userAgent: string | null
 }
 
+export class ApiCreditUsageSchema extends BaseModel {
+  static $columns = ['createdAt', 'dailyCount', 'day', 'id', 'lastMinuteAt', 'minuteCount', 'sessionCount', 'sessionStartedAt', 'teamId', 'updatedAt', 'userId', 'weekStart', 'weeklyCount', 'weeklyStartedAt'] as const
+  $columns = ApiCreditUsageSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare dailyCount: number
+  @column.date()
+  declare day: DateTime
+  @column({ isPrimary: true })
+  declare id: bigint | number
+  @column.dateTime()
+  declare lastMinuteAt: DateTime | null
+  @column()
+  declare minuteCount: number
+  @column()
+  declare sessionCount: number
+  @column.dateTime()
+  declare sessionStartedAt: DateTime | null
+  @column()
+  declare teamId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+  @column()
+  declare userId: string | null
+  @column.date()
+  declare weekStart: DateTime
+  @column()
+  declare weeklyCount: number
+  @column.dateTime()
+  declare weeklyStartedAt: DateTime | null
+}
+
 export class ApiIdempotencyKeySchema extends BaseModel {
   static $columns = ['apiKeyId', 'bodyHash', 'createdAt', 'expiresAt', 'key', 'method', 'path', 'responseBody', 'responseStatus'] as const
   $columns = ApiIdempotencyKeySchema.$columns
@@ -229,7 +262,7 @@ export class ApiIdempotencyKeySchema extends BaseModel {
 }
 
 export class ApiKeyWebhookSchema extends BaseModel {
-  static $columns = ['apiKeyId', 'consecutiveFailures', 'createdAt', 'events', 'id', 'isActive', 'lastDeliveryAt', 'lastDeliveryStatus', 'secretHash', 'secretLast4', 'updatedAt', 'url'] as const
+  static $columns = ['apiKeyId', 'consecutiveFailures', 'createdAt', 'deliveryBackoffSeconds', 'deliveryCustomHeaders', 'deliveryMaxRetries', 'deliveryTimeoutMs', 'events', 'id', 'isActive', 'lastDeliveryAt', 'lastDeliveryStatus', 'secretHash', 'secretLast4', 'updatedAt', 'url'] as const
   $columns = ApiKeyWebhookSchema.$columns
   @column()
   declare apiKeyId: string
@@ -237,6 +270,14 @@ export class ApiKeyWebhookSchema extends BaseModel {
   declare consecutiveFailures: number
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
+  @column()
+  declare deliveryBackoffSeconds: number
+  @column()
+  declare deliveryCustomHeaders: any
+  @column()
+  declare deliveryMaxRetries: number
+  @column()
+  declare deliveryTimeoutMs: number
   @column()
   declare events: any
   @column({ isPrimary: true })

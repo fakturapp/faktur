@@ -57,6 +57,7 @@ export type ScannedRoutes = {
     'list_user_oauth_apps': { paramsTuple?: []; params?: {} }
     'revoke_user_oauth_app': { paramsTuple: [ParamValue]; params: {'authorizationId': ParamValue} }
     'revoke_user_oauth_session': { paramsTuple: [ParamValue]; params: {'tokenId': ParamValue} }
+    'api_usage_show': { paramsTuple?: []; params?: {} }
     'create_team': { paramsTuple?: []; params?: {} }
     'create_company': { paramsTuple?: []; params?: {} }
     'skip_company': { paramsTuple?: []; params?: {} }
@@ -282,7 +283,9 @@ export type ScannedRoutes = {
     'dashboard.apiKeys.deliveries.retry': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'deliveryId': ParamValue} }
     'dashboard.apiKeys.logs': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.usageStats': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'dashboard.credits.usage': { paramsTuple?: []; params?: {} }
     'apiV2.meta.ping': { paramsTuple?: []; params?: {} }
+    'apiV2.meta.session': { paramsTuple?: []; params?: {} }
     'apiV2.clients.list': { paramsTuple?: []; params?: {} }
     'apiV2.clients.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'apiV2.clients.create': { paramsTuple?: []; params?: {} }
@@ -455,6 +458,7 @@ export type ScannedRoutes = {
     'list_providers': { paramsTuple?: []; params?: {} }
     'passkey_list': { paramsTuple?: []; params?: {} }
     'list_user_oauth_apps': { paramsTuple?: []; params?: {} }
+    'api_usage_show': { paramsTuple?: []; params?: {} }
     'search_company': { paramsTuple?: []; params?: {} }
     'dashboard.index': { paramsTuple?: []; params?: {} }
     'dashboard.stats': { paramsTuple?: []; params?: {} }
@@ -547,7 +551,9 @@ export type ScannedRoutes = {
     'dashboard.apiKeys.deliveries.list': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.logs': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.usageStats': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'dashboard.credits.usage': { paramsTuple?: []; params?: {} }
     'apiV2.meta.ping': { paramsTuple?: []; params?: {} }
+    'apiV2.meta.session': { paramsTuple?: []; params?: {} }
     'apiV2.clients.list': { paramsTuple?: []; params?: {} }
     'apiV2.clients.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'apiV2.products.list': { paramsTuple?: []; params?: {} }
@@ -580,6 +586,7 @@ export type ScannedRoutes = {
     'list_providers': { paramsTuple?: []; params?: {} }
     'passkey_list': { paramsTuple?: []; params?: {} }
     'list_user_oauth_apps': { paramsTuple?: []; params?: {} }
+    'api_usage_show': { paramsTuple?: []; params?: {} }
     'search_company': { paramsTuple?: []; params?: {} }
     'dashboard.index': { paramsTuple?: []; params?: {} }
     'dashboard.stats': { paramsTuple?: []; params?: {} }
@@ -672,7 +679,9 @@ export type ScannedRoutes = {
     'dashboard.apiKeys.deliveries.list': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.logs': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.usageStats': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'dashboard.credits.usage': { paramsTuple?: []; params?: {} }
     'apiV2.meta.ping': { paramsTuple?: []; params?: {} }
+    'apiV2.meta.session': { paramsTuple?: []; params?: {} }
     'apiV2.clients.list': { paramsTuple?: []; params?: {} }
     'apiV2.clients.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'apiV2.products.list': { paramsTuple?: []; params?: {} }

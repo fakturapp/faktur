@@ -324,6 +324,12 @@ const routes = {
     tokens: [{"old":"/api/v1/account/oauth-apps/sessions/:tokenId/revoke","type":0,"val":"api","end":""},{"old":"/api/v1/account/oauth-apps/sessions/:tokenId/revoke","type":0,"val":"v1","end":""},{"old":"/api/v1/account/oauth-apps/sessions/:tokenId/revoke","type":0,"val":"account","end":""},{"old":"/api/v1/account/oauth-apps/sessions/:tokenId/revoke","type":0,"val":"oauth-apps","end":""},{"old":"/api/v1/account/oauth-apps/sessions/:tokenId/revoke","type":0,"val":"sessions","end":""},{"old":"/api/v1/account/oauth-apps/sessions/:tokenId/revoke","type":1,"val":"tokenId","end":""},{"old":"/api/v1/account/oauth-apps/sessions/:tokenId/revoke","type":0,"val":"revoke","end":""}],
     types: placeholder as Registry['revoke_user_oauth_session']['types'],
   },
+  'api_usage_show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/account/api-usage',
+    tokens: [{"old":"/api/v1/account/api-usage","type":0,"val":"api","end":""},{"old":"/api/v1/account/api-usage","type":0,"val":"v1","end":""},{"old":"/api/v1/account/api-usage","type":0,"val":"account","end":""},{"old":"/api/v1/account/api-usage","type":0,"val":"api-usage","end":""}],
+    types: placeholder as Registry['api_usage_show']['types'],
+  },
   'create_team': {
     methods: ["POST"],
     pattern: '/api/v1/onboarding/team',
@@ -1674,11 +1680,23 @@ const routes = {
     tokens: [{"old":"/api/v1/dashboard/settings/api-keys/:id/usage-stats","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/usage-stats","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/usage-stats","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/usage-stats","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/usage-stats","type":0,"val":"api-keys","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/usage-stats","type":1,"val":"id","end":""},{"old":"/api/v1/dashboard/settings/api-keys/:id/usage-stats","type":0,"val":"usage-stats","end":""}],
     types: placeholder as Registry['dashboard.apiKeys.usageStats']['types'],
   },
+  'dashboard.credits.usage': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/dashboard/settings/credits/usage',
+    tokens: [{"old":"/api/v1/dashboard/settings/credits/usage","type":0,"val":"api","end":""},{"old":"/api/v1/dashboard/settings/credits/usage","type":0,"val":"v1","end":""},{"old":"/api/v1/dashboard/settings/credits/usage","type":0,"val":"dashboard","end":""},{"old":"/api/v1/dashboard/settings/credits/usage","type":0,"val":"settings","end":""},{"old":"/api/v1/dashboard/settings/credits/usage","type":0,"val":"credits","end":""},{"old":"/api/v1/dashboard/settings/credits/usage","type":0,"val":"usage","end":""}],
+    types: placeholder as Registry['dashboard.credits.usage']['types'],
+  },
   'apiV2.meta.ping': {
     methods: ["GET","HEAD"],
     pattern: '/api/v2/ping',
     tokens: [{"old":"/api/v2/ping","type":0,"val":"api","end":""},{"old":"/api/v2/ping","type":0,"val":"v2","end":""},{"old":"/api/v2/ping","type":0,"val":"ping","end":""}],
     types: placeholder as Registry['apiV2.meta.ping']['types'],
+  },
+  'apiV2.meta.session': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v2/session',
+    tokens: [{"old":"/api/v2/session","type":0,"val":"api","end":""},{"old":"/api/v2/session","type":0,"val":"v2","end":""},{"old":"/api/v2/session","type":0,"val":"session","end":""}],
+    types: placeholder as Registry['apiV2.meta.session']['types'],
   },
   'apiV2.clients.list': {
     methods: ["GET","HEAD"],

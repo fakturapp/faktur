@@ -54,6 +54,9 @@ export const controllers = {
       Enable: () => import('#controllers/account/two_factor/enable'),
       Setup: () => import('#controllers/account/two_factor/setup'),
     },
+    apiUsage: {
+      Show: () => import('#controllers/account/api_usage/show'),
+    },
   },
   admin: {
     analytics: {
@@ -124,6 +127,7 @@ export const controllers = {
     },
     meta: {
       Ping: () => import('#controllers/api_v2/meta/ping'),
+      Session: () => import('#controllers/api_v2/meta/session'),
     },
     NotFound: () => import('#controllers/api_v2/not_found'),
     products: {
@@ -295,6 +299,9 @@ export const controllers = {
     Charts: () => import('#controllers/dashboard/charts'),
     SidebarCounts: () => import('#controllers/dashboard/sidebar_counts'),
     Stats: () => import('#controllers/dashboard/stats'),
+    credits: {
+      Usage: () => import('#controllers/dashboard/credits/usage'),
+    },
   },
   einvoicing: {
     Submit: () => import('#controllers/einvoicing/submit'),

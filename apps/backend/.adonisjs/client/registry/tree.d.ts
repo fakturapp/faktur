@@ -57,6 +57,7 @@ export interface ApiDefinition {
   listUserOauthApps: typeof routes['list_user_oauth_apps']
   revokeUserOauthApp: typeof routes['revoke_user_oauth_app']
   revokeUserOauthSession: typeof routes['revoke_user_oauth_session']
+  apiUsageShow: typeof routes['api_usage_show']
   createTeam: typeof routes['create_team']
   createCompany: typeof routes['create_company']
   skipCompany: typeof routes['skip_company']
@@ -107,6 +108,9 @@ export interface ApiDefinition {
       destroy: typeof routes['dashboard.apiProjects.destroy']
       auditLogs: typeof routes['dashboard.apiProjects.auditLogs']
       explorerEvent: typeof routes['dashboard.apiProjects.explorerEvent']
+    }
+    credits: {
+      usage: typeof routes['dashboard.credits.usage']
     }
   }
   serveIcon: typeof routes['serve_icon']
@@ -305,6 +309,7 @@ export interface ApiDefinition {
   apiV2: {
     meta: {
       ping: typeof routes['apiV2.meta.ping']
+      session: typeof routes['apiV2.meta.session']
     }
     clients: {
       list: typeof routes['apiV2.clients.list']

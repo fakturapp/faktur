@@ -1,28 +1,56 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
   <g transform="translate(60, 20)">
 
+    <!-- Connexions API derrière le fichier -->
+    <line x1="-20" y1="245" x2="35" y2="245" stroke="#a5b4fc" stroke-width="10" stroke-linecap="round" opacity="0.75"/>
+    <circle cx="-25" cy="245" r="14" fill="#eef2ff" stroke="#6366f1" stroke-width="8"/>
+
+    <line x1="245" y1="245" x2="315" y2="215" stroke="#a5b4fc" stroke-width="10" stroke-linecap="round" opacity="0.75"/>
+    <circle cx="320" cy="212" r="14" fill="#eef2ff" stroke="#6366f1" stroke-width="8"/>
+
+    <line x1="245" y1="300" x2="315" y2="330" stroke="#a5b4fc" stroke-width="10" stroke-linecap="round" opacity="0.75"/>
+    <circle cx="320" cy="332" r="14" fill="#eef2ff" stroke="#6366f1" stroke-width="8"/>
+
+    <!-- Forme principale du fichier -->
     <path d="M 40 0 H 190 L 280 90 V 320 A 40 40 0 0 1 240 360 H 40 A 40 40 0 0 1 0 320 V 40 A 40 40 0 0 1 40 0 Z" fill="#6366f1"/>
 
+    <!-- Coin plié -->
     <path d="M 190 0 V 60 A 30 30 0 0 0 220 90 H 280 Z" fill="#4f46e5"/>
 
-    <ellipse cx="90" cy="150" rx="30" ry="32" fill="white"/>
-    <ellipse cx="98" cy="146" rx="15" ry="16" fill="#1e1b4b"/>
-    <ellipse cx="104" cy="138" rx="5" ry="5" fill="white"/>
+    <!-- Yeux -->
+    <ellipse cx="90" cy="140" rx="30" ry="32" fill="white"/>
+    <ellipse cx="98" cy="136" rx="15" ry="16" fill="#1e1b4b"/>
+    <ellipse cx="104" cy="128" rx="5" ry="5" fill="white"/>
 
-    <ellipse cx="190" cy="150" rx="30" ry="32" fill="white"/>
-    <ellipse cx="198" cy="146" rx="15" ry="16" fill="#1e1b4b"/>
-    <ellipse cx="204" cy="138" rx="5" ry="5" fill="white"/>
+    <ellipse cx="190" cy="140" rx="30" ry="32" fill="white"/>
+    <ellipse cx="198" cy="136" rx="15" ry="16" fill="#1e1b4b"/>
+    <ellipse cx="204" cy="128" rx="5" ry="5" fill="white"/>
 
-    <path d="M 105 220 C 120 245 160 245 175 220" stroke="white" stroke-width="15" stroke-linecap="round" fill="none"/>
+    <!-- Sourire -->
+    <path d="M 105 205 C 120 230 160 230 175 205" stroke="white" stroke-width="15" stroke-linecap="round" fill="none"/>
 
-    <ellipse cx="70" cy="200" rx="20" ry="12" fill="#a5b4fc" opacity="0.5"/>
-    <ellipse cx="210" cy="200" rx="20" ry="12" fill="#a5b4fc" opacity="0.5"/>
+    <!-- Joues -->
+    <ellipse cx="70" cy="190" rx="20" ry="12" fill="#a5b4fc" opacity="0.5"/>
+    <ellipse cx="210" cy="190" rx="20" ry="12" fill="#a5b4fc" opacity="0.5"/>
 
-    <line x1="70" y1="280" x2="210" y2="280" stroke="#a5b4fc" stroke-width="12" stroke-linecap="round" opacity="0.6"/>
-    <line x1="70" y1="310" x2="160" y2="310" stroke="#a5b4fc" stroke-width="12" stroke-linecap="round" opacity="0.6"/>
+    <!-- Badge API -->
+    <rect x="45" y="255" width="190" height="72" rx="22" fill="#eef2ff" opacity="0.96"/>
 
-    <path d="M -20 200 C -40 200 -50 220 -40 235" stroke="#6366f1" stroke-width="20" stroke-linecap="round" fill="none"/>
-    <path d="M 300 200 C 320 200 330 220 320 235" stroke="#6366f1" stroke-width="20" stroke-linecap="round" fill="none"/>
+    <!-- Symbole code gauche -->
+    <path d="M 88 282 L 68 291 L 88 300" stroke="#4f46e5" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 
+    <!-- Texte API -->
+    <text x="140" y="304"
+          text-anchor="middle"
+          font-family="Inter, Arial, sans-serif"
+          font-size="36"
+          font-weight="800"
+          fill="#4f46e5">
+      API
+    </text>
+
+    <!-- Symbole code droit -->
+    <path d="M 192 282 L 212 291 L 192 300" stroke="#4f46e5" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+	
   </g>
 </svg>

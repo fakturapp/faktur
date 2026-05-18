@@ -643,6 +643,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/oauth_apps/revoke_session').default['handle']>>>
     }
   }
+  'api_usage_show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/account/api-usage'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/account/api_usage/show').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/api_usage/show').default['handle']>>>
+    }
+  }
   'create_team': {
     methods: ["POST"]
     pattern: '/api/v1/onboarding/team'
@@ -3343,6 +3355,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/api_keys/usage_stats').default['handle']>>>
     }
   }
+  'dashboard.credits.usage': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/dashboard/settings/credits/usage'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard/credits/usage').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard/credits/usage').default['handle']>>>
+    }
+  }
   'apiV2.meta.ping': {
     methods: ["GET","HEAD"]
     pattern: '/api/v2/ping'
@@ -3353,6 +3377,18 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/meta/ping').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/meta/ping').default['handle']>>>
+    }
+  }
+  'apiV2.meta.session': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v2/session'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/api_v2/meta/session').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/api_v2/meta/session').default['handle']>>>
     }
   }
   'apiV2.clients.list': {
