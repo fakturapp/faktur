@@ -29,5 +29,5 @@ router
     router.delete('/:id', [CreditNoteDelete, 'handle'])
   })
   .prefix(API_PREFIX + '/credit-notes')
-  .use(middleware.auth())
+  .use(middleware.authOrApiKey())
   .use(middleware.vault())

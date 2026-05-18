@@ -22,5 +22,5 @@ router
     router.patch('/:id/toggle-active', [RecurringInvoiceToggleActive, 'handle'])
   })
   .prefix(API_PREFIX + '/recurring-invoices')
-  .use(middleware.auth())
+  .use(middleware.authOrApiKey())
   .use(middleware.vault())

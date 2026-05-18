@@ -25,5 +25,5 @@ router
     router.delete('/bank-accounts/:id', [BankAccounts, 'destroy'])
   })
   .prefix(API_PREFIX + '/company')
-  .use(middleware.auth())
+  .use(middleware.authOrApiKey())
   .use(middleware.vault())
