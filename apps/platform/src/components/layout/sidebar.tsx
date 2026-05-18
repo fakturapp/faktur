@@ -313,6 +313,7 @@ function KeySidebarBody({
     { href: `${base}/deliveries`, icon: ListChecks, label: 'Livraisons' },
     { href: `${base}/logs`, icon: ScrollText, label: 'Journaux' },
     { href: `${base}/usage`, icon: BarChart3, label: 'Utilisation' },
+    { href: `${base}/settings`, icon: Settings, label: 'Paramètres' },
   ]
 
   return (

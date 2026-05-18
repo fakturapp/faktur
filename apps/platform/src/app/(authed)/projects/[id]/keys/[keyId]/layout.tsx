@@ -1,26 +1,16 @@
 'use client'
 
-import { useState, type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { RefreshCw, Settings, Trash2, AlertTriangle } from 'lucide-react'
+import { Settings } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Spinner } from '@/components/ui/spinner'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useToast } from '@/components/ui/toast'
-import { apiKeysClient, type ApiKeyShape } from '@/lib/api-keys-client'
+import { type ApiKeyShape } from '@/lib/api-keys-client'
 import { ApiKeyProvider, useApiKey } from '@/lib/api-key-context'
-import { RevealedKeyDialog } from '@/components/api-keys/revealed-key-dialog'
-import {
-  Dialog,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from '@/components/ui/dialog'
 
 function statusInfo(status: ApiKeyShape['status']) {
   switch (status) {
@@ -37,42 +27,7 @@ function statusInfo(status: ApiKeyShape['status']) {
 
 function KeyHeader() {
   const params = useParams<{ id: string; keyId: string }>()
-  const router = useRouter()
-  const { toast } = useToast()
-  const { apiKey, reload } = useApiKey()
-  const [rotated, setRotated] = useState<{ plaintext: string } | null>(null)
-  const [rotating, setRotating] = useState(false)
-  const [revoking, setRevoking] = useState(false)
-  const [resetConfirmOpen, setResetConfirmOpen] = useState(false)
-
-  async function handleReset() {
-    if (!apiKey) return
-    setRotating(true)
-    setResetConfirmOpen(false)
-    const res = await apiKeysClient.rotate(apiKey.id)
-    setRotating(false)
-    if (res.error || !res.data?.plaintext) {
-      toast(res.error || 'Échec de la réinitialisation', 'error')
-      return
-    }
-    toast('Clé réinitialisée — l’ancien secret est invalidé', 'success')
-    setRotated({ plaintext: res.data.plaintext })
-    reload()
-  }
-
-  async function handleRevoke() {
-    if (!apiKey) return
-    if (!confirm(`Révoquer la clé « ${apiKey.name} » ? Cette action est irréversible.`)) return
-    setRevoking(true)
-    const res = await apiKeysClient.revoke(apiKey.id)
-    setRevoking(false)
-    if (res.error) {
-      toast(res.error, 'error')
-      return
-    }
-    toast('Clé révoquée', 'success')
-    router.push(`/projects/${params.id}`)
-  }
+  const { apiKey } = useApiKey()
 
   if (!apiKey) {
     return (
@@ -86,103 +41,33 @@ function KeyHeader() {
   }
 
   const status = statusInfo(apiKey.status)
-  const isActive = apiKey.status === 'active'
 
   return (
-    <>
-      <Card className="border-border/50">
-        <CardContent className="p-6">
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0">
-              <div className="flex items-center gap-2.5">
-                <h1 className="text-xl font-bold text-foreground truncate">{apiKey.name}</h1>
-                <Badge variant={status.variant} size="sm">
-                  {status.label}
-                </Badge>
-              </div>
-              <p className="mt-1 font-mono text-sm text-muted-foreground">
-                {apiKey.masked_token}
-              </p>
+    <Card className="border-border/50">
+      <CardContent className="p-6">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-xl font-bold text-foreground truncate">{apiKey.name}</h1>
+              <Badge variant={status.variant} size="sm">
+                {status.label}
+              </Badge>
             </div>
-            <div className="flex shrink-0 items-center gap-2">
-              {isActive && (
-                <>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setResetConfirmOpen(true)}
-                    disabled={rotating}
-                  >
-                    {rotating ? (
-                      <>
-                        <Spinner />
-                        Réinitialisation...
-                      </>
-                    ) : (
-                      <>
-                        <RefreshCw className="h-4 w-4 mr-2" />
-                        Réinitialiser
-                      </>
-                    )}
-                  </Button>
-                  <Button variant="danger" size="sm" onClick={handleRevoke} disabled={revoking}>
-                    {revoking ? (
-                      <>
-                        <Spinner />
-                        Révocation...
-                      </>
-                    ) : (
-                      <>
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Révoquer
-                      </>
-                    )}
-                  </Button>
-                </>
-              )}
-              <Link href={`/projects/${params.id}/keys/${params.keyId}/settings`}>
-                <Button variant="outline" size="sm">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Paramètres
-                </Button>
-              </Link>
-            </div>
+            <p className="mt-1 font-mono text-sm text-muted-foreground">
+              {apiKey.masked_token}
+            </p>
           </div>
-        </CardContent>
-      </Card>
-
-      <RevealedKeyDialog
-        open={rotated !== null}
-        plaintext={rotated?.plaintext ?? ''}
-        keyName={apiKey.name}
-        kind="api_key"
-        onClose={() => setRotated(null)}
-      />
-
-      <Dialog open={resetConfirmOpen} onClose={() => setResetConfirmOpen(false)} className="max-w-md">
-        <DialogHeader onClose={() => setResetConfirmOpen(false)}>
-          <DialogTitle className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-warning" />
-            Réinitialiser la clé ?
-          </DialogTitle>
-          <DialogDescription>
-            Un nouveau secret sera généré pour <strong>« {apiKey.name} »</strong>.
-            L’ancien secret continuera de fonctionner pendant une courte période de grâce,
-            puis sera définitivement invalidé. Pensez à mettre à jour toutes vos
-            intégrations avec la nouvelle clé.
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => setResetConfirmOpen(false)}>
-            Annuler
-          </Button>
-          <Button onClick={handleReset}>
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Réinitialiser
-          </Button>
-        </DialogFooter>
-      </Dialog>
-    </>
+          <div className="flex shrink-0 items-center gap-2">
+            <Link href={`/projects/${params.id}/keys/${params.keyId}/settings`}>
+              <Button variant="outline" size="sm">
+                <Settings className="h-4 w-4 mr-2" />
+                Paramètres
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   )
 }
 
