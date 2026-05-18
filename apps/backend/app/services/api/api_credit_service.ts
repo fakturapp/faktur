@@ -5,6 +5,7 @@ export const CREDIT_LIMITS = {
   PER_MINUTE: 3,
   SESSION_HOURS: 5,
   PER_SESSION: 100,
+  WEEKLY_DAYS: 7,
   PER_WEEK: 1000,
 } as const
 
@@ -21,17 +22,13 @@ export type CreditCheckResult =
       retry_after_seconds: number
     }
 
-function isoWeekStart(now: DateTime): DateTime {
-  return now.toUTC().startOf('week')
-}
-
 function isoDay(now: DateTime): DateTime {
   return now.toUTC().startOf('day')
 }
 
-function sessionExpired(startedAt: DateTime | null, now: DateTime): boolean {
+function expired(startedAt: DateTime | null, now: DateTime, hours: number): boolean {
   if (!startedAt) return true
-  return now.diff(startedAt, 'hours').hours >= CREDIT_LIMITS.SESSION_HOURS
+  return now.diff(startedAt, 'hours').hours >= hours
 }
 
 class ApiCreditService {
@@ -41,50 +38,28 @@ class ApiCreditService {
     now: DateTime
   ): Promise<ApiCreditUsage> {
     const day = isoDay(now)
-    const weekStart = isoWeekStart(now)
 
     const existing = await ApiCreditUsage.query()
       .where('teamId', teamId)
       .where('day', day.toSQLDate()!)
       .first()
 
-    if (existing) {
-      if (
-        !existing.weekStart ||
-        existing.weekStart.toUTC().toMillis() !== weekStart.toMillis()
-      ) {
-        existing.weekStart = weekStart
-        existing.weeklyCount = await this.recomputeWeeklyTotal(teamId, weekStart)
-        await existing.save()
-      }
-      return existing
-    }
+    if (existing) return existing
 
-    const weeklyCount = await this.recomputeWeeklyTotal(teamId, weekStart)
     const row = await ApiCreditUsage.create({
       teamId,
       userId,
       day,
-      weekStart,
+      weekStart: day,
       dailyCount: 0,
-      weeklyCount,
+      weeklyCount: 0,
       lastMinuteAt: null,
       minuteCount: 0,
       sessionStartedAt: null,
       sessionCount: 0,
+      weeklyStartedAt: null,
     })
     return row
-  }
-
-  async recomputeWeeklyTotal(teamId: string, weekStart: DateTime): Promise<number> {
-    const result = await ApiCreditUsage.query()
-      .where('teamId', teamId)
-      .where('weekStart', weekStart.toSQLDate()!)
-      .sum('daily_count as total')
-      .first()
-    const raw = (result as unknown as { $extras?: { total?: string | number } } | null)?.$extras
-      ?.total
-    return raw ? Number(raw) : 0
   }
 
   async findActiveSession(
@@ -100,9 +75,27 @@ class ApiCreditService {
       .first()
 
     if (!recent || !recent.sessionStartedAt) return null
-    if (sessionExpired(recent.sessionStartedAt, now)) return null
+    if (expired(recent.sessionStartedAt, now, CREDIT_LIMITS.SESSION_HOURS)) return null
 
     return { startedAt: recent.sessionStartedAt, count: recent.sessionCount, row: recent }
+  }
+
+  async findActiveWeek(
+    teamId: string,
+    now: DateTime
+  ): Promise<{ startedAt: DateTime; count: number; row: ApiCreditUsage } | null> {
+    const cutoff = now.minus({ days: CREDIT_LIMITS.WEEKLY_DAYS })
+    const recent = await ApiCreditUsage.query()
+      .where('teamId', teamId)
+      .whereNotNull('weeklyStartedAt')
+      .where('weeklyStartedAt', '>=', cutoff.toSQL()!)
+      .orderBy('weeklyStartedAt', 'desc')
+      .first()
+
+    if (!recent || !recent.weeklyStartedAt) return null
+    if (expired(recent.weeklyStartedAt, now, CREDIT_LIMITS.WEEKLY_DAYS * 24)) return null
+
+    return { startedAt: recent.weeklyStartedAt, count: recent.weeklyCount, row: recent }
   }
 
   async check(teamId: string, userId: string | null): Promise<CreditCheckResult> {
@@ -127,19 +120,21 @@ class ApiCreditService {
       }
     }
 
-    if (row.weeklyCount >= CREDIT_LIMITS.PER_WEEK) {
-      const nextWeek = isoWeekStart(now).plus({ weeks: 1 })
+    const week = await this.findActiveWeek(teamId, now)
+    const weeklyCount = week?.count ?? 0
+    if (weeklyCount >= CREDIT_LIMITS.PER_WEEK) {
+      const expiresAt = week!.startedAt.plus({ days: CREDIT_LIMITS.WEEKLY_DAYS })
       return {
         ok: false,
         reason: 'quota_weekly',
-        retry_after_seconds: Math.max(1, Math.floor(nextWeek.diff(now, 'seconds').seconds)),
+        retry_after_seconds: Math.max(1, Math.floor(expiresAt.diff(now, 'seconds').seconds)),
       }
     }
 
     return {
       ok: true,
       session_remaining: Math.max(0, CREDIT_LIMITS.PER_SESSION - sessionCount),
-      weekly_remaining: Math.max(0, CREDIT_LIMITS.PER_WEEK - row.weeklyCount),
+      weekly_remaining: Math.max(0, CREDIT_LIMITS.PER_WEEK - weeklyCount),
       minute_remaining: Math.max(
         0,
         CREDIT_LIMITS.PER_MINUTE -
@@ -156,7 +151,6 @@ class ApiCreditService {
 
     const withinMinute =
       row.lastMinuteAt && now.diff(row.lastMinuteAt, 'seconds').seconds < 60
-
     row.minuteCount = withinMinute ? row.minuteCount + amount : amount
     row.lastMinuteAt = now
 
@@ -171,8 +165,18 @@ class ApiCreditService {
       row.sessionCount = amount
     }
 
+    const activeWeek = await this.findActiveWeek(teamId, now)
+    if (activeWeek && activeWeek.row.id === row.id) {
+      row.weeklyCount += amount
+    } else if (activeWeek) {
+      activeWeek.row.weeklyCount += amount
+      await activeWeek.row.save()
+    } else {
+      row.weeklyStartedAt = now
+      row.weeklyCount = amount
+    }
+
     row.dailyCount += amount
-    row.weeklyCount += amount
     if (userId && !row.userId) row.userId = userId
     await row.save()
   }
@@ -187,20 +191,32 @@ class ApiCreditService {
       hours_window: number
       active: boolean
     }
-    weekly: { used: number; limit: number; remaining: number; reset_at: string }
+    weekly: {
+      used: number
+      limit: number
+      remaining: number
+      started_at: string | null
+      reset_at: string | null
+      days_window: number
+      active: boolean
+    }
     per_minute: { limit: number }
   }> {
     const now = DateTime.utc()
-    const weekStart = isoWeekStart(now)
 
     const session = await this.findActiveSession(teamId, now)
-    const sessionUsed = session?.count ?? 0
     const sessionStartedAt = session?.startedAt ?? null
     const sessionResetAt = sessionStartedAt
       ? sessionStartedAt.plus({ hours: CREDIT_LIMITS.SESSION_HOURS })
       : null
+    const sessionUsed = session?.count ?? 0
 
-    const weekly = await this.recomputeWeeklyTotal(teamId, weekStart)
+    const week = await this.findActiveWeek(teamId, now)
+    const weekStartedAt = week?.startedAt ?? null
+    const weekResetAt = weekStartedAt
+      ? weekStartedAt.plus({ days: CREDIT_LIMITS.WEEKLY_DAYS })
+      : null
+    const weekUsed = week?.count ?? 0
 
     return {
       session: {
@@ -213,10 +229,13 @@ class ApiCreditService {
         active: Boolean(sessionStartedAt),
       },
       weekly: {
-        used: weekly,
+        used: weekUsed,
         limit: CREDIT_LIMITS.PER_WEEK,
-        remaining: Math.max(0, CREDIT_LIMITS.PER_WEEK - weekly),
-        reset_at: weekStart.plus({ weeks: 1 }).toISO()!,
+        remaining: Math.max(0, CREDIT_LIMITS.PER_WEEK - weekUsed),
+        started_at: weekStartedAt ? weekStartedAt.toISO() : null,
+        reset_at: weekResetAt ? weekResetAt.toISO() : null,
+        days_window: CREDIT_LIMITS.WEEKLY_DAYS,
+        active: Boolean(weekStartedAt),
       },
       per_minute: { limit: CREDIT_LIMITS.PER_MINUTE },
     }
