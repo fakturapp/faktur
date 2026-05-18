@@ -19,16 +19,18 @@ import { useToast } from '@/components/ui/toast'
 import { api } from '@/lib/api'
 import { Spinner } from '@/components/ui/spinner'
 import { startRegistration } from '@simplewebauthn/browser'
-import { User, Shield, Monitor, Trash2, Smartphone, Copy, Check, Camera, Globe, MapPin, Download, Lock, AlertTriangle, Calendar, Link2, Unlink, Eye, EyeOff, Fingerprint, KeyRound, Plus, ShieldCheck, Bug } from 'lucide-react'
+import { User, Shield, Monitor, Trash2, Smartphone, Copy, Check, Camera, Globe, MapPin, Download, Lock, AlertTriangle, Calendar, Link2, Unlink, Eye, EyeOff, Fingerprint, KeyRound, Plus, ShieldCheck, Bug, Code2 } from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
 import { Tooltip } from '@/components/ui/tooltip'
 import { toast as t } from '@/components/ui/toast'
 import { useDevMode } from '@/lib/dev-mode'
+import { ApiUsagePanel } from '@/components/account/api-usage-panel'
 
 const tabs = [
   { id: 'profile', label: 'Profil', icon: <User className="h-4 w-4" /> },
   { id: 'security', label: 'Sécurité', icon: <Shield className="h-4 w-4" /> },
   { id: 'sessions', label: 'Sessions', icon: <Monitor className="h-4 w-4" /> },
+  { id: 'api', label: 'API', icon: <Code2 className="h-4 w-4" /> },
   { id: 'export', label: 'Exportation', icon: <Download className="h-4 w-4" /> },
 ]
 
@@ -50,6 +52,7 @@ export default function AccountPage() {
 
   const activeTab = pathname.endsWith('/security') ? 'security'
     : pathname.endsWith('/sessions') ? 'sessions'
+    : pathname.endsWith('/api') ? 'api'
     : pathname.endsWith('/export') ? 'export'
     : 'profile'
 
@@ -1121,6 +1124,8 @@ export default function AccountPage() {
           </Card>
         </div>
       )}
+
+      {activeTab === 'api' && <ApiUsagePanel />}
 
       {/* Modals */}
       {/* Name edit modal */}
