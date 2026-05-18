@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import {
   ArrowRight,
@@ -39,6 +39,7 @@ function formatRelative(iso: string | null): string {
 
 export default function ProjectOverviewPage() {
   const params = useParams<{ id: string }>()
+  const router = useRouter()
   const { toast } = useToast()
   const [project, setProject] = useState<ApiProjectShape | null>(null)
   const [keys, setKeys] = useState<ApiKeyShape[] | null>(null)
@@ -250,7 +251,13 @@ export default function ProjectOverviewPage() {
         plaintext={revealed?.plaintext ?? ''}
         keyName={revealed?.key.name ?? ''}
         kind="api_key"
-        onClose={() => setRevealed(null)}
+        onClose={() => {
+          const target = revealed
+          setRevealed(null)
+          if (target) {
+            router.push(`/projects/${params.id}/keys/${target.key.id}`)
+          }
+        }}
       />
     </motion.div>
   )

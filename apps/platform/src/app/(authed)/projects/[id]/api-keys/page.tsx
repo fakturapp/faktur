@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronRight, Key, Lock, Plus, Trash2 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
@@ -53,6 +53,7 @@ function statusInfo(status: ApiKeyShape['status']) {
 
 export default function ProjectApiKeysPage() {
   const params = useParams<{ id: string }>()
+  const router = useRouter()
   const { toast } = useToast()
   const [keys, setKeys] = useState<ApiKeyShape[] | null>(null)
   const [createOpen, setCreateOpen] = useState(false)
@@ -212,7 +213,13 @@ export default function ProjectApiKeysPage() {
         plaintext={revealed?.plaintext ?? ''}
         keyName={revealed?.key.name ?? ''}
         kind="api_key"
-        onClose={() => setRevealed(null)}
+        onClose={() => {
+          const target = revealed
+          setRevealed(null)
+          if (target) {
+            router.push(`/projects/${params.id}/keys/${target.key.id}`)
+          }
+        }}
       />
 
       <Dialog
