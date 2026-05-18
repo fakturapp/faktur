@@ -265,15 +265,19 @@ export type ScannedRoutes = {
     'dashboard.apiProjects.auditLogs': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiProjects.explorerEvent': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.list': { paramsTuple?: []; params?: {} }
+    'dashboard.apiKeys.recentlyUsed': { paramsTuple?: []; params?: {} }
     'dashboard.apiKeys.create': { paramsTuple?: []; params?: {} }
     'dashboard.apiKeys.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.revoke': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'dashboard.apiKeys.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.rotate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.webhook.set': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.webhook.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.webhook.rotateSecret': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.webhook.test': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'dashboard.apiKeys.webhook.deliveryConfig.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'dashboard.apiKeys.webhook.deliveryConfig.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.deliveries.list': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.deliveries.retry': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'deliveryId': ParamValue} }
     'dashboard.apiKeys.logs': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -311,6 +315,7 @@ export type ScannedRoutes = {
     'apiV2.recurringInvoices.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'apiV2.recurringInvoices.pause': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'apiV2.recurringInvoices.resume': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'apiV2.notFound': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
     'create_feedback': { paramsTuple?: []; params?: {} }
     'my_feedback': { paramsTuple?: []; params?: {} }
     'create_bug_report': { paramsTuple?: []; params?: {} }
@@ -422,6 +427,7 @@ export type ScannedRoutes = {
     'dashboard.apiProjects.create': { paramsTuple?: []; params?: {} }
     'dashboard.apiProjects.explorerEvent': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.create': { paramsTuple?: []; params?: {} }
+    'dashboard.apiKeys.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.rotate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.webhook.rotateSecret': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.webhook.test': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -434,6 +440,7 @@ export type ScannedRoutes = {
     'apiV2.expenses.create': { paramsTuple?: []; params?: {} }
     'apiV2.recurringInvoices.pause': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'apiV2.recurringInvoices.resume': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'apiV2.notFound': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
     'create_feedback': { paramsTuple?: []; params?: {} }
     'create_bug_report': { paramsTuple?: []; params?: {} }
   }
@@ -534,7 +541,9 @@ export type ScannedRoutes = {
     'dashboard.apiProjects.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiProjects.auditLogs': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.list': { paramsTuple?: []; params?: {} }
+    'dashboard.apiKeys.recentlyUsed': { paramsTuple?: []; params?: {} }
     'dashboard.apiKeys.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'dashboard.apiKeys.webhook.deliveryConfig.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.deliveries.list': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.logs': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.usageStats': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -557,6 +566,7 @@ export type ScannedRoutes = {
     'apiV2.creditNotes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'apiV2.recurringInvoices.list': { paramsTuple?: []; params?: {} }
     'apiV2.recurringInvoices.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'apiV2.notFound': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
     'my_feedback': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
@@ -656,7 +666,9 @@ export type ScannedRoutes = {
     'dashboard.apiProjects.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiProjects.auditLogs': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.list': { paramsTuple?: []; params?: {} }
+    'dashboard.apiKeys.recentlyUsed': { paramsTuple?: []; params?: {} }
     'dashboard.apiKeys.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'dashboard.apiKeys.webhook.deliveryConfig.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.deliveries.list': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.logs': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.usageStats': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -679,6 +691,7 @@ export type ScannedRoutes = {
     'apiV2.creditNotes.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'apiV2.recurringInvoices.list': { paramsTuple?: []; params?: {} }
     'apiV2.recurringInvoices.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'apiV2.notFound': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
     'my_feedback': { paramsTuple?: []; params?: {} }
   }
   PUT: {
@@ -703,6 +716,8 @@ export type ScannedRoutes = {
     'expense_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'update_oauth_app': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.webhook.set': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'dashboard.apiKeys.webhook.deliveryConfig.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'apiV2.notFound': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
   }
   DELETE: {
     'session_revoke': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -737,6 +752,7 @@ export type ScannedRoutes = {
     'apiV2.products.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'apiV2.invoices.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'apiV2.expenses.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'apiV2.notFound': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
   }
   PATCH: {
     'quote_update_status': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -756,6 +772,10 @@ export type ScannedRoutes = {
     'dashboard.apiKeys.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'apiV2.clients.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'apiV2.products.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'apiV2.notFound': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
+  }
+  OPTIONS: {
+    'apiV2.notFound': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
   }
 }
 declare module '@adonisjs/core/types/http' {
