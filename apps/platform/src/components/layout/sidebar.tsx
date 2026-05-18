@@ -599,19 +599,13 @@ function UserFooter() {
 
 function FakturBadge() {
   return (
-    <svg
-      viewBox="0 0 32 32"
-      className="size-8 shrink-0"
-      aria-hidden
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <rect x="0" y="0" width="32" height="32" rx="8" fill="var(--accent)" />
-      <path
-        d="M9 9h14M9 16h11M9 23h8"
-        stroke="white"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-      />
-    </svg>
+    <img
+      src="/logo.svg"
+      alt="Faktur"
+      width={32}
+      height={32}
+      className="size-8 shrink-0 select-none"
+      draggable={false}
+    />
   )
 }
