@@ -8,7 +8,7 @@
     "clean": "node -e \"const fs=require('fs');try{if(fs.existsSync('.next'))fs.rmSync('.next',{recursive:true,force:true})}catch{}\"",
     "build": "npm run clean && next build",
     "start": "next start -p 3000 -H 0.0.0.0",
-    "lint": "next lint",
+    "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "ncu": "ncu -u && npm install"
   },
