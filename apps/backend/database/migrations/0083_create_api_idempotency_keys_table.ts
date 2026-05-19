@@ -5,7 +5,11 @@ export default class extends BaseSchema {
 
   async up() {
     const exists = await this.db.schema.hasTable(this.tableName)
-    if (exists) return
+    if (exists) {
+      const hasApiKeyId = await this.db.schema.hasColumn(this.tableName, 'api_key_id')
+      if (hasApiKeyId) return
+      this.schema.dropTable(this.tableName)
+    }
 
     this.schema.createTable(this.tableName, (table) => {
       table.string('key', 128).primary()

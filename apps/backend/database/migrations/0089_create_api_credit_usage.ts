@@ -5,7 +5,11 @@ export default class extends BaseSchema {
 
   async up() {
     const exists = await this.db.schema.hasTable(this.tableName)
-    if (exists) return
+    if (exists) {
+      const hasTeamId = await this.db.schema.hasColumn(this.tableName, 'team_id')
+      if (hasTeamId) return
+      this.schema.dropTable(this.tableName)
+    }
 
     this.schema.createTable(this.tableName, (table) => {
       table.bigIncrements('id').primary()

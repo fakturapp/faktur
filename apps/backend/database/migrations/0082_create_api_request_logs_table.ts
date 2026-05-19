@@ -5,7 +5,13 @@ export default class extends BaseSchema {
 
   async up() {
     const exists = await this.db.schema.hasTable(this.tableName)
-    if (exists) return
+    if (exists) {
+      const hasApiKeyId = await this.db.schema.hasColumn(this.tableName, 'api_key_id')
+      if (hasApiKeyId) return
+      // Table exists but with a broken schema (pre-existing empty placeholder from a
+      // half-committed deploy). The log table has no data we care about — drop it.
+      this.schema.dropTable(this.tableName)
+    }
 
     this.schema.createTable(this.tableName, (table) => {
       table.bigIncrements('id')
