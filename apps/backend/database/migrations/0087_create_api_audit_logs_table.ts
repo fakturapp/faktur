@@ -4,6 +4,9 @@ export default class extends BaseSchema {
   protected tableName = 'api_audit_logs'
 
   async up() {
+    const exists = await this.db.schema.hasTable(this.tableName)
+    if (exists) return
+
     this.schema.createTable(this.tableName, (table) => {
       table.bigIncrements('id')
 
@@ -39,6 +42,6 @@ export default class extends BaseSchema {
   }
 
   async down() {
-    this.schema.dropTable(this.tableName)
+    this.schema.dropTableIfExists(this.tableName)
   }
 }

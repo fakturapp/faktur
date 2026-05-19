@@ -4,6 +4,9 @@ export default class extends BaseSchema {
   protected tableName = 'api_projects'
 
   async up() {
+    const exists = await this.db.schema.hasTable(this.tableName)
+    if (exists) return
+
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().defaultTo(this.raw('gen_random_uuid()'))
 
@@ -32,6 +35,6 @@ export default class extends BaseSchema {
   }
 
   async down() {
-    this.schema.dropTable(this.tableName)
+    this.schema.dropTableIfExists(this.tableName)
   }
 }

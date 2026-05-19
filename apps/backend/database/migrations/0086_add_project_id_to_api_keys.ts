@@ -4,14 +4,17 @@ export default class extends BaseSchema {
   protected tableName = 'api_keys'
 
   async up() {
-    this.schema.alterTable(this.tableName, (table) => {
-      table
-        .uuid('project_id')
-        .nullable()
-        .references('id')
-        .inTable('api_projects')
-        .onDelete('RESTRICT')
-    })
+    const hasColumn = await this.db.schema.hasColumn(this.tableName, 'project_id')
+    if (!hasColumn) {
+      this.schema.alterTable(this.tableName, (table) => {
+        table
+          .uuid('project_id')
+          .nullable()
+          .references('id')
+          .inTable('api_projects')
+          .onDelete('RESTRICT')
+      })
+    }
 
     this.schema.raw(`
       INSERT INTO api_projects (id, team_id, name, description, is_default, created_at)
@@ -34,7 +37,7 @@ export default class extends BaseSchema {
       table.uuid('project_id').notNullable().alter()
     })
 
-    this.schema.raw(`CREATE INDEX idx_api_keys_project_id ON api_keys(project_id)`)
+    this.schema.raw(`CREATE INDEX IF NOT EXISTS idx_api_keys_project_id ON api_keys(project_id)`)
   }
 
   async down() {
