@@ -7,7 +7,7 @@
     "dev": "next dev --port 3002",
     "clean": "node -e \"const fs=require('fs');try{if(fs.existsSync('.next'))fs.rmSync('.next',{recursive:true,force:true})}catch{}\"",
     "build": "npm run clean && next build",
-    "start": "next start -p 3002",
+    "start": "next start -p 3002 -H 0.0.0.0",
     "lint": "eslint",
     "typecheck": "tsc --noEmit"
   },
