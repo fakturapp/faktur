@@ -11,6 +11,7 @@ import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service
 import keyStore from '#services/crypto/key_store'
 import securityConfig from '#config/security'
 import UserTransformer from '#transformers/user_transformer'
+import { realClientIp } from '#services/http/real_client_ip'
 
 const googleRegisterValidator = vine.compile(
   vine.object({
@@ -24,6 +25,7 @@ const googleRegisterValidator = vine.compile(
 export default class GoogleRegister {
   async handle(ctx: HttpContext) {
     const { request, response } = ctx
+    const clientIp = realClientIp(ctx)
     const data = await request.validateUsing(googleRegisterValidator)
 
     let profile
@@ -79,14 +81,14 @@ export default class GoogleRegister {
       .from('auth_access_tokens')
       .where('id', String(token.identifier))
       .update({
-        ip_address: request.ip(),
+        ip_address: clientIp,
         user_agent: (request.header('user-agent') || '').slice(0, 512),
       })
 
     await LoginHistory.create({
       userId: user.id,
       tokenIdentifier: String(token.identifier),
-      ipAddress: request.ip(),
+      ipAddress: clientIp,
       userAgent: request.header('user-agent') ?? undefined,
       status: 'success',
       isSuspicious: false,
@@ -97,7 +99,7 @@ export default class GoogleRegister {
       action: 'user.registered.google',
       resourceType: 'user',
       resourceId: user.id,
-      ipAddress: request.ip(),
+      ipAddress: clientIp,
       userAgent: request.header('user-agent'),
       severity: 'info',
     })

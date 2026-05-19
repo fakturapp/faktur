@@ -8,9 +8,12 @@ import AuditLog from '#models/shared/audit_log'
 import GoogleAuthService from '#services/auth/google_auth_service'
 import EncryptionService from '#services/encryption/encryption_service'
 import env from '#start/env'
+import { realClientIp } from '#services/http/real_client_ip'
 
 export default class GoogleCallback {
-  async handle({ request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { request, response } = ctx
+    const clientIp = realClientIp(ctx)
     const code = request.input('code')
     const stateParam = request.input('state')
     const error = request.input('error')
@@ -41,11 +44,11 @@ export default class GoogleCallback {
 
     // Handle "link" intent — link Google to existing account
     if (state.intent === 'link' && state.userId) {
-      return this.handleLink(request, response, frontendUrl, state.userId, profile)
+      return this.handleLink(request, response, frontendUrl, state.userId, profile, clientIp)
     }
 
     // Handle "login" intent — login or register
-    return this.handleLogin(request, response, frontendUrl, profile)
+    return this.handleLogin(request, response, frontendUrl, profile, clientIp)
   }
 
   private async handleLink(
@@ -53,7 +56,8 @@ export default class GoogleCallback {
     response: HttpContext['response'],
     frontendUrl: string,
     userId: string,
-    profile: { sub: string; email: string; name: string | null; picture: string | null }
+    profile: { sub: string; email: string; name: string | null; picture: string | null },
+    clientIp: string
   ) {
     const user = await User.find(userId)
     if (!user) {
@@ -97,7 +101,7 @@ export default class GoogleCallback {
       action: 'user.provider.linked',
       resourceType: 'auth_provider',
       metadata: { provider: 'google', email: profile.email },
-      ipAddress: request.ip(),
+      ipAddress: clientIp,
       userAgent: request.header('user-agent'),
       severity: 'info',
     })
@@ -109,7 +113,8 @@ export default class GoogleCallback {
     request: HttpContext['request'],
     response: HttpContext['response'],
     frontendUrl: string,
-    profile: { sub: string; email: string; name: string | null; picture: string | null }
+    profile: { sub: string; email: string; name: string | null; picture: string | null },
+    clientIp: string
   ) {
     // Check if this Google account is already linked
     const existingProvider = await AuthProvider.query()
@@ -135,14 +140,14 @@ export default class GoogleCallback {
         .from('auth_access_tokens')
         .where('id', String(token.identifier))
         .update({
-          ip_address: request.ip(),
+          ip_address: clientIp,
           user_agent: (request.header('user-agent') || '').slice(0, 512),
         })
 
       await LoginHistory.create({
         userId: user.id,
         tokenIdentifier: String(token.identifier),
-        ipAddress: request.ip(),
+        ipAddress: clientIp,
         userAgent: request.header('user-agent') ?? undefined,
         status: 'success',
         isSuspicious: false,
@@ -153,7 +158,7 @@ export default class GoogleCallback {
         action: 'user.login.google',
         resourceType: 'user',
         resourceId: user.id,
-        ipAddress: request.ip(),
+        ipAddress: clientIp,
         userAgent: request.header('user-agent'),
         severity: 'info',
       })

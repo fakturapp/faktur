@@ -15,10 +15,12 @@ import keyStore from '#services/crypto/key_store'
 import teamEncryptionService from '#services/crypto/team_encryption_service'
 import Team from '#models/team/team'
 import UserTransformer from '#transformers/user_transformer'
+import { realClientIp } from '#services/http/real_client_ip'
 
 export default class Login {
   async handle(ctx: HttpContext) {
     const { request, response } = ctx
+    const clientIp = realClientIp(ctx)
     const { email, password, code, turnstileToken } = request.only([
       'email',
       'password',
@@ -28,7 +30,7 @@ export default class Login {
 
     await request.validateUsing(loginValidator)
 
-    const turnstileValid = await TurnstileService.verifyToken(turnstileToken || '', request.ip())
+    const turnstileValid = await TurnstileService.verifyToken(turnstileToken || '', clientIp)
     if (!turnstileValid) {
       return response.forbidden({ message: 'Captcha verification failed' })
     }
@@ -100,13 +102,13 @@ export default class Login {
             action: 'user.recovery_code_used',
             resourceType: 'user',
             resourceId: user.id,
-            ipAddress: request.ip(),
+            ipAddress: clientIp,
             userAgent: request.header('user-agent'),
             severity: 'warning',
             metadata: { remainingCodes: result.remainingCodes.length },
           })
         } else {
-          await this.recordLoginAttempt(request, user.id, 'failed', 'Invalid recovery code')
+          await this.recordLoginAttempt(request, user.id, 'failed', 'Invalid recovery code', undefined, clientIp)
           return response.unauthorized({ message: 'Invalid verification code' })
         }
       } else {
@@ -117,7 +119,7 @@ export default class Login {
         const isValid = TwoFactorService.verifyToken(secret, code)
 
         if (!isValid.valid) {
-          await this.recordLoginAttempt(request, user.id, 'failed', 'Invalid 2FA code')
+          await this.recordLoginAttempt(request, user.id, 'failed', 'Invalid 2FA code', undefined, clientIp)
           return response.unauthorized({ message: 'Invalid verification code' })
         }
       }
@@ -136,18 +138,18 @@ export default class Login {
       .from('auth_access_tokens')
       .where('id', String(token.identifier))
       .update({
-        ip_address: request.ip(),
+        ip_address: clientIp,
         user_agent: (request.header('user-agent') || '').slice(0, 512),
       })
 
-    await this.recordLoginAttempt(request, user.id, 'success', null, String(token.identifier))
+    await this.recordLoginAttempt(request, user.id, 'success', null, String(token.identifier), clientIp)
 
     await AuditLog.create({
       userId: user.id,
       action: 'user.login',
       resourceType: 'user',
       resourceId: user.id,
-      ipAddress: request.ip(),
+      ipAddress: clientIp,
       userAgent: request.header('user-agent'),
       severity: 'info',
     })
@@ -242,14 +244,14 @@ export default class Login {
     userId: string | null,
     status: 'success' | 'failed' | 'blocked',
     failureReason: string | null,
-    tokenIdentifier?: string
+    tokenIdentifier?: string,
+    ip: string = request.ip()
   ) {
     let country: string | null = null
     let city: string | null = null
 
     if (status === 'success') {
       try {
-        const ip = request.ip()
         if (ip && ip !== '::1' && ip !== '127.0.0.1') {
           const res = await fetch(`http://ip-api.com/json/${ip}`)
           if (res.ok) {
@@ -268,7 +270,7 @@ export default class Login {
     await LoginHistory.create({
       userId: userId ?? undefined,
       tokenIdentifier: tokenIdentifier ?? undefined,
-      ipAddress: request.ip(),
+      ipAddress: ip,
       userAgent: request.header('user-agent') ?? undefined,
       status,
       failureReason: failureReason ?? undefined,

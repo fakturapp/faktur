@@ -4,9 +4,12 @@ import User from '#models/account/user'
 import TokenService from '#services/auth/token_service'
 import AuditLog from '#models/shared/audit_log'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
+import { realClientIp } from '#services/http/real_client_ip'
 
 export default class Reset {
-  async handle({ request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { request, response } = ctx
+    const clientIp = realClientIp(ctx)
     const data = request.only(['token', 'password', 'password_confirmation'])
 
     if (!data.token || !data.password) {
@@ -55,7 +58,7 @@ export default class Reset {
       action: 'user.password_reset',
       resourceType: 'user',
       resourceId: user.id,
-      ipAddress: request.ip(),
+      ipAddress: clientIp,
       userAgent: request.header('user-agent'),
       severity: 'warning',
     })

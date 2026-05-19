@@ -9,10 +9,12 @@ import TurnstileService from '#services/security/turnstile_service'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import UserTransformer from '#transformers/user_transformer'
 import EmailBlacklistService from '#services/security/email_blacklist_service'
+import { realClientIp } from '#services/http/real_client_ip'
 
 export default class Signup {
   async handle(ctx: HttpContext) {
     const { request, response } = ctx
+    const clientIp = realClientIp(ctx)
     const data = await request.validateUsing(registerValidator)
 
     const isDisposable = await EmailBlacklistService.isDisposableEmail(data.email)
@@ -26,7 +28,7 @@ export default class Signup {
 
     const turnstileValid = await TurnstileService.verifyToken(
       data.turnstileToken || '',
-      request.ip()
+      clientIp
     )
     if (!turnstileValid) {
       return response.forbidden({ message: 'Captcha verification failed' })
@@ -57,7 +59,7 @@ export default class Signup {
       action: 'user.registered',
       resourceType: 'user',
       resourceId: user.id,
-      ipAddress: request.ip(),
+      ipAddress: clientIp,
       userAgent: request.header('user-agent'),
       severity: 'info',
     })

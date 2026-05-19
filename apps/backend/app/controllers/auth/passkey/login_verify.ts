@@ -11,10 +11,12 @@ import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service
 import encryptionService from '#services/encryption/encryption_service'
 import keyStore from '#services/crypto/key_store'
 import UserTransformer from '#transformers/user_transformer'
+import { realClientIp } from '#services/http/real_client_ip'
 
 export default class LoginVerify {
   async handle(ctx: HttpContext) {
     const { request, response } = ctx
+    const clientIp = realClientIp(ctx)
     const { credential } = request.only(['credential'])
 
     if (!credential) {
@@ -88,18 +90,25 @@ export default class LoginVerify {
         .from('auth_access_tokens')
         .where('id', String(token.identifier))
         .update({
-          ip_address: request.ip(),
+          ip_address: clientIp,
           user_agent: (request.header('user-agent') || '').slice(0, 512),
         })
 
-      await this.recordLoginAttempt(request, user.id, 'success', null, String(token.identifier))
+      await this.recordLoginAttempt(
+        request,
+        user.id,
+        'success',
+        null,
+        String(token.identifier),
+        clientIp
+      )
 
       await AuditLog.create({
         userId: user.id,
         action: 'user.login_passkey',
         resourceType: 'user',
         resourceId: user.id,
-        ipAddress: request.ip(),
+        ipAddress: clientIp,
         userAgent: request.header('user-agent'),
         severity: 'info',
         metadata: { passkeyId: passkeyCredential.id },
@@ -157,7 +166,7 @@ export default class LoginVerify {
         token: token.value!.release(),
       })
     } catch {
-      await this.recordLoginAttempt(request, null, 'failed', 'Passkey error')
+      await this.recordLoginAttempt(request, null, 'failed', 'Passkey error', undefined, clientIp)
       return response.unauthorized({
         message:
           "L'authentification par cl\u00e9 d'acc\u00e8s a \u00e9chou\u00e9. Veuillez r\u00e9essayer.",
@@ -171,14 +180,14 @@ export default class LoginVerify {
     userId: string | null,
     status: 'success' | 'failed' | 'blocked',
     failureReason: string | null,
-    tokenIdentifier?: string
+    tokenIdentifier?: string,
+    ip: string = request.ip()
   ) {
     let country: string | null = null
     let city: string | null = null
 
     if (status === 'success') {
       try {
-        const ip = request.ip()
         if (ip && ip !== '::1' && ip !== '127.0.0.1') {
           const res = await fetch(`http://ip-api.com/json/${ip}`)
           if (res.ok) {
@@ -195,7 +204,7 @@ export default class LoginVerify {
     await LoginHistory.create({
       userId: userId ?? undefined,
       tokenIdentifier: tokenIdentifier ?? undefined,
-      ipAddress: request.ip(),
+      ipAddress: ip,
       userAgent: request.header('user-agent') ?? undefined,
       status,
       failureReason: failureReason ?? undefined,

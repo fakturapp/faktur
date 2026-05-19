@@ -4,9 +4,12 @@ import User from '#models/account/user'
 import TokenService from '#services/auth/token_service'
 import AuditLog from '#models/shared/audit_log'
 import securityConfig from '#config/security'
+import { realClientIp } from '#services/http/real_client_ip'
 
 export default class Verify {
-  async handle({ request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { request, response } = ctx
+    const clientIp = realClientIp(ctx)
     const { token } = request.only(['token'])
 
     if (!token) {
@@ -40,7 +43,7 @@ export default class Verify {
       action: 'user.email_verified',
       resourceType: 'user',
       resourceId: user.id,
-      ipAddress: request.ip(),
+      ipAddress: clientIp,
       userAgent: request.header('user-agent'),
       severity: 'info',
     })

@@ -6,10 +6,12 @@ import LoginHistory from '#models/account/login_history'
 import TwoFactorService from '#services/auth/two_factor_service'
 import { twoFactorVerifyValidator } from '#validators/auth/auth_validators'
 import UserTransformer from '#transformers/user_transformer'
+import { realClientIp } from '#services/http/real_client_ip'
 
 export default class Verify {
   async handle(ctx: HttpContext) {
     const { request, response } = ctx
+    const clientIp = realClientIp(ctx)
     const data = await request.validateUsing(twoFactorVerifyValidator)
 
     const user = await User.find(data.userId)
@@ -31,7 +33,7 @@ export default class Verify {
         action: 'user.recovery_code_used',
         resourceType: 'user',
         resourceId: user.id,
-        ipAddress: request.ip(),
+        ipAddress: clientIp,
         userAgent: request.header('user-agent'),
         severity: 'warning',
         metadata: { remainingCodes: result.remainingCodes.length },
@@ -60,7 +62,7 @@ export default class Verify {
     await LoginHistory.create({
       userId: user.id,
       tokenIdentifier: String(token.identifier),
-      ipAddress: request.ip(),
+      ipAddress: clientIp,
       userAgent: request.header('user-agent') ?? undefined,
       status: 'success',
       isSuspicious: false,
@@ -71,7 +73,7 @@ export default class Verify {
       action: 'user.login',
       resourceType: 'user',
       resourceId: user.id,
-      ipAddress: request.ip(),
+      ipAddress: clientIp,
       userAgent: request.header('user-agent'),
       severity: 'info',
     })
