@@ -54,6 +54,12 @@ export function CreateApiKeyDialog({ open, onClose, onCreated, projectId }: Prop
   const [catalog, setCatalog] = useState<ScopesCatalog | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [scopeSearch, setScopeSearch] = useState('')
+  const [tomorrowIso, setTomorrowIso] = useState('')
+
+  useEffect(() => {
+    if (!open) return
+    setTomorrowIso(new Date(Date.now() + 24 * 3600 * 1000).toISOString().slice(0, 10))
+  }, [open])
 
   useEffect(() => {
     if (!open) return
@@ -269,7 +275,7 @@ export function CreateApiKeyDialog({ open, onClose, onCreated, projectId }: Prop
                   <Input
                     type="date"
                     value={customExpiry}
-                    min={new Date(Date.now() + 24 * 3600 * 1000).toISOString().slice(0, 10)}
+                    min={tomorrowIso}
                     onChange={(e) => setCustomExpiry(e.target.value)}
                   />
                   <FieldDescription>Choisissez la date d&apos;expiration de la clé.</FieldDescription>
