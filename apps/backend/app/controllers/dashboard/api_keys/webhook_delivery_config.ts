@@ -1,7 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import vine from '@vinejs/vine'
 import ApiKey from '#models/api/api_key'
-import ApiKeyWebhook from '#models/api/api_key_webhook'
+import type ApiKeyWebhook from '#models/api/api_key_webhook'
 import publicIdCodec, { PublicIdParseError } from '#services/api/public_id_codec'
 import auditLog from '#services/api/audit_log_service'
 
@@ -10,9 +10,7 @@ export const updateValidator = vine.compile(
     deliveryMaxRetries: vine.number().min(0).max(20).optional(),
     deliveryTimeoutMs: vine.number().min(1000).max(60000).optional(),
     deliveryBackoffSeconds: vine.number().min(5).max(3600).optional(),
-    deliveryCustomHeaders: vine
-      .record(vine.string().trim().minLength(1).maxLength(256))
-      .optional(),
+    deliveryCustomHeaders: vine.record(vine.string().trim().minLength(1).maxLength(256)).optional(),
   })
 )
 

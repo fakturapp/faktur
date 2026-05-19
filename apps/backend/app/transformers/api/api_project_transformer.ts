@@ -1,4 +1,4 @@
-import ApiProject from '#models/api/api_project'
+import type ApiProject from '#models/api/api_project'
 
 interface ProjectShape {
   id: string

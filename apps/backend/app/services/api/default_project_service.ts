@@ -4,10 +4,7 @@ const DEFAULT_NAME = 'Mon premier projet'
 const DEFAULT_DESCRIPTION = 'Projet créé automatiquement à la création de l’équipe.'
 
 class DefaultProjectService {
-  async ensureForTeam(
-    teamId: string,
-    ownerUserId: string | null
-  ): Promise<ApiProject> {
+  async ensureForTeam(teamId: string, ownerUserId: string | null): Promise<ApiProject> {
     const existing = await ApiProject.query()
       .where('team_id', teamId)
       .where('is_archived', false)

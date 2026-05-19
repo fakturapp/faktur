@@ -25,7 +25,8 @@ export default class ApiCreditMiddleware {
     }
 
     const teamId = apiKey.teamId
-    const userId = (apiKey as unknown as { createdByUserId?: string | null }).createdByUserId ?? null
+    const userId =
+      (apiKey as unknown as { createdByUserId?: string | null }).createdByUserId ?? null
 
     const check = await apiCreditService.check(teamId, userId)
 

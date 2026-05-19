@@ -25,7 +25,23 @@ export class AiUsageLogSchema extends BaseModel {
 }
 
 export class AnalyticsErrorSchema extends BaseModel {
-  static $columns = ['browser', 'createdAt', 'errorMessage', 'errorMessageFullEncrypted', 'errorType', 'fingerprint', 'id', 'isResolved', 'occurrenceCount', 'os', 'pagePath', 'sessionId', 'stackTraceEncrypted', 'timestamp', 'userId'] as const
+  static $columns = [
+    'browser',
+    'createdAt',
+    'errorMessage',
+    'errorMessageFullEncrypted',
+    'errorType',
+    'fingerprint',
+    'id',
+    'isResolved',
+    'occurrenceCount',
+    'os',
+    'pagePath',
+    'sessionId',
+    'stackTraceEncrypted',
+    'timestamp',
+    'userId',
+  ] as const
   $columns = AnalyticsErrorSchema.$columns
   @column()
   declare browser: string | null
@@ -60,7 +76,19 @@ export class AnalyticsErrorSchema extends BaseModel {
 }
 
 export class AnalyticsEventSchema extends BaseModel {
-  static $columns = ['createdAt', 'eventName', 'eventType', 'id', 'metadata', 'metadataEncrypted', 'pagePath', 'pagePathFullEncrypted', 'sessionId', 'timestamp', 'userId'] as const
+  static $columns = [
+    'createdAt',
+    'eventName',
+    'eventType',
+    'id',
+    'metadata',
+    'metadataEncrypted',
+    'pagePath',
+    'pagePathFullEncrypted',
+    'sessionId',
+    'timestamp',
+    'userId',
+  ] as const
   $columns = AnalyticsEventSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -87,7 +115,19 @@ export class AnalyticsEventSchema extends BaseModel {
 }
 
 export class AnalyticsPerformanceSchema extends BaseModel {
-  static $columns = ['connectionType', 'createdAt', 'deviceType', 'id', 'metricName', 'metricValue', 'pagePath', 'rating', 'sessionId', 'timestamp', 'userId'] as const
+  static $columns = [
+    'connectionType',
+    'createdAt',
+    'deviceType',
+    'id',
+    'metricName',
+    'metricValue',
+    'pagePath',
+    'rating',
+    'sessionId',
+    'timestamp',
+    'userId',
+  ] as const
   $columns = AnalyticsPerformanceSchema.$columns
   @column()
   declare connectionType: string | null
@@ -114,7 +154,35 @@ export class AnalyticsPerformanceSchema extends BaseModel {
 }
 
 export class AnalyticsSessionSchema extends BaseModel {
-  static $columns = ['browser', 'browserVersion', 'cityEncrypted', 'country', 'countryNameEncrypted', 'createdAt', 'deviceType', 'durationSeconds', 'endedAt', 'entryPage', 'eventCount', 'exitPage', 'id', 'ipAddressEncrypted', 'ipHash', 'isAuthenticated', 'language', 'os', 'pageCount', 'referrerEncrypted', 'screenHeight', 'screenWidth', 'sessionToken', 'startedAt', 'updatedAt', 'userAgentEncrypted', 'userId'] as const
+  static $columns = [
+    'browser',
+    'browserVersion',
+    'cityEncrypted',
+    'country',
+    'countryNameEncrypted',
+    'createdAt',
+    'deviceType',
+    'durationSeconds',
+    'endedAt',
+    'entryPage',
+    'eventCount',
+    'exitPage',
+    'id',
+    'ipAddressEncrypted',
+    'ipHash',
+    'isAuthenticated',
+    'language',
+    'os',
+    'pageCount',
+    'referrerEncrypted',
+    'screenHeight',
+    'screenWidth',
+    'sessionToken',
+    'startedAt',
+    'updatedAt',
+    'userAgentEncrypted',
+    'userId',
+  ] as const
   $columns = AnalyticsSessionSchema.$columns
   @column()
   declare browser: string | null
@@ -173,7 +241,22 @@ export class AnalyticsSessionSchema extends BaseModel {
 }
 
 export class ApiAuditLogSchema extends BaseModel {
-  static $columns = ['action', 'actorEmail', 'actorName', 'actorUserId', 'createdAt', 'id', 'ip', 'metadata', 'projectId', 'targetId', 'targetLabel', 'targetType', 'teamId', 'userAgent'] as const
+  static $columns = [
+    'action',
+    'actorEmail',
+    'actorName',
+    'actorUserId',
+    'createdAt',
+    'id',
+    'ip',
+    'metadata',
+    'projectId',
+    'targetId',
+    'targetLabel',
+    'targetType',
+    'teamId',
+    'userAgent',
+  ] as const
   $columns = ApiAuditLogSchema.$columns
   @column()
   declare action: string
@@ -206,7 +289,22 @@ export class ApiAuditLogSchema extends BaseModel {
 }
 
 export class ApiCreditUsageSchema extends BaseModel {
-  static $columns = ['createdAt', 'dailyCount', 'day', 'id', 'lastMinuteAt', 'minuteCount', 'sessionCount', 'sessionStartedAt', 'teamId', 'updatedAt', 'userId', 'weekStart', 'weeklyCount', 'weeklyStartedAt'] as const
+  static $columns = [
+    'createdAt',
+    'dailyCount',
+    'day',
+    'id',
+    'lastMinuteAt',
+    'minuteCount',
+    'sessionCount',
+    'sessionStartedAt',
+    'teamId',
+    'updatedAt',
+    'userId',
+    'weekStart',
+    'weeklyCount',
+    'weeklyStartedAt',
+  ] as const
   $columns = ApiCreditUsageSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -239,7 +337,17 @@ export class ApiCreditUsageSchema extends BaseModel {
 }
 
 export class ApiIdempotencyKeySchema extends BaseModel {
-  static $columns = ['apiKeyId', 'bodyHash', 'createdAt', 'expiresAt', 'key', 'method', 'path', 'responseBody', 'responseStatus'] as const
+  static $columns = [
+    'apiKeyId',
+    'bodyHash',
+    'createdAt',
+    'expiresAt',
+    'key',
+    'method',
+    'path',
+    'responseBody',
+    'responseStatus',
+  ] as const
   $columns = ApiIdempotencyKeySchema.$columns
   @column()
   declare apiKeyId: string
@@ -262,7 +370,24 @@ export class ApiIdempotencyKeySchema extends BaseModel {
 }
 
 export class ApiKeyWebhookSchema extends BaseModel {
-  static $columns = ['apiKeyId', 'consecutiveFailures', 'createdAt', 'deliveryBackoffSeconds', 'deliveryCustomHeaders', 'deliveryMaxRetries', 'deliveryTimeoutMs', 'events', 'id', 'isActive', 'lastDeliveryAt', 'lastDeliveryStatus', 'secretHash', 'secretLast4', 'updatedAt', 'url'] as const
+  static $columns = [
+    'apiKeyId',
+    'consecutiveFailures',
+    'createdAt',
+    'deliveryBackoffSeconds',
+    'deliveryCustomHeaders',
+    'deliveryMaxRetries',
+    'deliveryTimeoutMs',
+    'events',
+    'id',
+    'isActive',
+    'lastDeliveryAt',
+    'lastDeliveryStatus',
+    'secretHash',
+    'secretLast4',
+    'updatedAt',
+    'url',
+  ] as const
   $columns = ApiKeyWebhookSchema.$columns
   @column()
   declare apiKeyId: string
@@ -299,7 +424,29 @@ export class ApiKeyWebhookSchema extends BaseModel {
 }
 
 export class ApiKeySchema extends BaseModel {
-  static $columns = ['allowedIps', 'createdAt', 'createdByUserId', 'expiresAt', 'hash', 'id', 'last4', 'lastIp', 'lastUsedAt', 'name', 'prefix', 'projectId', 'rateLimitTier', 'revokedAt', 'revokedReason', 'rotatingToId', 'rotationGraceUntil', 'scopes', 'teamId', 'updatedAt', 'usageCount'] as const
+  static $columns = [
+    'allowedIps',
+    'createdAt',
+    'createdByUserId',
+    'expiresAt',
+    'hash',
+    'id',
+    'last4',
+    'lastIp',
+    'lastUsedAt',
+    'name',
+    'prefix',
+    'projectId',
+    'rateLimitTier',
+    'revokedAt',
+    'revokedReason',
+    'rotatingToId',
+    'rotationGraceUntil',
+    'scopes',
+    'teamId',
+    'updatedAt',
+    'usageCount',
+  ] as const
   $columns = ApiKeySchema.$columns
   @column()
   declare allowedIps: any | null
@@ -346,7 +493,18 @@ export class ApiKeySchema extends BaseModel {
 }
 
 export class ApiProjectSchema extends BaseModel {
-  static $columns = ['color', 'createdAt', 'createdByUserId', 'description', 'id', 'isArchived', 'isDefault', 'name', 'teamId', 'updatedAt'] as const
+  static $columns = [
+    'color',
+    'createdAt',
+    'createdByUserId',
+    'description',
+    'id',
+    'isArchived',
+    'isDefault',
+    'name',
+    'teamId',
+    'updatedAt',
+  ] as const
   $columns = ApiProjectSchema.$columns
   @column()
   declare color: string | null
@@ -371,7 +529,18 @@ export class ApiProjectSchema extends BaseModel {
 }
 
 export class ApiRequestLogSchema extends BaseModel {
-  static $columns = ['apiKeyId', 'createdAt', 'errorCode', 'id', 'ip', 'latencyMs', 'method', 'path', 'requestId', 'status'] as const
+  static $columns = [
+    'apiKeyId',
+    'createdAt',
+    'errorCode',
+    'id',
+    'ip',
+    'latencyMs',
+    'method',
+    'path',
+    'requestId',
+    'status',
+  ] as const
   $columns = ApiRequestLogSchema.$columns
   @column()
   declare apiKeyId: string
@@ -396,7 +565,22 @@ export class ApiRequestLogSchema extends BaseModel {
 }
 
 export class ApiWebhookDeliverySchema extends BaseModel {
-  static $columns = ['apiKeyId', 'attemptCount', 'createdAt', 'deliveredAt', 'encryptedPayload', 'eventId', 'eventType', 'id', 'lastError', 'lastStatusCode', 'nextAttemptAt', 'status', 'updatedAt', 'url'] as const
+  static $columns = [
+    'apiKeyId',
+    'attemptCount',
+    'createdAt',
+    'deliveredAt',
+    'encryptedPayload',
+    'eventId',
+    'eventType',
+    'id',
+    'lastError',
+    'lastStatusCode',
+    'nextAttemptAt',
+    'status',
+    'updatedAt',
+    'url',
+  ] as const
   $columns = ApiWebhookDeliverySchema.$columns
   @column()
   declare apiKeyId: string
@@ -429,7 +613,18 @@ export class ApiWebhookDeliverySchema extends BaseModel {
 }
 
 export class AuditLogSchema extends BaseModel {
-  static $columns = ['action', 'createdAt', 'id', 'ipAddress', 'metadata', 'resourceId', 'resourceType', 'severity', 'userAgent', 'userId'] as const
+  static $columns = [
+    'action',
+    'createdAt',
+    'id',
+    'ipAddress',
+    'metadata',
+    'resourceId',
+    'resourceType',
+    'severity',
+    'userAgent',
+    'userId',
+  ] as const
   $columns = AuditLogSchema.$columns
   @column()
   declare action: string
@@ -454,7 +649,21 @@ export class AuditLogSchema extends BaseModel {
 }
 
 export class AuthAccessTokenSchema extends BaseModel {
-  static $columns = ['abilities', 'createdAt', 'encryptedKek', 'expiresAt', 'hash', 'id', 'ipAddress', 'lastUsedAt', 'name', 'tokenableId', 'type', 'updatedAt', 'userAgent'] as const
+  static $columns = [
+    'abilities',
+    'createdAt',
+    'encryptedKek',
+    'expiresAt',
+    'hash',
+    'id',
+    'ipAddress',
+    'lastUsedAt',
+    'name',
+    'tokenableId',
+    'type',
+    'updatedAt',
+    'userAgent',
+  ] as const
   $columns = AuthAccessTokenSchema.$columns
   @column()
   declare abilities: string
@@ -485,7 +694,17 @@ export class AuthAccessTokenSchema extends BaseModel {
 }
 
 export class AuthProviderSchema extends BaseModel {
-  static $columns = ['avatarUrl', 'createdAt', 'displayName', 'email', 'id', 'provider', 'providerUserId', 'updatedAt', 'userId'] as const
+  static $columns = [
+    'avatarUrl',
+    'createdAt',
+    'displayName',
+    'email',
+    'id',
+    'provider',
+    'providerUserId',
+    'updatedAt',
+    'userId',
+  ] as const
   $columns = AuthProviderSchema.$columns
   @column()
   declare avatarUrl: string | null
@@ -508,7 +727,17 @@ export class AuthProviderSchema extends BaseModel {
 }
 
 export class BankAccountSchema extends BaseModel {
-  static $columns = ['bankName', 'bic', 'createdAt', 'iban', 'id', 'isDefault', 'label', 'teamId', 'updatedAt'] as const
+  static $columns = [
+    'bankName',
+    'bic',
+    'createdAt',
+    'iban',
+    'id',
+    'isDefault',
+    'label',
+    'teamId',
+    'updatedAt',
+  ] as const
   $columns = BankAccountSchema.$columns
   @column()
   declare bankName: string | null
@@ -531,7 +760,17 @@ export class BankAccountSchema extends BaseModel {
 }
 
 export class BugReportSchema extends BaseModel {
-  static $columns = ['createdAt', 'description', 'id', 'severity', 'status', 'stepsToReproduce', 'subject', 'updatedAt', 'userId'] as const
+  static $columns = [
+    'createdAt',
+    'description',
+    'id',
+    'severity',
+    'status',
+    'stepsToReproduce',
+    'subject',
+    'updatedAt',
+    'userId',
+  ] as const
   $columns = BugReportSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -554,7 +793,21 @@ export class BugReportSchema extends BaseModel {
 }
 
 export class ClientContactSchema extends BaseModel {
-  static $columns = ['clientId', 'createdAt', 'email', 'firstName', 'id', 'includeInEmails', 'isPrimary', 'lastName', 'notes', 'phone', 'role', 'teamId', 'updatedAt'] as const
+  static $columns = [
+    'clientId',
+    'createdAt',
+    'email',
+    'firstName',
+    'id',
+    'includeInEmails',
+    'isPrimary',
+    'lastName',
+    'notes',
+    'phone',
+    'role',
+    'teamId',
+    'updatedAt',
+  ] as const
   $columns = ClientContactSchema.$columns
   @column()
   declare clientId: string
@@ -585,7 +838,30 @@ export class ClientContactSchema extends BaseModel {
 }
 
 export class ClientSchema extends BaseModel {
-  static $columns = ['address', 'addressComplement', 'b2BContactId', 'city', 'civility', 'companyName', 'country', 'createdAt', 'email', 'firstName', 'id', 'includeInEmails', 'lastName', 'notes', 'phone', 'postalCode', 'siren', 'siret', 'teamId', 'type', 'updatedAt', 'vatNumber'] as const
+  static $columns = [
+    'address',
+    'addressComplement',
+    'b2BContactId',
+    'city',
+    'civility',
+    'companyName',
+    'country',
+    'createdAt',
+    'email',
+    'firstName',
+    'id',
+    'includeInEmails',
+    'lastName',
+    'notes',
+    'phone',
+    'postalCode',
+    'siren',
+    'siret',
+    'teamId',
+    'type',
+    'updatedAt',
+    'vatNumber',
+  ] as const
   $columns = ClientSchema.$columns
   @column()
   declare address: string | null
@@ -634,7 +910,32 @@ export class ClientSchema extends BaseModel {
 }
 
 export class CompanySchema extends BaseModel {
-  static $columns = ['addressLine1', 'addressLine2', 'bankName', 'bic', 'city', 'country', 'createdAt', 'currency', 'email', 'iban', 'id', 'legalForm', 'legalName', 'logoUrl', 'paymentConditions', 'phone', 'postalCode', 'siren', 'siret', 'teamId', 'tradeName', 'updatedAt', 'vatNumber', 'website'] as const
+  static $columns = [
+    'addressLine1',
+    'addressLine2',
+    'bankName',
+    'bic',
+    'city',
+    'country',
+    'createdAt',
+    'currency',
+    'email',
+    'iban',
+    'id',
+    'legalForm',
+    'legalName',
+    'logoUrl',
+    'paymentConditions',
+    'phone',
+    'postalCode',
+    'siren',
+    'siret',
+    'teamId',
+    'tradeName',
+    'updatedAt',
+    'vatNumber',
+    'website',
+  ] as const
   $columns = CompanySchema.$columns
   @column()
   declare addressLine1: string | null
@@ -687,7 +988,17 @@ export class CompanySchema extends BaseModel {
 }
 
 export class CookieConsentSchema extends BaseModel {
-  static $columns = ['action', 'consentAnalytics', 'consentEssential', 'createdAt', 'id', 'ipAddressEncrypted', 'userAgentEncrypted', 'userId', 'visitorId'] as const
+  static $columns = [
+    'action',
+    'consentAnalytics',
+    'consentEssential',
+    'createdAt',
+    'id',
+    'ipAddressEncrypted',
+    'userAgentEncrypted',
+    'userId',
+    'visitorId',
+  ] as const
   $columns = CookieConsentSchema.$columns
   @column()
   declare action: string
@@ -710,7 +1021,20 @@ export class CookieConsentSchema extends BaseModel {
 }
 
 export class CreditNoteLineSchema extends BaseModel {
-  static $columns = ['createdAt', 'creditNoteId', 'description', 'id', 'position', 'quantity', 'saleType', 'total', 'unit', 'unitPrice', 'updatedAt', 'vatRate'] as const
+  static $columns = [
+    'createdAt',
+    'creditNoteId',
+    'description',
+    'id',
+    'position',
+    'quantity',
+    'saleType',
+    'total',
+    'unit',
+    'unitPrice',
+    'updatedAt',
+    'vatRate',
+  ] as const
   $columns = CreditNoteLineSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -739,7 +1063,41 @@ export class CreditNoteLineSchema extends BaseModel {
 }
 
 export class CreditNoteSchema extends BaseModel {
-  static $columns = ['accentColor', 'acceptanceConditions', 'billingType', 'clientId', 'clientSiren', 'clientSnapshot', 'clientVatNumber', 'comment', 'companySnapshot', 'createdAt', 'creditNoteNumber', 'deliveryAddress', 'documentTitle', 'freeField', 'globalDiscountType', 'globalDiscountValue', 'id', 'issueDate', 'language', 'logoUrl', 'notes', 'operationCategory', 'reason', 'signatureField', 'sourceInvoiceId', 'status', 'subject', 'subtotal', 'taxAmount', 'teamId', 'total', 'updatedAt', 'vatExemptReason'] as const
+  static $columns = [
+    'accentColor',
+    'acceptanceConditions',
+    'billingType',
+    'clientId',
+    'clientSiren',
+    'clientSnapshot',
+    'clientVatNumber',
+    'comment',
+    'companySnapshot',
+    'createdAt',
+    'creditNoteNumber',
+    'deliveryAddress',
+    'documentTitle',
+    'freeField',
+    'globalDiscountType',
+    'globalDiscountValue',
+    'id',
+    'issueDate',
+    'language',
+    'logoUrl',
+    'notes',
+    'operationCategory',
+    'reason',
+    'signatureField',
+    'sourceInvoiceId',
+    'status',
+    'subject',
+    'subtotal',
+    'taxAmount',
+    'teamId',
+    'total',
+    'updatedAt',
+    'vatExemptReason',
+  ] as const
   $columns = CreditNoteSchema.$columns
   @column()
   declare accentColor: string
@@ -810,7 +1168,21 @@ export class CreditNoteSchema extends BaseModel {
 }
 
 export class DocumentShareLinkSchema extends BaseModel {
-  static $columns = ['autoExpire', 'createdAt', 'createdByUserId', 'documentId', 'documentType', 'expiresAt', 'id', 'isActive', 'permission', 'teamId', 'token', 'updatedAt', 'visibility'] as const
+  static $columns = [
+    'autoExpire',
+    'createdAt',
+    'createdByUserId',
+    'documentId',
+    'documentType',
+    'expiresAt',
+    'id',
+    'isActive',
+    'permission',
+    'teamId',
+    'token',
+    'updatedAt',
+    'visibility',
+  ] as const
   $columns = DocumentShareLinkSchema.$columns
   @column()
   declare autoExpire: boolean
@@ -841,7 +1213,19 @@ export class DocumentShareLinkSchema extends BaseModel {
 }
 
 export class DocumentShareSchema extends BaseModel {
-  static $columns = ['createdAt', 'documentId', 'documentType', 'id', 'permission', 'sharedByUserId', 'sharedWithEmail', 'sharedWithUserId', 'status', 'teamId', 'updatedAt'] as const
+  static $columns = [
+    'createdAt',
+    'documentId',
+    'documentType',
+    'id',
+    'permission',
+    'sharedByUserId',
+    'sharedWithEmail',
+    'sharedWithUserId',
+    'status',
+    'teamId',
+    'updatedAt',
+  ] as const
   $columns = DocumentShareSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -868,7 +1252,25 @@ export class DocumentShareSchema extends BaseModel {
 }
 
 export class EinvoicingSubmissionSchema extends BaseModel {
-  static $columns = ['createdAt', 'documentId', 'documentNumber', 'documentType', 'externalId', 'id', 'lastCheckedAt', 'lifecycleEvents', 'provider', 'status', 'statusMessage', 'submittedAt', 'submittedByUserId', 'teamId', 'trackingId', 'updatedAt', 'xmlContent'] as const
+  static $columns = [
+    'createdAt',
+    'documentId',
+    'documentNumber',
+    'documentType',
+    'externalId',
+    'id',
+    'lastCheckedAt',
+    'lifecycleEvents',
+    'provider',
+    'status',
+    'statusMessage',
+    'submittedAt',
+    'submittedByUserId',
+    'teamId',
+    'trackingId',
+    'updatedAt',
+    'xmlContent',
+  ] as const
   $columns = EinvoicingSubmissionSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -907,7 +1309,24 @@ export class EinvoicingSubmissionSchema extends BaseModel {
 }
 
 export class EmailAccountSchema extends BaseModel {
-  static $columns = ['accessToken', 'createdAt', 'displayName', 'email', 'id', 'isActive', 'isDefault', 'provider', 'refreshToken', 'smtpHost', 'smtpPassword', 'smtpPort', 'smtpUsername', 'teamId', 'tokenExpiresAt', 'updatedAt'] as const
+  static $columns = [
+    'accessToken',
+    'createdAt',
+    'displayName',
+    'email',
+    'id',
+    'isActive',
+    'isDefault',
+    'provider',
+    'refreshToken',
+    'smtpHost',
+    'smtpPassword',
+    'smtpPort',
+    'smtpUsername',
+    'teamId',
+    'tokenExpiresAt',
+    'updatedAt',
+  ] as const
   $columns = EmailAccountSchema.$columns
   @column()
   declare accessToken: string | null
@@ -944,7 +1363,22 @@ export class EmailAccountSchema extends BaseModel {
 }
 
 export class EmailLogSchema extends BaseModel {
-  static $columns = ['body', 'createdAt', 'documentId', 'documentNumber', 'documentType', 'emailType', 'errorMessage', 'fromEmail', 'id', 'status', 'subject', 'teamId', 'toEmail', 'updatedAt'] as const
+  static $columns = [
+    'body',
+    'createdAt',
+    'documentId',
+    'documentNumber',
+    'documentType',
+    'emailType',
+    'errorMessage',
+    'fromEmail',
+    'id',
+    'status',
+    'subject',
+    'teamId',
+    'toEmail',
+    'updatedAt',
+  ] as const
   $columns = EmailLogSchema.$columns
   @column()
   declare body: string
@@ -977,7 +1411,15 @@ export class EmailLogSchema extends BaseModel {
 }
 
 export class EmailTemplateSchema extends BaseModel {
-  static $columns = ['body', 'createdAt', 'id', 'subject', 'teamId', 'templateType', 'updatedAt'] as const
+  static $columns = [
+    'body',
+    'createdAt',
+    'id',
+    'subject',
+    'teamId',
+    'templateType',
+    'updatedAt',
+  ] as const
   $columns = EmailTemplateSchema.$columns
   @column()
   declare body: string
@@ -1013,7 +1455,24 @@ export class ExpenseCategorySchema extends BaseModel {
 }
 
 export class ExpenseSchema extends BaseModel {
-  static $columns = ['amount', 'categoryId', 'createdAt', 'currency', 'description', 'expenseDate', 'id', 'isDeductible', 'notes', 'paymentMethod', 'receiptUrl', 'supplier', 'teamId', 'updatedAt', 'vatAmount', 'vatRate'] as const
+  static $columns = [
+    'amount',
+    'categoryId',
+    'createdAt',
+    'currency',
+    'description',
+    'expenseDate',
+    'id',
+    'isDeductible',
+    'notes',
+    'paymentMethod',
+    'receiptUrl',
+    'supplier',
+    'teamId',
+    'updatedAt',
+    'vatAmount',
+    'vatRate',
+  ] as const
   $columns = ExpenseSchema.$columns
   @column()
   declare amount: string
@@ -1067,7 +1526,20 @@ export class FeedbackSchema extends BaseModel {
 }
 
 export class InvoiceLineSchema extends BaseModel {
-  static $columns = ['createdAt', 'description', 'id', 'invoiceId', 'position', 'quantity', 'saleType', 'total', 'unit', 'unitPrice', 'updatedAt', 'vatRate'] as const
+  static $columns = [
+    'createdAt',
+    'description',
+    'id',
+    'invoiceId',
+    'position',
+    'quantity',
+    'saleType',
+    'total',
+    'unit',
+    'unitPrice',
+    'updatedAt',
+    'vatRate',
+  ] as const
   $columns = InvoiceLineSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -1096,7 +1568,17 @@ export class InvoiceLineSchema extends BaseModel {
 }
 
 export class InvoicePaymentSchema extends BaseModel {
-  static $columns = ['amount', 'createdAt', 'id', 'invoiceId', 'notes', 'paymentDate', 'paymentMethod', 'teamId', 'updatedAt'] as const
+  static $columns = [
+    'amount',
+    'createdAt',
+    'id',
+    'invoiceId',
+    'notes',
+    'paymentDate',
+    'paymentMethod',
+    'teamId',
+    'updatedAt',
+  ] as const
   $columns = InvoicePaymentSchema.$columns
   @column()
   declare amount: string
@@ -1119,7 +1601,69 @@ export class InvoicePaymentSchema extends BaseModel {
 }
 
 export class InvoiceSettingSchema extends BaseModel {
-  static $columns = ['accentColor', 'aiApiKeyClaude', 'aiApiKeyGemini', 'aiApiKeyGroq', 'aiCustomApiKey', 'aiEnabled', 'aiKeyMode', 'aiModel', 'aiProvider', 'b2BAccountId', 'b2BEnterpriseSize', 'b2BEreportingEnabled', 'b2BNafCode', 'b2BTypeOperation', 'billingType', 'collaborationEnabled', 'createdAt', 'creditNoteFilenamePattern', 'customPaymentMethod', 'darkMode', 'defaultAcceptanceConditions', 'defaultFooterText', 'defaultFreeField', 'defaultLanguage', 'defaultOperationCategory', 'defaultShowDeliveryAddress', 'defaultShowNotes', 'defaultShowQuantityColumn', 'defaultShowUnitColumn', 'defaultShowUnitPriceColumn', 'defaultShowVatColumn', 'defaultSignatureField', 'defaultSubject', 'defaultVatExempt', 'defaultVatOnDebits', 'defaultVatRate', 'documentFont', 'eInvoicingEnabled', 'footerMode', 'id', 'invoiceFilenamePattern', 'invoiceNumberPattern', 'logoBorderRadius', 'logoSource', 'logoUrl', 'nextCreditNoteNumber', 'nextInvoiceNumber', 'nextQuoteNumber', 'paymentMethods', 'pdpApiKey', 'pdpProvider', 'pdpSandbox', 'quoteFilenamePattern', 'quoteNumberPattern', 'stripePublishableKey', 'stripeSecretKey', 'stripeWebhookSecret', 'stripeWebhookSecretApp', 'teamId', 'template', 'updatedAt'] as const
+  static $columns = [
+    'accentColor',
+    'aiApiKeyClaude',
+    'aiApiKeyGemini',
+    'aiApiKeyGroq',
+    'aiCustomApiKey',
+    'aiEnabled',
+    'aiKeyMode',
+    'aiModel',
+    'aiProvider',
+    'b2BAccountId',
+    'b2BEnterpriseSize',
+    'b2BEreportingEnabled',
+    'b2BNafCode',
+    'b2BTypeOperation',
+    'billingType',
+    'collaborationEnabled',
+    'createdAt',
+    'creditNoteFilenamePattern',
+    'customPaymentMethod',
+    'darkMode',
+    'defaultAcceptanceConditions',
+    'defaultFooterText',
+    'defaultFreeField',
+    'defaultLanguage',
+    'defaultOperationCategory',
+    'defaultShowDeliveryAddress',
+    'defaultShowNotes',
+    'defaultShowQuantityColumn',
+    'defaultShowUnitColumn',
+    'defaultShowUnitPriceColumn',
+    'defaultShowVatColumn',
+    'defaultSignatureField',
+    'defaultSubject',
+    'defaultVatExempt',
+    'defaultVatOnDebits',
+    'defaultVatRate',
+    'documentFont',
+    'eInvoicingEnabled',
+    'footerMode',
+    'id',
+    'invoiceFilenamePattern',
+    'invoiceNumberPattern',
+    'logoBorderRadius',
+    'logoSource',
+    'logoUrl',
+    'nextCreditNoteNumber',
+    'nextInvoiceNumber',
+    'nextQuoteNumber',
+    'paymentMethods',
+    'pdpApiKey',
+    'pdpProvider',
+    'pdpSandbox',
+    'quoteFilenamePattern',
+    'quoteNumberPattern',
+    'stripePublishableKey',
+    'stripeSecretKey',
+    'stripeWebhookSecret',
+    'stripeWebhookSecretApp',
+    'teamId',
+    'template',
+    'updatedAt',
+  ] as const
   $columns = InvoiceSettingSchema.$columns
   @column()
   declare accentColor: string
@@ -1246,7 +1790,50 @@ export class InvoiceSettingSchema extends BaseModel {
 }
 
 export class InvoiceSchema extends BaseModel {
-  static $columns = ['accentColor', 'acceptanceConditions', 'bankAccountId', 'billingType', 'clientId', 'clientSiren', 'clientSnapshot', 'clientVatNumber', 'comment', 'companySnapshot', 'createdAt', 'deliveryAddress', 'documentTitle', 'dueDate', 'freeField', 'globalDiscountType', 'globalDiscountValue', 'id', 'invoiceNumber', 'issueDate', 'language', 'logoUrl', 'notes', 'operationCategory', 'paidDate', 'paymentMethod', 'paymentTerms', 'showQuantityColumn', 'showUnitColumn', 'showUnitPriceColumn', 'showVatColumn', 'signatureField', 'sourceQuoteId', 'status', 'subject', 'subtotal', 'taxAmount', 'teamId', 'total', 'updatedAt', 'vatExemptReason', 'vatOnDebits'] as const
+  static $columns = [
+    'accentColor',
+    'acceptanceConditions',
+    'bankAccountId',
+    'billingType',
+    'clientId',
+    'clientSiren',
+    'clientSnapshot',
+    'clientVatNumber',
+    'comment',
+    'companySnapshot',
+    'createdAt',
+    'deliveryAddress',
+    'documentTitle',
+    'dueDate',
+    'freeField',
+    'globalDiscountType',
+    'globalDiscountValue',
+    'id',
+    'invoiceNumber',
+    'issueDate',
+    'language',
+    'logoUrl',
+    'notes',
+    'operationCategory',
+    'paidDate',
+    'paymentMethod',
+    'paymentTerms',
+    'showQuantityColumn',
+    'showUnitColumn',
+    'showUnitPriceColumn',
+    'showVatColumn',
+    'signatureField',
+    'sourceQuoteId',
+    'status',
+    'subject',
+    'subtotal',
+    'taxAmount',
+    'teamId',
+    'total',
+    'updatedAt',
+    'vatExemptReason',
+    'vatOnDebits',
+  ] as const
   $columns = InvoiceSchema.$columns
   @column()
   declare accentColor: string
@@ -1335,7 +1922,19 @@ export class InvoiceSchema extends BaseModel {
 }
 
 export class LoginHistorySchema extends BaseModel {
-  static $columns = ['city', 'country', 'createdAt', 'failureReason', 'id', 'ipAddress', 'isSuspicious', 'status', 'tokenIdentifier', 'userAgent', 'userId'] as const
+  static $columns = [
+    'city',
+    'country',
+    'createdAt',
+    'failureReason',
+    'id',
+    'ipAddress',
+    'isSuspicious',
+    'status',
+    'tokenIdentifier',
+    'userAgent',
+    'userId',
+  ] as const
   $columns = LoginHistorySchema.$columns
   @column()
   declare city: string | null
@@ -1362,7 +1961,28 @@ export class LoginHistorySchema extends BaseModel {
 }
 
 export class OauthAppSchema extends BaseModel {
-  static $columns = ['allowAllOrigins', 'allowedOrigins', 'clientId', 'clientSecretHash', 'createdAt', 'createdByUserId', 'description', 'encryptedWebhookSecret', 'iconUrl', 'id', 'isActive', 'isFirstParty', 'kind', 'name', 'redirectUris', 'scopes', 'updatedAt', 'webhookEvents', 'webhookUrl', 'websiteUrl'] as const
+  static $columns = [
+    'allowAllOrigins',
+    'allowedOrigins',
+    'clientId',
+    'clientSecretHash',
+    'createdAt',
+    'createdByUserId',
+    'description',
+    'encryptedWebhookSecret',
+    'iconUrl',
+    'id',
+    'isActive',
+    'isFirstParty',
+    'kind',
+    'name',
+    'redirectUris',
+    'scopes',
+    'updatedAt',
+    'webhookEvents',
+    'webhookUrl',
+    'websiteUrl',
+  ] as const
   $columns = OauthAppSchema.$columns
   @column()
   declare allowAllOrigins: boolean
@@ -1407,7 +2027,16 @@ export class OauthAppSchema extends BaseModel {
 }
 
 export class OauthAuthorizationSchema extends BaseModel {
-  static $columns = ['createdAt', 'firstAuthorizedAt', 'id', 'lastAuthorizedAt', 'oauthAppId', 'scopes', 'updatedAt', 'userId'] as const
+  static $columns = [
+    'createdAt',
+    'firstAuthorizedAt',
+    'id',
+    'lastAuthorizedAt',
+    'oauthAppId',
+    'scopes',
+    'updatedAt',
+    'userId',
+  ] as const
   $columns = OauthAuthorizationSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -1428,7 +2057,21 @@ export class OauthAuthorizationSchema extends BaseModel {
 }
 
 export class OauthCodeSchema extends BaseModel {
-  static $columns = ['clientIp', 'codeChallenge', 'codeChallengeMethod', 'codeHash', 'createdAt', 'expiresAt', 'id', 'oauthAppId', 'redirectUri', 'scopes', 'usedAt', 'userAgent', 'userId'] as const
+  static $columns = [
+    'clientIp',
+    'codeChallenge',
+    'codeChallengeMethod',
+    'codeHash',
+    'createdAt',
+    'expiresAt',
+    'id',
+    'oauthAppId',
+    'redirectUri',
+    'scopes',
+    'usedAt',
+    'userAgent',
+    'userId',
+  ] as const
   $columns = OauthCodeSchema.$columns
   @column()
   declare clientIp: string | null
@@ -1459,7 +2102,26 @@ export class OauthCodeSchema extends BaseModel {
 }
 
 export class OauthTokenSchema extends BaseModel {
-  static $columns = ['accessTokenHash', 'createdAt', 'deviceName', 'deviceOs', 'devicePlatform', 'expiresAt', 'id', 'lastIp', 'lastUsedAt', 'lastUserAgent', 'oauthAppId', 'refreshExpiresAt', 'refreshTokenHash', 'revokedAt', 'revokedReason', 'scopes', 'updatedAt', 'userId'] as const
+  static $columns = [
+    'accessTokenHash',
+    'createdAt',
+    'deviceName',
+    'deviceOs',
+    'devicePlatform',
+    'expiresAt',
+    'id',
+    'lastIp',
+    'lastUsedAt',
+    'lastUserAgent',
+    'oauthAppId',
+    'refreshExpiresAt',
+    'refreshTokenHash',
+    'revokedAt',
+    'revokedReason',
+    'scopes',
+    'updatedAt',
+    'userId',
+  ] as const
   $columns = OauthTokenSchema.$columns
   @column()
   declare accessTokenHash: string
@@ -1500,7 +2162,22 @@ export class OauthTokenSchema extends BaseModel {
 }
 
 export class OauthWebhookDeliverySchema extends BaseModel {
-  static $columns = ['attemptCount', 'createdAt', 'deliveredAt', 'encryptedPayload', 'eventId', 'eventType', 'id', 'lastError', 'lastStatusCode', 'nextAttemptAt', 'oauthAppId', 'status', 'updatedAt', 'url'] as const
+  static $columns = [
+    'attemptCount',
+    'createdAt',
+    'deliveredAt',
+    'encryptedPayload',
+    'eventId',
+    'eventType',
+    'id',
+    'lastError',
+    'lastStatusCode',
+    'nextAttemptAt',
+    'oauthAppId',
+    'status',
+    'updatedAt',
+    'url',
+  ] as const
   $columns = OauthWebhookDeliverySchema.$columns
   @column()
   declare attemptCount: number
@@ -1550,7 +2227,20 @@ export class PasskeyChallengeSchema extends BaseModel {
 }
 
 export class PasskeyCredentialSchema extends BaseModel {
-  static $columns = ['backedUp', 'counter', 'createdAt', 'credentialId', 'encryptedKek', 'friendlyName', 'id', 'lastUsedAt', 'publicKey', 'transports', 'updatedAt', 'userId'] as const
+  static $columns = [
+    'backedUp',
+    'counter',
+    'createdAt',
+    'credentialId',
+    'encryptedKek',
+    'friendlyName',
+    'id',
+    'lastUsedAt',
+    'publicKey',
+    'transports',
+    'updatedAt',
+    'userId',
+  ] as const
   $columns = PasskeyCredentialSchema.$columns
   @column()
   declare backedUp: boolean
@@ -1579,7 +2269,42 @@ export class PasskeyCredentialSchema extends BaseModel {
 }
 
 export class PaymentLinkSchema extends BaseModel {
-  static $columns = ['amount', 'clientEmail', 'clientName', 'companyName', 'confirmationDate', 'confirmationNotes', 'confirmedAt', 'confirmedByUserId', 'createdAt', 'createdByUserId', 'currency', 'encryptedBankName', 'encryptedBic', 'encryptedIban', 'encryptedStripePublishableKey', 'encryptedStripeSecretKey', 'expirationType', 'expiresAt', 'id', 'invoiceId', 'invoiceNumber', 'isActive', 'paidAt', 'passwordHash', 'paymentMethod', 'paymentType', 'pdfData', 'pdfStorageKey', 'showIban', 'stripePaymentIntentId', 'stripeStatus', 'teamId', 'tokenHash', 'updatedAt'] as const
+  static $columns = [
+    'amount',
+    'clientEmail',
+    'clientName',
+    'companyName',
+    'confirmationDate',
+    'confirmationNotes',
+    'confirmedAt',
+    'confirmedByUserId',
+    'createdAt',
+    'createdByUserId',
+    'currency',
+    'encryptedBankName',
+    'encryptedBic',
+    'encryptedIban',
+    'encryptedStripePublishableKey',
+    'encryptedStripeSecretKey',
+    'expirationType',
+    'expiresAt',
+    'id',
+    'invoiceId',
+    'invoiceNumber',
+    'isActive',
+    'paidAt',
+    'passwordHash',
+    'paymentMethod',
+    'paymentType',
+    'pdfData',
+    'pdfStorageKey',
+    'showIban',
+    'stripePaymentIntentId',
+    'stripeStatus',
+    'teamId',
+    'tokenHash',
+    'updatedAt',
+  ] as const
   $columns = PaymentLinkSchema.$columns
   @column()
   declare amount: string
@@ -1652,7 +2377,20 @@ export class PaymentLinkSchema extends BaseModel {
 }
 
 export class PaymentReminderSettingSchema extends BaseModel {
-  static $columns = ['autoSend', 'createdAt', 'daysAfterDue', 'daysBeforeDue', 'emailAccountId', 'emailBodyTemplate', 'emailSubjectTemplate', 'enabled', 'id', 'repeatIntervalDays', 'teamId', 'updatedAt'] as const
+  static $columns = [
+    'autoSend',
+    'createdAt',
+    'daysAfterDue',
+    'daysBeforeDue',
+    'emailAccountId',
+    'emailBodyTemplate',
+    'emailSubjectTemplate',
+    'enabled',
+    'id',
+    'repeatIntervalDays',
+    'teamId',
+    'updatedAt',
+  ] as const
   $columns = PaymentReminderSettingSchema.$columns
   @column()
   declare autoSend: boolean
@@ -1681,7 +2419,18 @@ export class PaymentReminderSettingSchema extends BaseModel {
 }
 
 export class PaymentReminderSchema extends BaseModel {
-  static $columns = ['createdAt', 'errorMessage', 'id', 'invoiceId', 'sentAt', 'status', 'teamId', 'toEmail', 'type', 'updatedAt'] as const
+  static $columns = [
+    'createdAt',
+    'errorMessage',
+    'id',
+    'invoiceId',
+    'sentAt',
+    'status',
+    'teamId',
+    'toEmail',
+    'type',
+    'updatedAt',
+  ] as const
   $columns = PaymentReminderSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -1706,7 +2455,20 @@ export class PaymentReminderSchema extends BaseModel {
 }
 
 export class ProductSchema extends BaseModel {
-  static $columns = ['createdAt', 'description', 'id', 'isArchived', 'name', 'reference', 'saleType', 'teamId', 'unit', 'unitPrice', 'updatedAt', 'vatRate'] as const
+  static $columns = [
+    'createdAt',
+    'description',
+    'id',
+    'isArchived',
+    'name',
+    'reference',
+    'saleType',
+    'teamId',
+    'unit',
+    'unitPrice',
+    'updatedAt',
+    'vatRate',
+  ] as const
   $columns = ProductSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -1735,7 +2497,20 @@ export class ProductSchema extends BaseModel {
 }
 
 export class QuoteLineSchema extends BaseModel {
-  static $columns = ['createdAt', 'description', 'id', 'position', 'quantity', 'quoteId', 'saleType', 'total', 'unit', 'unitPrice', 'updatedAt', 'vatRate'] as const
+  static $columns = [
+    'createdAt',
+    'description',
+    'id',
+    'position',
+    'quantity',
+    'quoteId',
+    'saleType',
+    'total',
+    'unit',
+    'unitPrice',
+    'updatedAt',
+    'vatRate',
+  ] as const
   $columns = QuoteLineSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -1764,7 +2539,43 @@ export class QuoteLineSchema extends BaseModel {
 }
 
 export class QuoteSchema extends BaseModel {
-  static $columns = ['accentColor', 'acceptanceConditions', 'billingType', 'clientId', 'clientSiren', 'clientSnapshot', 'clientVatNumber', 'comment', 'companySnapshot', 'createdAt', 'deliveryAddress', 'documentTitle', 'freeField', 'globalDiscountType', 'globalDiscountValue', 'id', 'issueDate', 'language', 'logoUrl', 'notes', 'quoteNumber', 'showQuantityColumn', 'showUnitColumn', 'showUnitPriceColumn', 'showVatColumn', 'signatureField', 'status', 'subject', 'subtotal', 'taxAmount', 'teamId', 'total', 'updatedAt', 'validityDate', 'vatExemptReason'] as const
+  static $columns = [
+    'accentColor',
+    'acceptanceConditions',
+    'billingType',
+    'clientId',
+    'clientSiren',
+    'clientSnapshot',
+    'clientVatNumber',
+    'comment',
+    'companySnapshot',
+    'createdAt',
+    'deliveryAddress',
+    'documentTitle',
+    'freeField',
+    'globalDiscountType',
+    'globalDiscountValue',
+    'id',
+    'issueDate',
+    'language',
+    'logoUrl',
+    'notes',
+    'quoteNumber',
+    'showQuantityColumn',
+    'showUnitColumn',
+    'showUnitPriceColumn',
+    'showVatColumn',
+    'signatureField',
+    'status',
+    'subject',
+    'subtotal',
+    'taxAmount',
+    'teamId',
+    'total',
+    'updatedAt',
+    'validityDate',
+    'vatExemptReason',
+  ] as const
   $columns = QuoteSchema.$columns
   @column()
   declare accentColor: string
@@ -1850,7 +2661,20 @@ export class RateLimitSchema extends BaseModel {
 }
 
 export class RecurringInvoiceLineSchema extends BaseModel {
-  static $columns = ['createdAt', 'description', 'id', 'position', 'quantity', 'recurringInvoiceId', 'saleType', 'total', 'unit', 'unitPrice', 'updatedAt', 'vatRate'] as const
+  static $columns = [
+    'createdAt',
+    'description',
+    'id',
+    'position',
+    'quantity',
+    'recurringInvoiceId',
+    'saleType',
+    'total',
+    'unit',
+    'unitPrice',
+    'updatedAt',
+    'vatRate',
+  ] as const
   $columns = RecurringInvoiceLineSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -1879,7 +2703,45 @@ export class RecurringInvoiceLineSchema extends BaseModel {
 }
 
 export class RecurringInvoiceSchema extends BaseModel {
-  static $columns = ['accentColor', 'acceptanceConditions', 'bankAccountId', 'billingType', 'clientId', 'clientSiren', 'clientSnapshot', 'clientVatNumber', 'companySnapshot', 'createdAt', 'customIntervalDays', 'deliveryAddress', 'documentTitle', 'dueDays', 'endDate', 'freeField', 'frequency', 'generationCount', 'globalDiscountType', 'globalDiscountValue', 'id', 'isActive', 'language', 'lastGeneratedAt', 'logoUrl', 'name', 'nextExecutionDate', 'notes', 'operationCategory', 'paymentMethod', 'paymentTerms', 'signatureField', 'startDate', 'subject', 'teamId', 'updatedAt', 'vatExemptReason'] as const
+  static $columns = [
+    'accentColor',
+    'acceptanceConditions',
+    'bankAccountId',
+    'billingType',
+    'clientId',
+    'clientSiren',
+    'clientSnapshot',
+    'clientVatNumber',
+    'companySnapshot',
+    'createdAt',
+    'customIntervalDays',
+    'deliveryAddress',
+    'documentTitle',
+    'dueDays',
+    'endDate',
+    'freeField',
+    'frequency',
+    'generationCount',
+    'globalDiscountType',
+    'globalDiscountValue',
+    'id',
+    'isActive',
+    'language',
+    'lastGeneratedAt',
+    'logoUrl',
+    'name',
+    'nextExecutionDate',
+    'notes',
+    'operationCategory',
+    'paymentMethod',
+    'paymentTerms',
+    'signatureField',
+    'startDate',
+    'subject',
+    'teamId',
+    'updatedAt',
+    'vatExemptReason',
+  ] as const
   $columns = RecurringInvoiceSchema.$columns
   @column()
   declare accentColor: string
@@ -1958,7 +2820,25 @@ export class RecurringInvoiceSchema extends BaseModel {
 }
 
 export class TeamMemberSchema extends BaseModel {
-  static $columns = ['createdAt', 'dekVersion', 'encryptedInviteDek', 'encryptedRecoveryKey', 'encryptedTeamDek', 'encryptedTeamDekRecovery', 'id', 'invitationExpiresAt', 'invitationToken', 'invitedAt', 'invitedEmail', 'joinedAt', 'role', 'status', 'teamId', 'updatedAt', 'userId'] as const
+  static $columns = [
+    'createdAt',
+    'dekVersion',
+    'encryptedInviteDek',
+    'encryptedRecoveryKey',
+    'encryptedTeamDek',
+    'encryptedTeamDekRecovery',
+    'id',
+    'invitationExpiresAt',
+    'invitationToken',
+    'invitedAt',
+    'invitedEmail',
+    'joinedAt',
+    'role',
+    'status',
+    'teamId',
+    'updatedAt',
+    'userId',
+  ] as const
   $columns = TeamMemberSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -1997,7 +2877,18 @@ export class TeamMemberSchema extends BaseModel {
 }
 
 export class TeamSchema extends BaseModel {
-  static $columns = ['b2BAccountId', 'createdAt', 'encryptionMode', 'encryptionModeConfirmedAt', 'iconUrl', 'id', 'name', 'onboardingCompletedAt', 'ownerId', 'updatedAt'] as const
+  static $columns = [
+    'b2BAccountId',
+    'createdAt',
+    'encryptionMode',
+    'encryptionModeConfirmedAt',
+    'iconUrl',
+    'id',
+    'name',
+    'onboardingCompletedAt',
+    'ownerId',
+    'updatedAt',
+  ] as const
   $columns = TeamSchema.$columns
   @column()
   declare b2BAccountId: string | null
@@ -2022,7 +2913,43 @@ export class TeamSchema extends BaseModel {
 }
 
 export class UserSchema extends BaseModel {
-  static $columns = ['avatarUrl', 'createdAt', 'cryptoResetNeeded', 'currentTeamId', 'deletionCode', 'deletionCodeExpiresAt', 'deletionStartedAt', 'deletionStep', 'deletionToken', 'email', 'emailVerificationSentAt', 'emailVerificationToken', 'emailVerified', 'failedLoginAttempts', 'fullName', 'hasRecoveryKey', 'id', 'keyVersion', 'lastLoginAt', 'lockedUntil', 'oldSaltKdf', 'onboardingCompleted', 'password', 'passwordResetExpiresAt', 'passwordResetToken', 'pendingEmail', 'recoveryCodesEncrypted', 'recoveryKeyHash', 'saltKdf', 'securityCode', 'securityCodeExpiresAt', 'status', 'twoFactorEnabled', 'twoFactorSecretEncrypted', 'updatedAt'] as const
+  static $columns = [
+    'avatarUrl',
+    'createdAt',
+    'cryptoResetNeeded',
+    'currentTeamId',
+    'deletionCode',
+    'deletionCodeExpiresAt',
+    'deletionStartedAt',
+    'deletionStep',
+    'deletionToken',
+    'email',
+    'emailVerificationSentAt',
+    'emailVerificationToken',
+    'emailVerified',
+    'failedLoginAttempts',
+    'fullName',
+    'hasRecoveryKey',
+    'id',
+    'keyVersion',
+    'lastLoginAt',
+    'lockedUntil',
+    'oldSaltKdf',
+    'onboardingCompleted',
+    'password',
+    'passwordResetExpiresAt',
+    'passwordResetToken',
+    'pendingEmail',
+    'recoveryCodesEncrypted',
+    'recoveryKeyHash',
+    'saltKdf',
+    'securityCode',
+    'securityCodeExpiresAt',
+    'status',
+    'twoFactorEnabled',
+    'twoFactorSecretEncrypted',
+    'updatedAt',
+  ] as const
   $columns = UserSchema.$columns
   @column()
   declare avatarUrl: string | null

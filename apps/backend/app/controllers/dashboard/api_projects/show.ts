@@ -32,6 +32,8 @@ export default class Show {
       .count('* as total')
       .first()
 
-    return response.ok({ data: transformer.transform(project, Number((keysCount as any)?.$extras.total ?? 0)) })
+    return response.ok({
+      data: transformer.transform(project, Number((keysCount as any)?.$extras.total ?? 0)),
+    })
   }
 }

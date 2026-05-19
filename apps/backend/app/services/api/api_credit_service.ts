@@ -149,8 +149,7 @@ class ApiCreditService {
     const now = DateTime.utc()
     const row = await this.getOrCreateRow(teamId, userId, now)
 
-    const withinMinute =
-      row.lastMinuteAt && now.diff(row.lastMinuteAt, 'seconds').seconds < 60
+    const withinMinute = row.lastMinuteAt && now.diff(row.lastMinuteAt, 'seconds').seconds < 60
     row.minuteCount = withinMinute ? row.minuteCount + amount : amount
     row.lastMinuteAt = now
 

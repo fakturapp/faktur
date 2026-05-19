@@ -16,12 +16,7 @@ export default class extends BaseSchema {
         .inTable('api_projects')
         .onDelete('SET NULL')
 
-      table
-        .uuid('actor_user_id')
-        .nullable()
-        .references('id')
-        .inTable('users')
-        .onDelete('SET NULL')
+      table.uuid('actor_user_id').nullable().references('id').inTable('users').onDelete('SET NULL')
 
       table.string('actor_email', 254).nullable()
       table.string('actor_name', 200).nullable()

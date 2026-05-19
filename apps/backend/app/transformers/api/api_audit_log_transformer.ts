@@ -1,4 +1,4 @@
-import ApiAuditLog from '#models/api/api_audit_log'
+import type ApiAuditLog from '#models/api/api_audit_log'
 
 export interface AuditLogShape {
   id: number

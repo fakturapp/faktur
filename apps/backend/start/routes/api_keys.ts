@@ -8,8 +8,7 @@ const ProjectsCreate = () => import('#controllers/dashboard/api_projects/create'
 const ProjectsUpdate = () => import('#controllers/dashboard/api_projects/update')
 const ProjectsDestroy = () => import('#controllers/dashboard/api_projects/destroy')
 const ProjectsAuditLogs = () => import('#controllers/dashboard/api_projects/audit_logs')
-const ProjectsExplorerEvent = () =>
-  import('#controllers/dashboard/api_projects/explorer_event')
+const ProjectsExplorerEvent = () => import('#controllers/dashboard/api_projects/explorer_event')
 
 const KeysList = () => import('#controllers/dashboard/api_keys/list')
 const KeysShow = () => import('#controllers/dashboard/api_keys/show')
@@ -62,9 +61,7 @@ router
     router.get('/api-keys/:id', [KeysShow, 'handle']).as('dashboard.apiKeys.show')
     router.patch('/api-keys/:id', [KeysUpdate, 'handle']).as('dashboard.apiKeys.update')
     router.delete('/api-keys/:id', [KeysRevoke, 'handle']).as('dashboard.apiKeys.revoke')
-    router
-      .post('/api-keys/:id/destroy', [KeysDestroy, 'handle'])
-      .as('dashboard.apiKeys.destroy')
+    router.post('/api-keys/:id/destroy', [KeysDestroy, 'handle']).as('dashboard.apiKeys.destroy')
     router.post('/api-keys/:id/rotate', [KeysRotate, 'handle']).as('dashboard.apiKeys.rotate')
 
     router.put('/api-keys/:id/webhook', [WebhookSet, 'handle']).as('dashboard.apiKeys.webhook.set')

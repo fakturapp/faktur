@@ -30,7 +30,8 @@ export default class AuthOrApiKeyMiddleware {
         })
       }
 
-      const userId = (apiKey as unknown as { createdByUserId?: string | null }).createdByUserId ?? null
+      const userId =
+        (apiKey as unknown as { createdByUserId?: string | null }).createdByUserId ?? null
       const user = userId ? await User.find(userId) : null
       if (!user) {
         return ctx.response.unauthorized({

@@ -61,8 +61,7 @@ export default class ExplorerEvent {
       action: 'api_explorer.request',
       targetType: 'explorer',
       targetId: apiKeyInternalId,
-      targetLabel:
-        apiKeyLabel ?? `${payload.method.toUpperCase()} ${payload.path}`,
+      targetLabel: apiKeyLabel ?? `${payload.method.toUpperCase()} ${payload.path}`,
       metadata: {
         method: payload.method.toUpperCase(),
         path: payload.path,
