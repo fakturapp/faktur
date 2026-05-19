@@ -45,7 +45,7 @@ export default class WebhookSet {
     }
 
     let plaintext: string | null = null
-    let webhook = key.webhook
+    let webhook: ApiKeyWebhook | null = (key.webhook as unknown as ApiKeyWebhook | null) ?? null
     if (!webhook) {
       const gen = webhookSigner.generateSecret()
       plaintext = gen.plaintext

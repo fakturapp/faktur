@@ -1,5 +1,6 @@
 import crypto from 'node:crypto'
 import { DateTime } from 'luxon'
+import db from '@adonisjs/lucid/services/db'
 import ApiKey from '#models/api/api_key'
 import scopeChecker from '#services/api/scope_checker'
 
@@ -135,7 +136,7 @@ class ApiKeyService {
       .update({
         last_used_at: DateTime.now().toSQL(),
         last_ip: ip,
-        usage_count: ApiKey.$adapter.modelClient(ApiKey).knexQuery().raw('usage_count + 1') as any,
+        usage_count: db.raw('usage_count + 1') as any,
       })
       .catch(async () => {
         const key = await ApiKey.find(apiKeyId)

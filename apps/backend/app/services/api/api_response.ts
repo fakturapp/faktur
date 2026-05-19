@@ -1,4 +1,6 @@
-import type { Response } from '@adonisjs/core/http'
+import type { HttpContext } from '@adonisjs/core/http'
+
+type Response = HttpContext['response']
 
 export interface PaginationMeta {
   has_more: boolean

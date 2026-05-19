@@ -1,6 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import ApiKey from '#models/api/api_key'
-import ApiRequestLog from '#models/api/api_request_log'
 import db from '@adonisjs/lucid/services/db'
 import publicIdCodec, { PublicIdParseError } from '#services/api/public_id_codec'
 import { DateTime } from 'luxon'
