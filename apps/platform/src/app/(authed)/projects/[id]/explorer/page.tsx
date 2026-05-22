@@ -26,33 +26,48 @@ import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/toast'
 import { apiKeysClient, type ApiKeyShape } from '@/lib/api-keys-client'
 import { apiProjectsClient } from '@/lib/api-projects-client'
-import { API_BASE_URL } from '@/lib/oauth-config'
+import { API_BASE_URL, API_PREFIX_V1, API_PREFIX_PLATFORM } from '@/lib/oauth-config'
 
-const API_HOST_BASE = API_BASE_URL.replace(/\/api\/v1$/, '')
+// Strip whichever prefix API_BASE_URL was configured with so we can swap in
+// either v1 or platform freely without double-prefixing.
+const API_HOST_BASE = API_BASE_URL.replace(
+  new RegExp(`${API_PREFIX_V1.replace(/\//g, '\\/')}$`),
+  ''
+).replace(new RegExp(`${API_PREFIX_PLATFORM.replace(/\//g, '\\/')}$`), '')
 
 type ApiPrefix = 'platform' | 'v1'
 const PREFIX_PATHS: Record<ApiPrefix, string> = {
-  platform: '/api/platform',
-  v1: '/api/v1',
+  platform: API_PREFIX_PLATFORM,
+  v1: API_PREFIX_V1,
 }
 
 const METHODS = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'] as const
 type HttpMethod = (typeof METHODS)[number]
 
-const PRESETS: Array<{
-  label: string
+// Labels derive their displayed prefix from the configured env vars so the
+// presets stay in sync with whatever path the backend is serving (no stale
+// "/v1/clients" label when the prefix has moved to /api/v2/, etc.).
+const PREFIX_LABELS: Record<ApiPrefix, string> = {
+  v1: API_PREFIX_V1.replace(/^\/api/, '') || '/v1',
+  platform: API_PREFIX_PLATFORM.replace(/^\/api/, '') || '/platform',
+}
+
+function presetLabel(method: HttpMethod, prefix: ApiPrefix, path: string): string {
+  return `${method} ${PREFIX_LABELS[prefix]}${path}`
+}
+
+const PRESET_DEFS: Array<{
   method: HttpMethod
   path: string
   prefix: ApiPrefix
   body?: string
 }> = [
-  { label: 'GET /v1/clients', method: 'GET', path: '/clients', prefix: 'v1' },
-  { label: 'GET /v1/invoices', method: 'GET', path: '/invoices', prefix: 'v1' },
-  { label: 'GET /v1/products', method: 'GET', path: '/products', prefix: 'v1' },
-  { label: 'GET /v1/expenses', method: 'GET', path: '/expenses', prefix: 'v1' },
-  { label: 'GET /v1/quotes', method: 'GET', path: '/quotes', prefix: 'v1' },
+  { method: 'GET', path: '/clients', prefix: 'v1' },
+  { method: 'GET', path: '/invoices', prefix: 'v1' },
+  { method: 'GET', path: '/products', prefix: 'v1' },
+  { method: 'GET', path: '/expenses', prefix: 'v1' },
+  { method: 'GET', path: '/quotes', prefix: 'v1' },
   {
-    label: 'POST /v1/clients',
     method: 'POST',
     path: '/clients',
     prefix: 'v1',
@@ -66,10 +81,15 @@ const PRESETS: Array<{
       2
     ),
   },
-  { label: 'GET /platform/ping', method: 'GET', path: '/ping', prefix: 'platform' },
-  { label: 'GET /platform/session', method: 'GET', path: '/session', prefix: 'platform' },
-  { label: 'GET /platform/usage', method: 'GET', path: '/usage', prefix: 'platform' },
+  { method: 'GET', path: '/ping', prefix: 'platform' },
+  { method: 'GET', path: '/session', prefix: 'platform' },
+  { method: 'GET', path: '/usage', prefix: 'platform' },
 ]
+
+const PRESETS = PRESET_DEFS.map((p) => ({
+  ...p,
+  label: presetLabel(p.method, p.prefix, p.path),
+}))
 
 interface HeaderRow {
   id: string
@@ -482,8 +502,8 @@ export default function ExplorerPage() {
               value={prefix}
               onChange={(v) => setPrefix(v as ApiPrefix)}
               options={[
-                { value: 'v1', label: '/api/v1' },
-                { value: 'platform', label: '/api/platform' },
+                { value: 'v1', label: API_PREFIX_V1 },
+                { value: 'platform', label: API_PREFIX_PLATFORM },
               ]}
               className="font-mono"
             />

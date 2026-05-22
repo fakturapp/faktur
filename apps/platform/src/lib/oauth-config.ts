@@ -39,6 +39,23 @@ export const OAUTH_TOKEN_URL = `${API_BASE_URL}/oauth/token`
 export const OAUTH_REVOKE_URL = `${API_BASE_URL}/oauth/revoke`
 export const OAUTH_EXCHANGE_SESSION_URL = `${API_BASE_URL}/oauth/exchange-session`
 
+// Public API path prefixes used by the API Explorer. Override via .env if the
+// backend prefixes ever change (e.g. /api/v2, /api/internal). These are
+// path-only — the host comes from API_BASE_URL.
+function normalizePrefix(raw: string | undefined, fallback: string): string {
+  const value = raw && raw.trim() ? raw.trim() : fallback
+  return value.startsWith('/') ? value.replace(/\/+$/, '') : `/${value.replace(/\/+$/, '')}`
+}
+
+export const API_PREFIX_V1 = normalizePrefix(
+  process.env.NEXT_PUBLIC_API_PREFIX_V1,
+  '/api/v1'
+)
+export const API_PREFIX_PLATFORM = normalizePrefix(
+  process.env.NEXT_PUBLIC_API_PREFIX_PLATFORM,
+  '/api/platform'
+)
+
 export const STORAGE_KEYS = {
   accessToken: 'faktur_platform_access_token',
   refreshToken: 'faktur_platform_refresh_token',
