@@ -49,11 +49,11 @@ function normalizePrefix(raw: string | undefined, fallback: string): string {
 
 export const API_PREFIX_V1 = normalizePrefix(
   process.env.NEXT_PUBLIC_API_PREFIX_V1,
-  '/api/v1'
+  '/v1'
 )
 export const API_PREFIX_PLATFORM = normalizePrefix(
   process.env.NEXT_PUBLIC_API_PREFIX_PLATFORM,
-  '/api/platform'
+  '/v1/core/api'
 )
 
 export const STORAGE_KEYS = {
