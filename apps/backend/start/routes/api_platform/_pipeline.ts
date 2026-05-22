@@ -8,7 +8,7 @@ function normalizePrefix(raw: string): string {
   return withLeading.replace(/\/+$/, '')
 }
 
-export const API_PLATFORM_PREFIX = normalizePrefix(env.get('API_PLATFORM_PREFIX', '/api/platform'))
+export const API_PLATFORM_PREFIX = normalizePrefix(env.get('API_PLATFORM_PREFIX', '/v1/core/api'))
 
 export function apiPlatformStack(scopes: string[]) {
   return [

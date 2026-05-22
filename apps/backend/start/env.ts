@@ -34,6 +34,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   FRONTEND_URL: Env.schema.string.optional(),
 
   API_PREFIX: Env.schema.string.optional(),
+  API_PLATFORM_PREFIX: Env.schema.string.optional(),
 
   API_CREDITS_PER_MINUTE: Env.schema.number.optional(),
   API_CREDITS_PER_SESSION: Env.schema.number.optional(),
