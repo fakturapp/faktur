@@ -1,12 +1,19 @@
 import { DateTime } from 'luxon'
 import ApiCreditUsage from '#models/api/api_credit_usage'
 
+function readPositiveInt(name: string, fallback: number): number {
+  const raw = process.env[name]
+  if (!raw) return fallback
+  const n = Number.parseInt(raw, 10)
+  return Number.isFinite(n) && n > 0 ? n : fallback
+}
+
 export const CREDIT_LIMITS = {
-  PER_MINUTE: 3,
-  SESSION_HOURS: 5,
-  PER_SESSION: 100,
-  WEEKLY_DAYS: 7,
-  PER_WEEK: 1000,
+  PER_MINUTE: readPositiveInt('API_CREDITS_PER_MINUTE', 3),
+  SESSION_HOURS: readPositiveInt('API_CREDITS_SESSION_HOURS', 5),
+  PER_SESSION: readPositiveInt('API_CREDITS_PER_SESSION', 100),
+  WEEKLY_DAYS: readPositiveInt('API_CREDITS_WEEKLY_DAYS', 7),
+  PER_WEEK: readPositiveInt('API_CREDITS_PER_WEEK', 1000),
 } as const
 
 export type CreditCheckResult =

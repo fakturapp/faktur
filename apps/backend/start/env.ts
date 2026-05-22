@@ -35,6 +35,12 @@ export default await Env.create(new URL('../', import.meta.url), {
 
   API_PREFIX: Env.schema.string.optional(),
 
+  API_CREDITS_PER_MINUTE: Env.schema.number.optional(),
+  API_CREDITS_PER_SESSION: Env.schema.number.optional(),
+  API_CREDITS_SESSION_HOURS: Env.schema.number.optional(),
+  API_CREDITS_PER_WEEK: Env.schema.number.optional(),
+  API_CREDITS_WEEKLY_DAYS: Env.schema.number.optional(),
+
   CORS_ORIGIN: Env.schema.string.optional(),
 
   GOOGLE_CLIENT_ID: Env.schema.string.optional(),
