@@ -4,6 +4,7 @@ import crypto from 'node:crypto'
 import db from '@adonisjs/lucid/services/db'
 import User from '#models/account/user'
 import Team from '#models/team/team'
+import TeamMember from '#models/team/team_member'
 import oauthTokenService from '#services/oauth/oauth_token_service'
 import { extractOauthRequestContext } from '#services/oauth/oauth_request_context'
 import keyStore from '#services/crypto/key_store'
@@ -86,12 +87,35 @@ export default class ExchangeSession {
       vaultKey = sessionKey.toString('hex')
     }
 
+    const memberships = await TeamMember.query()
+      .where('user_id', user.id)
+      .where('status', 'active')
+      .preload('team')
+      .orderBy('joined_at', 'asc')
+
+    const teams = memberships
+      .filter((m) => !!m.team)
+      .map((m) => ({
+        id: m.team.id,
+        name: m.team.name,
+        iconUrl: m.team.iconUrl ?? null,
+        encryptionMode: m.team.encryptionMode as 'private' | 'standard',
+        locked: m.team.encryptionMode === 'private' && vaultKey === null,
+        role: m.role,
+      }))
+
     let currentTeamEncryptionMode: 'private' | 'standard' | null = null
     if (user.currentTeamId) {
-      const team = await Team.find(user.currentTeamId)
-      currentTeamEncryptionMode = team?.encryptionMode ?? null
+      const current = teams.find((t) => t.id === user.currentTeamId)
+      if (current) {
+        currentTeamEncryptionMode = current.encryptionMode
+      } else {
+        const team = await Team.find(user.currentTeamId)
+        currentTeamEncryptionMode = team?.encryptionMode ?? null
+      }
     }
     const vaultRequired = currentTeamEncryptionMode === 'private'
+    const allUnlockedOrStandard = teams.every((t) => !t.locked)
 
     return response.ok({
       message: 'Session exchanged',
@@ -101,6 +125,8 @@ export default class ExchangeSession {
       vaultLocked: vaultRequired && vaultKey === null,
       vaultRequired,
       currentTeamEncryptionMode,
+      teams,
+      allUnlockedOrStandard,
     })
   }
 }
