@@ -46,3 +46,6 @@ ui-preview/
 heroui/
 heroui-native/
 animate-ui/
+
+# Private dev scripts (perso, hors repo)
+scripts/spam-api.ts
