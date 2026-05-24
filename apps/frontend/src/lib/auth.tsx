@@ -112,6 +112,11 @@ function consumeDesktopSessionHash(): void {
     } else {
       localStorage.removeItem('faktur_vault_locked')
     }
+    if (payload.team && typeof payload.team === 'string') {
+      localStorage.setItem('faktur_desktop_target_team', payload.team)
+    } else {
+      localStorage.removeItem('faktur_desktop_target_team')
+    }
     const clean = window.location.pathname + window.location.search
     window.history.replaceState({}, '', clean)
   } catch (err) {
@@ -147,9 +152,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (error || !data?.user) {
       localStorage.removeItem('faktur_token')
       setUser(null)
-    } else {
-      setUser(data.user)
+      setLoading(false)
+      return
     }
+
+    const targetTeam = localStorage.getItem('faktur_desktop_target_team')
+    if (targetTeam && targetTeam !== data.user.currentTeamId) {
+      const { error: switchError } = await api.post('/team/switch', { teamId: targetTeam })
+      localStorage.removeItem('faktur_desktop_target_team')
+      if (!switchError) {
+        const { data: refreshed } = await api.get<{ user: User }>('/auth/me')
+        setUser(refreshed?.user ?? data.user)
+        setLoading(false)
+        return
+      }
+    } else if (targetTeam) {
+      localStorage.removeItem('faktur_desktop_target_team')
+    }
+
+    setUser(data.user)
     setLoading(false)
   }, [])
 
