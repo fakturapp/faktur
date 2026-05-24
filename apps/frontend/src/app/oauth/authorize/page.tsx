@@ -298,11 +298,11 @@ function AuthorizeContent() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -12 }}
           transition={{ duration: 0.25 }}
-          className="w-full max-w-[640px]"
+          className="w-full max-w-[480px]"
         >
-          <div className="rounded-2xl bg-overlay/85 backdrop-blur-xl shadow-overlay p-8">
-            <div className="flex items-center gap-3 pb-5 border-b border-border">
-              <div className="h-12 w-12 shrink-0 rounded-xl bg-surface flex items-center justify-center overflow-hidden">
+          <div className="rounded-2xl bg-overlay/85 backdrop-blur-xl shadow-overlay p-10">
+            <div className="flex items-center gap-4 pb-6 border-b border-border">
+              <div className="h-14 w-14 shrink-0 rounded-xl bg-surface flex items-center justify-center overflow-hidden">
                 {data.client.iconUrl ? (
                   <img
                     src={data.client.iconUrl}
@@ -310,12 +310,12 @@ function AuthorizeContent() {
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <KindIcon className="h-5 w-5 text-muted-foreground" />
+                  <KindIcon className="h-6 w-6 text-muted-foreground" />
                 )}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <h1 className="text-base font-semibold text-foreground truncate">
+                  <h1 className="text-lg font-semibold text-foreground truncate">
                     {data.client.name}
                   </h1>
                   {data.client.isFirstParty && (
@@ -331,12 +331,12 @@ function AuthorizeContent() {
                         }}
                         className="inline-flex"
                       >
-                        <VerifiedBadge className="h-4 w-4" />
+                        <VerifiedBadge className="h-5 w-5" />
                       </motion.span>
                     </Tooltip>
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   souhaite accéder à votre compte
                 </p>
               </div>
@@ -354,16 +354,16 @@ function AuthorizeContent() {
                   <p className="text-[12px] font-semibold text-foreground leading-tight">
                     Cette application n&apos;est pas vérifiée
                   </p>
-                  <p className="text-[11px] text-muted-foreground mt-1 leading-snug">
+                  <p className="text-[12px] text-muted-foreground mt-1 leading-snug">
                     N&apos;autorisez que si vous connaissez le développeur.
                   </p>
                 </div>
               </motion.div>
             )}
 
-            <div className="pt-4 pb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="h-8 w-8 shrink-0 rounded-full bg-primary/15 text-primary flex items-center justify-center text-[11px] font-bold overflow-hidden">
+            <div className="pt-5 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 shrink-0 rounded-full bg-primary/15 text-primary flex items-center justify-center text-[13px] font-bold overflow-hidden">
                   {user.avatarUrl ? (
                     <img
                       src={user.avatarUrl}
@@ -375,7 +375,7 @@ function AuthorizeContent() {
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[13px] text-foreground truncate">
+                  <p className="text-sm text-foreground truncate">
                     {user.fullName || user.email}
                   </p>
                 </div>
@@ -383,52 +383,54 @@ function AuthorizeContent() {
                   type="button"
                   onClick={() => setLogoutConfirmOpen(true)}
                   disabled={isRedirecting || switchingUser}
-                  className="text-[11px] text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40"
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40"
                 >
                   Ce n&apos;est pas toi ?
                 </button>
               </div>
             </div>
 
-            <div className="py-4 border-t border-border">
-              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2.5">
+            <div className="py-5 border-t border-border">
+              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">
                 Ce à quoi {data.client.name} a accès
               </p>
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 {GRANTED_ACCESSES.map((access) => (
                   <div
                     key={access}
-                    className="flex items-center gap-2 text-[13px] text-foreground"
+                    className="flex items-center gap-2.5 text-sm text-foreground"
                   >
-                    <Check className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                    <Check className="h-4 w-4 text-emerald-500 shrink-0" />
                     <span>{access}</span>
                   </div>
                 ))}
               </div>
-              <div className="mt-3 pt-3 border-t border-border/60 flex items-center gap-2 text-[12px] text-muted-foreground italic">
-                <X className="h-3.5 w-3.5 text-destructive/70 shrink-0" />
+              <div className="mt-4 pt-4 border-t border-border/60 flex items-center gap-2.5 text-[13px] text-muted-foreground italic">
+                <X className="h-4 w-4 text-destructive/70 shrink-0" />
                 <span className="truncate">
                   En revanche, {data.client.name} ne pourra pas {playfulDenied}
                 </span>
               </div>
             </div>
 
-            <div className="pt-4 border-t border-border flex gap-2">
+            <div className="pt-5 border-t border-border flex gap-3">
               <Button
                 variant="outline"
+                size="lg"
                 className="flex-1"
                 onClick={() => submitDecision('deny')}
                 disabled={isRedirecting || switchingUser}
               >
-                {state === 'denying' ? <Spinner className="h-3 w-3" /> : 'Refuser'}
+                {state === 'denying' ? <Spinner className="h-4 w-4" /> : 'Refuser'}
               </Button>
               <Button
+                size="lg"
                 className="flex-1"
                 onClick={() => submitDecision('allow')}
                 disabled={isRedirecting || switchingUser}
               >
                 {state === 'approving' || state === 'redirecting' ? (
-                  <Spinner className="h-3 w-3" />
+                  <Spinner className="h-4 w-4" />
                 ) : (
                   'Autoriser'
                 )}
