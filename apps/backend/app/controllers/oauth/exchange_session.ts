@@ -3,6 +3,7 @@ import { DateTime } from 'luxon'
 import crypto from 'node:crypto'
 import db from '@adonisjs/lucid/services/db'
 import User from '#models/account/user'
+import Team from '#models/team/team'
 import oauthTokenService from '#services/oauth/oauth_token_service'
 import { extractOauthRequestContext } from '#services/oauth/oauth_request_context'
 import keyStore from '#services/crypto/key_store'
@@ -85,12 +86,21 @@ export default class ExchangeSession {
       vaultKey = sessionKey.toString('hex')
     }
 
+    let currentTeamEncryptionMode: 'private' | 'standard' | null = null
+    if (user.currentTeamId) {
+      const team = await Team.find(user.currentTeamId)
+      currentTeamEncryptionMode = team?.encryptionMode ?? null
+    }
+    const vaultRequired = currentTeamEncryptionMode === 'private'
+
     return response.ok({
       message: 'Session exchanged',
       user: UserTransformer.transform(user),
       token: token.value!.release(),
       vaultKey,
-      vaultLocked: vaultKey === null,
+      vaultLocked: vaultRequired && vaultKey === null,
+      vaultRequired,
+      currentTeamEncryptionMode,
     })
   }
 }
