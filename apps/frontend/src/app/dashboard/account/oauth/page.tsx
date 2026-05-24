@@ -7,7 +7,8 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/toast'
 import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
+import { Tooltip } from '@/components/ui/tooltip'
+import { VerifiedBadge } from '@/components/ui/verified-badge'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -20,10 +21,8 @@ import {
   Clock,
   Trash2,
   ChevronDown,
-  ChevronRight,
   AlertTriangle,
   MapPin,
-  BadgeCheck,
 } from 'lucide-react'
 
 interface Session {
@@ -230,15 +229,14 @@ export default function AccountOauthAppsPage() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex items-center gap-1.5 flex-wrap">
                       <h3 className="text-base font-semibold text-foreground truncate">
                         {app.app.name}
                       </h3>
                       {app.app.isFirstParty && (
-                        <Badge variant="default" className="text-[10px] gap-0.5">
-                          <BadgeCheck className="h-3 w-3" />
-                          Officiel
-                        </Badge>
+                        <Tooltip content="Application officielle vérifiée par Faktur">
+                          <VerifiedBadge className="h-4 w-4" />
+                        </Tooltip>
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground mt-0.5">
