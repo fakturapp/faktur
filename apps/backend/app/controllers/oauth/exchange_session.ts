@@ -117,9 +117,13 @@ export default class ExchangeSession {
     const vaultRequired = currentTeamEncryptionMode === 'private'
     const allUnlockedOrStandard = teams.every((t) => !t.locked)
 
+    const serializedUser = await ctx.serialize.withoutWrapping(
+      UserTransformer.transform(user)
+    )
+
     return response.ok({
       message: 'Session exchanged',
-      user: UserTransformer.transform(user),
+      user: serializedUser,
       token: token.value!.release(),
       vaultKey,
       vaultLocked: vaultRequired && vaultKey === null,
