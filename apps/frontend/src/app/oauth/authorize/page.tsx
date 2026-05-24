@@ -1,11 +1,13 @@
 'use client'
 
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react'
+import dynamic from 'next/dynamic'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { api } from '@/lib/api'
 import { useAuth } from '@/lib/auth'
+import { useTheme } from '@/lib/theme'
 import { Spinner } from '@/components/ui/spinner'
 import { Button } from '@/components/ui/button'
 import { Tooltip } from '@/components/ui/tooltip'
@@ -26,7 +28,12 @@ import {
   KeyRound,
   ShieldAlert,
   LogOut,
+  EyeOff,
+  Sparkles,
+  ShieldCheck,
 } from 'lucide-react'
+
+const DarkVeil = dynamic(() => import('@/components/effects/DarkVeil'), { ssr: false })
 
 interface ConsentData {
   client: {
@@ -55,26 +62,26 @@ const GRANTED_ACCESSES = [
 ]
 
 const PLAYFUL_DENIED = [
-  "n'aura pas le droit de manger votre gâteau d'anniversaire 🎂",
-  "n'aura pas le droit de voler vos cookies 🍪",
-  "ne pourra pas changer votre fond d'écran en photo de chat 🐱",
-  "ne pourra pas appeler votre maman 📞",
-  'ne pourra pas commander une pizza à votre place 🍕',
-  'ne pourra pas regarder votre historique Netflix 📺',
-  'ne pourra pas deviner votre mot de passe 🤫',
-  'ne pourra pas juger vos choix vestimentaires 👕',
-  "ne pourra pas chanter sous la douche avec vous 🎤",
-  'ne pourra pas arrêter le temps ⏰',
-  'ne pourra pas prédire votre avenir 🔮',
-  'ne pourra pas gagner au loto à votre place 🎰',
-  "ne pourra pas vous faire la leçon 👨‍🏫",
-  'ne pourra pas apprendre à faire du vélo 🚴',
-  'ne pourra pas compter vos moutons avant de dormir 🐑',
-  'ne pourra pas faire la grasse matinée pour vous 😴',
-  "ne pourra pas vous parler à l'envers 🙃",
-  "ne pourra pas inventer un nouveau mot pour 'fromage' 🧀",
-  'ne pourra pas voyager dans le temps ⏳',
-  'ne pourra pas téléporter votre téléphone 📱',
+  "manger votre gâteau d'anniversaire 🎂",
+  'voler vos cookies 🍪',
+  "changer votre fond d'écran 🐱",
+  'appeler votre maman 📞',
+  'commander une pizza 🍕',
+  'lire votre historique Netflix 📺',
+  'deviner votre mot de passe 🤫',
+  'juger vos vêtements 👕',
+  'chanter sous la douche 🎤',
+  'arrêter le temps ⏰',
+  'prédire votre avenir 🔮',
+  'gagner au loto 🎰',
+  'vous faire la leçon 👨‍🏫',
+  'apprendre à faire du vélo 🚴',
+  'compter vos moutons 🐑',
+  'faire la grasse matinée 😴',
+  "vous parler à l'envers 🙃",
+  'inventer un mot pour "fromage" 🧀',
+  'voyager dans le temps ⏳',
+  'téléporter votre téléphone 📱',
 ]
 
 const KIND_ICONS: Record<string, any> = {
@@ -83,10 +90,21 @@ const KIND_ICONS: Record<string, any> = {
   cli: Terminal,
 }
 
+function pickN<T>(arr: T[], n: number): T[] {
+  const pool = [...arr]
+  const out: T[] = []
+  for (let i = 0; i < n && pool.length > 0; i++) {
+    const idx = Math.floor(Math.random() * pool.length)
+    out.push(pool.splice(idx, 1)[0])
+  }
+  return out
+}
+
 function AuthorizeContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { user, loading: authLoading } = useAuth()
+  const { resolvedTheme } = useTheme()
 
   const [state, setState] = useState<PageState>('loading')
   const [data, setData] = useState<ConsentData | null>(null)
@@ -94,10 +112,7 @@ function AuthorizeContent() {
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false)
   const [switchingUser, setSwitchingUser] = useState(false)
 
-  const playfulDenied = useMemo(
-    () => PLAYFUL_DENIED[Math.floor(Math.random() * PLAYFUL_DENIED.length)],
-    []
-  )
+  const playfulDenied = useMemo(() => pickN(PLAYFUL_DENIED, 4), [])
 
   const queryString = useMemo(() => searchParams.toString(), [searchParams])
   const params = useMemo(
@@ -179,10 +194,6 @@ function AuthorizeContent() {
     [data, user?.vaultLocked]
   )
 
-  useEffect(() => {
-    if (data?.autoApprove && state === 'ready' && !user?.vaultLocked) submitDecision('allow')
-  }, [data, state, submitDecision, user?.vaultLocked])
-
   async function handleSwitchAccount() {
     setSwitchingUser(true)
     try {
@@ -196,16 +207,23 @@ function AuthorizeContent() {
     router.replace(`/login?redirect=${returnTo}`)
   }
 
+  const veilHueShift = resolvedTheme === 'light' ? 220 : 0
+  const veilSpeed = resolvedTheme === 'light' ? 0.3 : 0.5
+  const veilOverlay =
+    resolvedTheme === 'light'
+      ? 'bg-background/70 backdrop-blur-xl'
+      : 'bg-background/55 backdrop-blur-md'
+
   if (user && user.vaultLocked) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+      <PageShell hueShift={veilHueShift} speed={veilSpeed} overlay={veilOverlay}>
         <motion.div
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.25 }}
-          className="w-[380px]"
+          className="w-full max-w-[440px]"
         >
-          <div className="rounded-xl border border-amber-500/20 bg-overlay shadow-surface p-6 text-center">
+          <div className="rounded-2xl border border-amber-500/20 bg-overlay/90 backdrop-blur-xl shadow-overlay p-7 text-center">
             <div className="h-12 w-12 rounded-full bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
               <Lock className="h-6 w-6 text-amber-500" />
             </div>
@@ -222,25 +240,25 @@ function AuthorizeContent() {
             </Button>
           </div>
         </motion.div>
-      </div>
+      </PageShell>
     )
   }
 
   if (authLoading || !user || state === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <PageShell hueShift={veilHueShift} speed={veilSpeed} overlay={veilOverlay}>
         <Spinner size="lg" className="text-primary" />
-      </div>
+      </PageShell>
     )
   }
 
   if (state === 'error' || !data) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+      <PageShell hueShift={veilHueShift} speed={veilSpeed} overlay={veilOverlay}>
         <motion.div
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="w-[380px] rounded-xl bg-overlay shadow-surface p-8 text-center"
+          className="w-full max-w-[440px] rounded-2xl bg-overlay/90 backdrop-blur-xl shadow-overlay p-8 text-center"
         >
           <div className="h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-4">
             <X className="h-6 w-6 text-destructive" />
@@ -253,7 +271,7 @@ function AuthorizeContent() {
             Réessayer
           </Button>
         </motion.div>
-      </div>
+      </PageShell>
     )
   }
 
@@ -262,7 +280,7 @@ function AuthorizeContent() {
     state === 'redirecting' || state === 'approving' || state === 'denying'
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-background">
+    <PageShell hueShift={veilHueShift} speed={veilSpeed} overlay={veilOverlay}>
       <motion.div
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -288,11 +306,11 @@ function AuthorizeContent() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -12 }}
           transition={{ duration: 0.25 }}
-          className="w-[400px]"
+          className="w-full max-w-[520px]"
         >
-          <div className="rounded-xl bg-overlay shadow-surface p-6">
+          <div className="rounded-2xl bg-overlay/90 backdrop-blur-xl shadow-overlay p-7">
             <div className="flex items-center gap-3 pb-5 border-b border-border">
-              <div className="h-11 w-11 shrink-0 rounded-xl bg-surface flex items-center justify-center overflow-hidden">
+              <div className="h-12 w-12 shrink-0 rounded-xl bg-surface flex items-center justify-center overflow-hidden">
                 {data.client.iconUrl ? (
                   <img
                     src={data.client.iconUrl}
@@ -304,8 +322,8 @@ function AuthorizeContent() {
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1">
-                  <h1 className="text-[15px] font-semibold text-foreground truncate">
+                <div className="flex items-center gap-1.5">
+                  <h1 className="text-base font-semibold text-foreground truncate">
                     {data.client.name}
                   </h1>
                   {data.client.isFirstParty && (
@@ -326,7 +344,7 @@ function AuthorizeContent() {
                     </Tooltip>
                   )}
                 </div>
-                <p className="text-[11px] text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   souhaite accéder à votre compte
                 </p>
               </div>
@@ -341,12 +359,11 @@ function AuthorizeContent() {
               >
                 <ShieldAlert className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-[11px] font-semibold text-foreground leading-tight">
+                  <p className="text-[12px] font-semibold text-foreground leading-tight">
                     Cette application n&apos;est pas vérifiée
                   </p>
-                  <p className="text-[10px] text-muted-foreground mt-1 leading-snug">
-                    N&apos;autorisez que si vous connaissez et faites
-                    confiance au développeur.
+                  <p className="text-[11px] text-muted-foreground mt-1 leading-snug">
+                    N&apos;autorisez que si vous connaissez le développeur.
                   </p>
                 </div>
               </motion.div>
@@ -354,7 +371,7 @@ function AuthorizeContent() {
 
             <div className="pt-4 pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="h-7 w-7 shrink-0 rounded-full bg-primary/15 text-primary flex items-center justify-center text-[10px] font-bold overflow-hidden">
+                <div className="h-8 w-8 shrink-0 rounded-full bg-primary/15 text-primary flex items-center justify-center text-[11px] font-bold overflow-hidden">
                   {user.avatarUrl ? (
                     <img
                       src={user.avatarUrl}
@@ -366,7 +383,7 @@ function AuthorizeContent() {
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[12px] text-foreground truncate">
+                  <p className="text-[13px] text-foreground truncate">
                     {user.fullName || user.email}
                   </p>
                 </div>
@@ -374,7 +391,7 @@ function AuthorizeContent() {
                   type="button"
                   onClick={() => setLogoutConfirmOpen(true)}
                   disabled={isRedirecting || switchingUser}
-                  className="text-[10px] text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40"
+                  className="text-[11px] text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40"
                 >
                   Ce n&apos;est pas toi ?
                 </button>
@@ -383,34 +400,56 @@ function AuthorizeContent() {
 
             <div className="py-3 border-t border-border">
               <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2.5">
-                Accès demandé
+                Ce que {data.client.name} pourra faire
               </p>
-              <div className="space-y-1.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                 {GRANTED_ACCESSES.map((access) => (
                   <div
                     key={access}
-                    className="flex items-center gap-2 text-[12px] text-foreground"
+                    className="flex items-center gap-2 text-[12.5px] text-foreground"
                   >
                     <Check className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
                     <span>{access}</span>
                   </div>
                 ))}
               </div>
+            </div>
 
-              <div className="mt-3 pt-3 border-t border-border/60">
-                <div className="flex items-start gap-2 text-[11px] text-muted-foreground italic leading-snug">
-                  <X className="h-3 w-3 text-destructive/70 shrink-0 mt-0.5" />
-                  <span>
-                    En revanche, {data.client.name} {playfulDenied}
-                  </span>
-                </div>
+            <div className="py-3 border-t border-border">
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2.5">
+                Ce que {data.client.name} ne pourra pas faire
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                {playfulDenied.map((line) => (
+                  <div
+                    key={line}
+                    className="flex items-center gap-2 text-[12.5px] text-muted-foreground"
+                  >
+                    <X className="h-3.5 w-3.5 text-destructive/70 shrink-0" />
+                    <span className="truncate">{line}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="py-3 border-t border-border space-y-1.5">
+              <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
+                <EyeOff className="h-3.5 w-3.5 text-primary shrink-0" />
+                <span>Faktur ne partage jamais votre mot de passe.</span>
+              </div>
+              <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
+                <ShieldCheck className="h-3.5 w-3.5 text-primary shrink-0" />
+                <span>Vous pouvez révoquer cet accès à tout moment.</span>
+              </div>
+              <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
+                <Sparkles className="h-3.5 w-3.5 text-primary shrink-0" />
+                <span>Connexion sécurisée par OAuth + PKCE.</span>
               </div>
             </div>
 
             <div className="pt-4 border-t border-border flex gap-2">
               <Button
                 variant="outline"
-                size="sm"
                 className="flex-1"
                 onClick={() => submitDecision('deny')}
                 disabled={isRedirecting || switchingUser}
@@ -418,7 +457,6 @@ function AuthorizeContent() {
                 {state === 'denying' ? <Spinner className="h-3 w-3" /> : 'Refuser'}
               </Button>
               <Button
-                size="sm"
                 className="flex-1"
                 onClick={() => submitDecision('allow')}
                 disabled={isRedirecting || switchingUser}
@@ -464,6 +502,28 @@ function AuthorizeContent() {
           </Button>
         </DialogFooter>
       </Dialog>
+    </PageShell>
+  )
+}
+
+function PageShell({
+  children,
+  hueShift,
+  speed,
+  overlay,
+}: {
+  children: React.ReactNode
+  hueShift: number
+  speed: number
+  overlay: string
+}) {
+  return (
+    <div className="relative isolate flex min-h-[100svh] flex-col items-center justify-center overflow-hidden bg-background p-4">
+      <div className="pointer-events-none absolute inset-0 -z-20">
+        <DarkVeil hueShift={hueShift} speed={speed} warpAmount={0.05} />
+      </div>
+      <div className={`pointer-events-none absolute inset-0 -z-10 ${overlay}`} />
+      {children}
     </div>
   )
 }
