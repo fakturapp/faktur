@@ -4,12 +4,14 @@ import crypto from 'node:crypto'
 import db from '@adonisjs/lucid/services/db'
 import User from '#models/account/user'
 import oauthTokenService from '#services/oauth/oauth_token_service'
+import { extractOauthRequestContext } from '#services/oauth/oauth_request_context'
 import keyStore from '#services/crypto/key_store'
 import encryptionService from '#services/encryption/encryption_service'
 import UserTransformer from '#transformers/user_transformer'
 
 export default class ExchangeSession {
-  async handle({ request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { request, response } = ctx
     const authHeader = request.header('authorization') || ''
     const match = authHeader.match(/^Bearer (.+)$/i)
     if (!match) {
@@ -43,7 +45,17 @@ export default class ExchangeSession {
       })
     }
 
-    await oauthTokenService.touch(oauthToken, request.ip(), request.header('user-agent') ?? null)
+    const reqCtx = extractOauthRequestContext(ctx)
+    if (reqCtx.deviceName && !oauthToken.deviceName) {
+      oauthToken.deviceName = reqCtx.deviceName
+    }
+    if (reqCtx.deviceOs && !oauthToken.deviceOs) {
+      oauthToken.deviceOs = reqCtx.deviceOs
+    }
+    if (reqCtx.devicePlatform && !oauthToken.devicePlatform) {
+      oauthToken.devicePlatform = reqCtx.devicePlatform
+    }
+    await oauthTokenService.touch(oauthToken, reqCtx.ip, reqCtx.userAgent)
 
     const token = await User.accessTokens.create(user, ['*'], {
       expiresIn: '1 day',
@@ -53,8 +65,8 @@ export default class ExchangeSession {
       .from('auth_access_tokens')
       .where('id', String(token.identifier))
       .update({
-        ip_address: request.ip(),
-        user_agent: (request.header('user-agent') || '').slice(0, 512),
+        ip_address: reqCtx.ip,
+        user_agent: (reqCtx.userAgent || '').slice(0, 512),
       })
 
     user.lastLoginAt = DateTime.now()

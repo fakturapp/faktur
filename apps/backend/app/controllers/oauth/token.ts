@@ -4,11 +4,13 @@ import oauthCodeService from '#services/oauth/oauth_code_service'
 import oauthTokenService from '#services/oauth/oauth_token_service'
 import oauthCrypto from '#services/oauth/oauth_crypto_service'
 import oauthWebhookService from '#services/oauth/oauth_webhook_service'
+import { extractOauthRequestContext } from '#services/oauth/oauth_request_context'
 import { tokenRequestValidator } from '#validators/oauth_validator'
 import { OAUTH_ERRORS } from '#services/oauth/oauth_constants'
 
 export default class Token {
-  async handle({ request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { request, response } = ctx
     const payload = await request.validateUsing(tokenRequestValidator)
 
     const app = await oauthAppService.authenticateClient(
@@ -23,10 +25,10 @@ export default class Token {
     }
 
     if (payload.grant_type === 'authorization_code') {
-      return this.handleAuthorizationCode(payload, app, request, response)
+      return this.handleAuthorizationCode(payload, app, ctx)
     }
     if (payload.grant_type === 'refresh_token') {
-      return this.handleRefreshToken(payload, app, request, response)
+      return this.handleRefreshToken(payload, app, ctx)
     }
 
     return response.badRequest({
@@ -35,7 +37,8 @@ export default class Token {
     })
   }
 
-  private async handleAuthorizationCode(payload: any, app: any, request: any, response: any) {
+  private async handleAuthorizationCode(payload: any, app: any, ctx: HttpContext) {
+    const { response } = ctx
     if (!payload.code || !payload.redirect_uri) {
       return response.badRequest({
         error: OAUTH_ERRORS.invalid_request,
@@ -92,23 +95,29 @@ export default class Token {
       }
     }
 
+    const reqCtx = extractOauthRequestContext(ctx, {
+      deviceName: payload.device_name ?? null,
+      devicePlatform: payload.device_platform ?? null,
+      deviceOs: payload.device_os ?? null,
+    })
+
     const issued = await oauthTokenService.issue({
       oauthAppId: app.id,
       userId: code.userId,
       scopes: code.scopes,
-      deviceName: payload.device_name ?? null,
-      devicePlatform: payload.device_platform ?? null,
-      deviceOs: payload.device_os ?? null,
-      ip: request.ip(),
-      userAgent: request.header('user-agent') ?? null,
+      deviceName: reqCtx.deviceName,
+      devicePlatform: reqCtx.devicePlatform,
+      deviceOs: reqCtx.deviceOs,
+      ip: reqCtx.ip,
+      userAgent: reqCtx.userAgent,
     })
 
     await oauthWebhookService.enqueue(app, 'token.issued', {
       user_id: code.userId,
       token_id: issued.record.id,
       scopes: code.scopes,
-      device_name: payload.device_name ?? null,
-      ip: request.ip(),
+      device_name: reqCtx.deviceName,
+      ip: reqCtx.ip,
     })
 
     return response.ok({
@@ -124,7 +133,8 @@ export default class Token {
     })
   }
 
-  private async handleRefreshToken(payload: any, app: any, request: any, response: any) {
+  private async handleRefreshToken(payload: any, app: any, ctx: HttpContext) {
+    const { response } = ctx
     if (!payload.refresh_token) {
       return response.badRequest({
         error: OAUTH_ERRORS.invalid_request,
@@ -146,17 +156,14 @@ export default class Token {
       })
     }
 
-    const issued = await oauthTokenService.rotate(
-      current,
-      request.ip(),
-      request.header('user-agent') ?? null
-    )
+    const reqCtx = extractOauthRequestContext(ctx)
+    const issued = await oauthTokenService.rotate(current, reqCtx.ip, reqCtx.userAgent)
 
     await oauthWebhookService.enqueue(app, 'token.refreshed', {
       user_id: issued.record.userId,
       old_token_id: current.id,
       new_token_id: issued.record.id,
-      ip: request.ip(),
+      ip: reqCtx.ip,
     })
 
     return response.ok({
