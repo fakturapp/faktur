@@ -28,9 +28,6 @@ import {
   KeyRound,
   ShieldAlert,
   LogOut,
-  EyeOff,
-  Sparkles,
-  ShieldCheck,
 } from 'lucide-react'
 
 const DarkVeil = dynamic(() => import('@/components/effects/DarkVeil'), { ssr: false })
@@ -90,14 +87,8 @@ const KIND_ICONS: Record<string, any> = {
   cli: Terminal,
 }
 
-function pickN<T>(arr: T[], n: number): T[] {
-  const pool = [...arr]
-  const out: T[] = []
-  for (let i = 0; i < n && pool.length > 0; i++) {
-    const idx = Math.floor(Math.random() * pool.length)
-    out.push(pool.splice(idx, 1)[0])
-  }
-  return out
+function pickOne<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)]
 }
 
 function AuthorizeContent() {
@@ -112,7 +103,7 @@ function AuthorizeContent() {
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false)
   const [switchingUser, setSwitchingUser] = useState(false)
 
-  const playfulDenied = useMemo(() => pickN(PLAYFUL_DENIED, 4), [])
+  const playfulDenied = useMemo(() => pickOne(PLAYFUL_DENIED), [])
 
   const queryString = useMemo(() => searchParams.toString(), [searchParams])
   const params = useMemo(
@@ -208,15 +199,16 @@ function AuthorizeContent() {
   }
 
   const veilHueShift = resolvedTheme === 'light' ? 220 : 0
-  const veilSpeed = resolvedTheme === 'light' ? 0.3 : 0.5
+  const veilSpeed = resolvedTheme === 'light' ? 0.6 : 0.9
+  const veilWarp = 0.35
   const veilOverlay =
     resolvedTheme === 'light'
-      ? 'bg-background/70 backdrop-blur-xl'
-      : 'bg-background/55 backdrop-blur-md'
+      ? 'bg-background/55 backdrop-blur-md'
+      : 'bg-background/35 backdrop-blur-sm'
 
   if (user && user.vaultLocked) {
     return (
-      <PageShell hueShift={veilHueShift} speed={veilSpeed} overlay={veilOverlay}>
+      <PageShell hueShift={veilHueShift} speed={veilSpeed} warp={veilWarp} overlay={veilOverlay}>
         <motion.div
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -246,7 +238,7 @@ function AuthorizeContent() {
 
   if (authLoading || !user || state === 'loading') {
     return (
-      <PageShell hueShift={veilHueShift} speed={veilSpeed} overlay={veilOverlay}>
+      <PageShell hueShift={veilHueShift} speed={veilSpeed} warp={veilWarp} overlay={veilOverlay}>
         <Spinner size="lg" className="text-primary" />
       </PageShell>
     )
@@ -254,7 +246,7 @@ function AuthorizeContent() {
 
   if (state === 'error' || !data) {
     return (
-      <PageShell hueShift={veilHueShift} speed={veilSpeed} overlay={veilOverlay}>
+      <PageShell hueShift={veilHueShift} speed={veilSpeed} warp={veilWarp} overlay={veilOverlay}>
         <motion.div
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -280,7 +272,7 @@ function AuthorizeContent() {
     state === 'redirecting' || state === 'approving' || state === 'denying'
 
   return (
-    <PageShell hueShift={veilHueShift} speed={veilSpeed} overlay={veilOverlay}>
+    <PageShell hueShift={veilHueShift} speed={veilSpeed} warp={veilWarp} overlay={veilOverlay}>
       <motion.div
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -306,9 +298,9 @@ function AuthorizeContent() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -12 }}
           transition={{ duration: 0.25 }}
-          className="w-full max-w-[520px]"
+          className="w-full max-w-[640px]"
         >
-          <div className="rounded-2xl bg-overlay/90 backdrop-blur-xl shadow-overlay p-7">
+          <div className="rounded-2xl bg-overlay/85 backdrop-blur-xl shadow-overlay p-8">
             <div className="flex items-center gap-3 pb-5 border-b border-border">
               <div className="h-12 w-12 shrink-0 rounded-xl bg-surface flex items-center justify-center overflow-hidden">
                 {data.client.iconUrl ? (
@@ -398,52 +390,26 @@ function AuthorizeContent() {
               </div>
             </div>
 
-            <div className="py-3 border-t border-border">
+            <div className="py-4 border-t border-border">
               <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2.5">
-                Ce que {data.client.name} pourra faire
+                Ce à quoi {data.client.name} a accès
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+              <div className="space-y-1.5">
                 {GRANTED_ACCESSES.map((access) => (
                   <div
                     key={access}
-                    className="flex items-center gap-2 text-[12.5px] text-foreground"
+                    className="flex items-center gap-2 text-[13px] text-foreground"
                   >
                     <Check className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
                     <span>{access}</span>
                   </div>
                 ))}
               </div>
-            </div>
-
-            <div className="py-3 border-t border-border">
-              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2.5">
-                Ce que {data.client.name} ne pourra pas faire
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                {playfulDenied.map((line) => (
-                  <div
-                    key={line}
-                    className="flex items-center gap-2 text-[12.5px] text-muted-foreground"
-                  >
-                    <X className="h-3.5 w-3.5 text-destructive/70 shrink-0" />
-                    <span className="truncate">{line}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="py-3 border-t border-border space-y-1.5">
-              <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
-                <EyeOff className="h-3.5 w-3.5 text-primary shrink-0" />
-                <span>Faktur ne partage jamais votre mot de passe.</span>
-              </div>
-              <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
-                <ShieldCheck className="h-3.5 w-3.5 text-primary shrink-0" />
-                <span>Vous pouvez révoquer cet accès à tout moment.</span>
-              </div>
-              <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
-                <Sparkles className="h-3.5 w-3.5 text-primary shrink-0" />
-                <span>Connexion sécurisée par OAuth + PKCE.</span>
+              <div className="mt-3 pt-3 border-t border-border/60 flex items-center gap-2 text-[12px] text-muted-foreground italic">
+                <X className="h-3.5 w-3.5 text-destructive/70 shrink-0" />
+                <span className="truncate">
+                  En revanche, {data.client.name} ne pourra pas {playfulDenied}
+                </span>
               </div>
             </div>
 
@@ -510,17 +476,19 @@ function PageShell({
   children,
   hueShift,
   speed,
+  warp,
   overlay,
 }: {
   children: React.ReactNode
   hueShift: number
   speed: number
+  warp: number
   overlay: string
 }) {
   return (
     <div className="relative isolate flex min-h-[100svh] flex-col items-center justify-center overflow-hidden bg-background p-4">
       <div className="pointer-events-none absolute inset-0 -z-20">
-        <DarkVeil hueShift={hueShift} speed={speed} warpAmount={0.05} />
+        <DarkVeil hueShift={hueShift} speed={speed} warpAmount={warp} />
       </div>
       <div className={`pointer-events-none absolute inset-0 -z-10 ${overlay}`} />
       {children}
