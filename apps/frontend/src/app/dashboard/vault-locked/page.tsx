@@ -134,25 +134,20 @@ export default function VaultLockedPage() {
   return (
     <div className="relative min-h-screen">
       <DashboardBackground />
-      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 h-14 flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-9 -ml-2 gap-1.5"
-            onClick={async () => {
-              await logout()
-            }}
-          >
-            <ArrowLeft className="h-4 w-4" /> Se déconnecter
-          </Button>
-          <div className="ml-auto text-xs font-medium text-muted-foreground">
-            Coffre-fort verrouillé
-          </div>
-        </div>
+      <div className="sticky top-4 z-10 mx-auto max-w-3xl px-4 sm:px-6">
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-9 gap-1.5 rounded-full bg-background/80 backdrop-blur shadow-surface"
+          onClick={async () => {
+            await logout()
+          }}
+        >
+          <ArrowLeft className="h-4 w-4" /> Se déconnecter
+        </Button>
       </div>
 
-      <div className="mx-auto max-w-3xl px-4 sm:px-6 py-8 space-y-6">
+      <div className="mx-auto max-w-3xl px-4 sm:px-6 pb-8 pt-4 space-y-6">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}

@@ -88,18 +88,18 @@ export function TeamTransferWizard({ team, candidates, onClose, onSuccess }: Pro
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-background/95 backdrop-blur-sm">
       <DashboardBackground />
-      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
-        <div className="mx-auto max-w-2xl px-4 sm:px-6 h-14 flex items-center gap-3">
-          <Button variant="ghost" size="sm" className="h-9 -ml-2 gap-1.5" onClick={onClose}>
-            <X className="h-4 w-4" /> Annuler
-          </Button>
-          <div className="ml-auto text-xs font-medium text-muted-foreground">
-            Transférer la propriété
-          </div>
-        </div>
+      <div className="sticky top-4 z-10 mx-auto max-w-2xl px-4 sm:px-6">
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-9 gap-1.5 rounded-full bg-background/80 backdrop-blur shadow-surface"
+          onClick={onClose}
+        >
+          <X className="h-4 w-4" /> Annuler
+        </Button>
       </div>
 
-      <div className="mx-auto max-w-2xl px-4 sm:px-6 py-8 space-y-6">
+      <div className="mx-auto max-w-2xl px-4 sm:px-6 pb-8 pt-4 space-y-6">
         <TeamIdentityCard team={team} />
 
         <div className="flex items-center gap-4">

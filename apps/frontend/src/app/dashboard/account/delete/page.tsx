@@ -345,25 +345,20 @@ export default function DeleteAccountPage() {
   return (
     <div className="relative min-h-screen">
       <DashboardBackground />
-      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
-        <div className="mx-auto max-w-2xl px-4 sm:px-6 h-14 flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-9 -ml-2 gap-1.5"
-            onClick={() => router.push('/dashboard/account')}
-          >
-            <ArrowLeft className="h-4 w-4" /> Retour
-          </Button>
-          <div className="ml-auto text-xs font-medium text-muted-foreground">
-            Suppression du compte
-          </div>
-        </div>
+      <div className="sticky top-4 z-10 mx-auto max-w-2xl px-4 sm:px-6">
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-9 gap-1.5 rounded-full bg-background/80 backdrop-blur shadow-surface"
+          onClick={() => router.push('/dashboard/account')}
+        >
+          <ArrowLeft className="h-4 w-4" /> Retour
+        </Button>
       </div>
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-2xl mx-auto space-y-6 px-4 sm:px-6 py-8"
+        className="max-w-2xl mx-auto space-y-6 px-4 sm:px-6 pb-8 pt-4"
       >
         {}
         <div className="flex items-center gap-4">
