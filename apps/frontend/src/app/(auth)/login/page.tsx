@@ -663,7 +663,19 @@ function LoginContent() {
                       exit={{ opacity: 0, y: -8 }}
                       transition={{ duration: 0.25 }}
                     >
-                      <form onSubmit={handleSubmit}>
+                      <form onSubmit={handleSubmit} autoComplete="on">
+                        <input
+                          type="text"
+                          name="username"
+                          id="login-stage-username"
+                          autoComplete="username"
+                          value={email}
+                          readOnly
+                          tabIndex={-1}
+                          aria-hidden="true"
+                          onChange={() => {}}
+                          style={{ position: 'absolute', left: '-10000px', width: '1px', height: '1px', overflow: 'hidden', opacity: 0 }}
+                        />
                         <FieldGroup>
                           {error && (
                             <motion.div
