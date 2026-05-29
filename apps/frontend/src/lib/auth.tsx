@@ -230,11 +230,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (user && !isPublicPath) {
       const isOnboarding = pathname.startsWith('/onboarding')
       const isAccountDeletion = pathname.startsWith('/dashboard/account/delete')
+      const isVaultLocked = pathname === '/dashboard/vault-locked'
       if (needsOnboarding && !isOnboarding && !isAccountDeletion) {
         router.replace('/onboarding')
         return
       }
       if (!needsOnboarding && isOnboarding) {
+        router.replace('/dashboard')
+        return
+      }
+      const shouldShowVaultPage =
+        !!user.vaultLocked &&
+        user.currentTeamEncryptionMode === 'private' &&
+        !user.cryptoResetNeeded &&
+        !forceCryptoReset
+      if (shouldShowVaultPage && !isVaultLocked && !isAccountDeletion) {
+        router.replace('/dashboard/vault-locked')
+        return
+      }
+      if (!shouldShowVaultPage && isVaultLocked) {
         router.replace('/dashboard')
         return
       }
@@ -337,12 +351,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         onRefresh={handleCryptoRefresh}
       />
       <VaultUnlockModal
-        forceOpen={
-          !!user?.vaultLocked &&
-          user?.currentTeamEncryptionMode === 'private' &&
-          !user?.cryptoResetNeeded &&
-          !forceCryptoReset
-        }
+        forceOpen={false}
         onStartRecovery={() => setForceCryptoReset(true)}
       />
       <RecoveryKeySetupModal
