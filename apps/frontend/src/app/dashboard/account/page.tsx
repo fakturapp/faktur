@@ -473,10 +473,25 @@ export default function AccountPage() {
       return toast(err || 'Erreur lors de la liaison', 'error')
     }
 
-    // Open popup
     const popup = window.open(data.url, 'google_link', 'width=500,height=600,left=200,top=100')
 
-    // Listen for postMessage from popup
+    const popupBlocked = !popup || popup.closed || typeof popup.closed === 'undefined'
+    if (popupBlocked) {
+      setProviderLinking(false)
+      try {
+        sessionStorage.setItem('faktur_google_link_pending', '1')
+      } catch {}
+      t.warning('Popup bloquée', {
+        description: 'Votre navigateur a bloqué la fenêtre de liaison Google. Cliquez pour continuer directement.',
+        actionProps: {
+          children: 'Continuer',
+          variant: 'primary',
+          onPress: () => { window.location.href = data.url },
+        },
+      })
+      return
+    }
+
     function onMessage(event: MessageEvent) {
       if (event.origin !== window.location.origin) return
       if (event.data?.type !== 'oauth_callback') return
@@ -484,9 +499,9 @@ export default function AccountPage() {
       setProviderLinking(false)
 
       if (event.data.success) {
-        toast('Compte Google lié avec succès', 'success')
         loadProviders()
         refreshUser()
+        router.push('/dashboard/account/google-linked')
       } else {
         const errors: Record<string, string> = {
           already_linked: 'Ce compte Google est déjà lié à un autre utilisateur.',
@@ -500,7 +515,6 @@ export default function AccountPage() {
 
     window.addEventListener('message', onMessage)
 
-    // Cleanup if popup is closed without completing
     const interval = setInterval(() => {
       if (popup?.closed) {
         clearInterval(interval)
