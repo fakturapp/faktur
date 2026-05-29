@@ -61,6 +61,7 @@ export default function DeleteAccountPage() {
   const [transferDialog, setTransferDialog] = useState<TeamInfo | null>(null)
   const [transferTarget, setTransferTarget] = useState('')
   const [leaveConfirm, setLeaveConfirm] = useState<TeamInfo | null>(null)
+  const [redirectingTeam, setRedirectingTeam] = useState<{ team: TeamInfo; action: 'delete-team' | 'transfer' | 'leave' } | null>(null)
 
   const [nameInput, setNameInput] = useState('')
 
@@ -177,6 +178,22 @@ export default function DeleteAccountPage() {
   function handleTeamsNext() {
     if (teams.length > 0) return
     goNext()
+  }
+
+  async function startTeamRedirect(team: TeamInfo, action: 'delete-team' | 'transfer' | 'leave') {
+    setRedirectingTeam({ team, action })
+    try {
+      const { error } = await api.post('/team/switch', { teamId: team.id })
+      if (error) {
+        setRedirectingTeam(null)
+        return toast(error, 'error')
+      }
+    } catch {
+      setRedirectingTeam(null)
+      return toast('Impossible de basculer sur cette équipe', 'error')
+    }
+    const params = new URLSearchParams({ action, from: 'account-delete' })
+    router.push(`/dashboard/settings/members?${params.toString()}`)
   }
 
   async function handleVerifyName(e: React.FormEvent) {
@@ -415,8 +432,8 @@ export default function DeleteAccountPage() {
                             variant="outline"
                             size="sm"
                             className="border-destructive/30 text-destructive hover:bg-destructive/10"
-                            onClick={() => { setDeleteTeamDialog(team); setDeleteTeamPassword(''); setShowDeleteTeamPassword(false) }}
-                            disabled={loading}
+                            onClick={() => startTeamRedirect(team, 'delete-team')}
+                            disabled={loading || !!redirectingTeam}
                           >
                             <Trash2 className="h-3.5 w-3.5 mr-1" /> Supprimer
                           </Button>
@@ -424,10 +441,10 @@ export default function DeleteAccountPage() {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => openTransferDialog(team)}
-                              disabled={loading}
+                              onClick={() => startTeamRedirect(team, 'transfer')}
+                              disabled={loading || !!redirectingTeam}
                             >
-                              <UserCheck className="h-3.5 w-3.5 mr-1" /> Transférer & Quitté
+                              <UserCheck className="h-3.5 w-3.5 mr-1" /> Transférer & Quitter
                             </Button>
                           )}
                         </>
@@ -435,8 +452,8 @@ export default function DeleteAccountPage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setLeaveConfirm(team)}
-                          disabled={loading}
+                          onClick={() => startTeamRedirect(team, 'leave')}
+                          disabled={loading || !!redirectingTeam}
                         >
                           <LogOut className="h-3.5 w-3.5 mr-1" /> Quitter
                         </Button>
@@ -770,6 +787,37 @@ export default function DeleteAccountPage() {
         </DialogFooter>
       </Dialog>
       </motion.div>
+
+      <AnimatePresence>
+        {redirectingTeam && (
+          <motion.div
+            key="redirect-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 12, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -8, scale: 0.98 }}
+              className="rounded-2xl border border-border bg-card shadow-2xl p-8 max-w-sm mx-4 text-center space-y-4"
+            >
+              <div className="mx-auto h-12 w-12 rounded-full bg-accent-soft flex items-center justify-center">
+                <Spinner size="sm" className="text-accent" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base font-semibold text-foreground">
+                  Redirection en cours
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Ouverture des paramètres de l&apos;équipe «&nbsp;{redirectingTeam.team.name}&nbsp;» pour {redirectingTeam.action === 'delete-team' ? 'supprimer' : redirectingTeam.action === 'transfer' ? 'transférer' : 'quitter'} l&apos;équipe.
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
