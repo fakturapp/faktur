@@ -21,6 +21,8 @@ import { DesktopUpdateCard } from '@/components/layout/desktop-update-card'
 import { WhatsNewModal } from '@/components/layout/whats-new-modal'
 import { VerifiedBadge } from '@/components/ui/verified-badge'
 import { Tooltip } from '@/components/ui/tooltip'
+import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
 import {
   LayoutDashboard,
   FileText,
@@ -117,6 +119,7 @@ interface NavItem {
   label: string
   icon: React.ElementType
   children?: { href: string; label: string; icon?: React.ElementType }[]
+  confirmRedirect?: { title: string; description: string }
 }
 
 const mainNav: NavItem[] = [
@@ -208,7 +211,15 @@ const accountNav: NavItem[] = [
   { href: '/dashboard/account/sessions', label: 'Sessions', icon: Monitor },
   { href: '/dashboard/account/oauth', label: 'Applications connectées', icon: ShieldCheck },
   { href: '/dashboard/account/export', label: 'Exportation', icon: Download },
-  { href: '/dashboard/account/delete', label: 'Supprimer le compte', icon: Trash2 },
+  {
+    href: '/dashboard/account/delete',
+    label: 'Supprimer le compte',
+    icon: Trash2,
+    confirmRedirect: {
+      title: 'Supprimer votre compte',
+      description: "Vous allez être redirigé vers la page de suppression de compte. Ce processus comporte plusieurs étapes de vérification.",
+    },
+  },
 ]
 
 const SETTINGS_EXPANDED_KEY = 'zenvoice_settings_expanded'
@@ -239,7 +250,7 @@ function LinkStatusIndicator(_props: { className?: string }) {
   return null
 }
 
-function NavLink({ item, pathname, badges, persistKey, collapsed }: { item: NavItem; pathname: string; badges?: Record<string, number>; persistKey?: string; collapsed?: boolean }) {
+function NavLink({ item, pathname, badges, persistKey, collapsed, onConfirmRedirect }: { item: NavItem; pathname: string; badges?: Record<string, number>; persistKey?: string; collapsed?: boolean; onConfirmRedirect?: (item: NavItem) => void }) {
   const isActive = item.href === '/dashboard'
     ? pathname === '/dashboard'
     : pathname === item.href || pathname.startsWith(item.href + '/')
@@ -285,7 +296,21 @@ function NavLink({ item, pathname, badges, persistKey, collapsed }: { item: NavI
   }
 
   if (!hasChildren) {
-    const link = (
+    const link = item.confirmRedirect ? (
+      <button
+        type="button"
+        className={rowClass}
+        aria-label={item.label}
+        onClick={() => onConfirmRedirect?.(item)}
+      >
+        <item.icon className={iconClass} />
+        {!collapsed && (
+          <motion.span {...labelFade} className="whitespace-nowrap text-left">
+            {item.label}
+          </motion.span>
+        )}
+      </button>
+    ) : (
       <Link href={item.href} className={rowClass} data-tutorial={tutorialMap[item.href]} aria-label={item.label}>
         <item.icon className={iconClass} />
         {!collapsed && (
@@ -387,6 +412,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
   const [convertModalOpen, setConvertModalOpen] = useState(false)
   const [whatsNewOpen, setWhatsNewOpen] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
+  const [confirmRedirect, setConfirmRedirect] = useState<NavItem | null>(null)
 
   const [desktop, setDesktop] = useState<{ is: boolean; version: string | null }>({
     is: false,
@@ -638,7 +664,14 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             { }
             <nav className={cn('flex-1 overflow-y-auto overflow-x-hidden px-3 py-1 space-y-0.5', collapsed && 'scrollbar-hidden')}>
               {accountNav.map((item) => (
-                <NavLink key={item.href} item={item} pathname={pathname} persistKey="account" collapsed={collapsed} />
+                <NavLink
+                  key={item.href}
+                  item={item}
+                  pathname={pathname}
+                  persistKey="account"
+                  collapsed={collapsed}
+                  onConfirmRedirect={(navItem) => setConfirmRedirect(navItem)}
+                />
               ))}
             </nav>
           </motion.div>
@@ -966,6 +999,31 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
         open={whatsNewOpen}
         onClose={() => setWhatsNewOpen(false)}
       />
+
+      <Dialog open={!!confirmRedirect} onClose={() => setConfirmRedirect(null)}>
+        <DialogHeader showClose={false}>
+          <DialogTitle>{confirmRedirect?.confirmRedirect?.title}</DialogTitle>
+          <DialogDescription>
+            {confirmRedirect?.confirmRedirect?.description}
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setConfirmRedirect(null)}>
+            Annuler
+          </Button>
+          <Button
+            variant="outline"
+            className="border-destructive/30 text-destructive hover:bg-destructive/10"
+            onClick={() => {
+              const target = confirmRedirect
+              setConfirmRedirect(null)
+              if (target) router.push(target.href)
+            }}
+          >
+            Continuer
+          </Button>
+        </DialogFooter>
+      </Dialog>
     </aside>
   )
 }
