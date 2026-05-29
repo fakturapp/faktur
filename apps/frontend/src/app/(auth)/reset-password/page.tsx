@@ -112,10 +112,12 @@ function ResetPasswordContent() {
                     <FieldLabel htmlFor="password">Nouveau mot de passe</FieldLabel>
                     <Input
                       id="password"
+                      name="new-password"
                       type="password"
                       placeholder="8 caractères minimum"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                      autoComplete="new-password"
                       minLength={8}
                       required
                       autoFocus
@@ -128,9 +130,11 @@ function ResetPasswordContent() {
                     <FieldLabel htmlFor="passwordConfirmation">Confirmer</FieldLabel>
                     <Input
                       id="passwordConfirmation"
+                      name="new-password-confirm"
                       type="password"
                       value={passwordConfirmation}
                       onChange={(e) => setPasswordConfirmation(e.target.value)}
+                      autoComplete="new-password"
                       minLength={8}
                       required
                     />
