@@ -224,7 +224,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <InvoiceSettingsProvider>
       <CompanySettingsProvider>
       <EmailProvider>
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen">
           <main className="flex-1">
             {children}
           </main>

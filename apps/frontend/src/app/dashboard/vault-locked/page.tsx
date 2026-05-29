@@ -132,7 +132,7 @@ export default function VaultLockedPage() {
   const otherTeams = teams.filter((t) => !t.isCurrent)
 
   return (
-    <div className="relative min-h-screen bg-background">
+    <div className="relative min-h-screen">
       <DashboardBackground />
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 h-14 flex items-center gap-3">

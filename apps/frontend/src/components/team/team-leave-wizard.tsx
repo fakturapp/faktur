@@ -68,7 +68,7 @@ export function TeamLeaveWizard({ team, memberId, onClose, onSuccess }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-background overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-background/95 backdrop-blur-sm">
       <DashboardBackground />
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
         <div className="mx-auto max-w-2xl px-4 sm:px-6 h-14 flex items-center gap-3">
