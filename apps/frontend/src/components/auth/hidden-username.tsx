@@ -7,8 +7,9 @@ export function HiddenUsername() {
   const value = user?.email ?? ''
   return (
     <input
-      type="email"
+      type="text"
       name="username"
+      id="faktur-hidden-username"
       autoComplete="username"
       value={value}
       readOnly
@@ -16,15 +17,12 @@ export function HiddenUsername() {
       aria-hidden="true"
       style={{
         position: 'absolute',
-        height: 0,
-        width: 0,
-        opacity: 0,
-        pointerEvents: 'none',
-        border: 0,
-        padding: 0,
-        margin: 0,
+        left: '-10000px',
+        top: 'auto',
+        width: '1px',
+        height: '1px',
         overflow: 'hidden',
-        clip: 'rect(0 0 0 0)',
+        opacity: 0,
       }}
       onChange={() => {}}
     />
