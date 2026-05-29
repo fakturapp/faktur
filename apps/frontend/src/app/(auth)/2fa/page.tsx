@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { OtpInput } from '@/components/ui/otp-input'
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldError } from '@/components/ui/field'
 import { Spinner } from '@/components/ui/spinner'
 import { api } from '@/lib/api'
@@ -97,17 +98,35 @@ function TwoFactorContent() {
                   <FieldLabel htmlFor="code">
                     {useRecovery ? 'Code de récupération' : 'Code de vérification'}
                   </FieldLabel>
-                  <Input
-                    id="code"
-                    type="text"
-                    placeholder={useRecovery ? 'XXXXX-XXXXX' : '000000'}
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                    className="text-center text-lg tracking-widest font-mono"
-                    maxLength={useRecovery ? 11 : 6}
-                    required
-                    autoFocus
-                  />
+                  {useRecovery ? (
+                    <Input
+                      id="code"
+                      type="text"
+                      placeholder="XXXXX-XXXXX"
+                      value={code}
+                      onChange={(e) => setCode(e.target.value)}
+                      className="text-center text-lg tracking-widest font-mono"
+                      maxLength={11}
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="off"
+                      spellCheck={false}
+                      required
+                      autoFocus
+                    />
+                  ) : (
+                    <div className="flex justify-center py-1">
+                      <OtpInput
+                        id="code"
+                        value={code}
+                        onChange={setCode}
+                        length={6}
+                        groupSize={3}
+                        autoFocus
+                        ariaLabel="Code de vérification 2FA"
+                      />
+                    </div>
+                  )}
                 </Field>
               </motion.div>
 
