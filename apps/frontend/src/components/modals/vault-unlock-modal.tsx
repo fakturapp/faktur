@@ -201,9 +201,11 @@ export function VaultUnlockModal({ forceOpen = false, onStartRecovery }: VaultUn
             <div className="relative">
               <Input
                 id="vaultPassword"
+                name="password"
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
                 required
                 autoFocus
                 className="pr-10"
@@ -224,9 +226,14 @@ export function VaultUnlockModal({ forceOpen = false, onStartRecovery }: VaultUn
             <FieldLabel htmlFor="vaultRecoveryKey">Clef de secours</FieldLabel>
             <Input
               id="vaultRecoveryKey"
+              name="recovery-key"
               type="text"
               value={recoveryKey}
               onChange={(e) => setRecoveryKey(formatRecoveryKeyInput(e.target.value))}
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck={false}
               maxLength={39}
               required
               autoFocus
