@@ -1038,7 +1038,11 @@ export default function TeamPage() {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="mt-4">
+        <form
+          onSubmit={(e) => { e.preventDefault(); if (transferPassword && !transferring) void handleTransferOwnership() }}
+          className="mt-4"
+          autoComplete="on"
+        >
           <HiddenUsername />
           <Input
             id="transfer-ownership-password"
@@ -1047,24 +1051,23 @@ export default function TeamPage() {
             placeholder="Votre mot de passe"
             value={transferPassword}
             onChange={(e) => setTransferPassword(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter' && transferPassword) handleTransferOwnership() }}
             autoComplete="current-password"
           />
-        </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => { setTransferOpen(false); setTransferPassword('') }}>
+          <Button type="button" variant="outline" onClick={() => { setTransferOpen(false); setTransferPassword('') }}>
             Annuler
           </Button>
           <Button
+            type="submit"
             variant="outline"
             className="border-destructive/30 text-destructive hover:bg-destructive/10"
-            onClick={handleTransferOwnership}
             disabled={transferring || !transferPassword}
           >
             {transferring ? <><Spinner /> Transfert...</> : 'Confirmer le transfert'}
           </Button>
         </DialogFooter>
+        </form>
       </Dialog>
 
       {/* Remove Member Dialog */}
@@ -1188,34 +1191,39 @@ export default function TeamPage() {
                 <DialogDescription>Étape 3 sur 3 — Authentification</DialogDescription>
               </DialogHeader>
 
-              <Field>
-                <FieldLabel htmlFor="deletePassword">Entrez votre mot de passe pour confirmer</FieldLabel>
+              <form
+                onSubmit={(e) => { e.preventDefault(); if (deletePassword && !deleting) void handleDeleteTeam() }}
+                autoComplete="on"
+              >
                 <HiddenUsername />
-                <Input
-                  id="deletePassword"
-                  name="password"
-                  type="password"
-                  value={deletePassword}
-                  onChange={(e) => setDeletePassword(e.target.value)}
-                  placeholder="Votre mot de passe"
-                  autoComplete="current-password"
-                  autoFocus
-                />
-              </Field>
+                <Field>
+                  <FieldLabel htmlFor="deletePassword">Entrez votre mot de passe pour confirmer</FieldLabel>
+                  <Input
+                    id="deletePassword"
+                    name="password"
+                    type="password"
+                    value={deletePassword}
+                    onChange={(e) => setDeletePassword(e.target.value)}
+                    placeholder="Votre mot de passe"
+                    autoComplete="current-password"
+                    autoFocus
+                  />
+                </Field>
 
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setDeleteStep(2)}>
-                  Retour
-                </Button>
-                <Button
-                  variant="outline"
-                  className="border-destructive/30 text-destructive hover:bg-destructive/10"
-                  onClick={handleDeleteTeam}
-                  disabled={deleting || !deletePassword}
-                >
-                  {deleting ? <><Spinner /> Suppression...</> : <><Trash2 className="h-4 w-4 mr-2" /> Supprimer définitivement</>}
-                </Button>
-              </DialogFooter>
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={() => setDeleteStep(2)}>
+                    Retour
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="outline"
+                    className="border-destructive/30 text-destructive hover:bg-destructive/10"
+                    disabled={deleting || !deletePassword}
+                  >
+                    {deleting ? <><Spinner /> Suppression...</> : <><Trash2 className="h-4 w-4 mr-2" /> Supprimer définitivement</>}
+                  </Button>
+                </DialogFooter>
+              </form>
             </motion.div>
           )}
         </AnimatePresence>

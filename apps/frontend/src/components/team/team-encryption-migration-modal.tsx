@@ -198,15 +198,19 @@ export function TeamEncryptionMigrationModal({ open, teamId, teamName, onClose, 
       )}
 
       {step === 'switch-standard' && (
-        <div className="space-y-4">
+        <form
+          onSubmit={(e) => { e.preventDefault(); if (password && !submitting) void switchToStandard() }}
+          className="space-y-4"
+          autoComplete="on"
+        >
           <p className="text-sm text-muted-foreground leading-relaxed">
             Entrez votre mot de passe pour déchiffrer la clef de votre équipe et la re-chiffrer avec
             la clef serveur. Vos factures, clients et autres données restent intacts.
           </p>
 
+          <HiddenUsername />
           <Field>
             <FieldLabel htmlFor="migrate-password">Mot de passe Faktur</FieldLabel>
-            <HiddenUsername />
             <Input
               id="migrate-password"
               name="password"
@@ -222,11 +226,11 @@ export function TeamEncryptionMigrationModal({ open, teamId, teamName, onClose, 
             <Button type="button" variant="outline" onClick={() => setStep('choice')}>
               Retour
             </Button>
-            <Button type="button" onClick={switchToStandard} disabled={!password || submitting}>
+            <Button type="submit" disabled={!password || submitting}>
               {submitting ? <><Spinner /> Migration...</> : 'Passer en Mode Standard'}
             </Button>
           </DialogFooter>
-        </div>
+        </form>
       )}
     </Dialog>
   )
