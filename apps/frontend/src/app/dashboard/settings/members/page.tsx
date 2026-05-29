@@ -994,11 +994,14 @@ export default function TeamPage() {
 
         <div className="mt-4">
           <Input
+            id="transfer-ownership-password"
+            name="password"
             type="password"
             placeholder="Votre mot de passe"
             value={transferPassword}
             onChange={(e) => setTransferPassword(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && transferPassword) handleTransferOwnership() }}
+            autoComplete="current-password"
           />
         </div>
 
@@ -1142,10 +1145,12 @@ export default function TeamPage() {
                 <FieldLabel htmlFor="deletePassword">Entrez votre mot de passe pour confirmer</FieldLabel>
                 <Input
                   id="deletePassword"
+                  name="password"
                   type="password"
                   value={deletePassword}
                   onChange={(e) => setDeletePassword(e.target.value)}
                   placeholder="Votre mot de passe"
+                  autoComplete="current-password"
                   autoFocus
                 />
               </Field>
