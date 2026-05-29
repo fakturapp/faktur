@@ -214,7 +214,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     )
   }
 
-  const isFullBleed = isPopup || pathname === '/dashboard/account/delete'
+  const isFullBleed = isPopup
+    || pathname === '/dashboard/account/delete'
+    || pathname === '/dashboard/account/google-linked'
 
   if (isFullBleed) {
     return (
