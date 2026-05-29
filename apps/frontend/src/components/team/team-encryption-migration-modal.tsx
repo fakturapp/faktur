@@ -207,9 +207,11 @@ export function TeamEncryptionMigrationModal({ open, teamId, teamName, onClose, 
             <FieldLabel htmlFor="migrate-password">Mot de passe Faktur</FieldLabel>
             <Input
               id="migrate-password"
+              name="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
               autoFocus
             />
           </Field>
