@@ -41,7 +41,14 @@ interface Session {
   createdAt: string
   lastUsedAt: string | null
   ipAddress: string | null
+  ipDisplay?: string | null
+  ipShort?: string | null
+  ipKind?: 'ipv4' | 'ipv6' | 'unknown'
   userAgent: string | null
+  browser?: string | null
+  browserVersion?: string | null
+  os?: string | null
+  deviceType?: 'desktop' | 'mobile' | 'tablet'
   location?: string | null
 }
 
@@ -408,19 +415,23 @@ export default function AccountPage() {
       setSessions(data.sessions)
       setSessionsLoaded(true)
 
-      // Fetch location for each unique IP
       const ips = [...new Set(data.sessions.map((s) => s.ipAddress).filter(Boolean))] as string[]
       for (const ip of ips) {
-        if (ip === '::1' || ip === '127.0.0.1') continue
+        if (!ip) continue
+        if (ip === '::1' || ip === '127.0.0.1' || ip === 'localhost') continue
+        if (/^(10\.|192\.168\.|169\.254\.|fe80:|fc[0-9a-f]{2}:|fd[0-9a-f]{2}:)/i.test(ip)) continue
+        if (/^172\.(1[6-9]|2\d|3[01])\./.test(ip)) continue
         try {
-          const res = await fetch(`http://ip-api.com/json/${ip}?fields=status,city,country`)
+          const res = await fetch(`https://ipwho.is/${encodeURIComponent(ip)}?fields=success,city,country,country_code`)
           if (res.ok) {
             const geo = await res.json()
-            if (geo.status === 'success') {
+            if (geo.success !== false) {
               const loc = [geo.city, geo.country].filter(Boolean).join(', ')
-              setSessions((prev) =>
-                prev.map((s) => (s.ipAddress === ip ? { ...s, location: loc } : s))
-              )
+              if (loc) {
+                setSessions((prev) =>
+                  prev.map((s) => (s.ipAddress === ip ? { ...s, location: loc } : s))
+                )
+              }
             }
           }
         } catch { }
@@ -601,7 +612,14 @@ export default function AccountPage() {
     ? user.fullName.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
     : user?.email.slice(0, 2).toUpperCase() || '??'
 
-  function parseUserAgent(ua: string | null): { browser: string; os: string } {
+  function sessionDeviceLabel(session: Session): { browser: string; os: string } {
+    if (session.browser || session.os) {
+      return {
+        browser: session.browser || 'Navigateur',
+        os: session.os || 'Système inconnu',
+      }
+    }
+    const ua = session.userAgent || ''
     if (!ua) return { browser: 'Inconnu', os: 'Inconnu' }
     let browser = 'Navigateur'
     if (ua.includes('Firefox')) browser = 'Firefox'
@@ -609,14 +627,12 @@ export default function AccountPage() {
     else if (ua.includes('OPR') || ua.includes('Opera')) browser = 'Opera'
     else if (ua.includes('Chrome')) browser = 'Chrome'
     else if (ua.includes('Safari')) browser = 'Safari'
-
     let os = 'Autre'
     if (ua.includes('Windows')) os = 'Windows'
     else if (ua.includes('Mac OS')) os = 'macOS'
     else if (ua.includes('Linux')) os = 'Linux'
     else if (ua.includes('Android')) os = 'Android'
     else if (ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS'
-
     return { browser, os }
   }
 
@@ -1050,9 +1066,15 @@ export default function AccountPage() {
 
               <div className="space-y-3">
                 {sessions.map((session) => {
-                  const isMobile = !!session.userAgent?.match(/Mobile|Android|iPhone/i)
-                  const { browser, os } = parseUserAgent(session.userAgent)
+                  const isMobile = session.deviceType
+                    ? session.deviceType !== 'desktop'
+                    : !!session.userAgent?.match(/Mobile|Android|iPhone/i)
+                  const { browser, os } = sessionDeviceLabel(session)
                   const DeviceIcon = isMobile ? Smartphone : Monitor
+                  const ipFull = session.ipDisplay || session.ipAddress || ''
+                  const ipLabel = session.ipKind === 'ipv6'
+                    ? (session.ipShort || ipFull)
+                    : ipFull
 
                   return (
                     <div
@@ -1079,10 +1101,13 @@ export default function AccountPage() {
                             )}
                           </div>
                           <div className="space-y-0.5">
-                            {session.ipAddress && (
+                            {ipFull && (
                               <p className="text-xs text-muted-foreground flex items-center gap-1.5">
                                 <Globe className="h-3 w-3 shrink-0" />
-                                {session.ipAddress}
+                                <span title={ipFull} className="font-mono tabular-nums">{ipLabel}</span>
+                                {session.ipKind === 'ipv6' && (
+                                  <span className="rounded bg-muted px-1 py-px text-[10px] uppercase tracking-wide text-muted-foreground/80">v6</span>
+                                )}
                                 {session.location && (
                                   <span className="flex items-center gap-1">
                                     <MapPin className="h-3 w-3 shrink-0" />
