@@ -201,14 +201,18 @@ export function TeamDeleteWizard({ team, onClose, onSuccess }: Props) {
             )}
 
             {step === 2 && (
-              <>
+              <form
+                onSubmit={(e) => { e.preventDefault(); if (password) goNext() }}
+                className="space-y-5"
+                autoComplete="on"
+              >
                 <div>
                   <h2 className="text-lg font-semibold text-foreground">Mot de passe</h2>
                   <p className="text-sm text-muted-foreground mt-1">Confirmez votre identité pour autoriser la suppression.</p>
                 </div>
+                <HiddenUsername />
                 <Field>
                   <FieldLabel htmlFor="wizard-delete-password">Mot de passe Faktur</FieldLabel>
-                  <HiddenUsername />
                   <div className="relative">
                     <Input
                       id="wizard-delete-password"
@@ -232,19 +236,19 @@ export function TeamDeleteWizard({ team, onClose, onSuccess }: Props) {
                   </div>
                 </Field>
                 <div className="flex justify-between">
-                  <Button variant="outline" onClick={goPrev}>
+                  <Button type="button" variant="outline" onClick={goPrev}>
                     <ArrowLeft className="h-4 w-4 mr-2" /> Retour
                   </Button>
                   <Button
+                    type="submit"
                     variant="outline"
                     className="border-destructive/30 text-destructive hover:bg-destructive/10"
-                    onClick={goNext}
                     disabled={!password}
                   >
                     Continuer <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
                 </div>
-              </>
+              </form>
             )}
 
             {step === 3 && (

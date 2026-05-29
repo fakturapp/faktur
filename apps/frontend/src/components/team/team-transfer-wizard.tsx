@@ -184,14 +184,18 @@ export function TeamTransferWizard({ team, candidates, onClose, onSuccess }: Pro
             )}
 
             {step === 1 && (
-              <>
+              <form
+                onSubmit={(e) => { e.preventDefault(); if (password) goNext() }}
+                className="space-y-5"
+                autoComplete="on"
+              >
                 <div>
                   <h2 className="text-lg font-semibold text-foreground">Votre mot de passe</h2>
                   <p className="text-sm text-muted-foreground mt-1">Confirmez votre identité pour autoriser le transfert.</p>
                 </div>
+                <HiddenUsername />
                 <Field>
                   <FieldLabel htmlFor="wizard-transfer-password">Mot de passe Faktur</FieldLabel>
-                  <HiddenUsername />
                   <Input
                     id="wizard-transfer-password"
                     name="password"
@@ -204,14 +208,14 @@ export function TeamTransferWizard({ team, candidates, onClose, onSuccess }: Pro
                   />
                 </Field>
                 <div className="flex justify-between">
-                  <Button variant="outline" onClick={goPrev}>
+                  <Button type="button" variant="outline" onClick={goPrev}>
                     <ArrowLeft className="h-4 w-4 mr-2" /> Retour
                   </Button>
-                  <Button onClick={goNext} disabled={!password}>
+                  <Button type="submit" disabled={!password}>
                     Continuer <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
                 </div>
-              </>
+              </form>
             )}
 
             {step === 2 && (
