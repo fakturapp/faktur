@@ -10,6 +10,7 @@ import { KeyRound, Eye, EyeOff, CheckCircle2 } from 'lucide-react'
 import { RecoveryKeyDisplay } from '@/components/shared/recovery-key-display'
 import { api } from '@/lib/api'
 import { useAuth } from '@/lib/auth'
+import { HiddenUsername } from '@/components/auth/hidden-username'
 
 export function RecoveryKeySetupModal({ open }: { open: boolean }) {
   const { refreshUser } = useAuth()
@@ -74,6 +75,7 @@ export function RecoveryKeySetupModal({ open }: { open: boolean }) {
 
             <Field>
               <FieldLabel htmlFor="recoverySetupPassword">Mot de passe actuel</FieldLabel>
+              <HiddenUsername />
               <div className="relative">
                 <Input
                   id="recoverySetupPassword"

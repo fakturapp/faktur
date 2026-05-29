@@ -10,6 +10,7 @@ import { Lock, Eye, EyeOff, KeyRound, ExternalLink, LogOut, ShieldAlert } from '
 import { api, onVaultLocked } from '@/lib/api'
 import { isFakturDesktop } from '@/lib/is-desktop'
 import { useAuth } from '@/lib/auth'
+import { HiddenUsername } from '@/components/auth/hidden-username'
 
 type UnlockMode = 'password' | 'recoveryKey'
 
@@ -198,6 +199,7 @@ export function VaultUnlockModal({ forceOpen = false, onStartRecovery }: VaultUn
         {mode === 'password' ? (
           <Field>
             <FieldLabel htmlFor="vaultPassword">Mot de passe</FieldLabel>
+            <HiddenUsername />
             <div className="relative">
               <Input
                 id="vaultPassword"

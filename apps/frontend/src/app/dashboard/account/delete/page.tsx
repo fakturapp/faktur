@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { OtpInput } from '@/components/ui/otp-input'
+import { HiddenUsername } from '@/components/auth/hidden-username'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { FormSelect } from '@/components/ui/dropdown'
@@ -616,6 +617,7 @@ export default function DeleteAccountPage() {
                 </div>
 
                 <form onSubmit={handleVerifyPassword} className="space-y-4">
+                  <HiddenUsername />
                   <div className="relative">
                     <Input
                       id="delete-account-password"
@@ -705,6 +707,7 @@ export default function DeleteAccountPage() {
           </DialogDescription>
         </DialogHeader>
         <div className="mt-4 relative">
+          <HiddenUsername />
           <Input
             id="delete-team-password"
             name="password"

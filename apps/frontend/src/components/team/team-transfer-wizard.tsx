@@ -10,6 +10,7 @@ import { Avatar } from '@/components/ui/avatar'
 import { Spinner } from '@/components/ui/spinner'
 import { api } from '@/lib/api'
 import { ArrowLeft, ArrowRight, Check, Crown, UserCheck, Lock, AlertTriangle, X } from 'lucide-react'
+import { HiddenUsername } from '@/components/auth/hidden-username'
 
 interface MemberOption {
   id: string
@@ -178,6 +179,7 @@ export function TeamTransferWizard({ team, candidates, onClose, onSuccess }: Pro
                 </div>
                 <Field>
                   <FieldLabel htmlFor="wizard-transfer-password">Mot de passe Faktur</FieldLabel>
+                  <HiddenUsername />
                   <Input
                     id="wizard-transfer-password"
                     name="password"

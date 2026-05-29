@@ -11,6 +11,7 @@ import { Separator } from '@/components/ui/separator'
 import { Spinner } from '@/components/ui/spinner'
 import { api } from '@/lib/api'
 import { useToast } from '@/components/ui/toast'
+import { HiddenUsername } from '@/components/auth/hidden-username'
 import {
   ChevronRight, ChevronLeft, Lock, Download, Shield,
   CheckCircle2, FileArchive, Landmark, ArrowRight, CreditCard,
@@ -417,6 +418,7 @@ export default function ExportPage() {
 
                     <Field>
                       <FieldLabel htmlFor="accountPass">Mot de passe du compte</FieldLabel>
+                      <HiddenUsername />
                       <Input
                         id="accountPass"
                         name="password"

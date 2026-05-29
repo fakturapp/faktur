@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { api } from '@/lib/api'
 import { Shield, AlertTriangle, Trash2, KeyRound, Loader2, CheckCircle2, Lock, Key, LogOut, RefreshCw } from 'lucide-react'
+import { HiddenUsername } from '@/components/auth/hidden-username'
 
 function formatRecoveryKeyInput(value: string): string {
   const raw = value.replace(/[^0-9a-fA-F]/g, '').toUpperCase().slice(0, 32)
@@ -302,6 +303,7 @@ export function CryptoResetModal({
 
                           <div>
                             <label className="block text-sm font-medium text-foreground mb-1.5">Ancien mot de passe</label>
+                            <HiddenUsername />
                             <input
                               id="crypto-recover-old-password"
                               name="current-password"
@@ -543,6 +545,7 @@ export function CryptoResetModal({
 
                           <div>
                             <label className="block text-sm font-medium text-foreground mb-1.5">Mot de passe actuel</label>
+                            <HiddenUsername />
                             <input
                               id="crypto-reset-wipe-password"
                               name="current-password"

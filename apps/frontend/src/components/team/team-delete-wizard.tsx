@@ -8,6 +8,7 @@ import { Field, FieldLabel } from '@/components/ui/field'
 import { Spinner } from '@/components/ui/spinner'
 import { api } from '@/lib/api'
 import { ArrowLeft, ArrowRight, Check, Trash2, X, AlertTriangle, Eye, EyeOff, Lock } from 'lucide-react'
+import { HiddenUsername } from '@/components/auth/hidden-username'
 
 interface Props {
   team: { id: string; name: string }
@@ -195,6 +196,7 @@ export function TeamDeleteWizard({ team, onClose, onSuccess }: Props) {
                 </div>
                 <Field>
                   <FieldLabel htmlFor="wizard-delete-password">Mot de passe Faktur</FieldLabel>
+                  <HiddenUsername />
                   <div className="relative">
                     <Input
                       id="wizard-delete-password"

@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Field, FieldLabel, FieldDescription } from '@/components/ui/field'
 import { Spinner } from '@/components/ui/spinner'
+import { HiddenUsername } from '@/components/auth/hidden-username'
 
 interface Props {
   open: boolean
@@ -52,6 +53,7 @@ export function ConfirmPasswordModal({ open, onClose, onConfirm, submitting }: P
       <form onSubmit={handleSubmit} className="mt-3 space-y-4">
         <Field>
           <FieldLabel htmlFor="confirm-password">Mot de passe Faktur</FieldLabel>
+          <HiddenUsername />
           <div className="relative">
             <Input
               id="confirm-password"

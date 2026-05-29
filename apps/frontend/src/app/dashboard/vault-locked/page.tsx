@@ -11,6 +11,7 @@ import { Avatar } from '@/components/ui/avatar'
 import { api, onVaultLocked } from '@/lib/api'
 import { useAuth } from '@/lib/auth'
 import { isFakturDesktop } from '@/lib/is-desktop'
+import { HiddenUsername } from '@/components/auth/hidden-username'
 import {
   Lock,
   Eye,
@@ -232,6 +233,7 @@ export default function VaultLockedPage() {
                 {mode === 'password' ? (
                   <Field>
                     <FieldLabel htmlFor="vaultPassword">Mot de passe</FieldLabel>
+                    <HiddenUsername />
                     <div className="relative">
                       <Input
                         id="vaultPassword"

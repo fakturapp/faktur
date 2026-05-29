@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Field, FieldLabel } from '@/components/ui/field'
 import { Spinner } from '@/components/ui/spinner'
+import { HiddenUsername } from '@/components/auth/hidden-username'
 import { useToast, toast as t } from '@/components/ui/toast'
 import { api } from '@/lib/api'
 import {
@@ -205,6 +206,7 @@ export function TeamEncryptionMigrationModal({ open, teamId, teamName, onClose, 
 
           <Field>
             <FieldLabel htmlFor="migrate-password">Mot de passe Faktur</FieldLabel>
+            <HiddenUsername />
             <Input
               id="migrate-password"
               name="password"

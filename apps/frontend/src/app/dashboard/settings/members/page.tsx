@@ -52,6 +52,7 @@ import { TeamEncryptionMigrationModal } from '@/components/team/team-encryption-
 import { TeamTransferWizard } from '@/components/team/team-transfer-wizard'
 import { TeamLeaveWizard } from '@/components/team/team-leave-wizard'
 import { TeamDeleteWizard } from '@/components/team/team-delete-wizard'
+import { HiddenUsername } from '@/components/auth/hidden-username'
 
 interface TeamMember {
   id: string
@@ -1038,6 +1039,7 @@ export default function TeamPage() {
         </DialogHeader>
 
         <div className="mt-4">
+          <HiddenUsername />
           <Input
             id="transfer-ownership-password"
             name="password"
@@ -1188,6 +1190,7 @@ export default function TeamPage() {
 
               <Field>
                 <FieldLabel htmlFor="deletePassword">Entrez votre mot de passe pour confirmer</FieldLabel>
+                <HiddenUsername />
                 <Input
                   id="deletePassword"
                   name="password"
