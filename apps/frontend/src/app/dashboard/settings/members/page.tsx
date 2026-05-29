@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -49,6 +49,9 @@ import {
 } from 'lucide-react'
 import { PLATFORM_URL } from '@/lib/external-urls'
 import { TeamEncryptionMigrationModal } from '@/components/team/team-encryption-migration-modal'
+import { TeamTransferWizard } from '@/components/team/team-transfer-wizard'
+import { TeamLeaveWizard } from '@/components/team/team-leave-wizard'
+import { TeamDeleteWizard } from '@/components/team/team-delete-wizard'
 
 interface TeamMember {
   id: string
@@ -150,9 +153,43 @@ export default function TeamPage() {
 
   const [encryptionMigrationOpen, setEncryptionMigrationOpen] = useState(false)
 
+  const searchParams = useSearchParams()
+  const wizardAction = searchParams.get('action') as 'delete-team' | 'transfer' | 'leave' | null
+  const fromAccountDelete = searchParams.get('from') === 'account-delete'
+  const [wizardOpen, setWizardOpen] = useState<'delete-team' | 'transfer' | 'leave' | null>(null)
+
   const currentMember = team?.members.find((m) => m.userId === user?.id)
   const isAdmin = currentMember && ['super_admin', 'admin'].includes(currentMember.role)
   const isSuperAdmin = currentMember?.role === 'super_admin'
+
+  useEffect(() => {
+    if (!team || !wizardAction) return
+    if (wizardAction === 'delete-team' && isSuperAdmin) {
+      setWizardOpen('delete-team')
+      return
+    }
+    if (wizardAction === 'transfer' && isSuperAdmin) {
+      setWizardOpen('transfer')
+      return
+    }
+    if (wizardAction === 'leave' && currentMember && !isSuperAdmin) {
+      setWizardOpen('leave')
+      return
+    }
+  }, [team, wizardAction, isSuperAdmin, currentMember])
+
+  function closeWizard(success?: boolean) {
+    setWizardOpen(null)
+    if (typeof window !== 'undefined' && wizardAction) {
+      const url = new URL(window.location.href)
+      url.searchParams.delete('action')
+      if (!success) url.searchParams.delete('from')
+      window.history.replaceState({}, '', url.toString())
+    }
+    if (success && fromAccountDelete) {
+      router.push('/dashboard/account/delete')
+    }
+  }
 
   useEffect(() => {
     loadTeam()
@@ -1250,6 +1287,51 @@ export default function TeamPage() {
           onResolved={async () => {
             setEncryptionMigrationOpen(false)
             await Promise.all([loadTeam(), refreshUser()])
+          }}
+        />
+      )}
+
+      {team && wizardOpen === 'delete-team' && isSuperAdmin && (
+        <TeamDeleteWizard
+          team={{ id: team.id, name: team.name }}
+          onClose={() => closeWizard(false)}
+          onSuccess={async (switchedToTeamId) => {
+            await refreshUser()
+            if (fromAccountDelete) {
+              router.push('/dashboard/account/delete')
+            } else if (switchedToTeamId) {
+              router.push('/dashboard')
+            } else {
+              router.push('/onboarding/team')
+            }
+          }}
+        />
+      )}
+
+      {team && wizardOpen === 'transfer' && isSuperAdmin && (
+        <TeamTransferWizard
+          team={{ id: team.id, name: team.name }}
+          candidates={team.members.filter((m) => m.status === 'active' && m.user?.id !== user?.id && m.role !== 'super_admin')}
+          onClose={() => closeWizard(false)}
+          onSuccess={async () => {
+            await Promise.all([loadTeam(), refreshUser()])
+            closeWizard(true)
+          }}
+        />
+      )}
+
+      {team && wizardOpen === 'leave' && currentMember && (
+        <TeamLeaveWizard
+          team={{ id: team.id, name: team.name }}
+          memberId={currentMember.id}
+          onClose={() => closeWizard(false)}
+          onSuccess={async () => {
+            await refreshUser()
+            if (fromAccountDelete) {
+              router.push('/dashboard/account/delete')
+            } else {
+              router.push('/dashboard')
+            }
           }}
         />
       )}
