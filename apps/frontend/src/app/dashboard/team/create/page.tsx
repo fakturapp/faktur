@@ -443,10 +443,12 @@ export default function CreateTeamPage() {
                         <FieldLabel htmlFor="importPassword">Mot de passe de dechiffrement</FieldLabel>
                         <Input
                           id="importPassword"
+                          name="archive-password"
                           type="password"
                           value={importPassword}
                           onChange={(e) => setImportPassword(e.target.value)}
                           placeholder="Mot de passe utilise lors de l'export"
+                          autoComplete="off"
                         />
                         <FieldDescription>
                           Ce fichier est chiffre. Entrez le mot de passe defini lors de l&apos;export.
