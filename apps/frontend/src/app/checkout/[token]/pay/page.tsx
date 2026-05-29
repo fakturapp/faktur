@@ -286,7 +286,7 @@ export default function CheckoutPayPage({ params }: { params: Promise<{ token: s
               <p className="text-sm text-muted-foreground mt-1.5">Ce lien est protégé. Entrez le mot de passe communiqué par l&apos;émetteur.</p>
             </div>
             <div className="space-y-3">
-              <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && submitPw()} placeholder="Mot de passe" autoFocus
+              <input id="checkout-link-password" name="link-password" type="password" value={pw} onChange={(e) => setPw(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && submitPw()} placeholder="Mot de passe" autoComplete="off" autoFocus
                 className="w-full h-12 rounded-xl border border-border bg-surface-hover px-4 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/15 transition-all" />
               {pwErr && <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="text-sm text-red-400 flex items-center gap-1.5"><IconAlert className="h-3.5 w-3.5" /> {pwErr}</motion.p>}
               <button onClick={submitPw} disabled={busy || !pw}
