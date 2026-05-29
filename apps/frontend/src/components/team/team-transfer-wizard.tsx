@@ -100,7 +100,7 @@ export function TeamTransferWizard({ team, candidates, onClose, onSuccess }: Pro
       </div>
 
       <div className="mx-auto max-w-2xl px-4 sm:px-6 py-8 space-y-6">
-        <TeamIdentityCard team={team} intent="transfer" />
+        <TeamIdentityCard team={team} />
 
         <div className="flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">

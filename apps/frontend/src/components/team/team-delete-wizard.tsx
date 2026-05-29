@@ -87,7 +87,7 @@ export function TeamDeleteWizard({ team, onClose, onSuccess }: Props) {
       </div>
 
       <div className="mx-auto max-w-2xl px-4 sm:px-6 py-8 space-y-6">
-        <TeamIdentityCard team={team} intent="delete" />
+        <TeamIdentityCard team={team} />
 
         <div className="flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-destructive/10">
