@@ -1,6 +1,6 @@
 {
   "name": "@faktur/frontend",
-  "version": "0.15.1",
+  "version": "0.20.0",
   "private": true,
   "type": "module",
   "scripts": {
