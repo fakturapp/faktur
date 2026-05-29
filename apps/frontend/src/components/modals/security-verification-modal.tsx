@@ -204,6 +204,7 @@ export function SecurityVerificationModal({
                     value={code}
                     onChange={setCode}
                     autoFocus
+                    purpose="email"
                     ariaLabel="Code reçu par email"
                   />
                 </div>
@@ -238,6 +239,7 @@ export function SecurityVerificationModal({
                 value={code}
                 onChange={setCode}
                 autoFocus
+                purpose="totp"
                 ariaLabel="Code 2FA"
               />
             </div>

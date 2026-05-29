@@ -813,6 +813,7 @@ export default function AccountPage() {
                           value={twoFactorCode}
                           onChange={setTwoFactorCode}
                           autoFocus
+                          purpose="totp"
                           ariaLabel="Code 2FA depuis l'application"
                         />
                       </div>
@@ -1280,6 +1281,7 @@ export default function AccountPage() {
                     value={emailCode}
                     onChange={setEmailCode}
                     autoFocus
+                    purpose="email"
                     ariaLabel="Code de vérification de l'email actuel"
                   />
                 </div>
@@ -1371,6 +1373,7 @@ export default function AccountPage() {
                     value={emailCode}
                     onChange={setEmailCode}
                     autoFocus
+                    purpose="email"
                     ariaLabel="Code de vérification du nouvel email"
                   />
                 </div>
@@ -1411,6 +1414,7 @@ export default function AccountPage() {
               value={disableCode}
               onChange={setDisableCode}
               autoFocus
+              purpose="totp"
               ariaLabel="Code 2FA pour désactiver"
             />
           </div>

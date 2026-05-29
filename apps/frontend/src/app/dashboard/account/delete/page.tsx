@@ -572,6 +572,7 @@ export default function DeleteAccountPage() {
                         value={codeInput}
                         onChange={setCodeInput}
                         autoFocus
+                        purpose="email"
                         ariaLabel="Code de vérification email"
                       />
                     </div>

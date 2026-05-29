@@ -15,6 +15,12 @@ interface OtpInputProps {
   ariaLabel?: string
   id?: string
   name?: string
+  /**
+   * Source of the code. Controls autofill behaviour:
+   * - 'totp' / 'sms' → autoComplete='one-time-code' (iOS Keychain + Authenticator + SMS picker)
+   * - 'email' → autoComplete='off' (no managers offering passwords or OTPs)
+   */
+  purpose?: 'totp' | 'sms' | 'email'
 }
 
 export function OtpInput({
@@ -28,7 +34,8 @@ export function OtpInput({
   className,
   ariaLabel = 'Code de vérification',
   id,
-  name = 'one-time-code',
+  name,
+  purpose = 'totp',
 }: OtpInputProps) {
   const inputRef = React.useRef<HTMLInputElement>(null)
   const [focused, setFocused] = React.useState(false)
@@ -66,11 +73,11 @@ export function OtpInput({
       <input
         ref={inputRef}
         id={id}
-        name={name}
+        name={name ?? (purpose === 'email' ? 'email-code' : 'one-time-code')}
         type="text"
         inputMode="numeric"
         pattern="[0-9]*"
-        autoComplete="one-time-code"
+        autoComplete={purpose === 'email' ? 'off' : 'one-time-code'}
         autoCorrect="off"
         autoCapitalize="off"
         spellCheck={false}

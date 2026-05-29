@@ -123,6 +123,7 @@ function TwoFactorContent() {
                         length={6}
                         groupSize={3}
                         autoFocus
+                        purpose="totp"
                         ariaLabel="Code de vérification 2FA"
                       />
                     </div>
