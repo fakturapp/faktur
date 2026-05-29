@@ -303,11 +303,14 @@ export function CryptoResetModal({
                           <div>
                             <label className="block text-sm font-medium text-foreground mb-1.5">Ancien mot de passe</label>
                             <input
+                              id="crypto-recover-old-password"
+                              name="current-password"
                               type="password"
                               value={oldPassword}
                               onChange={(e) => setOldPassword(e.target.value)}
                               onKeyDown={(e) => e.key === 'Enter' && handleRecover()}
                               placeholder="Votre ancien mot de passe"
+                              autoComplete="current-password"
                               className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                               autoFocus
                             />
@@ -541,11 +544,14 @@ export function CryptoResetModal({
                           <div>
                             <label className="block text-sm font-medium text-foreground mb-1.5">Mot de passe actuel</label>
                             <input
+                              id="crypto-reset-wipe-password"
+                              name="current-password"
                               type="password"
                               value={wipePassword}
                               onChange={(e) => setWipePassword(e.target.value)}
                               onKeyDown={(e) => e.key === 'Enter' && wipePassword.trim() && handleWipe()}
                               placeholder="Votre mot de passe"
+                              autoComplete="current-password"
                               className="w-full px-3 py-2 bg-background border border-destructive/30 rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-destructive/50"
                               autoFocus
                             />
