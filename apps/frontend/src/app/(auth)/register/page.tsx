@@ -519,7 +519,19 @@ function RegisterContent() {
                 exit="exit"
                 transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
               >
-                <form onSubmit={handleStepPasswordNext}>
+                <form onSubmit={handleStepPasswordNext} autoComplete="on">
+                  <input
+                    type="text"
+                    name="username"
+                    id="register-username"
+                    autoComplete="username"
+                    value={email}
+                    readOnly
+                    tabIndex={-1}
+                    aria-hidden="true"
+                    onChange={() => {}}
+                    style={{ position: 'absolute', left: '-10000px', width: '1px', height: '1px', overflow: 'hidden', opacity: 0 }}
+                  />
                   <FieldGroup>
                     <p className="text-sm text-muted-foreground mb-2">
                       Choisissez un mot de passe sécurisé pour protéger votre compte.
@@ -530,10 +542,12 @@ function RegisterContent() {
                       <div className="relative">
                         <Input
                           id="password"
+                          name="new-password"
                           type={showPassword ? 'text' : 'password'}
                           placeholder="8 caractères minimum"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
+                          autoComplete="new-password"
                           minLength={8}
                           required
                           autoFocus
@@ -577,9 +591,11 @@ function RegisterContent() {
                       <div className="relative">
                         <Input
                           id="passwordConfirmation"
+                          name="new-password-confirm"
                           type={showPasswordConfirm ? 'text' : 'password'}
                           value={passwordConfirmation}
                           onChange={(e) => setPasswordConfirmation(e.target.value)}
+                          autoComplete="new-password"
                           minLength={8}
                           required
                           className="h-11 pr-10"
