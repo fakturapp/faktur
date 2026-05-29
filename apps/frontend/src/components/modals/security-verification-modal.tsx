@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { OtpInput } from '@/components/ui/otp-input'
 import { Button } from '@/components/ui/button'
 import { FieldDescription } from '@/components/ui/field'
 import { api } from '@/lib/api'
@@ -198,16 +199,14 @@ export function SecurityVerificationModal({
                 <FieldDescription>
                   Un code à 6 chiffres a été envoyé à votre adresse email. Il est valide pendant 5 minutes.
                 </FieldDescription>
-                <Input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="000000"
-                  value={code}
-                  onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  className="text-center text-2xl tracking-[0.3em] font-mono"
-                  maxLength={6}
-                  autoFocus
-                />
+                <div className="flex justify-center py-1">
+                  <OtpInput
+                    value={code}
+                    onChange={setCode}
+                    autoFocus
+                    ariaLabel="Code reçu par email"
+                  />
+                </div>
                 {isExpired && (
                   <p className="text-xs text-destructive text-center">
                     Le code a expiré.
@@ -234,16 +233,14 @@ export function SecurityVerificationModal({
             <FieldDescription>
               Entrez le code à 6 chiffres de votre application d&apos;authentification.
             </FieldDescription>
-            <Input
-              type="text"
-              inputMode="numeric"
-              placeholder="000000"
-              value={code}
-              onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              className="text-center text-2xl tracking-[0.3em] font-mono"
-              maxLength={6}
-              autoFocus
-            />
+            <div className="flex justify-center py-1">
+              <OtpInput
+                value={code}
+                onChange={setCode}
+                autoFocus
+                ariaLabel="Code 2FA"
+              />
+            </div>
           </div>
         )}
 
@@ -258,6 +255,10 @@ export function SecurityVerificationModal({
               value={code}
               onChange={(e) => setCode(e.target.value)}
               className="text-center font-mono"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck={false}
               autoFocus
             />
           </div>
