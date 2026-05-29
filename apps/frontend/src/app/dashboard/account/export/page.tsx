@@ -355,11 +355,11 @@ export default function ExportPage() {
                 <FieldGroup>
                   <Field>
                     <FieldLabel htmlFor="encPass">Mot de passe</FieldLabel>
-                    <Input id="encPass" type="password" value={encryptionPassword} onChange={(e) => setEncryptionPassword(e.target.value)} autoFocus />
+                    <Input id="encPass" name="archive-password" type="password" value={encryptionPassword} onChange={(e) => setEncryptionPassword(e.target.value)} autoComplete="new-password" autoFocus />
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="encConfirm">Confirmer</FieldLabel>
-                    <Input id="encConfirm" type="password" value={encryptionConfirm} onChange={(e) => setEncryptionConfirm(e.target.value)} />
+                    <Input id="encConfirm" name="archive-password-confirm" type="password" value={encryptionConfirm} onChange={(e) => setEncryptionConfirm(e.target.value)} autoComplete="new-password" />
                     {encryptionPassword && encryptionConfirm && !encPasswordsMatch && (
                       <p className="text-xs text-destructive mt-1">Les mots de passe ne correspondent pas</p>
                     )}
@@ -419,10 +419,12 @@ export default function ExportPage() {
                       <FieldLabel htmlFor="accountPass">Mot de passe du compte</FieldLabel>
                       <Input
                         id="accountPass"
+                        name="password"
                         type="password"
                         value={accountPassword}
                         onChange={(e) => setAccountPassword(e.target.value)}
                         placeholder="Votre mot de passe"
+                        autoComplete="current-password"
                         onKeyDown={(e) => { if (e.key === 'Enter' && accountPassword) handleExport() }}
                         autoFocus
                       />

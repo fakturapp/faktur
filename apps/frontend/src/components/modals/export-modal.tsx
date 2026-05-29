@@ -404,10 +404,12 @@ export function ExportModal({ open, onClose }: ExportModalProps) {
                     <FieldLabel htmlFor="encPass">Mot de passe</FieldLabel>
                     <Input
                       id="encPass"
+                      name="archive-password"
                       type="password"
                       value={encryptionPassword}
                       onChange={(e) => setEncryptionPassword(e.target.value)}
                       placeholder="Mot de passe de chiffrement"
+                      autoComplete="new-password"
                       autoFocus
                     />
                   </Field>
@@ -415,10 +417,12 @@ export function ExportModal({ open, onClose }: ExportModalProps) {
                     <FieldLabel htmlFor="encPassConfirm">Confirmer</FieldLabel>
                     <Input
                       id="encPassConfirm"
+                      name="archive-password-confirm"
                       type="password"
                       value={encryptionConfirm}
                       onChange={(e) => setEncryptionConfirm(e.target.value)}
                       placeholder="Confirmer le mot de passe"
+                      autoComplete="new-password"
                     />
                     {encryptionPassword &&
                       encryptionConfirm &&
@@ -507,10 +511,12 @@ export function ExportModal({ open, onClose }: ExportModalProps) {
                       <FieldLabel htmlFor="accountPass">Mot de passe du compte</FieldLabel>
                       <Input
                         id="accountPass"
+                        name="password"
                         type="password"
                         value={accountPassword}
                         onChange={(e) => setAccountPassword(e.target.value)}
                         placeholder="Votre mot de passe"
+                        autoComplete="current-password"
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' && accountPassword) handleExport()
                         }}
