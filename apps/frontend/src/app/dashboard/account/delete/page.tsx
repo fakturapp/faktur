@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { OtpInput } from '@/components/ui/otp-input'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { FormSelect } from '@/components/ui/dropdown'
@@ -514,16 +515,14 @@ export default function DeleteAccountPage() {
                     <p className="text-sm text-muted-foreground">
                       Un code à 6 chiffres a été envoyé. Il est valide pendant 5 minutes.
                     </p>
-                    <Input
-                      type="text"
-                      inputMode="numeric"
-                      placeholder="000000"
-                      value={codeInput}
-                      onChange={(e) => setCodeInput(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                      className="text-center text-2xl tracking-[0.3em] font-mono"
-                      maxLength={6}
-                      autoFocus
-                    />
+                    <div className="flex justify-center py-1">
+                      <OtpInput
+                        value={codeInput}
+                        onChange={setCodeInput}
+                        autoFocus
+                        ariaLabel="Code de vérification email"
+                      />
+                    </div>
                     <div className="flex justify-center">
                       <Button
                         type="button"
@@ -568,10 +567,13 @@ export default function DeleteAccountPage() {
                 <form onSubmit={handleVerifyPassword} className="space-y-4">
                   <div className="relative">
                     <Input
+                      id="delete-account-password"
+                      name="password"
                       type={showPassword ? 'text' : 'password'}
                       placeholder="Votre mot de passe"
                       value={passwordInput}
                       onChange={(e) => setPasswordInput(e.target.value)}
+                      autoComplete="current-password"
                       className="pr-10"
                       autoFocus
                     />
@@ -653,10 +655,13 @@ export default function DeleteAccountPage() {
         </DialogHeader>
         <div className="mt-4 relative">
           <Input
+            id="delete-team-password"
+            name="password"
             type={showDeleteTeamPassword ? 'text' : 'password'}
             placeholder="Votre mot de passe"
             value={deleteTeamPassword}
             onChange={(e) => setDeleteTeamPassword(e.target.value)}
+            autoComplete="current-password"
             className="pr-10"
           />
           <button
