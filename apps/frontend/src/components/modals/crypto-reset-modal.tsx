@@ -296,21 +296,24 @@ export function CryptoResetModal({
 
                       {/* ===== RECOVER MODE ===== */}
                       {mode === 'recover' && (
-                        <div className="space-y-4">
+                        <form
+                          onSubmit={(e) => { e.preventDefault(); if (oldPassword.trim() && !loading) void handleRecover() }}
+                          className="space-y-4"
+                          autoComplete="on"
+                        >
                           <p className="text-sm text-muted-foreground">
                             Entrez votre ancien mot de passe pour déchiffrer vos données et les re-chiffrer avec votre nouveau mot de passe.
                           </p>
 
+                          <HiddenUsername />
                           <div>
-                            <label className="block text-sm font-medium text-foreground mb-1.5">Ancien mot de passe</label>
-                            <HiddenUsername />
+                            <label htmlFor="crypto-recover-old-password" className="block text-sm font-medium text-foreground mb-1.5">Ancien mot de passe</label>
                             <input
                               id="crypto-recover-old-password"
-                              name="current-password"
+                              name="password"
                               type="password"
                               value={oldPassword}
                               onChange={(e) => setOldPassword(e.target.value)}
-                              onKeyDown={(e) => e.key === 'Enter' && handleRecover()}
                               placeholder="Votre ancien mot de passe"
                               autoComplete="current-password"
                               className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -336,6 +339,7 @@ export function CryptoResetModal({
 
                           <div className="flex gap-2">
                             <motion.button
+                              type="button"
                               whileTap={{ scale: 0.97 }}
                               onClick={() => { setMode('choose'); setError('') }}
                               className="flex-1 px-4 py-2 text-sm font-medium text-muted-foreground border border-border rounded-lg hover:bg-muted/50 transition-colors"
@@ -343,8 +347,8 @@ export function CryptoResetModal({
                               Retour
                             </motion.button>
                             <motion.button
+                              type="submit"
                               whileTap={{ scale: 0.97 }}
-                              onClick={handleRecover}
                               disabled={loading || !oldPassword.trim()}
                               className="flex-1 px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                             >
@@ -363,7 +367,7 @@ export function CryptoResetModal({
                               Se déconnecter
                             </button>
                           )}
-                        </div>
+                        </form>
                       )}
 
                       {/* ===== RECOVER WITH KEY MODE ===== */}
@@ -533,7 +537,11 @@ export function CryptoResetModal({
 
                       {/* ===== WIPE STEP 3 - Password confirmation ===== */}
                       {mode === 'wipe' && wipeStep === 3 && (
-                        <div className="space-y-4">
+                        <form
+                          onSubmit={(e) => { e.preventDefault(); if (wipePassword.trim() && !loading) void handleWipe() }}
+                          className="space-y-4"
+                          autoComplete="on"
+                        >
                           <div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3">
                             <div className="flex items-start gap-2">
                               <Lock className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
@@ -543,16 +551,15 @@ export function CryptoResetModal({
                             </div>
                           </div>
 
+                          <HiddenUsername />
                           <div>
-                            <label className="block text-sm font-medium text-foreground mb-1.5">Mot de passe actuel</label>
-                            <HiddenUsername />
+                            <label htmlFor="crypto-reset-wipe-password" className="block text-sm font-medium text-foreground mb-1.5">Mot de passe actuel</label>
                             <input
                               id="crypto-reset-wipe-password"
-                              name="current-password"
+                              name="password"
                               type="password"
                               value={wipePassword}
                               onChange={(e) => setWipePassword(e.target.value)}
-                              onKeyDown={(e) => e.key === 'Enter' && wipePassword.trim() && handleWipe()}
                               placeholder="Votre mot de passe"
                               autoComplete="current-password"
                               className="w-full px-3 py-2 bg-background border border-destructive/30 rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-destructive/50"
@@ -578,6 +585,7 @@ export function CryptoResetModal({
 
                           <div className="flex gap-2">
                             <motion.button
+                              type="button"
                               whileTap={{ scale: 0.97 }}
                               onClick={() => { setWipeStep(2); setWipePassword(''); setError('') }}
                               className="flex-1 px-4 py-2 text-sm font-medium text-muted-foreground border border-border rounded-lg hover:bg-muted/50 transition-colors"
@@ -585,8 +593,8 @@ export function CryptoResetModal({
                               Retour
                             </motion.button>
                             <motion.button
+                              type="submit"
                               whileTap={{ scale: 0.97 }}
-                              onClick={handleWipe}
                               disabled={loading || !wipePassword.trim()}
                               className="flex-1 px-4 py-2 text-sm font-medium text-destructive-foreground bg-destructive rounded-lg hover:bg-destructive/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                             >
@@ -594,7 +602,7 @@ export function CryptoResetModal({
                               Supprimer tout
                             </motion.button>
                           </div>
-                        </div>
+                        </form>
                       )}
                     </motion.div>
                   </AnimatePresence>

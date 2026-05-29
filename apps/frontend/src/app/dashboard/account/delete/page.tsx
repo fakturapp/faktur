@@ -773,39 +773,44 @@ export default function DeleteAccountPage() {
             Toutes les données de cette équipe seront perdues. Entrez votre mot de passe pour confirmer.
           </DialogDescription>
         </DialogHeader>
-        <div className="mt-4 relative">
+        <form
+          onSubmit={(e) => { e.preventDefault(); if (deleteTeamPassword && !loading) void handleDeleteTeam() }}
+          autoComplete="on"
+        >
           <HiddenUsername />
-          <Input
-            id="delete-team-password"
-            name="password"
-            type={showDeleteTeamPassword ? 'text' : 'password'}
-            placeholder="Votre mot de passe"
-            value={deleteTeamPassword}
-            onChange={(e) => setDeleteTeamPassword(e.target.value)}
-            autoComplete="current-password"
-            className="pr-10"
-          />
-          <button
-            type="button"
-            onClick={() => setShowDeleteTeamPassword(!showDeleteTeamPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-            tabIndex={-1}
-          >
-            {showDeleteTeamPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-          </button>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => setDeleteTeamDialog(null)} disabled={loading}>
-            Annuler
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={handleDeleteTeam}
-            disabled={loading || !deleteTeamPassword}
-          >
-            {loading ? <><Spinner /> Suppression...</> : 'Supprimer'}
-          </Button>
-        </DialogFooter>
+          <div className="mt-4 relative">
+            <Input
+              id="delete-team-password"
+              name="password"
+              type={showDeleteTeamPassword ? 'text' : 'password'}
+              placeholder="Votre mot de passe"
+              value={deleteTeamPassword}
+              onChange={(e) => setDeleteTeamPassword(e.target.value)}
+              autoComplete="current-password"
+              className="pr-10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowDeleteTeamPassword(!showDeleteTeamPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              tabIndex={-1}
+            >
+              {showDeleteTeamPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setDeleteTeamDialog(null)} disabled={loading}>
+              Annuler
+            </Button>
+            <Button
+              type="submit"
+              variant="destructive"
+              disabled={loading || !deleteTeamPassword}
+            >
+              {loading ? <><Spinner /> Suppression...</> : 'Supprimer'}
+            </Button>
+          </DialogFooter>
+        </form>
       </Dialog>
 
       {/* Leave team confirmation dialog */}

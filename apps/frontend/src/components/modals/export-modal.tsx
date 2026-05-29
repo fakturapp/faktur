@@ -508,33 +508,35 @@ export function ExportModal({ open, onClose }: ExportModalProps) {
                       </div>
                     </div>
 
-                    <Field>
-                      <FieldLabel htmlFor="accountPass">Mot de passe du compte</FieldLabel>
+                    <form
+                      onSubmit={(e) => { e.preventDefault(); if (accountPassword) void handleExport() }}
+                      autoComplete="on"
+                    >
                       <HiddenUsername />
-                      <Input
-                        id="accountPass"
-                        name="password"
-                        type="password"
-                        value={accountPassword}
-                        onChange={(e) => setAccountPassword(e.target.value)}
-                        placeholder="Votre mot de passe"
-                        autoComplete="current-password"
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' && accountPassword) handleExport()
-                        }}
-                        autoFocus
-                      />
-                    </Field>
-                  </div>
+                      <Field>
+                        <FieldLabel htmlFor="accountPass">Mot de passe du compte</FieldLabel>
+                        <Input
+                          id="accountPass"
+                          name="password"
+                          type="password"
+                          value={accountPassword}
+                          onChange={(e) => setAccountPassword(e.target.value)}
+                          placeholder="Votre mot de passe"
+                          autoComplete="current-password"
+                          autoFocus
+                        />
+                      </Field>
 
-                  <DialogFooter className="mt-auto">
-                    <Button variant="outline" onClick={goBack}>
-                      <ChevronLeft className="h-4 w-4 mr-1" /> Retour
-                    </Button>
-                    <Button onClick={handleExport} disabled={!accountPassword}>
-                      <Download className="h-4 w-4 mr-2" /> Exporter
-                    </Button>
-                  </DialogFooter>
+                      <DialogFooter className="mt-auto">
+                        <Button type="button" variant="outline" onClick={goBack}>
+                          <ChevronLeft className="h-4 w-4 mr-1" /> Retour
+                        </Button>
+                        <Button type="submit" disabled={!accountPassword}>
+                          <Download className="h-4 w-4 mr-2" /> Exporter
+                        </Button>
+                      </DialogFooter>
+                    </form>
+                  </div>
                 </>
               ) : (
                 <div className="flex flex-col items-center justify-center py-8 gap-4">
