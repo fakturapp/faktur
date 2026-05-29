@@ -102,40 +102,77 @@ export default function DeleteAccountPage() {
   }, [])
 
   useEffect(() => {
+    if (deletionToken === null && currentStep === 0) return
+    try {
+      sessionStorage.setItem(
+        'faktur_account_delete_state',
+        JSON.stringify({ step: currentStep, token: deletionToken })
+      )
+    } catch {}
+  }, [currentStep, deletionToken])
+
+  useEffect(() => {
     let cancelled = false
     let flash: { kind: 'success' | 'cancel'; action: 'delete-team' | 'transfer' | 'leave' | null } | null = null
+    let persisted: { step: number; token: string | null } | null = null
     try {
-      const raw = sessionStorage.getItem('faktur_account_delete_flash')
-      if (raw) {
+      const flashRaw = sessionStorage.getItem('faktur_account_delete_flash')
+      if (flashRaw) {
         sessionStorage.removeItem('faktur_account_delete_flash')
-        flash = JSON.parse(raw)
+        flash = JSON.parse(flashRaw)
+      }
+      const stateRaw = sessionStorage.getItem('faktur_account_delete_state')
+      if (stateRaw) {
+        persisted = JSON.parse(stateRaw)
       }
     } catch {}
-    if (!flash) return
 
-    if (flash.kind === 'success') {
-      const msg = flash.action === 'delete-team' ? 'Équipe supprimée'
-        : flash.action === 'transfer' ? 'Équipe transférée'
-        : flash.action === 'leave' ? 'Vous avez quitté l\'équipe'
-        : 'Action effectuée'
-      toast(msg, 'success')
-    } else {
-      toast('Action annulée, vous pouvez réessayer', 'info')
+    if (flash) {
+      if (flash.kind === 'success') {
+        const msg = flash.action === 'delete-team' ? 'Équipe supprimée'
+          : flash.action === 'transfer' ? 'Équipe transférée'
+          : flash.action === 'leave' ? 'Vous avez quitté l\'équipe'
+          : 'Action effectuée'
+        toast(msg, 'success')
+      } else {
+        toast('Action annulée, vous pouvez réessayer', 'info')
+      }
     }
 
+    if (!flash && !persisted) return
+
     void (async () => {
-      const { data, error } = await api.post<{ token: string }>('/account/delete/start', {})
-      if (cancelled || error || !data?.token) return
-      setDeletionToken(data.token)
-      setCurrentStep(1)
+      let token = persisted?.token ?? null
+      let step = persisted?.step ?? 1
+      if (flash) step = Math.max(step, 1)
+
+      if (!token) {
+        const { data, error } = await api.post<{ token: string }>('/account/delete/start', {})
+        if (cancelled) return
+        if (error || !data?.token) {
+          try { sessionStorage.removeItem('faktur_account_delete_state') } catch {}
+          return
+        }
+        token = data.token
+      }
+
+      setDeletionToken(token)
+      setCurrentStep(step)
       setDirection(1)
-      const r = await api.get<{ teams: TeamInfo[] }>('/account/delete/teams', {
-        headers: { 'x-deletion-token': data.token } as Record<string, string>,
-      })
-      if (cancelled) return
-      if (r.data?.teams) {
-        setTeams(r.data.teams)
-        setTeamsLoaded(true)
+
+      if (step >= 1) {
+        const r = await api.get<{ teams: TeamInfo[] }>('/account/delete/teams', {
+          headers: { 'x-deletion-token': token } as Record<string, string>,
+        })
+        if (cancelled) return
+        if (r.data?.teams) {
+          setTeams(r.data.teams)
+          setTeamsLoaded(true)
+        } else if (r.error) {
+          try { sessionStorage.removeItem('faktur_account_delete_state') } catch {}
+          setDeletionToken(null)
+          setCurrentStep(0)
+        }
       }
     })()
 
@@ -291,6 +328,10 @@ export default function DeleteAccountPage() {
     }, { headers: headers() as Record<string, string> })
     setLoading(false)
     if (error) return toast(error, 'error')
+    try {
+      sessionStorage.removeItem('faktur_account_delete_state')
+      sessionStorage.removeItem('faktur_account_delete_flash')
+    } catch {}
     toast('Compte supprimé', 'success')
     await logout()
   }
