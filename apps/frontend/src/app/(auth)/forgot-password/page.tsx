@@ -81,10 +81,15 @@ export default function ForgotPasswordPage() {
                     <FieldLabel htmlFor="email">Email</FieldLabel>
                     <Input
                       id="email"
+                      name="email"
                       type="email"
                       placeholder="vous@exemple.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
+                      autoComplete="username"
+                      autoCorrect="off"
+                      autoCapitalize="off"
+                      spellCheck={false}
                       required
                       autoFocus
                     />
