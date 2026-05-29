@@ -229,7 +229,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (user && !isPublicPath) {
       const isOnboarding = pathname.startsWith('/onboarding')
-      if (needsOnboarding && !isOnboarding) {
+      const isAccountDeletion = pathname.startsWith('/dashboard/account/delete')
+      if (needsOnboarding && !isOnboarding && !isAccountDeletion) {
         router.replace('/onboarding')
         return
       }
