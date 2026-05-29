@@ -12,6 +12,7 @@ import { api, onVaultLocked } from '@/lib/api'
 import { useAuth } from '@/lib/auth'
 import { isFakturDesktop } from '@/lib/is-desktop'
 import { HiddenUsername } from '@/components/auth/hidden-username'
+import { DashboardBackground } from '@/components/layout/dashboard-background'
 import {
   Lock,
   Eye,
@@ -131,7 +132,8 @@ export default function VaultLockedPage() {
   const otherTeams = teams.filter((t) => !t.isCurrent)
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen bg-background">
+      <DashboardBackground />
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 h-14 flex items-center gap-3">
           <Button

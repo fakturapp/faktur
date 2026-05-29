@@ -1304,7 +1304,14 @@ export default function TeamPage() {
 
       {team && wizardOpen === 'delete-team' && isSuperAdmin && (
         <TeamDeleteWizard
-          team={{ id: team.id, name: team.name }}
+          team={{
+            id: team.id,
+            name: team.name,
+            iconUrl: team.iconUrl,
+            memberCount: team.members.filter((m) => m.status === 'active').length,
+            role: currentMember?.role,
+            encryptionMode: team.encryptionMode,
+          }}
           onClose={() => closeWizard(false)}
           onSuccess={async (switchedToTeamId) => {
             await refreshUser()
@@ -1321,7 +1328,14 @@ export default function TeamPage() {
 
       {team && wizardOpen === 'transfer' && isSuperAdmin && (
         <TeamTransferWizard
-          team={{ id: team.id, name: team.name }}
+          team={{
+            id: team.id,
+            name: team.name,
+            iconUrl: team.iconUrl,
+            memberCount: team.members.filter((m) => m.status === 'active').length,
+            role: currentMember?.role,
+            encryptionMode: team.encryptionMode,
+          }}
           candidates={team.members.filter((m) => m.status === 'active' && m.user?.id !== user?.id && m.role !== 'super_admin')}
           onClose={() => closeWizard(false)}
           onSuccess={async () => {
@@ -1333,7 +1347,14 @@ export default function TeamPage() {
 
       {team && wizardOpen === 'leave' && currentMember && (
         <TeamLeaveWizard
-          team={{ id: team.id, name: team.name }}
+          team={{
+            id: team.id,
+            name: team.name,
+            iconUrl: team.iconUrl,
+            memberCount: team.members.filter((m) => m.status === 'active').length,
+            role: currentMember.role,
+            encryptionMode: team.encryptionMode,
+          }}
           memberId={currentMember.id}
           onClose={() => closeWizard(false)}
           onSuccess={async () => {

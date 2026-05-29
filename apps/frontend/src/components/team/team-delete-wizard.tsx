@@ -9,9 +9,18 @@ import { Spinner } from '@/components/ui/spinner'
 import { api } from '@/lib/api'
 import { ArrowLeft, ArrowRight, Check, Trash2, X, AlertTriangle, Eye, EyeOff, Lock } from 'lucide-react'
 import { HiddenUsername } from '@/components/auth/hidden-username'
+import { TeamIdentityCard } from '@/components/team/team-identity-card'
+import { DashboardBackground } from '@/components/layout/dashboard-background'
 
 interface Props {
-  team: { id: string; name: string }
+  team: {
+    id: string
+    name: string
+    iconUrl?: string | null
+    memberCount?: number
+    role?: string
+    encryptionMode?: 'private' | 'standard' | null
+  }
   onClose: () => void
   onSuccess: (switchedToTeamId: string | null) => void
 }
@@ -65,18 +74,21 @@ export function TeamDeleteWizard({ team, onClose, onSuccess }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 bg-background overflow-y-auto">
+      <DashboardBackground />
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
         <div className="mx-auto max-w-2xl px-4 sm:px-6 h-14 flex items-center gap-3">
           <Button variant="ghost" size="sm" className="h-9 -ml-2 gap-1.5" onClick={onClose} disabled={submitting || success}>
             <X className="h-4 w-4" /> Annuler
           </Button>
           <div className="ml-auto text-xs font-medium text-muted-foreground">
-            Supprimer l&apos;équipe «&nbsp;{team.name}&nbsp;»
+            Suppression d&apos;équipe
           </div>
         </div>
       </div>
 
       <div className="mx-auto max-w-2xl px-4 sm:px-6 py-8 space-y-6">
+        <TeamIdentityCard team={team} intent="delete" />
+
         <div className="flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-destructive/10">
             <Trash2 className="h-6 w-6 text-destructive" />
