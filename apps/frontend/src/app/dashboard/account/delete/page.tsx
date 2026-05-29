@@ -102,21 +102,44 @@ export default function DeleteAccountPage() {
   }, [])
 
   useEffect(() => {
+    let cancelled = false
+    let flash: { kind: 'success' | 'cancel'; action: 'delete-team' | 'transfer' | 'leave' | null } | null = null
     try {
       const raw = sessionStorage.getItem('faktur_account_delete_flash')
-      if (!raw) return
-      sessionStorage.removeItem('faktur_account_delete_flash')
-      const flash = JSON.parse(raw) as { kind: 'success' | 'cancel'; action: 'delete-team' | 'transfer' | 'leave' | null }
-      if (flash.kind === 'success') {
-        const msg = flash.action === 'delete-team' ? 'Équipe supprimée'
-          : flash.action === 'transfer' ? 'Équipe transférée'
-          : flash.action === 'leave' ? 'Vous avez quitté l\'équipe'
-          : 'Action effectuée'
-        toast(msg, 'success')
-      } else {
-        toast('Action annulée, vous pouvez réessayer', 'info')
+      if (raw) {
+        sessionStorage.removeItem('faktur_account_delete_flash')
+        flash = JSON.parse(raw)
       }
     } catch {}
+    if (!flash) return
+
+    if (flash.kind === 'success') {
+      const msg = flash.action === 'delete-team' ? 'Équipe supprimée'
+        : flash.action === 'transfer' ? 'Équipe transférée'
+        : flash.action === 'leave' ? 'Vous avez quitté l\'équipe'
+        : 'Action effectuée'
+      toast(msg, 'success')
+    } else {
+      toast('Action annulée, vous pouvez réessayer', 'info')
+    }
+
+    void (async () => {
+      const { data, error } = await api.post<{ token: string }>('/account/delete/start', {})
+      if (cancelled || error || !data?.token) return
+      setDeletionToken(data.token)
+      setCurrentStep(1)
+      setDirection(1)
+      const r = await api.get<{ teams: TeamInfo[] }>('/account/delete/teams', {
+        headers: { 'x-deletion-token': data.token } as Record<string, string>,
+      })
+      if (cancelled) return
+      if (r.data?.teams) {
+        setTeams(r.data.teams)
+        setTeamsLoaded(true)
+      }
+    })()
+
+    return () => { cancelled = true }
   }, [toast])
 
   function goNext() {
