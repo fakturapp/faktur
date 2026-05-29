@@ -99,6 +99,24 @@ export default function DeleteAccountPage() {
     }
   }, [])
 
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem('faktur_account_delete_flash')
+      if (!raw) return
+      sessionStorage.removeItem('faktur_account_delete_flash')
+      const flash = JSON.parse(raw) as { kind: 'success' | 'cancel'; action: 'delete-team' | 'transfer' | 'leave' | null }
+      if (flash.kind === 'success') {
+        const msg = flash.action === 'delete-team' ? 'Équipe supprimée'
+          : flash.action === 'transfer' ? 'Équipe transférée'
+          : flash.action === 'leave' ? 'Vous avez quitté l\'équipe'
+          : 'Action effectuée'
+        toast(msg, 'success')
+      } else {
+        toast('Action annulée, vous pouvez réessayer', 'info')
+      }
+    } catch {}
+  }, [toast])
+
   function goNext() {
     setDirection(1)
     setCurrentStep((s) => s + 1)

@@ -183,10 +183,18 @@ export default function TeamPage() {
     if (typeof window !== 'undefined' && wizardAction) {
       const url = new URL(window.location.href)
       url.searchParams.delete('action')
-      if (!success) url.searchParams.delete('from')
+      url.searchParams.delete('from')
       window.history.replaceState({}, '', url.toString())
     }
-    if (success && fromAccountDelete) {
+    if (fromAccountDelete) {
+      try {
+        const flash = {
+          kind: success ? 'success' : 'cancel',
+          action: wizardAction,
+          ts: Date.now(),
+        }
+        sessionStorage.setItem('faktur_account_delete_flash', JSON.stringify(flash))
+      } catch {}
       router.push('/dashboard/account/delete')
     }
   }
@@ -1298,7 +1306,7 @@ export default function TeamPage() {
           onSuccess={async (switchedToTeamId) => {
             await refreshUser()
             if (fromAccountDelete) {
-              router.push('/dashboard/account/delete')
+              closeWizard(true)
             } else if (switchedToTeamId) {
               router.push('/dashboard')
             } else {
@@ -1328,7 +1336,7 @@ export default function TeamPage() {
           onSuccess={async () => {
             await refreshUser()
             if (fromAccountDelete) {
-              router.push('/dashboard/account/delete')
+              closeWizard(true)
             } else {
               router.push('/dashboard')
             }
