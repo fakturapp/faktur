@@ -242,21 +242,37 @@ export default function DeleteAccountPage() {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="max-w-2xl mx-auto space-y-6"
-    >
-      {}
-      <div className="flex items-center gap-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-destructive/10">
-          <Trash2 className="h-6 w-6 text-destructive" />
-        </div>
-        <div>
-          <h1 className="text-xl font-bold text-destructive">Supprimer mon compte</h1>
-          <p className="text-sm text-muted-foreground">Cette action est d&eacute;finitive et irr&eacute;versible.</p>
+    <div className="min-h-screen bg-background">
+      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
+        <div className="mx-auto max-w-2xl px-4 sm:px-6 h-14 flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-9 -ml-2 gap-1.5"
+            onClick={() => router.push('/dashboard/account')}
+          >
+            <ArrowLeft className="h-4 w-4" /> Retour
+          </Button>
+          <div className="ml-auto text-xs font-medium text-muted-foreground">
+            Suppression du compte
+          </div>
         </div>
       </div>
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-2xl mx-auto space-y-6 px-4 sm:px-6 py-8"
+      >
+        {}
+        <div className="flex items-center gap-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-destructive/10">
+            <Trash2 className="h-6 w-6 text-destructive" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-destructive">Supprimer mon compte</h1>
+            <p className="text-sm text-muted-foreground">Cette action est d&eacute;finitive et irr&eacute;versible.</p>
+          </div>
+        </div>
 
       {}
       <div className="rounded-xl bg-overlay shadow-surface p-4">
@@ -753,6 +769,7 @@ export default function DeleteAccountPage() {
           </Button>
         </DialogFooter>
       </Dialog>
-    </motion.div>
+      </motion.div>
+    </div>
   )
 }
