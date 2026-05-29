@@ -429,10 +429,15 @@ function RegisterContent() {
                       <FieldLabel htmlFor="email">Adresse email</FieldLabel>
                       <Input
                         id="email"
+                        name="email"
                         type="email"
                         placeholder="vous@exemple.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        autoComplete="email"
+                        autoCorrect="off"
+                        autoCapitalize="off"
+                        spellCheck={false}
                         required
                         autoFocus
                         className="h-11"
