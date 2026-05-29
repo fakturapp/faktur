@@ -214,7 +214,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     )
   }
 
-  if (isPopup) {
+  const isFullBleed = isPopup || pathname === '/dashboard/account/delete'
+
+  if (isFullBleed) {
     return (
       <InvoiceSettingsProvider>
       <CompanySettingsProvider>
