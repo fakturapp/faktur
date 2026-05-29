@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { OtpInput } from '@/components/ui/otp-input'
 import { Button } from '@/components/ui/button'
 import { Field, FieldGroup, FieldLabel, FieldDescription } from '@/components/ui/field'
 import { Tabs } from '@/components/ui/tabs'
@@ -776,17 +777,15 @@ export default function AccountPage() {
                   <form onSubmit={handleEnable2FA}>
                     <Field>
                       <FieldLabel htmlFor="twoFactorCode">Code de vérification</FieldLabel>
-                      <Input
-                        id="twoFactorCode"
-                        type="text"
-                        inputMode="numeric"
-                        placeholder="000000"
-                        value={twoFactorCode}
-                        onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                        className="text-center text-xl tracking-[0.3em] font-mono max-w-[200px]"
-                        maxLength={6}
-                        autoFocus
-                      />
+                      <div className="flex py-1">
+                        <OtpInput
+                          id="twoFactorCode"
+                          value={twoFactorCode}
+                          onChange={setTwoFactorCode}
+                          autoFocus
+                          ariaLabel="Code 2FA depuis l'application"
+                        />
+                      </div>
                       <FieldDescription>
                         Entrez le code à 6 chiffres affiché dans votre application.
                       </FieldDescription>
@@ -1237,16 +1236,14 @@ export default function AccountPage() {
                 <p className="text-sm text-muted-foreground">
                   Un code à 6 chiffres a été envoyé à <strong>{maskEmail(user?.email || '')}</strong>. Il est valide pendant 5 minutes.
                 </p>
-                <Input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="000000"
-                  value={emailCode}
-                  onChange={(e) => setEmailCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  className="text-center text-2xl tracking-[0.3em] font-mono"
-                  maxLength={6}
-                  autoFocus
-                />
+                <div className="flex justify-center py-1">
+                  <OtpInput
+                    value={emailCode}
+                    onChange={setEmailCode}
+                    autoFocus
+                    ariaLabel="Code de vérification de l'email actuel"
+                  />
+                </div>
                 <div className="flex justify-center">
                   <Button
                     type="button"
@@ -1283,10 +1280,15 @@ export default function AccountPage() {
                 <FieldLabel htmlFor="newEmail">Nouvelle adresse email</FieldLabel>
                 <Input
                   id="newEmail"
+                  name="email"
                   type="email"
                   value={newEmail}
                   onChange={(e) => setNewEmail(e.target.value)}
                   placeholder="nouvelle@email.com"
+                  autoComplete="email"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
                   required
                   autoFocus
                 />
@@ -1325,16 +1327,14 @@ export default function AccountPage() {
                 <p className="text-sm text-muted-foreground">
                   Un code à 6 chiffres a été envoyé à <strong>{newEmail}</strong>. Entrez-le ci-dessous pour confirmer.
                 </p>
-                <Input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="000000"
-                  value={emailCode}
-                  onChange={(e) => setEmailCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  className="text-center text-2xl tracking-[0.3em] font-mono"
-                  maxLength={6}
-                  autoFocus
-                />
+                <div className="flex justify-center py-1">
+                  <OtpInput
+                    value={emailCode}
+                    onChange={setEmailCode}
+                    autoFocus
+                    ariaLabel="Code de vérification du nouvel email"
+                  />
+                </div>
                 <div className="flex justify-center">
                   <Button
                     type="button"
@@ -1367,16 +1367,14 @@ export default function AccountPage() {
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={executeDisable2FA} className="mt-4">
-          <Input
-            type="text"
-            inputMode="numeric"
-            placeholder="000000"
-            value={disableCode}
-            onChange={(e) => setDisableCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-            className="text-center text-xl tracking-[0.3em] font-mono"
-            maxLength={6}
-            autoFocus
-          />
+          <div className="flex justify-center py-1">
+            <OtpInput
+              value={disableCode}
+              onChange={setDisableCode}
+              autoFocus
+              ariaLabel="Code 2FA pour désactiver"
+            />
+          </div>
           <DialogFooter className="mt-4">
             <Button type="button" variant="outline" onClick={() => setDisableOpen(false)}>
               Annuler
