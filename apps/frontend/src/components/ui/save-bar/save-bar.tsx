@@ -108,7 +108,7 @@ export function SaveBar({ hasChanges, saving, error, onSave, onReset }: SaveBarP
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">
-                Modifications non sauvegard&eacute;es
+                Modifications non sauvegardées
               </p>
             )}
 
@@ -120,7 +120,7 @@ export function SaveBar({ hasChanges, saving, error, onSave, onReset }: SaveBarP
                 className="button button--secondary button--sm"
               >
                 <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
-                R&eacute;initialiser
+                Réinitialiser
               </button>
               <button
                 type="button"

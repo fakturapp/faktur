@@ -364,7 +364,7 @@ function LoginContent() {
             <div>
               <h1 className="text-xl font-bold text-foreground">Bon retour, {user.fullName?.split(' ')[0] || 'vous'} !</h1>
               <p className="text-muted-foreground text-sm mt-1">
-                Connect&eacute; en tant que <span className="font-medium text-foreground">{user.fullName || user.email}</span>
+                Connecté en tant que <span className="font-medium text-foreground">{user.fullName || user.email}</span>
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">{user.email}</p>
             </div>
@@ -488,7 +488,7 @@ function LoginContent() {
                 <div>
                   <h1 className="text-xl font-bold text-foreground">Bon retour</h1>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Connectez-vous &agrave; votre compte
+                    Connectez-vous à votre compte
                   </p>
                 </div>
               </motion.div>

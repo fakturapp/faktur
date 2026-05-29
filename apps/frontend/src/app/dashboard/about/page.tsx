@@ -58,7 +58,7 @@ export default function AboutPage() {
             {desktop.is ? 'Faktur Desktop' : 'Faktur'}
           </h1>
           <p className="text-sm text-muted-foreground mt-2 max-w-sm leading-relaxed">
-            Logiciel de facturation gratuit, s&eacute;curis&eacute; et collaboratif avec chiffrement zero-access.
+            Logiciel de facturation gratuit, sécurisé et collaboratif avec chiffrement zero-access.
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap justify-center">
@@ -88,9 +88,9 @@ export default function AboutPage() {
                 <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                   Vous utilisez l&apos;application native Faktur Desktop, un client Electron qui
                   embarque le tableau de bord Faktur avec authentification OAuth2 + PKCE via
-                  votre navigateur syst&egrave;me. Vos jetons sont chiffr&eacute;s au niveau du
-                  syst&egrave;me d&apos;exploitation (Keychain, DPAPI ou libsecret) et ne sont
-                  jamais stock&eacute;s en clair sur disque.
+                  votre navigateur système. Vos jetons sont chiffrés au niveau du
+                  système d&apos;exploitation (Keychain, DPAPI ou libsecret) et ne sont
+                  jamais stockés en clair sur disque.
                 </p>
                 <div className="mt-3 grid grid-cols-2 gap-2 text-[11px]">
                   <div className="rounded-md bg-background/40 border border-border/60 px-2 py-1.5">
@@ -116,7 +116,7 @@ export default function AboutPage() {
 
       {}
       <motion.div variants={fadeUp} custom={1}>
-        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">&Eacute;quipe</h2>
+        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Équipe</h2>
         <div className="flex items-center gap-4">
           <img
             src="https://danbenba.dev/profile.png"
@@ -125,7 +125,7 @@ export default function AboutPage() {
           />
           <div>
             <p className="text-sm font-semibold text-foreground">danbenba</p>
-            <p className="text-xs text-muted-foreground">Cr&eacute;ateur & D&eacute;veloppeur</p>
+            <p className="text-xs text-muted-foreground">Créateur & Développeur</p>
           </div>
         </div>
       </motion.div>
@@ -134,15 +134,15 @@ export default function AboutPage() {
 
       {}
       <motion.div variants={fadeUp} custom={2}>
-        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">S&eacute;curit&eacute;</h2>
+        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Sécurité</h2>
         <div className="space-y-3">
           <div className="flex items-start gap-3.5 rounded-xl border border-primary/20 bg-primary/5 p-4">
             <Shield className="h-5 w-5 text-accent mt-0.5 shrink-0" />
             <div>
               <p className="text-sm font-semibold text-foreground">Chiffrement zero-access</p>
               <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                Vos donn&eacute;es sont chiffr&eacute;es avec votre mot de passe via AES-256-GCM.
-                M&ecirc;me avec un acc&egrave;s complet au serveur, personne ne peut lire vos informations.
+                Vos données sont chiffrées avec votre mot de passe via AES-256-GCM.
+                Même avec un accès complet au serveur, personne ne peut lire vos informations.
               </p>
             </div>
           </div>
@@ -162,24 +162,24 @@ export default function AboutPage() {
 
       {}
       <motion.div variants={fadeUp} custom={3}>
-        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Fonctionnalit&eacute;s</h2>
+        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Fonctionnalités</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
           {[
             'Factures, devis et avoirs',
             'Chiffrement zero-access',
             'Passkeys (WebAuthn)',
             'Double authentification',
-            '&Eacute;quipes multi-membres',
-            'Collaboration temps r&eacute;el',
-            'G&eacute;n&eacute;ration PDF & FacturX',
+            'Équipes multi-membres',
+            'Collaboration temps réel',
+            'Génération PDF & FacturX',
             'Email (Gmail, SMTP, Resend)',
-            'Facturation r&eacute;currente',
+            'Facturation récurrente',
             'Relances automatiques',
-            'D&eacute;penses & OCR',
+            'Dépenses & OCR',
             'Catalogue produits',
-            'Export chiffr&eacute;',
+            'Export chiffré',
             'Analyse par IA',
-            'Th&egrave;me clair / sombre',
+            'Thème clair / sombre',
             'Cookies RGPD',
           ].map((f) => (
             <div key={f} className="flex items-center gap-2 py-1.5">
@@ -244,7 +244,7 @@ export default function AboutPage() {
 
       {}
       <motion.div variants={fadeUp} custom={6}>
-        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Informations l&eacute;gales</h2>
+        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">Informations légales</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {[
             { label: 'Mentions l\u00e9gales', href: '/legal/mentions', icon: Scale },
@@ -268,7 +268,7 @@ export default function AboutPage() {
       {}
       <motion.div variants={fadeUp} custom={7} className="text-center pb-4 pt-2">
         <p className="text-[11px] text-muted-secondary flex items-center justify-center gap-1">
-          Fait avec <Heart className="h-3 w-3 text-red-400" /> par danbenba &mdash; 2025-2026
+          Fait avec <Heart className="h-3 w-3 text-red-400" /> par danbenba — 2025-2026
         </p>
       </motion.div>
     </motion.div>

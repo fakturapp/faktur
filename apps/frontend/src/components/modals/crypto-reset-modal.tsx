@@ -192,16 +192,16 @@ export function CryptoResetModal({
                       <Shield className="h-5 w-5 text-amber-500" />
                     </motion.div>
                     <div className="flex-1 min-w-0">
-                      <h2 className="text-lg font-semibold text-foreground">Donn&eacute;es chiffr&eacute;es</h2>
-                      <p className="text-xs text-muted-foreground">R&eacute;cup&eacute;ration du coffre de donn&eacute;es</p>
+                      <h2 className="text-lg font-semibold text-foreground">Données chiffrées</h2>
+                      <p className="text-xs text-muted-foreground">Récupération du coffre de données</p>
                     </div>
                     {onRefresh && (
                       <button
                         type="button"
                         onClick={handleRefresh}
                         disabled={refreshing}
-                        title="Actualiser l&apos;&eacute;tat du coffre"
-                        aria-label="Actualiser l&apos;&eacute;tat du coffre"
+                        title="Actualiser l&apos;état du coffre"
+                        aria-label="Actualiser l&apos;état du coffre"
                         className="flex items-center justify-center h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors disabled:opacity-50"
                       >
                         <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
@@ -226,8 +226,8 @@ export function CryptoResetModal({
                           <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-3">
                             <p className="text-sm text-amber-200">
                               {canRecoverWithPassword
-                                ? 'Vos donn&eacute;es sont chiffr&eacute;es avec votre ancien mot de passe. Vous pouvez les r&eacute;cup&eacute;rer avec cet ancien mot de passe, avec votre clef de secours, ou recommencer de z&eacute;ro.'
-                                : 'Les cl&eacute;s de votre coffre ne correspondent plus aux donn&eacute;es chiffr&eacute;es. Utilisez votre clef de secours si vous l&apos;avez, sinon il faudra repartir de z&eacute;ro.'}
+                                ? 'Vos données sont chiffrées avec votre ancien mot de passe. Vous pouvez les récupérer avec cet ancien mot de passe, avec votre clef de secours, ou recommencer de zéro.'
+                                : 'Les clés de votre coffre ne correspondent plus aux données chiffrées. Utilisez votre clef de secours si vous l&apos;avez, sinon il faudra repartir de zéro.'}
                             </p>
                           </div>
 
@@ -242,7 +242,7 @@ export function CryptoResetModal({
                                 <KeyRound className="h-4 w-4 text-primary" />
                               </div>
                               <div>
-                                <p className="text-sm font-medium text-foreground">R&eacute;cup&eacute;rer mes donn&eacute;es</p>
+                                <p className="text-sm font-medium text-foreground">Récupérer mes données</p>
                                 <p className="text-xs text-muted-foreground">J&apos;ai mon ancien mot de passe</p>
                               </div>
                             </motion.button>
@@ -260,7 +260,7 @@ export function CryptoResetModal({
                               </div>
                               <div>
                                 <p className="text-sm font-medium text-foreground">Utiliser ma clef de secours</p>
-                                <p className="text-xs text-muted-foreground">J&apos;ai ma clef de secours re&ccedil;ue par email</p>
+                                <p className="text-xs text-muted-foreground">J&apos;ai ma clef de secours reçue par email</p>
                               </div>
                             </motion.button>
                           )}
@@ -275,7 +275,7 @@ export function CryptoResetModal({
                               <Trash2 className="h-4 w-4 text-destructive" />
                             </div>
                             <div>
-                              <p className="text-sm font-medium text-destructive">Recommencer de z&eacute;ro</p>
+                              <p className="text-sm font-medium text-destructive">Recommencer de zéro</p>
                               <p className="text-xs text-muted-foreground">Je n&apos;ai ni mon ancien mot de passe, ni ma clef</p>
                             </div>
                           </motion.button>
@@ -287,7 +287,7 @@ export function CryptoResetModal({
                               className="w-full flex items-center justify-center gap-2 px-4 py-2 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
                             >
                               <LogOut className="h-3.5 w-3.5" />
-                              Se d&eacute;connecter
+                              Se déconnecter
                             </button>
                           )}
                         </div>
@@ -297,7 +297,7 @@ export function CryptoResetModal({
                       {mode === 'recover' && (
                         <div className="space-y-4">
                           <p className="text-sm text-muted-foreground">
-                            Entrez votre ancien mot de passe pour d&eacute;chiffrer vos donn&eacute;es et les re-chiffrer avec votre nouveau mot de passe.
+                            Entrez votre ancien mot de passe pour déchiffrer vos données et les re-chiffrer avec votre nouveau mot de passe.
                           </p>
 
                           <div>
@@ -347,7 +347,7 @@ export function CryptoResetModal({
                               className="flex-1 px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                             >
                               {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-                              R&eacute;cup&eacute;rer
+                              Récupérer
                             </motion.button>
                           </div>
 
@@ -358,7 +358,7 @@ export function CryptoResetModal({
                               className="w-full flex items-center justify-center gap-2 px-4 py-2 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
                             >
                               <LogOut className="h-3.5 w-3.5" />
-                              Se d&eacute;connecter
+                              Se déconnecter
                             </button>
                           )}
                         </div>
@@ -368,7 +368,7 @@ export function CryptoResetModal({
                       {mode === 'recover-key' && (
                         <div className="space-y-4">
                           <p className="text-sm text-muted-foreground">
-                            Entrez la clef de secours re&ccedil;ue par email pour r&eacute;cup&eacute;rer vos donn&eacute;es.
+                            Entrez la clef de secours reçue par email pour récupérer vos données.
                           </p>
 
                           <div>
@@ -416,7 +416,7 @@ export function CryptoResetModal({
                               className="flex-1 px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                             >
                               {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-                              R&eacute;cup&eacute;rer
+                              Récupérer
                             </motion.button>
                           </div>
 
@@ -427,7 +427,7 @@ export function CryptoResetModal({
                               className="w-full flex items-center justify-center gap-2 px-4 py-2 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
                             >
                               <LogOut className="h-3.5 w-3.5" />
-                              Se d&eacute;connecter
+                              Se déconnecter
                             </button>
                           )}
                         </div>
@@ -440,8 +440,8 @@ export function CryptoResetModal({
                             <div className="flex items-start gap-2">
                               <AlertTriangle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
                               <div className="text-sm text-destructive">
-                                <p className="font-medium mb-1">Attention : action irr&eacute;versible</p>
-                                <p>Cette action va supprimer <strong>toutes</strong> vos &eacute;quipes, clients, factures, devis, comptes bancaires et param&egrave;tres. Vous repartirez de z&eacute;ro.</p>
+                                <p className="font-medium mb-1">Attention : action irréversible</p>
+                                <p>Cette action va supprimer <strong>toutes</strong> vos équipes, clients, factures, devis, comptes bancaires et paramètres. Vous repartirez de zéro.</p>
                               </div>
                             </div>
                           </div>
@@ -469,7 +469,7 @@ export function CryptoResetModal({
                         <div className="space-y-4">
                           <div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3">
                             <p className="text-sm text-destructive font-medium">
-                              Confirmation 2/4 : &Ecirc;tes-vous vraiment s&ucirc;r ? Toutes vos donn&eacute;es seront d&eacute;finitivement perdues.
+                              Confirmation 2/4 : Êtes-vous vraiment sûr ? Toutes vos données seront définitivement perdues.
                             </p>
                           </div>
                           <div className="flex gap-2">
@@ -536,7 +536,7 @@ export function CryptoResetModal({
                             <div className="flex items-start gap-2">
                               <Lock className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
                               <p className="text-sm text-destructive font-medium">
-                                Confirmation finale 4/4 : Entrez votre mot de passe actuel pour confirmer la suppression d&eacute;finitive.
+                                Confirmation finale 4/4 : Entrez votre mot de passe actuel pour confirmer la suppression définitive.
                               </p>
                             </div>
                           </div>
@@ -637,7 +637,7 @@ export function CryptoResetModal({
                   transition={{ delay: 0.4, duration: 0.3 }}
                   className="text-center"
                 >
-                  <h3 className="text-lg font-semibold text-foreground mb-1">Donn&eacute;es supprim&eacute;es</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-1">Données supprimées</h3>
                   <p className="text-sm text-muted-foreground">Redirection vers la configuration...</p>
                 </motion.div>
 

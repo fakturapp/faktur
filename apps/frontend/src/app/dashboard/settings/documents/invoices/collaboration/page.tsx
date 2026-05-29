@@ -46,14 +46,14 @@ export default function CollaborationSettingsPage() {
         </div>
         <div>
           <h2 className="text-xl font-bold text-foreground flex items-center gap-2.5">
-            Collaboration en temps r&eacute;el
+            Collaboration en temps réel
             <span className="inline-flex items-center gap-1 rounded-full bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 text-[10px] font-bold text-purple-500 uppercase tracking-wider">
               <FlaskConical className="h-2.5 w-2.5" />
-              B&ecirc;ta
+              Bêta
             </span>
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
-            &Eacute;ditez vos documents &agrave; plusieurs en temps r&eacute;el, comme sur Figma ou Canva.
+            Éditez vos documents à plusieurs en temps réel, comme sur Figma ou Canva.
           </p>
         </div>
       </div>
@@ -89,7 +89,7 @@ export default function CollaborationSettingsPage() {
       {/* Features description */}
       <div>
         <h3 className="text-sm font-semibold text-foreground mb-4">
-          Fonctionnalit&eacute;s incluses
+          Fonctionnalités incluses
         </h3>
         <div className="grid gap-4 sm:grid-cols-2">
           {[
@@ -117,14 +117,14 @@ export default function CollaborationSettingsPage() {
       {/* Warning confirmation dialog */}
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)} className="max-w-md">
         <DialogHeader onClose={() => setConfirmOpen(false)} icon={<AlertTriangle className="h-5 w-5 text-amber-500" />}>
-          <DialogTitle>Fonctionnalit&eacute; en b&ecirc;ta extr&ecirc;me</DialogTitle>
+          <DialogTitle>Fonctionnalité en bêta extrême</DialogTitle>
           <DialogDescription>Lisez attentivement avant d&apos;activer</DialogDescription>
         </DialogHeader>
 
         <div className="mt-4 space-y-4">
           <p className="text-sm text-muted-foreground leading-relaxed">
-            La collaboration en temps r&eacute;el est une fonctionnalit&eacute;{' '}
-            <span className="font-semibold text-amber-500">exp&eacute;rimentale en b&ecirc;ta extr&ecirc;me</span>.
+            La collaboration en temps réel est une fonctionnalité{' '}
+            <span className="font-semibold text-amber-500">expérimentale en bêta extrême</span>.
             De nombreux bugs peuvent survenir.
           </p>
 
@@ -132,16 +132,16 @@ export default function CollaborationSettingsPage() {
             <p className="font-bold text-sm">Risques connus :</p>
             <ul className="list-disc list-inside space-y-1 leading-relaxed">
               <li>Des bugs d&apos;affichage ou de synchronisation peuvent survenir</li>
-              <li>Les curseurs peuvent &ecirc;tre d&eacute;cal&eacute;s dans certaines situations</li>
-              <li>Des conflits d&apos;&eacute;dition sont possibles si deux personnes modifient le m&ecirc;me champ</li>
-              <li>La fonctionnalit&eacute; peut &ecirc;tre instable ou lente selon la connexion</li>
-              <li>Des pertes de donn&eacute;es mineures sont possibles en cas de d&eacute;connexion</li>
+              <li>Les curseurs peuvent être décalés dans certaines situations</li>
+              <li>Des conflits d&apos;édition sont possibles si deux personnes modifient le même champ</li>
+              <li>La fonctionnalité peut être instable ou lente selon la connexion</li>
+              <li>Des pertes de données mineures sont possibles en cas de déconnexion</li>
             </ul>
           </div>
 
           <p className="text-xs text-muted-foreground leading-relaxed">
-            Vous pourrez d&eacute;sactiver cette fonctionnalit&eacute; &agrave; tout moment depuis cette page.
-            Aucune donn&eacute;e ne sera perdue en d&eacute;sactivant.
+            Vous pourrez désactiver cette fonctionnalité à tout moment depuis cette page.
+            Aucune donnée ne sera perdue en désactivant.
           </p>
         </div>
 
@@ -151,7 +151,7 @@ export default function CollaborationSettingsPage() {
           </Button>
           <Button size="sm" onClick={handleConfirmEnable} className="bg-purple-500 hover:bg-purple-600 gap-2">
             <FlaskConical className="h-3.5 w-3.5" />
-            Activer la b&ecirc;ta
+            Activer la bêta
           </Button>
         </DialogFooter>
       </Dialog>

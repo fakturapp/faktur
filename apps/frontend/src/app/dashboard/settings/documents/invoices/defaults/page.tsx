@@ -121,8 +121,8 @@ export default function InvoiceDefaultsPage() {
   return (
     <motion.div initial="hidden" animate="visible" className="space-y-6 px-4 lg:px-6 py-4 md:py-6">
       <motion.div variants={fadeUp} custom={0}>
-        <h1 className="text-2xl font-bold text-foreground">Valeurs par d&eacute;faut</h1>
-        <p className="text-muted-foreground mt-1">Pr&eacute;-remplissage automatique de vos documents</p>
+        <h1 className="text-2xl font-bold text-foreground">Valeurs par défaut</h1>
+        <p className="text-muted-foreground mt-1">Pré-remplissage automatique de vos documents</p>
       </motion.div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
@@ -135,9 +135,9 @@ export default function InvoiceDefaultsPage() {
                     <ClipboardList className="h-4.5 w-4.5 text-accent" />
                   </div>
                   <div>
-                    <h2 className="text-base font-semibold text-foreground">Valeurs par d&eacute;faut des devis</h2>
+                    <h2 className="text-base font-semibold text-foreground">Valeurs par défaut des devis</h2>
                     <p className="text-xs text-muted-foreground">
-                      Pr&eacute;-remplissage automatique lors de la cr&eacute;ation d&apos;un devis
+                      Pré-remplissage automatique lors de la création d&apos;un devis
                     </p>
                   </div>
                 </div>
@@ -145,7 +145,7 @@ export default function InvoiceDefaultsPage() {
                 <div className="space-y-4">
                   <div>
                     <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5 block">
-                      Objet par d&eacute;faut
+                      Objet par défaut
                     </label>
                     <Input
                       placeholder="Ex: Developpement site web"
@@ -160,7 +160,7 @@ export default function InvoiceDefaultsPage() {
                       Conditions d&apos;acceptation
                     </label>
                     <textarea
-                      placeholder="Conditions d'acceptation par d&eacute;faut..."
+                      placeholder="Conditions d'acceptation par défaut..."
                       value={settings.defaultAcceptanceConditions || ''}
                       onChange={(e) =>
                         updateSettings({ defaultAcceptanceConditions: e.target.value || null })
@@ -175,7 +175,7 @@ export default function InvoiceDefaultsPage() {
                       Champ libre
                     </label>
                     <textarea
-                      placeholder="Texte suppl&eacute;mentaire par d&eacute;faut..."
+                      placeholder="Texte supplémentaire par défaut..."
                       value={settings.defaultFreeField || ''}
                       onChange={(e) => updateSettings({ defaultFreeField: e.target.value || null })}
                       className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 resize-y min-h-[60px]"
@@ -230,7 +230,7 @@ export default function InvoiceDefaultsPage() {
                     {settings.footerMode === 'custom' && (
                       <div className="mt-2">
                         <Input
-                          placeholder="Ex: Conditions g&eacute;n&eacute;rales de vente..."
+                          placeholder="Ex: Conditions générales de vente..."
                           value={settings.defaultFooterText || ''}
                           onChange={(e) =>
                             updateSettings({ defaultFooterText: e.target.value?.slice(0, 50) || null })
@@ -238,7 +238,7 @@ export default function InvoiceDefaultsPage() {
                           className="text-sm"
                           maxLength={50}
                         />
-                        <p className="text-[10px] text-muted-foreground mt-1">50 caract&egrave;res max.</p>
+                        <p className="text-[10px] text-muted-foreground mt-1">50 caractères max.</p>
                       </div>
                     )}
                   </div>

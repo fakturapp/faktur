@@ -115,7 +115,7 @@ export function AccountPreview() {
 
         {}
         <div className="space-y-2">
-          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">S&eacute;curit&eacute;</p>
+          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Sécurité</p>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Shield className="h-3.5 w-3.5 text-muted-foreground" />
@@ -132,7 +132,7 @@ export function AccountPreview() {
           <>
             <Separator />
             <div className="space-y-2">
-              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Comptes li&eacute;s</p>
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Comptes liés</p>
               {providers.map((p, i) => (
                 <div key={i} className="flex items-center gap-2.5 rounded-lg border border-border/50 p-2.5">
                   <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-muted/50 shrink-0">
@@ -148,7 +148,7 @@ export function AccountPreview() {
                       {p.email || 'Compte li\u00e9'}
                     </p>
                   </div>
-                  <Badge variant="success" className="text-[8px] px-1.5 shrink-0">Li&eacute;</Badge>
+                  <Badge variant="success" className="text-[8px] px-1.5 shrink-0">Lié</Badge>
                 </div>
               ))}
             </div>
@@ -160,7 +160,7 @@ export function AccountPreview() {
           <>
             <Separator />
             <div className="space-y-2">
-              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Cl&eacute;s d&apos;acc&egrave;s</p>
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Clés d&apos;accès</p>
               {passkeys.map((pk) => (
                 <div key={pk.id} className="flex items-center gap-2">
                   <div className="flex h-6 w-6 items-center justify-center rounded-md bg-muted/50">

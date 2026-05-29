@@ -686,7 +686,7 @@ function RegisterContent() {
                         <CheckboxContent className="text-sm text-muted-foreground leading-tight mt-0.5">
                           J&apos;accepte les{' '}
                           <a href="/legal/terms" target="_blank" className="text-accent underline-offset-2 hover:underline">
-                            Conditions g&eacute;n&eacute;rales d&apos;utilisation
+                            Conditions générales d&apos;utilisation
                           </a>
                         </CheckboxContent>
                       </CheckboxRoot>
@@ -702,7 +702,7 @@ function RegisterContent() {
                         <CheckboxContent className="text-sm text-muted-foreground leading-tight mt-0.5">
                           J&apos;accepte la{' '}
                           <a href="/legal/privacy" target="_blank" className="text-accent underline-offset-2 hover:underline">
-                            Politique de confidentialit&eacute;
+                            Politique de confidentialité
                           </a>
                         </CheckboxContent>
                       </CheckboxRoot>

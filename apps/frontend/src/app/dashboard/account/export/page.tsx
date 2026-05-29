@@ -151,8 +151,8 @@ export default function ExportPage() {
           <Download className="h-6 w-6 text-accent" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-foreground">Exporter mes donn&eacute;es</h1>
-          <p className="text-sm text-muted-foreground">T&eacute;l&eacute;chargez une copie compl&egrave;te de vos donn&eacute;es.</p>
+          <h1 className="text-xl font-bold text-foreground">Exporter mes données</h1>
+          <p className="text-sm text-muted-foreground">Téléchargez une copie complète de vos données.</p>
         </div>
       </div>
 
@@ -160,7 +160,7 @@ export default function ExportPage() {
       <div className="rounded-xl bg-overlay shadow-surface p-4">
         <div className="flex items-center justify-between">
           <p className="text-xs font-semibold text-muted-foreground">
-            &Eacute;tape {visualStep + 1} sur {activeSteps.length}
+            Étape {visualStep + 1} sur {activeSteps.length}
           </p>
           <p className="text-xs font-medium text-primary">
             {activeSteps[visualStep]?.label}
@@ -198,8 +198,8 @@ export default function ExportPage() {
                     <Download className="h-5 w-5 text-accent" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-bold text-foreground">Choisir l&apos;&eacute;quipe</h2>
-                    <p className="text-sm text-muted-foreground">S&eacute;lectionnez l&apos;&eacute;quipe &agrave; exporter.</p>
+                    <h2 className="text-lg font-bold text-foreground">Choisir l&apos;équipe</h2>
+                    <p className="text-sm text-muted-foreground">Sélectionnez l&apos;équipe à exporter.</p>
                   </div>
                 </div>
 
@@ -274,14 +274,14 @@ export default function ExportPage() {
                   </div>
                   <div>
                     <h2 className="text-lg font-bold text-foreground">Options d&apos;export</h2>
-                    <p className="text-sm text-muted-foreground">Configurez les param&egrave;tres.</p>
+                    <p className="text-sm text-muted-foreground">Configurez les paramètres.</p>
                   </div>
                 </div>
 
                 <Field>
                   <FieldLabel htmlFor="exportFileName">Nom du fichier</FieldLabel>
                   <Input id="exportFileName" value={fileName} onChange={(e) => setFileName(e.target.value)} placeholder="mon-export" />
-                  <FieldDescription>Extension ajout&eacute;e automatiquement ({encrypt ? '.fpdata' : '.zip'})</FieldDescription>
+                  <FieldDescription>Extension ajoutée automatiquement ({encrypt ? '.fpdata' : '.zip'})</FieldDescription>
                 </Field>
 
                 <Separator />
@@ -308,7 +308,7 @@ export default function ExportPage() {
                     </div>
                     <div>
                       <p className="text-sm font-medium text-foreground">Inclure les comptes bancaires</p>
-                      <p className="text-xs text-muted-foreground">IBAN, BIC d&eacute;chiffr&eacute;s si n&eacute;cessaire</p>
+                      <p className="text-xs text-muted-foreground">IBAN, BIC déchiffrés si nécessaire</p>
                     </div>
                   </div>
                   <Switch checked={includeBankAccounts} onChange={setIncludeBankAccounts} />
@@ -322,8 +322,8 @@ export default function ExportPage() {
                       <CreditCard className="h-4 w-4 text-accent" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-foreground">Inclure les cl&eacute;s Stripe</p>
-                      <p className="text-xs text-muted-foreground">Cl&eacute;s API, webhook secrets</p>
+                      <p className="text-sm font-medium text-foreground">Inclure les clés Stripe</p>
+                      <p className="text-xs text-muted-foreground">Clés API, webhook secrets</p>
                     </div>
                   </div>
                   <Switch checked={includeStripeKeys} onChange={setIncludeStripeKeys} />
@@ -348,7 +348,7 @@ export default function ExportPage() {
                   </div>
                   <div>
                     <h2 className="text-lg font-bold text-foreground">Mot de passe de chiffrement</h2>
-                    <p className="text-sm text-muted-foreground">N&eacute;cessaire pour r&eacute;importer les donn&eacute;es.</p>
+                    <p className="text-sm text-muted-foreground">Nécessaire pour réimporter les données.</p>
                   </div>
                 </div>
 
@@ -394,7 +394,7 @@ export default function ExportPage() {
                     {/* Summary */}
                     <div className="rounded-lg bg-surface-secondary p-4 space-y-2.5">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">&Eacute;quipe</span>
+                        <span className="text-muted-foreground">Équipe</span>
                         <span className="font-medium text-foreground">{selectedTeamInfo?.name}</span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
@@ -410,7 +410,7 @@ export default function ExportPage() {
                         <span className="font-medium">{includeBankAccounts ? <span className="text-primary flex items-center gap-1"><Landmark className="h-3.5 w-3.5" /> Inclus</span> : 'Non'}</span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Cl&eacute;s Stripe</span>
+                        <span className="text-muted-foreground">Clés Stripe</span>
                         <span className="font-medium">{includeStripeKeys ? <span className="text-primary flex items-center gap-1"><CreditCard className="h-3.5 w-3.5" /> Inclus</span> : 'Non'}</span>
                       </div>
                     </div>
@@ -444,8 +444,8 @@ export default function ExportPage() {
                       {exportStatus === 'exporting' && (
                         <motion.div key="exp" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center gap-3">
                           <Spinner className="h-10 w-10 text-primary" />
-                          <p className="text-sm font-medium">Pr&eacute;paration de l&apos;export...</p>
-                          <p className="text-xs text-muted-foreground">Collecte des donn&eacute;es et fichiers</p>
+                          <p className="text-sm font-medium">Préparation de l&apos;export...</p>
+                          <p className="text-xs text-muted-foreground">Collecte des données et fichiers</p>
                         </motion.div>
                       )}
                       {exportStatus === 'downloading' && (
@@ -453,7 +453,7 @@ export default function ExportPage() {
                           <motion.div animate={{ y: [0, -5, 0] }} transition={{ duration: 1, repeat: Infinity }}>
                             <FileArchive className="h-10 w-10 text-primary" />
                           </motion.div>
-                          <p className="text-sm font-medium">T&eacute;l&eacute;chargement...</p>
+                          <p className="text-sm font-medium">Téléchargement...</p>
                         </motion.div>
                       )}
                       {exportStatus === 'done' && (
@@ -461,8 +461,8 @@ export default function ExportPage() {
                           <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', bounce: 0.5 }}>
                             <CheckCircle2 className="h-12 w-12 text-emerald-500" />
                           </motion.div>
-                          <p className="text-sm font-medium">Export termin&eacute; !</p>
-                          <p className="text-xs text-muted-foreground">Le fichier a &eacute;t&eacute; t&eacute;l&eacute;charg&eacute; automatiquement.</p>
+                          <p className="text-sm font-medium">Export terminé !</p>
+                          <p className="text-xs text-muted-foreground">Le fichier a été téléchargé automatiquement.</p>
                         </motion.div>
                       )}
                     </AnimatePresence>

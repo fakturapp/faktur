@@ -103,7 +103,7 @@ export function SettingsSearchModal({ open, onClose }: SettingsSearchModalProps)
                 </div>
               ) : results.length === 0 ? (
                 <div className="px-3 py-6 text-center">
-                  <p className="text-sm text-muted-foreground">Aucun résultat pour &laquo; {query} &raquo;</p>
+                  <p className="text-sm text-muted-foreground">Aucun résultat pour « {query} »</p>
                 </div>
               ) : (
                 results.map((item, i) => {

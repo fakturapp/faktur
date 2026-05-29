@@ -377,7 +377,7 @@ export default function RecurringInvoicesPage() {
         <DialogHeader showClose={false}>
           <DialogTitle>Supprimer la récurrence</DialogTitle>
           <DialogDescription>
-            Êtes-vous sûr de vouloir supprimer &laquo;&nbsp;{deleteConfirm?.name}&nbsp;&raquo; ? Les factures déjà générées ne seront pas affectées.
+            Êtes-vous sûr de vouloir supprimer «&nbsp;{deleteConfirm?.name}&nbsp;» ? Les factures déjà générées ne seront pas affectées.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>

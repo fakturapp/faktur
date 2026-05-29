@@ -287,7 +287,7 @@ export default function DeleteAccountPage() {
           </div>
           <div>
             <h1 className="text-xl font-bold text-destructive">Supprimer mon compte</h1>
-            <p className="text-sm text-muted-foreground">Cette action est d&eacute;finitive et irr&eacute;versible.</p>
+            <p className="text-sm text-muted-foreground">Cette action est définitive et irréversible.</p>
           </div>
         </div>
 
@@ -295,7 +295,7 @@ export default function DeleteAccountPage() {
       <div className="rounded-xl bg-overlay shadow-surface p-4">
         <div className="flex items-center justify-between">
           <p className="text-xs font-semibold text-muted-foreground">
-            &Eacute;tape {currentStep + 1} sur {steps.length}
+            Étape {currentStep + 1} sur {steps.length}
           </p>
           <p className="text-xs font-medium text-destructive">
             {steps[currentStep].label}
@@ -681,7 +681,7 @@ export default function DeleteAccountPage() {
       {/* Delete team dialog */}
       <Dialog open={!!deleteTeamDialog} onClose={() => setDeleteTeamDialog(null)}>
         <DialogHeader showClose={false} icon={<Trash2 className="h-5 w-5 text-danger" />}>
-          <DialogTitle>Supprimer l&apos;équipe &laquo; {deleteTeamDialog?.name} &raquo;</DialogTitle>
+          <DialogTitle>Supprimer l&apos;équipe « {deleteTeamDialog?.name} »</DialogTitle>
           <DialogDescription>
             Toutes les données de cette équipe seront perdues. Entrez votre mot de passe pour confirmer.
           </DialogDescription>
@@ -723,9 +723,9 @@ export default function DeleteAccountPage() {
       {/* Leave team confirmation dialog */}
       <Dialog open={!!leaveConfirm} onClose={() => setLeaveConfirm(null)} className="max-w-sm">
         <DialogHeader showClose={false} icon={<LogOut className="h-5 w-5 text-danger" />}>
-          <DialogTitle>Quitter &laquo; {leaveConfirm?.name} &raquo; ?</DialogTitle>
+          <DialogTitle>Quitter « {leaveConfirm?.name} » ?</DialogTitle>
           <DialogDescription>
-            Vous perdrez l&apos;acc&egrave;s &agrave; toutes les donn&eacute;es de cette &eacute;quipe. Cette action est irr&eacute;versible.
+            Vous perdrez l&apos;accès à toutes les données de cette équipe. Cette action est irréversible.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
@@ -749,7 +749,7 @@ export default function DeleteAccountPage() {
       {/* Transfer ownership dialog */}
       <Dialog open={!!transferDialog} onClose={() => setTransferDialog(null)}>
         <DialogHeader onClose={() => setTransferDialog(null)} icon={<UserCheck className="h-5 w-5 text-accent" />}>
-          <DialogTitle>Transférer &laquo; {transferDialog?.name} &raquo;</DialogTitle>
+          <DialogTitle>Transférer « {transferDialog?.name} »</DialogTitle>
           <DialogDescription>
             Choisissez un membre qui deviendra le nouveau propriétaire de cette équipe.
           </DialogDescription>

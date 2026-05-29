@@ -1900,8 +1900,8 @@ export function A4Sheet({
                       <div className="text-[11px] leading-[1.6]" style={{ color: T.textFooter }}>
                         {company && (<>
                           {ie(company.legalName, (v) => onCompanyFieldChange('legalName', v), 'font-semibold text-[11px]', t.society)}
-                          {company.siren && <> &mdash; SIREN : {ie(company.siren, (v) => onCompanyFieldChange('siren', v), 'text-[11px]')}</>}
-                          {company.vatNumber && <> &mdash; {lang === 'en' ? 'VAT No.' : 'N\u00b0 TVA'} : {ie(company.vatNumber, (v) => onCompanyFieldChange('vatNumber', v), 'text-[11px]')}</>}
+                          {company.siren && <> — SIREN : {ie(company.siren, (v) => onCompanyFieldChange('siren', v), 'text-[11px]')}</>}
+                          {company.vatNumber && <> — {lang === 'en' ? 'VAT No.' : 'N\u00b0 TVA'} : {ie(company.vatNumber, (v) => onCompanyFieldChange('vatNumber', v), 'text-[11px]')}</>}
                         </>)}
                       </div>
                     )}
@@ -1930,15 +1930,15 @@ export function A4Sheet({
                     <div className="text-[9px] leading-[1.6]" style={{ color: T.textFooter }}>
                       {company && (<>
                         {ie(company.legalName, (v) => onCompanyFieldChange('legalName', v), 'font-semibold text-[9px]', t.society)}
-                        {company.siren && <> &mdash; SIREN : {ie(company.siren, (v) => onCompanyFieldChange('siren', v), 'text-[9px]')}</>}
-                        {company.vatNumber && <> &mdash; {lang === 'en' ? 'VAT No.' : 'N\u00b0 TVA'} : {ie(company.vatNumber, (v) => onCompanyFieldChange('vatNumber', v), 'text-[9px]')}</>}
+                        {company.siren && <> — SIREN : {ie(company.siren, (v) => onCompanyFieldChange('siren', v), 'text-[9px]')}</>}
+                        {company.vatNumber && <> — {lang === 'en' ? 'VAT No.' : 'N\u00b0 TVA'} : {ie(company.vatNumber, (v) => onCompanyFieldChange('vatNumber', v), 'text-[9px]')}</>}
                         <br />
                         {ie(company.addressLine1 || '', (v) => onCompanyFieldChange('addressLine1', v), 'text-[9px]', t.address)}
                         {', '}
                         {ie(company.postalCode || '', (v) => onCompanyFieldChange('postalCode', v), 'text-[9px]', t.postalCode)}{' '}
                         {ie(company.city || '', (v) => onCompanyFieldChange('city', v), 'text-[9px]', t.city)}
-                        {company.phone && <> &mdash; {ie(company.phone, (v) => onCompanyFieldChange('phone', v), 'text-[9px]')}</>}
-                        {company.email && <> &mdash; {ie(company.email, (v) => onCompanyFieldChange('email', v), 'text-[9px]')}</>}
+                        {company.phone && <> — {ie(company.phone, (v) => onCompanyFieldChange('phone', v), 'text-[9px]')}</>}
+                        {company.email && <> — {ie(company.email, (v) => onCompanyFieldChange('email', v), 'text-[9px]')}</>}
                       </>)}
                     </div>
                   )}
