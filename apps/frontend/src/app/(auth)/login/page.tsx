@@ -599,10 +599,15 @@ function LoginContent() {
                               <div className="flex-1 min-w-0">
                                 <Input
                                   id="email"
+                                  name="email"
                                   type="email"
                                   placeholder="vous@exemple.com"
                                   value={email}
                                   onChange={(e) => setEmail(e.target.value)}
+                                  autoComplete="username"
+                                  autoCorrect="off"
+                                  autoCapitalize="off"
+                                  spellCheck={false}
                                   required
                                   autoFocus
                                   aria-label="Adresse email"
@@ -702,9 +707,11 @@ function LoginContent() {
                             <div className="relative">
                               <Input
                                 id="password"
+                                name="password"
                                 type={showPassword ? 'text' : 'password'}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
+                                autoComplete="current-password"
                                 required
                                 autoFocus
                                 className="h-11 pr-10"
