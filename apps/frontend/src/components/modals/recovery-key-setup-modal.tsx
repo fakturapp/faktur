@@ -77,9 +77,11 @@ export function RecoveryKeySetupModal({ open }: { open: boolean }) {
               <div className="relative">
                 <Input
                   id="recoverySetupPassword"
+                  name="password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
                   required
                   autoFocus
                   className="pr-10"

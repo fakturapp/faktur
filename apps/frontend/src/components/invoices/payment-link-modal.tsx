@@ -432,10 +432,13 @@ export function PaymentLinkModal({
                       <div className="pl-12 pr-3.5 pb-3.5 pt-1">
                         <div className="relative">
                           <Input
+                            id="payment-link-password"
+                            name="link-password"
                             type={showPassword ? 'text' : 'password'}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Entrez un mot de passe..."
+                            autoComplete="off"
                             autoFocus
                             className="pr-10 h-9 text-sm"
                           />

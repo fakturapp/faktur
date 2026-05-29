@@ -55,6 +55,7 @@ export function ConfirmPasswordModal({ open, onClose, onConfirm, submitting }: P
           <div className="relative">
             <Input
               id="confirm-password"
+              name="password"
               type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
