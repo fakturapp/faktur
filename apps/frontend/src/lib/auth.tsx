@@ -11,6 +11,11 @@ export interface TeamSummary {
   id: string
   name: string
   plan: 'free' | 'pro' | 'team'
+  subscriptionStatus?: string | null
+  planPeriod?: 'monthly' | 'annual' | null
+  subscriptionCurrentPeriodEnd?: string | null
+  subscriptionGraceEndsAt?: string | null
+  subscriptionCancelAtPeriodEnd?: boolean
   encryptionMode: 'private' | 'standard'
   encryptionModeConfirmedAt: string | null
   onboardingCompletedAt: string | null
