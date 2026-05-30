@@ -65,6 +65,8 @@ export default class Me {
         ? t.subscriptionGraceEndsAt.toISO()
         : null,
       subscriptionCancelAtPeriodEnd: t.subscriptionCancelAtPeriodEnd,
+      subscriptionStartedAt: t.subscriptionStartedAt ? t.subscriptionStartedAt.toISO() : null,
+      hasStripeSubscription: !!t.stripeSubscriptionId,
       encryptionMode: t.encryptionMode,
       encryptionModeConfirmedAt: t.encryptionModeConfirmedAt
         ? t.encryptionModeConfirmedAt.toISO()
