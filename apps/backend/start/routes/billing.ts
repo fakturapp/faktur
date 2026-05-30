@@ -8,9 +8,9 @@ const Portal = () => import('#controllers/billing/portal')
 
 const billingGroup = router
   .group(() => {
-    router.post('/billing/checkout', [Checkout, 'handle'])
-    router.get('/billing/checkout/:id', [CheckoutShow, 'handle'])
-    router.post('/billing/portal', [Portal, 'handle'])
+    router.post('/billing/checkout', [Checkout, 'handle']).as('billing_checkout')
+    router.get('/billing/checkout/:id', [CheckoutShow, 'handle']).as('billing_checkout_show')
+    router.post('/billing/portal', [Portal, 'handle']).as('billing_portal')
   })
   .use(middleware.auth())
 
