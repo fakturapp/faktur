@@ -20,12 +20,9 @@ interface Props {
   onClose: () => void
   title: string
   description: React.ReactNode
-  /** Exact string the admin must type to pass step 1 (email or team name). */
   confirmValue: string
-  /** Label for the step-1 confirmation input. */
   confirmLabel: string
   confirmPlaceholder?: string
-  /** Extra warning rendered above the confirmation field. */
   warning?: React.ReactNode
   submitLabel?: string
   submitting?: boolean
@@ -33,11 +30,6 @@ interface Props {
   onConfirm: (password: string) => void | Promise<void>
 }
 
-/**
- * Two-step destructive confirmation for the admin panel:
- *   1. type the exact target value (email / team name)
- *   2. re-authenticate with the admin password
- */
 export function AdminDangerModal({
   open,
   onClose,
@@ -110,11 +102,7 @@ export function AdminDangerModal({
             <Button variant="outline" onClick={handleClose}>
               Annuler
             </Button>
-            <Button
-              variant="destructive"
-              disabled={!matches}
-              onClick={() => setStep(2)}
-            >
+            <Button variant="destructive" disabled={!matches} onClick={() => setStep(2)}>
               Continuer <ArrowRight className="ml-1.5 h-4 w-4" />
             </Button>
           </DialogFooter>
