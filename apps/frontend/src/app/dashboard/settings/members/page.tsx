@@ -1114,7 +1114,7 @@ export default function TeamPage() {
             <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
               <DialogHeader showClose={false} icon={<AlertTriangle className="h-5 w-5 text-danger" />}>
                 <DialogTitle>Supprimer l&apos;équipe</DialogTitle>
-                <DialogDescription>Étape 1 sur 3 — Avertissement</DialogDescription>
+                <DialogDescription>Étape 1 sur 3 : Avertissement</DialogDescription>
               </DialogHeader>
 
               <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4 space-y-2">
@@ -1149,7 +1149,7 @@ export default function TeamPage() {
             <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
               <DialogHeader showClose={false}>
                 <DialogTitle>Confirmer le nom</DialogTitle>
-                <DialogDescription>Étape 2 sur 3 — Vérification</DialogDescription>
+                <DialogDescription>Étape 2 sur 3 : Vérification</DialogDescription>
               </DialogHeader>
 
               <Field>
@@ -1185,7 +1185,7 @@ export default function TeamPage() {
             <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
               <DialogHeader showClose={false}>
                 <DialogTitle>Mot de passe</DialogTitle>
-                <DialogDescription>Étape 3 sur 3 — Authentification</DialogDescription>
+                <DialogDescription>Étape 3 sur 3 : Authentification</DialogDescription>
               </DialogHeader>
 
               <form
