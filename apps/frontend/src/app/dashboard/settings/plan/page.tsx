@@ -14,7 +14,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { PLAN_IDS, PLANS, formatPlanPrice, type PlanId } from '@/lib/plans'
-import { Check, ArrowRight, Sparkles } from 'lucide-react'
+import { Check, ArrowRight, Layers } from 'lucide-react'
 
 interface TeamData {
   id: string
@@ -49,7 +49,7 @@ export default function PlanPage() {
     <div className="mx-auto max-w-5xl p-6">
       <div className="mb-8 space-y-3 text-center">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
-          <Sparkles className="h-7 w-7 text-primary" />
+          <Layers className="h-7 w-7 text-primary" />
         </div>
         <h1 className="text-3xl font-bold text-foreground">Choisissez votre plan</h1>
         <p className="mx-auto max-w-lg text-sm text-muted-foreground">
@@ -58,7 +58,6 @@ export default function PlanPage() {
         </p>
       </div>
 
-      {/* Mensuel / Annuel toggle */}
       <div className="mb-10 flex justify-center">
         <div className="inline-flex items-center rounded-full border border-border bg-muted/40 p-1">
           <button
@@ -91,7 +90,6 @@ export default function PlanPage() {
         </div>
       </div>
 
-      {/* Plan cards */}
       <div className="grid gap-6 md:grid-cols-3">
         {PLAN_IDS.map((id, i) => {
           const plan = PLANS[id]
@@ -181,7 +179,7 @@ export default function PlanPage() {
       </p>
 
       <Dialog open={!!comingSoon} onClose={() => setComingSoon(null)}>
-        <DialogHeader onClose={() => setComingSoon(null)} icon={<Sparkles className="h-5 w-5 text-primary" />}>
+        <DialogHeader onClose={() => setComingSoon(null)} icon={<Layers className="h-5 w-5 text-primary" />}>
           <DialogTitle>Bientôt disponible</DialogTitle>
           <DialogDescription>
             Le paiement en ligne arrive très bientôt. En attendant, le plan de votre équipe est géré
