@@ -1,41 +1,83 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
+import { useToast } from '@/components/ui/toast'
 import { Spinner } from '@/components/ui/spinner'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from '@/components/ui/dialog'
-import { PLAN_IDS, PLANS, formatPlanPrice, type PlanId } from '@/lib/plans'
-import { Check, ArrowRight, Layers } from 'lucide-react'
+import { PLAN_IDS, PLANS, getPlan, formatPlanPrice, type PlanId } from '@/lib/plans'
+import { Check, ArrowRight, Layers, Settings, AlertTriangle } from 'lucide-react'
 
 interface TeamData {
   id: string
   name: string
   plan: PlanId
+  subscriptionStatus?: string | null
+  planPeriod?: 'monthly' | 'annual' | null
+  subscriptionCurrentPeriodEnd?: string | null
+  subscriptionGraceEndsAt?: string | null
+  subscriptionCancelAtPeriodEnd?: boolean
+}
+
+function formatDate(iso?: string | null): string {
+  if (!iso) return ''
+  try {
+    return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+  } catch {
+    return ''
+  }
 }
 
 export default function PlanPage() {
+  const router = useRouter()
+  const { toast } = useToast()
   const [team, setTeam] = useState<TeamData | null>(null)
   const [loading, setLoading] = useState(true)
   const [period, setPeriod] = useState<'monthly' | 'annual'>('annual')
-  const [comingSoon, setComingSoon] = useState<PlanId | null>(null)
+  const [busy, setBusy] = useState<string | null>(null)
 
   useEffect(() => {
     api.get<{ team: TeamData }>('/team').then(({ data }) => {
-      if (data?.team) setTeam(data.team)
+      if (data?.team) {
+        setTeam(data.team)
+        if (data.team.planPeriod) setPeriod(data.team.planPeriod)
+      }
       setLoading(false)
     })
   }, [])
 
   const currentPlanId: PlanId = team?.plan ?? 'free'
+  const status = team?.subscriptionStatus ?? null
+  const isSubscribed =
+    currentPlanId !== 'free' && (status === 'active' || status === 'trialing' || status === 'past_due')
+
+  async function handleSubscribe(planId: PlanId) {
+    setBusy(planId)
+    const { data, error } = await api.post<{ sessionId: string }>('/billing/checkout', {
+      plan: planId,
+      period,
+    })
+    if (error || !data?.sessionId) {
+      setBusy(null)
+      toast(error || 'Impossible de démarrer le paiement', 'error')
+      return
+    }
+    router.push(`/checkout/facture/${data.sessionId}`)
+  }
+
+  async function handlePortal() {
+    setBusy('portal')
+    const { data, error } = await api.post<{ url: string }>('/billing/portal', {})
+    if (error || !data?.url) {
+      setBusy(null)
+      toast(error || 'Impossible d’ouvrir la gestion de l’abonnement', 'error')
+      return
+    }
+    window.location.href = data.url
+  }
 
   if (loading) {
     return (
@@ -45,18 +87,70 @@ export default function PlanPage() {
     )
   }
 
+  const currentMeta = getPlan(currentPlanId)
+  const CurrentIcon = currentMeta.icon
+
   return (
     <div className="mx-auto max-w-5xl p-6">
       <div className="mb-8 space-y-3 text-center">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
           <Layers className="h-7 w-7 text-primary" />
         </div>
-        <h1 className="text-3xl font-bold text-foreground">Choisissez votre plan</h1>
+        <h1 className="text-3xl font-bold text-foreground">Votre abonnement</h1>
         <p className="mx-auto max-w-lg text-sm text-muted-foreground">
-          Passez à la vitesse supérieure quand vous en avez besoin.
-          {team ? ` Plan de l’équipe « ${team.name} ».` : ''}
+          Abonnement actuel : <span className="font-medium text-foreground">{currentMeta.name}</span>
+          {team ? ` pour l’équipe « ${team.name} »` : ''}.
         </p>
       </div>
+
+      {isSubscribed && (
+        <div
+          className={cn(
+            'mb-8 rounded-2xl border bg-card p-6 shadow-surface',
+            status === 'past_due' ? 'border-amber-500/40' : currentMeta.accentRing
+          )}
+        >
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className={cn('flex h-11 w-11 items-center justify-center rounded-xl', currentMeta.accentSoft)}>
+                <CurrentIcon className={cn('h-6 w-6', currentMeta.accentText)} />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-foreground">
+                  Merci de vous être abonné à {currentMeta.name}
+                </h2>
+                {status === 'past_due' ? (
+                  <p className="mt-1 inline-flex items-center gap-1.5 text-sm text-amber-600 dark:text-amber-400">
+                    <AlertTriangle className="h-4 w-4" /> Paiement en échec, régularisez pour conserver vos avantages.
+                  </p>
+                ) : team?.subscriptionCancelAtPeriodEnd ? (
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Votre abonnement se termine le {formatDate(team?.subscriptionCurrentPeriodEnd)}.
+                  </p>
+                ) : team?.subscriptionCurrentPeriodEnd ? (
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Prochain renouvellement le {formatDate(team?.subscriptionCurrentPeriodEnd)}
+                    {period === 'annual' ? ' (facturation annuelle).' : ' (facturation mensuelle).'}
+                  </p>
+                ) : (
+                  <p className="mt-1 text-sm text-muted-foreground">{currentMeta.tagline}</p>
+                )}
+              </div>
+            </div>
+            <Button onClick={handlePortal} disabled={busy === 'portal'}>
+              {busy === 'portal' ? (
+                <>
+                  <Spinner /> Ouverture…
+                </>
+              ) : (
+                <>
+                  <Settings className="mr-1.5 h-4 w-4" /> Gérer l’abonnement
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      )}
 
       <div className="mb-10 flex justify-center">
         <div className="inline-flex items-center rounded-full border border-border bg-muted/40 p-1">
@@ -65,9 +159,7 @@ export default function PlanPage() {
             onClick={() => setPeriod('monthly')}
             className={cn(
               'rounded-full px-4 py-1.5 text-sm font-medium transition-all',
-              period === 'monthly'
-                ? 'bg-card text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
+              period === 'monthly' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
             )}
           >
             Mensuel
@@ -77,9 +169,7 @@ export default function PlanPage() {
             onClick={() => setPeriod('annual')}
             className={cn(
               'flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium transition-all',
-              period === 'annual'
-                ? 'bg-card text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
+              period === 'annual' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
             )}
           >
             Annuel
@@ -159,13 +249,30 @@ export default function PlanPage() {
                   <Button variant="outline" className="w-full" disabled>
                     Votre plan actuel
                   </Button>
-                ) : plan.recommended ? (
-                  <Button className="w-full" onClick={() => setComingSoon(id)}>
-                    Choisir {plan.name} <ArrowRight className="ml-1.5 h-4 w-4" />
+                ) : isSubscribed ? (
+                  <Button variant="outline" className="w-full" onClick={handlePortal} disabled={busy === 'portal'}>
+                    {busy === 'portal' ? <Spinner /> : <>Gérer l’abonnement</>}
+                  </Button>
+                ) : id === 'free' ? (
+                  <Button variant="outline" className="w-full" disabled>
+                    Inclus
                   </Button>
                 ) : (
-                  <Button variant="outline" className="w-full" onClick={() => setComingSoon(id)}>
-                    Choisir {plan.name} <ArrowRight className="ml-1.5 h-4 w-4" />
+                  <Button
+                    variant={plan.recommended ? undefined : 'outline'}
+                    className="w-full"
+                    onClick={() => handleSubscribe(id)}
+                    disabled={busy === id}
+                  >
+                    {busy === id ? (
+                      <>
+                        <Spinner /> Redirection…
+                      </>
+                    ) : (
+                      <>
+                        S’abonner à {plan.name} <ArrowRight className="ml-1.5 h-4 w-4" />
+                      </>
+                    )}
                   </Button>
                 )}
               </div>
@@ -175,21 +282,9 @@ export default function PlanPage() {
       </div>
 
       <p className="mt-8 text-center text-xs text-muted-foreground">
-        Tous les prix sont en euros, TVA non incluse. Vous pouvez changer de plan à tout moment.
+        Tous les prix sont en euros, TVA non incluse. Vous pouvez changer de plan ou annuler à tout
+        moment depuis la gestion de l’abonnement.
       </p>
-
-      <Dialog open={!!comingSoon} onClose={() => setComingSoon(null)}>
-        <DialogHeader onClose={() => setComingSoon(null)} icon={<Layers className="h-5 w-5 text-primary" />}>
-          <DialogTitle>Bientôt disponible</DialogTitle>
-          <DialogDescription>
-            Le paiement en ligne arrive très bientôt. En attendant, le plan de votre équipe est géré
-            par un administrateur Faktur.
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <Button onClick={() => setComingSoon(null)}>J&apos;ai compris</Button>
-        </DialogFooter>
-      </Dialog>
     </div>
   )
 }
