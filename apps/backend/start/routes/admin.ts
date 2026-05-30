@@ -5,6 +5,13 @@ import { API_PREFIX } from '#start/routes/_prefix'
 const AdminFeedbacks = () => import('#controllers/admin/feedbacks')
 const AdminBugReports = () => import('#controllers/admin/bug_reports')
 
+const AdminUsersList = () => import('#controllers/admin/users/list')
+const AdminUsersDelete = () => import('#controllers/admin/users/delete')
+
+const AdminTeamsList = () => import('#controllers/admin/teams/list')
+const AdminTeamsUpdate = () => import('#controllers/admin/teams/update')
+const AdminTeamsDelete = () => import('#controllers/admin/teams/delete')
+
 const ListOauthApps = () => import('#controllers/admin/oauth_apps/list')
 const CreateOauthApp = () => import('#controllers/admin/oauth_apps/create')
 const UpdateOauthApp = () => import('#controllers/admin/oauth_apps/update')
@@ -17,6 +24,13 @@ router
     router.get('/feedbacks', [AdminFeedbacks, 'handle'])
     router.get('/bug-reports', [AdminBugReports, 'index'])
     router.patch('/bug-reports/:id', [AdminBugReports, 'update'])
+
+    router.get('/users', [AdminUsersList, 'handle'])
+    router.delete('/users/:id', [AdminUsersDelete, 'handle'])
+
+    router.get('/teams', [AdminTeamsList, 'handle'])
+    router.put('/teams/:id', [AdminTeamsUpdate, 'handle'])
+    router.delete('/teams/:id', [AdminTeamsDelete, 'handle'])
 
     router.get('/oauth-apps', [ListOauthApps, 'handle'])
     router.post('/oauth-apps', [CreateOauthApp, 'handle'])
