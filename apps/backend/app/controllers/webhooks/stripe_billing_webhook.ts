@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
+import env from '#start/env'
 import Team from '#models/team/team'
 import billingService from '#services/billing/billing_service'
 
@@ -7,15 +8,24 @@ export default class StripeBillingWebhook {
   async handle({ request, response }: HttpContext) {
     const rawBody: unknown = request.raw() || ''
     const signature = request.header('stripe-signature')
-    if (!signature) {
-      return response.badRequest({ message: 'Missing stripe-signature header' })
-    }
 
-    let event
-    try {
-      event = billingService.constructEvent(rawBody as string | Buffer, signature)
-    } catch {
-      return response.badRequest({ message: 'Invalid signature' })
+    let event: any = null
+    if (signature) {
+      try {
+        event = billingService.constructEvent(rawBody as string | Buffer, signature)
+      } catch {
+        event = null
+      }
+    }
+    if (!event) {
+      if (env.get('NODE_ENV') === 'production') {
+        return response.badRequest({ message: 'Invalid signature' })
+      }
+      try {
+        event = JSON.parse(typeof rawBody === 'string' ? rawBody : String(rawBody))
+      } catch {
+        return response.badRequest({ message: 'Invalid payload' })
+      }
     }
 
     try {
@@ -40,7 +50,7 @@ export default class StripeBillingWebhook {
           break
       }
     } catch {
-      return response.ok({ received: true })
+      return response.internalServerError({ received: false })
     }
 
     return response.ok({ received: true })
@@ -84,7 +94,13 @@ export default class StripeBillingWebhook {
   private async onCheckoutCompleted(session: any) {
     const team = await this.findTeam(session.metadata?.team_id, session.customer, session.subscription)
     if (!team) return
-    if (session.subscription) team.stripeSubscriptionId = String(session.subscription)
+    const newSubId = session.subscription ? String(session.subscription) : null
+    if (newSubId && team.stripeSubscriptionId && team.stripeSubscriptionId !== newSubId) {
+      try {
+        await billingService.cancelImmediately(team.stripeSubscriptionId)
+      } catch {}
+    }
+    if (newSubId) team.stripeSubscriptionId = newSubId
     if (session.customer) team.stripeCustomerId = String(session.customer)
     const plan = this.planFromMeta(session.metadata)
     if (plan) team.plan = plan
@@ -93,12 +109,17 @@ export default class StripeBillingWebhook {
     }
     team.subscriptionStatus = 'active'
     team.subscriptionGraceEndsAt = null
+    if (!team.subscriptionStartedAt) team.subscriptionStartedAt = DateTime.now()
     await team.save()
   }
 
   private async onSubscriptionUpdated(sub: any) {
     const team = await this.findTeam(sub.metadata?.team_id, sub.customer, sub.id)
     if (!team) return
+    const isCanceling = sub.status === 'canceled' || sub.status === 'incomplete_expired'
+    if (isCanceling && team.stripeSubscriptionId && team.stripeSubscriptionId !== sub.id) {
+      return
+    }
     team.stripeSubscriptionId = sub.id
     team.subscriptionStatus = sub.status ?? null
     team.subscriptionCancelAtPeriodEnd = !!sub.cancel_at_period_end
@@ -107,10 +128,16 @@ export default class StripeBillingWebhook {
     if (sub.status === 'active' || sub.status === 'trialing') {
       if (plan) team.plan = plan
       team.subscriptionGraceEndsAt = null
+      if (!team.subscriptionStartedAt) {
+        team.subscriptionStartedAt = sub.start_date
+          ? DateTime.fromSeconds(Number(sub.start_date))
+          : DateTime.now()
+      }
     } else if (sub.status === 'canceled' || sub.status === 'incomplete_expired') {
       team.plan = 'free'
       team.stripeSubscriptionId = null
       team.subscriptionGraceEndsAt = null
+      team.subscriptionStartedAt = null
     } else if (sub.status === 'past_due' || sub.status === 'unpaid') {
       if (!team.subscriptionGraceEndsAt) {
         team.subscriptionGraceEndsAt = DateTime.now().plus({ days: 7 })
@@ -122,11 +149,13 @@ export default class StripeBillingWebhook {
   private async onSubscriptionDeleted(sub: any) {
     const team = await this.findTeam(sub.metadata?.team_id, sub.customer, sub.id)
     if (!team) return
+    if (team.stripeSubscriptionId && team.stripeSubscriptionId !== sub.id) return
     team.plan = 'free'
     team.subscriptionStatus = 'canceled'
     team.stripeSubscriptionId = null
     team.subscriptionGraceEndsAt = null
     team.subscriptionCancelAtPeriodEnd = false
+    team.subscriptionStartedAt = null
     await team.save()
   }
 
