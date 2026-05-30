@@ -44,6 +44,9 @@ export default class Team extends BaseModel {
   @column()
   declare subscriptionCancelAtPeriodEnd: boolean
 
+  @column.dateTime()
+  declare subscriptionStartedAt: DateTime | null
+
   @column()
   declare encryptionMode: 'private' | 'standard'
 
