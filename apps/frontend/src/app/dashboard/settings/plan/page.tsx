@@ -1,15 +1,16 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, useCallback } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { api } from '@/lib/api'
+import { useAuth } from '@/lib/auth'
 import { cn } from '@/lib/utils'
 import { useToast } from '@/components/ui/toast'
 import { Spinner } from '@/components/ui/spinner'
 import { Button } from '@/components/ui/button'
-import { PLAN_IDS, PLANS, getPlan, formatPlanPrice, type PlanId } from '@/lib/plans'
-import { Check, ArrowRight, Layers, Settings, AlertTriangle } from 'lucide-react'
+import { getPlan, type PlanId } from '@/lib/plans'
+import { Check, ArrowRight, Settings, AlertTriangle, PartyPopper, RotateCcw } from 'lucide-react'
 
 interface TeamData {
   id: string
@@ -33,40 +34,42 @@ function formatDate(iso?: string | null): string {
 
 export default function PlanPage() {
   const router = useRouter()
+  const params = useSearchParams()
+  const { refreshUser } = useAuth()
   const { toast } = useToast()
+  const justSubscribed = params.get('subscribed') === '1'
+
   const [team, setTeam] = useState<TeamData | null>(null)
   const [loading, setLoading] = useState(true)
-  const [period, setPeriod] = useState<'monthly' | 'annual'>('annual')
   const [busy, setBusy] = useState<string | null>(null)
 
-  useEffect(() => {
-    api.get<{ team: TeamData }>('/team').then(({ data }) => {
-      if (data?.team) {
-        setTeam(data.team)
-        if (data.team.planPeriod) setPeriod(data.team.planPeriod)
-      }
-      setLoading(false)
-    })
+  const load = useCallback(async () => {
+    const { data } = await api.get<{ team: TeamData }>('/team')
+    if (data?.team) setTeam(data.team)
+    setLoading(false)
   }, [])
+
+  useEffect(() => {
+    load()
+  }, [load])
+
+  useEffect(() => {
+    if (!justSubscribed) return
+    refreshUser()
+    const t1 = setTimeout(() => load(), 1500)
+    const t2 = setTimeout(() => load(), 4000)
+    return () => {
+      clearTimeout(t1)
+      clearTimeout(t2)
+    }
+  }, [justSubscribed, load, refreshUser])
 
   const currentPlanId: PlanId = team?.plan ?? 'free'
   const status = team?.subscriptionStatus ?? null
   const isSubscribed =
     currentPlanId !== 'free' && (status === 'active' || status === 'trialing' || status === 'past_due')
-
-  async function handleSubscribe(planId: PlanId) {
-    setBusy(planId)
-    const { data, error } = await api.post<{ sessionId: string }>('/billing/checkout', {
-      plan: planId,
-      period,
-    })
-    if (error || !data?.sessionId) {
-      setBusy(null)
-      toast(error || 'Impossible de démarrer le paiement', 'error')
-      return
-    }
-    router.push(`/checkout/facture/${data.sessionId}`)
-  }
+  const meta = getPlan(currentPlanId)
+  const Icon = meta.icon
 
   async function handlePortal() {
     setBusy('portal')
@@ -79,6 +82,18 @@ export default function PlanPage() {
     window.location.href = data.url
   }
 
+  async function handleResume() {
+    setBusy('resume')
+    const { error } = await api.post('/billing/cancel', { resume: true })
+    setBusy(null)
+    if (error) {
+      toast(error, 'error')
+      return
+    }
+    toast('Abonnement réactivé', 'success')
+    load()
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-24">
@@ -87,204 +102,126 @@ export default function PlanPage() {
     )
   }
 
-  const currentMeta = getPlan(currentPlanId)
-  const CurrentIcon = currentMeta.icon
-
   return (
-    <div className="mx-auto max-w-5xl p-6">
-      <div className="mb-8 space-y-3 text-center">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
-          <Layers className="h-7 w-7 text-primary" />
-        </div>
-        <h1 className="text-3xl font-bold text-foreground">Votre abonnement</h1>
-        <p className="mx-auto max-w-lg text-sm text-muted-foreground">
-          Abonnement actuel : <span className="font-medium text-foreground">{currentMeta.name}</span>
-          {team ? ` pour l’équipe « ${team.name} »` : ''}.
+    <div className="mx-auto max-w-3xl p-6">
+      {justSubscribed && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 flex items-center gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4"
+        >
+          <PartyPopper className="h-6 w-6 shrink-0 text-emerald-500" />
+          <div>
+            <p className="text-sm font-semibold text-foreground">
+              Félicitations, vous êtes passé au plan {meta.name} !
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Votre paiement est confirmé. Vos nouveaux avantages sont déjà actifs.
+            </p>
+          </div>
+        </motion.div>
+      )}
+
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-foreground">Votre abonnement</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Gérez le forfait de l’équipe {team ? `« ${team.name} »` : ''}.
         </p>
       </div>
 
-      {isSubscribed && (
-        <div
-          className={cn(
-            'mb-8 rounded-2xl border bg-card p-6 shadow-surface',
-            status === 'past_due' ? 'border-amber-500/40' : currentMeta.accentRing
-          )}
-        >
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div className="flex items-start gap-3">
-              <div className={cn('flex h-11 w-11 items-center justify-center rounded-xl', currentMeta.accentSoft)}>
-                <CurrentIcon className={cn('h-6 w-6', currentMeta.accentText)} />
-              </div>
-              <div>
-                <h2 className="text-lg font-bold text-foreground">
-                  Merci de vous être abonné à {currentMeta.name}
-                </h2>
-                {status === 'past_due' ? (
-                  <p className="mt-1 inline-flex items-center gap-1.5 text-sm text-amber-600 dark:text-amber-400">
-                    <AlertTriangle className="h-4 w-4" /> Paiement en échec, régularisez pour conserver vos avantages.
-                  </p>
-                ) : team?.subscriptionCancelAtPeriodEnd ? (
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Votre abonnement se termine le {formatDate(team?.subscriptionCurrentPeriodEnd)}.
-                  </p>
-                ) : team?.subscriptionCurrentPeriodEnd ? (
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Prochain renouvellement le {formatDate(team?.subscriptionCurrentPeriodEnd)}
-                    {period === 'annual' ? ' (facturation annuelle).' : ' (facturation mensuelle).'}
-                  </p>
-                ) : (
-                  <p className="mt-1 text-sm text-muted-foreground">{currentMeta.tagline}</p>
-                )}
-              </div>
-            </div>
-            <Button onClick={handlePortal} disabled={busy === 'portal'}>
-              {busy === 'portal' ? (
-                <>
-                  <Spinner /> Ouverture…
-                </>
-              ) : (
-                <>
-                  <Settings className="mr-1.5 h-4 w-4" /> Gérer l’abonnement
-                </>
-              )}
-            </Button>
+      <div
+        className={cn(
+          'rounded-2xl border bg-card p-6 shadow-surface',
+          status === 'past_due' ? 'border-amber-500/40' : isSubscribed ? meta.accentRing : 'border-border'
+        )}
+      >
+        <div className="flex items-start gap-4">
+          <div className={cn('flex h-12 w-12 shrink-0 items-center justify-center rounded-xl', meta.accentSoft)}>
+            <Icon className={cn('h-6 w-6', meta.accentText)} />
           </div>
-        </div>
-      )}
-
-      <div className="mb-10 flex justify-center">
-        <div className="inline-flex items-center rounded-full border border-border bg-muted/40 p-1">
-          <button
-            type="button"
-            onClick={() => setPeriod('monthly')}
-            className={cn(
-              'rounded-full px-4 py-1.5 text-sm font-medium transition-all',
-              period === 'monthly' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
-            )}
-          >
-            Mensuel
-          </button>
-          <button
-            type="button"
-            onClick={() => setPeriod('annual')}
-            className={cn(
-              'flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium transition-all',
-              period === 'annual' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
-            )}
-          >
-            Annuel
-            <span className="rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
-              -37%
-            </span>
-          </button>
-        </div>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-3">
-        {PLAN_IDS.map((id, i) => {
-          const plan = PLANS[id]
-          const Icon = plan.icon
-          const price = period === 'annual' ? plan.priceAnnual : plan.priceMonthly
-          const isCurrent = id === currentPlanId
-          return (
-            <motion.div
-              key={id}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.06 }}
-              className={cn(
-                'relative flex flex-col rounded-2xl border bg-card p-6 shadow-surface',
-                plan.recommended ? `${plan.accentRing} ring-1 ring-primary/30 md:-mt-2 md:mb-2` : 'border-border'
-              )}
-            >
-              {plan.recommended && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-primary-foreground shadow-sm">
-                  Recommandé
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-xl font-bold text-foreground">{meta.label}</h2>
+              {isSubscribed && status !== 'past_due' && (
+                <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                  Actif
                 </span>
               )}
+              {status === 'past_due' && (
+                <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[11px] font-semibold text-amber-600 dark:text-amber-400">
+                  Paiement en échec
+                </span>
+              )}
+            </div>
 
-              <div className="flex items-center gap-2.5">
-                <div className={cn('flex h-10 w-10 items-center justify-center rounded-xl', plan.accentSoft)}>
-                  <Icon className={cn('h-5 w-5', plan.accentText)} />
-                </div>
-                <h2 className="text-lg font-bold text-foreground">{plan.name}</h2>
-                {isCurrent && (
-                  <span className="ml-auto rounded-full bg-foreground/10 px-2.5 py-0.5 text-[11px] font-semibold text-foreground">
-                    Actuel
+            {isSubscribed ? (
+              <p className="mt-1 text-sm text-muted-foreground">
+                {status === 'past_due' ? (
+                  <span className="inline-flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
+                    <AlertTriangle className="h-4 w-4" /> Régularisez le paiement pour conserver vos avantages.
                   </span>
-                )}
-              </div>
-
-              <p className="mt-2 min-h-[2.5rem] text-sm text-muted-foreground">{plan.tagline}</p>
-
-              <div className="mt-4 flex items-baseline gap-1">
-                {price > 0 ? (
-                  <>
-                    <span className="text-4xl font-bold text-foreground">{formatPlanPrice(price)}</span>
-                    <span className="text-sm text-muted-foreground">/mois</span>
-                  </>
+                ) : team?.subscriptionCancelAtPeriodEnd ? (
+                  `Abonnement résilié : expire le ${formatDate(team?.subscriptionCurrentPeriodEnd)}.`
+                ) : team?.subscriptionCurrentPeriodEnd ? (
+                  `Se renouvelle le ${formatDate(team?.subscriptionCurrentPeriodEnd)}.`
                 ) : (
-                  <span className="text-4xl font-bold text-foreground">Gratuit</span>
+                  meta.tagline
                 )}
-              </div>
-              <p className="mt-1 h-4 text-xs text-muted-foreground">
-                {price > 0
-                  ? period === 'annual'
-                    ? `soit ${formatPlanPrice(price * 12)} facturés par an`
-                    : 'facturé chaque mois'
-                  : 'Pour toujours'}
               </p>
+            ) : (
+              <p className="mt-1 text-sm text-muted-foreground">{meta.tagline}</p>
+            )}
 
-              <ul className="mt-5 flex-1 space-y-2.5">
-                {plan.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm text-foreground/90">
-                    <Check className={cn('mt-0.5 h-4 w-4 shrink-0', plan.accentText)} />
-                    {f}
-                  </li>
-                ))}
-              </ul>
+            <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+              {meta.features.map((f) => (
+                <li key={f} className="flex items-start gap-2 text-sm text-foreground/90">
+                  <Check className={cn('mt-0.5 h-4 w-4 shrink-0', meta.accentText)} />
+                  {f}
+                </li>
+              ))}
+            </ul>
 
-              <div className="mt-6">
-                {isCurrent ? (
-                  <Button variant="outline" className="w-full" disabled>
-                    Votre plan actuel
-                  </Button>
-                ) : isSubscribed ? (
-                  <Button variant="outline" className="w-full" onClick={handlePortal} disabled={busy === 'portal'}>
-                    {busy === 'portal' ? <Spinner /> : <>Gérer l’abonnement</>}
-                  </Button>
-                ) : id === 'free' ? (
-                  <Button variant="outline" className="w-full" disabled>
-                    Inclus
-                  </Button>
-                ) : (
-                  <Button
-                    variant={plan.recommended ? undefined : 'outline'}
-                    className="w-full"
-                    onClick={() => handleSubscribe(id)}
-                    disabled={busy === id}
-                  >
-                    {busy === id ? (
+            <div className="mt-6 flex flex-wrap items-center gap-2">
+              {isSubscribed ? (
+                <>
+                  <Button onClick={handlePortal} disabled={busy === 'portal'}>
+                    {busy === 'portal' ? (
                       <>
-                        <Spinner /> Redirection…
+                        <Spinner /> Ouverture…
                       </>
                     ) : (
                       <>
-                        S’abonner à {plan.name} <ArrowRight className="ml-1.5 h-4 w-4" />
+                        <Settings className="mr-1.5 h-4 w-4" /> Gérer mon abonnement
                       </>
                     )}
                   </Button>
-                )}
-              </div>
-            </motion.div>
-          )
-        })}
+                  {team?.subscriptionCancelAtPeriodEnd ? (
+                    <Button variant="outline" onClick={handleResume} disabled={busy === 'resume'}>
+                      {busy === 'resume' ? (
+                        <>
+                          <Spinner /> …
+                        </>
+                      ) : (
+                        <>
+                          <RotateCcw className="mr-1.5 h-4 w-4" /> Réactiver
+                        </>
+                      )}
+                    </Button>
+                  ) : (
+                    <Button variant="outline" onClick={() => router.push('/dashboard/settings/plan/upgrade')}>
+                      Améliorer le forfait <ArrowRight className="ml-1.5 h-4 w-4" />
+                    </Button>
+                  )}
+                </>
+              ) : (
+                <Button onClick={() => router.push('/dashboard/settings/plan/upgrade')}>
+                  Choisir un forfait <ArrowRight className="ml-1.5 h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
-
-      <p className="mt-8 text-center text-xs text-muted-foreground">
-        Tous les prix sont en euros, TVA non incluse. Vous pouvez changer de plan ou annuler à tout
-        moment depuis la gestion de l’abonnement.
-      </p>
     </div>
   )
 }
