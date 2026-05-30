@@ -21,6 +21,9 @@ export default class Team extends BaseModel {
   declare ownerId: string
 
   @column()
+  declare plan: 'free' | 'pro' | 'team'
+
+  @column()
   declare encryptionMode: 'private' | 'standard'
 
   @column.dateTime()
