@@ -29,6 +29,7 @@ export default class Me {
       ? (teams.find((t) => t.id === user.currentTeamId) ?? null)
       : null
     const currentTeamEncryptionMode = currentTeam ? currentTeam.encryptionMode : null
+    const currentTeamPlan = currentTeam ? currentTeam.plan : null
 
     let vaultLocked = false
     if (currentTeam && currentTeam.encryptionMode === 'private' && user.saltKdf) {
@@ -54,6 +55,7 @@ export default class Me {
     const teamsSummary = teams.map((t) => ({
       id: t.id,
       name: t.name,
+      plan: t.plan,
       encryptionMode: t.encryptionMode,
       encryptionModeConfirmedAt: t.encryptionModeConfirmedAt
         ? t.encryptionModeConfirmedAt.toISO()
@@ -69,6 +71,7 @@ export default class Me {
         vaultLocked,
         isAdmin,
         currentTeamEncryptionMode,
+        currentTeamPlan,
         teams: teamsSummary,
       },
     })
