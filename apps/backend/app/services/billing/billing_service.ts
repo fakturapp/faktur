@@ -88,7 +88,7 @@ class BillingService {
 
     return this.client().checkout.sessions.create({
       mode: 'subscription',
-      ui_mode: 'custom',
+      ui_mode: 'elements',
       customer: params.customerId,
       line_items: [lineItem] as any,
       subscription_data: { metadata },
@@ -113,6 +113,19 @@ class BillingService {
 
   async setCancelAtPeriodEnd(subscriptionId: string, cancel: boolean): Promise<Stripe.Subscription> {
     return this.client().subscriptions.update(subscriptionId, { cancel_at_period_end: cancel })
+  }
+
+  async listSubscriptions(customerId: string): Promise<Stripe.Subscription[]> {
+    const res = await this.client().subscriptions.list({
+      customer: customerId,
+      status: 'all',
+      limit: 10,
+    })
+    return res.data
+  }
+
+  async cancelImmediately(subscriptionId: string): Promise<Stripe.Subscription> {
+    return this.client().subscriptions.cancel(subscriptionId)
   }
 
   constructEvent(rawBody: string | Buffer, signature: string): Stripe.Event {
