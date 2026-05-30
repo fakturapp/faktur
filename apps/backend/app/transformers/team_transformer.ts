@@ -6,6 +6,7 @@ export default class TeamTransformer extends BaseTransformer<Team> {
   toObject() {
     return {
       ...this.pick(this.resource, ['id', 'name', 'iconUrl', 'ownerId', 'createdAt']),
+      plan: this.resource.plan,
       encryptionMode: this.resource.encryptionMode,
       encryptionModeConfirmedAt: this.resource.encryptionModeConfirmedAt
         ? this.resource.encryptionModeConfirmedAt.toISO()
