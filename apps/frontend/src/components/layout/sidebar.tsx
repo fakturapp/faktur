@@ -56,7 +56,8 @@ import {
   RefreshCw,
   Bell,
   Wallet,
-  Star,
+  MessageSquare,
+  Layers,
   Bug,
   ShieldCheck,
   ArrowLeft,
@@ -163,7 +164,7 @@ const settingsNav: NavItem[] = [
     ],
   },
   { href: '/dashboard/settings/members', label: 'Équipe', icon: UsersRound },
-  { href: '/dashboard/settings/plan', label: 'Plan', icon: Sparkles },
+  { href: '/dashboard/settings/plan', label: 'Plan', icon: Layers },
   {
     href: '/dashboard/settings/documents/invoices',
     label: 'Facturation',
@@ -554,12 +555,23 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
           >
             { }
             <div className="px-3 pt-4 pb-3">
-              <div className="flex items-center justify-center gap-2.5">
+              <div className="flex items-center justify-start gap-2.5">
                 <img src="/logo.svg" alt={brandName} className="h-10 w-10 shrink-0 drop-shadow-sm" />
                 {!collapsed && (
                   <motion.div {...labelFade} className="flex flex-col items-start min-w-0">
-                    <span className="text-[18px] font-semibold text-foreground font-lexend tracking-tight leading-tight whitespace-nowrap">
-                      {brandName}
+                    <span className="flex items-center gap-1.5">
+                      <span className="text-[18px] font-semibold text-foreground font-lexend tracking-tight leading-tight whitespace-nowrap">
+                        {brandName}
+                      </span>
+                      {currentTeam && (
+                        <Tooltip content={`Plan ${currentPlan.name}`}>
+                          <span
+                            className={`inline-flex items-center rounded-full px-1.5 py-[1px] text-[9px] font-bold uppercase tracking-wide ${currentPlan.accentSoft} ${currentPlan.accentText}`}
+                          >
+                            {currentPlan.name}
+                          </span>
+                        </Tooltip>
+                      )}
                     </span>
                     <span className="flex items-center gap-1 leading-none whitespace-nowrap">
                       <span className="text-[9px] text-muted-foreground/40 font-medium">
@@ -628,7 +640,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
                 collapsed={collapsed}
               />
               <NavLink
-                item={{ href: '/dashboard/admin/feedbacks', label: 'Avis', icon: Star }}
+                item={{ href: '/dashboard/admin/feedbacks', label: 'Avis', icon: MessageSquare }}
                 pathname={pathname}
                 collapsed={collapsed}
               />
@@ -1000,7 +1012,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             </DropdownItem>
             <DropdownSeparator />
             <DropdownItem onClick={() => onOpenFeedback?.()}>
-              <Star className="h-4 w-4 text-amber-500" /> Laisser un avis
+              <MessageSquare className="h-4 w-4 text-amber-500" /> Laisser un avis
             </DropdownItem>
             <DropdownItem onClick={() => onOpenBugReport?.()}>
               <Bug className="h-4 w-4 text-rose-500" /> Signaler un bug
