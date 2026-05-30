@@ -1,15 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth'
-import { api } from '@/lib/api'
-import { useToast } from '@/components/ui/toast'
 import { AlertTriangle, ArrowRight } from 'lucide-react'
 
 export function SubscriptionBanner() {
   const { user } = useAuth()
-  const { toast } = useToast()
-  const [loading, setLoading] = useState(false)
+  const router = useRouter()
 
   const team = user?.teams?.find((t) => t.id === user.currentTeamId)
   if (!team || team.subscriptionStatus !== 'past_due') return null
@@ -20,33 +17,27 @@ export function SubscriptionBanner() {
     daysLeft = Math.max(0, Math.ceil(ms / 86_400_000))
   }
 
-  async function manage() {
-    setLoading(true)
-    const { data, error } = await api.post<{ url: string }>('/billing/portal', {})
-    setLoading(false)
-    if (error || !data?.url) {
-      toast(error || 'Impossible d’ouvrir la gestion de l’abonnement', 'error')
-      return
-    }
-    window.location.href = data.url
-  }
-
   return (
-    <div className="flex items-center gap-3 border-b border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-sm">
-      <AlertTriangle className="h-4 w-4 shrink-0 text-amber-500" />
-      <p className="flex-1 text-amber-700 dark:text-amber-300">
-        Le paiement de l’abonnement de l’équipe «&nbsp;{team.name}&nbsp;» a échoué.
-        {daysLeft !== null
-          ? ` Il vous reste ${daysLeft} jour${daysLeft > 1 ? 's' : ''} avant le retour au plan Gratuit.`
-          : ''}
-      </p>
-      <button
-        onClick={manage}
-        disabled={loading}
-        className="inline-flex shrink-0 items-center gap-1 rounded-full bg-amber-500 px-3 py-1 text-xs font-semibold text-white transition-colors hover:bg-amber-500/90 disabled:opacity-50"
-      >
-        Régler le paiement <ArrowRight className="h-3 w-3" />
-      </button>
-    </div>
+    <button
+      onClick={() => router.push('/dashboard/settings/plan?recover=1')}
+      className="flex w-full items-center gap-3 border-b border-amber-500/40 bg-amber-500/15 px-4 py-3 text-left transition-colors hover:bg-amber-500/25"
+    >
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-500/20">
+        <AlertTriangle className="h-5 w-5 text-amber-500" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-sm font-semibold text-amber-800 dark:text-amber-200">
+          Paiement en retard sur l’équipe «&nbsp;{team.name}&nbsp;»
+        </span>
+        <span className="block text-xs text-amber-700/90 dark:text-amber-300/90">
+          {daysLeft !== null
+            ? `Régularisez sous ${daysLeft} jour${daysLeft > 1 ? 's' : ''} pour éviter le retour au plan Gratuit.`
+            : 'Régularisez votre paiement pour conserver votre forfait.'}
+        </span>
+      </span>
+      <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white">
+        Régler maintenant <ArrowRight className="h-3.5 w-3.5" />
+      </span>
+    </button>
   )
 }
