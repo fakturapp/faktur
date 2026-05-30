@@ -6,6 +6,7 @@ const AdminFeedbacks = () => import('#controllers/admin/feedbacks')
 const AdminBugReports = () => import('#controllers/admin/bug_reports')
 
 const AdminUsersList = () => import('#controllers/admin/users/list')
+const AdminUsersUpdate = () => import('#controllers/admin/users/update')
 const AdminUsersDelete = () => import('#controllers/admin/users/delete')
 
 const AdminTeamsList = () => import('#controllers/admin/teams/list')
@@ -26,6 +27,7 @@ router
     router.patch('/bug-reports/:id', [AdminBugReports, 'update'])
 
     router.get('/users', [AdminUsersList, 'handle'])
+    router.put('/users/:id', [AdminUsersUpdate, 'handle'])
     router.delete('/users/:id', [AdminUsersDelete, 'handle'])
 
     router.get('/teams', [AdminTeamsList, 'handle'])
