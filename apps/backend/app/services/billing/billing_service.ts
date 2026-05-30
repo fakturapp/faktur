@@ -88,7 +88,7 @@ class BillingService {
 
     return this.client().checkout.sessions.create({
       mode: 'subscription',
-      ui_mode: 'embedded_page',
+      ui_mode: 'custom',
       customer: params.customerId,
       line_items: [lineItem] as any,
       subscription_data: { metadata },
@@ -109,6 +109,10 @@ class BillingService {
       customer: customerId,
       return_url: returnUrl,
     })
+  }
+
+  async setCancelAtPeriodEnd(subscriptionId: string, cancel: boolean): Promise<Stripe.Subscription> {
+    return this.client().subscriptions.update(subscriptionId, { cancel_at_period_end: cancel })
   }
 
   constructEvent(rawBody: string | Buffer, signature: string): Stripe.Event {
