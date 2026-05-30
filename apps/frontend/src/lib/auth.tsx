@@ -16,6 +16,8 @@ export interface TeamSummary {
   subscriptionCurrentPeriodEnd?: string | null
   subscriptionGraceEndsAt?: string | null
   subscriptionCancelAtPeriodEnd?: boolean
+  subscriptionStartedAt?: string | null
+  hasStripeSubscription?: boolean
   encryptionMode: 'private' | 'standard'
   encryptionModeConfirmedAt: string | null
   onboardingCompletedAt: string | null
