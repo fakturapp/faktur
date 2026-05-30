@@ -1,25 +1,18 @@
-import { Sparkles, Zap, Crown, type LucideIcon } from 'lucide-react'
+import { Package, Zap, Crown, type LucideIcon } from 'lucide-react'
 
 export type PlanId = 'free' | 'pro' | 'team'
 
 export interface PlanMeta {
   id: PlanId
-  /** Short display name — "Gratuit", "Pro", "Team" */
   name: string
-  /** Full label used in badges — "Plan Gratuit" */
   label: string
   tagline: string
-  /** Price per month when billed monthly (euros) */
   priceMonthly: number
-  /** Price per month when billed annually (euros) */
   priceAnnual: number
   recommended?: boolean
   icon: LucideIcon
-  /** Tailwind text-color token for the plan accent */
   accentText: string
-  /** Tailwind background token for soft accent surfaces */
   accentSoft: string
-  /** Ring/border token used to highlight the plan card */
   accentRing: string
   features: string[]
 }
@@ -34,7 +27,7 @@ export const PLANS: Record<PlanId, PlanMeta> = {
     tagline: 'Pour démarrer votre facturation, sans aucun frais.',
     priceMonthly: 0,
     priceAnnual: 0,
-    icon: Sparkles,
+    icon: Package,
     accentText: 'text-muted-foreground',
     accentSoft: 'bg-muted',
     accentRing: 'border-border',
@@ -93,7 +86,6 @@ export function getPlan(id: string | null | undefined): PlanMeta {
   return PLANS[(id as PlanId) in PLANS ? (id as PlanId) : 'free']
 }
 
-/** "7,99 €" or "Gratuit" (French formatting) */
 export function formatPlanPrice(amount: number): string {
   if (amount <= 0) return 'Gratuit'
   return `${amount.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`
