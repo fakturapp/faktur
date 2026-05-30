@@ -15,6 +15,7 @@ export default class List {
         id: m.team.id,
         name: m.team.name,
         iconUrl: m.team.iconUrl,
+        plan: m.team.plan,
         role: m.role,
         isOwner: m.team.ownerId === user.id,
         isCurrent: m.team.id === user.currentTeamId,
