@@ -24,6 +24,27 @@ export default class Team extends BaseModel {
   declare plan: 'free' | 'pro' | 'team'
 
   @column()
+  declare stripeCustomerId: string | null
+
+  @column()
+  declare stripeSubscriptionId: string | null
+
+  @column()
+  declare subscriptionStatus: string | null
+
+  @column()
+  declare planPeriod: 'monthly' | 'annual' | null
+
+  @column.dateTime()
+  declare subscriptionCurrentPeriodEnd: DateTime | null
+
+  @column.dateTime()
+  declare subscriptionGraceEndsAt: DateTime | null
+
+  @column()
+  declare subscriptionCancelAtPeriodEnd: boolean
+
+  @column()
   declare encryptionMode: 'private' | 'standard'
 
   @column.dateTime()
