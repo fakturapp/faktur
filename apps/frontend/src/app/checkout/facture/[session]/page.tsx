@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { loadStripe, type Stripe } from '@stripe/stripe-js'
+import { loadStripe, type Stripe, type Appearance } from '@stripe/stripe-js'
 import { CheckoutElementsProvider, useCheckout, PaymentElement } from '@stripe/react-stripe-js/checkout'
 import { api } from '@/lib/api'
 import { Spinner } from '@/components/ui/spinner'
@@ -50,6 +50,18 @@ export default function SubscriptionCheckoutPage() {
     init()
   }, [init])
 
+  const appearance: Appearance = {
+    theme:
+      typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+        ? 'night'
+        : 'stripe',
+    variables: {
+      colorPrimary: '#6366f1',
+      borderRadius: '12px',
+      fontFamily: 'inherit',
+    },
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto flex w-full max-w-[560px] flex-col px-6 pb-16 pt-8">
@@ -79,7 +91,10 @@ export default function SubscriptionCheckoutPage() {
             </Button>
           </div>
         ) : stripePromise && data ? (
-          <CheckoutElementsProvider stripe={stripePromise} options={{ clientSecret: data.clientSecret }}>
+          <CheckoutElementsProvider
+            stripe={stripePromise}
+            options={{ clientSecret: data.clientSecret, elementsOptions: { appearance } }}
+          >
             <CheckoutInner plan={data.plan} period={data.period} />
           </CheckoutElementsProvider>
         ) : null}
