@@ -36,6 +36,7 @@ interface TeamListItem {
   id: string
   name: string
   iconUrl: string | null
+  plan: 'free' | 'pro' | 'team'
   role: string
   isOwner: boolean
   isCurrent: boolean
