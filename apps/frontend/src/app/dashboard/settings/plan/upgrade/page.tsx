@@ -37,6 +37,8 @@ function formatDate(iso?: string | null): string {
   }
 }
 
+const RANK: Record<PlanId, number> = { free: 0, pro: 1, team: 2 }
+
 export default function PlanUpgradePage() {
   const router = useRouter()
   const { toast } = useToast()
@@ -77,17 +79,6 @@ export default function PlanUpgradePage() {
       return
     }
     router.push(`/checkout/facture/${data.sessionId}`)
-  }
-
-  async function handlePortal() {
-    setBusy('portal')
-    const { data, error } = await api.post<{ url: string }>('/billing/portal', {})
-    if (error || !data?.url) {
-      setBusy(null)
-      toast(error || 'Impossible d’ouvrir la gestion de l’abonnement', 'error')
-      return
-    }
-    window.location.href = data.url
   }
 
   async function handleCancel() {
@@ -239,10 +230,18 @@ export default function PlanUpgradePage() {
                   <Button
                     variant={plan.recommended ? undefined : 'outline'}
                     className="w-full"
-                    onClick={handlePortal}
-                    disabled={busy === 'portal'}
+                    onClick={() => handleSubscribe(id)}
+                    disabled={busy === id}
                   >
-                    {busy === 'portal' ? <Spinner /> : 'Changer de forfait'}
+                    {busy === id ? (
+                      <>
+                        <Spinner /> Redirection…
+                      </>
+                    ) : RANK[id] < RANK[currentPlanId] ? (
+                      `Rétrograder vers ${plan.name}`
+                    ) : (
+                      `Passer à ${plan.name}`
+                    )}
                   </Button>
                 ) : (
                   <Button
@@ -269,25 +268,35 @@ export default function PlanUpgradePage() {
       </div>
 
       <Dialog open={cancelOpen} onClose={() => busy !== 'cancel' && setCancelOpen(false)}>
-        <DialogHeader showClose={false} icon={<TrendingDown className="h-5 w-5 text-destructive" />}>
-          <DialogTitle>Résilier l’abonnement ?</DialogTitle>
+        <DialogHeader showClose={false} icon={<TrendingDown className="h-5 w-5 text-amber-500" />}>
+          <DialogTitle>Passer au plan Gratuit ?</DialogTitle>
           <DialogDescription>
-            Vous conservez le plan {getPlan(currentPlanId).name} jusqu’au{' '}
-            {formatDate(team?.subscriptionCurrentPeriodEnd) || 'terme de la période'}, puis votre
-            équipe repassera automatiquement au plan Gratuit.
+            Pas d’inquiétude : vous conservez tous les avantages du plan{' '}
+            {getPlan(currentPlanId).name} jusqu’au{' '}
+            {formatDate(team?.subscriptionCurrentPeriodEnd) || 'terme de la période en cours'}.
           </DialogDescription>
         </DialogHeader>
+        <div className="mb-2 rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 text-sm text-muted-foreground">
+          À cette date, votre équipe repassera automatiquement au{' '}
+          <span className="font-medium text-foreground">plan Gratuit</span>. Vous pourrez réactiver à
+          tout moment d’ici là.
+        </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => setCancelOpen(false)} disabled={busy === 'cancel'}>
-            Garder mon abonnement
+          <Button onClick={() => setCancelOpen(false)} disabled={busy === 'cancel'}>
+            Rester sur le plan {getPlan(currentPlanId).name}
           </Button>
-          <Button variant="destructive" onClick={handleCancel} disabled={busy === 'cancel'}>
+          <Button
+            variant="outline"
+            className="border-destructive/30 text-destructive hover:bg-destructive/10"
+            onClick={handleCancel}
+            disabled={busy === 'cancel'}
+          >
             {busy === 'cancel' ? (
               <>
-                <Spinner /> Résiliation…
+                <Spinner /> …
               </>
             ) : (
-              'Confirmer la résiliation'
+              'Confirmer la rétrogradation'
             )}
           </Button>
         </DialogFooter>
