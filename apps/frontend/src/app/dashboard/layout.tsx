@@ -112,6 +112,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   }, [user?.currentTeamId])
 
+  useEffect(() => {
+    if (!user) return
+    function refetchTeams() {
+      if (document.visibilityState !== 'visible') return
+      api.get<{ teams: TeamListItem[] }>('/team/all').then(({ data }) => {
+        if (data?.teams) setTeams(data.teams)
+      })
+    }
+    window.addEventListener('focus', refetchTeams)
+    document.addEventListener('visibilitychange', refetchTeams)
+    return () => {
+      window.removeEventListener('focus', refetchTeams)
+      document.removeEventListener('visibilitychange', refetchTeams)
+    }
+  }, [user?.id])
+
   function handleSwitchTeam(teamId: string) {
     const team = teams.find((t) => t.id === teamId)
     if (team && !team.isCurrent) {
