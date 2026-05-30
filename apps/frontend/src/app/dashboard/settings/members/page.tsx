@@ -42,12 +42,11 @@ import {
   Building2 as BuildingIcon,
   Upload,
   AlertTriangle,
-  Lock,
-  Cloud,
   Code2,
   ExternalLink,
 } from 'lucide-react'
 import { PLATFORM_URL } from '@/lib/external-urls'
+import { getPlan } from '@/lib/plans'
 import { TeamEncryptionMigrationModal } from '@/components/team/team-encryption-migration-modal'
 import { TeamTransferWizard } from '@/components/team/team-transfer-wizard'
 import { TeamLeaveWizard } from '@/components/team/team-leave-wizard'
@@ -75,6 +74,7 @@ interface Team {
   name: string
   iconUrl: string | null
   ownerId: string
+  plan: 'free' | 'pro' | 'team'
   members: TeamMember[]
   recoveryKeyAvailable: boolean
   recoveryKeyUnavailableReason: 'legacy_team' | null
@@ -162,6 +162,9 @@ export default function TeamPage() {
   const currentMember = team?.members.find((m) => m.userId === user?.id)
   const isAdmin = currentMember && ['super_admin', 'admin'].includes(currentMember.role)
   const isSuperAdmin = currentMember?.role === 'super_admin'
+
+  const planMeta = getPlan(team?.plan)
+  const PlanIcon = planMeta.icon
 
   useEffect(() => {
     if (!team || !wizardAction) return
@@ -486,30 +489,24 @@ export default function TeamPage() {
                       <span className="text-amber-400/80"> &middot; {pendingMembers.length} en attente</span>
                     )}
                   </p>
-                  {team?.encryptionMode && (
-                    <p className="mt-1 text-xs text-muted-foreground inline-flex items-center gap-1.5">
-                      <Tooltip
-                        content={
-                          team.encryptionMode === 'private'
-                            ? "Chiffrement de bout en bout — seuls vous et votre clef de secours peuvent déchiffrer les données."
-                            : "Chiffrement géré par les serveurs Faktur — aucun mot de passe supplémentaire, aucun verrouillage du coffre."
-                        }
-                        side="top"
-                      >
-                        <span className="inline-flex items-center gap-1.5 cursor-help">
-                          {team.encryptionMode === 'private' ? (
-                            <Lock className="h-3.5 w-3.5 text-amber-400" />
-                          ) : (
-                            <Cloud className="h-3.5 w-3.5 text-accent" />
-                          )}
-                          <span>
-                            Mode de chiffrement&nbsp;:{' '}
-                            <span className="font-medium text-foreground">
-                              {team.encryptionMode === 'private' ? 'Privé' : 'Standard'}
-                            </span>
-                          </span>
+                  {team && (
+                    <p className="mt-1 inline-flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+                      <span className="inline-flex items-center gap-1.5">
+                        <PlanIcon className={`h-3.5 w-3.5 ${planMeta.accentText}`} />
+                        <span>
+                          Plan&nbsp;:{' '}
+                          <span className="font-medium text-foreground">{planMeta.name}</span>
                         </span>
-                      </Tooltip>
+                      </span>
+                      {' '}
+                      &middot;{' '}
+                      <button
+                        type="button"
+                        onClick={() => router.push('/dashboard/settings/plan')}
+                        className="text-accent underline-offset-2 hover:underline"
+                      >
+                        Voir les plans
+                      </button>
                       {isSuperAdmin && team.encryptionMode === 'private' && (
                         <>
                           {' '}
@@ -518,9 +515,9 @@ export default function TeamPage() {
                             <button
                               type="button"
                               onClick={() => setEncryptionMigrationOpen(true)}
-                              className="underline-offset-2 hover:underline text-accent"
+                              className="text-muted-foreground underline-offset-2 hover:underline hover:text-foreground"
                             >
-                              Passer en Standard
+                              Chiffrement&nbsp;: Privé
                             </button>
                           </Tooltip>
                         </>
