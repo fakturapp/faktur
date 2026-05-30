@@ -10,6 +10,7 @@ import { RecoveryKeySetupModal } from '@/components/modals/recovery-key-setup-mo
 export interface TeamSummary {
   id: string
   name: string
+  plan: 'free' | 'pro' | 'team'
   encryptionMode: 'private' | 'standard'
   encryptionModeConfirmedAt: string | null
   onboardingCompletedAt: string | null
@@ -34,6 +35,7 @@ interface User {
   vaultLocked: boolean
   isAdmin: boolean
   currentTeamEncryptionMode?: 'private' | 'standard' | null
+  currentTeamPlan?: 'free' | 'pro' | 'team' | null
   teams?: TeamSummary[]
 }
 
