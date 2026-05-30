@@ -57,6 +57,7 @@ export default class Create {
       name: payload.name,
       iconUrl: payload.iconUrl ?? null,
       ownerId: user.id,
+      plan: 'free',
       encryptionMode,
       encryptionModeConfirmedAt: DateTime.now(),
       onboardingCompletedAt: payload.skipOnboarding ? DateTime.now() : null,
@@ -94,6 +95,7 @@ export default class Create {
           id: team.id,
           name: team.name,
           iconUrl: team.iconUrl,
+          plan: team.plan,
           encryptionMode: team.encryptionMode,
           onboardingCompletedAt: team.onboardingCompletedAt
             ? team.onboardingCompletedAt.toISO()
@@ -111,6 +113,7 @@ export default class Create {
         id: team.id,
         name: team.name,
         iconUrl: team.iconUrl,
+        plan: team.plan,
         encryptionMode: team.encryptionMode,
         onboardingCompletedAt: team.onboardingCompletedAt
           ? team.onboardingCompletedAt.toISO()
