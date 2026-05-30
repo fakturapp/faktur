@@ -21,7 +21,6 @@ export default class DeleteUser {
     const admin = auth.user!
     const payload = await request.validateUsing(deleteUserValidator)
 
-    // Confirmation 1 — admin re-authenticates with their own password
     const validPassword = await hash.verify(admin.password, payload.password)
     if (!validPassword) {
       return response.unauthorized({ message: 'Mot de passe administrateur incorrect' })
@@ -39,17 +38,13 @@ export default class DeleteUser {
     }
 
     if (isAdminEmail(target.email)) {
-      return response.forbidden({
-        message: 'Impossible de supprimer un autre administrateur.',
-      })
+      return response.forbidden({ message: 'Impossible de supprimer un autre administrateur.' })
     }
 
-    // Confirmation 2 — the typed email must match the target account
     if (payload.confirmEmail.toLowerCase() !== target.email.toLowerCase()) {
       return response.unprocessableEntity({ message: "L'email ne correspond pas" })
     }
 
-    // Cascade-delete every team this user owns (frees other members' FKs first)
     const ownedTeams = await Team.query().where('ownerId', target.id)
     const ownedTeamIds = ownedTeams.map((t) => t.id)
 
@@ -60,7 +55,6 @@ export default class DeleteUser {
       await deleteTeamCascade(team.id)
     }
 
-    // Drop the user's remaining memberships in teams they don't own
     await TeamMember.query().where('userId', target.id).delete()
 
     keyStore.clear(target.id)

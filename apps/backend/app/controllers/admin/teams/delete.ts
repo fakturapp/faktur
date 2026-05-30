@@ -17,7 +17,6 @@ export default class DeleteTeam {
     const admin = auth.user!
     const payload = await request.validateUsing(deleteTeamValidator)
 
-    // Confirmation 1 — admin re-authenticates with their own password
     const valid = await hash.verify(admin.password, payload.password)
     if (!valid) {
       return response.unauthorized({ message: 'Mot de passe administrateur incorrect' })
@@ -28,12 +27,10 @@ export default class DeleteTeam {
       return response.notFound({ message: 'Équipe introuvable' })
     }
 
-    // Confirmation 2 — the typed name must match the team
     if (payload.confirmName !== team.name) {
       return response.unprocessableEntity({ message: "Le nom de l'équipe ne correspond pas" })
     }
 
-    // Free any user pointing here as their current team, then cascade-delete
     await db.from('users').where('current_team_id', team.id).update({ current_team_id: null })
     await deleteTeamCascade(team.id)
 
