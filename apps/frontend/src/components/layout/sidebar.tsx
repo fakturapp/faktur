@@ -11,6 +11,7 @@ import { Dropdown, DropdownItem, DropdownLabel, DropdownSeparator, DropdownSub }
 import { CreateInvoiceModal } from '@/components/invoices/create-invoice-modal'
 import { useTheme } from '@/lib/theme'
 import { APP_VERSION } from '@/lib/version'
+import { getPlan } from '@/lib/plans'
 import {
   isFakturDesktop,
   getFakturDesktopVersion,
@@ -81,6 +82,7 @@ interface TeamListItem {
   id: string
   name: string
   iconUrl: string | null
+  plan: 'free' | 'pro' | 'team'
   role: string
   isOwner: boolean
   isCurrent: boolean
@@ -161,6 +163,7 @@ const settingsNav: NavItem[] = [
     ],
   },
   { href: '/dashboard/settings/members', label: 'Équipe', icon: UsersRound },
+  { href: '/dashboard/settings/plan', label: 'Plan', icon: Sparkles },
   {
     href: '/dashboard/settings/documents/invoices',
     label: 'Facturation',
@@ -446,6 +449,9 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
     ? user.fullName.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
     : user.email.slice(0, 2).toUpperCase()
 
+  const currentPlan = getPlan(currentTeam?.plan)
+  const CurrentPlanIcon = currentPlan.icon
+
   return (
     <aside
       data-tutorial="sidebar"
@@ -608,6 +614,16 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             <nav className={cn('flex-1 overflow-y-auto overflow-x-hidden px-3 py-1 space-y-0.5', collapsed && 'scrollbar-hidden')}>
               <NavLink
                 item={{ href: '/dashboard/admin', label: "Vue d'ensemble", icon: LayoutDashboard }}
+                pathname={pathname}
+                collapsed={collapsed}
+              />
+              <NavLink
+                item={{ href: '/dashboard/admin/users', label: 'Utilisateurs', icon: Users }}
+                pathname={pathname}
+                collapsed={collapsed}
+              />
+              <NavLink
+                item={{ href: '/dashboard/admin/teams', label: 'Équipes', icon: UsersRound }}
                 pathname={pathname}
                 collapsed={collapsed}
               />
@@ -830,6 +846,12 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
                     <p className="text-[14px] font-medium text-foreground truncate leading-tight">
                       {user.fullName || user.email.split('@')[0]}
                     </p>
+                    {currentTeam && (
+                      <p className="mt-0.5 flex items-center gap-1 text-[11px] leading-tight text-muted-foreground truncate">
+                        <CurrentPlanIcon className={`h-3 w-3 shrink-0 ${currentPlan.accentText}`} />
+                        {currentPlan.label}
+                      </p>
+                    )}
                   </motion.div>
 
                   <motion.button
@@ -876,6 +898,28 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
               </div>
             </div>
           </div>
+
+          {currentTeam &&
+            (currentPlan.id === 'team' ? (
+              <div className="mx-1 mb-1 flex items-center gap-2 rounded-lg px-3 py-2">
+                <Crown className="h-4 w-4 shrink-0 text-amber-500" />
+                <span className="text-[13px] font-medium text-foreground">Plan Team</span>
+                <span className="ml-auto text-[11px] text-muted-foreground">Plan maximal</span>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => router.push('/dashboard/settings/plan')}
+                className="mx-1 mb-1 flex w-[calc(100%-0.5rem)] items-center gap-2 rounded-lg px-3 py-2 transition-colors hover:bg-muted/60"
+              >
+                <CurrentPlanIcon className={`h-4 w-4 shrink-0 ${currentPlan.accentText}`} />
+                <span className="text-[13px] font-medium text-foreground">{currentPlan.label}</span>
+                <span className="ml-auto inline-flex items-center gap-1 text-[11px] font-semibold text-primary">
+                  Mettre à niveau <ArrowRight className="h-3 w-3" />
+                </span>
+              </button>
+            ))}
+          {currentTeam && <DropdownSeparator />}
 
           <Link href="/dashboard/account">
             <DropdownItem>
