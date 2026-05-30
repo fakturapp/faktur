@@ -47,6 +47,20 @@ class BillingService {
     return customer.id
   }
 
+  productRef(plan: BillingPlan, period: BillingPeriod): string | undefined {
+    const refs: Record<BillingPlan, Record<BillingPeriod, string | undefined>> = {
+      pro: {
+        monthly: env.get('STRIPE_PRODUCT_PRO_MONTHLY'),
+        annual: env.get('STRIPE_PRODUCT_PRO_YEARLY'),
+      },
+      team: {
+        monthly: env.get('STRIPE_PRODUCT_TEAM_MONTHLY'),
+        annual: env.get('STRIPE_PRODUCT_TEAM_YEARLY'),
+      },
+    }
+    return refs[plan][period] || undefined
+  }
+
   async createCheckoutSession(params: {
     team: Team
     customerId: string
@@ -55,25 +69,30 @@ class BillingService {
     returnUrl: string
   }): Promise<Stripe.Checkout.Session> {
     const { unitAmount, interval } = this.priceFor(params.plan, params.period)
+    const ref = this.productRef(params.plan, params.period)
+    const metadata = { team_id: params.team.id, plan: params.plan, period: params.period }
+
+    let lineItem: Record<string, any>
+    if (ref && ref.startsWith('price_')) {
+      lineItem = { price: ref, quantity: 1 }
+    } else {
+      const priceData: Record<string, any> = {
+        currency: 'eur',
+        unit_amount: unitAmount,
+        recurring: { interval },
+      }
+      if (ref) priceData.product = ref
+      else priceData.product_data = { name: PRODUCT_NAMES[params.plan] }
+      lineItem = { quantity: 1, price_data: priceData }
+    }
+
     return this.client().checkout.sessions.create({
       mode: 'subscription',
       ui_mode: 'embedded_page',
       customer: params.customerId,
-      line_items: [
-        {
-          quantity: 1,
-          price_data: {
-            currency: 'eur',
-            product_data: { name: PRODUCT_NAMES[params.plan] },
-            unit_amount: unitAmount,
-            recurring: { interval },
-          },
-        },
-      ],
-      subscription_data: {
-        metadata: { team_id: params.team.id, plan: params.plan, period: params.period },
-      },
-      metadata: { team_id: params.team.id, plan: params.plan, period: params.period },
+      line_items: [lineItem] as any,
+      subscription_data: { metadata },
+      metadata,
       return_url: params.returnUrl,
     })
   }
