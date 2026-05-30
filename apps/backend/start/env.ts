@@ -67,6 +67,10 @@ export default await Env.create(new URL('../', import.meta.url), {
 
   CHECKOUT_URL: Env.schema.string.optional(),
 
+  STRIPE_SECRET_KEY: Env.schema.string.optional(),
+  STRIPE_PUBLISHABLE_KEY: Env.schema.string.optional(),
+  STRIPE_BILLING_WEBHOOK_SECRET: Env.schema.string.optional(),
+
   R2_ACCOUNT_ID: Env.schema.string.optional(),
   R2_ACCESS_KEY_ID: Env.schema.string.optional(),
   R2_SECRET_ACCESS_KEY: Env.schema.string.optional(),
