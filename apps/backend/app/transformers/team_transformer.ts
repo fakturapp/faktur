@@ -7,6 +7,15 @@ export default class TeamTransformer extends BaseTransformer<Team> {
     return {
       ...this.pick(this.resource, ['id', 'name', 'iconUrl', 'ownerId', 'createdAt']),
       plan: this.resource.plan,
+      subscriptionStatus: this.resource.subscriptionStatus,
+      planPeriod: this.resource.planPeriod,
+      subscriptionCurrentPeriodEnd: this.resource.subscriptionCurrentPeriodEnd
+        ? this.resource.subscriptionCurrentPeriodEnd.toISO()
+        : null,
+      subscriptionGraceEndsAt: this.resource.subscriptionGraceEndsAt
+        ? this.resource.subscriptionGraceEndsAt.toISO()
+        : null,
+      subscriptionCancelAtPeriodEnd: this.resource.subscriptionCancelAtPeriodEnd,
       encryptionMode: this.resource.encryptionMode,
       encryptionModeConfirmedAt: this.resource.encryptionModeConfirmedAt
         ? this.resource.encryptionModeConfirmedAt.toISO()

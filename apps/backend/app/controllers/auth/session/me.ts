@@ -56,6 +56,15 @@ export default class Me {
       id: t.id,
       name: t.name,
       plan: t.plan,
+      subscriptionStatus: t.subscriptionStatus,
+      planPeriod: t.planPeriod,
+      subscriptionCurrentPeriodEnd: t.subscriptionCurrentPeriodEnd
+        ? t.subscriptionCurrentPeriodEnd.toISO()
+        : null,
+      subscriptionGraceEndsAt: t.subscriptionGraceEndsAt
+        ? t.subscriptionGraceEndsAt.toISO()
+        : null,
+      subscriptionCancelAtPeriodEnd: t.subscriptionCancelAtPeriodEnd,
       encryptionMode: t.encryptionMode,
       encryptionModeConfirmedAt: t.encryptionModeConfirmedAt
         ? t.encryptionModeConfirmedAt.toISO()
