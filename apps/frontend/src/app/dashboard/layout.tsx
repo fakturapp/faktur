@@ -129,6 +129,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   }, [user?.id])
 
+  useEffect(() => {
+    if (!user) return
+    const id = setInterval(() => {
+      if (document.visibilityState === 'visible') refreshUser()
+    }, 30000)
+    return () => clearInterval(id)
+  }, [user?.id, refreshUser])
+
   function handleSwitchTeam(teamId: string) {
     const team = teams.find((t) => t.id === teamId)
     if (team && !team.isCurrent) {
