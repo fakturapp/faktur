@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils'
 import { useToast } from '@/components/ui/toast'
 import { Spinner } from '@/components/ui/spinner'
 import { Button } from '@/components/ui/button'
+import { Tooltip } from '@/components/ui/tooltip'
 import { getPlan, type PlanId } from '@/lib/plans'
 import {
   Check,
@@ -31,6 +32,7 @@ interface TeamData {
   subscriptionCurrentPeriodEnd?: string | null
   subscriptionGraceEndsAt?: string | null
   subscriptionCancelAtPeriodEnd?: boolean
+  subscriptionCancelExternal?: boolean
   subscriptionStartedAt?: string | null
   hasStripeSubscription?: boolean
 }
@@ -271,17 +273,38 @@ export default function PlanPage() {
                     )}
                   </Button>
                   {team?.subscriptionCancelAtPeriodEnd ? (
-                    <Button variant="outline" className="w-full" onClick={handleResume} disabled={busy === 'resume'}>
-                      {busy === 'resume' ? (
-                        <>
-                          <Spinner /> …
-                        </>
-                      ) : (
-                        <>
-                          <RotateCcw className="mr-1.5 h-4 w-4" /> Réactiver
-                        </>
-                      )}
-                    </Button>
+                    team?.subscriptionCancelExternal ? (
+                      <Tooltip content="Cette annulation a été effectuée depuis Stripe. Pour réactiver, passez par le portail Stripe.">
+                        <Button
+                          variant="outline"
+                          className="w-full"
+                          onClick={openPortal}
+                          disabled={busy === 'portal'}
+                        >
+                          {busy === 'portal' ? (
+                            <>
+                              <Spinner /> …
+                            </>
+                          ) : (
+                            <>
+                              <RotateCcw className="mr-1.5 h-4 w-4" /> Réactiver via Stripe
+                            </>
+                          )}
+                        </Button>
+                      </Tooltip>
+                    ) : (
+                      <Button variant="outline" className="w-full" onClick={handleResume} disabled={busy === 'resume'}>
+                        {busy === 'resume' ? (
+                          <>
+                            <Spinner /> …
+                          </>
+                        ) : (
+                          <>
+                            <RotateCcw className="mr-1.5 h-4 w-4" /> Réactiver
+                          </>
+                        )}
+                      </Button>
+                    )
                   ) : (
                     <Button
                       variant="outline"
