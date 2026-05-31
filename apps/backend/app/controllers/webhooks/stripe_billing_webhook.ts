@@ -82,7 +82,8 @@ export default class StripeBillingWebhook {
   }
 
   private periodEnd(sub: any): DateTime | null {
-    const ts = sub?.current_period_end ?? sub?.items?.data?.[0]?.current_period_end
+    const ts =
+      sub?.cancel_at ?? sub?.current_period_end ?? sub?.items?.data?.[0]?.current_period_end
     return ts ? DateTime.fromSeconds(Number(ts)) : null
   }
 
@@ -122,7 +123,7 @@ export default class StripeBillingWebhook {
     }
     team.stripeSubscriptionId = sub.id
     team.subscriptionStatus = sub.status ?? null
-    team.subscriptionCancelAtPeriodEnd = !!sub.cancel_at_period_end
+    team.subscriptionCancelAtPeriodEnd = !!sub.cancel_at_period_end || !!sub.cancel_at
     team.subscriptionCurrentPeriodEnd = this.periodEnd(sub)
     const plan = this.planFromMeta(sub.metadata)
     if (sub.status === 'active' || sub.status === 'trialing') {

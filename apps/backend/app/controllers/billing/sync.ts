@@ -64,8 +64,9 @@ export default class Sync {
 
     team.stripeSubscriptionId = active.id
     team.subscriptionStatus = active.status
-    team.subscriptionCancelAtPeriodEnd = !!active.cancel_at_period_end
-    const periodEnd = active.current_period_end ?? active.items?.data?.[0]?.current_period_end
+    team.subscriptionCancelAtPeriodEnd = !!active.cancel_at_period_end || !!active.cancel_at
+    const periodEnd =
+      active.cancel_at ?? active.current_period_end ?? active.items?.data?.[0]?.current_period_end
     team.subscriptionCurrentPeriodEnd = periodEnd ? DateTime.fromSeconds(Number(periodEnd)) : null
 
     const plan = active.metadata?.plan

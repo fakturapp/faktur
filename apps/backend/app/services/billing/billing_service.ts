@@ -112,7 +112,13 @@ class BillingService {
   }
 
   async setCancelAtPeriodEnd(subscriptionId: string, cancel: boolean): Promise<Stripe.Subscription> {
-    return this.client().subscriptions.update(subscriptionId, { cancel_at_period_end: cancel })
+    if (cancel) {
+      return this.client().subscriptions.update(subscriptionId, { cancel_at_period_end: true })
+    }
+    return this.client().subscriptions.update(subscriptionId, {
+      cancel_at_period_end: false,
+      cancel_at: '',
+    } as any)
   }
 
   async listSubscriptions(customerId: string): Promise<Stripe.Subscription[]> {
