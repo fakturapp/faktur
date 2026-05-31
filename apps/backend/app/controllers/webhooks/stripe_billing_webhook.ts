@@ -110,6 +110,8 @@ export default class StripeBillingWebhook {
     }
     team.subscriptionStatus = 'active'
     team.subscriptionGraceEndsAt = null
+    team.subscriptionCancelAtPeriodEnd = false
+    team.subscriptionCancelExternal = false
     if (!team.subscriptionStartedAt) team.subscriptionStartedAt = DateTime.now()
     await team.save()
   }
@@ -124,6 +126,7 @@ export default class StripeBillingWebhook {
     team.stripeSubscriptionId = sub.id
     team.subscriptionStatus = sub.status ?? null
     team.subscriptionCancelAtPeriodEnd = !!sub.cancel_at_period_end || !!sub.cancel_at
+    team.subscriptionCancelExternal = !!sub.cancel_at && !sub.cancel_at_period_end
     team.subscriptionCurrentPeriodEnd = this.periodEnd(sub)
     const plan = this.planFromMeta(sub.metadata)
     if (sub.status === 'active' || sub.status === 'trialing') {
@@ -139,6 +142,8 @@ export default class StripeBillingWebhook {
       team.stripeSubscriptionId = null
       team.subscriptionGraceEndsAt = null
       team.subscriptionStartedAt = null
+      team.subscriptionCancelAtPeriodEnd = false
+      team.subscriptionCancelExternal = false
     } else if (sub.status === 'past_due' || sub.status === 'unpaid') {
       if (!team.subscriptionGraceEndsAt) {
         team.subscriptionGraceEndsAt = DateTime.now().plus({ days: 7 })
@@ -156,6 +161,7 @@ export default class StripeBillingWebhook {
     team.stripeSubscriptionId = null
     team.subscriptionGraceEndsAt = null
     team.subscriptionCancelAtPeriodEnd = false
+    team.subscriptionCancelExternal = false
     team.subscriptionStartedAt = null
     await team.save()
   }

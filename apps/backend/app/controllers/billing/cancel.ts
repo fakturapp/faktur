@@ -41,6 +41,7 @@ export default class Cancel {
     try {
       await billingService.setCancelAtPeriodEnd(team.stripeSubscriptionId, !resume)
       team.subscriptionCancelAtPeriodEnd = !resume
+      team.subscriptionCancelExternal = false
       await team.save()
       return response.ok({
         message: resume ? 'Abonnement réactivé' : 'Abonnement programmé pour annulation',
