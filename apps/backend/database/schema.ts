@@ -1997,7 +1997,7 @@ export class TeamMemberSchema extends BaseModel {
 }
 
 export class TeamSchema extends BaseModel {
-  static $columns = ['b2BAccountId', 'createdAt', 'encryptionMode', 'encryptionModeConfirmedAt', 'iconUrl', 'id', 'name', 'onboardingCompletedAt', 'ownerId', 'plan', 'planPeriod', 'stripeCustomerId', 'stripeSubscriptionId', 'subscriptionCancelAtPeriodEnd', 'subscriptionCurrentPeriodEnd', 'subscriptionGraceEndsAt', 'subscriptionStartedAt', 'subscriptionStatus', 'updatedAt'] as const
+  static $columns = ['b2BAccountId', 'createdAt', 'encryptionMode', 'encryptionModeConfirmedAt', 'iconUrl', 'id', 'name', 'onboardingCompletedAt', 'ownerId', 'plan', 'planPeriod', 'stripeCustomerId', 'stripeSubscriptionId', 'subscriptionCancelAtPeriodEnd', 'subscriptionCancelExternal', 'subscriptionCurrentPeriodEnd', 'subscriptionGraceEndsAt', 'subscriptionStartedAt', 'subscriptionStatus', 'updatedAt'] as const
   $columns = TeamSchema.$columns
   @column()
   declare b2BAccountId: string | null
@@ -2027,6 +2027,8 @@ export class TeamSchema extends BaseModel {
   declare stripeSubscriptionId: string | null
   @column()
   declare subscriptionCancelAtPeriodEnd: boolean
+  @column()
+  declare subscriptionCancelExternal: boolean
   @column.dateTime()
   declare subscriptionCurrentPeriodEnd: DateTime | null
   @column.dateTime()
