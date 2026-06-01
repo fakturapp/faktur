@@ -190,6 +190,11 @@ class BillingService {
     } as any)
   }
 
+  async listInvoices(customerId: string): Promise<Stripe.Invoice[]> {
+    const res = await this.client().invoices.list({ customer: customerId, limit: 24 })
+    return res.data
+  }
+
   async listSubscriptions(customerId: string): Promise<Stripe.Subscription[]> {
     const res = await this.client().subscriptions.list({
       customer: customerId,
