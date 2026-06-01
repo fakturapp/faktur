@@ -1,0 +1,19 @@
+import { cn } from '@/lib/utils'
+
+export function StripeLogo({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 32 32"
+      fill="#635bff"
+      className={cn('h-5 w-5', className)}
+      role="img"
+      aria-label="Stripe"
+    >
+      <path
+        fillRule="evenodd"
+        d="M13.88 9.515c0-1.37 1.14-1.9 2.982-1.9A19.661 19.661 0 0 1 25.6 9.876v-8.27A23.184 23.184 0 0 0 16.862.001C9.762.001 5 3.72 5 9.93c0 9.716 13.342 8.138 13.342 12.326c0 1.638-1.4 2.146-3.37 2.146c-2.905 0-6.657-1.202-9.6-2.802v8.378A24.353 24.353 0 0 0 14.973 32C22.27 32 27.3 28.395 27.3 22.077c0-10.486-13.42-8.613-13.42-12.56z"
+      />
+    </svg>
+  )
+}
