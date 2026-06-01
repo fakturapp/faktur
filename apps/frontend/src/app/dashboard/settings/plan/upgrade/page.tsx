@@ -46,6 +46,7 @@ export default function PlanUpgradePage() {
   const [busy, setBusy] = useState<string | null>(null)
   const [cancelOpen, setCancelOpen] = useState(false)
   const [downgradeTarget, setDowngradeTarget] = useState<PlanId | null>(null)
+  const [cancelScheduledOpen, setCancelScheduledOpen] = useState(false)
 
   const load = useCallback(async () => {
     const { data } = await api.get<{ team: TeamData }>('/team')
@@ -64,6 +65,7 @@ export default function PlanUpgradePage() {
   const status = team?.subscriptionStatus ?? null
   const isSubscribed =
     currentPlanId !== 'free' && (status === 'active' || status === 'trialing' || status === 'past_due')
+  const pendingPlanId: PlanId | null = team?.pendingPlan ?? null
 
   async function handleSubscribe(planId: PlanId) {
     setBusy(planId)
@@ -90,6 +92,19 @@ export default function PlanUpgradePage() {
     }
     toast(`Vous passerez au forfait ${getPlan(planId).name} à la fin de votre période`, 'success')
     router.push('/dashboard/settings/plan')
+  }
+
+  async function handleCancelScheduled() {
+    setBusy('cancel-scheduled')
+    const { error } = await api.post('/billing/schedule-change', { cancel: true })
+    setBusy(null)
+    setCancelScheduledOpen(false)
+    if (error) {
+      toast(error, 'error')
+      return
+    }
+    toast('Rétrogradation annulée', 'success')
+    load()
   }
 
   async function handleCancel() {
@@ -252,7 +267,22 @@ export default function PlanUpgradePage() {
               </ul>
 
               <div className="mt-6">
-                {isCurrent ? (
+                {pendingPlanId && id === pendingPlanId ? (
+                  <div className="space-y-1.5 text-center">
+                    <p className="text-sm font-semibold text-foreground">Rétrogradation programmée</p>
+                    <p className="text-xs text-muted-foreground">
+                      Effective le{' '}
+                      {formatDate(team?.subscriptionCurrentPeriodEnd) || 'terme de la période'}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setCancelScheduledOpen(true)}
+                      className="text-sm font-semibold text-primary transition-opacity hover:opacity-70"
+                    >
+                      Annuler la rétrogradation
+                    </button>
+                  </div>
+                ) : isCurrent ? (
                   <Button variant="outline" className="w-full" disabled>
                     Forfait actuel
                   </Button>
@@ -359,6 +389,45 @@ export default function PlanUpgradePage() {
               {busy === downgradeTarget ? (
                 <>
                   <Spinner /> Programmation…
+                </>
+              ) : (
+                'Confirmer'
+              )}
+            </Button>
+          </div>
+        </div>
+      </Dialog>
+
+      <Dialog
+        open={cancelScheduledOpen}
+        onClose={() => busy !== 'cancel-scheduled' && setCancelScheduledOpen(false)}
+      >
+        <div className="flex flex-col items-center px-2 pb-1 pt-1 text-center">
+          <div className="mb-4 h-14 w-14 text-primary">
+            <PlanRings tier={currentPlanId} />
+          </div>
+          <DialogTitle className="text-lg font-bold">Annuler la rétrogradation ?</DialogTitle>
+          <DialogDescription className="mt-1.5 max-w-xs">
+            Le changement programmé{pendingPlanId ? ` vers ${getPlan(pendingPlanId).name}` : ''} sera
+            annulé. Vous restez sur votre forfait {getPlan(currentPlanId).name}.
+          </DialogDescription>
+          <div className="mt-6 flex w-full gap-2">
+            <Button
+              className="flex-1"
+              onClick={() => setCancelScheduledOpen(false)}
+              disabled={busy === 'cancel-scheduled'}
+            >
+              Garder
+            </Button>
+            <Button
+              variant="ghost"
+              className="flex-1 text-destructive hover:bg-destructive/10"
+              onClick={handleCancelScheduled}
+              disabled={busy === 'cancel-scheduled'}
+            >
+              {busy === 'cancel-scheduled' ? (
+                <>
+                  <Spinner /> Annulation…
                 </>
               ) : (
                 'Confirmer'
