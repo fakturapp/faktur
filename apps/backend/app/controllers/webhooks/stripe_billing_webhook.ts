@@ -134,6 +134,25 @@ export default class StripeBillingWebhook {
     }
     applyStripeSubscription(team, sub, schedule)
     await team.save()
+    if (sub.status === 'past_due' || sub.status === 'unpaid') {
+      await this.notifyPaymentFailedOnce(team)
+    }
+  }
+
+  private async notifyPaymentFailedOnce(team: Team) {
+    if (team.subscriptionDunningNotifiedAt) return
+    try {
+      const owner = await User.find(team.ownerId)
+      if (!owner?.email) return
+      const graceDate = team.subscriptionGraceEndsAt
+        ? team.subscriptionGraceEndsAt.setLocale('fr').toLocaleString(DateTime.DATE_FULL)
+        : ''
+      await mail.send(
+        new PaymentFailedNotification(owner.email, team.name, graceDate, owner.fullName ?? undefined)
+      )
+      team.subscriptionDunningNotifiedAt = DateTime.now()
+      await team.save()
+    } catch {}
   }
 
   private async onSubscriptionDeleted(sub: any) {
@@ -147,6 +166,7 @@ export default class StripeBillingWebhook {
     team.subscriptionCancelAtPeriodEnd = false
     team.subscriptionCancelExternal = false
     team.subscriptionStartedAt = null
+    team.subscriptionDunningNotifiedAt = null
     team.pendingPlan = null
     team.pendingPlanPeriod = null
     await team.save()
@@ -155,31 +175,12 @@ export default class StripeBillingWebhook {
   private async onInvoiceFailed(invoice: any) {
     const team = await this.findTeam(invoice.metadata?.team_id, invoice.customer, this.invoiceSubId(invoice))
     if (!team) return
-    const wasGraceNull = !team.subscriptionGraceEndsAt
     team.subscriptionStatus = 'past_due'
-    if (wasGraceNull) {
+    if (!team.subscriptionGraceEndsAt) {
       team.subscriptionGraceEndsAt = DateTime.now().plus({ days: 7 })
     }
     await team.save()
-
-    if (wasGraceNull && team.subscriptionGraceEndsAt) {
-      try {
-        const owner = await User.find(team.ownerId)
-        if (owner?.email) {
-          const graceDate = team.subscriptionGraceEndsAt
-            .setLocale('fr')
-            .toLocaleString(DateTime.DATE_FULL)
-          await mail.send(
-            new PaymentFailedNotification(
-              owner.email,
-              team.name,
-              graceDate,
-              owner.fullName ?? undefined
-            )
-          )
-        }
-      } catch {}
-    }
+    await this.notifyPaymentFailedOnce(team)
   }
 
   private async onInvoicePaid(invoice: any) {
@@ -189,6 +190,7 @@ export default class StripeBillingWebhook {
       team.subscriptionStatus = 'active'
     }
     team.subscriptionGraceEndsAt = null
+    team.subscriptionDunningNotifiedAt = null
     await team.save()
   }
 }

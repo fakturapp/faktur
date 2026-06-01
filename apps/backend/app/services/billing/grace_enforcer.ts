@@ -26,6 +26,7 @@ export async function enforceExpiredGrace(): Promise<number> {
     team.subscriptionCancelAtPeriodEnd = false
     team.subscriptionCancelExternal = false
     team.subscriptionStartedAt = null
+    team.subscriptionDunningNotifiedAt = null
     team.pendingPlan = null
     team.pendingPlanPeriod = null
     await team.save()

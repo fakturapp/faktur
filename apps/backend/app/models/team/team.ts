@@ -47,6 +47,9 @@ export default class Team extends BaseModel {
   @column.dateTime()
   declare subscriptionGraceEndsAt: DateTime | null
 
+  @column.dateTime()
+  declare subscriptionDunningNotifiedAt: DateTime | null
+
   @column()
   declare subscriptionCancelAtPeriodEnd: boolean
 

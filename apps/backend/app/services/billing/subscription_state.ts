@@ -50,6 +50,7 @@ export function applyStripeSubscription(team: Team, sub: any, schedule?: any): v
 
   if (status === 'active' || status === 'trialing') {
     team.subscriptionGraceEndsAt = null
+    team.subscriptionDunningNotifiedAt = null
   } else if (status === 'past_due' || status === 'unpaid') {
     if (!team.subscriptionGraceEndsAt) {
       team.subscriptionGraceEndsAt = DateTime.now().plus({ days: 7 })
@@ -62,6 +63,7 @@ export function applyStripeSubscription(team: Team, sub: any, schedule?: any): v
     team.subscriptionCancelAtPeriodEnd = false
     team.subscriptionCancelExternal = false
     team.subscriptionPaused = false
+    team.subscriptionDunningNotifiedAt = null
     team.pendingPlan = null
     team.pendingPlanPeriod = null
   }
