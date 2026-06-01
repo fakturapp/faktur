@@ -29,6 +29,8 @@ interface TeamData {
   plan: PlanId
   subscriptionStatus?: string | null
   planPeriod?: 'monthly' | 'annual' | null
+  pendingPlan?: PlanId | null
+  pendingPlanPeriod?: 'monthly' | 'annual' | null
   subscriptionCurrentPeriodEnd?: string | null
   subscriptionGraceEndsAt?: string | null
   subscriptionCancelAtPeriodEnd?: boolean
@@ -96,6 +98,9 @@ export default function PlanPage() {
   const isAdminGranted = isPaid && !hasStripe
   const meta = getPlan(currentPlanId)
   const Icon = meta.icon
+  const pendingPlanId: PlanId | null =
+    team?.pendingPlan && team.pendingPlan !== currentPlanId ? team.pendingPlan : null
+  const pendingMeta = pendingPlanId ? getPlan(pendingPlanId) : null
 
   const openPortal = useCallback(async () => {
     setBusy('portal')
@@ -123,6 +128,19 @@ export default function PlanPage() {
       return
     }
     toast('Abonnement réactivé', 'success')
+    load()
+  }
+
+  async function handleCancelScheduled() {
+    setBusy('cancel-scheduled')
+    const { error } = await api.post('/billing/schedule-change', { cancel: true })
+    setBusy(null)
+    if (error) {
+      toast(error, 'error')
+      return
+    }
+    toast('Changement de forfait annulé', 'success')
+    refreshUser()
     load()
   }
 
@@ -245,13 +263,25 @@ export default function PlanPage() {
                 )}
                 <div>
                   <p className="text-xs text-muted-foreground">
-                    {team?.subscriptionCancelAtPeriodEnd ? 'Expire le' : 'Se renouvelle le'}
+                    {pendingMeta
+                      ? `Vous passerez à ${pendingMeta.name} le`
+                      : team?.subscriptionCancelAtPeriodEnd
+                        ? 'Expire le'
+                        : 'Se renouvelle le'}
                   </p>
                   <p className="inline-flex items-center gap-1.5 font-medium text-foreground">
                     <CalendarClock className="h-4 w-4 text-muted-foreground" />
                     {formatDate(team?.subscriptionCurrentPeriodEnd) || '—'}
                   </p>
                 </div>
+
+                {pendingMeta && (
+                  <div className="flex items-start gap-2 rounded-lg border border-border bg-muted/30 p-2.5 text-xs text-muted-foreground">
+                    <CalendarClock className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                    Vous gardez tous les avantages du forfait {meta.name} jusqu’à cette date, puis
+                    vous passerez automatiquement au forfait {pendingMeta.name}.
+                  </div>
+                )}
 
                 {status === 'past_due' && (
                   <div className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-2.5 text-xs text-amber-700 dark:text-amber-300">
@@ -272,7 +302,24 @@ export default function PlanPage() {
                       </>
                     )}
                   </Button>
-                  {team?.subscriptionCancelAtPeriodEnd ? (
+                  {pendingMeta ? (
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={handleCancelScheduled}
+                      disabled={busy === 'cancel-scheduled'}
+                    >
+                      {busy === 'cancel-scheduled' ? (
+                        <>
+                          <Spinner /> …
+                        </>
+                      ) : (
+                        <>
+                          <RotateCcw className="mr-1.5 h-4 w-4" /> Annuler le changement
+                        </>
+                      )}
+                    </Button>
+                  ) : team?.subscriptionCancelAtPeriodEnd ? (
                     team?.subscriptionCancelExternal ? (
                       <Tooltip content="Cette annulation a été effectuée depuis Stripe. Pour réactiver, passez par le portail Stripe.">
                         <Button
