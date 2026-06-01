@@ -112,6 +112,8 @@ export default class StripeBillingWebhook {
     team.subscriptionGraceEndsAt = null
     team.subscriptionCancelAtPeriodEnd = false
     team.subscriptionCancelExternal = false
+    team.pendingPlan = null
+    team.pendingPlanPeriod = null
     if (!team.subscriptionStartedAt) team.subscriptionStartedAt = DateTime.now()
     await team.save()
   }
@@ -131,6 +133,14 @@ export default class StripeBillingWebhook {
     const plan = this.planFromMeta(sub.metadata)
     if (sub.status === 'active' || sub.status === 'trialing') {
       if (plan) team.plan = plan
+      if (team.pendingPlan && team.plan === team.pendingPlan) {
+        team.pendingPlan = null
+        team.pendingPlanPeriod = null
+      }
+      if (!sub.schedule) {
+        team.pendingPlan = null
+        team.pendingPlanPeriod = null
+      }
       team.subscriptionGraceEndsAt = null
       if (!team.subscriptionStartedAt) {
         team.subscriptionStartedAt = sub.start_date
@@ -163,6 +173,8 @@ export default class StripeBillingWebhook {
     team.subscriptionCancelAtPeriodEnd = false
     team.subscriptionCancelExternal = false
     team.subscriptionStartedAt = null
+    team.pendingPlan = null
+    team.pendingPlanPeriod = null
     await team.save()
   }
 

@@ -76,6 +76,18 @@ export default class Sync {
     const period = active.metadata?.period
     if (period === 'monthly' || period === 'annual') team.planPeriod = period
 
+    if (!active.schedule) {
+      team.pendingPlan = null
+      team.pendingPlanPeriod = null
+    } else {
+      try {
+        const schedule = await billingService.retrieveSchedule(String(active.schedule))
+        const pending = billingService.detectPendingChange({ schedule })
+        team.pendingPlan = pending?.plan ?? null
+        team.pendingPlanPeriod = pending?.period ?? null
+      } catch {}
+    }
+
     if (!team.subscriptionStartedAt) {
       team.subscriptionStartedAt = active.start_date
         ? DateTime.fromSeconds(Number(active.start_date))
