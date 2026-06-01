@@ -60,6 +60,10 @@ export default defineConfig({
       file: () => import('#providers/api_v2_webhook_provider'),
       environment: ['web'],
     },
+    {
+      file: () => import('#providers/billing_grace_provider'),
+      environment: ['web'],
+    },
   ],
 
   /*
