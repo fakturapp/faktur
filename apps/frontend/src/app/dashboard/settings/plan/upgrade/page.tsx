@@ -24,6 +24,7 @@ interface TeamData {
   plan: PlanId
   subscriptionStatus?: string | null
   planPeriod?: 'monthly' | 'annual' | null
+  pendingPlan?: PlanId | null
   subscriptionCurrentPeriodEnd?: string | null
   subscriptionCancelAtPeriodEnd?: boolean
 }
@@ -48,6 +49,7 @@ export default function PlanUpgradePage() {
   const [period, setPeriod] = useState<'monthly' | 'annual'>('annual')
   const [busy, setBusy] = useState<string | null>(null)
   const [cancelOpen, setCancelOpen] = useState(false)
+  const [downgradeTarget, setDowngradeTarget] = useState<PlanId | null>(null)
 
   const load = useCallback(async () => {
     const { data } = await api.get<{ team: TeamData }>('/team')
@@ -79,6 +81,19 @@ export default function PlanUpgradePage() {
       return
     }
     router.push(`/checkout/facture/${data.sessionId}`)
+  }
+
+  async function handleScheduleDowngrade(planId: PlanId) {
+    setBusy(planId)
+    const { error } = await api.post('/billing/schedule-change', { plan: planId, period })
+    setBusy(null)
+    setDowngradeTarget(null)
+    if (error) {
+      toast(error, 'error')
+      return
+    }
+    toast(`Vous passerez au forfait ${getPlan(planId).name} à la fin de votre période`, 'success')
+    router.push('/dashboard/settings/plan')
   }
 
   async function handleCancel() {
@@ -226,6 +241,23 @@ export default function PlanUpgradePage() {
                   >
                     <TrendingDown className="mr-1.5 h-4 w-4" /> Rétrograder
                   </Button>
+                ) : isSubscribed && RANK[id] < RANK[currentPlanId] ? (
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => setDowngradeTarget(id)}
+                    disabled={busy === id}
+                  >
+                    {busy === id ? (
+                      <>
+                        <Spinner /> …
+                      </>
+                    ) : (
+                      <>
+                        <TrendingDown className="mr-1.5 h-4 w-4" /> Rétrograder vers {plan.name}
+                      </>
+                    )}
+                  </Button>
                 ) : isSubscribed ? (
                   <Button
                     variant={plan.recommended ? undefined : 'outline'}
@@ -237,8 +269,6 @@ export default function PlanUpgradePage() {
                       <>
                         <Spinner /> Redirection…
                       </>
-                    ) : RANK[id] < RANK[currentPlanId] ? (
-                      `Rétrograder vers ${plan.name}`
                     ) : (
                       `Passer à ${plan.name}`
                     )}
@@ -266,6 +296,48 @@ export default function PlanUpgradePage() {
           )
         })}
       </div>
+
+      <Dialog
+        open={downgradeTarget !== null}
+        onClose={() => busy !== downgradeTarget && setDowngradeTarget(null)}
+      >
+        <DialogHeader showClose={false} icon={<TrendingDown className="h-5 w-5 text-amber-500" />}>
+          <DialogTitle>
+            Passer au forfait {downgradeTarget ? getPlan(downgradeTarget).name : ''} ?
+          </DialogTitle>
+          <DialogDescription>
+            Vous conservez tous les avantages du forfait {getPlan(currentPlanId).name} jusqu’au{' '}
+            {formatDate(team?.subscriptionCurrentPeriodEnd) || 'terme de la période en cours'}.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="mb-2 rounded-xl border border-border bg-muted/30 p-3 text-sm text-muted-foreground">
+          À cette date, vous passerez automatiquement au forfait{' '}
+          <span className="font-medium text-foreground">
+            {downgradeTarget ? getPlan(downgradeTarget).name : ''}
+          </span>
+          . Comme vous avez déjà payé, rien ne vous sera prélevé maintenant. Vous pourrez annuler ce
+          changement à tout moment d’ici là.
+        </div>
+        <DialogFooter>
+          <Button onClick={() => setDowngradeTarget(null)} disabled={busy === downgradeTarget}>
+            Rester sur le forfait {getPlan(currentPlanId).name}
+          </Button>
+          <Button
+            variant="outline"
+            className="border-amber-500/30 text-amber-600 hover:bg-amber-500/10 dark:text-amber-400"
+            onClick={() => downgradeTarget && handleScheduleDowngrade(downgradeTarget)}
+            disabled={busy === downgradeTarget}
+          >
+            {busy === downgradeTarget ? (
+              <>
+                <Spinner /> …
+              </>
+            ) : (
+              'Confirmer le changement'
+            )}
+          </Button>
+        </DialogFooter>
+      </Dialog>
 
       <Dialog open={cancelOpen} onClose={() => busy !== 'cancel' && setCancelOpen(false)}>
         <DialogHeader showClose={false} icon={<TrendingDown className="h-5 w-5 text-amber-500" />}>
