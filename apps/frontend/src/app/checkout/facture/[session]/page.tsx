@@ -26,6 +26,10 @@ function formatCents(cents: number): string {
   })} €`
 }
 
+const CHECKOUT_FONT_FAMILY =
+  "'SN Pro', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+const CHECKOUT_FONT_CSS = 'https://cdn.jsdelivr.net/npm/@fontsource/sn-pro@5.2.6/index.css'
+
 function buildAppearance(): Appearance {
   const dark =
     typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
@@ -42,7 +46,7 @@ function buildAppearance(): Appearance {
       borderRadius: '10px',
       fontSizeBase: '14px',
       spacingUnit: '4px',
-      fontFamily: 'inherit',
+      fontFamily: CHECKOUT_FONT_FAMILY,
     },
     rules: {
       '.Tab': {
@@ -121,7 +125,13 @@ export default function SubscriptionCheckoutPage() {
         ) : stripePromise && data ? (
           <CheckoutElementsProvider
             stripe={stripePromise}
-            options={{ clientSecret: data.clientSecret, elementsOptions: { appearance: buildAppearance() } }}
+            options={{
+              clientSecret: data.clientSecret,
+              elementsOptions: {
+                appearance: buildAppearance(),
+                fonts: [{ cssSrc: CHECKOUT_FONT_CSS }],
+              },
+            }}
           >
             <CheckoutInner
               plan={data.plan}
