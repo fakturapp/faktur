@@ -31,6 +31,7 @@ import {
   Link as LinkIcon,
   ChevronLeft,
   ChevronRight,
+  ShieldAlert,
 } from 'lucide-react'
 
 const INVOICES_PER_PAGE = 6
@@ -140,7 +141,7 @@ export default function PlanPage() {
   const params = useSearchParams()
   const { refreshUser } = useAuth()
   const { toast } = useToast()
-  const justSubscribed = params.get('subscribed') === '1'
+  const justSubscribed = params.get('subscribed') === '1' || !!params.get('checkout')
   const recover = params.get('recover') === '1'
 
   const [team, setTeam] = useState<TeamData | null>(null)
@@ -156,6 +157,7 @@ export default function PlanPage() {
     last4: string | null
   } | null>(null)
   const [cancelOpen, setCancelOpen] = useState(false)
+  const [contactAdminOpen, setContactAdminOpen] = useState(false)
 
   const load = useCallback(async () => {
     const { data } = await api.get<{ team: TeamData }>('/team')
@@ -180,6 +182,7 @@ export default function PlanPage() {
 
   useEffect(() => {
     if (!justSubscribed) return
+    setSyncing(true)
     let active = true
     let tries = 0
     const startedAt = Date.now()
@@ -384,7 +387,11 @@ export default function PlanPage() {
             <p className="text-sm text-muted-foreground">{renewalLine}</p>
           </div>
         </div>
-        {isPaid ? (
+        {isAdminGranted ? (
+          <Button variant="outline" onClick={() => setContactAdminOpen(true)}>
+            Modifier l’abonnement
+          </Button>
+        ) : isPaid ? (
           <Button variant="outline" onClick={() => router.push('/dashboard/settings/plan/upgrade')}>
             Modifier l’abonnement
           </Button>
@@ -589,18 +596,36 @@ export default function PlanPage() {
 
         {isAdminGranted && (
           <Section
-            title="Gestion"
-            desc="Ce forfait a été attribué manuellement par un administrateur Faktur. Il ne se renouvelle pas et n’a aucun paiement associé."
+            title="Paiement"
+            desc="Ce forfait a été attribué via le panneau d’administration Faktur. Il ne se renouvelle pas et n’a aucun paiement associé."
             action={
-              currentPlanId !== 'team' ? (
-                <Button variant="outline" onClick={() => router.push('/dashboard/settings/plan/upgrade')}>
-                  Voir les forfaits
-                </Button>
-              ) : undefined
+              <Button variant="outline" onClick={() => setContactAdminOpen(true)}>
+                Mettre à jour
+              </Button>
             }
-          />
+          >
+            <div className="mt-3 flex items-center gap-2.5 text-sm font-medium text-foreground">
+              <span className="flex h-6 w-6 items-center justify-center rounded-md bg-indigo-500/15">
+                <ShieldAlert className="h-3.5 w-3.5 text-indigo-500" />
+              </span>
+              Géré via le panneau d’administration
+            </div>
+          </Section>
         )}
       </div>
+
+      <Dialog open={contactAdminOpen} onClose={() => setContactAdminOpen(false)}>
+        <DialogHeader showClose={false} icon={<ShieldAlert className="h-5 w-5 text-indigo-500" />}>
+          <DialogTitle>Forfait géré par votre administrateur</DialogTitle>
+          <DialogDescription>
+            Ce forfait a été attribué via le panneau d’administration Faktur. Pour le modifier ou
+            mettre à jour le paiement, contactez votre administrateur.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button onClick={() => setContactAdminOpen(false)}>Compris</Button>
+        </DialogFooter>
+      </Dialog>
 
       <Dialog open={cancelOpen} onClose={() => busy !== 'cancel' && setCancelOpen(false)}>
         <DialogHeader showClose={false} icon={<AlertTriangle className="h-5 w-5 text-amber-500" />}>
