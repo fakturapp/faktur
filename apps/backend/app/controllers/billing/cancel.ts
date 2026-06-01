@@ -47,8 +47,12 @@ export default class Cancel {
         message: resume ? 'Abonnement réactivé' : 'Abonnement programmé pour annulation',
         cancelAtPeriodEnd: !resume,
       })
-    } catch (err: any) {
-      return response.badRequest({ message: err?.message || "Impossible de mettre à jour l'abonnement" })
+    } catch {
+      return response.badRequest({
+        message: resume
+          ? 'Impossible de réactiver l’abonnement. Réessayez ou passez par le portail Stripe.'
+          : 'Impossible de résilier l’abonnement pour le moment. Réessayez plus tard.',
+      })
     }
   }
 }
