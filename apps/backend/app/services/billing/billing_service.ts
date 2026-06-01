@@ -190,6 +190,49 @@ class BillingService {
     } as any)
   }
 
+  async retrievePaymentMethod(params: {
+    subscriptionId?: string | null
+    customerId?: string | null
+  }): Promise<{ type: string; brand: string | null; last4: string | null } | null> {
+    const client = this.client()
+    let pm: any = null
+    if (params.subscriptionId) {
+      try {
+        const sub: any = await client.subscriptions.retrieve(params.subscriptionId, {
+          expand: ['default_payment_method'],
+        })
+        pm = sub?.default_payment_method
+      } catch {}
+    }
+    if (!pm && params.customerId) {
+      try {
+        const cust: any = await client.customers.retrieve(params.customerId, {
+          expand: ['invoice_settings.default_payment_method'],
+        })
+        pm = cust?.invoice_settings?.default_payment_method
+      } catch {}
+    }
+    if (!pm) return null
+    if (typeof pm === 'string') {
+      try {
+        pm = await client.paymentMethods.retrieve(pm)
+      } catch {
+        return null
+      }
+    }
+    const type = pm.type ?? 'other'
+    if (type === 'card' && pm.card) {
+      const wallet = pm.card.wallet?.type
+      return {
+        type: wallet === 'link' ? 'link' : 'card',
+        brand: pm.card.brand ?? null,
+        last4: pm.card.last4 ?? null,
+      }
+    }
+    if (type === 'link') return { type: 'link', brand: null, last4: null }
+    return { type, brand: null, last4: null }
+  }
+
   async listInvoices(customerId: string): Promise<Stripe.Invoice[]> {
     const res = await this.client().invoices.list({ customer: customerId, limit: 24 })
     return res.data

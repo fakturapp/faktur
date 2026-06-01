@@ -8,6 +8,7 @@ const Portal = () => import('#controllers/billing/portal')
 const Cancel = () => import('#controllers/billing/cancel')
 const ScheduleChange = () => import('#controllers/billing/schedule_change')
 const Invoices = () => import('#controllers/billing/invoices')
+const PaymentMethod = () => import('#controllers/billing/payment_method')
 const SyncSubscription = () => import('#controllers/billing/sync')
 
 const billingGroup = router
@@ -18,6 +19,7 @@ const billingGroup = router
     router.post('/billing/cancel', [Cancel, 'handle']).as('billing_cancel')
     router.post('/billing/schedule-change', [ScheduleChange, 'handle']).as('billing_schedule_change')
     router.get('/billing/invoices', [Invoices, 'handle']).as('billing_invoices')
+    router.get('/billing/payment-method', [PaymentMethod, 'handle']).as('billing_payment_method')
     router.post('/billing/sync', [SyncSubscription, 'handle']).as('billing_sync')
   })
   .use(middleware.auth())
