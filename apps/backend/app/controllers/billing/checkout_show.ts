@@ -29,6 +29,9 @@ export default class CheckoutShow {
       plan: session.metadata?.plan ?? null,
       period: session.metadata?.period ?? null,
       status: session.status,
+      amountSubtotal: session.amount_subtotal,
+      amountTotal: session.amount_total,
+      amountDiscount: session.total_details?.amount_discount ?? 0,
     })
   }
 }
