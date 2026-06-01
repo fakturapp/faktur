@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '@/lib/auth'
 import { Sidebar } from '@/components/layout/sidebar'
 import { SiteHeader } from '@/components/layout/site-header'
@@ -136,6 +136,32 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }, 30000)
     return () => clearInterval(id)
   }, [user?.id, refreshUser])
+
+  const ownsCurrentTeam = teams.find((t) => t.isCurrent)?.isOwner ?? false
+  const lastBillingSync = useRef(0)
+  useEffect(() => {
+    if (!user || !ownsCurrentTeam) return
+    let cancelled = false
+    async function syncBilling(force = false) {
+      if (document.visibilityState !== 'visible') return
+      const now = Date.now()
+      if (!force && now - lastBillingSync.current < 60000) return
+      lastBillingSync.current = now
+      const { error } = await api.post('/billing/sync', {})
+      if (!error && !cancelled) refreshUser()
+    }
+    syncBilling(true)
+    function onFocus() {
+      void syncBilling()
+    }
+    window.addEventListener('focus', onFocus)
+    document.addEventListener('visibilitychange', onFocus)
+    return () => {
+      cancelled = true
+      window.removeEventListener('focus', onFocus)
+      document.removeEventListener('visibilitychange', onFocus)
+    }
+  }, [user?.id, ownsCurrentTeam, refreshUser])
 
   function handleSwitchTeam(teamId: string) {
     const team = teams.find((t) => t.id === teamId)
