@@ -7,6 +7,7 @@ import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import { useToast } from '@/components/ui/toast'
 import { Spinner } from '@/components/ui/spinner'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { PLAN_IDS, PLANS, getPlan, formatPlanPrice, type PlanId } from '@/lib/plans'
@@ -106,8 +107,29 @@ export default function PlanUpgradePage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-24">
-        <Spinner size="lg" className="text-primary" />
+      <div className="mx-auto max-w-6xl px-6 py-10">
+        <div className="mb-10 flex flex-col items-center gap-3">
+          <Skeleton className="h-9 w-72 rounded-lg" />
+          <Skeleton className="h-9 w-44 rounded-full" />
+        </div>
+        <div className="grid gap-8 md:grid-cols-3">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-8 shadow-surface">
+              <div className="flex items-center gap-3">
+                <Skeleton className="h-14 w-14 rounded-2xl" />
+                <Skeleton className="h-6 w-24" />
+              </div>
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-10 w-32" />
+              <div className="mt-2 space-y-2.5">
+                {[0, 1, 2, 3, 4].map((j) => (
+                  <Skeleton key={j} className="h-4 w-full" />
+                ))}
+              </div>
+              <Skeleton className="mt-4 h-10 w-full rounded-lg" />
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
