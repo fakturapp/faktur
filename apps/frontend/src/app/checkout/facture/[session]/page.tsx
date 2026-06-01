@@ -5,12 +5,9 @@ import { useParams, useRouter } from 'next/navigation'
 import { loadStripe, type Stripe, type Appearance } from '@stripe/stripe-js'
 import { CheckoutElementsProvider, useCheckout, PaymentElement } from '@stripe/react-stripe-js/checkout'
 import { api } from '@/lib/api'
-import { useAuth } from '@/lib/auth'
 import { Spinner } from '@/components/ui/spinner'
-import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
 import { getPlan, formatPlanPrice, type PlanId } from '@/lib/plans'
-import { ArrowLeft, ShieldCheck } from 'lucide-react'
+import { ChevronLeft } from 'lucide-react'
 
 interface CheckoutData {
   clientSecret: string
@@ -27,6 +24,40 @@ function formatCents(cents: number): string {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })} €`
+}
+
+function buildAppearance(): Appearance {
+  const dark =
+    typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+  return {
+    theme: 'flat',
+    labels: 'floating',
+    variables: {
+      colorPrimary: '#6366f1',
+      colorBackground: dark ? '#18181b' : '#f4f4f5',
+      colorText: dark ? '#fafafa' : '#18181b',
+      colorTextSecondary: dark ? '#a1a1aa' : '#71717a',
+      colorTextPlaceholder: dark ? '#71717a' : '#a1a1aa',
+      colorDanger: '#ef4444',
+      borderRadius: '10px',
+      fontSizeBase: '14px',
+      spacingUnit: '4px',
+      fontFamily: 'inherit',
+    },
+    rules: {
+      '.Tab': {
+        border: dark ? '1px solid #3f3f46' : '1px solid #e4e4e7',
+        backgroundColor: 'transparent',
+      },
+      '.Tab--selected': {
+        border: dark ? '2px solid #fafafa' : '2px solid #18181b',
+        backgroundColor: dark ? '#27272a' : '#ffffff',
+      },
+      '.Input': {
+        border: 'none',
+      },
+    },
+  }
 }
 
 export default function SubscriptionCheckoutPage() {
@@ -62,35 +93,16 @@ export default function SubscriptionCheckoutPage() {
     init()
   }, [init])
 
-  const appearance: Appearance = {
-    theme:
-      typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
-        ? 'night'
-        : 'stripe',
-    variables: {
-      colorPrimary: '#6366f1',
-      borderRadius: '12px',
-      fontFamily: 'inherit',
-      fontSizeBase: '15px',
-      spacingUnit: '4px',
-    },
-  }
-
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto flex w-full max-w-[600px] flex-col px-5 pb-20 pt-7">
-        <div className="mb-8 flex items-center justify-between">
-          <button
-            onClick={() => router.push('/dashboard/settings/plan/upgrade')}
-            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3.5 py-1.5 text-sm font-medium text-foreground shadow-surface transition-colors hover:bg-surface-hover"
-          >
-            <ArrowLeft className="h-4 w-4" /> Changer votre forfait
-          </button>
-          <div className="flex items-center gap-2">
-            <img src="/logo.svg" alt="Faktur" className="h-7 w-7" />
-            <span className="text-base font-semibold tracking-tight text-foreground">Faktur</span>
-          </div>
-        </div>
+    <div className="flex min-h-screen justify-center bg-background px-5 py-10">
+      <div className="w-full max-w-[440px]">
+        <button
+          onClick={() => router.push('/dashboard/settings/plan/upgrade')}
+          className="mb-8 flex items-center text-foreground transition-opacity hover:opacity-70"
+        >
+          <ChevronLeft className="mr-3 h-5 w-5" strokeWidth={2.5} />
+          <h1 className="text-[18px] font-semibold">Configurer votre forfait</h1>
+        </button>
 
         {loading ? (
           <div className="flex justify-center py-20">
@@ -99,14 +111,17 @@ export default function SubscriptionCheckoutPage() {
         ) : error ? (
           <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-6 text-center">
             <p className="text-sm text-destructive">{error}</p>
-            <Button variant="outline" className="mt-4" onClick={() => router.push('/dashboard/settings/plan')}>
+            <button
+              className="mt-4 text-sm font-semibold text-foreground underline"
+              onClick={() => router.push('/dashboard/settings/plan')}
+            >
               Retour aux forfaits
-            </Button>
+            </button>
           </div>
         ) : stripePromise && data ? (
           <CheckoutElementsProvider
             stripe={stripePromise}
-            options={{ clientSecret: data.clientSecret, elementsOptions: { appearance } }}
+            options={{ clientSecret: data.clientSecret, elementsOptions: { appearance: buildAppearance() } }}
           >
             <CheckoutInner
               plan={data.plan}
@@ -136,7 +151,6 @@ function CheckoutInner({
   amountDiscount: number | null
 }) {
   const router = useRouter()
-  const { user } = useAuth()
   const checkoutState = useCheckout()
   const [submitting, setSubmitting] = useState(false)
   const [err, setErr] = useState<string | null>(null)
@@ -165,15 +179,6 @@ function CheckoutInner({
   const subtotalLabel = amountSubtotal != null ? formatCents(amountSubtotal) : formatPlanPrice(fullPrice)
   const dueTodayLabel = amountTotal != null ? formatCents(amountTotal) : formatPlanPrice(fullPrice)
 
-  const today = new Date().toLocaleDateString('fr-FR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  })
-  const invoiceRef = meta ? `ABO-${meta.name.toUpperCase()}-${new Date().getFullYear()}` : ''
-  const currentTeam = user?.teams?.find((t) => t.id === user.currentTeamId) ?? null
-  const accentBar = plan === 'team' ? 'bg-amber-500' : 'bg-primary'
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (submitting) return
@@ -189,112 +194,56 @@ function CheckoutInner({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit}>
       {meta && (
-        <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-surface">
-          <div className="flex items-start justify-between gap-4 p-6 pb-5">
-            <div className="flex items-center gap-3">
-              <div className={cn('flex h-11 w-11 items-center justify-center rounded-xl', meta.accentSoft)}>
-                <meta.icon className={cn('h-5 w-5', meta.accentText)} />
-              </div>
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  Facture d&apos;abonnement
-                </p>
-                <h2 className="text-lg font-bold text-foreground">Forfait {meta.name}</h2>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className={cn('text-xs font-bold uppercase tracking-wider', meta.accentText)}>Facture</p>
-              <p className="mt-0.5 text-[11px] font-medium text-muted-foreground">{invoiceRef}</p>
-              <p className="text-[11px] text-muted-foreground">{today}</p>
-            </div>
-          </div>
-
-          <div className={cn('mx-6 h-0.5 rounded-full', accentBar)} />
-
-          <div className="grid grid-cols-2 gap-4 p-6 pb-4">
-            <div className="space-y-1">
-              <p className={cn('text-[10px] font-semibold uppercase tracking-wider', meta.accentText)}>
-                Émetteur
-              </p>
-              <p className="text-sm font-medium text-foreground">Faktur</p>
-              <p className="text-xs text-muted-foreground">Logiciel de facturation</p>
-            </div>
-            <div className="space-y-1 text-right">
-              <p className={cn('text-[10px] font-semibold uppercase tracking-wider', meta.accentText)}>
-                Facturé à
-              </p>
-              {currentTeam && <p className="truncate text-sm font-medium text-foreground">{currentTeam.name}</p>}
-              {user?.email && <p className="truncate text-xs text-muted-foreground">{user.email}</p>}
-            </div>
-          </div>
-
-          <div className="px-6">
-            <div
-              className={cn(
-                'flex items-center justify-between rounded-t-lg px-4 py-2 text-[11px] font-semibold uppercase tracking-wider',
-                meta.accentSoft,
-                meta.accentText
-              )}
-            >
-              <span>Description</span>
-              <span>Montant</span>
-            </div>
-
-            <div className="flex items-center justify-between border-b border-border px-4 py-3 text-sm">
-              <span className="text-foreground">
-                Forfait {meta.name} · Abonnement {isAnnual ? 'annuel' : 'mensuel'}
+        <div className="mb-6">
+          <h2 className="mb-3 text-[15px] font-semibold text-foreground">Forfait {meta.name}</h2>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">
+                Abonnement {isAnnual ? 'annuel' : 'mensuel'}
               </span>
-              <span className="font-medium text-foreground">{subtotalLabel}</span>
+              <span className="text-foreground">{subtotalLabel}</span>
             </div>
-
             {discount > 0 && (
-              <div className="flex items-center justify-between border-b border-border px-4 py-3 text-sm">
-                <span className="text-emerald-600 dark:text-emerald-400">Crédit · temps déjà payé</span>
-                <span className="font-medium text-emerald-600 dark:text-emerald-400">
+              <div className="flex justify-between">
+                <span className="text-emerald-600 dark:text-emerald-400">
+                  Crédit (temps déjà payé)
+                </span>
+                <span className="text-emerald-600 dark:text-emerald-400">
                   -{formatCents(discount)}
                 </span>
               </div>
             )}
-
-            <div className="flex items-center justify-between border-b border-border px-4 py-3 text-sm">
-              <span className="text-muted-foreground">TVA estimée</span>
-              <span className="text-muted-foreground">0,00 €</span>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Montant estimé des taxes</span>
+              <span className="text-foreground">0,00 €</span>
             </div>
-          </div>
-
-          <div className="p-6 pt-4">
-            <div
-              className={cn(
-                'flex items-center justify-between rounded-xl px-4 py-3',
-                meta.accentSoft
-              )}
-            >
-              <span className={cn('text-sm font-semibold', meta.accentText)}>Dû aujourd&apos;hui</span>
-              <span className={cn('text-xl font-bold', meta.accentText)}>{dueTodayLabel}</span>
+            <div className="mt-3 flex justify-between font-semibold">
+              <span className="text-foreground">Dû aujourd&apos;hui</span>
+              <span className="text-foreground">{dueTodayLabel}</span>
             </div>
-            <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
-              Renouvellement {isAnnual ? 'annuel' : 'mensuel'} jusqu&apos;à annulation
-              {meta ? ` (${formatPlanPrice(fullPrice)} TTC)` : ''}. Annulable à tout moment depuis vos
-              paramètres.
-            </p>
           </div>
         </div>
       )}
 
-      <div className="rounded-2xl border border-border bg-card p-6 shadow-surface">
-        <h3 className="mb-4 text-sm font-semibold text-foreground">Mode de paiement</h3>
-        <PaymentElement />
-      </div>
+      <hr className="my-6 border-border" />
+
+      <h3 className="mb-4 text-base font-semibold text-foreground">Mode de paiement</h3>
+
+      <PaymentElement options={{ layout: 'tabs' }} />
 
       {err && (
-        <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive">
+        <div className="mt-4 rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive">
           {err}
         </div>
       )}
 
-      <Button type="submit" className="w-full py-3 text-base" disabled={submitting}>
+      <button
+        type="submit"
+        disabled={submitting}
+        className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-4 text-[15px] font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
+      >
         {submitting ? (
           <>
             <Spinner /> Paiement en cours…
@@ -302,22 +251,23 @@ function CheckoutInner({
         ) : (
           "S'abonner"
         )}
-      </Button>
+      </button>
 
-      <p className="flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
-        <ShieldCheck className="h-3.5 w-3.5" /> Paiement sécurisé par Stripe
-      </p>
-      <p className="text-center text-[11px] leading-relaxed text-muted-foreground">
-        En vous abonnant, vous acceptez nos{' '}
+      <p className="mt-4 text-[11px] leading-relaxed text-muted-foreground">
+        Renouvellement {isAnnual ? 'annuel' : 'mensuel'} jusqu&apos;à annulation.
+        {meta ? ` ${formatPlanPrice(fullPrice)} ${isAnnual ? 'par an' : 'par mois'} (TTC) sera facturé. ` : ' '}
+        <a href="/legal" target="_blank" rel="noreferrer" className="underline">
+          Annuler à tout moment
+        </a>{' '}
+        via les paramètres. En sélectionnant « S&apos;abonner », vous acceptez nos{' '}
         <a href="/legal" target="_blank" rel="noreferrer" className="underline">
           conditions d&apos;utilisation
-        </a>{' '}
-        et notre{' '}
+        </a>
+        , confirmez avoir lu notre{' '}
         <a href="/legal" target="_blank" rel="noreferrer" className="underline">
           politique de confidentialité
-        </a>
-        , et autorisez Faktur à enregistrer votre mode de paiement et à le débiter pour ce
-        renouvellement.
+        </a>{' '}
+        et autorisez Faktur à enregistrer votre mode de paiement et à le débiter.
       </p>
     </form>
   )
