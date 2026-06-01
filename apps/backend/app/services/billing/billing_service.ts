@@ -35,6 +35,70 @@ class BillingService {
     return { unitAmount: PRICES[plan][period], interval: period === 'annual' ? 'year' : 'month' }
   }
 
+  subscriptionPeriod(sub: any): { start: number | null; end: number | null } {
+    const item = sub?.items?.data?.[0]
+    const start = sub?.current_period_start ?? item?.current_period_start ?? sub?.start_date ?? null
+    const end = sub?.current_period_end ?? item?.current_period_end ?? null
+    return { start: start ? Number(start) : null, end: end ? Number(end) : null }
+  }
+
+  computeUnusedCredit(params: {
+    plan: BillingPlan
+    period: BillingPeriod
+    periodStart: number | null
+    periodEnd: number | null
+    nowSeconds: number
+  }): number {
+    const { plan, period, periodStart, periodEnd, nowSeconds } = params
+    if (!periodStart || !periodEnd || periodEnd <= periodStart) return 0
+    const paid = PRICES[plan][period]
+    const total = periodEnd - periodStart
+    const remaining = Math.max(0, Math.min(total, periodEnd - nowSeconds))
+    return Math.round((paid * remaining) / total)
+  }
+
+  async retrieveSubscription(id: string): Promise<Stripe.Subscription> {
+    return this.client().subscriptions.retrieve(id)
+  }
+
+  async createUnusedTimeCoupon(params: {
+    currentPlan: BillingPlan
+    currentPeriod: BillingPeriod
+    targetPlan: BillingPlan
+    targetPeriod: BillingPeriod
+    subscription: any
+    teamId: string
+  }): Promise<{ couponId: string; amountOff: number } | null> {
+    const { start, end } = this.subscriptionPeriod(params.subscription)
+    const credit = this.computeUnusedCredit({
+      plan: params.currentPlan,
+      period: params.currentPeriod,
+      periodStart: start,
+      periodEnd: end,
+      nowSeconds: Math.floor(Date.now() / 1000),
+    })
+    if (credit < 1) return null
+
+    const targetCharge = PRICES[params.targetPlan][params.targetPeriod]
+    const amountOff = Math.min(credit, targetCharge)
+    if (amountOff < 1) return null
+
+    const coupon = await this.client().coupons.create({
+      amount_off: amountOff,
+      currency: 'eur',
+      duration: 'once',
+      max_redemptions: 1,
+      name: `Crédit ${PRODUCT_NAMES[params.currentPlan]} (temps restant)`,
+      metadata: {
+        team_id: params.teamId,
+        kind: 'plan_switch_credit',
+        from_plan: params.currentPlan,
+        to_plan: params.targetPlan,
+      },
+    })
+    return { couponId: coupon.id, amountOff }
+  }
+
   async ensureCustomer(team: Team, email: string): Promise<string> {
     if (team.stripeCustomerId) return team.stripeCustomerId
     const customer = await this.client().customers.create({
@@ -67,6 +131,7 @@ class BillingService {
     plan: BillingPlan
     period: BillingPeriod
     returnUrl: string
+    couponId?: string
   }): Promise<Stripe.Checkout.Session> {
     const { unitAmount, interval } = this.priceFor(params.plan, params.period)
     const ref = this.productRef(params.plan, params.period)
@@ -86,15 +151,18 @@ class BillingService {
       lineItem = { quantity: 1, price_data: priceData }
     }
 
-    return this.client().checkout.sessions.create({
+    const sessionParams: Record<string, any> = {
       mode: 'subscription',
       ui_mode: 'elements',
       customer: params.customerId,
-      line_items: [lineItem] as any,
+      line_items: [lineItem],
       subscription_data: { metadata },
       metadata,
       return_url: params.returnUrl,
-    })
+    }
+    if (params.couponId) sessionParams.discounts = [{ coupon: params.couponId }]
+
+    return this.client().checkout.sessions.create(sessionParams as any)
   }
 
   async retrieveCheckoutSession(id: string): Promise<Stripe.Checkout.Session> {
