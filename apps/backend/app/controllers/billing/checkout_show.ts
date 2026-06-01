@@ -1,4 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import TeamMember from '#models/team/team_member'
 import billingService from '#services/billing/billing_service'
 
 export default class CheckoutShow {
@@ -10,6 +11,15 @@ export default class CheckoutShow {
     }
     if (!user.currentTeamId) {
       return response.badRequest({ message: 'Aucune équipe sélectionnée' })
+    }
+
+    const member = await TeamMember.query()
+      .where('teamId', user.currentTeamId)
+      .where('userId', user.id)
+      .where('status', 'active')
+      .first()
+    if (!member || member.role !== 'super_admin') {
+      return response.forbidden({ message: "Seul le propriétaire peut gérer l'abonnement." })
     }
 
     let session

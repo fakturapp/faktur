@@ -70,6 +70,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   STRIPE_SECRET_KEY: Env.schema.string.optional(),
   STRIPE_PUBLISHABLE_KEY: Env.schema.string.optional(),
   STRIPE_BILLING_WEBHOOK_SECRET: Env.schema.string.optional(),
+  STRIPE_ALLOW_UNVERIFIED_WEBHOOK: Env.schema.boolean.optional(),
   STRIPE_PRODUCT_PRO_MONTHLY: Env.schema.string.optional(),
   STRIPE_PRODUCT_PRO_YEARLY: Env.schema.string.optional(),
   STRIPE_PRODUCT_TEAM_MONTHLY: Env.schema.string.optional(),
