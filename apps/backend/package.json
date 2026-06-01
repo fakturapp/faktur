@@ -1,6 +1,6 @@
 {
   "name": "@faktur/backend",
-  "version": "1.9.10",
+  "version": "1.9.11",
   "private": true,
   "type": "module",
   "license": "MIT",
