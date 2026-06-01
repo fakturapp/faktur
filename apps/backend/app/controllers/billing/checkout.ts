@@ -40,6 +40,32 @@ export default class Checkout {
     const customerId = await billingService.ensureCustomer(team, user.email)
     const frontendUrl = env.get('FRONTEND_URL') ?? 'http://localhost:3000'
 
+    let couponId: string | undefined
+    if (
+      team.stripeSubscriptionId &&
+      (team.plan === 'pro' || team.plan === 'team') &&
+      (team.planPeriod === 'monthly' || team.planPeriod === 'annual')
+    ) {
+      const samePlan = team.plan === payload.plan && team.planPeriod === payload.period
+      if (!samePlan) {
+        try {
+          const sub = await billingService.retrieveSubscription(team.stripeSubscriptionId)
+          const status = String((sub as any)?.status ?? '')
+          if (status === 'active' || status === 'trialing' || status === 'past_due') {
+            const credit = await billingService.createUnusedTimeCoupon({
+              currentPlan: team.plan,
+              currentPeriod: team.planPeriod,
+              targetPlan: payload.plan,
+              targetPeriod: payload.period,
+              subscription: sub,
+              teamId: team.id,
+            })
+            couponId = credit?.couponId
+          }
+        } catch {}
+      }
+    }
+
     try {
       const session = await billingService.createCheckoutSession({
         team,
@@ -47,6 +73,7 @@ export default class Checkout {
         plan: payload.plan,
         period: payload.period,
         returnUrl: `${frontendUrl}/dashboard/settings/plan?checkout={CHECKOUT_SESSION_ID}`,
+        couponId,
       })
       return response.ok({ sessionId: session.id })
     } catch (err: any) {
