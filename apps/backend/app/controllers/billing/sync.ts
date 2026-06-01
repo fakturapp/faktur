@@ -73,10 +73,6 @@ export default class Sync {
     team.subscriptionCancelAtPeriodEnd = !!full.cancel_at_period_end || !!full.cancel_at
     team.subscriptionCancelExternal = !!full.cancel_at && !full.cancel_at_period_end
 
-    const period = billingService.subscriptionPeriod(full)
-    const endTs = full.cancel_at ?? period.end
-    team.subscriptionCurrentPeriodEnd = endTs ? DateTime.fromSeconds(Number(endTs)) : null
-
     team.subscriptionStartedAt = full.start_date
       ? DateTime.fromSeconds(Number(full.start_date))
       : null
@@ -86,17 +82,25 @@ export default class Sync {
     const planPeriod = full.metadata?.period
     if (planPeriod === 'monthly' || planPeriod === 'annual') team.planPeriod = planPeriod
 
+    let scheduleSwitchTs: number | null = null
     if (!full.schedule) {
       team.pendingPlan = null
       team.pendingPlanPeriod = null
     } else {
       try {
-        const schedule = await billingService.retrieveSchedule(String(full.schedule))
+        const schedule: any = await billingService.retrieveSchedule(String(full.schedule))
         const pending = billingService.detectPendingChange({ schedule })
         team.pendingPlan = pending?.plan ?? null
         team.pendingPlanPeriod = pending?.period ?? null
+        if (pending && schedule?.current_phase?.end_date) {
+          scheduleSwitchTs = Number(schedule.current_phase.end_date)
+        }
       } catch {}
     }
+
+    const period = billingService.subscriptionPeriod(full)
+    const endTs = full.cancel_at ?? scheduleSwitchTs ?? period.end
+    team.subscriptionCurrentPeriodEnd = endTs ? DateTime.fromSeconds(Number(endTs)) : null
 
     if (full.status !== 'past_due') team.subscriptionGraceEndsAt = null
 
