@@ -19,6 +19,7 @@ export default class TeamTransformer extends BaseTransformer<Team> {
         : null,
       subscriptionCancelAtPeriodEnd: this.resource.subscriptionCancelAtPeriodEnd,
       subscriptionCancelExternal: this.resource.subscriptionCancelExternal,
+      subscriptionPaused: this.resource.subscriptionPaused,
       subscriptionStartedAt: this.resource.subscriptionStartedAt
         ? this.resource.subscriptionStartedAt.toISO()
         : null,

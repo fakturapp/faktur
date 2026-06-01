@@ -10,12 +10,6 @@ function metaPeriod(meta: any): 'monthly' | 'annual' | null {
   return meta?.period === 'monthly' || meta?.period === 'annual' ? meta.period : null
 }
 
-/**
- * Single source of truth: project a Stripe Subscription (and its optional
- * schedule) onto a Team. Every code path that learns about a subscription
- * (webhook, manual sync) funnels through here so the stored state can never
- * drift from Stripe.
- */
 export function applyStripeSubscription(team: Team, sub: any, schedule?: any): void {
   const status = String(sub?.status ?? '')
 
@@ -24,6 +18,7 @@ export function applyStripeSubscription(team: Team, sub: any, schedule?: any): v
   team.subscriptionStatus = status || null
   team.subscriptionCancelAtPeriodEnd = !!sub.cancel_at_period_end || !!sub.cancel_at
   team.subscriptionCancelExternal = !!sub.cancel_at && !sub.cancel_at_period_end
+  team.subscriptionPaused = !!sub.pause_collection || status === 'paused'
 
   const plan = metaPlan(sub.metadata)
   if (plan) team.plan = plan
@@ -66,6 +61,7 @@ export function applyStripeSubscription(team: Team, sub: any, schedule?: any): v
     team.subscriptionGraceEndsAt = null
     team.subscriptionCancelAtPeriodEnd = false
     team.subscriptionCancelExternal = false
+    team.subscriptionPaused = false
     team.pendingPlan = null
     team.pendingPlanPeriod = null
   }

@@ -53,6 +53,9 @@ export default class Team extends BaseModel {
   @column()
   declare subscriptionCancelExternal: boolean
 
+  @column()
+  declare subscriptionPaused: boolean
+
   @column.dateTime()
   declare subscriptionStartedAt: DateTime | null
 

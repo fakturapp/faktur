@@ -22,10 +22,6 @@ export default class StripeBillingWebhook {
       }
     }
     if (!event) {
-      // Signature could not be verified. Only accept the raw payload when the
-      // operator has explicitly opted in for local development (e.g. when using
-      // `stripe listen` with a different signing secret). This is never enabled
-      // in production, so forged events can never mutate billing state there.
       const allowUnverified =
         env.get('NODE_ENV') !== 'production' &&
         env.get('STRIPE_ALLOW_UNVERIFIED_WEBHOOK') === true
@@ -127,8 +123,6 @@ export default class StripeBillingWebhook {
     const team = await this.findTeam(sub.metadata?.team_id, sub.customer, sub.id)
     if (!team) return
     const isCanceling = sub.status === 'canceled' || sub.status === 'incomplete_expired'
-    // Ignore a cancellation event fired for an old subscription we already
-    // replaced (e.g. during a plan switch), so it can't downgrade the team.
     if (isCanceling && team.stripeSubscriptionId && team.stripeSubscriptionId !== sub.id) {
       return
     }
