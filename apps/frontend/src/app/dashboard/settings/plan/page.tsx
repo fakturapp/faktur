@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
+import confetti from 'canvas-confetti'
 import { api } from '@/lib/api'
 import { useAuth } from '@/lib/auth'
 import { cn } from '@/lib/utils'
@@ -149,6 +150,7 @@ export default function PlanPage() {
   const [busy, setBusy] = useState<string | null>(null)
   const [syncing, setSyncing] = useState(justSubscribed)
   const [welcome, setWelcome] = useState(false)
+  const [welcomeModal, setWelcomeModal] = useState(false)
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [invoicePage, setInvoicePage] = useState(0)
   const [paymentMethod, setPaymentMethod] = useState<{
@@ -192,9 +194,13 @@ export default function PlanPage() {
         if (!active) return
         setSyncing(false)
         setWelcome(true)
+        setWelcomeModal(true)
         setLoading(false)
         refreshUser()
         router.replace('/dashboard/settings/plan')
+        try {
+          confetti({ particleCount: 130, spread: 78, origin: { y: 0.35 }, scalar: 0.9 })
+        } catch {}
       }, wait)
     }
     async function poll() {
@@ -248,10 +254,14 @@ export default function PlanPage() {
   }, [toast])
 
   useEffect(() => {
+    if (!team?.id) return
+    api.get<{ invoices: Invoice[] }>('/billing/invoices').then(({ data }) => {
+      if (data?.invoices) setInvoices(data.invoices)
+    })
+  }, [team?.id])
+
+  useEffect(() => {
     if (isStripeSubscribed) {
-      api.get<{ invoices: Invoice[] }>('/billing/invoices').then(({ data }) => {
-        if (data?.invoices) setInvoices(data.invoices)
-      })
       api
         .get<{ method: { type: string; brand: string | null; last4: string | null } | null }>(
           '/billing/payment-method'
@@ -352,7 +362,7 @@ export default function PlanPage() {
               Bravo, bienvenue sur Faktur {meta.name} !
             </p>
             <p className="text-xs text-muted-foreground">
-              Votre paiement est confirmé et vos nouveaux avantages sont déjà actifs.
+              Votre paiement a été confirmé et votre abonnement a bien été mis à jour avec succès.
             </p>
           </div>
         </motion.div>
@@ -367,11 +377,6 @@ export default function PlanPage() {
           <div className="space-y-1">
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-base font-bold text-foreground">{meta.label}</h1>
-              {isStripeSubscribed && status !== 'past_due' && !cancelAtPeriodEnd && !pendingMeta && (
-                <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
-                  Actif
-                </span>
-              )}
               {status === 'past_due' && (
                 <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[11px] font-semibold text-amber-600 dark:text-amber-400">
                   Paiement en échec
@@ -463,7 +468,7 @@ export default function PlanPage() {
           }
         />
 
-        {isStripeSubscribed && invoices.length > 0 && (
+        {invoices.length > 0 && (
           <Section title="Factures">
             <div className="mt-4 overflow-x-auto">
               <table className="w-full border-collapse text-left text-sm">
@@ -613,6 +618,26 @@ export default function PlanPage() {
           </Section>
         )}
       </div>
+
+      <Dialog open={welcomeModal} onClose={() => setWelcomeModal(false)}>
+        <div className="flex flex-col items-center px-2 pb-2 pt-1 text-center">
+          <motion.div
+            initial={{ scale: 0, rotate: -25, opacity: 0 }}
+            animate={{ scale: 1, rotate: 0, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 220, damping: 13 }}
+            className={cn('mb-4 flex h-16 w-16 items-center justify-center rounded-2xl', meta.accentSoft)}
+          >
+            <Icon className={cn('h-8 w-8', meta.accentText)} />
+          </motion.div>
+          <DialogTitle className="text-xl font-bold">Bienvenue sur Faktur {meta.name} !</DialogTitle>
+          <DialogDescription className="mt-2 max-w-sm">
+            Votre paiement a été confirmé et votre abonnement a bien été mis à jour avec succès.
+          </DialogDescription>
+          <Button className="mt-6 w-full" onClick={() => setWelcomeModal(false)}>
+            Découvrir mes avantages
+          </Button>
+        </div>
+      </Dialog>
 
       <Dialog open={contactAdminOpen} onClose={() => setContactAdminOpen(false)}>
         <DialogHeader showClose={false} icon={<ShieldAlert className="h-5 w-5 text-indigo-500" />}>
