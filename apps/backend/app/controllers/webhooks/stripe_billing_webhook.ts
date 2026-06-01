@@ -1,8 +1,11 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
+import mail from '@adonisjs/mail/services/main'
 import env from '#start/env'
 import Team from '#models/team/team'
+import User from '#models/account/user'
 import billingService from '#services/billing/billing_service'
+import { PaymentFailedNotification } from '#mails/payment_failed_notification'
 
 export default class StripeBillingWebhook {
   async handle({ request, response }: HttpContext) {
@@ -179,11 +182,31 @@ export default class StripeBillingWebhook {
   private async onInvoiceFailed(invoice: any) {
     const team = await this.findTeam(invoice.metadata?.team_id, invoice.customer, this.invoiceSubId(invoice))
     if (!team) return
+    const wasGraceNull = !team.subscriptionGraceEndsAt
     team.subscriptionStatus = 'past_due'
-    if (!team.subscriptionGraceEndsAt) {
+    if (wasGraceNull) {
       team.subscriptionGraceEndsAt = DateTime.now().plus({ days: 7 })
     }
     await team.save()
+
+    if (wasGraceNull && team.subscriptionGraceEndsAt) {
+      try {
+        const owner = await User.find(team.ownerId)
+        if (owner?.email) {
+          const graceDate = team.subscriptionGraceEndsAt
+            .setLocale('fr')
+            .toLocaleString(DateTime.DATE_FULL)
+          await mail.send(
+            new PaymentFailedNotification(
+              owner.email,
+              team.name,
+              graceDate,
+              owner.fullName ?? undefined
+            )
+          )
+        }
+      } catch {}
+    }
   }
 
   private async onInvoicePaid(invoice: any) {
