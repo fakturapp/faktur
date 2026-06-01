@@ -160,6 +160,7 @@ export default function PlanPage() {
     brand: string | null
     last4: string | null
   } | null>(null)
+  const [pmLoaded, setPmLoaded] = useState(false)
   const [cancelOpen, setCancelOpen] = useState(false)
   const [contactAdminOpen, setContactAdminOpen] = useState(false)
 
@@ -274,7 +275,10 @@ export default function PlanPage() {
         .get<{ method: { type: string; brand: string | null; last4: string | null } | null }>(
           '/billing/payment-method'
         )
-        .then(({ data }) => setPaymentMethod(data?.method ?? null))
+        .then(({ data }) => {
+          setPaymentMethod(data?.method ?? null)
+          setPmLoaded(true)
+        })
     }
   }, [isStripeSubscribed])
 
@@ -336,8 +340,32 @@ export default function PlanPage() {
 
   if (loading && !syncing) {
     return (
-      <div className="flex items-center justify-center py-24">
-        <Spinner size="lg" className="text-primary" />
+      <div className="mx-auto max-w-3xl px-6 py-8">
+        <div className="flex items-start justify-between gap-4 pb-2">
+          <div className="flex items-start gap-4">
+            <Skeleton className="h-14 w-14 rounded-2xl" />
+            <div className="space-y-2">
+              <Skeleton className="h-5 w-40" />
+              <Skeleton className="h-4 w-60" />
+              <Skeleton className="h-4 w-72" />
+            </div>
+          </div>
+          <Skeleton className="h-10 w-40 rounded-lg" />
+        </div>
+        <div className="mt-6">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="border-t border-border py-7">
+              <div className="flex items-start justify-between gap-4">
+                <div className="space-y-2">
+                  <Skeleton className="h-5 w-32" />
+                  <Skeleton className="h-4 w-64" />
+                </div>
+                <Skeleton className="h-9 w-32 rounded-lg" />
+              </div>
+              <Skeleton className="mt-4 h-5 w-48" />
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
@@ -450,7 +478,12 @@ export default function PlanPage() {
             }
           >
             <div className="mt-3 flex items-center gap-2.5 text-sm font-medium text-foreground">
-              {paymentMethod?.type === 'link' ? (
+              {!pmLoaded ? (
+                <span className="inline-flex items-center gap-2">
+                  <Skeleton className="h-5 w-5 rounded-md" />
+                  <Skeleton className="h-4 w-40" />
+                </span>
+              ) : paymentMethod?.type === 'link' ? (
                 <span className="inline-flex items-center gap-1.5">
                   <LinkLogo className="h-3.5" />
                   <span className="text-muted-foreground">by Stripe</span>
