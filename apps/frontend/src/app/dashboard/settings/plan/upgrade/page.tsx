@@ -16,6 +16,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { PLAN_IDS, PLANS, getPlan, formatPlanPrice, type PlanId } from '@/lib/plans'
+import { PlanRings } from '@/components/plans/plan-rings'
 import { ArrowLeft, Check, ArrowRight, TrendingDown } from 'lucide-react'
 
 interface TeamData {
@@ -118,7 +119,7 @@ export default function PlanUpgradePage() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl p-6">
+    <div className="mx-auto max-w-6xl px-6 py-10">
       <div className="mb-6">
         <button
           onClick={() => router.push('/dashboard/settings/plan')}
@@ -128,8 +129,8 @@ export default function PlanUpgradePage() {
         </button>
       </div>
 
-      <div className="mb-8 space-y-2 text-center">
-        <h1 className="text-3xl font-bold text-foreground">Choisissez votre forfait</h1>
+      <div className="mb-10 space-y-2 text-center">
+        <h1 className="text-4xl font-bold text-foreground">Choisissez votre forfait</h1>
         <p className="mx-auto max-w-lg text-sm text-muted-foreground">
           Changez de forfait à tout moment. Les modifications sont calculées au prorata.
         </p>
@@ -163,10 +164,9 @@ export default function PlanUpgradePage() {
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className="grid gap-8 md:grid-cols-3">
         {PLAN_IDS.map((id, i) => {
           const plan = PLANS[id]
-          const Icon = plan.icon
           const price = period === 'annual' ? plan.priceAnnual : plan.priceMonthly
           const isCurrent = id === currentPlanId
           return (
@@ -176,8 +176,8 @@ export default function PlanUpgradePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.06 }}
               className={cn(
-                'relative flex flex-col rounded-2xl border bg-card p-6 shadow-surface',
-                plan.recommended ? `${plan.accentRing} ring-1 ring-primary/30 md:-mt-2 md:mb-2` : 'border-border'
+                'relative flex flex-col rounded-3xl border bg-card p-8 shadow-surface',
+                plan.recommended ? `${plan.accentRing} ring-1 ring-primary/30 md:-mt-3 md:mb-3` : 'border-border'
               )}
             >
               {plan.recommended && (
@@ -186,11 +186,11 @@ export default function PlanUpgradePage() {
                 </span>
               )}
 
-              <div className="flex items-center gap-2.5">
-                <div className={cn('flex h-10 w-10 items-center justify-center rounded-xl', plan.accentSoft)}>
-                  <Icon className={cn('h-5 w-5', plan.accentText)} />
+              <div className="flex items-center gap-3">
+                <div className={cn('h-14 w-14 shrink-0', plan.accentText)}>
+                  <PlanRings tier={id} />
                 </div>
-                <h2 className="text-lg font-bold text-foreground">{plan.name}</h2>
+                <h2 className="text-xl font-bold text-foreground">{plan.name}</h2>
                 {isCurrent && (
                   <span className="ml-auto rounded-full bg-foreground/10 px-2.5 py-0.5 text-[11px] font-semibold text-foreground">
                     Forfait actuel
@@ -198,7 +198,7 @@ export default function PlanUpgradePage() {
                 )}
               </div>
 
-              <p className="mt-2 min-h-[2.5rem] text-sm text-muted-foreground">{plan.tagline}</p>
+              <p className="mt-3 min-h-[2.5rem] text-sm text-muted-foreground">{plan.tagline}</p>
 
               <div className="mt-4 flex items-baseline gap-1">
                 {price > 0 ? (
