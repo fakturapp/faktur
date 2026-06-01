@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { api } from '@/lib/api'
 import { useAuth } from '@/lib/auth'
 import { cn } from '@/lib/utils'
@@ -10,17 +10,24 @@ import { useToast } from '@/components/ui/toast'
 import { Spinner } from '@/components/ui/spinner'
 import { Button } from '@/components/ui/button'
 import { Tooltip } from '@/components/ui/tooltip'
-import { getPlan, type PlanId } from '@/lib/plans'
 import {
-  Check,
-  ArrowRight,
-  Settings,
-  AlertTriangle,
+  Dialog,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import { getPlan, type PlanId } from '@/lib/plans'
+import { PLATFORM_URL } from '@/lib/external-urls'
+import {
   PartyPopper,
   RotateCcw,
+  CreditCard,
+  Gauge,
+  ArrowUpRight,
+  ExternalLink,
+  AlertTriangle,
   Infinity as InfinityIcon,
-  CalendarClock,
-  ShieldCheck,
 } from 'lucide-react'
 
 interface TeamData {
@@ -39,6 +46,19 @@ interface TeamData {
   hasStripeSubscription?: boolean
 }
 
+interface Invoice {
+  id: string
+  number: string | null
+  created: number | null
+  dueDate: number | null
+  total: number | null
+  currency: string
+  status: string | null
+  amountRemaining: number | null
+  hostedUrl: string | null
+  pdfUrl: string | null
+}
+
 function formatDate(iso?: string | null): string {
   if (!iso) return ''
   try {
@@ -46,6 +66,64 @@ function formatDate(iso?: string | null): string {
   } catch {
     return ''
   }
+}
+
+function formatDateMs(ms?: number | null): string {
+  if (!ms) return ''
+  try {
+    return new Date(ms).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
+  } catch {
+    return ''
+  }
+}
+
+function formatCents(cents?: number | null, currency = 'eur'): string {
+  if (cents == null) return '—'
+  const symbol = currency.toLowerCase() === 'eur' ? '€' : currency.toUpperCase()
+  return `${(cents / 100).toLocaleString('fr-FR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })} ${symbol}`
+}
+
+function invoiceStatus(s: string | null): { label: string; cls: string } {
+  switch (s) {
+    case 'paid':
+      return { label: 'Payée', cls: 'text-foreground' }
+    case 'open':
+      return { label: 'En attente', cls: 'text-amber-600 dark:text-amber-400' }
+    case 'void':
+      return { label: 'Annulée', cls: 'text-muted-foreground' }
+    case 'uncollectible':
+      return { label: 'Impayée', cls: 'text-destructive' }
+    default:
+      return { label: s ?? '—', cls: 'text-muted-foreground' }
+  }
+}
+
+function Section({
+  title,
+  desc,
+  action,
+  children,
+}: {
+  title: string
+  desc?: string
+  action?: React.ReactNode
+  children?: React.ReactNode
+}) {
+  return (
+    <section className="border-t border-border py-7">
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <h2 className="text-[15px] font-bold text-foreground">{title}</h2>
+          {desc && <p className="mt-1 max-w-md text-sm text-muted-foreground">{desc}</p>}
+        </div>
+        {action}
+      </div>
+      {children}
+    </section>
+  )
 }
 
 export default function PlanPage() {
@@ -59,6 +137,10 @@ export default function PlanPage() {
   const [team, setTeam] = useState<TeamData | null>(null)
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState<string | null>(null)
+  const [syncing, setSyncing] = useState(justSubscribed)
+  const [welcome, setWelcome] = useState(false)
+  const [invoices, setInvoices] = useState<Invoice[]>([])
+  const [cancelOpen, setCancelOpen] = useState(false)
 
   const load = useCallback(async () => {
     const { data } = await api.get<{ team: TeamData }>('/team')
@@ -71,6 +153,7 @@ export default function PlanPage() {
   }, [load])
 
   useEffect(() => {
+    if (justSubscribed) return
     let cancelled = false
     api.post('/billing/sync', {}).then(() => {
       if (!cancelled) load()
@@ -78,16 +161,39 @@ export default function PlanPage() {
     return () => {
       cancelled = true
     }
-  }, [load])
+  }, [load, justSubscribed])
 
   useEffect(() => {
     if (!justSubscribed) return
-    refreshUser()
-    const t = setTimeout(() => {
-      api.post('/billing/sync', {}).then(() => load())
-    }, 2500)
-    return () => clearTimeout(t)
-  }, [justSubscribed, load, refreshUser])
+    let active = true
+    let tries = 0
+    async function poll() {
+      await api.post('/billing/sync', {}).catch(() => {})
+      const { data } = await api.get<{ team: TeamData }>('/team')
+      if (!active) return
+      if (data?.team) setTeam(data.team)
+      const t = data?.team
+      const ok =
+        !!t &&
+        t.plan !== 'free' &&
+        !!t.hasStripeSubscription &&
+        (t.subscriptionStatus === 'active' || t.subscriptionStatus === 'trialing')
+      tries++
+      if (ok || tries >= 6) {
+        setSyncing(false)
+        setWelcome(true)
+        setLoading(false)
+        refreshUser()
+        router.replace('/dashboard/settings/plan')
+      } else {
+        setTimeout(poll, 1500)
+      }
+    }
+    poll()
+    return () => {
+      active = false
+    }
+  }, [justSubscribed, refreshUser, router])
 
   const currentPlanId: PlanId = team?.plan ?? 'free'
   const status = team?.subscriptionStatus ?? null
@@ -101,6 +207,8 @@ export default function PlanPage() {
   const pendingPlanId: PlanId | null =
     team?.pendingPlan && team.pendingPlan !== currentPlanId ? team.pendingPlan : null
   const pendingMeta = pendingPlanId ? getPlan(pendingPlanId) : null
+  const cancelAtPeriodEnd = !!team?.subscriptionCancelAtPeriodEnd
+  const periodEnd = formatDate(team?.subscriptionCurrentPeriodEnd)
 
   const openPortal = useCallback(async () => {
     setBusy('portal')
@@ -112,6 +220,14 @@ export default function PlanPage() {
     }
     window.location.href = data.url
   }, [toast])
+
+  useEffect(() => {
+    if (isStripeSubscribed) {
+      api.get<{ invoices: Invoice[] }>('/billing/invoices').then(({ data }) => {
+        if (data?.invoices) setInvoices(data.invoices)
+      })
+    }
+  }, [isStripeSubscribed])
 
   useEffect(() => {
     if (recover && !loading && isStripeSubscribed) {
@@ -144,7 +260,30 @@ export default function PlanPage() {
     load()
   }
 
-  if (loading) {
+  async function handleCancel() {
+    setBusy('cancel')
+    const { error } = await api.post('/billing/cancel', {})
+    setBusy(null)
+    setCancelOpen(false)
+    if (error) {
+      toast(error, 'error')
+      return
+    }
+    toast('Abonnement résilié, il restera actif jusqu’à son expiration', 'success')
+    load()
+  }
+
+  const renewalLine = (() => {
+    if (isAdminGranted) return 'Forfait attribué par un administrateur · sans expiration.'
+    if (pendingMeta && periodEnd) return `Vous passerez au forfait ${pendingMeta.name} le ${periodEnd}.`
+    if (cancelAtPeriodEnd && periodEnd) return `Votre abonnement prendra fin le ${periodEnd}.`
+    if (isStripeSubscribed && periodEnd)
+      return `Votre abonnement se renouvellera automatiquement le ${periodEnd}.`
+    if (!isPaid) return 'Forfait gratuit, pour toujours, sans aucun frais.'
+    return meta.tagline
+  })()
+
+  if (loading && !syncing) {
     return (
       <div className="flex items-center justify-center py-24">
         <Spinner size="lg" className="text-primary" />
@@ -153,230 +292,253 @@ export default function PlanPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl p-6">
-      {justSubscribed && (
+    <div className="mx-auto max-w-3xl px-6 py-8">
+      <AnimatePresence>
+        {syncing && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[70] flex flex-col items-center justify-center bg-background/70 backdrop-blur-md"
+          >
+            <Spinner size="lg" className="text-primary" />
+            <p className="mt-4 text-sm font-medium text-foreground">
+              Mise à jour de votre abonnement…
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {welcome && (
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-6 flex items-center gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4"
+          className="mb-8 flex items-center gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4"
         >
           <PartyPopper className="h-6 w-6 shrink-0 text-emerald-500" />
           <div>
             <p className="text-sm font-semibold text-foreground">
-              Félicitations, vous êtes passé au plan {meta.name} !
+              Bravo, bienvenue sur Faktur {meta.name} !
             </p>
             <p className="text-xs text-muted-foreground">
-              Votre paiement est confirmé. Vos nouveaux avantages sont déjà actifs.
+              Votre paiement est confirmé et vos nouveaux avantages sont déjà actifs.
             </p>
           </div>
         </motion.div>
       )}
 
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-foreground">Votre abonnement</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Gérez le forfait de l’équipe {team ? `« ${team.name} »` : ''}.
-        </p>
+      {/* Plan hero */}
+      <div className="flex items-start justify-between gap-4 pb-2">
+        <div className="flex items-start gap-4">
+          <div className={cn('flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl', meta.accentSoft)}>
+            <Icon className={cn('h-7 w-7', meta.accentText)} />
+          </div>
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-base font-bold text-foreground">{meta.label}</h1>
+              {isStripeSubscribed && status !== 'past_due' && !cancelAtPeriodEnd && !pendingMeta && (
+                <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                  Actif
+                </span>
+              )}
+              {status === 'past_due' && (
+                <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[11px] font-semibold text-amber-600 dark:text-amber-400">
+                  Paiement en échec
+                </span>
+              )}
+              {isAdminGranted && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-indigo-500/15 px-2 py-0.5 text-[11px] font-semibold text-indigo-500">
+                  <InfinityIcon className="h-3 w-3" /> Illimité
+                </span>
+              )}
+            </div>
+            <p className="text-[15px] font-medium text-foreground">{meta.tagline}</p>
+            <p className="text-sm text-muted-foreground">{renewalLine}</p>
+          </div>
+        </div>
+        {isPaid ? (
+          <Button variant="outline" onClick={() => router.push('/dashboard/settings/plan/upgrade')}>
+            Modifier l’abonnement
+          </Button>
+        ) : (
+          <Button onClick={() => router.push('/dashboard/settings/plan/upgrade')}>
+            Choisir un forfait <ArrowUpRight className="ml-1.5 h-4 w-4" />
+          </Button>
+        )}
       </div>
 
-      <div
-        className={cn(
-          'overflow-hidden rounded-2xl border bg-card shadow-surface',
-          status === 'past_due' ? 'border-amber-500/40' : isPaid ? meta.accentRing : 'border-border'
-        )}
-      >
-        <div className="grid md:grid-cols-[1fr_minmax(0,18rem)]">
-          {/* Plan */}
-          <div className="p-6">
-            <div className="flex items-center gap-3">
-              <div className={cn('flex h-12 w-12 shrink-0 items-center justify-center rounded-xl', meta.accentSoft)}>
-                <Icon className={cn('h-6 w-6', meta.accentText)} />
-              </div>
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <h2 className="text-xl font-bold text-foreground">{meta.label}</h2>
-                  {isStripeSubscribed && status !== 'past_due' && (
-                    <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
-                      Actif
-                    </span>
-                  )}
-                  {status === 'past_due' && (
-                    <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[11px] font-semibold text-amber-600 dark:text-amber-400">
-                      Paiement en échec
-                    </span>
-                  )}
-                  {isAdminGranted && (
-                    <span className="rounded-full bg-indigo-500/15 px-2 py-0.5 text-[11px] font-semibold text-indigo-500">
-                      Attribué par l’administrateur
-                    </span>
-                  )}
-                </div>
-                <p className="mt-0.5 text-sm text-muted-foreground">{meta.tagline}</p>
-              </div>
+      {status === 'past_due' && (
+        <div className="mt-4 flex items-start gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-700 dark:text-amber-300">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+          Le dernier paiement a échoué. Régularisez-le pour éviter la rétrogradation.
+        </div>
+      )}
+
+      <div className="mt-6">
+        {isStripeSubscribed && (
+          <Section
+            title="Paiement"
+            action={
+              <Button variant="outline" onClick={openPortal} disabled={busy === 'portal'}>
+                {busy === 'portal' ? <Spinner /> : 'Mettre à jour'}
+              </Button>
+            }
+          >
+            <div className="mt-3 flex items-center gap-2.5 text-sm font-medium text-foreground">
+              <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[#635bff]">
+                <CreditCard className="h-3.5 w-3.5 text-white" />
+              </span>
+              Moyen de paiement géré par Stripe
             </div>
+          </Section>
+        )}
 
-            <ul className="mt-5 grid gap-2 sm:grid-cols-2">
-              {meta.features.map((f) => (
-                <li key={f} className="flex items-start gap-2 text-sm text-foreground/90">
-                  <Check className={cn('mt-0.5 h-4 w-4 shrink-0', meta.accentText)} />
-                  {f}
-                </li>
-              ))}
-            </ul>
-          </div>
+        <Section
+          title="Crédits d’utilisation"
+          desc="Votre utilisation de l’API et des fonctionnalités avancées est incluse avec votre abonnement. Consultez votre consommation détaillée sur la plateforme développeur."
+          action={
+            <a
+              href={`${PLATFORM_URL}/usage`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-border bg-card px-3.5 py-2 text-sm font-semibold text-foreground shadow-surface transition-colors hover:bg-surface-hover"
+            >
+              <Gauge className="h-4 w-4" /> Voir dans la page Plateforme
+              <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
+            </a>
+          }
+        />
 
-          {/* Détails / gestion du paiement */}
-          <div className="border-t border-border bg-muted/20 p-6 md:border-l md:border-t-0">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Détails de l’abonnement
-            </h3>
+        {isStripeSubscribed && invoices.length > 0 && (
+          <Section title="Factures">
+            <div className="mt-4 overflow-x-auto">
+              <table className="w-full border-collapse text-left text-sm">
+                <thead>
+                  <tr className="text-foreground">
+                    <th className="pb-4 font-bold">Date</th>
+                    <th className="pb-4 font-bold">Total</th>
+                    <th className="pb-4 font-bold">Statut</th>
+                    <th className="pb-4 text-right font-bold">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {invoices.map((inv) => {
+                    const st = invoiceStatus(inv.status)
+                    return (
+                      <tr key={inv.id} className="border-t border-border">
+                        <td className="py-3.5 text-foreground">{formatDateMs(inv.created)}</td>
+                        <td className="py-3.5 text-foreground">{formatCents(inv.total, inv.currency)}</td>
+                        <td className={cn('py-3.5', st.cls)}>{st.label}</td>
+                        <td className="py-3.5 text-right">
+                          {inv.hostedUrl || inv.pdfUrl ? (
+                            <a
+                              href={(inv.hostedUrl || inv.pdfUrl)!}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="font-medium text-primary hover:underline"
+                            >
+                              Voir
+                            </a>
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </Section>
+        )}
 
-            {isAdminGranted ? (
-              <div className="mt-4 space-y-3 text-sm">
-                <div className="flex items-center gap-2 text-foreground">
-                  <InfinityIcon className="h-4 w-4 text-indigo-500" />
-                  Sans expiration · Illimité
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Ce forfait a été attribué manuellement par un administrateur Faktur. Il ne se
-                  renouvelle pas et n’a pas de paiement associé.
-                </p>
-                {currentPlanId !== 'team' && (
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => router.push('/dashboard/settings/plan/upgrade')}
-                  >
-                    Voir les forfaits
-                  </Button>
-                )}
-              </div>
-            ) : isStripeSubscribed ? (
-              <div className="mt-4 space-y-4 text-sm">
-                {team?.subscriptionStartedAt && (
-                  <div>
-                    <p className="text-xs text-muted-foreground">Abonné depuis</p>
-                    <p className="font-medium text-foreground">
-                      {formatDate(team.subscriptionStartedAt)}
-                    </p>
-                  </div>
-                )}
-                <div>
-                  <p className="text-xs text-muted-foreground">
-                    {pendingMeta
-                      ? `Vous passerez à ${pendingMeta.name} le`
-                      : team?.subscriptionCancelAtPeriodEnd
-                        ? 'Expire le'
-                        : 'Se renouvelle le'}
-                  </p>
-                  <p className="inline-flex items-center gap-1.5 font-medium text-foreground">
-                    <CalendarClock className="h-4 w-4 text-muted-foreground" />
-                    {formatDate(team?.subscriptionCurrentPeriodEnd) || '—'}
-                  </p>
-                </div>
+        {isStripeSubscribed && (
+          <Section title={pendingMeta ? 'Changement programmé' : 'Annulation'}>
+            <div className="mt-3 flex items-center justify-between gap-4">
+              <span className="text-sm font-medium text-foreground">
+                {pendingMeta
+                  ? `Passage au forfait ${pendingMeta.name} programmé`
+                  : cancelAtPeriodEnd
+                    ? 'Votre abonnement est programmé pour expirer'
+                    : 'Annuler l’abonnement'}
+              </span>
 
-                {pendingMeta && (
-                  <div className="flex items-start gap-2 rounded-lg border border-border bg-muted/30 p-2.5 text-xs text-muted-foreground">
-                    <CalendarClock className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                    Vous gardez tous les avantages du forfait {meta.name} jusqu’à cette date, puis
-                    vous passerez automatiquement au forfait {pendingMeta.name}.
-                  </div>
-                )}
-
-                {status === 'past_due' && (
-                  <div className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-2.5 text-xs text-amber-700 dark:text-amber-300">
-                    <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                    Le dernier paiement a échoué. Régularisez-le pour éviter la rétrogradation.
-                  </div>
-                )}
-
-                <div className="space-y-2 pt-1">
-                  <Button className="w-full" onClick={openPortal} disabled={busy === 'portal'}>
-                    {busy === 'portal' ? (
-                      <>
-                        <Spinner /> Ouverture…
-                      </>
-                    ) : (
-                      <>
-                        <Settings className="mr-1.5 h-4 w-4" /> Gérer mon abonnement
-                      </>
-                    )}
-                  </Button>
-                  {pendingMeta ? (
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      onClick={handleCancelScheduled}
-                      disabled={busy === 'cancel-scheduled'}
-                    >
-                      {busy === 'cancel-scheduled' ? (
-                        <>
-                          <Spinner /> …
-                        </>
+              {pendingMeta ? (
+                <Button variant="outline" onClick={handleCancelScheduled} disabled={busy === 'cancel-scheduled'}>
+                  {busy === 'cancel-scheduled' ? (
+                    <Spinner />
+                  ) : (
+                    <>
+                      <RotateCcw className="mr-1.5 h-4 w-4" /> Annuler le changement
+                    </>
+                  )}
+                </Button>
+              ) : cancelAtPeriodEnd ? (
+                team?.subscriptionCancelExternal ? (
+                  <Tooltip content="Cette annulation a été effectuée depuis Stripe. Pour réactiver, passez par le portail Stripe.">
+                    <Button variant="outline" onClick={openPortal} disabled={busy === 'portal'}>
+                      {busy === 'portal' ? (
+                        <Spinner />
                       ) : (
                         <>
-                          <RotateCcw className="mr-1.5 h-4 w-4" /> Annuler le changement
+                          <RotateCcw className="mr-1.5 h-4 w-4" /> Réactiver via Stripe
                         </>
                       )}
                     </Button>
-                  ) : team?.subscriptionCancelAtPeriodEnd ? (
-                    team?.subscriptionCancelExternal ? (
-                      <Tooltip content="Cette annulation a été effectuée depuis Stripe. Pour réactiver, passez par le portail Stripe.">
-                        <Button
-                          variant="outline"
-                          className="w-full"
-                          onClick={openPortal}
-                          disabled={busy === 'portal'}
-                        >
-                          {busy === 'portal' ? (
-                            <>
-                              <Spinner /> …
-                            </>
-                          ) : (
-                            <>
-                              <RotateCcw className="mr-1.5 h-4 w-4" /> Réactiver via Stripe
-                            </>
-                          )}
-                        </Button>
-                      </Tooltip>
+                  </Tooltip>
+                ) : (
+                  <Button variant="outline" onClick={handleResume} disabled={busy === 'resume'}>
+                    {busy === 'resume' ? (
+                      <Spinner />
                     ) : (
-                      <Button variant="outline" className="w-full" onClick={handleResume} disabled={busy === 'resume'}>
-                        {busy === 'resume' ? (
-                          <>
-                            <Spinner /> …
-                          </>
-                        ) : (
-                          <>
-                            <RotateCcw className="mr-1.5 h-4 w-4" /> Réactiver
-                          </>
-                        )}
-                      </Button>
-                    )
-                  ) : (
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => router.push('/dashboard/settings/plan/upgrade')}
-                    >
-                      Changer de forfait
-                    </Button>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <div className="mt-4 space-y-4 text-sm">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <ShieldCheck className="h-4 w-4" />
-                  Forfait gratuit, pour toujours.
-                </div>
-                <Button className="w-full" onClick={() => router.push('/dashboard/settings/plan/upgrade')}>
-                  Choisir un forfait <ArrowRight className="ml-1.5 h-4 w-4" />
+                      <>
+                        <RotateCcw className="mr-1.5 h-4 w-4" /> Réactiver
+                      </>
+                    )}
+                  </Button>
+                )
+              ) : (
+                <Button variant="destructive" onClick={() => setCancelOpen(true)}>
+                  Annuler
                 </Button>
-              </div>
-            )}
-          </div>
-        </div>
+              )}
+            </div>
+          </Section>
+        )}
+
+        {isAdminGranted && (
+          <Section
+            title="Gestion"
+            desc="Ce forfait a été attribué manuellement par un administrateur Faktur. Il ne se renouvelle pas et n’a aucun paiement associé."
+            action={
+              currentPlanId !== 'team' ? (
+                <Button variant="outline" onClick={() => router.push('/dashboard/settings/plan/upgrade')}>
+                  Voir les forfaits
+                </Button>
+              ) : undefined
+            }
+          />
+        )}
       </div>
+
+      <Dialog open={cancelOpen} onClose={() => busy !== 'cancel' && setCancelOpen(false)}>
+        <DialogHeader showClose={false} icon={<AlertTriangle className="h-5 w-5 text-amber-500" />}>
+          <DialogTitle>Annuler votre abonnement ?</DialogTitle>
+          <DialogDescription>
+            Vous conservez tous les avantages du forfait {meta.name} jusqu’au{' '}
+            {periodEnd || 'terme de la période en cours'}. À cette date, votre équipe repassera au
+            plan Gratuit.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button onClick={() => setCancelOpen(false)} disabled={busy === 'cancel'}>
+            Conserver mon abonnement
+          </Button>
+          <Button variant="destructive" onClick={handleCancel} disabled={busy === 'cancel'}>
+            {busy === 'cancel' ? <Spinner /> : 'Confirmer l’annulation'}
+          </Button>
+        </DialogFooter>
+      </Dialog>
     </div>
   )
 }
