@@ -35,6 +35,12 @@ export default class Team extends BaseModel {
   @column()
   declare planPeriod: 'monthly' | 'annual' | null
 
+  @column()
+  declare pendingPlan: 'free' | 'pro' | 'team' | null
+
+  @column()
+  declare pendingPlanPeriod: 'monthly' | 'annual' | null
+
   @column.dateTime()
   declare subscriptionCurrentPeriodEnd: DateTime | null
 
