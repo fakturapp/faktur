@@ -63,37 +63,42 @@ export default class Sync {
       } catch {}
     }
 
-    team.stripeSubscriptionId = active.id
-    team.subscriptionStatus = active.status
-    team.subscriptionCancelAtPeriodEnd = !!active.cancel_at_period_end || !!active.cancel_at
-    team.subscriptionCancelExternal = !!active.cancel_at && !active.cancel_at_period_end
-    const periodEnd =
-      active.cancel_at ?? active.current_period_end ?? active.items?.data?.[0]?.current_period_end
-    team.subscriptionCurrentPeriodEnd = periodEnd ? DateTime.fromSeconds(Number(periodEnd)) : null
+    let full: any = active
+    try {
+      full = await billingService.retrieveSubscription(active.id)
+    } catch {}
 
-    const plan = active.metadata?.plan
+    team.stripeSubscriptionId = full.id
+    team.subscriptionStatus = full.status
+    team.subscriptionCancelAtPeriodEnd = !!full.cancel_at_period_end || !!full.cancel_at
+    team.subscriptionCancelExternal = !!full.cancel_at && !full.cancel_at_period_end
+
+    const period = billingService.subscriptionPeriod(full)
+    const endTs = full.cancel_at ?? period.end
+    team.subscriptionCurrentPeriodEnd = endTs ? DateTime.fromSeconds(Number(endTs)) : null
+
+    team.subscriptionStartedAt = full.start_date
+      ? DateTime.fromSeconds(Number(full.start_date))
+      : null
+
+    const plan = full.metadata?.plan
     if (plan === 'pro' || plan === 'team') team.plan = plan
-    const period = active.metadata?.period
-    if (period === 'monthly' || period === 'annual') team.planPeriod = period
+    const planPeriod = full.metadata?.period
+    if (planPeriod === 'monthly' || planPeriod === 'annual') team.planPeriod = planPeriod
 
-    if (!active.schedule) {
+    if (!full.schedule) {
       team.pendingPlan = null
       team.pendingPlanPeriod = null
     } else {
       try {
-        const schedule = await billingService.retrieveSchedule(String(active.schedule))
+        const schedule = await billingService.retrieveSchedule(String(full.schedule))
         const pending = billingService.detectPendingChange({ schedule })
         team.pendingPlan = pending?.plan ?? null
         team.pendingPlanPeriod = pending?.period ?? null
       } catch {}
     }
 
-    if (!team.subscriptionStartedAt) {
-      team.subscriptionStartedAt = active.start_date
-        ? DateTime.fromSeconds(Number(active.start_date))
-        : DateTime.now()
-    }
-    if (active.status !== 'past_due') team.subscriptionGraceEndsAt = null
+    if (full.status !== 'past_due') team.subscriptionGraceEndsAt = null
 
     await team.save()
     return response.ok({ synced: true, plan: team.plan, status: team.subscriptionStatus })

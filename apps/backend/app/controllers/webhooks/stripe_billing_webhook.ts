@@ -83,7 +83,7 @@ export default class StripeBillingWebhook {
 
   private periodEnd(sub: any): DateTime | null {
     const ts =
-      sub?.cancel_at ?? sub?.current_period_end ?? sub?.items?.data?.[0]?.current_period_end
+      sub?.cancel_at ?? sub?.items?.data?.[0]?.current_period_end ?? sub?.current_period_end
     return ts ? DateTime.fromSeconds(Number(ts)) : null
   }
 
@@ -142,10 +142,8 @@ export default class StripeBillingWebhook {
         team.pendingPlanPeriod = null
       }
       team.subscriptionGraceEndsAt = null
-      if (!team.subscriptionStartedAt) {
-        team.subscriptionStartedAt = sub.start_date
-          ? DateTime.fromSeconds(Number(sub.start_date))
-          : DateTime.now()
+      if (sub.start_date) {
+        team.subscriptionStartedAt = DateTime.fromSeconds(Number(sub.start_date))
       }
     } else if (sub.status === 'canceled' || sub.status === 'incomplete_expired') {
       team.plan = 'free'
