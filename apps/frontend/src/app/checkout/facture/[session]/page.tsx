@@ -5,10 +5,12 @@ import { useParams, useRouter } from 'next/navigation'
 import { loadStripe, type Stripe, type Appearance } from '@stripe/stripe-js'
 import { CheckoutElementsProvider, useCheckout, PaymentElement } from '@stripe/react-stripe-js/checkout'
 import { api } from '@/lib/api'
+import { useAuth } from '@/lib/auth'
 import { Spinner } from '@/components/ui/spinner'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { getPlan, formatPlanPrice, type PlanId } from '@/lib/plans'
-import { ArrowLeft, FileText, ShieldCheck } from 'lucide-react'
+import { ArrowLeft, ShieldCheck } from 'lucide-react'
 
 interface CheckoutData {
   clientSecret: string
@@ -69,28 +71,29 @@ export default function SubscriptionCheckoutPage() {
       colorPrimary: '#6366f1',
       borderRadius: '12px',
       fontFamily: 'inherit',
+      fontSizeBase: '15px',
+      spacingUnit: '4px',
     },
   }
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto flex w-full max-w-[560px] flex-col px-6 pb-16 pt-8">
-        <div className="relative mb-8 flex h-10 items-center justify-center">
-          <div className="absolute left-0 flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-            <FileText className="h-5 w-5 text-primary" />
-          </div>
+      <div className="mx-auto flex w-full max-w-[600px] flex-col px-5 pb-20 pt-7">
+        <div className="mb-8 flex items-center justify-between">
           <button
             onClick={() => router.push('/dashboard/settings/plan/upgrade')}
-            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-4 py-1.5 text-sm font-medium text-foreground shadow-surface transition-colors hover:bg-surface-hover"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3.5 py-1.5 text-sm font-medium text-foreground shadow-surface transition-colors hover:bg-surface-hover"
           >
             <ArrowLeft className="h-4 w-4" /> Changer votre forfait
           </button>
+          <div className="flex items-center gap-2">
+            <img src="/logo.svg" alt="Faktur" className="h-7 w-7" />
+            <span className="text-base font-semibold tracking-tight text-foreground">Faktur</span>
+          </div>
         </div>
 
-        <h1 className="mb-6 text-2xl font-bold text-foreground">Configurer votre forfait</h1>
-
         {loading ? (
-          <div className="flex justify-center py-16">
+          <div className="flex justify-center py-20">
             <Spinner size="lg" className="text-primary" />
           </div>
         ) : error ? (
@@ -133,13 +136,14 @@ function CheckoutInner({
   amountDiscount: number | null
 }) {
   const router = useRouter()
+  const { user } = useAuth()
   const checkoutState = useCheckout()
   const [submitting, setSubmitting] = useState(false)
   const [err, setErr] = useState<string | null>(null)
 
   if (checkoutState.type === 'loading') {
     return (
-      <div className="flex justify-center py-16">
+      <div className="flex justify-center py-20">
         <Spinner size="lg" className="text-primary" />
       </div>
     )
@@ -158,9 +162,17 @@ function CheckoutInner({
   const monthly = meta ? (isAnnual ? meta.priceAnnual : meta.priceMonthly) : 0
   const fullPrice = isAnnual ? monthly * 12 : monthly
   const discount = amountDiscount && amountDiscount > 0 ? amountDiscount : 0
-  const subtotalLabel =
-    amountSubtotal != null ? formatCents(amountSubtotal) : formatPlanPrice(fullPrice)
+  const subtotalLabel = amountSubtotal != null ? formatCents(amountSubtotal) : formatPlanPrice(fullPrice)
   const dueTodayLabel = amountTotal != null ? formatCents(amountTotal) : formatPlanPrice(fullPrice)
+
+  const today = new Date().toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  })
+  const invoiceRef = meta ? `ABO-${meta.name.toUpperCase()}-${new Date().getFullYear()}` : ''
+  const currentTeam = user?.teams?.find((t) => t.id === user.currentTeamId) ?? null
+  const accentBar = plan === 'team' ? 'bg-amber-500' : 'bg-primary'
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -177,34 +189,101 @@ function CheckoutInner({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-5">
       {meta && (
-        <div className="rounded-2xl border border-border bg-card p-5 shadow-surface">
-          <h2 className="text-lg font-semibold text-foreground">Forfait {meta.name}</h2>
-          <div className="mt-3 space-y-1.5 text-sm">
-            <div className="flex justify-between text-muted-foreground">
-              <span>Abonnement {isAnnual ? 'annuel' : 'mensuel'}</span>
-              <span>{subtotalLabel}</span>
+        <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-surface">
+          <div className="flex items-start justify-between gap-4 p-6 pb-5">
+            <div className="flex items-center gap-3">
+              <div className={cn('flex h-11 w-11 items-center justify-center rounded-xl', meta.accentSoft)}>
+                <meta.icon className={cn('h-5 w-5', meta.accentText)} />
+              </div>
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  Facture d&apos;abonnement
+                </p>
+                <h2 className="text-lg font-bold text-foreground">Forfait {meta.name}</h2>
+              </div>
             </div>
+            <div className="text-right">
+              <p className={cn('text-xs font-bold uppercase tracking-wider', meta.accentText)}>Facture</p>
+              <p className="mt-0.5 text-[11px] font-medium text-muted-foreground">{invoiceRef}</p>
+              <p className="text-[11px] text-muted-foreground">{today}</p>
+            </div>
+          </div>
+
+          <div className={cn('mx-6 h-0.5 rounded-full', accentBar)} />
+
+          <div className="grid grid-cols-2 gap-4 p-6 pb-4">
+            <div className="space-y-1">
+              <p className={cn('text-[10px] font-semibold uppercase tracking-wider', meta.accentText)}>
+                Émetteur
+              </p>
+              <p className="text-sm font-medium text-foreground">Faktur</p>
+              <p className="text-xs text-muted-foreground">Logiciel de facturation</p>
+            </div>
+            <div className="space-y-1 text-right">
+              <p className={cn('text-[10px] font-semibold uppercase tracking-wider', meta.accentText)}>
+                Facturé à
+              </p>
+              {currentTeam && <p className="truncate text-sm font-medium text-foreground">{currentTeam.name}</p>}
+              {user?.email && <p className="truncate text-xs text-muted-foreground">{user.email}</p>}
+            </div>
+          </div>
+
+          <div className="px-6">
+            <div
+              className={cn(
+                'flex items-center justify-between rounded-t-lg px-4 py-2 text-[11px] font-semibold uppercase tracking-wider',
+                meta.accentSoft,
+                meta.accentText
+              )}
+            >
+              <span>Description</span>
+              <span>Montant</span>
+            </div>
+
+            <div className="flex items-center justify-between border-b border-border px-4 py-3 text-sm">
+              <span className="text-foreground">
+                Forfait {meta.name} · Abonnement {isAnnual ? 'annuel' : 'mensuel'}
+              </span>
+              <span className="font-medium text-foreground">{subtotalLabel}</span>
+            </div>
+
             {discount > 0 && (
-              <div className="flex justify-between text-emerald-600 dark:text-emerald-400">
-                <span>Crédit (temps déjà payé)</span>
-                <span>-{formatCents(discount)}</span>
+              <div className="flex items-center justify-between border-b border-border px-4 py-3 text-sm">
+                <span className="text-emerald-600 dark:text-emerald-400">Crédit · temps déjà payé</span>
+                <span className="font-medium text-emerald-600 dark:text-emerald-400">
+                  -{formatCents(discount)}
+                </span>
               </div>
             )}
-            <div className="flex justify-between text-muted-foreground">
-              <span>Montant estimé des taxes</span>
-              <span>0,00 €</span>
+
+            <div className="flex items-center justify-between border-b border-border px-4 py-3 text-sm">
+              <span className="text-muted-foreground">TVA estimée</span>
+              <span className="text-muted-foreground">0,00 €</span>
             </div>
-            <div className="mt-2 flex justify-between border-t border-border pt-2 text-base font-semibold text-foreground">
-              <span>Dû aujourd&apos;hui</span>
-              <span>{dueTodayLabel}</span>
+          </div>
+
+          <div className="p-6 pt-4">
+            <div
+              className={cn(
+                'flex items-center justify-between rounded-xl px-4 py-3',
+                meta.accentSoft
+              )}
+            >
+              <span className={cn('text-sm font-semibold', meta.accentText)}>Dû aujourd&apos;hui</span>
+              <span className={cn('text-xl font-bold', meta.accentText)}>{dueTodayLabel}</span>
             </div>
+            <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
+              Renouvellement {isAnnual ? 'annuel' : 'mensuel'} jusqu&apos;à annulation
+              {meta ? ` (${formatPlanPrice(fullPrice)} TTC)` : ''}. Annulable à tout moment depuis vos
+              paramètres.
+            </p>
           </div>
         </div>
       )}
 
-      <div className="rounded-2xl border border-border bg-card p-5 shadow-surface">
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-surface">
         <h3 className="mb-4 text-sm font-semibold text-foreground">Mode de paiement</h3>
         <PaymentElement />
       </div>
@@ -215,7 +294,7 @@ function CheckoutInner({
         </div>
       )}
 
-      <Button type="submit" className="w-full" disabled={submitting}>
+      <Button type="submit" className="w-full py-3 text-base" disabled={submitting}>
         {submitting ? (
           <>
             <Spinner /> Paiement en cours…
@@ -229,13 +308,16 @@ function CheckoutInner({
         <ShieldCheck className="h-3.5 w-3.5" /> Paiement sécurisé par Stripe
       </p>
       <p className="text-center text-[11px] leading-relaxed text-muted-foreground">
-        Renouvellement {isAnnual ? 'annuel' : 'mensuel'} jusqu&apos;à annulation
-        {meta ? ` (${formatPlanPrice(fullPrice)} TTC)` : ''}. Annulable à tout moment depuis les
-        paramètres. En vous abonnant, vous acceptez nos{' '}
+        En vous abonnant, vous acceptez nos{' '}
         <a href="/legal" target="_blank" rel="noreferrer" className="underline">
           conditions d&apos;utilisation
+        </a>{' '}
+        et notre{' '}
+        <a href="/legal" target="_blank" rel="noreferrer" className="underline">
+          politique de confidentialité
         </a>
-        .
+        , et autorisez Faktur à enregistrer votre mode de paiement et à le débiter pour ce
+        renouvellement.
       </p>
     </form>
   )
