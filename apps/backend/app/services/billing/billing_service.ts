@@ -125,6 +125,22 @@ class BillingService {
     return refs[plan][period] || undefined
   }
 
+  buildLineItem(plan: BillingPlan, period: BillingPeriod): Record<string, any> {
+    const { unitAmount, interval } = this.priceFor(plan, period)
+    const ref = this.productRef(plan, period)
+    if (ref && ref.startsWith('price_')) {
+      return { price: ref }
+    }
+    const priceData: Record<string, any> = {
+      currency: 'eur',
+      unit_amount: unitAmount,
+      recurring: { interval },
+    }
+    if (ref) priceData.product = ref
+    else priceData.product_data = { name: PRODUCT_NAMES[plan] }
+    return { price_data: priceData }
+  }
+
   async createCheckoutSession(params: {
     team: Team
     customerId: string
@@ -133,23 +149,8 @@ class BillingService {
     returnUrl: string
     couponId?: string
   }): Promise<Stripe.Checkout.Session> {
-    const { unitAmount, interval } = this.priceFor(params.plan, params.period)
-    const ref = this.productRef(params.plan, params.period)
     const metadata = { team_id: params.team.id, plan: params.plan, period: params.period }
-
-    let lineItem: Record<string, any>
-    if (ref && ref.startsWith('price_')) {
-      lineItem = { price: ref, quantity: 1 }
-    } else {
-      const priceData: Record<string, any> = {
-        currency: 'eur',
-        unit_amount: unitAmount,
-        recurring: { interval },
-      }
-      if (ref) priceData.product = ref
-      else priceData.product_data = { name: PRODUCT_NAMES[params.plan] }
-      lineItem = { quantity: 1, price_data: priceData }
-    }
+    const lineItem = { ...this.buildLineItem(params.plan, params.period), quantity: 1 }
 
     const sessionParams: Record<string, any> = {
       mode: 'subscription',
@@ -200,6 +201,90 @@ class BillingService {
 
   async cancelImmediately(subscriptionId: string): Promise<Stripe.Subscription> {
     return this.client().subscriptions.cancel(subscriptionId)
+  }
+
+  async scheduleChangeAtPeriodEnd(params: {
+    subscriptionId: string
+    currentPlan: BillingPlan
+    currentPeriod: BillingPeriod
+    targetPlan: BillingPlan
+    targetPeriod: BillingPeriod
+    teamId: string
+  }): Promise<{ scheduleId: string; effectiveAt: number | null }> {
+    const client = this.client()
+    const sub: any = await client.subscriptions.retrieve(params.subscriptionId)
+
+    let scheduleId: string | null = sub?.schedule ? String(sub.schedule) : null
+    if (!scheduleId) {
+      const created = await client.subscriptionSchedules.create({
+        from_subscription: params.subscriptionId,
+      })
+      scheduleId = created.id
+    }
+
+    const schedule: any = await client.subscriptionSchedules.retrieve(scheduleId)
+    const period = this.subscriptionPeriod(sub)
+    const currentPriceId = sub?.items?.data?.[0]?.price?.id ?? undefined
+    const start = schedule?.current_phase?.start_date ?? period.start ?? undefined
+    const end = schedule?.current_phase?.end_date ?? period.end ?? undefined
+
+    const currentItem = currentPriceId
+      ? { price: currentPriceId, quantity: 1 }
+      : { ...this.buildLineItem(params.currentPlan, params.currentPeriod), quantity: 1 }
+
+    await client.subscriptionSchedules.update(scheduleId, {
+      end_behavior: 'release',
+      proration_behavior: 'none',
+      phases: [
+        {
+          items: [currentItem],
+          start_date: start,
+          end_date: end,
+          metadata: {
+            team_id: params.teamId,
+            plan: params.currentPlan,
+            period: params.currentPeriod,
+          },
+        },
+        {
+          items: [{ ...this.buildLineItem(params.targetPlan, params.targetPeriod), quantity: 1 }],
+          metadata: {
+            team_id: params.teamId,
+            plan: params.targetPlan,
+            period: params.targetPeriod,
+          },
+        },
+      ],
+    } as any)
+
+    return { scheduleId, effectiveAt: end ? Number(end) : null }
+  }
+
+  async retrieveSchedule(scheduleId: string): Promise<Stripe.SubscriptionSchedule> {
+    return this.client().subscriptionSchedules.retrieve(scheduleId)
+  }
+
+  async releaseScheduledChange(subscriptionId: string): Promise<void> {
+    const client = this.client()
+    const sub: any = await client.subscriptions.retrieve(subscriptionId)
+    const scheduleId = sub?.schedule ? String(sub.schedule) : null
+    if (scheduleId) {
+      try {
+        await client.subscriptionSchedules.release(scheduleId)
+      } catch {}
+    }
+  }
+
+  detectPendingChange(sub: any): { plan: BillingPlan; period: BillingPeriod } | null {
+    const phases: any[] = sub?.schedule?.phases ?? []
+    if (phases.length < 2) return null
+    const future = phases[phases.length - 1]
+    const plan = future?.metadata?.plan
+    const period = future?.metadata?.period
+    if ((plan === 'pro' || plan === 'team') && (period === 'monthly' || period === 'annual')) {
+      return { plan, period }
+    }
+    return null
   }
 
   constructEvent(rawBody: string | Buffer, signature: string): Stripe.Event {
