@@ -58,6 +58,8 @@ export default class Me {
       plan: t.plan,
       subscriptionStatus: t.subscriptionStatus,
       planPeriod: t.planPeriod,
+      pendingPlan: t.pendingPlan,
+      pendingPlanPeriod: t.pendingPlanPeriod,
       subscriptionCurrentPeriodEnd: t.subscriptionCurrentPeriodEnd
         ? t.subscriptionCurrentPeriodEnd.toISO()
         : null,

@@ -13,6 +13,8 @@ export interface TeamSummary {
   plan: 'free' | 'pro' | 'team'
   subscriptionStatus?: string | null
   planPeriod?: 'monthly' | 'annual' | null
+  pendingPlan?: 'free' | 'pro' | 'team' | null
+  pendingPlanPeriod?: 'monthly' | 'annual' | null
   subscriptionCurrentPeriodEnd?: string | null
   subscriptionGraceEndsAt?: string | null
   subscriptionCancelAtPeriodEnd?: boolean

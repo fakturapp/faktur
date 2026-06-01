@@ -9,6 +9,8 @@ export default class TeamTransformer extends BaseTransformer<Team> {
       plan: this.resource.plan,
       subscriptionStatus: this.resource.subscriptionStatus,
       planPeriod: this.resource.planPeriod,
+      pendingPlan: this.resource.pendingPlan,
+      pendingPlanPeriod: this.resource.pendingPlanPeriod,
       subscriptionCurrentPeriodEnd: this.resource.subscriptionCurrentPeriodEnd
         ? this.resource.subscriptionCurrentPeriodEnd.toISO()
         : null,
