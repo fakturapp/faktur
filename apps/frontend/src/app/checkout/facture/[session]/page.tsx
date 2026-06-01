@@ -15,6 +15,16 @@ interface CheckoutData {
   publishableKey: string
   plan: PlanId | null
   period: 'monthly' | 'annual' | null
+  amountSubtotal?: number | null
+  amountTotal?: number | null
+  amountDiscount?: number | null
+}
+
+function formatCents(cents: number): string {
+  return `${(cents / 100).toLocaleString('fr-FR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })} €`
 }
 
 export default function SubscriptionCheckoutPage() {
@@ -95,7 +105,13 @@ export default function SubscriptionCheckoutPage() {
             stripe={stripePromise}
             options={{ clientSecret: data.clientSecret, elementsOptions: { appearance } }}
           >
-            <CheckoutInner plan={data.plan} period={data.period} />
+            <CheckoutInner
+              plan={data.plan}
+              period={data.period}
+              amountSubtotal={data.amountSubtotal ?? null}
+              amountTotal={data.amountTotal ?? null}
+              amountDiscount={data.amountDiscount ?? null}
+            />
           </CheckoutElementsProvider>
         ) : null}
       </div>
@@ -103,7 +119,19 @@ export default function SubscriptionCheckoutPage() {
   )
 }
 
-function CheckoutInner({ plan, period }: { plan: PlanId | null; period: 'monthly' | 'annual' | null }) {
+function CheckoutInner({
+  plan,
+  period,
+  amountSubtotal,
+  amountTotal,
+  amountDiscount,
+}: {
+  plan: PlanId | null
+  period: 'monthly' | 'annual' | null
+  amountSubtotal: number | null
+  amountTotal: number | null
+  amountDiscount: number | null
+}) {
   const router = useRouter()
   const checkoutState = useCheckout()
   const [submitting, setSubmitting] = useState(false)
@@ -128,7 +156,11 @@ function CheckoutInner({ plan, period }: { plan: PlanId | null; period: 'monthly
   const meta = plan ? getPlan(plan) : null
   const isAnnual = period === 'annual'
   const monthly = meta ? (isAnnual ? meta.priceAnnual : meta.priceMonthly) : 0
-  const dueToday = isAnnual ? monthly * 12 : monthly
+  const fullPrice = isAnnual ? monthly * 12 : monthly
+  const discount = amountDiscount && amountDiscount > 0 ? amountDiscount : 0
+  const subtotalLabel =
+    amountSubtotal != null ? formatCents(amountSubtotal) : formatPlanPrice(fullPrice)
+  const dueTodayLabel = amountTotal != null ? formatCents(amountTotal) : formatPlanPrice(fullPrice)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -152,15 +184,21 @@ function CheckoutInner({ plan, period }: { plan: PlanId | null; period: 'monthly
           <div className="mt-3 space-y-1.5 text-sm">
             <div className="flex justify-between text-muted-foreground">
               <span>Abonnement {isAnnual ? 'annuel' : 'mensuel'}</span>
-              <span>{formatPlanPrice(dueToday)}</span>
+              <span>{subtotalLabel}</span>
             </div>
+            {discount > 0 && (
+              <div className="flex justify-between text-emerald-600 dark:text-emerald-400">
+                <span>Crédit (temps déjà payé)</span>
+                <span>-{formatCents(discount)}</span>
+              </div>
+            )}
             <div className="flex justify-between text-muted-foreground">
               <span>Montant estimé des taxes</span>
               <span>0,00 €</span>
             </div>
             <div className="mt-2 flex justify-between border-t border-border pt-2 text-base font-semibold text-foreground">
               <span>Dû aujourd&apos;hui</span>
-              <span>{formatPlanPrice(dueToday)}</span>
+              <span>{dueTodayLabel}</span>
             </div>
           </div>
         </div>
@@ -192,7 +230,7 @@ function CheckoutInner({ plan, period }: { plan: PlanId | null; period: 'monthly
       </p>
       <p className="text-center text-[11px] leading-relaxed text-muted-foreground">
         Renouvellement {isAnnual ? 'annuel' : 'mensuel'} jusqu&apos;à annulation
-        {meta ? ` (${formatPlanPrice(dueToday)} TTC)` : ''}. Annulable à tout moment depuis les
+        {meta ? ` (${formatPlanPrice(fullPrice)} TTC)` : ''}. Annulable à tout moment depuis les
         paramètres. En vous abonnant, vous acceptez nos{' '}
         <a href="/legal" target="_blank" rel="noreferrer" className="underline">
           conditions d&apos;utilisation
