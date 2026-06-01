@@ -54,6 +54,7 @@ interface TeamData {
   subscriptionGraceEndsAt?: string | null
   subscriptionCancelAtPeriodEnd?: boolean
   subscriptionCancelExternal?: boolean
+  subscriptionPaused?: boolean
   subscriptionStartedAt?: string | null
   hasStripeSubscription?: boolean
 }
@@ -246,6 +247,7 @@ export default function PlanPage() {
     team?.pendingPlan && team.pendingPlan !== currentPlanId ? team.pendingPlan : null
   const pendingMeta = pendingPlanId ? getPlan(pendingPlanId) : null
   const cancelAtPeriodEnd = !!team?.subscriptionCancelAtPeriodEnd
+  const suspended = isStripeSubscribed && !!team?.subscriptionPaused
   const periodEnd = formatDate(team?.subscriptionCurrentPeriodEnd)
 
   const openPortal = useCallback(async () => {
@@ -321,6 +323,8 @@ export default function PlanPage() {
   }
 
   const renewalLine = (() => {
+    if (suspended)
+      return 'Abonnement suspendu via Stripe. Contactez votre administrateur pour le réactiver.'
     if (isAdminGranted) return 'Forfait attribué par un administrateur · sans expiration.'
     if (pendingMeta && periodEnd) return `Vous passerez au forfait ${pendingMeta.name} le ${periodEnd}.`
     if (cancelAtPeriodEnd && periodEnd) return `Votre abonnement prendra fin le ${periodEnd}.`
@@ -377,13 +381,18 @@ export default function PlanPage() {
       {/* Plan hero */}
       <div className="flex items-start justify-between gap-4 pb-2">
         <div className="flex items-start gap-4">
-          <div className={cn('h-14 w-14 shrink-0', meta.accentText)}>
-            <PlanRings tier={currentPlanId} />
+          <div className={cn('h-14 w-14 shrink-0', suspended ? 'text-muted-foreground' : meta.accentText)}>
+            <PlanRings tier={suspended ? 'free' : currentPlanId} />
           </div>
           <div className="space-y-1">
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-base font-bold text-foreground">{meta.label}</h1>
-              {status === 'past_due' && (
+              {suspended && (
+                <span className="rounded-full bg-red-500/15 px-2 py-0.5 text-[11px] font-semibold text-red-600 dark:text-red-400">
+                  Suspendu
+                </span>
+              )}
+              {!suspended && status === 'past_due' && (
                 <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[11px] font-semibold text-amber-600 dark:text-amber-400">
                   Paiement en échec
                 </span>
@@ -398,7 +407,11 @@ export default function PlanPage() {
             <p className="text-sm text-muted-foreground">{renewalLine}</p>
           </div>
         </div>
-        {isAdminGranted ? (
+        {suspended ? (
+          <Button variant="outline" onClick={() => setContactAdminOpen(true)}>
+            Contacter l’administrateur
+          </Button>
+        ) : isAdminGranted ? (
           <Button variant="outline" onClick={() => setContactAdminOpen(true)}>
             Modifier l’abonnement
           </Button>
@@ -421,7 +434,7 @@ export default function PlanPage() {
       )}
 
       <div className="mt-6">
-        {isStripeSubscribed && (
+        {isStripeSubscribed && !suspended && (
           <Section
             title="Paiement"
             action={
@@ -567,7 +580,7 @@ export default function PlanPage() {
           )}
         </Section>
 
-        {isStripeSubscribed && (
+        {isStripeSubscribed && !suspended && (
           <Section title={pendingMeta ? 'Changement programmé' : 'Annulation'}>
             <div className="mt-3 flex items-center justify-between gap-4">
               <span className="text-sm font-medium text-foreground">
@@ -669,10 +682,13 @@ export default function PlanPage() {
 
       <Dialog open={contactAdminOpen} onClose={() => setContactAdminOpen(false)}>
         <DialogHeader showClose={false} icon={<ShieldAlert className="h-5 w-5 text-indigo-500" />}>
-          <DialogTitle>Forfait géré par votre administrateur</DialogTitle>
+          <DialogTitle>
+            {suspended ? 'Abonnement suspendu' : 'Forfait géré par votre administrateur'}
+          </DialogTitle>
           <DialogDescription>
-            Ce forfait a été attribué via le panneau d’administration Faktur. Pour le modifier ou
-            mettre à jour le paiement, contactez votre administrateur.
+            {suspended
+              ? 'Votre abonnement a été suspendu via Stripe. Contactez votre administrateur Faktur pour le réactiver.'
+              : 'Ce forfait a été attribué via le panneau d’administration Faktur. Pour le modifier ou mettre à jour le paiement, contactez votre administrateur.'}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>

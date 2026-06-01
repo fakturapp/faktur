@@ -12,7 +12,9 @@ export function SubscriptionBanner() {
   const [busy, setBusy] = useState(false)
 
   const team = user?.teams?.find((t) => t.id === user.currentTeamId)
-  if (!team || team.subscriptionStatus !== 'past_due') return null
+  const paused = !!team?.subscriptionPaused
+  const pastDue = team?.subscriptionStatus === 'past_due'
+  if (!team || (!pastDue && !paused)) return null
 
   let daysLeft: number | null = null
   if (team.subscriptionGraceEndsAt) {
@@ -22,6 +24,10 @@ export function SubscriptionBanner() {
 
   async function handleClick() {
     if (busy) return
+    if (paused) {
+      router.push('/dashboard/settings/plan')
+      return
+    }
     setBusy(true)
     const { data, error } = await api.post<{ url: string }>('/billing/portal', {})
     if (!error && data?.url) {
@@ -43,16 +49,21 @@ export function SubscriptionBanner() {
       </span>
       <span className="min-w-0 flex-1">
         <span className="block text-sm font-semibold text-red-800 dark:text-red-200">
-          Paiement échoué sur l’équipe «&nbsp;{team.name}&nbsp;»
+          {paused
+            ? `Abonnement suspendu sur l’équipe « ${team.name} »`
+            : `Paiement échoué sur l’équipe « ${team.name} »`}
         </span>
         <span className="block text-xs text-red-700/90 dark:text-red-300/90">
-          {daysLeft !== null
-            ? `Régularisez sous ${daysLeft} jour${daysLeft > 1 ? 's' : ''} via Stripe, sinon votre abonnement repassera au plan Gratuit.`
-            : 'Régularisez votre paiement via Stripe pour conserver votre forfait.'}
+          {paused
+            ? 'Votre abonnement a été suspendu via Stripe. Contactez votre administrateur pour le réactiver.'
+            : daysLeft !== null
+              ? `Régularisez sous ${daysLeft} jour${daysLeft > 1 ? 's' : ''} via Stripe, sinon votre abonnement repassera au plan Gratuit.`
+              : 'Régularisez votre paiement via Stripe pour conserver votre forfait.'}
         </span>
       </span>
       <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-red-500 px-3 py-1.5 text-xs font-semibold text-white">
-        {busy ? 'Ouverture…' : 'Régler maintenant'} <ArrowRight className="h-3.5 w-3.5" />
+        {paused ? 'En savoir plus' : busy ? 'Ouverture…' : 'Régler maintenant'}{' '}
+        <ArrowRight className="h-3.5 w-3.5" />
       </span>
     </button>
   )
