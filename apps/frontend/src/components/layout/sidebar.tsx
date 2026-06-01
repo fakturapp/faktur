@@ -10,7 +10,6 @@ import { Avatar } from '@/components/ui/avatar'
 import { Dropdown, DropdownItem, DropdownLabel, DropdownSeparator, DropdownSub } from '@/components/ui/dropdown'
 import { CreateInvoiceModal } from '@/components/invoices/create-invoice-modal'
 import { useTheme } from '@/lib/theme'
-import { APP_VERSION } from '@/lib/version'
 import { getPlan } from '@/lib/plans'
 import {
   isFakturDesktop,
@@ -436,7 +435,6 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
     }
   }, [])
   const brandName = desktop.is ? 'Faktur Desktop' : 'Faktur'
-  const brandVersion = desktop.is && desktop.version ? desktop.version : APP_VERSION
   const isCertifiedOfficial = desktop.is && certification?.certified === true
 
   const collapsed = collapsedProp && !isHovered
@@ -451,7 +449,6 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
     : user.email.slice(0, 2).toUpperCase()
 
   const currentPlan = getPlan(currentTeam?.plan)
-  const CurrentPlanIcon = currentPlan.icon
 
   return (
     <aside
@@ -558,31 +555,25 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
               <div className="flex items-center justify-start gap-2.5">
                 <img src="/logo.svg" alt={brandName} className="h-10 w-10 shrink-0 drop-shadow-sm" />
                 {!collapsed && (
-                  <motion.div {...labelFade} className="flex flex-col items-start min-w-0">
-                    <span className="flex items-center gap-1.5">
-                      <span className="text-[18px] font-semibold text-foreground font-lexend tracking-tight leading-tight whitespace-nowrap">
-                        {brandName}
-                      </span>
-                      {currentTeam && (
-                        <Tooltip content={`Plan ${currentPlan.name}`}>
-                          <span
-                            className={`inline-flex items-center rounded-full px-1.5 py-[1px] text-[9px] font-bold uppercase tracking-wide ${currentPlan.accentSoft} ${currentPlan.accentText}`}
-                          >
-                            {currentPlan.name}
-                          </span>
-                        </Tooltip>
-                      )}
+                  <motion.div {...labelFade} className="flex min-w-0 items-center gap-1.5">
+                    <span className="text-[21px] font-bold tracking-tight leading-tight whitespace-nowrap text-foreground">
+                      {brandName}
                     </span>
-                    <span className="flex items-center gap-1 leading-none whitespace-nowrap">
-                      <span className="text-[9px] text-muted-foreground/40 font-medium">
-                        v{brandVersion}
+                    {currentTeam && currentPlan.id === 'pro' && (
+                      <span className="text-[21px] font-bold leading-tight tracking-tight text-muted-foreground">
+                        Pro
                       </span>
-                      {isCertifiedOfficial && (
-                        <Tooltip content="Version officielle de Faktur Desktop">
-                          <VerifiedBadge className="h-3 w-3" label="Version officielle" />
-                        </Tooltip>
-                      )}
-                    </span>
+                    )}
+                    {currentTeam && currentPlan.id === 'team' && (
+                      <span className="text-[21px] font-bold leading-tight tracking-tight text-foreground/55">
+                        Team
+                      </span>
+                    )}
+                    {isCertifiedOfficial && (
+                      <Tooltip content="Version officielle de Faktur Desktop">
+                        <VerifiedBadge className="h-3.5 w-3.5" label="Version officielle" />
+                      </Tooltip>
+                    )}
                   </motion.div>
                 )}
               </div>
@@ -859,8 +850,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
                       {user.fullName || user.email.split('@')[0]}
                     </p>
                     {currentTeam && (
-                      <p className="mt-0.5 flex items-center gap-1 text-[11px] leading-tight text-muted-foreground truncate">
-                        <CurrentPlanIcon className={`h-3 w-3 shrink-0 ${currentPlan.accentText}`} />
+                      <p className="mt-0.5 flex items-center gap-1 truncate text-[12.5px] font-medium leading-tight text-muted-foreground">
                         {currentPlan.label}
                       </p>
                     )}
@@ -884,6 +874,19 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
                     ) : (
                       <Sun className="h-4 w-4" />
                     )}
+                  </motion.button>
+
+                  <motion.button
+                    {...labelFade}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      router.push('/download')
+                    }}
+                    className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-black/5 hover:text-foreground dark:hover:bg-white/5"
+                    title="Installer l'application"
+                  >
+                    <Download className="h-4 w-4" />
                   </motion.button>
 
                   <motion.div {...labelFade}>
@@ -921,14 +924,11 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             ) : (
               <button
                 type="button"
-                onClick={() => router.push('/dashboard/settings/plan')}
+                onClick={() => router.push('/dashboard/settings/plan/upgrade')}
                 className="mx-1 mb-1 flex w-[calc(100%-0.5rem)] items-center gap-2 rounded-lg px-3 py-2 transition-colors hover:bg-muted/60"
               >
-                <CurrentPlanIcon className={`h-4 w-4 shrink-0 ${currentPlan.accentText}`} />
-                <span className="text-[13px] font-medium text-foreground">{currentPlan.label}</span>
-                <span className="ml-auto inline-flex items-center gap-1 text-[11px] font-semibold text-primary">
-                  Mettre à niveau <ArrowRight className="h-3 w-3" />
-                </span>
+                <span className="text-[13px] font-semibold text-foreground">Mettre à niveau</span>
+                <ArrowRight className="ml-auto h-3.5 w-3.5 text-primary" />
               </button>
             ))}
           {currentTeam && <DropdownSeparator />}
@@ -1029,14 +1029,6 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
               </DropdownItem>
             </Link>
           </DropdownSub>
-
-          <DropdownSeparator />
-
-          <Link href="/download">
-            <DropdownItem>
-              <Download className="h-4 w-4 text-emerald-500" /> Installer l&apos;application
-            </DropdownItem>
-          </Link>
 
           <DropdownSeparator />
 
