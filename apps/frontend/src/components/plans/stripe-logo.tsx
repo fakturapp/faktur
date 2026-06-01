@@ -6,7 +6,7 @@ export function StripeLogo({ className }: { className?: string }) {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 32 32"
       fill="#635bff"
-      className={cn('h-5 w-5', className)}
+      className={cn('block h-5 w-5 shrink-0', className)}
       role="img"
       aria-label="Stripe"
     >

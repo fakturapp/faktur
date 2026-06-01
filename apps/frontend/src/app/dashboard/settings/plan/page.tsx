@@ -477,27 +477,29 @@ export default function PlanPage() {
               </Button>
             }
           >
-            <div className="mt-3 flex items-center gap-2.5 text-sm font-medium text-foreground">
+            <div className="mt-3 flex items-center gap-2 text-sm font-medium leading-none text-foreground">
               {!pmLoaded ? (
-                <span className="inline-flex items-center gap-2">
-                  <Skeleton className="h-5 w-5 rounded-md" />
+                <>
+                  <Skeleton className="h-4 w-4 rounded-md" />
                   <Skeleton className="h-4 w-40" />
-                </span>
+                </>
               ) : paymentMethod?.type === 'link' ? (
-                <span className="inline-flex items-center gap-1.5">
-                  <LinkLogo className="h-3.5" />
-                  <span className="text-muted-foreground">by Stripe</span>
-                </span>
+                <>
+                  <LinkLogo className="h-4" />
+                  <span className="leading-none text-muted-foreground">by Stripe</span>
+                </>
               ) : paymentMethod?.type === 'card' && paymentMethod.last4 ? (
                 <>
-                  <StripeLogo className="h-5 w-5" />
-                  {paymentMethod.brand ? capitalize(paymentMethod.brand) : 'Carte'} ••••{' '}
-                  {paymentMethod.last4}
+                  <StripeLogo className="h-4 w-4" />
+                  <span className="leading-none">
+                    {paymentMethod.brand ? capitalize(paymentMethod.brand) : 'Carte'} ••••{' '}
+                    {paymentMethod.last4}
+                  </span>
                 </>
               ) : (
                 <>
-                  <StripeLogo className="h-5 w-5" />
-                  Moyen de paiement géré par Stripe
+                  <StripeLogo className="h-4 w-4" />
+                  <span className="leading-none">Moyen de paiement géré par Stripe</span>
                 </>
               )}
             </div>

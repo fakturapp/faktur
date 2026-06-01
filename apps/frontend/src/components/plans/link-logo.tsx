@@ -6,7 +6,7 @@ export function LinkLogo({ className }: { className?: string }) {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 78 26"
       fill="none"
-      className={cn('h-5 w-auto', className)}
+      className={cn('block h-5 w-auto shrink-0', className)}
       role="img"
       aria-label="Link"
     >
