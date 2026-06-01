@@ -75,7 +75,7 @@ export default function PlanUpgradePage() {
       toast(error || 'Impossible de démarrer le paiement', 'error')
       return
     }
-    router.push(`/checkout/facture/${data.sessionId}`)
+    router.push(`/checkout/faktur_buy/${data.sessionId}`)
   }
 
   async function handleScheduleDowngrade(planId: PlanId) {

@@ -65,9 +65,9 @@ function buildAppearance(): Appearance {
 }
 
 export default function SubscriptionCheckoutPage() {
-  const params = useParams<{ session: string }>()
+  const params = useParams<{ key: string }>()
   const router = useRouter()
-  const sessionId = params?.session
+  const sessionId = params?.key
 
   const [data, setData] = useState<CheckoutData | null>(null)
   const [stripePromise, setStripePromise] = useState<Promise<Stripe | null> | null>(null)
