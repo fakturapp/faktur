@@ -184,7 +184,15 @@ export default function PlanUpgradePage() {
         {PLAN_IDS.map((id, i) => {
           const plan = PLANS[id]
           const price = period === 'annual' ? plan.priceAnnual : plan.priceMonthly
-          const isCurrent = id === currentPlanId
+          const curPeriod = team?.planPeriod ?? 'annual'
+          const sameTier = id === currentPlanId
+          const isCurrent = sameTier && (id === 'free' || period === curPeriod)
+          const periodDowngrade = sameTier && curPeriod === 'annual' && period === 'monthly'
+          const periodUpgrade = sameTier && curPeriod === 'monthly' && period === 'annual'
+          const isDowngrade =
+            isSubscribed && id !== 'free' && (RANK[id] < RANK[currentPlanId] || periodDowngrade)
+          const isUpgrade =
+            isSubscribed && id !== 'free' && (RANK[id] > RANK[currentPlanId] || periodUpgrade)
           return (
             <motion.div
               key={id}
@@ -257,7 +265,7 @@ export default function PlanUpgradePage() {
                   >
                     <TrendingDown className="mr-1.5 h-4 w-4" /> Rétrograder
                   </Button>
-                ) : isSubscribed && RANK[id] < RANK[currentPlanId] ? (
+                ) : isDowngrade ? (
                   <Button
                     variant="outline"
                     className="w-full"
@@ -270,11 +278,12 @@ export default function PlanUpgradePage() {
                       </>
                     ) : (
                       <>
-                        <TrendingDown className="mr-1.5 h-4 w-4" /> Rétrograder vers {plan.name}
+                        <TrendingDown className="mr-1.5 h-4 w-4" />{' '}
+                        {periodDowngrade ? 'Passer au mensuel' : `Rétrograder vers ${plan.name}`}
                       </>
                     )}
                   </Button>
-                ) : isSubscribed ? (
+                ) : isUpgrade ? (
                   <Button
                     variant={plan.recommended ? undefined : 'outline'}
                     className="w-full"
@@ -285,6 +294,8 @@ export default function PlanUpgradePage() {
                       <>
                         <Spinner /> Redirection…
                       </>
+                    ) : periodUpgrade ? (
+                      'Passer à l’annuel'
                     ) : (
                       `Passer à ${plan.name}`
                     )}
@@ -322,12 +333,14 @@ export default function PlanUpgradePage() {
             {downgradeTarget && <PlanRings tier={downgradeTarget} />}
           </div>
           <DialogTitle className="text-lg font-bold">
-            Passer au forfait {downgradeTarget ? getPlan(downgradeTarget).name : ''} ?
+            {downgradeTarget === currentPlanId
+              ? 'Passer à la facturation mensuelle ?'
+              : `Passer au forfait ${downgradeTarget ? getPlan(downgradeTarget).name : ''} ?`}
           </DialogTitle>
           <DialogDescription className="mt-1.5 max-w-xs">
-            Vous gardez {getPlan(currentPlanId).name} jusqu’au{' '}
-            {formatDate(team?.subscriptionCurrentPeriodEnd) || 'terme de la période'}, puis passage
-            automatique. Rien ne vous est prélevé maintenant.
+            {downgradeTarget === currentPlanId
+              ? `Vous gardez la facturation annuelle jusqu’au ${formatDate(team?.subscriptionCurrentPeriodEnd) || 'terme de la période'}, puis passage au mensuel. Rien ne vous est prélevé maintenant.`
+              : `Vous gardez ${getPlan(currentPlanId).name} jusqu’au ${formatDate(team?.subscriptionCurrentPeriodEnd) || 'terme de la période'}, puis passage automatique. Rien ne vous est prélevé maintenant.`}
           </DialogDescription>
           <div className="mt-6 flex w-full gap-2">
             <Button

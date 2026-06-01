@@ -60,7 +60,11 @@ export default class ScheduleChange {
     if (team.plan !== 'pro' && team.plan !== 'team') {
       return response.badRequest({ message: 'Aucun forfait payant en cours.' })
     }
-    if (RANK[payload.plan] >= RANK[team.plan]) {
+    const targetPeriod = payload.period ?? team.planPeriod ?? 'monthly'
+    const sameTierToMonthly =
+      payload.plan === team.plan && team.planPeriod === 'annual' && targetPeriod === 'monthly'
+    const isDowngrade = RANK[payload.plan] < RANK[team.plan] || sameTierToMonthly
+    if (!isDowngrade) {
       return response.badRequest({
         message: "Ce changement n'est pas une rétrogradation.",
       })
