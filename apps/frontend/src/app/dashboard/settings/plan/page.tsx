@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { Tooltip } from '@/components/ui/tooltip'
 import { Skeleton } from '@/components/ui/skeleton'
 import { PlanRings } from '@/components/plans/plan-rings'
+import { LinkLogo } from '@/components/plans/link-logo'
 import {
   Dialog,
   DialogHeader,
@@ -31,7 +32,6 @@ import {
   ExternalLink,
   AlertTriangle,
   Infinity as InfinityIcon,
-  Link as LinkIcon,
   ChevronLeft,
   ChevronRight,
   ShieldAlert,
@@ -421,17 +421,21 @@ export default function PlanPage() {
             title="Paiement"
             action={
               <Button variant="outline" onClick={openPortal} disabled={busy === 'portal'}>
-                {busy === 'portal' ? <Spinner /> : 'Mettre à jour'}
+                {busy === 'portal' ? (
+                  <>
+                    <Spinner /> Ouverture…
+                  </>
+                ) : (
+                  'Mettre à jour'
+                )}
               </Button>
             }
           >
             <div className="mt-3 flex items-center gap-2.5 text-sm font-medium text-foreground">
               {paymentMethod?.type === 'link' ? (
                 <>
-                  <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[#00d66f]">
-                    <LinkIcon className="h-3.5 w-3.5 text-black" strokeWidth={2.5} />
-                  </span>
-                  Link by Stripe
+                  <LinkLogo />
+                  <span className="text-muted-foreground">by Stripe</span>
                 </>
               ) : paymentMethod?.type === 'card' && paymentMethod.last4 ? (
                 <>
@@ -576,7 +580,9 @@ export default function PlanPage() {
               {pendingMeta ? (
                 <Button variant="outline" onClick={handleCancelScheduled} disabled={busy === 'cancel-scheduled'}>
                   {busy === 'cancel-scheduled' ? (
-                    <Spinner />
+                    <>
+                      <Spinner /> Annulation en cours…
+                    </>
                   ) : (
                     <>
                       <RotateCcw className="mr-1.5 h-4 w-4" /> Annuler le changement
@@ -588,7 +594,9 @@ export default function PlanPage() {
                   <Tooltip content="Cette annulation a été effectuée depuis Stripe. Pour réactiver, passez par le portail Stripe.">
                     <Button variant="outline" onClick={openPortal} disabled={busy === 'portal'}>
                       {busy === 'portal' ? (
-                        <Spinner />
+                        <>
+                          <Spinner /> Ouverture…
+                        </>
                       ) : (
                         <>
                           <RotateCcw className="mr-1.5 h-4 w-4" /> Réactiver via Stripe
@@ -599,7 +607,9 @@ export default function PlanPage() {
                 ) : (
                   <Button variant="outline" onClick={handleResume} disabled={busy === 'resume'}>
                     {busy === 'resume' ? (
-                      <Spinner />
+                      <>
+                        <Spinner /> Réactivation en cours…
+                      </>
                     ) : (
                       <>
                         <RotateCcw className="mr-1.5 h-4 w-4" /> Réactiver
@@ -670,22 +680,35 @@ export default function PlanPage() {
       </Dialog>
 
       <Dialog open={cancelOpen} onClose={() => busy !== 'cancel' && setCancelOpen(false)}>
-        <DialogHeader showClose={false} icon={<AlertTriangle className="h-5 w-5 text-amber-500" />}>
-          <DialogTitle>Annuler votre abonnement ?</DialogTitle>
-          <DialogDescription>
-            Vous conservez tous les avantages du forfait {meta.name} jusqu’au{' '}
-            {periodEnd || 'terme de la période en cours'}. À cette date, votre équipe repassera au
-            plan Gratuit.
+        <div className="flex flex-col items-center px-2 pb-1 pt-1 text-center">
+          <div className="mb-4 h-14 w-14 text-muted-foreground">
+            <PlanRings tier="free" />
+          </div>
+          <DialogTitle className="text-lg font-bold">Annuler votre abonnement ?</DialogTitle>
+          <DialogDescription className="mt-1.5 max-w-xs">
+            Vous gardez le forfait {meta.name} jusqu’au {periodEnd || 'terme de la période'}, puis
+            retour au plan Gratuit.
           </DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <Button onClick={() => setCancelOpen(false)} disabled={busy === 'cancel'}>
-            Conserver mon abonnement
-          </Button>
-          <Button variant="destructive" onClick={handleCancel} disabled={busy === 'cancel'}>
-            {busy === 'cancel' ? <Spinner /> : 'Confirmer l’annulation'}
-          </Button>
-        </DialogFooter>
+          <div className="mt-6 flex w-full flex-col gap-2">
+            <Button onClick={() => setCancelOpen(false)} disabled={busy === 'cancel'}>
+              Conserver mon abonnement
+            </Button>
+            <Button
+              variant="ghost"
+              className="text-destructive hover:bg-destructive/10"
+              onClick={handleCancel}
+              disabled={busy === 'cancel'}
+            >
+              {busy === 'cancel' ? (
+                <>
+                  <Spinner /> Annulation en cours…
+                </>
+              ) : (
+                'Confirmer l’annulation'
+              )}
+            </Button>
+          </div>
+        </div>
       </Dialog>
     </div>
   )
