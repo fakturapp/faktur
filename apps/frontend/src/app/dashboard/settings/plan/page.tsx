@@ -11,6 +11,8 @@ import { useToast } from '@/components/ui/toast'
 import { Spinner } from '@/components/ui/spinner'
 import { Button } from '@/components/ui/button'
 import { Tooltip } from '@/components/ui/tooltip'
+import { Skeleton } from '@/components/ui/skeleton'
+import { PlanRings } from '@/components/plans/plan-rings'
 import {
   Dialog,
   DialogHeader,
@@ -235,7 +237,6 @@ export default function PlanPage() {
     isPaid && hasStripe && (status === 'active' || status === 'trialing' || status === 'past_due')
   const isAdminGranted = isPaid && !hasStripe
   const meta = getPlan(currentPlanId)
-  const Icon = meta.icon
   const pendingPlanId: PlanId | null =
     team?.pendingPlan && team.pendingPlan !== currentPlanId ? team.pendingPlan : null
   const pendingMeta = pendingPlanId ? getPlan(pendingPlanId) : null
@@ -371,8 +372,8 @@ export default function PlanPage() {
       {/* Plan hero */}
       <div className="flex items-start justify-between gap-4 pb-2">
         <div className="flex items-start gap-4">
-          <div className={cn('flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl', meta.accentSoft)}>
-            <Icon className={cn('h-7 w-7', meta.accentText)} />
+          <div className={cn('h-14 w-14 shrink-0', meta.accentText)}>
+            <PlanRings tier={currentPlanId} />
           </div>
           <div className="space-y-1">
             <div className="flex flex-wrap items-center gap-2">
@@ -468,8 +469,9 @@ export default function PlanPage() {
           }
         />
 
-        {invoices.length > 0 && (
-          <Section title="Factures">
+        <Section title="Factures">
+          {invoices.length > 0 ? (
+            <>
             <div className="mt-4 overflow-x-auto">
               <table className="w-full border-collapse text-left text-sm">
                 <thead>
@@ -542,8 +544,23 @@ export default function PlanPage() {
                 </div>
               </div>
             )}
-          </Section>
-        )}
+            </>
+          ) : (
+            <div className="mt-4 space-y-3">
+              {[0, 1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-4 border-t border-border py-3.5 first:border-t-0"
+                >
+                  <Skeleton className="h-3.5 w-28" />
+                  <Skeleton className="h-3.5 w-16" />
+                  <Skeleton className="h-3.5 w-20" />
+                  <Skeleton className="ml-auto h-3.5 w-10" />
+                </div>
+              ))}
+            </div>
+          )}
+        </Section>
 
         {isStripeSubscribed && (
           <Section title={pendingMeta ? 'Changement programmé' : 'Annulation'}>
@@ -622,12 +639,12 @@ export default function PlanPage() {
       <Dialog open={welcomeModal} onClose={() => setWelcomeModal(false)}>
         <div className="flex flex-col items-center px-2 pb-2 pt-1 text-center">
           <motion.div
-            initial={{ scale: 0, rotate: -25, opacity: 0 }}
-            animate={{ scale: 1, rotate: 0, opacity: 1 }}
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
             transition={{ type: 'spring', stiffness: 220, damping: 13 }}
-            className={cn('mb-4 flex h-16 w-16 items-center justify-center rounded-2xl', meta.accentSoft)}
+            className={cn('mb-4 h-20 w-20', meta.accentText)}
           >
-            <Icon className={cn('h-8 w-8', meta.accentText)} />
+            <PlanRings tier={currentPlanId} />
           </motion.div>
           <DialogTitle className="text-xl font-bold">Bienvenue sur Faktur {meta.name} !</DialogTitle>
           <DialogDescription className="mt-2 max-w-sm">
