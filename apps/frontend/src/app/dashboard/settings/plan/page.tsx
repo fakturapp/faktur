@@ -28,7 +28,16 @@ import {
   ExternalLink,
   AlertTriangle,
   Infinity as InfinityIcon,
+  Link as LinkIcon,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react'
+
+const INVOICES_PER_PAGE = 6
+
+function capitalize(s: string | null): string {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''
+}
 
 interface TeamData {
   id: string
@@ -140,6 +149,12 @@ export default function PlanPage() {
   const [syncing, setSyncing] = useState(justSubscribed)
   const [welcome, setWelcome] = useState(false)
   const [invoices, setInvoices] = useState<Invoice[]>([])
+  const [invoicePage, setInvoicePage] = useState(0)
+  const [paymentMethod, setPaymentMethod] = useState<{
+    type: string
+    brand: string | null
+    last4: string | null
+  } | null>(null)
   const [cancelOpen, setCancelOpen] = useState(false)
 
   const load = useCallback(async () => {
@@ -167,6 +182,18 @@ export default function PlanPage() {
     if (!justSubscribed) return
     let active = true
     let tries = 0
+    const startedAt = Date.now()
+    function finish() {
+      const wait = Math.max(0, 3000 - (Date.now() - startedAt))
+      setTimeout(() => {
+        if (!active) return
+        setSyncing(false)
+        setWelcome(true)
+        setLoading(false)
+        refreshUser()
+        router.replace('/dashboard/settings/plan')
+      }, wait)
+    }
     async function poll() {
       await api.post('/billing/sync', {}).catch(() => {})
       const { data } = await api.get<{ team: TeamData }>('/team')
@@ -180,11 +207,7 @@ export default function PlanPage() {
         (t.subscriptionStatus === 'active' || t.subscriptionStatus === 'trialing')
       tries++
       if (ok || tries >= 6) {
-        setSyncing(false)
-        setWelcome(true)
-        setLoading(false)
-        refreshUser()
-        router.replace('/dashboard/settings/plan')
+        finish()
       } else {
         setTimeout(poll, 1500)
       }
@@ -226,6 +249,11 @@ export default function PlanPage() {
       api.get<{ invoices: Invoice[] }>('/billing/invoices').then(({ data }) => {
         if (data?.invoices) setInvoices(data.invoices)
       })
+      api
+        .get<{ method: { type: string; brand: string | null; last4: string | null } | null }>(
+          '/billing/payment-method'
+        )
+        .then(({ data }) => setPaymentMethod(data?.method ?? null))
     }
   }, [isStripeSubscribed])
 
@@ -303,7 +331,7 @@ export default function PlanPage() {
           >
             <Spinner size="lg" className="text-primary" />
             <p className="mt-4 text-sm font-medium text-foreground">
-              Mise à jour de votre abonnement…
+              Traitement de votre paiement…
             </p>
           </motion.div>
         )}
@@ -385,10 +413,29 @@ export default function PlanPage() {
             }
           >
             <div className="mt-3 flex items-center gap-2.5 text-sm font-medium text-foreground">
-              <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[#635bff]">
-                <CreditCard className="h-3.5 w-3.5 text-white" />
-              </span>
-              Moyen de paiement géré par Stripe
+              {paymentMethod?.type === 'link' ? (
+                <>
+                  <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[#00d66f]">
+                    <LinkIcon className="h-3.5 w-3.5 text-black" strokeWidth={2.5} />
+                  </span>
+                  Link by Stripe
+                </>
+              ) : paymentMethod?.type === 'card' && paymentMethod.last4 ? (
+                <>
+                  <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[#635bff]">
+                    <CreditCard className="h-3.5 w-3.5 text-white" />
+                  </span>
+                  {paymentMethod.brand ? capitalize(paymentMethod.brand) : 'Carte'} ••••{' '}
+                  {paymentMethod.last4}
+                </>
+              ) : (
+                <>
+                  <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[#635bff]">
+                    <CreditCard className="h-3.5 w-3.5 text-white" />
+                  </span>
+                  Moyen de paiement géré par Stripe
+                </>
+              )}
             </div>
           </Section>
         )}
@@ -422,33 +469,67 @@ export default function PlanPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {invoices.map((inv) => {
-                    const st = invoiceStatus(inv.status)
-                    return (
-                      <tr key={inv.id} className="border-t border-border">
-                        <td className="py-3.5 text-foreground">{formatDateMs(inv.created)}</td>
-                        <td className="py-3.5 text-foreground">{formatCents(inv.total, inv.currency)}</td>
-                        <td className={cn('py-3.5', st.cls)}>{st.label}</td>
-                        <td className="py-3.5 text-right">
-                          {inv.hostedUrl || inv.pdfUrl ? (
-                            <a
-                              href={(inv.hostedUrl || inv.pdfUrl)!}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="font-medium text-primary hover:underline"
-                            >
-                              Voir
-                            </a>
-                          ) : (
-                            <span className="text-muted-foreground">—</span>
-                          )}
-                        </td>
-                      </tr>
-                    )
-                  })}
+                  {invoices
+                    .slice(invoicePage * INVOICES_PER_PAGE, invoicePage * INVOICES_PER_PAGE + INVOICES_PER_PAGE)
+                    .map((inv) => {
+                      const st = invoiceStatus(inv.status)
+                      return (
+                        <tr key={inv.id} className="border-t border-border">
+                          <td className="py-3.5 text-foreground">{formatDateMs(inv.created)}</td>
+                          <td className="py-3.5 text-foreground">{formatCents(inv.total, inv.currency)}</td>
+                          <td className={cn('py-3.5', st.cls)}>{st.label}</td>
+                          <td className="py-3.5 text-right">
+                            {inv.hostedUrl || inv.pdfUrl ? (
+                              <a
+                                href={(inv.hostedUrl || inv.pdfUrl)!}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="font-medium text-primary hover:underline"
+                              >
+                                Voir
+                              </a>
+                            ) : (
+                              <span className="text-muted-foreground">—</span>
+                            )}
+                          </td>
+                        </tr>
+                      )
+                    })}
                 </tbody>
               </table>
             </div>
+
+            {invoices.length > INVOICES_PER_PAGE && (
+              <div className="mt-4 flex items-center justify-between border-t border-border pt-4 text-sm">
+                <span className="text-muted-foreground">
+                  {invoicePage * INVOICES_PER_PAGE + 1}–
+                  {Math.min((invoicePage + 1) * INVOICES_PER_PAGE, invoices.length)} sur{' '}
+                  {invoices.length}
+                </span>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setInvoicePage((p) => Math.max(0, p - 1))}
+                    disabled={invoicePage === 0}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border text-foreground transition-colors hover:bg-surface-hover disabled:opacity-40"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setInvoicePage((p) =>
+                        (p + 1) * INVOICES_PER_PAGE < invoices.length ? p + 1 : p
+                      )
+                    }
+                    disabled={(invoicePage + 1) * INVOICES_PER_PAGE >= invoices.length}
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border text-foreground transition-colors hover:bg-surface-hover disabled:opacity-40"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            )}
           </Section>
         )}
 
