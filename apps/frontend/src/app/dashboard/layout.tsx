@@ -132,7 +132,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   useEffect(() => {
     if (!user) return
     const id = setInterval(() => {
-      if (document.visibilityState === 'visible') refreshUser()
+      if (document.visibilityState !== 'visible') return
+      refreshUser()
+      api.get<{ teams: TeamListItem[] }>('/team/all').then(({ data }) => {
+        if (data?.teams) setTeams(data.teams)
+      })
     }, 30000)
     return () => clearInterval(id)
   }, [user?.id, refreshUser])
@@ -148,7 +152,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       if (!force && now - lastBillingSync.current < 60000) return
       lastBillingSync.current = now
       const { error } = await api.post('/billing/sync', {})
-      if (!error && !cancelled) refreshUser()
+      if (!error && !cancelled) {
+        refreshUser()
+        api.get<{ teams: TeamListItem[] }>('/team/all').then(({ data }) => {
+          if (data?.teams && !cancelled) setTeams(data.teams)
+        })
+      }
     }
     syncBilling(true)
     function onFocus() {
