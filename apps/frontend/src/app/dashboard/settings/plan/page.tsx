@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import confetti from 'canvas-confetti'
 import { api } from '@/lib/api'
 import { useAuth } from '@/lib/auth'
 import { cn } from '@/lib/utils'
@@ -200,9 +199,15 @@ export default function PlanPage() {
         setLoading(false)
         refreshUser()
         router.replace('/dashboard/settings/plan')
-        try {
-          confetti({ particleCount: 130, spread: 78, origin: { y: 0.35 }, scalar: 0.9 })
-        } catch {}
+        import('canvas-confetti')
+          .then((m) => {
+            const fire = (opts: Record<string, unknown>) =>
+              m.default({ zIndex: 10000, disableForReducedMotion: true, ...opts })
+            fire({ particleCount: 90, spread: 70, origin: { y: 0.4 }, scalar: 0.9 })
+            setTimeout(() => fire({ particleCount: 60, angle: 60, spread: 60, origin: { x: 0, y: 0.6 } }), 150)
+            setTimeout(() => fire({ particleCount: 60, angle: 120, spread: 60, origin: { x: 1, y: 0.6 } }), 150)
+          })
+          .catch(() => {})
       }, wait)
     }
     async function poll() {
@@ -426,14 +431,17 @@ export default function PlanPage() {
                     <Spinner /> Ouverture…
                   </>
                 ) : (
-                  'Mettre à jour'
+                  'Gérer l’abonnement'
                 )}
               </Button>
             }
           >
             <div className="mt-3 flex items-center gap-2.5 text-sm font-medium text-foreground">
               {paymentMethod?.type === 'link' ? (
-                <LinkLogo className="h-5" />
+                <span className="inline-flex items-center gap-1.5">
+                  <LinkLogo className="h-3.5" />
+                  <span className="text-muted-foreground">by Stripe</span>
+                </span>
               ) : paymentMethod?.type === 'card' && paymentMethod.last4 ? (
                 <>
                   <StripeLogo className="h-5 w-5" />
