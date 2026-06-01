@@ -307,22 +307,26 @@ export default function PlanUpgradePage() {
             {formatDate(team?.subscriptionCurrentPeriodEnd) || 'terme de la période'}, puis passage
             automatique. Rien ne vous est prélevé maintenant.
           </DialogDescription>
-          <div className="mt-6 flex w-full flex-col gap-2">
-            <Button onClick={() => setDowngradeTarget(null)} disabled={busy === downgradeTarget}>
-              Rester sur le forfait {getPlan(currentPlanId).name}
+          <div className="mt-6 flex w-full gap-2">
+            <Button
+              className="flex-1"
+              onClick={() => setDowngradeTarget(null)}
+              disabled={busy === downgradeTarget}
+            >
+              Conserver
             </Button>
             <Button
               variant="ghost"
-              className="text-amber-600 hover:bg-amber-500/10 dark:text-amber-400"
+              className="flex-1 text-amber-600 hover:bg-amber-500/10 dark:text-amber-400"
               onClick={() => downgradeTarget && handleScheduleDowngrade(downgradeTarget)}
               disabled={busy === downgradeTarget}
             >
               {busy === downgradeTarget ? (
                 <>
-                  <Spinner /> Programmation en cours…
+                  <Spinner /> Programmation…
                 </>
               ) : (
-                'Confirmer le changement'
+                'Confirmer'
               )}
             </Button>
           </div>
@@ -340,22 +344,22 @@ export default function PlanUpgradePage() {
             {formatDate(team?.subscriptionCurrentPeriodEnd) || 'terme de la période'}, puis retour au
             plan Gratuit. Réactivable à tout moment d’ici là.
           </DialogDescription>
-          <div className="mt-6 flex w-full flex-col gap-2">
-            <Button onClick={() => setCancelOpen(false)} disabled={busy === 'cancel'}>
-              Rester sur le plan {getPlan(currentPlanId).name}
+          <div className="mt-6 flex w-full gap-2">
+            <Button className="flex-1" onClick={() => setCancelOpen(false)} disabled={busy === 'cancel'}>
+              Conserver
             </Button>
             <Button
               variant="ghost"
-              className="text-destructive hover:bg-destructive/10"
+              className="flex-1 text-destructive hover:bg-destructive/10"
               onClick={handleCancel}
               disabled={busy === 'cancel'}
             >
               {busy === 'cancel' ? (
                 <>
-                  <Spinner /> Rétrogradation en cours…
+                  <Spinner /> Rétrogradation…
                 </>
               ) : (
-                'Confirmer la rétrogradation'
+                'Confirmer'
               )}
             </Button>
           </div>

@@ -14,6 +14,7 @@ import { Tooltip } from '@/components/ui/tooltip'
 import { Skeleton } from '@/components/ui/skeleton'
 import { PlanRings } from '@/components/plans/plan-rings'
 import { LinkLogo } from '@/components/plans/link-logo'
+import { StripeLogo } from '@/components/plans/stripe-logo'
 import {
   Dialog,
   DialogHeader,
@@ -26,7 +27,6 @@ import { PLATFORM_URL } from '@/lib/external-urls'
 import {
   PartyPopper,
   RotateCcw,
-  CreditCard,
   Gauge,
   ArrowUpRight,
   ExternalLink,
@@ -433,23 +433,16 @@ export default function PlanPage() {
           >
             <div className="mt-3 flex items-center gap-2.5 text-sm font-medium text-foreground">
               {paymentMethod?.type === 'link' ? (
-                <>
-                  <LinkLogo />
-                  <span className="text-muted-foreground">by Stripe</span>
-                </>
+                <LinkLogo className="h-5" />
               ) : paymentMethod?.type === 'card' && paymentMethod.last4 ? (
                 <>
-                  <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[#635bff]">
-                    <CreditCard className="h-3.5 w-3.5 text-white" />
-                  </span>
+                  <StripeLogo className="h-5 w-5" />
                   {paymentMethod.brand ? capitalize(paymentMethod.brand) : 'Carte'} ••••{' '}
                   {paymentMethod.last4}
                 </>
               ) : (
                 <>
-                  <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[#635bff]">
-                    <CreditCard className="h-3.5 w-3.5 text-white" />
-                  </span>
+                  <StripeLogo className="h-5 w-5" />
                   Moyen de paiement géré par Stripe
                 </>
               )}
@@ -689,22 +682,22 @@ export default function PlanPage() {
             Vous gardez le forfait {meta.name} jusqu’au {periodEnd || 'terme de la période'}, puis
             retour au plan Gratuit.
           </DialogDescription>
-          <div className="mt-6 flex w-full flex-col gap-2">
-            <Button onClick={() => setCancelOpen(false)} disabled={busy === 'cancel'}>
-              Conserver mon abonnement
+          <div className="mt-6 flex w-full gap-2">
+            <Button className="flex-1" onClick={() => setCancelOpen(false)} disabled={busy === 'cancel'}>
+              Conserver
             </Button>
             <Button
               variant="ghost"
-              className="text-destructive hover:bg-destructive/10"
+              className="flex-1 text-destructive hover:bg-destructive/10"
               onClick={handleCancel}
               disabled={busy === 'cancel'}
             >
               {busy === 'cancel' ? (
                 <>
-                  <Spinner /> Annulation en cours…
+                  <Spinner /> Annulation…
                 </>
               ) : (
-                'Confirmer l’annulation'
+                'Confirmer'
               )}
             </Button>
           </div>
