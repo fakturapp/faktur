@@ -8,13 +8,7 @@ import { cn } from '@/lib/utils'
 import { useToast } from '@/components/ui/toast'
 import { Spinner } from '@/components/ui/spinner'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from '@/components/ui/dialog'
+import { Dialog, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { PLAN_IDS, PLANS, getPlan, formatPlanPrice, type PlanId } from '@/lib/plans'
 import { PlanRings } from '@/components/plans/plan-rings'
 import { ArrowLeft, Check, ArrowRight, TrendingDown } from 'lucide-react'
@@ -250,7 +244,7 @@ export default function PlanUpgradePage() {
                   >
                     {busy === id ? (
                       <>
-                        <Spinner /> …
+                        <Spinner /> Programmation…
                       </>
                     ) : (
                       <>
@@ -301,77 +295,71 @@ export default function PlanUpgradePage() {
         open={downgradeTarget !== null}
         onClose={() => busy !== downgradeTarget && setDowngradeTarget(null)}
       >
-        <DialogHeader showClose={false} icon={<TrendingDown className="h-5 w-5 text-amber-500" />}>
-          <DialogTitle>
+        <div className="flex flex-col items-center px-2 pb-1 pt-1 text-center">
+          <div className={cn('mb-4 h-14 w-14', downgradeTarget ? getPlan(downgradeTarget).accentText : '')}>
+            {downgradeTarget && <PlanRings tier={downgradeTarget} />}
+          </div>
+          <DialogTitle className="text-lg font-bold">
             Passer au forfait {downgradeTarget ? getPlan(downgradeTarget).name : ''} ?
           </DialogTitle>
-          <DialogDescription>
-            Vous conservez tous les avantages du forfait {getPlan(currentPlanId).name} jusqu’au{' '}
-            {formatDate(team?.subscriptionCurrentPeriodEnd) || 'terme de la période en cours'}.
+          <DialogDescription className="mt-1.5 max-w-xs">
+            Vous gardez {getPlan(currentPlanId).name} jusqu’au{' '}
+            {formatDate(team?.subscriptionCurrentPeriodEnd) || 'terme de la période'}, puis passage
+            automatique. Rien ne vous est prélevé maintenant.
           </DialogDescription>
-        </DialogHeader>
-        <div className="mb-2 rounded-xl border border-border bg-muted/30 p-3 text-sm text-muted-foreground">
-          À cette date, vous passerez automatiquement au forfait{' '}
-          <span className="font-medium text-foreground">
-            {downgradeTarget ? getPlan(downgradeTarget).name : ''}
-          </span>
-          . Comme vous avez déjà payé, rien ne vous sera prélevé maintenant. Vous pourrez annuler ce
-          changement à tout moment d’ici là.
+          <div className="mt-6 flex w-full flex-col gap-2">
+            <Button onClick={() => setDowngradeTarget(null)} disabled={busy === downgradeTarget}>
+              Rester sur le forfait {getPlan(currentPlanId).name}
+            </Button>
+            <Button
+              variant="ghost"
+              className="text-amber-600 hover:bg-amber-500/10 dark:text-amber-400"
+              onClick={() => downgradeTarget && handleScheduleDowngrade(downgradeTarget)}
+              disabled={busy === downgradeTarget}
+            >
+              {busy === downgradeTarget ? (
+                <>
+                  <Spinner /> Programmation en cours…
+                </>
+              ) : (
+                'Confirmer le changement'
+              )}
+            </Button>
+          </div>
         </div>
-        <DialogFooter>
-          <Button onClick={() => setDowngradeTarget(null)} disabled={busy === downgradeTarget}>
-            Rester sur le forfait {getPlan(currentPlanId).name}
-          </Button>
-          <Button
-            variant="outline"
-            className="border-amber-500/30 text-amber-600 hover:bg-amber-500/10 dark:text-amber-400"
-            onClick={() => downgradeTarget && handleScheduleDowngrade(downgradeTarget)}
-            disabled={busy === downgradeTarget}
-          >
-            {busy === downgradeTarget ? (
-              <>
-                <Spinner /> …
-              </>
-            ) : (
-              'Confirmer le changement'
-            )}
-          </Button>
-        </DialogFooter>
       </Dialog>
 
       <Dialog open={cancelOpen} onClose={() => busy !== 'cancel' && setCancelOpen(false)}>
-        <DialogHeader showClose={false} icon={<TrendingDown className="h-5 w-5 text-amber-500" />}>
-          <DialogTitle>Passer au plan Gratuit ?</DialogTitle>
-          <DialogDescription>
-            Pas d’inquiétude : vous conservez tous les avantages du plan{' '}
-            {getPlan(currentPlanId).name} jusqu’au{' '}
-            {formatDate(team?.subscriptionCurrentPeriodEnd) || 'terme de la période en cours'}.
+        <div className="flex flex-col items-center px-2 pb-1 pt-1 text-center">
+          <div className="mb-4 h-14 w-14 text-muted-foreground">
+            <PlanRings tier="free" />
+          </div>
+          <DialogTitle className="text-lg font-bold">Passer au plan Gratuit ?</DialogTitle>
+          <DialogDescription className="mt-1.5 max-w-xs">
+            Vous gardez {getPlan(currentPlanId).name} jusqu’au{' '}
+            {formatDate(team?.subscriptionCurrentPeriodEnd) || 'terme de la période'}, puis retour au
+            plan Gratuit. Réactivable à tout moment d’ici là.
           </DialogDescription>
-        </DialogHeader>
-        <div className="mb-2 rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 text-sm text-muted-foreground">
-          À cette date, votre équipe repassera automatiquement au{' '}
-          <span className="font-medium text-foreground">plan Gratuit</span>. Vous pourrez réactiver à
-          tout moment d’ici là.
+          <div className="mt-6 flex w-full flex-col gap-2">
+            <Button onClick={() => setCancelOpen(false)} disabled={busy === 'cancel'}>
+              Rester sur le plan {getPlan(currentPlanId).name}
+            </Button>
+            <Button
+              variant="ghost"
+              className="text-destructive hover:bg-destructive/10"
+              onClick={handleCancel}
+              disabled={busy === 'cancel'}
+            >
+              {busy === 'cancel' ? (
+                <>
+                  <Spinner /> Rétrogradation en cours…
+                </>
+              ) : (
+                'Confirmer la rétrogradation'
+              )}
+            </Button>
+          </div>
         </div>
-        <DialogFooter>
-          <Button onClick={() => setCancelOpen(false)} disabled={busy === 'cancel'}>
-            Rester sur le plan {getPlan(currentPlanId).name}
-          </Button>
-          <Button
-            variant="outline"
-            className="border-destructive/30 text-destructive hover:bg-destructive/10"
-            onClick={handleCancel}
-            disabled={busy === 'cancel'}
-          >
-            {busy === 'cancel' ? (
-              <>
-                <Spinner /> …
-              </>
-            ) : (
-              'Confirmer la rétrogradation'
-            )}
-          </Button>
-        </DialogFooter>
       </Dialog>
     </div>
   )
