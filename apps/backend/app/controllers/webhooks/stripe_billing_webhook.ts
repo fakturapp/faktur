@@ -5,6 +5,7 @@ import env from '#start/env'
 import Team from '#models/team/team'
 import User from '#models/account/user'
 import billingService from '#services/billing/billing_service'
+import { applyStripeSubscription } from '#services/billing/subscription_state'
 import { PaymentFailedNotification } from '#mails/payment_failed_notification'
 
 export default class StripeBillingWebhook {
@@ -21,7 +22,14 @@ export default class StripeBillingWebhook {
       }
     }
     if (!event) {
-      if (env.get('NODE_ENV') === 'production') {
+      // Signature could not be verified. Only accept the raw payload when the
+      // operator has explicitly opted in for local development (e.g. when using
+      // `stripe listen` with a different signing secret). This is never enabled
+      // in production, so forged events can never mutate billing state there.
+      const allowUnverified =
+        env.get('NODE_ENV') !== 'production' &&
+        env.get('STRIPE_ALLOW_UNVERIFIED_WEBHOOK') === true
+      if (!allowUnverified) {
         return response.badRequest({ message: 'Invalid signature' })
       }
       try {
@@ -84,12 +92,6 @@ export default class StripeBillingWebhook {
     return p === 'pro' || p === 'team' ? p : null
   }
 
-  private periodEnd(sub: any): DateTime | null {
-    const ts =
-      sub?.cancel_at ?? sub?.items?.data?.[0]?.current_period_end ?? sub?.current_period_end
-    return ts ? DateTime.fromSeconds(Number(ts)) : null
-  }
-
   private invoiceSubId(invoice: any): string | null {
     const s = invoice?.subscription ?? invoice?.parent?.subscription_details?.subscription
     return s ? String(s) : null
@@ -125,41 +127,18 @@ export default class StripeBillingWebhook {
     const team = await this.findTeam(sub.metadata?.team_id, sub.customer, sub.id)
     if (!team) return
     const isCanceling = sub.status === 'canceled' || sub.status === 'incomplete_expired'
+    // Ignore a cancellation event fired for an old subscription we already
+    // replaced (e.g. during a plan switch), so it can't downgrade the team.
     if (isCanceling && team.stripeSubscriptionId && team.stripeSubscriptionId !== sub.id) {
       return
     }
-    team.stripeSubscriptionId = sub.id
-    team.subscriptionStatus = sub.status ?? null
-    team.subscriptionCancelAtPeriodEnd = !!sub.cancel_at_period_end || !!sub.cancel_at
-    team.subscriptionCancelExternal = !!sub.cancel_at && !sub.cancel_at_period_end
-    team.subscriptionCurrentPeriodEnd = this.periodEnd(sub)
-    const plan = this.planFromMeta(sub.metadata)
-    if (sub.status === 'active' || sub.status === 'trialing') {
-      if (plan) team.plan = plan
-      if (team.pendingPlan && team.plan === team.pendingPlan) {
-        team.pendingPlan = null
-        team.pendingPlanPeriod = null
-      }
-      if (!sub.schedule) {
-        team.pendingPlan = null
-        team.pendingPlanPeriod = null
-      }
-      team.subscriptionGraceEndsAt = null
-      if (sub.start_date) {
-        team.subscriptionStartedAt = DateTime.fromSeconds(Number(sub.start_date))
-      }
-    } else if (sub.status === 'canceled' || sub.status === 'incomplete_expired') {
-      team.plan = 'free'
-      team.stripeSubscriptionId = null
-      team.subscriptionGraceEndsAt = null
-      team.subscriptionStartedAt = null
-      team.subscriptionCancelAtPeriodEnd = false
-      team.subscriptionCancelExternal = false
-    } else if (sub.status === 'past_due' || sub.status === 'unpaid') {
-      if (!team.subscriptionGraceEndsAt) {
-        team.subscriptionGraceEndsAt = DateTime.now().plus({ days: 7 })
-      }
+    let schedule: any = null
+    if (sub.schedule) {
+      try {
+        schedule = await billingService.retrieveSchedule(String(sub.schedule))
+      } catch {}
     }
+    applyStripeSubscription(team, sub, schedule)
     await team.save()
   }
 

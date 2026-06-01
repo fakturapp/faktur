@@ -1,8 +1,8 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import { DateTime } from 'luxon'
 import Team from '#models/team/team'
 import TeamMember from '#models/team/team_member'
 import billingService from '#services/billing/billing_service'
+import { applyStripeSubscription } from '#services/billing/subscription_state'
 
 export default class Sync {
   async handle({ auth, response }: HttpContext) {
@@ -51,6 +51,8 @@ export default class Sync {
         team.subscriptionGraceEndsAt = null
         team.subscriptionStartedAt = null
         team.planPeriod = null
+        team.pendingPlan = null
+        team.pendingPlanPeriod = null
         await team.save()
         return response.ok({ synced: true, plan: 'free', status: 'canceled' })
       }
@@ -68,42 +70,14 @@ export default class Sync {
       full = await billingService.retrieveSubscription(active.id)
     } catch {}
 
-    team.stripeSubscriptionId = full.id
-    team.subscriptionStatus = full.status
-    team.subscriptionCancelAtPeriodEnd = !!full.cancel_at_period_end || !!full.cancel_at
-    team.subscriptionCancelExternal = !!full.cancel_at && !full.cancel_at_period_end
-
-    team.subscriptionStartedAt = full.start_date
-      ? DateTime.fromSeconds(Number(full.start_date))
-      : null
-
-    const plan = full.metadata?.plan
-    if (plan === 'pro' || plan === 'team') team.plan = plan
-    const planPeriod = full.metadata?.period
-    if (planPeriod === 'monthly' || planPeriod === 'annual') team.planPeriod = planPeriod
-
-    let scheduleSwitchTs: number | null = null
-    if (!full.schedule) {
-      team.pendingPlan = null
-      team.pendingPlanPeriod = null
-    } else {
+    let schedule: any = null
+    if (full.schedule) {
       try {
-        const schedule: any = await billingService.retrieveSchedule(String(full.schedule))
-        const pending = billingService.detectPendingChange({ schedule })
-        team.pendingPlan = pending?.plan ?? null
-        team.pendingPlanPeriod = pending?.period ?? null
-        if (pending && schedule?.current_phase?.end_date) {
-          scheduleSwitchTs = Number(schedule.current_phase.end_date)
-        }
+        schedule = await billingService.retrieveSchedule(String(full.schedule))
       } catch {}
     }
 
-    const period = billingService.subscriptionPeriod(full)
-    const endTs = full.cancel_at ?? scheduleSwitchTs ?? period.end
-    team.subscriptionCurrentPeriodEnd = endTs ? DateTime.fromSeconds(Number(endTs)) : null
-
-    if (full.status !== 'past_due') team.subscriptionGraceEndsAt = null
-
+    applyStripeSubscription(team, full, schedule)
     await team.save()
     return response.ok({ synced: true, plan: team.plan, status: team.subscriptionStatus })
   }
