@@ -1997,7 +1997,7 @@ export class TeamMemberSchema extends BaseModel {
 }
 
 export class TeamSchema extends BaseModel {
-  static $columns = ['b2BAccountId', 'createdAt', 'encryptionMode', 'encryptionModeConfirmedAt', 'iconUrl', 'id', 'name', 'onboardingCompletedAt', 'ownerId', 'plan', 'planPeriod', 'stripeCustomerId', 'stripeSubscriptionId', 'subscriptionCancelAtPeriodEnd', 'subscriptionCancelExternal', 'subscriptionCurrentPeriodEnd', 'subscriptionGraceEndsAt', 'subscriptionStartedAt', 'subscriptionStatus', 'updatedAt'] as const
+  static $columns = ['b2BAccountId', 'createdAt', 'encryptionMode', 'encryptionModeConfirmedAt', 'iconUrl', 'id', 'name', 'onboardingCompletedAt', 'ownerId', 'pendingPlan', 'pendingPlanPeriod', 'plan', 'planPeriod', 'stripeCustomerId', 'stripeSubscriptionId', 'subscriptionCancelAtPeriodEnd', 'subscriptionCancelExternal', 'subscriptionCurrentPeriodEnd', 'subscriptionDunningNotifiedAt', 'subscriptionGraceEndsAt', 'subscriptionPaused', 'subscriptionStartedAt', 'subscriptionStatus', 'updatedAt'] as const
   $columns = TeamSchema.$columns
   @column()
   declare b2BAccountId: string | null
@@ -2018,6 +2018,10 @@ export class TeamSchema extends BaseModel {
   @column()
   declare ownerId: string
   @column()
+  declare pendingPlan: string | null
+  @column()
+  declare pendingPlanPeriod: string | null
+  @column()
   declare plan: string
   @column()
   declare planPeriod: string | null
@@ -2032,7 +2036,11 @@ export class TeamSchema extends BaseModel {
   @column.dateTime()
   declare subscriptionCurrentPeriodEnd: DateTime | null
   @column.dateTime()
+  declare subscriptionDunningNotifiedAt: DateTime | null
+  @column.dateTime()
   declare subscriptionGraceEndsAt: DateTime | null
+  @column()
+  declare subscriptionPaused: boolean
   @column.dateTime()
   declare subscriptionStartedAt: DateTime | null
   @column()

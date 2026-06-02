@@ -5,6 +5,9 @@
 
 export const controllers = {
   account: {
+    apiUsage: {
+      Show: () => import('#controllers/account/api_usage/show'),
+    },
     delete: {
       Helpers: () => import('#controllers/account/delete/_helpers'),
       Confirm: () => import('#controllers/account/delete/confirm'),
@@ -54,9 +57,6 @@ export const controllers = {
       Enable: () => import('#controllers/account/two_factor/enable'),
       Setup: () => import('#controllers/account/two_factor/setup'),
     },
-    apiUsage: {
-      Show: () => import('#controllers/account/api_usage/show'),
-    },
   },
   admin: {
     analytics: {
@@ -77,6 +77,21 @@ export const controllers = {
       RotateSecrets: () => import('#controllers/admin/oauth_apps/rotate_secrets'),
       Update: () => import('#controllers/admin/oauth_apps/update'),
     },
+    teams: {
+      Delete: () => import('#controllers/admin/teams/delete'),
+      List: () => import('#controllers/admin/teams/list'),
+      Update: () => import('#controllers/admin/teams/update'),
+    },
+    users: {
+      Delete: () => import('#controllers/admin/users/delete'),
+      List: () => import('#controllers/admin/users/list'),
+      Update: () => import('#controllers/admin/users/update'),
+    },
+    promoCodes: {
+      List: () => import('#controllers/admin/promo_codes/list'),
+      Create: () => import('#controllers/admin/promo_codes/create'),
+      Update: () => import('#controllers/admin/promo_codes/update'),
+    },
   },
   ai: {
     AiQuota: () => import('#controllers/ai/ai_quota'),
@@ -91,6 +106,14 @@ export const controllers = {
   analytics: {
     Consent: () => import('#controllers/analytics/consent'),
     Ingest: () => import('#controllers/analytics/ingest'),
+  },
+  apiPlatform: {
+    meta: {
+      Ping: () => import('#controllers/api_platform/meta/ping'),
+      Session: () => import('#controllers/api_platform/meta/session'),
+      Usage: () => import('#controllers/api_platform/meta/usage'),
+    },
+    NotFound: () => import('#controllers/api_platform/not_found'),
   },
   auth: {
     oauth: {
@@ -131,6 +154,16 @@ export const controllers = {
     vault: {
       Unlock: () => import('#controllers/auth/vault/unlock'),
     },
+  },
+  billing: {
+    Cancel: () => import('#controllers/billing/cancel'),
+    CheckoutShow: () => import('#controllers/billing/checkout_show'),
+    Checkout: () => import('#controllers/billing/checkout'),
+    Invoices: () => import('#controllers/billing/invoices'),
+    PaymentMethod: () => import('#controllers/billing/payment_method'),
+    Portal: () => import('#controllers/billing/portal'),
+    ScheduleChange: () => import('#controllers/billing/schedule_change'),
+    Sync: () => import('#controllers/billing/sync'),
   },
   bugReport: {
     Create: () => import('#controllers/bug_report/create'),
@@ -210,6 +243,7 @@ export const controllers = {
       Create: () => import('#controllers/dashboard/api_keys/create'),
       DeliveriesList: () => import('#controllers/dashboard/api_keys/deliveries_list'),
       DeliveriesRetry: () => import('#controllers/dashboard/api_keys/deliveries_retry'),
+      Destroy: () => import('#controllers/dashboard/api_keys/destroy'),
       List: () => import('#controllers/dashboard/api_keys/list'),
       LogsList: () => import('#controllers/dashboard/api_keys/logs_list'),
       RecentlyUsed: () => import('#controllers/dashboard/api_keys/recently_used'),
@@ -226,7 +260,6 @@ export const controllers = {
       WebhookRotateSecret: () => import('#controllers/dashboard/api_keys/webhook_rotate_secret'),
       WebhookSet: () => import('#controllers/dashboard/api_keys/webhook_set'),
       WebhookTest: () => import('#controllers/dashboard/api_keys/webhook_test'),
-      Destroy: () => import('#controllers/dashboard/api_keys/destroy'),
     },
     apiProjects: {
       AuditLogs: () => import('#controllers/dashboard/api_projects/audit_logs'),
@@ -239,11 +272,11 @@ export const controllers = {
     },
     CashFlow: () => import('#controllers/dashboard/cash_flow'),
     Charts: () => import('#controllers/dashboard/charts'),
-    SidebarCounts: () => import('#controllers/dashboard/sidebar_counts'),
-    Stats: () => import('#controllers/dashboard/stats'),
     credits: {
       Usage: () => import('#controllers/dashboard/credits/usage'),
     },
+    SidebarCounts: () => import('#controllers/dashboard/sidebar_counts'),
+    Stats: () => import('#controllers/dashboard/stats'),
   },
   einvoicing: {
     Submit: () => import('#controllers/einvoicing/submit'),
@@ -466,14 +499,7 @@ export const controllers = {
     },
   },
   webhooks: {
+    StripeBillingWebhook: () => import('#controllers/webhooks/stripe_billing_webhook'),
     StripeWebhook: () => import('#controllers/webhooks/stripe_webhook'),
-  },
-  apiPlatform: {
-    meta: {
-      Ping: () => import('#controllers/api_platform/meta/ping'),
-      Session: () => import('#controllers/api_platform/meta/session'),
-      Usage: () => import('#controllers/api_platform/meta/usage'),
-    },
-    NotFound: () => import('#controllers/api_platform/not_found'),
   },
 }

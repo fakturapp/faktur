@@ -2527,6 +2527,78 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/bug_reports').default['update']>>>
     }
   }
+  'admin_users_list': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/admin/users'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/users/list').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/users/list').default['handle']>>>
+    }
+  }
+  'admin_users_update': {
+    methods: ["PUT"]
+    pattern: '/api/v1/admin/users/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/users/update').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/users/update').default['handle']>>>
+    }
+  }
+  'admin_users_delete': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/admin/users/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/users/delete').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/users/delete').default['handle']>>>
+    }
+  }
+  'admin_teams_list': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/admin/teams'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/teams/list').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/teams/list').default['handle']>>>
+    }
+  }
+  'admin_teams_update': {
+    methods: ["PUT"]
+    pattern: '/api/v1/admin/teams/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/teams/update').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/teams/update').default['handle']>>>
+    }
+  }
+  'admin_teams_delete': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/admin/teams/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/teams/delete').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/teams/delete').default['handle']>>>
+    }
+  }
   'list_oauth_apps': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/admin/oauth-apps'
@@ -2597,6 +2669,42 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/oauth_apps/revoke_sessions').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/oauth_apps/revoke_sessions').default['handle']>>>
+    }
+  }
+  'list_promo_codes': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/admin/promo-codes'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/promo_codes/list').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/promo_codes/list').default['handle']>>>
+    }
+  }
+  'create_promo_code': {
+    methods: ["POST"]
+    pattern: '/api/v1/admin/promo-codes'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/promo_codes/create').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/promo_codes/create').default['handle']>>>
+    }
+  }
+  'update_promo_code': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/admin/promo-codes/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/promo_codes/update').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/promo_codes/update').default['handle']>>>
     }
   }
   'analytics_ingest': {
@@ -2981,6 +3089,114 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/webhooks/stripe_webhook').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/webhooks/stripe_webhook').default['handle']>>>
+    }
+  }
+  'stripe_billing_webhook': {
+    methods: ["POST"]
+    pattern: '/webhooks/stripe/billing'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/webhooks/stripe_billing_webhook').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/webhooks/stripe_billing_webhook').default['handle']>>>
+    }
+  }
+  'billing_checkout': {
+    methods: ["POST"]
+    pattern: '/api/v1/billing/checkout'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing/checkout').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing/checkout').default['handle']>>>
+    }
+  }
+  'billing_checkout_show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/billing/checkout/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing/checkout_show').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing/checkout_show').default['handle']>>>
+    }
+  }
+  'billing_portal': {
+    methods: ["POST"]
+    pattern: '/api/v1/billing/portal'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing/portal').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing/portal').default['handle']>>>
+    }
+  }
+  'billing_cancel': {
+    methods: ["POST"]
+    pattern: '/api/v1/billing/cancel'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing/cancel').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing/cancel').default['handle']>>>
+    }
+  }
+  'billing_schedule_change': {
+    methods: ["POST"]
+    pattern: '/api/v1/billing/schedule-change'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing/schedule_change').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing/schedule_change').default['handle']>>>
+    }
+  }
+  'billing_invoices': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/billing/invoices'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing/invoices').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing/invoices').default['handle']>>>
+    }
+  }
+  'billing_payment_method': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/billing/payment-method'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing/payment_method').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing/payment_method').default['handle']>>>
+    }
+  }
+  'billing_sync': {
+    methods: ["POST"]
+    pattern: '/api/v1/billing/sync'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing/sync').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing/sync').default['handle']>>>
     }
   }
   'authorize.show': {
@@ -3369,7 +3585,7 @@ export interface Registry {
   }
   'apiPlatform.meta.ping': {
     methods: ["GET","HEAD"]
-    pattern: '/api/platform/ping'
+    pattern: '/v1/core/api/ping'
     types: {
       body: {}
       paramsTuple: []
@@ -3381,7 +3597,7 @@ export interface Registry {
   }
   'apiPlatform.meta.session': {
     methods: ["GET","HEAD"]
-    pattern: '/api/platform/session'
+    pattern: '/v1/core/api/session'
     types: {
       body: {}
       paramsTuple: []
@@ -3393,7 +3609,7 @@ export interface Registry {
   }
   'apiPlatform.meta.usage': {
     methods: ["GET","HEAD"]
-    pattern: '/api/platform/usage'
+    pattern: '/v1/core/api/usage'
     types: {
       body: {}
       paramsTuple: []
@@ -3405,7 +3621,7 @@ export interface Registry {
   }
   'apiPlatform.notFound': {
     methods: ["HEAD","OPTIONS","GET","POST","PUT","PATCH","DELETE"]
-    pattern: '/api/platform/*'
+    pattern: '/v1/core/api/*'
     types: {
       body: {}
       paramsTuple: [ParamValue]

@@ -214,12 +214,21 @@ export type ScannedRoutes = {
     'admin_feedbacks': { paramsTuple?: []; params?: {} }
     'admin_bug_reports.index': { paramsTuple?: []; params?: {} }
     'admin_bug_reports.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin_users_list': { paramsTuple?: []; params?: {} }
+    'admin_users_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin_users_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin_teams_list': { paramsTuple?: []; params?: {} }
+    'admin_teams_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin_teams_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'list_oauth_apps': { paramsTuple?: []; params?: {} }
     'create_oauth_app': { paramsTuple?: []; params?: {} }
     'update_oauth_app': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'destroy_oauth_app': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'rotate_oauth_app_secrets': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'revoke_oauth_app_sessions': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'list_promo_codes': { paramsTuple?: []; params?: {} }
+    'create_promo_code': { paramsTuple?: []; params?: {} }
+    'update_promo_code': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'analytics_ingest': { paramsTuple?: []; params?: {} }
     'analytics_consent': { paramsTuple?: []; params?: {} }
     'analytics_overview': { paramsTuple?: []; params?: {} }
@@ -252,6 +261,15 @@ export type ScannedRoutes = {
     'checkout_download_pdf': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'checkout_create_intent': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'stripe_webhook': { paramsTuple?: []; params?: {} }
+    'stripe_billing_webhook': { paramsTuple?: []; params?: {} }
+    'billing_checkout': { paramsTuple?: []; params?: {} }
+    'billing_checkout_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'billing_portal': { paramsTuple?: []; params?: {} }
+    'billing_cancel': { paramsTuple?: []; params?: {} }
+    'billing_schedule_change': { paramsTuple?: []; params?: {} }
+    'billing_invoices': { paramsTuple?: []; params?: {} }
+    'billing_payment_method': { paramsTuple?: []; params?: {} }
+    'billing_sync': { paramsTuple?: []; params?: {} }
     'authorize.show': { paramsTuple?: []; params?: {} }
     'authorize.consent': { paramsTuple?: []; params?: {} }
     'token': { paramsTuple?: []; params?: {} }
@@ -381,6 +399,7 @@ export type ScannedRoutes = {
     'create_oauth_app': { paramsTuple?: []; params?: {} }
     'rotate_oauth_app_secrets': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'revoke_oauth_app_sessions': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'create_promo_code': { paramsTuple?: []; params?: {} }
     'analytics_ingest': { paramsTuple?: []; params?: {} }
     'analytics_consent': { paramsTuple?: []; params?: {} }
     'share_create': { paramsTuple?: []; params?: {} }
@@ -392,6 +411,12 @@ export type ScannedRoutes = {
     'checkout_mark_paid': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'checkout_create_intent': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'stripe_webhook': { paramsTuple?: []; params?: {} }
+    'stripe_billing_webhook': { paramsTuple?: []; params?: {} }
+    'billing_checkout': { paramsTuple?: []; params?: {} }
+    'billing_portal': { paramsTuple?: []; params?: {} }
+    'billing_cancel': { paramsTuple?: []; params?: {} }
+    'billing_schedule_change': { paramsTuple?: []; params?: {} }
+    'billing_sync': { paramsTuple?: []; params?: {} }
     'authorize.consent': { paramsTuple?: []; params?: {} }
     'token': { paramsTuple?: []; params?: {} }
     'revoke': { paramsTuple?: []; params?: {} }
@@ -484,7 +509,10 @@ export type ScannedRoutes = {
     'ai_quota': { paramsTuple?: []; params?: {} }
     'admin_feedbacks': { paramsTuple?: []; params?: {} }
     'admin_bug_reports.index': { paramsTuple?: []; params?: {} }
+    'admin_users_list': { paramsTuple?: []; params?: {} }
+    'admin_teams_list': { paramsTuple?: []; params?: {} }
     'list_oauth_apps': { paramsTuple?: []; params?: {} }
+    'list_promo_codes': { paramsTuple?: []; params?: {} }
     'analytics_overview': { paramsTuple?: []; params?: {} }
     'analytics_pages': { paramsTuple?: []; params?: {} }
     'analytics_features': { paramsTuple?: []; params?: {} }
@@ -500,6 +528,9 @@ export type ScannedRoutes = {
     'checkout_show': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'checkout_get_iban': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'checkout_download_pdf': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'billing_checkout_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'billing_invoices': { paramsTuple?: []; params?: {} }
+    'billing_payment_method': { paramsTuple?: []; params?: {} }
     'authorize.show': { paramsTuple?: []; params?: {} }
     'dashboard.apiKeys.scopesCatalog': { paramsTuple?: []; params?: {} }
     'dashboard.apiProjects.list': { paramsTuple?: []; params?: {} }
@@ -595,7 +626,10 @@ export type ScannedRoutes = {
     'ai_quota': { paramsTuple?: []; params?: {} }
     'admin_feedbacks': { paramsTuple?: []; params?: {} }
     'admin_bug_reports.index': { paramsTuple?: []; params?: {} }
+    'admin_users_list': { paramsTuple?: []; params?: {} }
+    'admin_teams_list': { paramsTuple?: []; params?: {} }
     'list_oauth_apps': { paramsTuple?: []; params?: {} }
+    'list_promo_codes': { paramsTuple?: []; params?: {} }
     'analytics_overview': { paramsTuple?: []; params?: {} }
     'analytics_pages': { paramsTuple?: []; params?: {} }
     'analytics_features': { paramsTuple?: []; params?: {} }
@@ -611,6 +645,9 @@ export type ScannedRoutes = {
     'checkout_show': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'checkout_get_iban': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'checkout_download_pdf': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'billing_checkout_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'billing_invoices': { paramsTuple?: []; params?: {} }
+    'billing_payment_method': { paramsTuple?: []; params?: {} }
     'authorize.show': { paramsTuple?: []; params?: {} }
     'dashboard.apiKeys.scopesCatalog': { paramsTuple?: []; params?: {} }
     'dashboard.apiProjects.list': { paramsTuple?: []; params?: {} }
@@ -650,6 +687,8 @@ export type ScannedRoutes = {
     'recurring_invoice_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'reminder_settings_update': { paramsTuple?: []; params?: {} }
     'expense_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin_users_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin_teams_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'update_oauth_app': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.webhook.set': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.webhook.deliveryConfig.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -677,6 +716,8 @@ export type ScannedRoutes = {
     'recurring_invoice_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'expense_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'expense_category_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin_users_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'admin_teams_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'destroy_oauth_app': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'share_revoke': { paramsTuple: [ParamValue]; params: {'shareId': ParamValue} }
     'link_destroy': { paramsTuple: [ParamValue]; params: {'linkId': ParamValue} }
@@ -697,6 +738,7 @@ export type ScannedRoutes = {
     'credit_note_update_comment': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recurring_invoice_toggle_active': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin_bug_reports.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'update_promo_code': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'analytics_errors.resolve': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'share_update': { paramsTuple: [ParamValue]; params: {'shareId': ParamValue} }
     'link_update': { paramsTuple: [ParamValue]; params: {'linkId': ParamValue} }

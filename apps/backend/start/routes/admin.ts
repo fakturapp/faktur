@@ -20,6 +20,10 @@ const DestroyOauthApp = () => import('#controllers/admin/oauth_apps/destroy')
 const RotateOauthAppSecrets = () => import('#controllers/admin/oauth_apps/rotate_secrets')
 const RevokeOauthAppSessions = () => import('#controllers/admin/oauth_apps/revoke_sessions')
 
+const ListPromoCodes = () => import('#controllers/admin/promo_codes/list')
+const CreatePromoCode = () => import('#controllers/admin/promo_codes/create')
+const UpdatePromoCode = () => import('#controllers/admin/promo_codes/update')
+
 router
   .group(() => {
     router.get('/feedbacks', [AdminFeedbacks, 'handle'])
@@ -40,6 +44,10 @@ router
     router.delete('/oauth-apps/:id', [DestroyOauthApp, 'handle'])
     router.post('/oauth-apps/:id/rotate-secrets', [RotateOauthAppSecrets, 'handle'])
     router.post('/oauth-apps/:id/revoke-sessions', [RevokeOauthAppSessions, 'handle'])
+
+    router.get('/promo-codes', [ListPromoCodes, 'handle'])
+    router.post('/promo-codes', [CreatePromoCode, 'handle'])
+    router.patch('/promo-codes/:id', [UpdatePromoCode, 'handle'])
   })
   .use([middleware.auth(), middleware.admin()])
   .prefix(API_PREFIX + '/admin')
