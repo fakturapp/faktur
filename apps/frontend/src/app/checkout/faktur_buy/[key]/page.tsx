@@ -251,7 +251,7 @@ function CheckoutInner({
     if (submitting) return
     setSubmitting(true)
     setErr(null)
-    const result: any = await checkout.confirm()
+    const result: any = await checkout.confirm({ redirect: 'if_required' })
     if (result?.type === 'error') {
       setErr(result.error?.message || 'Le paiement a échoué')
       setSubmitting(false)
@@ -322,7 +322,7 @@ function CheckoutInner({
             {discount > 0 && (
               <div className="flex justify-between">
                 <span className="text-emerald-600 dark:text-emerald-400">
-                  {promoCode ? 'Code promo' : 'Crédit (temps déjà payé)'}
+                  {promoCode ? 'Code promo' : 'Report de votre ancien abonnement'}
                 </span>
                 <span className="text-emerald-600 dark:text-emerald-400">
                   -{formatCents(discount)}
