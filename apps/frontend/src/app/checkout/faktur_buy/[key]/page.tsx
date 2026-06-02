@@ -221,15 +221,23 @@ function CheckoutInner({
     if (!value || promoBusy) return
     setPromoBusy(true)
     setPromoErr(null)
-    const res: any = await checkout.applyPromotionCode(value)
-    if (res?.type === 'error') {
-      setPromoErr(res.error?.message || "Ce code promo n'est pas valide.")
+    try {
+      if (typeof (checkout as any).applyPromotionCode !== 'function') {
+        setPromoErr("Les codes promo ne sont pas disponibles pour ce paiement.")
+        return
+      }
+      const res: any = await checkout.applyPromotionCode(value)
+      if (res?.type === 'error') {
+        setPromoErr(res.error?.message || "Ce code promo n'est pas valide.")
+        return
+      }
+      setPromoCode(value)
+      await refreshAmounts()
+    } catch (e: any) {
+      setPromoErr(e?.message || "Impossible d'appliquer ce code promo.")
+    } finally {
       setPromoBusy(false)
-      return
     }
-    setPromoCode(value)
-    await refreshAmounts()
-    setPromoBusy(false)
   }
 
   async function removePromo() {
@@ -237,13 +245,18 @@ function CheckoutInner({
     setPromoBusy(true)
     setPromoErr(null)
     try {
-      await checkout.removePromotionCode()
-    } catch {}
-    setPromoCode(null)
-    setPromoInput('')
-    setPromoOpen(false)
-    await refreshAmounts()
-    setPromoBusy(false)
+      if (typeof (checkout as any).removePromotionCode === 'function') {
+        await checkout.removePromotionCode()
+      }
+      setPromoCode(null)
+      setPromoInput('')
+      setPromoOpen(false)
+      await refreshAmounts()
+    } catch {
+      /* ignore */
+    } finally {
+      setPromoBusy(false)
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -305,7 +318,7 @@ function CheckoutInner({
                 </button>
               </div>
             ) : promoOpen ? (
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center rounded-lg border border-border pl-3 pr-1 transition-colors focus-within:border-[#635bff]/60">
                 <input
                   value={promoInput}
                   onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
@@ -315,18 +328,18 @@ function CheckoutInner({
                       applyPromo()
                     }
                   }}
-                  placeholder="Code promo"
+                  placeholder="Entrez votre code"
                   autoFocus
-                  className="h-8 w-32 rounded-md border border-border bg-transparent px-2.5 text-[13px] font-mono uppercase outline-none transition-colors focus:border-foreground/40"
+                  className="h-9 flex-1 bg-transparent text-[13px] font-mono uppercase tracking-wide text-foreground outline-none placeholder:font-sans placeholder:normal-case placeholder:tracking-normal placeholder:text-muted-foreground"
                 />
                 <button
                   type="button"
                   onClick={applyPromo}
                   disabled={promoBusy || !promoInput.trim()}
                   style={{ backgroundColor: '#635bff' }}
-                  className="flex h-8 items-center justify-center rounded-md px-3 text-[13px] font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                  className="ml-2 flex h-7 w-[84px] items-center justify-center rounded-md text-[12px] font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-40"
                 >
-                  {promoBusy ? <Spinner /> : 'Appliquer'}
+                  {promoBusy ? <Spinner size="sm" className="text-white" /> : 'Appliquer'}
                 </button>
               </div>
             ) : (
