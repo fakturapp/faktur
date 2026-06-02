@@ -31,6 +31,7 @@ import {
   Settings,
   ChevronRight,
   ChevronDown,
+  ChevronUp,
   Plus,
   Check,
   LogOut,
@@ -39,11 +40,11 @@ import {
   Shield,
   UserCog,
   Eye,
-  MoreHorizontal,
   CirclePlus,
   Sun,
   Moon,
   Monitor,
+  Palette,
   Building2,
   UsersRound,
   CreditCard,
@@ -70,7 +71,6 @@ import {
   Download,
   Trash2,
   FilePlus,
-  ArrowRight,
   GraduationCap,
   Gift,
   Key,
@@ -449,6 +449,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
     : user.email.slice(0, 2).toUpperCase()
 
   const currentPlan = getPlan(currentTeam?.plan)
+  const PlanIcon = currentPlan.icon
 
   return (
     <aside
@@ -829,7 +830,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
           sideOffset={4}
           alignOffset={8}
           className="min-w-[260px]"
-          trigger={
+          trigger={(open) => (
             <div
               data-tutorial="user-dropdown"
               className={cn(
@@ -856,46 +857,32 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
                     )}
                   </motion.div>
 
-                  <motion.button
-                    {...labelFade}
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      const next = theme === 'system' ? 'light' : theme === 'light' ? 'dark' : 'system'
-                      setTheme(next)
-                    }}
-                    className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-                    title={theme === 'system' ? 'Systeme' : theme === 'dark' ? 'Sombre' : 'Clair'}
-                  >
-                    {theme === 'system' ? (
-                      <Monitor className="h-4 w-4" />
-                    ) : theme === 'dark' ? (
-                      <Moon className="h-4 w-4" />
-                    ) : (
-                      <Sun className="h-4 w-4" />
-                    )}
-                  </motion.button>
-
-                  <motion.button
-                    {...labelFade}
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      router.push('/download')
-                    }}
-                    className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-black/5 hover:text-foreground dark:hover:bg-white/5"
-                    title="Installer l'application"
-                  >
-                    <Download className="h-4 w-4" />
-                  </motion.button>
-
-                  <motion.div {...labelFade}>
-                    <MoreHorizontal className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                  </motion.div>
+                  {currentPlan.id === 'free' ? (
+                    <motion.button
+                      {...labelFade}
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        router.push('/dashboard/settings/plan/upgrade')
+                      }}
+                      className="shrink-0 rounded-lg bg-primary/10 px-2.5 py-1 text-[12px] font-semibold text-primary transition-colors hover:bg-primary/20"
+                    >
+                      Mettre à niveau
+                    </motion.button>
+                  ) : (
+                    <motion.div {...labelFade}>
+                      <ChevronUp
+                        className={cn(
+                          'h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200',
+                          open && 'rotate-180'
+                        )}
+                      />
+                    </motion.div>
+                  )}
                 </>
               )}
             </div>
-          }
+          )}
         >
           <div className="px-3 py-3 border-b border-border mb-1">
             <div className="flex items-center gap-3">
@@ -903,10 +890,10 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
                 src={user.avatarUrl}
                 alt={user.fullName || user.email}
                 fallback={initials}
-                size="sm"
+                size="md"
               />
               <div className="min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">
+                <p className="text-sm font-semibold text-foreground truncate">
                   {user.fullName || user.email}
                 </p>
                 <p className="text-xs text-muted-foreground truncate">{user.email}</p>
@@ -914,24 +901,9 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             </div>
           </div>
 
-          {currentTeam &&
-            (currentPlan.id === 'team' ? (
-              <div className="mx-1 mb-1 flex items-center gap-2 rounded-lg px-3 py-2">
-                <Crown className="h-4 w-4 shrink-0 text-amber-500" />
-                <span className="text-[13px] font-medium text-foreground">Plan Team</span>
-                <span className="ml-auto text-[11px] text-muted-foreground">Plan maximal</span>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => router.push('/dashboard/settings/plan/upgrade')}
-                className="mx-1 mb-1 flex w-[calc(100%-0.5rem)] items-center gap-2 rounded-lg px-3 py-2 transition-colors hover:bg-muted/60"
-              >
-                <span className="text-[13px] font-semibold text-foreground">Mettre à niveau</span>
-                <ArrowRight className="ml-auto h-3.5 w-3.5 text-primary" />
-              </button>
-            ))}
-          {currentTeam && <DropdownSeparator />}
+          <DropdownItem onClick={() => router.push('/dashboard/settings/plan/upgrade')}>
+            <PlanIcon className={cn('h-4 w-4', currentPlan.accentText)} /> Changer de forfait
+          </DropdownItem>
 
           <Link href="/dashboard/account">
             <DropdownItem>
@@ -951,6 +923,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
 
           { }
           <DropdownSub
+            className="min-w-[220px]"
             trigger={
               <>
                 <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-primary/10 text-[9px] font-bold text-primary overflow-hidden">
@@ -996,6 +969,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
           <DropdownSeparator />
 
           <DropdownSub
+            className="min-w-[220px]"
             trigger={
               <>
                 <Info className="h-4 w-4 text-sky-500" />
@@ -1003,6 +977,27 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
               </>
             }
           >
+            <DropdownItem
+              onMouseDown={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation()
+                const next = theme === 'system' ? 'light' : theme === 'light' ? 'dark' : 'system'
+                setTheme(next)
+              }}
+            >
+              <Palette className="h-4 w-4 text-indigo-500" />
+              Thème
+              <span className="ml-auto flex h-7 w-7 items-center justify-center rounded-md bg-foreground/[0.06] text-foreground">
+                {theme === 'system' ? (
+                  <Monitor className="h-4 w-4" />
+                ) : theme === 'dark' ? (
+                  <Moon className="h-4 w-4" />
+                ) : (
+                  <Sun className="h-4 w-4" />
+                )}
+              </span>
+            </DropdownItem>
+            <DropdownSeparator />
             <DropdownItem onClick={() => {
               const tutorial = (window as any).__fakturTutorialOpen
               if (typeof tutorial === 'function') tutorial()
@@ -1025,9 +1020,13 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             </Link>
             <Link href="/legal" target="_blank">
               <DropdownItem>
-                <Scale className="h-4 w-4 text-muted-foreground" /> Info legales
+                <Scale className="h-4 w-4 text-muted-foreground" /> Mentions légales
               </DropdownItem>
             </Link>
+            <DropdownSeparator />
+            <DropdownItem onClick={() => router.push('/download')}>
+              <Download className="h-4 w-4 text-sky-500" /> Télécharger les applications
+            </DropdownItem>
           </DropdownSub>
 
           <DropdownSeparator />

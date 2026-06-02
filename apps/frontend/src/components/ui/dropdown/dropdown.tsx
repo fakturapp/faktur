@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 
 interface DropdownProps {
-  trigger: React.ReactNode
+  trigger: React.ReactNode | ((open: boolean) => React.ReactNode)
   children: React.ReactNode
   align?: 'left' | 'right'
   position?: 'below' | 'above'
@@ -101,7 +101,7 @@ export function Dropdown({ trigger, children, align = 'right', position = 'below
   return (
     <div ref={triggerRef} className="relative">
       <div onClick={() => setOpen(!open)} className="cursor-pointer">
-        {trigger}
+        {typeof trigger === 'function' ? trigger(open) : trigger}
       </div>
       {typeof document !== 'undefined' && createPortal(popup, document.body)}
     </div>
