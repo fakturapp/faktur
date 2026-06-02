@@ -16,6 +16,9 @@ const PRODUCT_NAMES: Record<BillingPlan, string> = {
   team: 'Faktur Team',
 }
 
+const CREDIT_INSTANT_RETENTION = 0.75
+const CREDIT_DECAY_POWER = 3
+
 class BillingService {
   isConfigured(): boolean {
     return !!env.get('STRIPE_SECRET_KEY')
@@ -54,7 +57,9 @@ class BillingService {
     const paid = PRICES[plan][period]
     const total = periodEnd - periodStart
     const remaining = Math.max(0, Math.min(total, periodEnd - nowSeconds))
-    return Math.round((paid * remaining) / total)
+    const fractionRemaining = remaining / total
+    const factor = CREDIT_INSTANT_RETENTION * Math.pow(fractionRemaining, CREDIT_DECAY_POWER)
+    return Math.round(paid * factor)
   }
 
   async retrieveSubscription(id: string): Promise<Stripe.Subscription> {
@@ -83,19 +88,25 @@ class BillingService {
     const amountOff = Math.min(credit, targetCharge)
     if (amountOff < 1) return null
 
-    const coupon = await this.client().coupons.create({
-      amount_off: amountOff,
-      currency: 'eur',
-      duration: 'once',
-      max_redemptions: 1,
-      name: `Crédit ${PRODUCT_NAMES[params.currentPlan]} (temps restant)`,
-      metadata: {
-        team_id: params.teamId,
-        kind: 'plan_switch_credit',
-        from_plan: params.currentPlan,
-        to_plan: params.targetPlan,
+    const hourBucket = Math.floor(Date.now() / 3_600_000)
+    const idempotencyKey = `credit:${params.teamId}:${params.currentPlan}-${params.currentPeriod}:${params.targetPlan}-${params.targetPeriod}:${hourBucket}`
+
+    const coupon = await this.client().coupons.create(
+      {
+        amount_off: amountOff,
+        currency: 'eur',
+        duration: 'once',
+        max_redemptions: 1,
+        name: `Crédit ${PRODUCT_NAMES[params.currentPlan]} (temps restant)`,
+        metadata: {
+          team_id: params.teamId,
+          kind: 'plan_switch_credit',
+          from_plan: params.currentPlan,
+          to_plan: params.targetPlan,
+        },
       },
-    })
+      { idempotencyKey }
+    )
     return { couponId: coupon.id, amountOff }
   }
 
@@ -232,6 +243,132 @@ class BillingService {
     return res.data
   }
 
+  async resolveProductId(plan: BillingPlan): Promise<string | null> {
+    const client = this.client()
+    for (const period of ['monthly', 'annual'] as BillingPeriod[]) {
+      const ref = this.productRef(plan, period)
+      if (!ref) continue
+      if (ref.startsWith('prod_')) return ref
+      if (ref.startsWith('price_')) {
+        try {
+          const price: any = await client.prices.retrieve(ref)
+          const product = price?.product
+          if (typeof product === 'string') return product
+          if (product?.id) return product.id
+        } catch {}
+      }
+    }
+    return null
+  }
+
+  async productPlanMap(): Promise<Record<string, BillingPlan>> {
+    const map: Record<string, BillingPlan> = {}
+    for (const plan of ['pro', 'team'] as BillingPlan[]) {
+      const id = await this.resolveProductId(plan)
+      if (id) map[id] = plan
+    }
+    return map
+  }
+
+  async createPromotionCode(params: {
+    code: string
+    discountType: 'percent' | 'amount'
+    value: number
+    duration: 'once' | 'forever' | 'repeating'
+    durationInMonths?: number | null
+    plans?: BillingPlan[]
+    expiresAt?: number | null
+    maxRedemptions?: number | null
+    name?: string | null
+  }): Promise<{ id: string; code: string; couponId: string }> {
+    const client = this.client()
+    const couponParams: Record<string, any> = { duration: params.duration }
+    if (params.name) couponParams.name = params.name
+    if (params.duration === 'repeating') {
+      couponParams.duration_in_months =
+        params.durationInMonths && params.durationInMonths > 0 ? params.durationInMonths : 1
+    }
+    if (params.discountType === 'percent') {
+      couponParams.percent_off = params.value
+    } else {
+      couponParams.amount_off = params.value
+      couponParams.currency = 'eur'
+    }
+    if (params.plans && params.plans.length) {
+      const products = (
+        await Promise.all(params.plans.map((p) => this.resolveProductId(p)))
+      ).filter((p): p is string => !!p)
+      if (products.length) couponParams.applies_to = { products }
+    }
+    const coupon = await client.coupons.create(couponParams as any, {
+      idempotencyKey: `promo-coupon:${params.code}`,
+    })
+
+    const promoParams: Record<string, any> = {
+      promotion: { type: 'coupon', coupon: coupon.id },
+      code: params.code,
+    }
+    if (params.expiresAt) promoParams.expires_at = params.expiresAt
+    if (params.maxRedemptions && params.maxRedemptions > 0) {
+      promoParams.max_redemptions = params.maxRedemptions
+    }
+    try {
+      const promo = await client.promotionCodes.create(promoParams as any)
+      return { id: promo.id, code: promo.code, couponId: coupon.id }
+    } catch (err) {
+      await client.coupons.del(coupon.id).catch(() => {})
+      throw err
+    }
+  }
+
+  async listPromotionCodes(): Promise<
+    Array<{
+      id: string
+      code: string
+      active: boolean
+      expiresAt: number | null
+      maxRedemptions: number | null
+      timesRedeemed: number
+      percentOff: number | null
+      amountOff: number | null
+      duration: string
+      durationInMonths: number | null
+      plans: BillingPlan[]
+      createdAt: number | null
+    }>
+  > {
+    const res = await this.client().promotionCodes.list({
+      limit: 100,
+      expand: ['data.promotion.coupon'],
+    })
+    const productToPlan = await this.productPlanMap()
+    return res.data.map((pc: any) => {
+      const c = pc.promotion?.coupon || pc.coupon || {}
+      const products: string[] = c.applies_to?.products ?? []
+      const plans = products
+        .map((id) => productToPlan[id])
+        .filter((p): p is BillingPlan => !!p)
+      return {
+        id: pc.id,
+        code: pc.code,
+        active: pc.active,
+        expiresAt: pc.expires_at ?? null,
+        maxRedemptions: pc.max_redemptions ?? null,
+        timesRedeemed: pc.times_redeemed ?? 0,
+        percentOff: c.percent_off ?? null,
+        amountOff: c.amount_off ?? null,
+        duration: c.duration ?? 'once',
+        durationInMonths: c.duration_in_months ?? null,
+        plans,
+        createdAt: pc.created ?? null,
+      }
+    })
+  }
+
+  async setPromotionCodeActive(id: string, active: boolean): Promise<void> {
+    await this.client().promotionCodes.update(id, { active })
+  }
+
   async listSubscriptions(customerId: string): Promise<Stripe.Subscription[]> {
     const res = await this.client().subscriptions.list({
       customer: customerId,
@@ -258,9 +395,10 @@ class BillingService {
 
     let scheduleId: string | null = sub?.schedule ? String(sub.schedule) : null
     if (!scheduleId) {
-      const created = await client.subscriptionSchedules.create({
-        from_subscription: params.subscriptionId,
-      })
+      const created = await client.subscriptionSchedules.create(
+        { from_subscription: params.subscriptionId },
+        { idempotencyKey: `schedule:${params.subscriptionId}` }
+      )
       scheduleId = created.id
     }
 
