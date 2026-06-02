@@ -1957,6 +1957,17 @@ export class RecurringInvoiceSchema extends BaseModel {
   declare vatExemptReason: string
 }
 
+export class StripeWebhookEventSchema extends BaseModel {
+  static $columns = ['id', 'processedAt', 'type'] as const
+  $columns = StripeWebhookEventSchema.$columns
+  @column({ isPrimary: true })
+  declare id: string
+  @column.dateTime()
+  declare processedAt: DateTime
+  @column()
+  declare type: string
+}
+
 export class TeamMemberSchema extends BaseModel {
   static $columns = ['createdAt', 'dekVersion', 'encryptedInviteDek', 'encryptedRecoveryKey', 'encryptedTeamDek', 'encryptedTeamDekRecovery', 'id', 'invitationExpiresAt', 'invitationToken', 'invitedAt', 'invitedEmail', 'joinedAt', 'role', 'status', 'teamId', 'updatedAt', 'userId'] as const
   $columns = TeamMemberSchema.$columns

@@ -5,6 +5,7 @@ import env from '#start/env'
 import Team from '#models/team/team'
 import User from '#models/account/user'
 import billingService from '#services/billing/billing_service'
+import StripeWebhookEvent from '#models/billing/stripe_webhook_event'
 import { applyStripeSubscription } from '#services/billing/subscription_state'
 import { PaymentFailedNotification } from '#mails/payment_failed_notification'
 
@@ -35,6 +36,14 @@ export default class StripeBillingWebhook {
       }
     }
 
+    if (event.id) {
+      try {
+        await StripeWebhookEvent.create({ id: String(event.id), type: String(event.type ?? '') })
+      } catch {
+        return response.ok({ received: true, duplicate: true })
+      }
+    }
+
     try {
       switch (event.type) {
         case 'checkout.session.completed':
@@ -57,6 +66,9 @@ export default class StripeBillingWebhook {
           break
       }
     } catch {
+      if (event.id) {
+        await StripeWebhookEvent.query().where('id', String(event.id)).delete().catch(() => {})
+      }
       return response.internalServerError({ received: false })
     }
 
