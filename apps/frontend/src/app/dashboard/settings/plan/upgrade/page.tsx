@@ -10,7 +10,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTitle, DialogDescription } from '@/components/ui/dialog'
-import { PLAN_IDS, PLANS, getPlan, type PlanId } from '@/lib/plans'
+import { PLAN_IDS, PLANS, getPlan, formatPlanPrice, type PlanId } from '@/lib/plans'
 import { PlanRings } from '@/components/plans/plan-rings'
 import { AnimatedPrice } from '@/components/plans/animated-price'
 import { ArrowLeft, Check, ArrowRight, TrendingDown } from 'lucide-react'
@@ -47,7 +47,12 @@ export default function PlanUpgradePage() {
   const [busy, setBusy] = useState<string | null>(null)
   const [cancelOpen, setCancelOpen] = useState(false)
   const [downgradeTarget, setDowngradeTarget] = useState<PlanId | null>(null)
+  const [downgradeAccepted, setDowngradeAccepted] = useState(false)
   const [cancelScheduledOpen, setCancelScheduledOpen] = useState(false)
+
+  useEffect(() => {
+    if (downgradeTarget) setDowngradeAccepted(false)
+  }, [downgradeTarget])
 
   const load = useCallback(async () => {
     const { data } = await api.get<{ team: TeamData }>('/team')
@@ -374,12 +379,50 @@ export default function PlanUpgradePage() {
               ? 'Passer à la facturation mensuelle ?'
               : `Passer au forfait ${downgradeTarget ? getPlan(downgradeTarget).name : ''} ?`}
           </DialogTitle>
-          <DialogDescription className="mt-1.5 max-w-xs">
-            {downgradeTarget === currentPlanId
-              ? `Vous gardez la facturation annuelle jusqu’au ${formatDate(team?.subscriptionCurrentPeriodEnd) || 'terme de la période'}, puis passage au mensuel. Rien ne vous est prélevé maintenant.`
-              : `Vous gardez ${getPlan(currentPlanId).name} jusqu’au ${formatDate(team?.subscriptionCurrentPeriodEnd) || 'terme de la période'}, puis passage automatique. Rien ne vous est prélevé maintenant.`}
+          <DialogDescription className="mt-1.5 max-w-sm">
+            {(() => {
+              const date = formatDate(team?.subscriptionCurrentPeriodEnd) || 'la fin de votre période'
+              const billed =
+                downgradeTarget &&
+                (period === 'annual'
+                  ? `${formatPlanPrice(getPlan(downgradeTarget).priceAnnual * 12)} par an`
+                  : `${formatPlanPrice(getPlan(downgradeTarget).priceMonthly)} par mois`)
+              return downgradeTarget === currentPlanId
+                ? `Vous conservez la facturation annuelle de ${getPlan(currentPlanId).name} jusqu’au ${date}. À partir de cette date, vous serez facturé ${billed}. Rien ne vous est prélevé aujourd’hui.`
+                : `Vous conservez votre forfait ${getPlan(currentPlanId).name} jusqu’au ${date}. À partir de cette date, vous passerez automatiquement au forfait ${getPlan(downgradeTarget!).name} et serez facturé ${billed}. Rien ne vous est prélevé aujourd’hui.`
+            })()}
           </DialogDescription>
-          <div className="mt-6 flex w-full gap-2">
+
+          <button
+            type="button"
+            onClick={() => setDowngradeAccepted((v) => !v)}
+            className="mt-5 flex w-full items-start gap-2.5 text-left"
+          >
+            <span
+              className={cn(
+                'mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors',
+                downgradeAccepted ? 'border-primary bg-primary text-primary-foreground' : 'border-border'
+              )}
+            >
+              {downgradeAccepted && <Check className="h-3 w-3" strokeWidth={3} />}
+            </span>
+            <span className="text-[12px] leading-snug text-muted-foreground">
+              En confirmant, j’accepte que mon forfait change automatiquement à la date indiquée et d’être
+              facturé au tarif ci-dessus. Je peux annuler ce changement à tout moment avant cette date. Voir les{' '}
+              <a
+                href="/legal"
+                target="_blank"
+                rel="noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="underline underline-offset-2 hover:text-foreground"
+              >
+                conditions de vente
+              </a>
+              .
+            </span>
+          </button>
+
+          <div className="mt-5 flex w-full gap-2">
             <Button
               className="flex-1"
               onClick={() => setDowngradeTarget(null)}
@@ -391,7 +434,7 @@ export default function PlanUpgradePage() {
               variant="ghost"
               className="flex-1 text-amber-600 hover:bg-amber-500/10 dark:text-amber-400"
               onClick={() => downgradeTarget && handleScheduleDowngrade(downgradeTarget)}
-              disabled={busy === downgradeTarget}
+              disabled={busy === downgradeTarget || !downgradeAccepted}
             >
               {busy === downgradeTarget ? (
                 <>
