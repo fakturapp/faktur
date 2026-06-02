@@ -10,8 +10,9 @@ import { Spinner } from '@/components/ui/spinner'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTitle, DialogDescription } from '@/components/ui/dialog'
-import { PLAN_IDS, PLANS, getPlan, formatPlanPrice, type PlanId } from '@/lib/plans'
+import { PLAN_IDS, PLANS, getPlan, type PlanId } from '@/lib/plans'
 import { PlanRings } from '@/components/plans/plan-rings'
+import { AnimatedPrice } from '@/components/plans/animated-price'
 import { ArrowLeft, Check, ArrowRight, TrendingDown } from 'lucide-react'
 
 interface TeamData {
@@ -242,7 +243,7 @@ export default function PlanUpgradePage() {
               <div className="mt-4 flex items-baseline gap-1">
                 {price > 0 ? (
                   <>
-                    <span className="text-4xl font-bold text-foreground">{formatPlanPrice(price)}</span>
+                    <AnimatedPrice value={price} className="text-4xl font-bold text-foreground" />
                     <span className="text-sm text-muted-foreground">/mois</span>
                   </>
                 ) : (
@@ -250,11 +251,17 @@ export default function PlanUpgradePage() {
                 )}
               </div>
               <p className="mt-1 h-4 text-xs text-muted-foreground">
-                {price > 0
-                  ? period === 'annual'
-                    ? `soit ${formatPlanPrice(price * 12)} facturés par an`
-                    : 'facturé chaque mois'
-                  : 'Pour toujours'}
+                {price > 0 ? (
+                  period === 'annual' ? (
+                    <>
+                      soit <AnimatedPrice value={price * 12} /> facturés par an
+                    </>
+                  ) : (
+                    'facturé chaque mois'
+                  )
+                ) : (
+                  'Pour toujours'
+                )}
               </p>
 
               <ul className="mt-5 flex-1 space-y-2.5">
