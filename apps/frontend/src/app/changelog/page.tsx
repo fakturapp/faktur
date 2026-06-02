@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import ReactMarkdown, { type Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -45,23 +45,11 @@ const mdComponents: Components = {
   ),
 }
 
-/** Map every section id (month or entry) back to its month id. */
-const MONTH_OF: Record<string, string> = (() => {
-  const map: Record<string, string> = {}
-  for (const month of CHANGELOG) {
-    map[month.id] = month.id
-    for (const e of month.entries) map[e.id] = month.id
-  }
-  return map
-})()
-
 export default function ChangelogPage() {
   const router = useRouter()
   const { toast } = useToast()
   const [activeId, setActiveId] = useState<string>(SECTION_IDS[0])
-  // The month currently shown in the table of contents. Driven by scroll, but
-  // can be set manually by clicking another month tab.
-  const [openMonth, setOpenMonth] = useState<string>(CHANGELOG[0].id)
+  const tocRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     function onScroll() {
@@ -76,8 +64,6 @@ export default function ChangelogPage() {
         current = SECTION_IDS[SECTION_IDS.length - 1]
       }
       setActiveId(current)
-      const month = MONTH_OF[current]
-      if (month) setOpenMonth(month)
     }
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
@@ -88,7 +74,17 @@ export default function ChangelogPage() {
     }
   }, [])
 
-  const currentMonth = CHANGELOG.find((m) => m.id === openMonth) ?? CHANGELOG[0]
+  // Keep the active entry visible inside the scrollable table of contents.
+  useEffect(() => {
+    const c = tocRef.current
+    if (!c) return
+    const el = c.querySelector<HTMLElement>(`[data-toc-id="${activeId}"]`)
+    if (!el) return
+    const cRect = c.getBoundingClientRect()
+    const eRect = el.getBoundingClientRect()
+    if (eRect.top < cRect.top) c.scrollTop -= cRect.top - eRect.top + 16
+    else if (eRect.bottom > cRect.bottom) c.scrollTop += eRect.bottom - cRect.bottom + 16
+  }, [activeId])
 
   function goTo(id: string) {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -136,63 +132,7 @@ export default function ChangelogPage() {
           </div>
         </header>
 
-        <div className="mt-16 grid gap-x-16 gap-y-10 lg:grid-cols-[230px_minmax(0,1fr)]">
-          <aside className="hidden lg:block">
-            <nav className="sticky top-12">
-              <p className="mb-4 text-[12px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
-                Sommaire
-              </p>
-
-              {/* Month switcher — always visible, picks which month shows below */}
-              <div className="mb-4 flex flex-wrap gap-1.5">
-                {CHANGELOG.map((month) => (
-                  <button
-                    key={month.id}
-                    type="button"
-                    onClick={() => {
-                      setOpenMonth(month.id)
-                      goTo(month.id)
-                    }}
-                    className={cn(
-                      'rounded-full px-3 py-1 text-[12.5px] font-semibold transition-colors',
-                      openMonth === month.id
-                        ? 'bg-primary text-white'
-                        : 'bg-foreground/[0.05] text-foreground/70 hover:bg-foreground/[0.1] hover:text-foreground'
-                    )}
-                  >
-                    {month.label}
-                  </button>
-                ))}
-              </div>
-
-              {/* Only the active month's entries, with a blurred scroll edge */}
-              <ScrollShadow
-                size={48}
-                className="max-h-[calc(100vh-12rem)]"
-                aria-label={`Sommaire — ${currentMonth.label}`}
-              >
-                <ul className="space-y-0.5 border-l border-border pr-1">
-                  {currentMonth.entries.map((e) => (
-                    <li key={e.id}>
-                      <button
-                        type="button"
-                        onClick={() => goTo(e.id)}
-                        className={cn(
-                          '-ml-px block w-full border-l-2 py-1.5 pl-4 text-left text-[13.5px] leading-snug transition-colors',
-                          activeId === e.id
-                            ? 'border-primary font-medium text-primary'
-                            : 'border-transparent text-muted-foreground hover:text-foreground'
-                        )}
-                      >
-                        {e.title}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </ScrollShadow>
-            </nav>
-          </aside>
-
+        <div className="mt-16 grid gap-x-16 gap-y-10 lg:grid-cols-[minmax(0,1fr)_240px]">
           <article className="min-w-0 max-w-3xl">
             {CHANGELOG.map((month) => (
               <section key={month.id} className="mb-20 last:mb-0">
@@ -215,6 +155,54 @@ export default function ChangelogPage() {
               </section>
             ))}
           </article>
+
+          <aside className="hidden lg:block">
+            <nav className="sticky top-12">
+              <p className="mb-4 text-[12px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
+                Table des matières
+              </p>
+              <ScrollShadow ref={tocRef} size={48} className="max-h-[calc(100vh-10rem)]" aria-label="Table des matières">
+                <ul className="space-y-1 border-l border-border pr-1">
+                  {CHANGELOG.map((month) => (
+                    <li key={month.id}>
+                      <button
+                        data-toc-id={month.id}
+                        type="button"
+                        onClick={() => goTo(month.id)}
+                        className={cn(
+                          '-ml-px block w-full border-l-2 py-1.5 pl-4 text-left text-[13.5px] font-semibold transition-colors',
+                          activeId === month.id
+                            ? 'border-primary text-foreground'
+                            : 'border-transparent text-foreground/70 hover:text-foreground'
+                        )}
+                      >
+                        {month.label}
+                      </button>
+                      <ul className="space-y-0.5 pb-1">
+                        {month.entries.map((e) => (
+                          <li key={e.id}>
+                            <button
+                              data-toc-id={e.id}
+                              type="button"
+                              onClick={() => goTo(e.id)}
+                              className={cn(
+                                '-ml-px block w-full border-l-2 py-1.5 pl-6 text-left text-[13px] leading-snug transition-colors',
+                                activeId === e.id
+                                  ? 'border-primary font-medium text-primary'
+                                  : 'border-transparent text-muted-foreground hover:text-foreground'
+                              )}
+                            >
+                              {e.title}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </li>
+                  ))}
+                </ul>
+              </ScrollShadow>
+            </nav>
+          </aside>
         </div>
       </div>
     </div>
