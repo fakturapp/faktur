@@ -74,7 +74,8 @@ export default function ChangelogPage() {
     }
   }, [])
 
-  // Keep the active entry visible inside the scrollable table of contents.
+  // Keep the active entry visible inside the scrollable table of contents,
+  // gliding to it with a smooth animation rather than a hard jump.
   useEffect(() => {
     const c = tocRef.current
     if (!c) return
@@ -82,8 +83,17 @@ export default function ChangelogPage() {
     if (!el) return
     const cRect = c.getBoundingClientRect()
     const eRect = el.getBoundingClientRect()
-    if (eRect.top < cRect.top) c.scrollTop -= cRect.top - eRect.top + 16
-    else if (eRect.bottom > cRect.bottom) c.scrollTop += eRect.bottom - cRect.bottom + 16
+    const margin = 24
+    let target = c.scrollTop
+    if (eRect.top < cRect.top + margin) {
+      target = c.scrollTop - (cRect.top + margin - eRect.top)
+    } else if (eRect.bottom > cRect.bottom - margin) {
+      target = c.scrollTop + (eRect.bottom - (cRect.bottom - margin))
+    }
+    target = Math.max(0, Math.min(target, c.scrollHeight - c.clientHeight))
+    if (Math.abs(target - c.scrollTop) > 1) {
+      c.scrollTo({ top: target, behavior: 'smooth' })
+    }
   }, [activeId])
 
   function goTo(id: string) {
@@ -170,7 +180,7 @@ export default function ChangelogPage() {
                         type="button"
                         onClick={() => goTo(month.id)}
                         className={cn(
-                          '-ml-px block w-full border-l-2 py-1.5 pl-4 text-left text-[13.5px] font-semibold transition-colors',
+                          '-ml-px block w-full border-l-2 py-1.5 pl-4 text-left text-[13.5px] font-semibold transition-all duration-300',
                           activeId === month.id
                             ? 'border-primary text-foreground'
                             : 'border-transparent text-foreground/70 hover:text-foreground'
@@ -186,7 +196,7 @@ export default function ChangelogPage() {
                               type="button"
                               onClick={() => goTo(e.id)}
                               className={cn(
-                                '-ml-px block w-full border-l-2 py-1.5 pl-6 text-left text-[13px] leading-snug transition-colors',
+                                '-ml-px block w-full border-l-2 py-1.5 pl-6 text-left text-[13px] leading-snug transition-all duration-300',
                                 activeId === e.id
                                   ? 'border-primary font-medium text-primary'
                                   : 'border-transparent text-muted-foreground hover:text-foreground'
