@@ -161,7 +161,7 @@ export default function ChangelogPage() {
               <p className="mb-4 text-[12px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
                 Table des matières
               </p>
-              <ScrollShadow ref={tocRef} size={48} className="max-h-[calc(100vh-10rem)]" aria-label="Table des matières">
+              <ScrollShadow ref={tocRef} size={44} className="max-h-[320px]" aria-label="Table des matières">
                 <ul className="space-y-1 border-l border-border pr-1">
                   {CHANGELOG.map((month) => (
                     <li key={month.id}>
