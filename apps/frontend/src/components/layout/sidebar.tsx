@@ -18,7 +18,6 @@ import {
   type FakturDesktopCertificationStatus,
 } from '@/lib/is-desktop'
 import { DesktopUpdateCard } from '@/components/layout/desktop-update-card'
-import { WhatsNewModal } from '@/components/layout/whats-new-modal'
 import { VerifiedBadge } from '@/components/ui/verified-badge'
 import { Tooltip } from '@/components/ui/tooltip'
 import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
@@ -413,7 +412,6 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
   const router = useRouter()
   const { theme, setTheme } = useTheme()
   const [convertModalOpen, setConvertModalOpen] = useState(false)
-  const [whatsNewOpen, setWhatsNewOpen] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
   const [confirmRedirect, setConfirmRedirect] = useState<NavItem | null>(null)
 
@@ -802,7 +800,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
       <div className="px-3 pb-1.5">
         <button
           type="button"
-          onClick={() => setWhatsNewOpen(true)}
+          onClick={() => router.push('/dashboard/changelog')}
           className={cn(
             'flex w-full items-center rounded-lg text-[15px] font-medium text-muted-foreground hover:bg-muted/40 dark:hover:bg-white/[0.04] hover:text-foreground transition-all duration-200',
             collapsed ? 'justify-center h-10 w-10 mx-auto' : 'justify-start gap-2.5 px-3 py-2.5'
@@ -1040,11 +1038,6 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
       <CreateInvoiceModal
         open={convertModalOpen}
         onClose={() => setConvertModalOpen(false)}
-      />
-
-      <WhatsNewModal
-        open={whatsNewOpen}
-        onClose={() => setWhatsNewOpen(false)}
       />
 
       <Dialog open={!!confirmRedirect} onClose={() => setConfirmRedirect(null)}>
