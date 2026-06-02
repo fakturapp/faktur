@@ -261,51 +261,6 @@ function CheckoutInner({
     setTimeout(() => router.push('/dashboard/settings/plan?subscribed=1'), 1800)
   }
 
-  if (succeeded) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-5 py-24">
-        <motion.svg
-          width="88"
-          height="88"
-          viewBox="0 0 52 52"
-          initial={{ scale: 0.6, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 220, damping: 18 }}
-        >
-          <motion.circle
-            cx="26"
-            cy="26"
-            r="24"
-            fill="none"
-            stroke="#635bff"
-            strokeWidth="3"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 0.5, ease: 'easeInOut' }}
-          />
-          <motion.path
-            fill="none"
-            stroke="#635bff"
-            strokeWidth="4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M15 27 l8 8 l15 -17"
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 0.4, delay: 0.45, ease: 'easeOut' }}
-          />
-        </motion.svg>
-        <motion.p
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.55 }}
-          className="text-[15px] font-semibold text-foreground"
-        >
-          Paiement confirmé
-        </motion.p>
-      </div>
-    )
-  }
 
   return (
     <form onSubmit={handleSubmit}>
@@ -416,10 +371,31 @@ function CheckoutInner({
 
       <button
         type="submit"
-        disabled={submitting}
-        className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-4 text-[15px] font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
+        disabled={submitting || succeeded}
+        className="mt-6 flex h-[54px] w-full items-center justify-center gap-2 rounded-full bg-primary px-4 text-[15px] font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-100"
       >
-        {submitting ? (
+        {succeeded ? (
+          <motion.svg
+            width="26"
+            height="26"
+            viewBox="0 0 24 24"
+            initial={{ scale: 0.4, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 260, damping: 15 }}
+          >
+            <motion.path
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M5 13 l4 4 l10 -11"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
+            />
+          </motion.svg>
+        ) : submitting ? (
           <>
             <Spinner /> Paiement en cours…
           </>
