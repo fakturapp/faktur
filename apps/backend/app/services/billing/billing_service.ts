@@ -172,7 +172,11 @@ class BillingService {
       metadata,
       return_url: params.returnUrl,
     }
-    if (params.couponId) sessionParams.discounts = [{ coupon: params.couponId }]
+    if (params.couponId) {
+      sessionParams.discounts = [{ coupon: params.couponId }]
+    } else {
+      sessionParams.allow_promotion_codes = true
+    }
 
     return this.client().checkout.sessions.create(sessionParams as any)
   }
