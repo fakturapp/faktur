@@ -800,7 +800,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
       <div className="px-3 pb-1.5">
         <button
           type="button"
-          onClick={() => router.push('/dashboard/changelog')}
+          onClick={() => router.push('/changelog')}
           className={cn(
             'flex w-full items-center rounded-lg text-[15px] font-medium text-muted-foreground hover:bg-muted/40 dark:hover:bg-white/[0.04] hover:text-foreground transition-all duration-200',
             collapsed ? 'justify-center h-10 w-10 mx-auto' : 'justify-start gap-2.5 px-3 py-2.5'
