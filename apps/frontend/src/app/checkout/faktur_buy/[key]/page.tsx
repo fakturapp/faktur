@@ -7,8 +7,9 @@ import { loadStripe, type Stripe, type Appearance } from '@stripe/stripe-js'
 import { CheckoutElementsProvider, useCheckout, PaymentElement } from '@stripe/react-stripe-js/checkout'
 import { api } from '@/lib/api'
 import { Spinner } from '@/components/ui/spinner'
+import { useToast } from '@/components/ui/toast'
 import { getPlan, formatPlanPrice, type PlanId } from '@/lib/plans'
-import { ChevronLeft, Check, Info } from 'lucide-react'
+import { ChevronLeft, Check } from 'lucide-react'
 
 interface CheckoutData {
   clientSecret: string
@@ -165,6 +166,7 @@ function CheckoutInner({
   amountDiscount: number | null
 }) {
   const router = useRouter()
+  const { toast } = useToast()
   const checkoutState = useCheckout()
   const [submitting, setSubmitting] = useState(false)
   const [succeeded, setSucceeded] = useState(false)
@@ -178,7 +180,6 @@ function CheckoutInner({
   const [promoOpen, setPromoOpen] = useState(false)
   const [promoInput, setPromoInput] = useState('')
   const [promoCode, setPromoCode] = useState<string | null>(null)
-  const [promoErr, setPromoErr] = useState<string | null>(null)
   const [promoBusy, setPromoBusy] = useState(false)
 
   const refreshAmounts = useCallback(async () => {
@@ -220,21 +221,21 @@ function CheckoutInner({
     const value = promoInput.trim().toUpperCase()
     if (!value || promoBusy) return
     setPromoBusy(true)
-    setPromoErr(null)
     try {
       if (typeof (checkout as any).applyPromotionCode !== 'function') {
-        setPromoErr("Les codes promo ne sont pas disponibles pour ce paiement.")
+        toast('Les codes promo ne sont pas disponibles pour ce paiement.', 'error')
         return
       }
       const res: any = await checkout.applyPromotionCode(value)
       if (res?.type === 'error') {
-        setPromoErr(res.error?.message || "Ce code promo n'est pas valide.")
+        toast(res.error?.message || "Ce code promo n'est pas valide.", 'error')
         return
       }
       setPromoCode(value)
       await refreshAmounts()
+      toast('Code promo appliqué', 'success')
     } catch (e: any) {
-      setPromoErr(e?.message || "Impossible d'appliquer ce code promo.")
+      toast(e?.message || "Impossible d'appliquer ce code promo.", 'error')
     } finally {
       setPromoBusy(false)
     }
@@ -243,7 +244,6 @@ function CheckoutInner({
   async function removePromo() {
     if (promoBusy) return
     setPromoBusy(true)
-    setPromoErr(null)
     try {
       if (typeof (checkout as any).removePromotionCode === 'function') {
         await checkout.removePromotionCode()
@@ -350,16 +350,6 @@ function CheckoutInner({
               >
                 J&apos;ai un code promo
               </button>
-            )}
-
-            {promoErr && (
-              <div className="flex items-start gap-2 rounded-md border border-amber-500/30 bg-amber-500/5 px-2.5 py-2">
-                <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
-                <div className="text-[12px] leading-snug">
-                  <p className="font-semibold text-foreground">Code non applicable</p>
-                  <p className="text-muted-foreground">{promoErr}</p>
-                </div>
-              </div>
             )}
 
             <div className="mt-3 flex justify-between font-semibold">
