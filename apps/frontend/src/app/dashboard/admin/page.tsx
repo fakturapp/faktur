@@ -7,7 +7,7 @@ import { motion } from 'framer-motion'
 import { api } from '@/lib/api'
 import { Spinner } from '@/components/ui/spinner'
 import { cn } from '@/lib/utils'
-import { Star, Bug, MessageSquare, ShieldCheck } from 'lucide-react'
+import { Star, Bug, MessageSquare, ShieldCheck, Ticket } from 'lucide-react'
 
 interface FeedbackItem {
   id: string
@@ -32,6 +32,7 @@ export default function AdminOverviewPage() {
   const [feedbacks, setFeedbacks] = useState<FeedbackItem[]>([])
   const [bugReports, setBugReports] = useState<BugReportItem[]>([])
   const [oauthStats, setOauthStats] = useState<{ apps: number; sessions: number } | null>(null)
+  const [promoCount, setPromoCount] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -43,7 +44,8 @@ export default function AdminOverviewPage() {
       api.get<{ feedbacks: FeedbackItem[] }>('/admin/feedbacks'),
       api.get<{ bugReports: BugReportItem[] }>('/admin/bug-reports'),
       api.get<{ apps: Array<{ isActive: boolean; activeSessions: number }> }>('/admin/oauth-apps'),
-    ]).then(([fb, br, oa]) => {
+      api.get<{ promoCodes: Array<{ active: boolean }> }>('/admin/promo-codes'),
+    ]).then(([fb, br, oa, pc]) => {
       if (fb.data?.feedbacks) setFeedbacks(fb.data.feedbacks)
       if (br.data?.bugReports) setBugReports(br.data.bugReports)
       if (oa.data?.apps) {
@@ -52,6 +54,7 @@ export default function AdminOverviewPage() {
           sessions: oa.data.apps.reduce((sum, a) => sum + (a.activeSessions || 0), 0),
         })
       }
+      if (pc.data?.promoCodes) setPromoCount(pc.data.promoCodes.filter((c) => c.active).length)
       setLoading(false)
     })
   }, [user, router])
@@ -152,6 +155,24 @@ export default function AdminOverviewPage() {
                     )}
                   </p>
                   <p className="text-xs text-muted-foreground">Applications OAuth</p>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="rounded-xl border border-border bg-card p-5 cursor-pointer hover:border-emerald-500/30 transition-colors"
+              onClick={() => router.push('/dashboard/admin/promo-codes')}
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-emerald-500/10">
+                  <Ticket className="h-5 w-5 text-emerald-500" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-foreground">{promoCount ?? 0}</p>
+                  <p className="text-xs text-muted-foreground">Codes promo actifs</p>
                 </div>
               </div>
             </motion.div>
