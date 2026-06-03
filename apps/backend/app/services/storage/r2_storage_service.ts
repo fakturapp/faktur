@@ -3,6 +3,7 @@ import {
   PutObjectCommand,
   DeleteObjectCommand,
   ListObjectsV2Command,
+  HeadObjectCommand,
 } from '@aws-sdk/client-s3'
 import env from '#start/env'
 import app from '@adonisjs/core/services/app'
@@ -125,6 +126,42 @@ class R2StorageService {
     } while (continuationToken)
 
     return objects
+  }
+
+  async headObject(
+    urlOrKey: string
+  ): Promise<{ size: number; contentType?: string } | null> {
+    if (!this.isConfigured()) {
+      return null
+    }
+
+    let key: string
+    if (urlOrKey.startsWith('http://') || urlOrKey.startsWith('https://')) {
+      key = new URL(urlOrKey).pathname.replace(/^\//, '')
+    } else {
+      key = urlOrKey.replace(/^\//, '')
+    }
+
+    try {
+      const result = await this.client!.send(
+        new HeadObjectCommand({ Bucket: this.bucket!, Key: key })
+      )
+      return { size: Number(result.ContentLength ?? 0), contentType: result.ContentType }
+    } catch {
+      return null
+    }
+  }
+
+  keyFromUrl(urlOrKey: string): string | null {
+    if (!urlOrKey) return null
+    if (urlOrKey.startsWith('http://') || urlOrKey.startsWith('https://')) {
+      try {
+        return new URL(urlOrKey).pathname.replace(/^\//, '')
+      } catch {
+        return null
+      }
+    }
+    return urlOrKey.replace(/^\//, '')
   }
 
   getPublicUrl(key: string): string {

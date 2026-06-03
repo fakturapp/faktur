@@ -80,6 +80,44 @@ class StorageService {
     })
   }
 
+  async reconcileActiveFiles(teamId: string): Promise<void> {
+    const [company, invoiceSetting, team] = await Promise.all([
+      Company.findBy('teamId', teamId),
+      InvoiceSetting.findBy('teamId', teamId),
+      Team.find(teamId),
+    ])
+
+    const refs: { url: string | null; category: StorageCategory }[] = [
+      { url: company?.logoUrl ?? null, category: 'company_logo' },
+      { url: invoiceSetting?.logoUrl ?? null, category: 'invoice_logo' },
+      { url: team?.iconUrl ?? null, category: 'team_icon' },
+    ]
+
+    for (const ref of refs) {
+      if (!ref.url) continue
+      const objectKey = r2StorageService.keyFromUrl(ref.url)
+      if (!objectKey) continue
+
+      const existing = await StorageFile.findBy('objectKey', objectKey)
+      if (existing) continue
+
+      const head = await r2StorageService.headObject(objectKey)
+      if (!head) continue
+
+      await StorageFile.create({
+        id: randomUUID(),
+        teamId,
+        category: ref.category,
+        objectKey,
+        publicUrl: ref.url,
+        sizeBytes: head.size,
+        contentType: head.contentType ?? null,
+        originalName: null,
+        isOrphaned: false,
+      })
+    }
+  }
+
   async fileBytes(teamId: string): Promise<number> {
     const row = await db.from('storage_files').where('team_id', teamId).sum('size_bytes as total').first()
     return Number(row?.total ?? 0)

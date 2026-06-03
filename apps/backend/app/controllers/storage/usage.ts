@@ -15,6 +15,8 @@ export default class Usage {
       return response.notFound({ message: 'Équipe introuvable' })
     }
 
+    await storageService.reconcileActiveFiles(team.id)
+
     const usage = await storageService.usage(team.id, team.plan)
     return response.ok(usage)
   }

@@ -9,6 +9,8 @@ export default class Files {
       return response.badRequest({ message: 'Aucune équipe sélectionnée' })
     }
 
+    await storageService.reconcileActiveFiles(user.currentTeamId)
+
     const files = await storageService.listFiles(user.currentTeamId)
     return response.ok({ files })
   }
