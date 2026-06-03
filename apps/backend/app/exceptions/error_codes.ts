@@ -248,6 +248,12 @@ export const ERROR_CODES = {
     visibility: 'user_facing',
     defaultMessage: 'Too many requests, please slow down',
   },
+  storage_full: {
+    type: 'storage_quota_error',
+    status: 403,
+    visibility: 'user_facing',
+    defaultMessage: "Espace de stockage plein. Augmentez votre forfait ou supprimez des fichiers.",
+  },
   internal_error: {
     type: 'api_error',
     status: 500,
