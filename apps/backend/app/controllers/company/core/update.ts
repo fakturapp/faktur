@@ -6,6 +6,7 @@ import {
   decryptModelFields,
   ENCRYPTED_FIELDS,
 } from '#services/crypto/field_encryption_helper'
+import storageService from '#services/storage/storage_service'
 
 export default class Update {
   async handle(ctx: HttpContext) {
@@ -25,11 +26,16 @@ export default class Update {
 
     const payload = await request.validateUsing(updateCompanyValidator)
 
+    const previousLogoUrl = company.logoUrl
     const data: Record<string, any> = { ...payload }
     encryptModelFields(data, [...ENCRYPTED_FIELDS.company], dek)
 
     company.merge(data as Partial<typeof company>)
     await company.save()
+
+    if ('logoUrl' in payload && previousLogoUrl && previousLogoUrl !== company.logoUrl) {
+      await storageService.purgeByPublicUrl(user.currentTeamId, previousLogoUrl)
+    }
 
     decryptModelFields(company, [...ENCRYPTED_FIELDS.company], dek)
 

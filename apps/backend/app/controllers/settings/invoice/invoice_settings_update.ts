@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import InvoiceSetting from '#models/team/invoice_setting'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
+import storageService from '#services/storage/storage_service'
 import { buildDefaultInvoiceSettings } from '#services/settings/default_invoice_settings'
 import { serializeInvoiceSettings } from '#services/settings/serialize_invoice_settings'
 import { updateInvoiceSettingsValidator } from '#validators/invoice_settings_validator'
@@ -86,6 +87,13 @@ export default class InvoiceSettingsUpdate {
       settings.paymentMethods = payload.paymentMethods
       settings.customPaymentMethod = payload.customPaymentMethod || null
       if (payload.logoSource !== undefined) settings.logoSource = payload.logoSource || 'custom'
+      if (payload.logoUrl !== undefined) {
+        const previousLogoUrl = settings.logoUrl
+        settings.logoUrl = payload.logoUrl
+        if (previousLogoUrl && previousLogoUrl !== payload.logoUrl) {
+          await storageService.purgeByPublicUrl(user.currentTeamId, previousLogoUrl)
+        }
+      }
       if (payload.template) settings.template = payload.template
       if (payload.darkMode !== undefined) settings.darkMode = payload.darkMode
       if (payload.documentFont) settings.documentFont = payload.documentFont

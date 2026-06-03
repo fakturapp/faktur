@@ -118,6 +118,20 @@ class StorageService {
     }
   }
 
+  async purgeByPublicUrl(teamId: string, url: string | null | undefined): Promise<void> {
+    if (!url) return
+
+    try {
+      await r2StorageService.delete(url)
+    } catch {}
+
+    const objectKey = r2StorageService.keyFromUrl(url)
+    const query = StorageFile.query().where('teamId', teamId)
+    if (objectKey) query.where('objectKey', objectKey)
+    else query.where('publicUrl', url)
+    await query.delete()
+  }
+
   async fileBytes(teamId: string): Promise<number> {
     const row = await db.from('storage_files').where('team_id', teamId).sum('size_bytes as total').first()
     return Number(row?.total ?? 0)

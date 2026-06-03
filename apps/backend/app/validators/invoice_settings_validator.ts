@@ -25,6 +25,7 @@ export const updateInvoiceSettingsValidator = vine.compile(
       .regex(/^#[0-9a-fA-F]{6}$/),
     paymentMethods: vine.array(vine.string().trim().maxLength(50)),
     logoSource: vine.enum(LOGO_SOURCES).optional(),
+    logoUrl: vine.string().trim().maxLength(1024).nullable().optional(),
     customPaymentMethod: vine.string().trim().maxLength(255).optional(),
     template: vine.string().trim().maxLength(30).optional(),
     darkMode: looseBool.clone(),
