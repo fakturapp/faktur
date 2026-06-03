@@ -10,13 +10,13 @@ import r2StorageService from '#services/storage/r2_storage_service'
 export type PlanId = 'free' | 'pro' | 'team'
 
 export const QUOTA_BYTES: Record<PlanId, number> = {
-  free: 50 * 1024 * 1024,
-  pro: 1024 * 1024 * 1024,
+  free: 10 * 1024 * 1024,
+  pro: 100 * 1024 * 1024,
   team: 20 * 1024 * 1024 * 1024,
 }
 
-const DOC_BASE_BYTES = 8 * 1024
-const DOC_PER_LINE_BYTES = 1024
+const DOC_BASE_BYTES = 25 * 1024
+const DOC_PER_LINE_BYTES = 2 * 1024
 
 const SINGLETON_CATEGORIES: StorageCategory[] = ['company_logo', 'invoice_logo', 'team_icon']
 
