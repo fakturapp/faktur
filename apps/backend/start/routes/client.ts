@@ -17,7 +17,7 @@ router
   .group(() => {
     router.get('/search-siren', [SearchSiren, 'handle'])
     router.get('/', [ClientList, 'handle'])
-    router.get('/:id', [ClientShow, 'handle'])
+    router.get('/:id', [ClientShow, 'handle']).use(middleware.storageQuota())
     router.post('/', [ClientCreate, 'handle'])
     router.put('/:id', [ClientUpdate, 'handle'])
     router.delete('/:id', [ClientDelete, 'handle'])

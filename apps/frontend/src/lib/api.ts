@@ -200,6 +200,7 @@ async function blobRequest(endpoint: string): Promise<{ blob?: Blob; filename?: 
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({ message: 'Download failed' }))
+      maybeNotifyStorageFull(data, res.status)
       return { error: parseErrorPayload(data).message || 'Download failed' }
     }
 
@@ -244,6 +245,7 @@ async function postBlobRequest(
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({ message: 'Download failed' }))
+      maybeNotifyStorageFull(data, res.status)
       return { error: parseErrorPayload(data).message || 'Download failed' }
     }
 
