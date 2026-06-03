@@ -130,7 +130,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       })
     }
     window.addEventListener('faktur:storage-changed', refetchStorage)
-    const offStorageFull = onStorageFull(() => refetchStorage())
+    const offStorageFull = onStorageFull(() => {
+      refetchStorage()
+      setStorageModalOpen(true)
+    })
     const id = setInterval(() => {
       if (document.visibilityState !== 'visible') return
       refetchStorage()
@@ -418,10 +421,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           switching && 'blur-sm pointer-events-none'
         )}
       >
+        <StorageBanner storage={storage} onOpen={() => setStorageModalOpen(true)} />
         <SiteHeader onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)} />
         <RouteProgressBar />
         <SubscriptionBanner />
-        <StorageBanner storage={storage} onOpen={() => setStorageModalOpen(true)} />
         <TeamEncryptionBanner />
 
         <main className="relative flex-1 overflow-y-auto" data-tutorial="main-content">
