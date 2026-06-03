@@ -13,6 +13,7 @@ import {
 import encryptionService from '#services/encryption/encryption_service'
 import { generateInvoicePdf } from '#services/pdf/document_pdf_service'
 import r2StorageService from '#services/storage/r2_storage_service'
+import storageService from '#services/storage/storage_service'
 import { buildCheckoutUrl } from '#services/checkout/checkout_url_builder'
 
 export default class Create {
@@ -189,6 +190,16 @@ export default class Create {
         )
         paymentLink.pdfStorageKey = pdfUrl
         await paymentLink.save()
+
+        await storageService.recordUpload(
+          teamId,
+          'payment_link_pdf',
+          `payment-links/${paymentLink.id}/${filename}`,
+          pdfUrl,
+          pdfBuffer.length,
+          'application/pdf',
+          filename
+        )
       } catch {}
     }
 

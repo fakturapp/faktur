@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import Team from '#models/team/team'
 import r2StorageService from '#services/storage/r2_storage_service'
+import storageService from '#services/storage/storage_service'
 
 export default class UploadIcon {
   async handle({ auth, request, response }: HttpContext) {
@@ -49,8 +50,19 @@ export default class UploadIcon {
     const buffer = await readFile(icon.tmpPath)
     const contentType = icon.headers?.['content-type'] || 'image/png'
 
-    team.iconUrl = await r2StorageService.upload('team-icons', fileName, buffer, contentType)
+    const iconUrl = await r2StorageService.upload('team-icons', fileName, buffer, contentType)
+    team.iconUrl = iconUrl
     await team.save()
+
+    await storageService.recordUpload(
+      team.id,
+      'team_icon',
+      `team-icons/${fileName}`,
+      iconUrl,
+      buffer.length,
+      contentType,
+      icon.clientName ?? null
+    )
 
     return response.ok({
       message: 'Logo mis à jour',

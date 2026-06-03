@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import InvoiceSetting from '#models/team/invoice_setting'
 import r2StorageService from '#services/storage/r2_storage_service'
+import storageService from '#services/storage/storage_service'
 
 export default class InvoiceLogoUpload {
   async handle({ auth, request, response }: HttpContext) {
@@ -34,6 +35,16 @@ export default class InvoiceLogoUpload {
     const contentType = logo.headers?.['content-type'] || 'image/png'
 
     const logoUrl = await r2StorageService.upload('invoice-logos', fileName, buffer, contentType)
+
+    await storageService.recordUpload(
+      user.currentTeamId,
+      'invoice_logo',
+      `invoice-logos/${fileName}`,
+      logoUrl,
+      buffer.length,
+      contentType,
+      logo.clientName ?? null
+    )
 
     let settings = await InvoiceSetting.findBy('teamId', user.currentTeamId)
 
