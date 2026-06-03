@@ -752,46 +752,69 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
           >
             { }
             <div className="px-3 pt-2 pb-1">
-              <Dropdown
-                align="left"
-                trigger={
+              {storage?.isOver ? (
+                <Tooltip
+                  content="Stockage plein — supprimez des fichiers ou augmentez votre forfait"
+                  side="right"
+                >
                   <div
                     data-tutorial="create-button"
+                    aria-disabled="true"
                     className={cn(
-                      'flex items-center justify-center rounded-lg text-[15px] font-semibold hover:bg-muted/40 dark:hover:bg-white/[0.04] transition-all cursor-pointer',
+                      'flex cursor-not-allowed items-center justify-center rounded-lg text-[15px] font-semibold text-muted-foreground opacity-50',
                       collapsed ? 'h-10 w-10 mx-auto' : 'gap-2.5 px-3 py-2.5'
                     )}
                   >
-                    <CirclePlus className={cn('text-primary shrink-0 transition-all duration-200', collapsed ? 'h-5 w-5' : 'h-[18px] w-[18px]')} />
+                    <CirclePlus className={cn('shrink-0 transition-all duration-200', collapsed ? 'h-5 w-5' : 'h-[18px] w-[18px]')} />
                     {!collapsed && (
-                      <motion.span {...labelFade} className="text-primary whitespace-nowrap">
+                      <motion.span {...labelFade} className="whitespace-nowrap">
                         Créer
                       </motion.span>
                     )}
                   </div>
-                }
-                className="min-w-[220px]"
-              >
-                <DropdownSub
+                </Tooltip>
+              ) : (
+                <Dropdown
+                  align="left"
                   trigger={
-                    <>
-                      <FileText className="h-4 w-4 text-blue-500" />
-                      <span className="flex-1 text-left">Facture</span>
-                    </>
+                    <div
+                      data-tutorial="create-button"
+                      className={cn(
+                        'flex items-center justify-center rounded-lg text-[15px] font-semibold hover:bg-muted/40 dark:hover:bg-white/[0.04] transition-all cursor-pointer',
+                        collapsed ? 'h-10 w-10 mx-auto' : 'gap-2.5 px-3 py-2.5'
+                      )}
+                    >
+                      <CirclePlus className={cn('text-primary shrink-0 transition-all duration-200', collapsed ? 'h-5 w-5' : 'h-[18px] w-[18px]')} />
+                      {!collapsed && (
+                        <motion.span {...labelFade} className="text-primary whitespace-nowrap">
+                          Créer
+                        </motion.span>
+                      )}
+                    </div>
                   }
+                  className="min-w-[220px]"
                 >
-                  <DropdownItem onClick={() => router.push('/dashboard/invoices/new')}>
-                    <FilePlus className="h-4 w-4 text-blue-500" /> Facture vierge
+                  <DropdownSub
+                    trigger={
+                      <>
+                        <FileText className="h-4 w-4 text-blue-500" />
+                        <span className="flex-1 text-left">Facture</span>
+                      </>
+                    }
+                  >
+                    <DropdownItem onClick={() => router.push('/dashboard/invoices/new')}>
+                      <FilePlus className="h-4 w-4 text-blue-500" /> Facture vierge
+                    </DropdownItem>
+                    <DropdownItem onClick={() => setConvertModalOpen(true)}>
+                      <RefreshCw className="h-4 w-4 text-emerald-500" /> Convertir un devis
+                    </DropdownItem>
+                  </DropdownSub>
+                  <DropdownItem onClick={() => router.push('/dashboard/quotes/new')}>
+                    <Receipt className="h-4 w-4 text-orange-500" />
+                    <span>Devis</span>
                   </DropdownItem>
-                  <DropdownItem onClick={() => setConvertModalOpen(true)}>
-                    <RefreshCw className="h-4 w-4 text-emerald-500" /> Convertir un devis
-                  </DropdownItem>
-                </DropdownSub>
-                <DropdownItem onClick={() => router.push('/dashboard/quotes/new')}>
-                  <Receipt className="h-4 w-4 text-orange-500" />
-                  <span>Devis</span>
-                </DropdownItem>
-              </Dropdown>
+                </Dropdown>
+              )}
             </div>
 
             { }
