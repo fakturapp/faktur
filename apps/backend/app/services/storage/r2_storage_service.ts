@@ -1,4 +1,9 @@
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+  ListObjectsV2Command,
+} from '@aws-sdk/client-s3'
 import env from '#start/env'
 import app from '@adonisjs/core/services/app'
 import { existsSync, mkdirSync, writeFileSync, unlinkSync } from 'node:fs'
@@ -90,6 +95,36 @@ class R2StorageService {
     if (existsSync(filePath)) {
       unlinkSync(filePath)
     }
+  }
+
+  async listObjects(
+    prefix: string
+  ): Promise<{ key: string; size: number; contentType?: string }[]> {
+    if (!this.isConfigured()) {
+      return []
+    }
+
+    const objects: { key: string; size: number; contentType?: string }[] = []
+    let continuationToken: string | undefined
+
+    do {
+      const result = await this.client!.send(
+        new ListObjectsV2Command({
+          Bucket: this.bucket!,
+          Prefix: prefix,
+          ContinuationToken: continuationToken,
+        })
+      )
+
+      for (const item of result.Contents ?? []) {
+        if (!item.Key) continue
+        objects.push({ key: item.Key, size: Number(item.Size ?? 0) })
+      }
+
+      continuationToken = result.IsTruncated ? result.NextContinuationToken : undefined
+    } while (continuationToken)
+
+    return objects
   }
 
   getPublicUrl(key: string): string {
