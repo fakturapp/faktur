@@ -10,6 +10,31 @@ import app from '@adonisjs/core/services/app'
 import { existsSync, mkdirSync, writeFileSync, unlinkSync } from 'node:fs'
 import { join } from 'node:path'
 
+const ALLOWED_CONTENT_TYPES = new Set([
+  'image/png',
+  'image/jpeg',
+  'image/jpg',
+  'image/webp',
+  'image/gif',
+  'image/svg+xml',
+  'application/pdf',
+])
+
+const MAX_KEY_LENGTH = 1024
+const ASSET_CACHE_CONTROL = 'public, max-age=31536000, immutable'
+
+function sanitizeContentType(contentType?: string): string {
+  const base = (contentType || '').split(';')[0].trim().toLowerCase()
+  return ALLOWED_CONTENT_TYPES.has(base) ? base : 'application/octet-stream'
+}
+
+function normalizeKey(rawKey: string): string | null {
+  const key = rawKey.replace(/^\/+/, '')
+  if (!key || key.length > MAX_KEY_LENGTH) return null
+  if (key.includes('..') || key.includes('\\') || key.includes('\0')) return null
+  return key
+}
+
 class R2StorageService {
   private client: S3Client | null = null
   private bucket: string | null = null
@@ -48,7 +73,12 @@ class R2StorageService {
     buffer: Buffer,
     contentType: string
   ): Promise<string> {
-    const key = `${folder}/${fileName}`
+    const key = normalizeKey(`${folder}/${fileName}`)
+    if (!key) {
+      throw new Error('Invalid storage key')
+    }
+
+    const safeContentType = sanitizeContentType(contentType)
 
     if (this.isConfigured()) {
       await this.client!.send(
@@ -56,7 +86,9 @@ class R2StorageService {
           Bucket: this.bucket!,
           Key: key,
           Body: buffer,
-          ContentType: contentType,
+          ContentType: safeContentType,
+          ContentLength: buffer.length,
+          CacheControl: ASSET_CACHE_CONTROL,
         })
       )
       return `${this.publicUrl}/${key}`
@@ -72,14 +104,8 @@ class R2StorageService {
   }
 
   async delete(urlOrKey: string): Promise<void> {
-    // Extract key from full URL or relative path
-    let key: string
-    if (urlOrKey.startsWith('http://') || urlOrKey.startsWith('https://')) {
-      const url = new URL(urlOrKey)
-      key = url.pathname.replace(/^\//, '')
-    } else {
-      key = urlOrKey.replace(/^\//, '')
-    }
+    const key = this.keyFromUrl(urlOrKey)
+    if (!key) return
 
     if (this.isConfigured()) {
       await this.client!.send(
@@ -135,12 +161,8 @@ class R2StorageService {
       return null
     }
 
-    let key: string
-    if (urlOrKey.startsWith('http://') || urlOrKey.startsWith('https://')) {
-      key = new URL(urlOrKey).pathname.replace(/^\//, '')
-    } else {
-      key = urlOrKey.replace(/^\//, '')
-    }
+    const key = this.keyFromUrl(urlOrKey)
+    if (!key) return null
 
     try {
       const result = await this.client!.send(
@@ -154,14 +176,17 @@ class R2StorageService {
 
   keyFromUrl(urlOrKey: string): string | null {
     if (!urlOrKey) return null
+    let raw: string
     if (urlOrKey.startsWith('http://') || urlOrKey.startsWith('https://')) {
       try {
-        return new URL(urlOrKey).pathname.replace(/^\//, '')
+        raw = decodeURIComponent(new URL(urlOrKey).pathname)
       } catch {
         return null
       }
+    } else {
+      raw = urlOrKey
     }
-    return urlOrKey.replace(/^\//, '')
+    return normalizeKey(raw)
   }
 
   getPublicUrl(key: string): string {
