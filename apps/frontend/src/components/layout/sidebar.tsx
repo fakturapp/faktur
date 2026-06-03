@@ -996,7 +996,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
             </div>
           </div>
 
-          <DropdownItem onClick={() => router.push('/dashboard/settings/plan/upgrade')}>
+          <DropdownItem onClick={() => router.push('/dashboard/settings/plan')}>
             <PlanIcon className={cn('h-4 w-4', currentPlan.accentText)} /> Changer de forfait
           </DropdownItem>
 
