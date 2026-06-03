@@ -16,7 +16,7 @@ router
   .group(() => {
     router.get('/invoices', [InvoiceSettingsShow, 'handle'])
     router.put('/invoices', [InvoiceSettingsUpdate, 'handle'])
-    router.post('/invoices/logo', [InvoiceLogoUpload, 'handle'])
+    router.post('/invoices/logo', [InvoiceLogoUpload, 'handle']).use(middleware.storageQuota())
 
     router.get('/stripe', [StripeSettingsShow, 'handle'])
     router.put('/stripe', [StripeSettingsSave, 'handle'])

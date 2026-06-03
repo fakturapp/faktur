@@ -45,7 +45,7 @@ router
     router.put('/', [TeamUpdate, 'handle'])
     router.delete('/', [TeamDelete, 'handle'])
     router.post('/leave', [TeamLeave, 'handle'])
-    router.post('/icon', [UploadIcon, 'handle'])
+    router.post('/icon', [UploadIcon, 'handle']).use(middleware.storageQuota())
     router.post('/switch', [TeamSwitch, 'handle'])
     router.post('/export', [TeamExport, 'handle'])
     router.post('/import', [TeamImport, 'handle'])

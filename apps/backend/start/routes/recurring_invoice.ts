@@ -15,10 +15,10 @@ router
   .group(() => {
     router.get('/', [RecurringInvoiceList, 'handle'])
     router.get('/:id', [RecurringInvoiceShow, 'handle'])
-    router.post('/', [RecurringInvoiceCreate, 'handle'])
-    router.put('/:id', [RecurringInvoiceUpdate, 'handle'])
+    router.post('/', [RecurringInvoiceCreate, 'handle']).use(middleware.storageQuota())
+    router.put('/:id', [RecurringInvoiceUpdate, 'handle']).use(middleware.storageQuota())
     router.delete('/:id', [RecurringInvoiceDelete, 'handle'])
-    router.post('/:id/generate', [RecurringInvoiceGenerate, 'handle'])
+    router.post('/:id/generate', [RecurringInvoiceGenerate, 'handle']).use(middleware.storageQuota())
     router.patch('/:id/toggle-active', [RecurringInvoiceToggleActive, 'handle'])
   })
   .prefix(API_PREFIX + '/recurring-invoices')

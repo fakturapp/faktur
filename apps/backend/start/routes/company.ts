@@ -16,7 +16,7 @@ router
     router.get('/', [CompanyShow, 'handle'])
     router.put('/', [CompanyUpdate, 'handle'])
     router.put('/bank', [CompanyBank, 'handle'])
-    router.post('/logo', [UploadLogo, 'handle'])
+    router.post('/logo', [UploadLogo, 'handle']).use(middleware.storageQuota())
 
     router.get('/bank-accounts', [BankAccounts, 'index'])
     router.get('/bank-accounts/:id', [BankAccounts, 'show'])
