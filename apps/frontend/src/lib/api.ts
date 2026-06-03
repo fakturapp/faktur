@@ -27,6 +27,19 @@ function notifyVaultLocked() {
   vaultLockListeners.forEach((cb) => cb())
 }
 
+let storageFullListeners: ((message: string) => void)[] = []
+export function onStorageFull(cb: (message: string) => void) {
+  storageFullListeners.push(cb)
+  return () => { storageFullListeners = storageFullListeners.filter((l) => l !== cb) }
+}
+function maybeNotifyStorageFull(data: any, status: number) {
+  if (status !== 403) return
+  const { code, message } = parseErrorPayload(data)
+  if (code === 'storage_full' || code === 'STORAGE_FULL') {
+    storageFullListeners.forEach((cb) => cb(message))
+  }
+}
+
 function parseErrorPayload(data: any): { code?: string; message: string } {
   const details = data?.error?.details
   const validationErrors = Array.isArray(details?.errors) ? details.errors : Array.isArray(data?.errors) ? data.errors : null
@@ -107,6 +120,7 @@ async function request<T = unknown>(
 
     if (!res.ok) {
       recordApiError(options.method || 'GET', endpoint, res.status, data)
+      maybeNotifyStorageFull(data, res.status)
       const parsed = parseErrorPayload(data)
       return { error: parsed.message, errorCode: parsed.code }
     }
@@ -120,7 +134,7 @@ async function request<T = unknown>(
 async function uploadRequest<T = unknown>(
   endpoint: string,
   formData: FormData
-): Promise<{ data?: T; error?: string }> {
+): Promise<{ data?: T; error?: string; errorCode?: string }> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('faktur_token') : null
   const vaultKey = typeof window !== 'undefined' ? localStorage.getItem('faktur_vault_key') : null
 
@@ -151,7 +165,9 @@ async function uploadRequest<T = unknown>(
 
     if (!res.ok) {
       recordApiError('POST', endpoint, res.status, data)
-      return { error: parseErrorPayload(data).message }
+      maybeNotifyStorageFull(data, res.status)
+      const parsed = parseErrorPayload(data)
+      return { error: parsed.message, errorCode: parsed.code }
     }
     return { data }
   } catch (err) {
