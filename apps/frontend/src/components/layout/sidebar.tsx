@@ -74,7 +74,10 @@ import {
   Gift,
   Key,
   Webhook,
+  HardDrive,
 } from 'lucide-react'
+import { ProgressBar } from '@/components/ui/progress'
+import { formatBytes } from '@/lib/utils'
 import { useTutorialSafe } from '@/lib/tutorial-context'
 
 interface TeamListItem {
@@ -85,6 +88,14 @@ interface TeamListItem {
   role: string
   isOwner: boolean
   isCurrent: boolean
+}
+
+export interface StorageUsageSummary {
+  totalBytes: number
+  quotaBytes: number
+  percent: number
+  isOver: boolean
+  plan: 'free' | 'pro' | 'team'
 }
 
 export interface SidebarProps {
@@ -99,6 +110,7 @@ export interface SidebarProps {
   isAdmin?: boolean
   onOpenFeedback?: () => void
   onOpenBugReport?: () => void
+  storage?: StorageUsageSummary | null
 }
 
 const roleIcons: Record<string, React.ReactNode> = {
@@ -163,6 +175,7 @@ const settingsNav: NavItem[] = [
   },
   { href: '/dashboard/settings/members', label: 'Équipe', icon: UsersRound },
   { href: '/dashboard/settings/plan', label: 'Plan', icon: Layers },
+  { href: '/dashboard/settings/storage', label: 'Stockage', icon: HardDrive },
   {
     href: '/dashboard/settings/documents/invoices',
     label: 'Facturation',
@@ -407,7 +420,7 @@ function NavLink({ item, pathname, badges, persistKey, collapsed, onConfirmRedir
   )
 }
 
-export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, onLogout, collapsed: collapsedProp, badges, isAdmin, onOpenFeedback, onOpenBugReport }: SidebarProps) {
+export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, onLogout, collapsed: collapsedProp, badges, isAdmin, onOpenFeedback, onOpenBugReport, storage }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const { theme, setTheme } = useTheme()
@@ -815,6 +828,67 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
           )}
         </button>
       </div>
+
+      {storage &&
+        (collapsed ? (
+          <div className="flex justify-center px-3 pb-1.5">
+            <Tooltip
+              content={`Stockage : ${formatBytes(storage.totalBytes)} / ${formatBytes(storage.quotaBytes)}`}
+              side="right"
+            >
+              <button
+                type="button"
+                onClick={() => router.push('/dashboard/settings/storage')}
+                className={cn(
+                  'flex h-10 w-10 items-center justify-center rounded-lg transition-colors hover:bg-muted/40 dark:hover:bg-white/[0.04]',
+                  storage.percent >= 80 ? 'text-danger' : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                <HardDrive className="h-5 w-5" />
+              </button>
+            </Tooltip>
+          </div>
+        ) : (
+          <div className="px-3 pb-2">
+            <button
+              type="button"
+              onClick={() => router.push('/dashboard/settings/storage')}
+              className="w-full rounded-lg px-3 py-2.5 text-left transition-all duration-200 hover:bg-muted/40 dark:hover:bg-white/[0.04]"
+            >
+              <div className="mb-1.5 flex items-center justify-between gap-2">
+                <span className="flex items-center gap-2 text-[13px] font-medium text-foreground">
+                  <HardDrive className="h-[15px] w-[15px] text-muted-foreground" />
+                  Espace de stockage
+                </span>
+                <span
+                  className={cn(
+                    'shrink-0 text-[11px] tabular-nums',
+                    storage.percent >= 80 ? 'font-medium text-danger' : 'text-muted-foreground'
+                  )}
+                >
+                  {formatBytes(storage.totalBytes)} / {formatBytes(storage.quotaBytes)}
+                </span>
+              </div>
+              <ProgressBar
+                value={storage.percent}
+                maxValue={100}
+                size="sm"
+                showOutput={false}
+                color={storage.percent >= 80 ? 'danger' : 'accent'}
+                aria-label="Espace de stockage"
+              />
+            </button>
+            {storage.plan !== 'team' && (
+              <button
+                type="button"
+                onClick={() => router.push('/dashboard/settings/plan/upgrade')}
+                className="mt-1 w-full rounded-lg px-3 py-1.5 text-left text-[12px] font-medium text-primary transition-colors hover:bg-primary/10"
+              >
+                Augmenter l&apos;espace de stockage
+              </button>
+            )}
+          </div>
+        ))}
 
       <div className="mx-3 h-px bg-border" />
 
