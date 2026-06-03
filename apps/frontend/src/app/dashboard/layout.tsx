@@ -32,6 +32,7 @@ import { TutorialOfferModal } from '@/components/tutorial/tutorial-offer-modal'
 import { TutorialLevelComplete } from '@/components/tutorial/tutorial-level-complete'
 import { TeamEncryptionBanner } from '@/components/team/team-encryption-banner'
 import { SubscriptionBanner } from '@/components/team/subscription-banner'
+import type { StorageUsageSummary } from '@/components/layout/sidebar'
 
 interface TeamListItem {
   id: string
@@ -60,6 +61,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [switching, setSwitching] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [sidebarBadges, setSidebarBadges] = useState<Record<string, number>>({})
+  const [storage, setStorage] = useState<StorageUsageSummary | null>(null)
   const [logoutConfirm, setLogoutConfirm] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
   const [logoutWipeAll, setLogoutWipeAll] = useState(false)
@@ -110,8 +112,29 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           })
         }
       })
+      api.get<StorageUsageSummary>('/storage/usage').then(({ data }) => {
+        if (data) setStorage(data)
+      })
     }
   }, [user?.currentTeamId])
+
+  useEffect(() => {
+    if (!user) return
+    function refetchStorage() {
+      api.get<StorageUsageSummary>('/storage/usage').then(({ data }) => {
+        if (data) setStorage(data)
+      })
+    }
+    window.addEventListener('faktur:storage-changed', refetchStorage)
+    const id = setInterval(() => {
+      if (document.visibilityState !== 'visible') return
+      refetchStorage()
+    }, 30000)
+    return () => {
+      window.removeEventListener('faktur:storage-changed', refetchStorage)
+      clearInterval(id)
+    }
+  }, [user?.id, user?.currentTeamId])
 
   useEffect(() => {
     if (!user) return
@@ -379,6 +402,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         isAdmin={user.isAdmin}
         onOpenFeedback={() => setFeedbackOpen(true)}
         onOpenBugReport={() => setBugReportOpen(true)}
+        storage={storage}
       />
 
       <div
