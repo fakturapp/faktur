@@ -7,7 +7,6 @@ import { cn, formatBytes } from '@/lib/utils'
 import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ProgressBar } from '@/components/ui/progress'
 import {
   Dialog,
   DialogHeader,
@@ -15,7 +14,18 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { HardDrive, Trash2, FileText, Building2, Receipt, UsersRound, ArrowUpRight } from 'lucide-react'
+import {
+  HardDrive,
+  Trash2,
+  FileText,
+  Building2,
+  Receipt,
+  UsersRound,
+  ArrowUpRight,
+  Sparkles,
+  FileStack,
+  ImageIcon,
+} from 'lucide-react'
 
 type StorageCategory = 'company_logo' | 'invoice_logo' | 'team_icon' | 'payment_link_pdf'
 
@@ -50,6 +60,12 @@ const CATEGORY_META: Record<StorageCategory, { label: string; icon: typeof Build
 
 const CATEGORY_ORDER: StorageCategory[] = ['company_logo', 'invoice_logo', 'team_icon', 'payment_link_pdf']
 
+const SEGMENTS = [
+  { key: 'documents', label: 'Documents', icon: FileStack, bar: 'bg-blue-500', dot: 'text-blue-500' },
+  { key: 'media', label: 'Médias & logos', icon: ImageIcon, bar: 'bg-violet-500', dot: 'text-violet-500' },
+  { key: 'pdf', label: 'PDF', icon: FileText, bar: 'bg-amber-500', dot: 'text-amber-500' },
+] as const
+
 export default function StoragePage() {
   const router = useRouter()
   const { toast } = useToast()
@@ -58,6 +74,7 @@ export default function StoragePage() {
   const [loading, setLoading] = useState(true)
   const [toDelete, setToDelete] = useState<StorageFileEntry | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [optimizing, setOptimizing] = useState(false)
 
   const load = useCallback(async () => {
     const [usageRes, filesRes] = await Promise.all([
@@ -89,13 +106,29 @@ export default function StoragePage() {
     load()
   }
 
+  async function optimize() {
+    const orphans = files.filter((f) => !f.isActive)
+    if (orphans.length === 0) return
+    setOptimizing(true)
+    let removed = 0
+    for (const file of orphans) {
+      const { error } = await api.delete(`/storage/files/${file.id}`)
+      if (!error) removed++
+    }
+    setOptimizing(false)
+    setFiles((prev) => prev.filter((f) => f.isActive))
+    toast(`${removed} fichier${removed > 1 ? 's' : ''} supprimé${removed > 1 ? 's' : ''}`, 'success')
+    window.dispatchEvent(new Event('faktur:storage-changed'))
+    load()
+  }
+
   const danger = (usage?.percent ?? 0) >= 80
 
   if (loading) {
     return (
       <div className="mx-auto max-w-3xl px-6 py-8">
         <Skeleton className="mb-6 h-7 w-48" />
-        <Skeleton className="mb-8 h-24 w-full rounded-2xl" />
+        <Skeleton className="mb-8 h-40 w-full rounded-2xl" />
         <div className="space-y-3">
           {[...Array(4)].map((_, i) => (
             <Skeleton key={i} className="h-16 w-full rounded-xl" />
@@ -104,6 +137,25 @@ export default function StoragePage() {
       </div>
     )
   }
+
+  const quota = usage?.quotaBytes ?? 0
+  const total = usage?.totalBytes ?? 0
+  const mediaBytes = files
+    .filter((f) => f.category !== 'payment_link_pdf')
+    .reduce((sum, f) => sum + f.sizeBytes, 0)
+  const pdfBytes = files
+    .filter((f) => f.category === 'payment_link_pdf')
+    .reduce((sum, f) => sum + f.sizeBytes, 0)
+  const segmentBytes: Record<string, number> = {
+    documents: usage?.docBytes ?? 0,
+    media: mediaBytes,
+    pdf: pdfBytes,
+  }
+  const freeBytes = Math.max(0, quota - total)
+  const pct = (n: number) => (quota > 0 ? Math.min(100, (n / quota) * 100) : 0)
+
+  const orphanCount = files.filter((f) => !f.isActive).length
+  const orphanBytes = files.filter((f) => !f.isActive).reduce((sum, f) => sum + f.sizeBytes, 0)
 
   const grouped = CATEGORY_ORDER.map((category) => ({
     category,
@@ -119,24 +171,22 @@ export default function StoragePage() {
         <div>
           <h1 className="text-base font-bold text-foreground">Espace de stockage</h1>
           <p className="text-xs text-muted-foreground">
-            Logos, icônes et fichiers stockés par votre équipe
+            Répartition de l&apos;espace utilisé par votre équipe
           </p>
         </div>
       </div>
 
       <div
         className={cn(
-          'mb-8 rounded-2xl border p-5 shadow-surface',
+          'mb-6 rounded-2xl border p-5 shadow-surface',
           danger ? 'border-danger/30 bg-danger/[0.04]' : 'border-border bg-surface'
         )}
       >
-        <div className="mb-3 flex items-end justify-between gap-3">
+        <div className="mb-4 flex items-end justify-between gap-3">
           <div>
-            <p className="text-2xl font-bold tabular-nums text-foreground">
-              {formatBytes(usage?.totalBytes ?? 0)}
-            </p>
+            <p className="text-2xl font-bold tabular-nums text-foreground">{formatBytes(total)}</p>
             <p className="text-xs text-muted-foreground">
-              sur {formatBytes(usage?.quotaBytes ?? 0)} disponibles
+              utilisés sur {formatBytes(quota)}
             </p>
           </div>
           <span
@@ -148,18 +198,47 @@ export default function StoragePage() {
             {usage?.percent ?? 0}%
           </span>
         </div>
-        <ProgressBar
-          value={usage?.percent ?? 0}
-          maxValue={100}
-          showOutput={false}
-          color={danger ? 'danger' : 'accent'}
-          aria-label="Espace de stockage utilisé"
-        />
+
+        <div className="flex h-3 w-full overflow-hidden rounded-full bg-muted">
+          {SEGMENTS.map((seg) => {
+            const width = pct(segmentBytes[seg.key])
+            if (width <= 0) return null
+            return (
+              <div
+                key={seg.key}
+                className={cn(seg.bar, 'h-full transition-all duration-500')}
+                style={{ width: `${width}%` }}
+              />
+            )
+          })}
+        </div>
+
+        <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-4">
+          {SEGMENTS.map((seg) => (
+            <div key={seg.key} className="flex items-center gap-2">
+              <span className={cn('text-base leading-none', seg.dot)}>●</span>
+              <div className="min-w-0">
+                <p className="truncate text-xs font-medium text-foreground">{seg.label}</p>
+                <p className="text-[11px] tabular-nums text-muted-foreground">
+                  {formatBytes(segmentBytes[seg.key])}
+                </p>
+              </div>
+            </div>
+          ))}
+          <div className="flex items-center gap-2">
+            <span className="text-base leading-none text-muted-foreground/40">●</span>
+            <div className="min-w-0">
+              <p className="truncate text-xs font-medium text-foreground">Libre</p>
+              <p className="text-[11px] tabular-nums text-muted-foreground">{formatBytes(freeBytes)}</p>
+            </div>
+          </div>
+        </div>
+
         {usage?.plan !== 'team' && (
           <Button
             variant="outline"
             size="sm"
-            className="mt-4"
+            className="mt-5"
             onClick={() => router.push('/dashboard/settings/plan/upgrade')}
           >
             Augmenter l&apos;espace de stockage
@@ -167,6 +246,24 @@ export default function StoragePage() {
           </Button>
         )}
       </div>
+
+      {orphanCount > 0 && (
+        <div className="mb-8 flex items-center gap-3 rounded-2xl border border-border bg-surface p-4 shadow-surface">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500">
+            <Sparkles className="h-5 w-5" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold text-foreground">Optimiser le stockage</p>
+            <p className="text-xs text-muted-foreground">
+              {orphanCount} fichier{orphanCount > 1 ? 's' : ''} inutilisé{orphanCount > 1 ? 's' : ''} ·{' '}
+              {formatBytes(orphanBytes)} récupérable{orphanBytes > 0 ? 's' : ''}
+            </p>
+          </div>
+          <Button variant="outline" size="sm" onClick={optimize} disabled={optimizing}>
+            {optimizing ? 'Nettoyage…' : 'Optimiser'}
+          </Button>
+        </div>
+      )}
 
       {grouped.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border py-12 text-center">
@@ -193,11 +290,7 @@ export default function StoragePage() {
                     >
                       <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-muted">
                         {meta.isImage ? (
-                          <img
-                            src={file.publicUrl}
-                            alt=""
-                            className="h-full w-full object-contain"
-                          />
+                          <img src={file.publicUrl} alt="" className="h-full w-full object-contain" />
                         ) : (
                           <FileText className="h-5 w-5 text-muted-foreground" />
                         )}
