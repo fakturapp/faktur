@@ -14,6 +14,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog'
+import { CheckboxRoot, CheckboxControl, CheckboxIndicator, CheckboxContent } from '@/components/ui/checkbox'
 import {
   HardDrive,
   Trash2,
@@ -22,7 +23,7 @@ import {
   Receipt,
   UsersRound,
   ArrowUpRight,
-  Sparkles,
+  Recycle,
   FileStack,
   ImageIcon,
 } from 'lucide-react'
@@ -75,6 +76,8 @@ export default function StoragePage() {
   const [toDelete, setToDelete] = useState<StorageFileEntry | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [optimizing, setOptimizing] = useState(false)
+  const [optimizeOpen, setOptimizeOpen] = useState(false)
+  const [optimizeAck, setOptimizeAck] = useState(false)
 
   const load = useCallback(async () => {
     const [usageRes, filesRes] = await Promise.all([
@@ -116,6 +119,8 @@ export default function StoragePage() {
       if (!error) removed++
     }
     setOptimizing(false)
+    setOptimizeOpen(false)
+    setOptimizeAck(false)
     setFiles((prev) => prev.filter((f) => f.isActive))
     toast(`${removed} fichier${removed > 1 ? 's' : ''} supprimé${removed > 1 ? 's' : ''}`, 'success')
     window.dispatchEvent(new Event('faktur:storage-changed'))
@@ -250,7 +255,7 @@ export default function StoragePage() {
       {orphanCount > 0 && (
         <div className="mb-8 flex items-center gap-3 rounded-2xl border border-border bg-surface p-4 shadow-surface">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500">
-            <Sparkles className="h-5 w-5" />
+            <Recycle className="h-5 w-5" />
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold text-foreground">Optimiser le stockage</p>
@@ -259,8 +264,8 @@ export default function StoragePage() {
               {formatBytes(orphanBytes)} récupérable{orphanBytes > 0 ? 's' : ''}
             </p>
           </div>
-          <Button variant="outline" size="sm" onClick={optimize} disabled={optimizing}>
-            {optimizing ? 'Nettoyage…' : 'Optimiser'}
+          <Button variant="outline" size="sm" onClick={() => setOptimizeOpen(true)}>
+            Optimiser
           </Button>
         </div>
       )}
@@ -343,6 +348,64 @@ export default function StoragePage() {
           </Button>
           <Button variant="destructive" onClick={confirmDelete} disabled={deleting}>
             {deleting ? 'Suppression…' : 'Supprimer'}
+          </Button>
+        </DialogFooter>
+      </Dialog>
+
+      <Dialog
+        open={optimizeOpen}
+        onClose={() => {
+          setOptimizeOpen(false)
+          setOptimizeAck(false)
+        }}
+      >
+        <DialogHeader
+          onClose={() => {
+            setOptimizeOpen(false)
+            setOptimizeAck(false)
+          }}
+          icon={<Recycle className="h-5 w-5 text-danger" />}
+        >
+          <DialogTitle>Optimiser le stockage</DialogTitle>
+          <DialogDescription>
+            {orphanCount} fichier{orphanCount > 1 ? 's' : ''} inutilisé{orphanCount > 1 ? 's' : ''} (
+            {formatBytes(orphanBytes)}) {orphanCount > 1 ? 'seront' : 'sera'} définitivement supprimé
+            {orphanCount > 1 ? 's' : ''} de Cloudflare.
+          </DialogDescription>
+        </DialogHeader>
+
+        <CheckboxRoot
+          isSelected={optimizeAck}
+          onChange={setOptimizeAck}
+          className="group mb-1 flex cursor-pointer items-start gap-3 rounded-xl bg-surface p-3.5 shadow-surface transition-colors hover:bg-surface-hover"
+        >
+          <CheckboxControl className="mt-0.5 data-[selected=true]:border-destructive data-[selected=true]:bg-destructive">
+            <CheckboxIndicator />
+          </CheckboxControl>
+          <CheckboxContent className="min-w-0 flex-1 text-left">
+            <p className="text-[13px] font-semibold leading-tight text-foreground">
+              Je comprends que ces fichiers seront supprimés
+            </p>
+            <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
+              Les fichiers inutilisés (anciens logos, PDF orphelins) seront effacés définitivement.
+              Cette action est irréversible.
+            </p>
+          </CheckboxContent>
+        </CheckboxRoot>
+
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setOptimizeOpen(false)
+              setOptimizeAck(false)
+            }}
+            disabled={optimizing}
+          >
+            Annuler
+          </Button>
+          <Button variant="destructive" onClick={optimize} disabled={!optimizeAck || optimizing}>
+            {optimizing ? 'Nettoyage…' : 'Supprimer'}
           </Button>
         </DialogFooter>
       </Dialog>
