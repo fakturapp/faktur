@@ -32,6 +32,9 @@ import { TutorialOfferModal } from '@/components/tutorial/tutorial-offer-modal'
 import { TutorialLevelComplete } from '@/components/tutorial/tutorial-level-complete'
 import { TeamEncryptionBanner } from '@/components/team/team-encryption-banner'
 import { SubscriptionBanner } from '@/components/team/subscription-banner'
+import { StorageBanner } from '@/components/team/storage-banner'
+import { StorageFullModal } from '@/components/team/storage-full-modal'
+import { onStorageFull } from '@/lib/api'
 import type { StorageUsageSummary } from '@/components/layout/sidebar'
 
 interface TeamListItem {
@@ -62,6 +65,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [sidebarBadges, setSidebarBadges] = useState<Record<string, number>>({})
   const [storage, setStorage] = useState<StorageUsageSummary | null>(null)
+  const [storageModalOpen, setStorageModalOpen] = useState(false)
   const [logoutConfirm, setLogoutConfirm] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
   const [logoutWipeAll, setLogoutWipeAll] = useState(false)
@@ -126,12 +130,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       })
     }
     window.addEventListener('faktur:storage-changed', refetchStorage)
+    const offStorageFull = onStorageFull(() => refetchStorage())
     const id = setInterval(() => {
       if (document.visibilityState !== 'visible') return
       refetchStorage()
     }, 30000)
     return () => {
       window.removeEventListener('faktur:storage-changed', refetchStorage)
+      offStorageFull()
       clearInterval(id)
     }
   }, [user?.id, user?.currentTeamId])
@@ -415,6 +421,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <SiteHeader onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)} />
         <RouteProgressBar />
         <SubscriptionBanner />
+        <StorageBanner storage={storage} onOpen={() => setStorageModalOpen(true)} />
         <TeamEncryptionBanner />
 
         <main className="relative flex-1 overflow-y-auto" data-tutorial="main-content">
@@ -517,6 +524,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
       <BugReportModal open={bugReportOpen} onClose={() => setBugReportOpen(false)} />
+      <StorageFullModal open={storageModalOpen} onClose={() => setStorageModalOpen(false)} usage={storage} />
 
       {/* Tutorial system */}
       <TutorialBanner />
