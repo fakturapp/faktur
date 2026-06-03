@@ -317,6 +317,9 @@ export interface ApiDefinition {
   billingInvoices: typeof routes['billing_invoices']
   billingPaymentMethod: typeof routes['billing_payment_method']
   billingSync: typeof routes['billing_sync']
+  storageUsage: typeof routes['storage_usage']
+  storageFiles: typeof routes['storage_files']
+  storageDeleteFile: typeof routes['storage_delete_file']
   authorize: {
     show: typeof routes['authorize.show']
     consent: typeof routes['authorize.consent']

@@ -1602,6 +1602,24 @@ const routes = {
     tokens: [{"old":"/api/v1/billing/sync","type":0,"val":"api","end":""},{"old":"/api/v1/billing/sync","type":0,"val":"v1","end":""},{"old":"/api/v1/billing/sync","type":0,"val":"billing","end":""},{"old":"/api/v1/billing/sync","type":0,"val":"sync","end":""}],
     types: placeholder as Registry['billing_sync']['types'],
   },
+  'storage_usage': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/storage/usage',
+    tokens: [{"old":"/api/v1/storage/usage","type":0,"val":"api","end":""},{"old":"/api/v1/storage/usage","type":0,"val":"v1","end":""},{"old":"/api/v1/storage/usage","type":0,"val":"storage","end":""},{"old":"/api/v1/storage/usage","type":0,"val":"usage","end":""}],
+    types: placeholder as Registry['storage_usage']['types'],
+  },
+  'storage_files': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/storage/files',
+    tokens: [{"old":"/api/v1/storage/files","type":0,"val":"api","end":""},{"old":"/api/v1/storage/files","type":0,"val":"v1","end":""},{"old":"/api/v1/storage/files","type":0,"val":"storage","end":""},{"old":"/api/v1/storage/files","type":0,"val":"files","end":""}],
+    types: placeholder as Registry['storage_files']['types'],
+  },
+  'storage_delete_file': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/storage/files/:id',
+    tokens: [{"old":"/api/v1/storage/files/:id","type":0,"val":"api","end":""},{"old":"/api/v1/storage/files/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/storage/files/:id","type":0,"val":"storage","end":""},{"old":"/api/v1/storage/files/:id","type":0,"val":"files","end":""},{"old":"/api/v1/storage/files/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['storage_delete_file']['types'],
+  },
   'authorize.show': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/oauth/authorize',

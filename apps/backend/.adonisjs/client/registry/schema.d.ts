@@ -3199,6 +3199,42 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing/sync').default['handle']>>>
     }
   }
+  'storage_usage': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/storage/usage'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/storage/usage').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/storage/usage').default['handle']>>>
+    }
+  }
+  'storage_files': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/storage/files'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/storage/files').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/storage/files').default['handle']>>>
+    }
+  }
+  'storage_delete_file': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/storage/files/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/storage/delete_file').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/storage/delete_file').default['handle']>>>
+    }
+  }
   'authorize.show': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/oauth/authorize'

@@ -270,6 +270,9 @@ export type ScannedRoutes = {
     'billing_invoices': { paramsTuple?: []; params?: {} }
     'billing_payment_method': { paramsTuple?: []; params?: {} }
     'billing_sync': { paramsTuple?: []; params?: {} }
+    'storage_usage': { paramsTuple?: []; params?: {} }
+    'storage_files': { paramsTuple?: []; params?: {} }
+    'storage_delete_file': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'authorize.show': { paramsTuple?: []; params?: {} }
     'authorize.consent': { paramsTuple?: []; params?: {} }
     'token': { paramsTuple?: []; params?: {} }
@@ -531,6 +534,8 @@ export type ScannedRoutes = {
     'billing_checkout_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'billing_invoices': { paramsTuple?: []; params?: {} }
     'billing_payment_method': { paramsTuple?: []; params?: {} }
+    'storage_usage': { paramsTuple?: []; params?: {} }
+    'storage_files': { paramsTuple?: []; params?: {} }
     'authorize.show': { paramsTuple?: []; params?: {} }
     'dashboard.apiKeys.scopesCatalog': { paramsTuple?: []; params?: {} }
     'dashboard.apiProjects.list': { paramsTuple?: []; params?: {} }
@@ -648,6 +653,8 @@ export type ScannedRoutes = {
     'billing_checkout_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'billing_invoices': { paramsTuple?: []; params?: {} }
     'billing_payment_method': { paramsTuple?: []; params?: {} }
+    'storage_usage': { paramsTuple?: []; params?: {} }
+    'storage_files': { paramsTuple?: []; params?: {} }
     'authorize.show': { paramsTuple?: []; params?: {} }
     'dashboard.apiKeys.scopesCatalog': { paramsTuple?: []; params?: {} }
     'dashboard.apiProjects.list': { paramsTuple?: []; params?: {} }
@@ -722,6 +729,7 @@ export type ScannedRoutes = {
     'share_revoke': { paramsTuple: [ParamValue]; params: {'shareId': ParamValue} }
     'link_destroy': { paramsTuple: [ParamValue]; params: {'linkId': ParamValue} }
     'payment_link_delete': { paramsTuple: [ParamValue]; params: {'invoiceId': ParamValue} }
+    'storage_delete_file': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiProjects.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.revoke': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'dashboard.apiKeys.webhook.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

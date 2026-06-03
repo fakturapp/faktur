@@ -1957,6 +1957,33 @@ export class RecurringInvoiceSchema extends BaseModel {
   declare vatExemptReason: string
 }
 
+export class StorageFileSchema extends BaseModel {
+  static $columns = ['category', 'contentType', 'createdAt', 'id', 'isOrphaned', 'objectKey', 'originalName', 'publicUrl', 'sizeBytes', 'teamId', 'updatedAt'] as const
+  $columns = StorageFileSchema.$columns
+  @column()
+  declare category: string
+  @column()
+  declare contentType: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare isOrphaned: boolean
+  @column()
+  declare objectKey: string
+  @column()
+  declare originalName: string | null
+  @column()
+  declare publicUrl: string
+  @column()
+  declare sizeBytes: bigint | number
+  @column()
+  declare teamId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+}
+
 export class StripeWebhookEventSchema extends BaseModel {
   static $columns = ['id', 'processedAt', 'type'] as const
   $columns = StripeWebhookEventSchema.$columns

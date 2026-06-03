@@ -77,6 +77,11 @@ export const controllers = {
       RotateSecrets: () => import('#controllers/admin/oauth_apps/rotate_secrets'),
       Update: () => import('#controllers/admin/oauth_apps/update'),
     },
+    promoCodes: {
+      Create: () => import('#controllers/admin/promo_codes/create'),
+      List: () => import('#controllers/admin/promo_codes/list'),
+      Update: () => import('#controllers/admin/promo_codes/update'),
+    },
     teams: {
       Delete: () => import('#controllers/admin/teams/delete'),
       List: () => import('#controllers/admin/teams/list'),
@@ -86,11 +91,6 @@ export const controllers = {
       Delete: () => import('#controllers/admin/users/delete'),
       List: () => import('#controllers/admin/users/list'),
       Update: () => import('#controllers/admin/users/update'),
-    },
-    promoCodes: {
-      List: () => import('#controllers/admin/promo_codes/list'),
-      Create: () => import('#controllers/admin/promo_codes/create'),
-      Update: () => import('#controllers/admin/promo_codes/update'),
     },
   },
   ai: {
@@ -501,5 +501,10 @@ export const controllers = {
   webhooks: {
     StripeBillingWebhook: () => import('#controllers/webhooks/stripe_billing_webhook'),
     StripeWebhook: () => import('#controllers/webhooks/stripe_webhook'),
+  },
+  storage: {
+    Usage: () => import('#controllers/storage/usage'),
+    Files: () => import('#controllers/storage/files'),
+    DeleteFile: () => import('#controllers/storage/delete_file'),
   },
 }
