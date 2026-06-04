@@ -3,6 +3,7 @@ import Team from '#models/team/team'
 import TeamMember from '#models/team/team_member'
 import billingService from '#services/billing/billing_service'
 import { applyStripeSubscription } from '#services/billing/subscription_state'
+import { enforceGraceForTeam } from '#services/billing/grace_enforcer'
 
 export default class Sync {
   async handle({ auth, response }: HttpContext) {
@@ -79,6 +80,7 @@ export default class Sync {
 
     applyStripeSubscription(team, full, schedule)
     await team.save()
+    await enforceGraceForTeam(team)
     return response.ok({ synced: true, plan: team.plan, status: team.subscriptionStatus })
   }
 }
