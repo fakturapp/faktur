@@ -23,15 +23,17 @@ export default class PasswordResetNotification extends BaseMail {
     const resetUrl = `${getFrontendUrl()}/reset-password?token=${this.token}`
 
     const content = `
-      <h2 style="font-size: 20px; font-weight: 600; color: #171717; letter-spacing: -0.02em; margin: 0 0 12px; text-align: center;">R&eacute;initialisez votre mot de passe</h2>
-      <p style="font-size: 14px; line-height: 1.7; color: #707070; margin: 0 0 16px; text-align: center;">
-        Bonjour${this.name ? ` <span style="color: #5957e8; font-weight: 600;">${this.name}</span>` : ''},<br><br>
+      <h2 style="font-size: 20px; font-weight: 600; color: #171717; letter-spacing: -0.02em; margin: 0 0 8px; text-align: center;">R&eacute;initialisez votre mot de passe</h2>
+      <p style="font-size: 14px; line-height: 1.7; color: #707070; margin: 0 0 4px; text-align: center;">
+        ${this.name ? `Bonjour <span style="color: #5957e8; font-weight: 600;">${this.name}</span>,` : 'Bonjour,'}
+      </p>
+      <p style="font-size: 14px; line-height: 1.7; color: #707070; margin: 0 0 4px; text-align: center;">
         Nous avons re&ccedil;u une demande de r&eacute;initialisation de votre mot de passe. Cliquez sur le bouton ci-dessous pour en choisir un nouveau.
       </p>
       ${ctaButton(resetUrl, 'R&eacute;initialiser le mot de passe')}
-      <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 24px 0;"><tr>
+      <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 20px 0 0;"><tr>
         <td style="border-radius: 14px; padding: 16px 20px; font-size: 14px; line-height: 1.6; background: #fef2f2; color: #dc2626;">
-          Si vous n'&ecirc;tes pas &agrave; l'origine de cette demande, ignorez cet email. Votre mot de passe restera inchang&eacute;.
+          Si vous n&rsquo;&ecirc;tes pas &agrave; l&rsquo;origine de cette demande, ignorez cet email. Votre mot de passe restera inchang&eacute;.
         </td>
       </tr></table>
       ${validityTag('Valide 10 minutes')}

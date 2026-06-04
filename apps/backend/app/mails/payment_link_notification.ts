@@ -1,4 +1,13 @@
-import { wrapHtml, ctaButton, infoBox, linkFallback } from '#mails/helpers/email_template'
+import {
+  wrapHtml,
+  ctaButton,
+  infoBox,
+  linkFallback,
+  brandBadge,
+  amountDisplay,
+  detailRows,
+  getFrontendUrl,
+} from '#mails/helpers/email_template'
 
 export class PaymentLinkNotification {
   private paymentUrl: string
@@ -32,19 +41,25 @@ export class PaymentLinkNotification {
       currency: this.currency,
     }).format(this.amount)
 
+    const today = new Intl.DateTimeFormat('fr-FR', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    }).format(new Date())
+
+    const rows: { label: string; value: string }[] = [
+      { label: 'Facture', value: this.invoiceNumber },
+      { label: 'Date', value: today },
+    ]
+    if (this.clientName) {
+      rows.push({ label: 'Destinataire', value: this.clientName })
+    }
+    rows.push({ label: 'Montant d&ucirc;', value: formattedAmount })
+
     const content = `
-      <h2 style="font-size: 20px; font-weight: 600; color: #171717; letter-spacing: -0.02em; margin: 0 0 12px;">
-        Paiement de votre facture
-      </h2>
-      <p style="font-size: 14px; line-height: 1.7; color: #707070; margin: 0 0 16px;">
-        Bonjour${this.clientName ? ` ${this.clientName}` : ''},
-      </p>
-      <p style="font-size: 14px; line-height: 1.7; color: #707070; margin: 0 0 16px;">
-        Vous avez re&ccedil;u une facture <strong style="color: #171717;">${this.invoiceNumber}</strong> d&rsquo;un montant de <strong style="color: #171717;">${formattedAmount}</strong>.
-      </p>
-      <p style="font-size: 14px; line-height: 1.7; color: #707070; margin: 0 0 16px;">
-        Cliquez sur le bouton ci-dessous pour acc&eacute;der aux instructions de paiement.
-      </p>
+      ${brandBadge('Faktur', `${getFrontendUrl()}/logo.svg`)}
+      ${amountDisplay(formattedAmount, 'Montant &agrave; r&eacute;gler')}
+      ${detailRows(rows)}
       ${ctaButton(this.paymentUrl, 'Payer la facture')}
       ${infoBox('La facture est &eacute;galement jointe &agrave; cet email au format PDF.')}
       ${linkFallback(this.paymentUrl)}

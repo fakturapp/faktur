@@ -14,19 +14,21 @@ export default class TwoFactorEnabledNotification extends BaseMail {
 
   prepare() {
     const content = `
-      <h2 style="font-size: 20px; font-weight: 600; color: #171717; letter-spacing: -0.02em; margin: 0 0 12px; text-align: center;">Double authentification activ&eacute;e</h2>
-      <p style="font-size: 14px; line-height: 1.7; color: #707070; margin: 0 0 16px; text-align: center;">
-        Bonjour${this.name ? ` <span style="color: #5957e8; font-weight: 600;">${this.name}</span>` : ''},<br><br>
+      <h2 style="font-size: 20px; font-weight: 600; color: #171717; letter-spacing: -0.02em; margin: 0 0 8px; text-align: center;">Double authentification activ&eacute;e</h2>
+      <p style="font-size: 14px; line-height: 1.7; color: #707070; margin: 0 0 4px; text-align: center;">
+        ${this.name ? `Bonjour <span style="color: #5957e8; font-weight: 600;">${this.name}</span>,` : 'Bonjour,'}
+      </p>
+      <p style="font-size: 14px; line-height: 1.7; color: #707070; margin: 0 0 24px; text-align: center;">
         La double authentification (2FA) a &eacute;t&eacute; activ&eacute;e sur votre compte avec succ&egrave;s.
       </p>
-      <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 24px 0;"><tr>
+      <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 0 0 16px;"><tr>
         <td style="border-radius: 14px; padding: 16px 20px; font-size: 14px; line-height: 1.6; background: #f0fdf4; color: #16a34a;">
           Votre compte est d&eacute;sormais mieux prot&eacute;g&eacute;. Un code de v&eacute;rification vous sera demand&eacute; &agrave; chaque connexion.
         </td>
       </tr></table>
-      <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 24px 0;"><tr>
+      <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
         <td style="border-radius: 14px; padding: 16px 20px; font-size: 14px; line-height: 1.6; background: #fef2f2; color: #dc2626;">
-          Si vous n'&ecirc;tes pas &agrave; l'origine de cette modification, contactez le support imm&eacute;diatement.
+          Si vous n&rsquo;&ecirc;tes pas &agrave; l&rsquo;origine de cette modification, contactez le support imm&eacute;diatement.
         </td>
       </tr></table>
     `

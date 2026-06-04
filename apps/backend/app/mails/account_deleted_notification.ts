@@ -14,18 +14,20 @@ export default class AccountDeletedNotification extends BaseMail {
 
   prepare() {
     const content = `
-      <h2 style="font-size: 20px; font-weight: 600; color: #171717; letter-spacing: -0.02em; margin: 0 0 12px; text-align: center;">Compte supprim&eacute;</h2>
-      <p style="font-size: 14px; line-height: 1.7; color: #707070; margin: 0 0 16px; text-align: center;">
-        Bonjour${this.name ? ` <span style="color: #5957e8; font-weight: 600;">${this.name}</span>` : ''},<br><br>
+      <h2 style="font-size: 20px; font-weight: 600; color: #171717; letter-spacing: -0.02em; margin: 0 0 8px; text-align: center;">Compte supprim&eacute;</h2>
+      <p style="font-size: 14px; line-height: 1.7; color: #707070; margin: 0 0 4px; text-align: center;">
+        ${this.name ? `Bonjour <span style="color: #5957e8; font-weight: 600;">${this.name}</span>,` : 'Bonjour,'}
+      </p>
+      <p style="font-size: 14px; line-height: 1.7; color: #707070; margin: 0 0 24px; text-align: center;">
         Votre compte Faktur a &eacute;t&eacute; supprim&eacute; d&eacute;finitivement conform&eacute;ment &agrave; votre demande. Toutes vos donn&eacute;es ont &eacute;t&eacute; effac&eacute;es.
       </p>
-      <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 24px 0;"><tr>
+      <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 0 0 16px;"><tr>
         <td style="border-radius: 14px; padding: 16px 20px; font-size: 14px; line-height: 1.6; background: #fef2f2; color: #dc2626;">
-          Si vous n'&ecirc;tes pas &agrave; l'origine de cette suppression, contactez le support imm&eacute;diatement.
+          Si vous n&rsquo;&ecirc;tes pas &agrave; l&rsquo;origine de cette suppression, contactez le support imm&eacute;diatement.
         </td>
       </tr></table>
-      <p style="margin: 24px 0 0; font-size: 13px; line-height: 1.7; color: #a3a3a3; text-align: center;">
-        Merci d'avoir utilis&eacute; Faktur. Vous pouvez recr&eacute;er un compte &agrave; tout moment.
+      <p style="margin: 20px 0 0; font-size: 13px; line-height: 1.7; color: #a3a3a3; text-align: center;">
+        Merci d&rsquo;avoir utilis&eacute; Faktur. Vous pouvez recr&eacute;er un compte &agrave; tout moment.
       </p>
     `
 

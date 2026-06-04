@@ -14,8 +14,8 @@ export default class TeamInviteNotification extends BaseMail {
 
   prepare() {
     const content = `
-      <h2 style="font-size: 20px; font-weight: 600; color: #171717; letter-spacing: -0.02em; margin: 0 0 12px; text-align: center;">Invitation &agrave; rejoindre une &eacute;quipe</h2>
-      <p style="font-size: 14px; line-height: 1.7; color: #707070; margin: 0 0 16px; text-align: center;">
+      <h2 style="font-size: 20px; font-weight: 600; color: #171717; letter-spacing: -0.02em; margin: 0 0 8px; text-align: center;">Invitation &agrave; rejoindre une &eacute;quipe</h2>
+      <p style="font-size: 14px; line-height: 1.7; color: #707070; margin: 0 0 4px; text-align: center;">
         <span style="color: #5957e8; font-weight: 600;">${this.inviterName}</span> vous invite &agrave; rejoindre son &eacute;quipe sur Faktur.
       </p>
       ${ctaButton(this.inviteUrl, "Accepter l'invitation")}
