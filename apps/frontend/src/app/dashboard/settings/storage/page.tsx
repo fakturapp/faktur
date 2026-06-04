@@ -26,9 +26,21 @@ import {
   Recycle,
   FileStack,
   ImageIcon,
+  Download,
+  ScrollText,
+  Undo2,
+  RefreshCw,
+  ChevronRight,
 } from 'lucide-react'
 
 type StorageCategory = 'company_logo' | 'invoice_logo' | 'team_icon' | 'payment_link_pdf'
+
+interface DocCategoryUsage {
+  type: string
+  label: string
+  count: number
+  bytes: number
+}
 
 interface StorageUsage {
   fileBytes: number
@@ -38,6 +50,7 @@ interface StorageUsage {
   percent: number
   isOver: boolean
   plan: 'free' | 'pro' | 'team'
+  documents: DocCategoryUsage[]
 }
 
 interface StorageFileEntry {
@@ -60,6 +73,13 @@ const CATEGORY_META: Record<StorageCategory, { label: string; icon: typeof Build
 }
 
 const CATEGORY_ORDER: StorageCategory[] = ['company_logo', 'invoice_logo', 'team_icon', 'payment_link_pdf']
+
+const DOC_META: Record<string, { icon: typeof FileText; href: string }> = {
+  invoice: { icon: FileText, href: '/dashboard/invoices' },
+  quote: { icon: ScrollText, href: '/dashboard/quotes' },
+  credit_note: { icon: Undo2, href: '/dashboard/credit-notes' },
+  recurring: { icon: RefreshCw, href: '/dashboard/recurring-invoices' },
+}
 
 const SEGMENTS = [
   { key: 'documents', label: 'Documents', icon: FileStack, bar: 'bg-blue-500', dot: 'text-blue-500' },
@@ -145,6 +165,7 @@ export default function StoragePage() {
 
   const quota = usage?.quotaBytes ?? 0
   const total = usage?.totalBytes ?? 0
+  const documents = (usage?.documents ?? []).filter((d) => d.count > 0)
   const mediaBytes = files
     .filter((f) => f.category !== 'payment_link_pdf')
     .reduce((sum, f) => sum + f.sizeBytes, 0)
@@ -239,18 +260,71 @@ export default function StoragePage() {
           </div>
         </div>
 
-        {usage?.plan !== 'team' && (
+        <div className="mt-5 flex flex-wrap gap-2">
+          {usage?.plan !== 'team' && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => router.push('/dashboard/settings/plan/upgrade')}
+            >
+              Augmenter l&apos;espace de stockage
+              <ArrowUpRight className="h-4 w-4" />
+            </Button>
+          )}
           <Button
             variant="outline"
             size="sm"
-            className="mt-5"
-            onClick={() => router.push('/dashboard/settings/plan/upgrade')}
+            onClick={() => router.push('/dashboard/account/export')}
           >
-            Augmenter l&apos;espace de stockage
-            <ArrowUpRight className="h-4 w-4" />
+            <Download className="h-4 w-4" />
+            Exporter mes données
           </Button>
-        )}
+        </div>
       </div>
+
+      {documents.length > 0 && (
+        <section className="mb-8">
+          <h2 className="mb-3 flex items-center gap-2 text-[13px] font-bold uppercase tracking-wide text-muted-foreground">
+            <FileStack className="h-4 w-4" />
+            Documents
+          </h2>
+          <div className="space-y-2">
+            {documents.map((doc) => {
+              const meta = DOC_META[doc.type]
+              const Icon = meta?.icon ?? FileText
+              const clickable = !!meta?.href
+              return (
+                <div
+                  key={doc.type}
+                  role={clickable ? 'button' : undefined}
+                  tabIndex={clickable ? 0 : undefined}
+                  onClick={clickable ? () => router.push(meta.href) : undefined}
+                  className={cn(
+                    'flex items-center gap-3 rounded-xl border border-border bg-surface p-3 shadow-surface',
+                    clickable && 'cursor-pointer transition-colors hover:bg-surface-hover'
+                  )}
+                >
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-blue-500">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-foreground">{doc.label}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {doc.count} document{doc.count > 1 ? 's' : ''}
+                    </p>
+                  </div>
+                  <p className="shrink-0 text-sm font-medium tabular-nums text-foreground">
+                    {formatBytes(doc.bytes)}
+                  </p>
+                  {clickable && (
+                    <ChevronRight className="h-4 w-4 shrink-0 text-muted-secondary" />
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </section>
+      )}
 
       {orphanCount > 0 && (
         <div className="mb-8 flex items-center gap-3 rounded-2xl border border-border bg-surface p-4 shadow-surface">
