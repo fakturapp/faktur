@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Pagination } from '@/components/ui/pagination'
 import { api } from '@/lib/api'
+import { formatBytes } from '@/lib/utils'
 import { useToast } from '@/components/ui/toast'
 import { StatusDropdown, invoiceStatusOptions } from '@/components/shared/status-dropdown'
 import {
@@ -58,6 +59,7 @@ interface InvoiceListItem {
   sourceQuoteId: string | null
   createdAt: string
   needsAction?: boolean
+  sizeBytes?: number
 }
 
 interface PaginationMeta {
@@ -413,7 +415,12 @@ export default function InvoicesPage() {
                         <p className="text-sm font-medium text-foreground">
                           {Number(invoice.total).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
                         </p>
-                        <p className="text-xs text-muted-foreground">TTC</p>
+                        <p className="text-xs text-muted-foreground">
+                          TTC
+                          {invoice.sizeBytes != null && (
+                            <span className="text-muted-secondary"> · {formatBytes(invoice.sizeBytes)}</span>
+                          )}
+                        </p>
                       </div>
 
                       {/* Active editors */}

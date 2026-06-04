@@ -7,6 +7,7 @@ import {
   decryptModelFieldsArray,
   ENCRYPTED_FIELDS,
 } from '#services/crypto/field_encryption_helper'
+import { DOC_BASE_BYTES, DOC_PER_LINE_BYTES } from '#services/storage/storage_service'
 
 export default class List {
   async handle(ctx: HttpContext) {
@@ -33,6 +34,7 @@ export default class List {
     const query = Invoice.query()
       .where('team_id', teamId)
       .preload('client')
+      .withCount('lines')
       .orderBy('created_at', 'desc')
 
     if (status) {
@@ -57,11 +59,16 @@ export default class List {
       }
     }
 
+    const sizes = invoices.map(
+      (inv) => DOC_BASE_BYTES + Number(inv.$extras.lines_count ?? 0) * DOC_PER_LINE_BYTES
+    )
+
     const transformed = await ctx.serialize.withoutWrapping(InvoiceTransformer.transform(invoices))
     const invoiceList = (Array.isArray(transformed) ? transformed : [transformed]).map(
-      (inv: any) => ({
+      (inv: any, idx: number) => ({
         ...inv,
         needsAction: inv.status === 'paid_unconfirmed' || inv.status === 'overdue',
+        sizeBytes: sizes[idx] ?? DOC_BASE_BYTES,
       })
     )
 
