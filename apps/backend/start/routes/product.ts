@@ -11,7 +11,7 @@ const ProductDelete = () => import('#controllers/product/delete')
 router
   .group(() => {
     router.get('/', [ProductList, 'handle'])
-    router.get('/:id', [ProductShow, 'handle'])
+    router.get('/:id', [ProductShow, 'handle']).use(middleware.storageQuota())
     router.post('/', [ProductCreate, 'handle'])
     router.put('/:id', [ProductUpdate, 'handle'])
     router.delete('/:id', [ProductDelete, 'handle'])

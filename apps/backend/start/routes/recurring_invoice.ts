@@ -14,11 +14,13 @@ const RecurringInvoiceToggleActive = () =>
 router
   .group(() => {
     router.get('/', [RecurringInvoiceList, 'handle'])
-    router.get('/:id', [RecurringInvoiceShow, 'handle'])
+    router.get('/:id', [RecurringInvoiceShow, 'handle']).use(middleware.storageQuota())
     router.post('/', [RecurringInvoiceCreate, 'handle']).use(middleware.storageQuota())
     router.put('/:id', [RecurringInvoiceUpdate, 'handle']).use(middleware.storageQuota())
     router.delete('/:id', [RecurringInvoiceDelete, 'handle'])
-    router.post('/:id/generate', [RecurringInvoiceGenerate, 'handle']).use(middleware.storageQuota())
+    router
+      .post('/:id/generate', [RecurringInvoiceGenerate, 'handle'])
+      .use(middleware.storageQuota())
     router.patch('/:id/toggle-active', [RecurringInvoiceToggleActive, 'handle'])
   })
   .prefix(API_PREFIX + '/recurring-invoices')
