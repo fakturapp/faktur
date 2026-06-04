@@ -55,6 +55,28 @@ class StripeService {
     const stripe = new Stripe('', { apiVersion: '2026-05-27.dahlia' })
     return stripe.webhooks.constructEvent(rawBody, signature, webhookSecret)
   }
+
+  async getReceiptUrl(
+    secretKey: string,
+    paymentIntent: Stripe.PaymentIntent
+  ): Promise<string | null> {
+    try {
+      const pi = paymentIntent as Stripe.PaymentIntent & {
+        charges?: { data?: Array<{ receipt_url?: string | null }> }
+      }
+      const direct = pi.charges?.data?.[0]?.receipt_url
+      if (direct) return direct
+
+      const chargeId =
+        typeof pi.latest_charge === 'string' ? pi.latest_charge : (pi.latest_charge?.id ?? null)
+      if (!chargeId) return null
+
+      const charge = await this.getClient(secretKey).charges.retrieve(chargeId)
+      return charge.receipt_url ?? null
+    } catch {
+      return null
+    }
+  }
 }
 
 export default new StripeService()
