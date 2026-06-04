@@ -460,6 +460,11 @@ export const controllers = {
       StripeSettingsShow: () => import('#controllers/settings/stripe/stripe_settings_show'),
     },
   },
+  storage: {
+    DeleteFile: () => import('#controllers/storage/delete_file'),
+    Files: () => import('#controllers/storage/files'),
+    Usage: () => import('#controllers/storage/usage'),
+  },
   tax: {
     VatReport: () => import('#controllers/tax/vat_report'),
   },
@@ -501,10 +506,5 @@ export const controllers = {
   webhooks: {
     StripeBillingWebhook: () => import('#controllers/webhooks/stripe_billing_webhook'),
     StripeWebhook: () => import('#controllers/webhooks/stripe_webhook'),
-  },
-  storage: {
-    Usage: () => import('#controllers/storage/usage'),
-    Files: () => import('#controllers/storage/files'),
-    DeleteFile: () => import('#controllers/storage/delete_file'),
   },
 }

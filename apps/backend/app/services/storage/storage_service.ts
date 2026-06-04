@@ -15,16 +15,34 @@ export const QUOTA_BYTES: Record<PlanId, number> = {
   team: 20 * 1024 * 1024 * 1024,
 }
 
-const DOC_BASE_BYTES = 25 * 1024
-const DOC_PER_LINE_BYTES = 2 * 1024
+export const DOC_BASE_BYTES = 25 * 1024
+export const DOC_PER_LINE_BYTES = 2 * 1024
 
 const SINGLETON_CATEGORIES: StorageCategory[] = ['company_logo', 'invoice_logo', 'team_icon']
 
 const DOCUMENT_DEFS = [
-  { table: 'invoices', lineTable: 'invoice_lines', fk: 'invoice_id' },
-  { table: 'quotes', lineTable: 'quote_lines', fk: 'quote_id' },
-  { table: 'credit_notes', lineTable: 'credit_note_lines', fk: 'credit_note_id' },
-  { table: 'recurring_invoices', lineTable: 'recurring_invoice_lines', fk: 'recurring_invoice_id' },
+  {
+    type: 'invoice',
+    label: 'Factures',
+    table: 'invoices',
+    lineTable: 'invoice_lines',
+    fk: 'invoice_id',
+  },
+  { type: 'quote', label: 'Devis', table: 'quotes', lineTable: 'quote_lines', fk: 'quote_id' },
+  {
+    type: 'credit_note',
+    label: 'Avoirs',
+    table: 'credit_notes',
+    lineTable: 'credit_note_lines',
+    fk: 'credit_note_id',
+  },
+  {
+    type: 'recurring',
+    label: 'Factures récurrentes',
+    table: 'recurring_invoices',
+    lineTable: 'recurring_invoice_lines',
+    fk: 'recurring_invoice_id',
+  },
 ] as const
 
 export interface StorageUsage {
@@ -35,6 +53,7 @@ export interface StorageUsage {
   percent: number
   isOver: boolean
   plan: PlanId
+  documents: DocCategoryUsage[]
 }
 
 export interface StorageFileEntry {
@@ -47,6 +66,13 @@ export interface StorageFileEntry {
   originalName: string | null
   isActive: boolean
   createdAt: string | null
+}
+
+export interface DocCategoryUsage {
+  type: string
+  label: string
+  count: number
+  bytes: number
 }
 
 class StorageService {
@@ -133,12 +159,16 @@ class StorageService {
   }
 
   async fileBytes(teamId: string): Promise<number> {
-    const row = await db.from('storage_files').where('team_id', teamId).sum('size_bytes as total').first()
+    const row = await db
+      .from('storage_files')
+      .where('team_id', teamId)
+      .sum('size_bytes as total')
+      .first()
     return Number(row?.total ?? 0)
   }
 
-  async docDataBytes(teamId: string): Promise<number> {
-    let total = 0
+  async docBreakdown(teamId: string): Promise<DocCategoryUsage[]> {
+    const breakdown: DocCategoryUsage[] = []
     for (const def of DOCUMENT_DEFS) {
       const docRow = await db.from(def.table).where('team_id', teamId).count('* as total').first()
       const lineRow = await db
@@ -147,16 +177,28 @@ class StorageService {
         .where(`${def.table}.team_id`, teamId)
         .count('* as total')
         .first()
-      total += Number(docRow?.total ?? 0) * DOC_BASE_BYTES + Number(lineRow?.total ?? 0) * DOC_PER_LINE_BYTES
+      const count = Number(docRow?.total ?? 0)
+      const lineCount = Number(lineRow?.total ?? 0)
+      breakdown.push({
+        type: def.type,
+        label: def.label,
+        count,
+        bytes: count * DOC_BASE_BYTES + lineCount * DOC_PER_LINE_BYTES,
+      })
     }
-    return total
+    return breakdown
   }
 
   async usage(teamId: string, plan: PlanId): Promise<StorageUsage> {
-    const [fileBytes, docBytes] = await Promise.all([this.fileBytes(teamId), this.docDataBytes(teamId)])
+    const [fileBytes, documents] = await Promise.all([
+      this.fileBytes(teamId),
+      this.docBreakdown(teamId),
+    ])
+    const docBytes = documents.reduce((sum, def) => sum + def.bytes, 0)
     const totalBytes = fileBytes + docBytes
     const quotaBytes = QUOTA_BYTES[plan] ?? QUOTA_BYTES.free
-    const percent = quotaBytes > 0 ? Math.min(100, Math.round((totalBytes / quotaBytes) * 1000) / 10) : 0
+    const percent =
+      quotaBytes > 0 ? Math.min(100, Math.round((totalBytes / quotaBytes) * 1000) / 10) : 0
     return {
       fileBytes,
       docBytes,
@@ -165,11 +207,13 @@ class StorageService {
       percent,
       isOver: totalBytes >= quotaBytes,
       plan,
+      documents,
     }
   }
 
   async isOverQuota(teamId: string, plan: PlanId): Promise<boolean> {
-    return (await this.usage(teamId, plan)).isOver
+    const usage = await this.usage(teamId, plan)
+    return usage.isOver
   }
 
   async listFiles(teamId: string): Promise<StorageFileEntry[]> {
