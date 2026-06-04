@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth'
 import { api } from '@/lib/api'
-import { AlertTriangle, ArrowRight } from 'lucide-react'
+import { AlertTriangle } from 'lucide-react'
 
 export function SubscriptionBanner() {
   const { user } = useAuth()
@@ -38,33 +38,23 @@ export function SubscriptionBanner() {
     router.push('/dashboard/settings/plan?recover=1')
   }
 
+  const label = paused
+    ? `Abonnement suspendu sur l’équipe « ${team.name} ». Cliquez pour en savoir plus.`
+    : daysLeft !== null
+      ? `Paiement échoué sur l’équipe « ${team.name} ». Régularisez sous ${daysLeft} jour${daysLeft > 1 ? 's' : ''}, sinon retour au plan Gratuit. Cliquez pour régler.`
+      : `Paiement échoué sur l’équipe « ${team.name} ». Cliquez pour régler.`
+
   return (
     <button
+      type="button"
       onClick={handleClick}
       disabled={busy}
-      className="flex w-full items-center gap-3 border-b border-red-500/40 bg-red-500/15 px-4 py-3 text-left transition-colors hover:bg-red-500/25 disabled:opacity-70"
+      aria-label={label}
+      className="flex w-full items-center justify-center gap-2 bg-red-600 px-4 py-2 text-[12px] font-semibold uppercase tracking-wide text-white shadow-[0_4px_16px_rgba(0,0,0,0.15)] transition-colors hover:bg-red-500 disabled:opacity-70"
     >
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-500/20">
-        <AlertTriangle className="h-5 w-5 text-red-500" />
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block text-sm font-semibold text-red-800 dark:text-red-200">
-          {paused
-            ? `Abonnement suspendu sur l’équipe « ${team.name} »`
-            : `Paiement échoué sur l’équipe « ${team.name} »`}
-        </span>
-        <span className="block text-xs text-red-700/90 dark:text-red-300/90">
-          {paused
-            ? 'Votre abonnement a été suspendu via Stripe. Contactez votre administrateur pour le réactiver.'
-            : daysLeft !== null
-              ? `Régularisez sous ${daysLeft} jour${daysLeft > 1 ? 's' : ''} via Stripe, sinon votre abonnement repassera au plan Gratuit.`
-              : 'Régularisez votre paiement via Stripe pour conserver votre forfait.'}
-        </span>
-      </span>
-      <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-red-500 px-3 py-1.5 text-xs font-semibold text-white">
-        {paused ? 'En savoir plus' : busy ? 'Ouverture…' : 'Régler maintenant'}{' '}
-        <ArrowRight className="h-3.5 w-3.5" />
-      </span>
+      <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+      <span>{busy ? 'Ouverture du portail Stripe…' : label}</span>
+      <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
     </button>
   )
 }

@@ -431,10 +431,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         )}
       >
         <StorageBanner storage={storage} onOpen={() => setStorageModalOpen(true)} />
-        <SiteHeader onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)} />
-        <RouteProgressBar />
         <SubscriptionBanner />
         <TeamEncryptionBanner />
+        <SiteHeader onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)} />
+        <RouteProgressBar />
 
         <main className="relative flex-1 overflow-y-auto" data-tutorial="main-content">
           <div className="relative @container/main flex flex-1 flex-col gap-2">
