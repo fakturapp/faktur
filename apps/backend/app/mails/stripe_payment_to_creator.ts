@@ -9,7 +9,8 @@ export class StripePaymentToCreator extends BaseMail {
     private invoiceNumber: string,
     private amount: number,
     private currency: string,
-    private invoiceUrl: string
+    private invoiceUrl: string,
+    private receiptUrl?: string | null
   ) {
     super()
     this.subject = `Paiement Stripe reçu — Facture ${this.invoiceNumber}`
@@ -34,9 +35,10 @@ export class StripePaymentToCreator extends BaseMail {
         </td>
       </tr></table>
       ${ctaButton(this.invoiceUrl, 'Voir la facture')}
+      ${this.receiptUrl ? `<p style="text-align: center; margin: 0;"><a href="${this.receiptUrl}" style="color: #5957e8; text-decoration: none; font-size: 13px; font-weight: 500;">Voir le re&ccedil;u Stripe</a></p>` : ''}
     `
 
-    const plainText = `Paiement Stripe reçu\n\nUn paiement par carte bancaire de ${formattedAmount} a été reçu pour la facture ${this.invoiceNumber}.\n\nCe paiement a été automatiquement confirmé par Stripe. La facture a été marquée comme payée.\n\n${this.invoiceUrl}`
+    const plainText = `Paiement Stripe reçu\n\nUn paiement par carte bancaire de ${formattedAmount} a été reçu pour la facture ${this.invoiceNumber}.\n\nCe paiement a été automatiquement confirmé par Stripe. La facture a été marquée comme payée.\n\n${this.invoiceUrl}${this.receiptUrl ? `\n\nReçu Stripe : ${this.receiptUrl}` : ''}`
 
     this.message.to(this.email)
     this.message.subject(this.subject)

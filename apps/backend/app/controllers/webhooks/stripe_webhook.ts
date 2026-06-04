@@ -67,7 +67,7 @@ export default class StripeWebhook {
     }
 
     if (event.type === 'payment_intent.succeeded') {
-      await this.handlePaymentSucceeded(event.data.object)
+      await this.handlePaymentSucceeded(event.data.object, settings)
     } else if (event.type === 'payment_intent.payment_failed') {
       await this.handlePaymentFailed(event.data.object)
     }
@@ -75,7 +75,7 @@ export default class StripeWebhook {
     return response.ok({ received: true })
   }
 
-  private async handlePaymentSucceeded(pi: any) {
+  private async handlePaymentSucceeded(pi: any, settings: InvoiceSetting) {
     const paymentLinkId = pi.metadata?.payment_link_id
     if (!paymentLinkId) return
 
@@ -124,6 +124,16 @@ export default class StripeWebhook {
       broadcastDocumentSaved('invoice', invoice.id, 'system')
     }
 
+    let receiptUrl: string | null = null
+    try {
+      if (settings.stripeSecretKey) {
+        const secretKey = encryptionService.decrypt(settings.stripeSecretKey)
+        receiptUrl = await stripeService.getReceiptUrl(secretKey, pi)
+      }
+    } catch {
+      /* */
+    }
+
     try {
       const creator = await User.find(paymentLink.createdByUserId)
       if (creator?.email) {
@@ -135,7 +145,8 @@ export default class StripeWebhook {
             paymentLink.invoiceNumber,
             paymentLink.amount,
             paymentLink.currency,
-            invoiceUrl
+            invoiceUrl,
+            receiptUrl
           )
         )
       }
@@ -143,7 +154,6 @@ export default class StripeWebhook {
       /* */
     }
 
-    // Send email to Abel (client)
     if (paymentLink.clientEmail) {
       try {
         const clientEmail = encryptionService.decrypt(paymentLink.clientEmail)
@@ -156,7 +166,14 @@ export default class StripeWebhook {
           }
         }
         await mail.send(
-          new StripePaymentToClient(clientEmail, paymentLink.invoiceNumber, clientName)
+          new StripePaymentToClient(
+            clientEmail,
+            paymentLink.invoiceNumber,
+            paymentLink.amount,
+            paymentLink.currency,
+            clientName,
+            receiptUrl
+          )
         )
       } catch {
         /* */
