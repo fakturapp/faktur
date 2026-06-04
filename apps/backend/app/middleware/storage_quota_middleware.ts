@@ -18,9 +18,14 @@ export default class StorageQuotaMiddleware {
 
     const over = await storageService.isOverQuota(team.id, team.plan)
     if (over) {
+      const isRead = ctx.request.method() === 'GET'
+      const message = isRead
+        ? 'Accès refusé : votre espace de stockage est plein. Veuillez le vider pour pouvoir lire vos données.'
+        : 'Accès refusé : votre espace de stockage est plein. Veuillez le vider pour pouvoir continuer.'
       return ctx.response.status(403).send(
         buildStructuredErrorResponse(ctx, {
           errorCode: 'storage_full',
+          message,
         })
       )
     }

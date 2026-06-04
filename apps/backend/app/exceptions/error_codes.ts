@@ -252,7 +252,8 @@ export const ERROR_CODES = {
     type: 'storage_quota_error',
     status: 403,
     visibility: 'user_facing',
-    defaultMessage: "Espace de stockage plein. Augmentez votre forfait ou supprimez des fichiers.",
+    defaultMessage:
+      'Accès refusé : votre espace de stockage est plein. Veuillez le vider ou augmenter votre forfait pour continuer.',
   },
   internal_error: {
     type: 'api_error',
