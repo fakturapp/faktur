@@ -460,7 +460,6 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
     : user.email.slice(0, 2).toUpperCase()
 
   const currentPlan = getPlan(currentTeam?.plan)
-  const PlanIcon = currentPlan.icon
 
   return (
     <aside
@@ -996,9 +995,11 @@ Stockage
             </div>
           </div>
 
-          <DropdownItem onClick={() => router.push('/dashboard/settings/plan')}>
-            <PlanIcon className={cn('h-4 w-4', currentPlan.accentText)} /> Changer de forfait
-          </DropdownItem>
+          {currentPlan.id !== 'team' && (
+            <DropdownItem onClick={() => router.push('/dashboard/settings/plan')}>
+              <Crown className="h-4 w-4 text-amber-500" /> Upgrade
+            </DropdownItem>
+          )}
 
           <Link href="/dashboard/account">
             <DropdownItem>
