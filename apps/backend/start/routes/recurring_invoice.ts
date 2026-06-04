@@ -21,7 +21,9 @@ router
     router
       .post('/:id/generate', [RecurringInvoiceGenerate, 'handle'])
       .use(middleware.storageQuota())
-    router.patch('/:id/toggle-active', [RecurringInvoiceToggleActive, 'handle'])
+    router
+      .patch('/:id/toggle-active', [RecurringInvoiceToggleActive, 'handle'])
+      .use(middleware.storageQuota())
   })
   .prefix(API_PREFIX + '/recurring-invoices')
   .use(middleware.authOrApiKey())
