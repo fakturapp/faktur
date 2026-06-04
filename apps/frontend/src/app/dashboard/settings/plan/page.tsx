@@ -191,16 +191,23 @@ export default function PlanPage() {
     let active = true
     let tries = 0
     const startedAt = Date.now()
-    function finish() {
+    function finish(success: boolean) {
       const wait = Math.max(0, 3000 - (Date.now() - startedAt))
       setTimeout(() => {
         if (!active) return
         setSyncing(false)
-        setWelcome(true)
-        setWelcomeModal(true)
         setLoading(false)
         refreshUser()
         router.replace('/dashboard/settings/plan')
+        if (!success) {
+          toast(
+            "Nous n'avons pas encore pu confirmer votre abonnement. Patientez quelques instants puis rechargez la page.",
+            'error'
+          )
+          return
+        }
+        setWelcome(true)
+        setWelcomeModal(true)
         import('canvas-confetti')
           .then((m) => {
             const fire = (opts: Record<string, unknown>) =>
@@ -224,8 +231,10 @@ export default function PlanPage() {
         !!t.hasStripeSubscription &&
         (t.subscriptionStatus === 'active' || t.subscriptionStatus === 'trialing')
       tries++
-      if (ok || tries >= 6) {
-        finish()
+      if (ok) {
+        finish(true)
+      } else if (tries >= 6) {
+        finish(false)
       } else {
         setTimeout(poll, 1500)
       }
@@ -234,7 +243,7 @@ export default function PlanPage() {
     return () => {
       active = false
     }
-  }, [justSubscribed, refreshUser, router])
+  }, [justSubscribed, refreshUser, router, toast])
 
   const currentPlanId: PlanId = team?.plan ?? 'free'
   const status = team?.subscriptionStatus ?? null
