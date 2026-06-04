@@ -146,6 +146,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }, [user?.id, user?.currentTeamId])
 
   useEffect(() => {
+    if (!storage?.isOver) return
+    const match = pathname.match(/^(\/dashboard\/(?:invoices|quotes|credit-notes))\/(?:new|[^/]+\/edit)$/)
+    if (match) {
+      setStorageModalOpen(true)
+      router.replace(match[1])
+    }
+  }, [pathname, storage?.isOver, router])
+
+  useEffect(() => {
     if (!user) return
     function refetchTeams() {
       if (document.visibilityState !== 'visible') return
