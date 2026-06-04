@@ -12,8 +12,8 @@ router
   .group(() => {
     router.get('/', [ProductList, 'handle'])
     router.get('/:id', [ProductShow, 'handle']).use(middleware.storageQuota())
-    router.post('/', [ProductCreate, 'handle'])
-    router.put('/:id', [ProductUpdate, 'handle'])
+    router.post('/', [ProductCreate, 'handle']).use(middleware.storageQuota())
+    router.put('/:id', [ProductUpdate, 'handle']).use(middleware.storageQuota())
     router.delete('/:id', [ProductDelete, 'handle'])
   })
   .prefix(API_PREFIX + '/products')

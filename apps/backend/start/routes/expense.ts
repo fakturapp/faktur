@@ -14,15 +14,15 @@ const ParseReceipt = () => import('#controllers/expense/ocr/parse_receipt')
 router
   .group(() => {
     router.get('/', [ExpenseList, 'handle'])
-    router.post('/', [ExpenseCreate, 'handle'])
-    router.put('/:id', [ExpenseUpdate, 'handle'])
+    router.post('/', [ExpenseCreate, 'handle']).use(middleware.storageQuota())
+    router.put('/:id', [ExpenseUpdate, 'handle']).use(middleware.storageQuota())
     router.delete('/:id', [ExpenseDelete, 'handle'])
 
     router.get('/categories', [ExpenseCategoryList, 'handle'])
-    router.post('/categories', [ExpenseCategoryCreate, 'handle'])
+    router.post('/categories', [ExpenseCategoryCreate, 'handle']).use(middleware.storageQuota())
     router.delete('/categories/:id', [ExpenseCategoryDelete, 'handle'])
 
-    router.post('/parse-receipt', [ParseReceipt, 'handle'])
+    router.post('/parse-receipt', [ParseReceipt, 'handle']).use(middleware.storageQuota())
   })
   .prefix(API_PREFIX + '/expenses')
   .use(middleware.authOrApiKey())

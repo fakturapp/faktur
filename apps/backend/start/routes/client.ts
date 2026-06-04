@@ -18,13 +18,17 @@ router
     router.get('/search-siren', [SearchSiren, 'handle'])
     router.get('/', [ClientList, 'handle'])
     router.get('/:id', [ClientShow, 'handle']).use(middleware.storageQuota())
-    router.post('/', [ClientCreate, 'handle'])
-    router.put('/:id', [ClientUpdate, 'handle'])
+    router.post('/', [ClientCreate, 'handle']).use(middleware.storageQuota())
+    router.put('/:id', [ClientUpdate, 'handle']).use(middleware.storageQuota())
     router.delete('/:id', [ClientDelete, 'handle'])
 
     router.get('/:clientId/contacts', [ClientContactIndex, 'handle'])
-    router.post('/:clientId/contacts', [ClientContactStore, 'handle'])
-    router.put('/:clientId/contacts/:id', [ClientContactUpdate, 'handle'])
+    router
+      .post('/:clientId/contacts', [ClientContactStore, 'handle'])
+      .use(middleware.storageQuota())
+    router
+      .put('/:clientId/contacts/:id', [ClientContactUpdate, 'handle'])
+      .use(middleware.storageQuota())
     router.delete('/:clientId/contacts/:id', [ClientContactDestroy, 'handle'])
   })
   .prefix(API_PREFIX + '/clients')
