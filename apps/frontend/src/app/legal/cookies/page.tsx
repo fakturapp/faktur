@@ -1,7 +1,7 @@
 'use client'
 
 import { Card, CardContent } from '@/components/ui/card'
-import { Cookie } from 'lucide-react'
+import { Cookie } from '@/components/ui/icons'
 
 export default function CookiesPage() {
   return (

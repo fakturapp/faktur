@@ -23,7 +23,7 @@ import {
   ChevronDown,
   AlertTriangle,
   MapPin,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 interface Session {
   id: string

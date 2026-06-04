@@ -6,7 +6,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { motion } from 'framer-motion'
 import { DateRangePicker } from '@/components/admin/analytics/date-range-picker'
 import { WebVitalGauge } from '@/components/admin/analytics/web-vital-gauge'
-import { Gauge, Monitor, Smartphone, Tablet } from 'lucide-react'
+import { Gauge, Monitor, Smartphone, Tablet } from '@/components/ui/icons'
 
 interface WebVitalData {
   name: string

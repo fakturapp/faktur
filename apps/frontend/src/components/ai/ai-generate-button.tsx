@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Sparkles, Loader2 } from 'lucide-react'
+import { Sparkles, Loader2 } from '@/components/ui/icons'
 import { api } from '@/lib/api'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { cn } from '@/lib/utils'

@@ -5,7 +5,7 @@ import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/componen
 import { Dropdown, DropdownItem } from '@/components/ui/dropdown'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown } from '@/components/ui/icons'
 
 interface MarkPaidInfoModalProps {
   open: boolean

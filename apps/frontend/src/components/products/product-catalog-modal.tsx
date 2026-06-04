@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { api } from '@/lib/api'
-import { Search, Package, Briefcase, ShoppingBag, Check } from 'lucide-react'
+import { Search, Package, Briefcase, ShoppingBag, Check } from '@/components/ui/icons'
 
 export interface CatalogProduct {
   id: string

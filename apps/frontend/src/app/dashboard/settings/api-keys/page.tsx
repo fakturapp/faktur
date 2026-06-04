@@ -26,7 +26,7 @@ import {
   ExternalLink,
   ChevronRight,
   AlertTriangle,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import { apiKeysClient, type ApiKeyShape } from '@/lib/api-keys-client'
 import { CreateApiKeyDialog } from '@/components/api-keys/create-api-key-dialog'
 import { RevealedKeyDialog } from '@/components/api-keys/revealed-key-dialog'

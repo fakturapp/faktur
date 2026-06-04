@@ -5,7 +5,7 @@ import { Dialog, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { api } from '@/lib/api'
-import { Mail, CheckCircle2, XCircle, Clock } from 'lucide-react'
+import { Mail, CheckCircle2, XCircle, Clock } from '@/components/ui/icons'
 
 interface EmailLogEntry {
   id: string

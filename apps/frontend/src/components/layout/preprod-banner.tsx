@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { AlertTriangle, Database } from 'lucide-react'
+import { AlertTriangle, Database } from '@/components/ui/icons'
 import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { IS_PREPROD } from '@/lib/app-env'

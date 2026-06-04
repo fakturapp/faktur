@@ -1,7 +1,7 @@
 'use client'
 
 import { AnimatePresence, motion } from 'framer-motion'
-import { X } from 'lucide-react'
+import { X } from '@/components/ui/icons'
 import { TEMPLATES } from '@/lib/invoice-templates'
 import { TemplateThumbnail } from '@/components/shared/template-thumbnail'
 

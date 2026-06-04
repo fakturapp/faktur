@@ -26,7 +26,7 @@ import {
   Calendar,
   Shield,
   CheckCircle,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 interface PaymentLinkModalProps {
   open: boolean

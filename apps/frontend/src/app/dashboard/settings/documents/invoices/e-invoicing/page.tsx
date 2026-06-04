@@ -19,7 +19,7 @@ import {
   EyeOff,
   AlertTriangle,
   FlaskConical,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 export default function EInvoicingPage() {
   const { settings, loading, updateSettings } = useInvoiceSettings()

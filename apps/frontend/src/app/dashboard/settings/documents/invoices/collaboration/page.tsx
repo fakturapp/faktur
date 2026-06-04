@@ -6,7 +6,7 @@ import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
-import { Users, FlaskConical, AlertTriangle, Zap, Eye, MousePointer2, Share2 } from 'lucide-react'
+import { Users, FlaskConical, AlertTriangle, Zap, Eye, MousePointer2, Share2 } from '@/components/ui/icons'
 
 export default function CollaborationSettingsPage() {
   const { settings, updateSettings, loading } = useInvoiceSettings()

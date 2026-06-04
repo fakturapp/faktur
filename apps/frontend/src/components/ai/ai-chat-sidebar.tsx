@@ -22,7 +22,7 @@ import {
   ChevronRight,
   ArrowLeft,
   RotateCcw,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import { GeminiIcon } from '@/components/icons/gemini-icon'
 import {
   type ChatMode,

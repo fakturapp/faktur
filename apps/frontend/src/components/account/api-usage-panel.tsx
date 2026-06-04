@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Code2, ExternalLink, Info, RefreshCw } from 'lucide-react'
+import { Code2, ExternalLink, Info, RefreshCw } from '@/components/ui/icons'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { Switch } from '@/components/ui/switch'

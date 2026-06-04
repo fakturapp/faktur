@@ -9,7 +9,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { useToast, toast as t } from '@/components/ui/toast'
 import { useEmail } from '@/lib/email-context'
 import { api } from '@/lib/api'
-import { Send, Paperclip, ChevronDown, Plus, X, Trash2, CheckCircle2 } from 'lucide-react'
+import { Send, Paperclip, ChevronDown, Plus, X, Trash2, CheckCircle2 } from '@/components/ui/icons'
 import { AiGenerateButton } from '@/components/ai/ai-generate-button'
 import { useTrackFeature } from '@/hooks/use-analytics'
 

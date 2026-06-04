@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/toast'
 import { api } from '@/lib/api'
-import { AlertTriangle, CheckCircle, Eye, EyeOff, Copy, Check } from 'lucide-react'
+import { AlertTriangle, CheckCircle, Eye, EyeOff, Copy, Check } from '@/components/ui/icons'
 
 interface StripeActivationModalProps {
   open: boolean

@@ -14,7 +14,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/toast'
 import { useEmail } from '@/lib/email-context'
 import { api } from '@/lib/api'
-import { Bell, Save, Info } from 'lucide-react'
+import { Bell, Save, Info } from '@/components/ui/icons'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },

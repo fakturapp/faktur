@@ -12,7 +12,7 @@ import { ListBoxRoot as ListBox, ListBoxItemRoot as ListBoxItem } from '@/compon
 import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/toast'
 import { api } from '@/lib/api'
-import { X, RefreshCw, Plus, Trash2 } from 'lucide-react'
+import { X, RefreshCw, Plus, Trash2 } from '@/components/ui/icons'
 
 interface RecurringInvoicePanelProps {
   open: boolean

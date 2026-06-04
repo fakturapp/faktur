@@ -10,7 +10,7 @@ import { api } from '@/lib/api'
 import { useOnboardingNav } from '@/lib/onboarding-nav'
 import { TEMPLATES } from '@/lib/invoice-templates'
 import { TemplateThumbnail } from '@/components/shared/template-thumbnail'
-import { Paintbrush, Check, ImagePlus, Trash2, ChevronLeft, Moon, Sun, Type } from 'lucide-react'
+import { Paintbrush, Check, ImagePlus, Trash2, ChevronLeft, Moon, Sun, Type } from '@/components/ui/icons'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },

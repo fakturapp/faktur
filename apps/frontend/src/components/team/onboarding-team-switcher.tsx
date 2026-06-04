@@ -5,7 +5,7 @@ import { useAuth } from '@/lib/auth'
 import { api } from '@/lib/api'
 import { Dropdown, DropdownItem } from '@/components/ui/dropdown'
 import { Spinner } from '@/components/ui/spinner'
-import { Building2, ChevronsUpDown } from 'lucide-react'
+import { Building2, ChevronsUpDown } from '@/components/ui/icons'
 
 export function OnboardingTeamSwitcher() {
   const { user } = useAuth()

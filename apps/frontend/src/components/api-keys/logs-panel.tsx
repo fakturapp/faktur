@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { RefreshCw } from 'lucide-react'
+import { RefreshCw } from '@/components/ui/icons'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'

@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import {
   Check, Zap, ClipboardList, ChevronDown, ChevronRight, Building2, UserRound,
   Palette, Pen, Info, Landmark, Banknote, CreditCard, MoreHorizontal, Shield,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import { Tooltip } from '@/components/ui/tooltip'
 import { SelectRoot, SelectTrigger, SelectValue, SelectIndicator, SelectPopover } from '@/components/ui/select'
 import { ListBoxRoot as ListBox, ListBoxItemRoot as ListBoxItem } from '@/components/ui/list-box'

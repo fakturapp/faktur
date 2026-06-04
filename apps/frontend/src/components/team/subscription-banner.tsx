@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth'
 import { api } from '@/lib/api'
-import { AlertTriangle, CreditCard } from 'lucide-react'
+import { AlertTriangle, CreditCard } from '@/components/ui/icons'
 import {
   Dialog,
   DialogHeader,

@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ShieldAlert } from 'lucide-react'
+import { ShieldAlert } from '@/components/ui/icons'
 import { useAuth } from '@/lib/auth'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'

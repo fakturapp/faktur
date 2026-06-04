@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
-import { AlertTriangle, Copy, Check } from 'lucide-react'
+import { AlertTriangle, Copy, Check } from '@/components/ui/icons'
 import { API_V2_BASE_URL } from '@/lib/external-urls'
 
 interface Props {

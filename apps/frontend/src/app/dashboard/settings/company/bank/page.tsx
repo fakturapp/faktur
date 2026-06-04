@@ -14,7 +14,7 @@ import { Badge } from '@/components/ui/badge'
 import { IbanInput } from '@/components/ui/iban-input'
 import { useCompanySettings, type BankAccountItem, type BankAccountForm } from '@/lib/company-settings-context'
 import { api } from '@/lib/api'
-import { CreditCard, Banknote, Plus, Shield, Star, Pencil, Trash2 } from 'lucide-react'
+import { CreditCard, Banknote, Plus, Shield, Star, Pencil, Trash2 } from '@/components/ui/icons'
 import { CheckboxRoot, CheckboxControl, CheckboxIndicator, CheckboxContent } from '@/components/ui/checkbox'
 
 const BANK_DOMAINS: Record<string, string> = {

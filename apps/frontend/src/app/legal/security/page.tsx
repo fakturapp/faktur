@@ -1,7 +1,7 @@
 'use client'
 
 import { Card, CardContent } from '@/components/ui/card'
-import { Shield, Lock, Key, Eye, Server } from 'lucide-react'
+import { Shield, Lock, Key, Eye, Server } from '@/components/ui/icons'
 
 export default function SecurityPolicyPage() {
   return (

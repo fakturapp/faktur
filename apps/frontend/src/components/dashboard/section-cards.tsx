@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { TrendingUp, TrendingDown, DollarSign, AlertCircle, Wallet } from 'lucide-react'
+import { TrendingUp, TrendingDown, DollarSign, AlertCircle, Wallet } from '@/components/ui/icons'
 
 interface StatCard {
   label: string

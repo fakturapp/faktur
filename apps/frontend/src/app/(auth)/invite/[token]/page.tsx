@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { useAuth } from '@/lib/auth'
 import { api } from '@/lib/api'
 import { Spinner } from '@/components/ui/spinner'
-import { Users, Check, X } from 'lucide-react'
+import { Users, Check, X } from '@/components/ui/icons'
 
 interface InviteInfo {
   email: string

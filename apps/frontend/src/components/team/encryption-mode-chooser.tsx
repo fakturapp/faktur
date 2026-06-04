@@ -3,7 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Cloud, Lock, AlertTriangle, ChevronDown } from 'lucide-react'
+import { Cloud, Lock, AlertTriangle, ChevronDown } from '@/components/ui/icons'
 import { cn } from '@/lib/utils'
 import { Dialog, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'

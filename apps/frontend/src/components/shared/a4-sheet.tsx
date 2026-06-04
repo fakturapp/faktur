@@ -8,7 +8,7 @@ import {
   Trash2, Search, X, Building2, UserRound,
   RefreshCw, MousePointerClick, FileText, Plus, Type, ChevronDown, Package, ImagePlus, Upload,
   AlertTriangle, GripVertical, ChevronLeft, ChevronRight,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import { api } from '@/lib/api'
 import { RichTextarea, mdToHtml } from '@/components/ui/rich-textarea'
 import { Dialog, DialogTitle } from '@/components/ui/dialog'

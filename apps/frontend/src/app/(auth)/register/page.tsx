@@ -14,7 +14,7 @@ import { useAuth } from '@/lib/auth'
 import { api } from '@/lib/api'
 import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile'
 import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
-import { Check, Mail, Lock, Shield, User, ArrowRight, Activity, ArrowLeft, Eye, EyeOff, AlertTriangle, MailX, UserPlus } from 'lucide-react'
+import { Check, Mail, Lock, Shield, User, ArrowRight, Activity, ArrowLeft, Eye, EyeOff, AlertTriangle, MailX, UserPlus } from '@/components/ui/icons'
 import { CheckboxRoot, CheckboxControl, CheckboxIndicator, CheckboxContent } from '@/components/ui/checkbox'
 
 const fadeUp: Variants = {

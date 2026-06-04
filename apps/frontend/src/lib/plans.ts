@@ -1,4 +1,4 @@
-import { Package, Zap, Crown, type LucideIcon } from 'lucide-react'
+import { Package, Zap, Crown, type LucideIcon } from '@/components/ui/icons'
 
 export type PlanId = 'free' | 'pro' | 'team'
 

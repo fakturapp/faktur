@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, TrendingUp, DollarSign, Target, BarChart3, Activity, Plus, Check, Loader2 } from 'lucide-react'
+import { X, TrendingUp, DollarSign, Target, BarChart3, Activity, Plus, Check, Loader2 } from '@/components/ui/icons'
 import { Button } from '@/components/ui/button'
 
 export type ChartKey = 'revenue' | 'collected' | 'micro' | 'treasury_variation' | 'treasury_balance'

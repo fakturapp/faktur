@@ -15,7 +15,7 @@ import { useOnboardingNav } from '@/lib/onboarding-nav'
 import {
   Mail, Check, Plus, ChevronLeft, ChevronRight, Zap, Eye, EyeOff, Key,
   Send, Server, ArrowLeft, X, CheckCircle2, XCircle, ArrowRight,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },

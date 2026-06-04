@@ -24,7 +24,7 @@ import {
   Check,
   Building2,
   Lock,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 interface QuoteItem {
   id: string

@@ -4,7 +4,7 @@ import * as React from 'react'
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardAction } from '@/components/ui/card'
 import { Dropdown, DropdownItem } from '@/components/ui/dropdown'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown } from '@/components/ui/icons'
 
 interface RevenueDataPoint {
   date: string

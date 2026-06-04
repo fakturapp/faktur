@@ -12,7 +12,7 @@ import { ListBoxRoot as ListBox, ListBoxItemRoot as ListBoxItem } from '@/compon
 import { Spinner } from '@/components/ui/spinner'
 import { useToast, toast as t } from '@/components/ui/toast'
 import { api } from '@/lib/api'
-import { X, Package } from 'lucide-react'
+import { X, Package } from '@/components/ui/icons'
 import { useTrackFeature } from '@/hooks/use-analytics'
 import type { ProductListItem } from '@/app/dashboard/products/page'
 

@@ -21,7 +21,7 @@ import {
   CheckCircle2,
   FileArchive,
   Landmark,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 interface TeamInfo {
   id: string

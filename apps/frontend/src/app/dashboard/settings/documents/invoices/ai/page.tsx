@@ -25,7 +25,7 @@ import {
   Shield,
   RefreshCw,
   BarChart3,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 const MODEL_TIERS = [
   {

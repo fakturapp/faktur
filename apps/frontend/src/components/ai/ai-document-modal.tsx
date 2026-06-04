@@ -30,7 +30,7 @@ import {
   Banknote,
   CreditCard,
   Check,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import { ShinyText } from '@/components/ui/shiny-text'
 import { GeminiIcon } from '@/components/icons/gemini-icon'
 

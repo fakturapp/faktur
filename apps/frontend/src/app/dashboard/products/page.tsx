@@ -20,7 +20,7 @@ import {
   Pencil,
   Trash2,
   ArchiveRestore,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import { Dropdown, DropdownItem, DropdownSeparator } from '@/components/ui/dropdown'
 import { useToast } from '@/components/ui/toast'
 

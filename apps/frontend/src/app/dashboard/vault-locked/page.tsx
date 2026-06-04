@@ -25,7 +25,7 @@ import {
   Cloud,
   Check,
   ArrowRight,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 type UnlockMode = 'password' | 'recoveryKey'
 

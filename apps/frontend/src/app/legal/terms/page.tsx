@@ -1,7 +1,7 @@
 'use client'
 
 import { Card, CardContent } from '@/components/ui/card'
-import { ScrollText } from 'lucide-react'
+import { ScrollText } from '@/components/ui/icons'
 
 export default function TermsPage() {
   return (

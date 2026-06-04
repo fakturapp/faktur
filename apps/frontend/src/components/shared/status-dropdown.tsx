@@ -16,7 +16,7 @@ import {
   AlertTriangle,
   CreditCard,
   ChevronDown,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 interface StatusOption {
   value: string

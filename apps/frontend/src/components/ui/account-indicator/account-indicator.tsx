@@ -1,6 +1,6 @@
 'use client'
 
-import { X } from 'lucide-react'
+import { X } from '@/components/ui/icons'
 import { ShinyRevealText } from '@/components/ui/shiny-reveal-text/shiny-reveal-text'
 
 interface AccountIndicatorProps {

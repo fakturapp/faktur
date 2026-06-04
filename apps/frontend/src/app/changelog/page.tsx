@@ -6,7 +6,7 @@ import ReactMarkdown, { type Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { cn } from '@/lib/utils'
 import { useToast } from '@/components/ui/toast'
-import { ChevronLeft, Share2, Clock, CalendarDays } from 'lucide-react'
+import { ChevronLeft, Share2, Clock, CalendarDays } from '@/components/ui/icons'
 import { ScrollShadow } from '@/components/ui/scroll-shadow'
 import {
   CHANGELOG,

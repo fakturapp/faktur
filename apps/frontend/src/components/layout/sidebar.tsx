@@ -75,7 +75,7 @@ import {
   Key,
   Webhook,
   HardDrive,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import { ProgressBar } from '@/components/ui/progress'
 import { formatBytes } from '@/lib/utils'
 import { useTutorialSafe } from '@/lib/tutorial-context'
@@ -881,7 +881,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
               <div className="mb-1.5 flex items-center justify-between gap-2">
                 <span className="flex items-center gap-2 text-[13px] font-medium text-foreground">
                   <HardDrive className="h-[15px] w-[15px] text-muted-foreground" />
-                  Espace de stockage
+Stockage
                 </span>
                 <span
                   className={cn(
@@ -898,7 +898,7 @@ export function Sidebar({ teams, currentTeam, teamsLoaded, onSwitchTeam, user, o
                 size="sm"
                 showOutput={false}
                 color={storage.percent >= 80 ? 'danger' : 'accent'}
-                aria-label="Espace de stockage"
+                aria-label="Stockage"
               />
             </button>
             {storage.plan !== 'team' && (

@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Field, FieldLabel } from '@/components/ui/field'
 import { Spinner } from '@/components/ui/spinner'
 import { api } from '@/lib/api'
-import { ArrowLeft, ArrowRight, Check, LogOut, X, AlertTriangle } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, LogOut, X, AlertTriangle } from '@/components/ui/icons'
 import { TeamIdentityCard } from '@/components/team/team-identity-card'
 import { DashboardBackground } from '@/components/layout/dashboard-background'
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { Sparkles } from 'lucide-react'
+import { Sparkles } from '@/components/ui/icons'
 import { Spinner } from '@/components/ui/spinner'
 import { ShinyText } from '@/components/ui/shiny-text'
 

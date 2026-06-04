@@ -3,7 +3,7 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { useInvoiceSettings } from '@/lib/invoice-settings-context'
 import { getTemplate } from '@/lib/invoice-templates'
-import { Eye, ImagePlus } from 'lucide-react'
+import { Eye, ImagePlus } from '@/components/ui/icons'
 
 export function InvoicePreview() {
   const { settings, companyLogoUrl } = useInvoiceSettings()

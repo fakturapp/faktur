@@ -14,7 +14,7 @@ import {
 import { RecoveryKeyDisplay } from '@/components/shared/recovery-key-display'
 import { useOnboardingNav } from '@/lib/onboarding-nav'
 import { useAuth } from '@/lib/auth'
-import { KeyRound } from 'lucide-react'
+import { KeyRound } from '@/components/ui/icons'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },

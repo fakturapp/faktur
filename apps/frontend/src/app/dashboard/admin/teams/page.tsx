@@ -34,7 +34,7 @@ import {
   Trash2,
   Pencil,
   ChevronRight,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 interface TeamMemberLite {
   id: string

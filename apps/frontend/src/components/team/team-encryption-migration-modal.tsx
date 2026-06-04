@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ShieldCheck, Cloud, Lock, AlertTriangle } from 'lucide-react'
+import { ShieldCheck, Cloud, Lock, AlertTriangle } from '@/components/ui/icons'
 import {
   Dialog,
   DialogHeader,

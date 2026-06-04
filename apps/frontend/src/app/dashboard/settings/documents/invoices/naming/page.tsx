@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { motion, type Variants } from 'framer-motion'
-import { Hash, Pencil, Plus, X, AlertCircle } from 'lucide-react'
+import { Hash, Pencil, Plus, X, AlertCircle } from '@/components/ui/icons'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'

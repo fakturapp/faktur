@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { usePathname } from 'next/navigation'
 import { useTutorial } from '@/lib/tutorial-context'
 import { cn } from '@/lib/utils'
-import { ChevronLeft, ChevronRight, SkipForward, Wand2, GripVertical } from 'lucide-react'
+import { ChevronLeft, ChevronRight, SkipForward, Wand2, GripVertical } from '@/components/ui/icons'
 
 interface Rect { top: number; left: number; width: number; height: number }
 

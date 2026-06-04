@@ -16,7 +16,7 @@ import {
   Mail, Plus, Server, Zap, Send, Eye, EyeOff, Key, Star, Trash2,
   ArrowLeft, ArrowRight, CheckCircle2, XCircle, Check,
   FileText, Receipt, FileMinus2, ArrowUpRight,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },

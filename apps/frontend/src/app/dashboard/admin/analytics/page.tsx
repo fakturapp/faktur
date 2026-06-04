@@ -8,7 +8,7 @@ import { motion } from 'framer-motion'
 import { StatCard } from '@/components/admin/analytics/stat-card'
 import { Heatmap } from '@/components/admin/analytics/heatmap'
 import { DateRangePicker } from '@/components/admin/analytics/date-range-picker'
-import { Activity, Zap, AlertTriangle, Users } from 'lucide-react'
+import { Activity, Zap, AlertTriangle, Users } from '@/components/ui/icons'
 
 const CHART_COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4']
 

@@ -24,7 +24,7 @@ import {
   type ToastProps as ToastPrimitiveProps,
   type ToastRegionProps,
 } from "react-aria-components"
-import { CheckCircle2, AlertTriangle, AlertCircle, Info, X } from "lucide-react"
+import { CheckCircle2, AlertTriangle, AlertCircle, Info, X } from "@/components/ui/icons"
 import { Button as RACButton } from "react-aria-components"
 
 import { Button } from "@/components/ui/button"

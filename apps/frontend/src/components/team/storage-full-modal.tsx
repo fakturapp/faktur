@@ -5,7 +5,7 @@ import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } fr
 import { Button } from '@/components/ui/button'
 import { ProgressBar } from '@/components/ui/progress'
 import { formatBytes } from '@/lib/utils'
-import { HardDrive, Trash2, ArrowUpRight } from 'lucide-react'
+import { HardDrive, Trash2, ArrowUpRight } from '@/components/ui/icons'
 
 interface StorageInfo {
   totalBytes: number

@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useTutorial } from '@/lib/tutorial-context'
 import { getLevel, TUTORIAL_LEVELS } from '@/components/tutorial/tutorial-steps'
 import { Button } from '@/components/ui/button'
-import { ArrowRight, PartyPopper, Trophy } from 'lucide-react'
+import { ArrowRight, PartyPopper, Trophy } from '@/components/ui/icons'
 
 function ConfettiPiece({ delay }: { delay: number }) {
   const colors = ['#6366f1', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6']

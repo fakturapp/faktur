@@ -15,7 +15,7 @@ import {
   Copy,
   Eye,
   ChevronRight,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 export const CHECKOUT_FEATURE_SEEN_KEY = 'faktur_seen_checkout_feature_v1'
 

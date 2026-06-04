@@ -12,7 +12,7 @@ import { FormSelect } from '@/components/ui/dropdown'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { useToast } from '@/components/ui/toast'
-import { Ticket, Plus, Calendar, Users2, Infinity as InfinityIcon, Power, ArrowLeft } from 'lucide-react'
+import { Ticket, Plus, Calendar, Users2, Infinity as InfinityIcon, Power, ArrowLeft } from '@/components/ui/icons'
 
 type PlanChoice = 'both' | 'pro' | 'team'
 type MaxChoice = 'illimite' | '1' | '4' | '6' | '100' | '1000' | 'custom'

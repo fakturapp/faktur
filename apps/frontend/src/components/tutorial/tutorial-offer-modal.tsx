@@ -5,7 +5,7 @@ import { Dialog, DialogTitle, DialogDescription, DialogFooter } from '@/componen
 import { Button } from '@/components/ui/button'
 import { useTutorial } from '@/lib/tutorial-context'
 import { TUTORIAL_LEVELS } from '@/components/tutorial/tutorial-steps'
-import { GraduationCap, ArrowRight } from 'lucide-react'
+import { GraduationCap, ArrowRight } from '@/components/ui/icons'
 import { Badge } from '@/components/ui/badge'
 
 export function TutorialOfferModal() {

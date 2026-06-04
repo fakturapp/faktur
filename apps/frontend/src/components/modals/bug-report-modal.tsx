@@ -11,7 +11,7 @@ import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Spinner } from '@/components/ui/spinner'
 import { api } from '@/lib/api'
 import { useToast } from '@/components/ui/toast'
-import { Bug, CheckCircle2 } from 'lucide-react'
+import { Bug, CheckCircle2 } from '@/components/ui/icons'
 
 interface BugReportModalProps {
   open: boolean

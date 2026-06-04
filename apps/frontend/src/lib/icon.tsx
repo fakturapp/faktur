@@ -15,7 +15,7 @@ import {
   Info,
   AlertTriangle,
   CheckCircle,
-} from "lucide-react";
+} from "@/components/ui/icons";
 
 const LUCIDE_MAP: Record<string, React.ComponentType<SVGProps<SVGSVGElement>>> = {
   "chevron-down": ChevronDown as React.ComponentType<SVGProps<SVGSVGElement>>,

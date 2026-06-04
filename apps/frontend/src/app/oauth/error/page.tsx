@@ -3,7 +3,7 @@
 import { Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { X } from 'lucide-react'
+import { X } from '@/components/ui/icons'
 import { Button } from '@/components/ui/button'
 
 const KNOWN_ERRORS: Record<string, string> = {

@@ -16,7 +16,7 @@ import { api } from '@/lib/api'
 import { Spinner } from '@/components/ui/spinner'
 import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile'
 import { startAuthentication } from '@simplewebauthn/browser'
-import { LogOut, LayoutDashboard, ArrowRight, Shield, Eye, EyeOff, KeyRound, Smartphone, Lock, Mail } from 'lucide-react'
+import { LogOut, LayoutDashboard, ArrowRight, Shield, Eye, EyeOff, KeyRound, Smartphone, Lock, Mail } from '@/components/ui/icons'
 
 type LoginStage = 'email' | 'password'
 type EmailStatus = 'idle' | 'checking' | 'exists' | 'not-exists'

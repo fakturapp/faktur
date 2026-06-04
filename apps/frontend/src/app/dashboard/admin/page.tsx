@@ -7,7 +7,7 @@ import { motion } from 'framer-motion'
 import { api } from '@/lib/api'
 import { Spinner } from '@/components/ui/spinner'
 import { cn } from '@/lib/utils'
-import { Star, Bug, MessageSquare, ShieldCheck, Ticket } from 'lucide-react'
+import { Star, Bug, MessageSquare, ShieldCheck, Ticket } from '@/components/ui/icons'
 
 interface FeedbackItem {
   id: string

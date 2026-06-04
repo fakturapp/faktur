@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { Card, CardContent } from '@/components/ui/card'
-import { FileText, Receipt, Users, Plus, ArrowRight } from 'lucide-react'
+import { FileText, Receipt, Users, Plus, ArrowRight } from '@/components/ui/icons'
 
 const actions = [
   { label: 'Nouvelle facture', icon: FileText, href: '/dashboard/invoices/new', color: 'bg-primary/10 text-primary' },

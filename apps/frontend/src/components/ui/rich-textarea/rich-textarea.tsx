@@ -8,7 +8,7 @@ import {
   Palette, Highlighter, ALargeSmall, Type,
   Link, List, Heading2, X, Check, ChevronDown,
   Unlink,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import { cn } from '@/lib/utils'
 import { measureTextBlock, resolveFont } from '@/lib/pretext'
 

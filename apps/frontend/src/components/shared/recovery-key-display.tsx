@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Eye, EyeOff, Copy, Check, Download, Mail } from 'lucide-react'
+import { Eye, EyeOff, Copy, Check, Download, Mail } from '@/components/ui/icons'
 
 interface RecoveryKeyDisplayProps {
   recoveryKey: string

@@ -36,7 +36,7 @@ import {
   ImageOff,
   Eye,
   EyeOff,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 interface AdminUser {
   id: string

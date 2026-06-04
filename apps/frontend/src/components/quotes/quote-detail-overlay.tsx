@@ -28,7 +28,7 @@ import {
   Clock,
   MessageSquare,
   History,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 interface QuoteDetail {
   id: string

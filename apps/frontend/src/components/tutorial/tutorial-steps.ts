@@ -1,8 +1,8 @@
-import type { LucideIcon } from 'lucide-react'
+import type { LucideIcon } from '@/components/ui/icons'
 import {
   GraduationCap, Building2, UserPlus, Package, FileText,
   Eye, Mail, Receipt, CreditCard, Trophy,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 export interface TutorialHighlight {
   target: string

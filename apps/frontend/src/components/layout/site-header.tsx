@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 import { Separator } from '@/components/ui/separator'
 import { SettingsSearchModal } from '@/components/settings/settings-search-modal'
 import { Tooltip } from '@/components/ui/tooltip'
-import { PanelLeft, Search } from 'lucide-react'
+import { PanelLeft, Search } from '@/components/ui/icons'
 
 const routeTitles: Record<string, string> = {
   '/dashboard': 'Dashboard',

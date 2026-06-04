@@ -5,7 +5,7 @@ import { useEffect, useRef, useLayoutEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, ChevronRight } from 'lucide-react'
+import { ChevronDown, ChevronRight } from '@/components/ui/icons'
 
 interface DropdownProps {
   trigger: React.ReactNode | ((open: boolean) => React.ReactNode)

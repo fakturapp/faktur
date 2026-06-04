@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { api } from '@/lib/api'
-import { Shield, AlertTriangle, Trash2, KeyRound, Loader2, CheckCircle2, Lock, Key, LogOut, RefreshCw } from 'lucide-react'
+import { Shield, AlertTriangle, Trash2, KeyRound, Loader2, CheckCircle2, Lock, Key, LogOut, RefreshCw } from '@/components/ui/icons'
 import { HiddenUsername } from '@/components/auth/hidden-username'
 
 function formatRecoveryKeyInput(value: string): string {

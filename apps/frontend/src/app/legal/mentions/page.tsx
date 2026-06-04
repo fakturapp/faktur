@@ -1,7 +1,7 @@
 'use client'
 
 import { Card, CardContent } from '@/components/ui/card'
-import { Scale } from 'lucide-react'
+import { Scale } from '@/components/ui/icons'
 
 export default function MentionsLegalesPage() {
   return (

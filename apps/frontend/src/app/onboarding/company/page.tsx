@@ -15,7 +15,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { PhoneInput } from '@/components/ui/phone-input'
 import { IbanInput } from '@/components/ui/iban-input'
 import { Dropdown, DropdownItem } from '@/components/ui/dropdown'
-import { Building2, Search, Phone, Mail, Globe, ChevronLeft, ChevronRight, MapPin, CreditCard, AlertTriangle, Check, ChevronDown } from 'lucide-react'
+import { Building2, Search, Phone, Mail, Globe, ChevronLeft, ChevronRight, MapPin, CreditCard, AlertTriangle, Check, ChevronDown } from '@/components/ui/icons'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },

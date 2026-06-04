@@ -13,7 +13,7 @@ import { Dialog, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { PLAN_IDS, PLANS, getPlan, formatPlanPrice, type PlanId } from '@/lib/plans'
 import { PlanRings } from '@/components/plans/plan-rings'
 import { AnimatedPrice } from '@/components/plans/animated-price'
-import { ArrowLeft, Check, ArrowRight, TrendingDown } from 'lucide-react'
+import { ArrowLeft, Check, ArrowRight, TrendingDown } from '@/components/ui/icons'
 
 interface TeamData {
   id: string

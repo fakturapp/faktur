@@ -28,7 +28,7 @@ import {
   FileText,
   Send,
   Mail,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 interface CreditNoteDetail {
   id: string

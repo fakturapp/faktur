@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Bug } from "lucide-react"
+import { Bug } from "@/components/ui/icons"
 import { Dialog, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { DEV_DETAILS_EVENT } from "@/components/ui/toast"

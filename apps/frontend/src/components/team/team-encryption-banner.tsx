@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { ShieldCheck, X } from 'lucide-react'
+import { ShieldCheck, X } from '@/components/ui/icons'
 import { Button } from '@/components/ui/button'
 import { Tooltip } from '@/components/ui/tooltip'
 import { useAuth, type TeamSummary } from '@/lib/auth'

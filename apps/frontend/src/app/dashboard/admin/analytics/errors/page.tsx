@@ -6,7 +6,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { motion } from 'framer-motion'
 import { DateRangePicker } from '@/components/admin/analytics/date-range-picker'
 import { ErrorRow } from '@/components/admin/analytics/error-row'
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle } from '@/components/ui/icons'
 
 interface ErrorData {
   id: string

@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { FieldDescription } from '@/components/ui/field'
 import { api } from '@/lib/api'
 import { Spinner } from '@/components/ui/spinner'
-import { Shield, Mail, Smartphone, Key } from 'lucide-react'
+import { Shield, Mail, Smartphone, Key } from '@/components/ui/icons'
 
 interface SecurityVerificationModalProps {
   open: boolean

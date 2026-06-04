@@ -10,7 +10,7 @@ import { FormSelect } from '@/components/ui/dropdown'
 import { Spinner } from '@/components/ui/spinner'
 import { Avatar } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
-import { Bug, AlertTriangle, CheckCircle2, Clock, XCircle } from 'lucide-react'
+import { Bug, AlertTriangle, CheckCircle2, Clock, XCircle } from '@/components/ui/icons'
 
 interface BugReportItem {
   id: string

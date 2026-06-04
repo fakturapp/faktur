@@ -12,7 +12,7 @@ import {
   ArrowUpRight,
   Clock,
   ChevronRight,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 interface RecentItem {
   id: string

@@ -32,7 +32,7 @@ import {
   Eye,
   EyeOff,
   Pencil,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import { CheckboxRoot, CheckboxControl, CheckboxIndicator, CheckboxContent } from '@/components/ui/checkbox'
 
 interface OauthApp {

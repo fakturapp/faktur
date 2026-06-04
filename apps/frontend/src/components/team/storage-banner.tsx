@@ -1,6 +1,6 @@
 'use client'
 
-import { HardDrive } from 'lucide-react'
+import { HardDrive } from '@/components/ui/icons'
 
 interface StorageInfo {
   totalBytes: number

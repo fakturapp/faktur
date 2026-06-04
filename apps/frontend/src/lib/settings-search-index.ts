@@ -11,7 +11,7 @@ import {
   Hash,
   Mail,
   Bell,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import type { ElementType } from 'react'
 
 export interface SettingsSearchItem {

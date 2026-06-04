@@ -17,7 +17,7 @@ import { api } from '@/lib/api'
 import {
   Building2, Plus, Pencil, AlertCircle, MapPin, Phone, Globe,
   ChevronLeft, ChevronRight as ChevronRightIcon, ImagePlus, Trash2,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 const editSteps = [
   { id: 'identity', label: 'Identité', icon: Building2, tooltip: 'Raison sociale, SIREN, N° TVA, forme juridique' },

@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/toast'
 import { api } from '@/lib/api'
-import { AlertTriangle, CheckCircle } from 'lucide-react'
+import { AlertTriangle, CheckCircle } from '@/components/ui/icons'
 import { CheckboxRoot, CheckboxControl, CheckboxIndicator, CheckboxContent } from '@/components/ui/checkbox'
 
 interface ConfirmPaymentModalProps {

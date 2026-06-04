@@ -13,7 +13,7 @@ import {
   Code2, Globe, ExternalLink, Server, Database, Layout,
   Layers, Paintbrush, Sparkles, Shield, Lock, Scale,
   ScrollText, Cookie, Zap, Fingerprint, Heart, Monitor,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import { isFakturDesktop, getFakturDesktopVersion } from '@/lib/is-desktop'
 
 const fadeUp = {

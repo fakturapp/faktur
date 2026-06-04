@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { KeyRound } from 'lucide-react'
+import { KeyRound } from '@/components/ui/icons'
 import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { RecoveryKeyDisplay } from '@/components/shared/recovery-key-display'

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Spinner } from '@/components/ui/spinner'
-import { AlertTriangle, Save, RotateCcw } from 'lucide-react'
+import { AlertTriangle, Save, RotateCcw } from '@/components/ui/icons'
 
 interface SaveBarProps {
   hasChanges: boolean

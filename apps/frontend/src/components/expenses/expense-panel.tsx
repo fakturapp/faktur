@@ -11,7 +11,7 @@ import { Switch } from '@/components/ui/switch'
 import { Spinner } from '@/components/ui/spinner'
 import { useToast, toast as t } from '@/components/ui/toast'
 import { api } from '@/lib/api'
-import { X, Wallet, Plus } from 'lucide-react'
+import { X, Wallet, Plus } from '@/components/ui/icons'
 
 interface ExpensePanelProps {
   open: boolean

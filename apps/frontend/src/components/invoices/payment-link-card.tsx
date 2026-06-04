@@ -15,7 +15,7 @@ import {
   AlertTriangle,
   CheckCircle,
   Lock,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 interface PaymentLinkInfo {
   id: string

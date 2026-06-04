@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, X } from 'lucide-react'
+import { Search, X } from '@/components/ui/icons'
 import { searchSettings, type SettingsSearchItem } from '@/lib/settings-search-index'
 
 interface SettingsSearchModalProps {

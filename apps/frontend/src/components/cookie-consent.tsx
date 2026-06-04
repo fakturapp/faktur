@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence, type PanInfo } from 'framer-motion'
-import { Cookie, X, Shield, BarChart3 } from 'lucide-react'
+import { Cookie, X, Shield, BarChart3 } from '@/components/ui/icons'
 import { cn } from '@/lib/utils'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3333'

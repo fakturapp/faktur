@@ -25,7 +25,7 @@ import {
   TrendingUp,
   FilePlus,
   Sparkles,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import { Spinner } from '@/components/ui/spinner'
 import { Dropdown, DropdownItem } from '@/components/ui/dropdown'
 import { QuoteDetailOverlay } from '@/components/quotes/quote-detail-overlay'

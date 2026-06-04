@@ -44,7 +44,7 @@ import {
   AlertTriangle,
   Code2,
   ExternalLink,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import { PLATFORM_URL } from '@/lib/external-urls'
 import { getPlan } from '@/lib/plans'
 import { TeamEncryptionMigrationModal } from '@/components/team/team-encryption-migration-modal'

@@ -18,7 +18,7 @@ import {
   Download,
   ArrowLeft,
   Trash2,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },

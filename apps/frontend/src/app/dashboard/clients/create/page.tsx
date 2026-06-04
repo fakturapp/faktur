@@ -26,7 +26,7 @@ import {
   MapPin,
   StickyNote,
   ChevronRight,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 type ClientType = 'company' | 'individual'
 

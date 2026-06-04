@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
-import { Check, ArrowLeft, ArrowRight } from 'lucide-react'
+import { Check, ArrowLeft, ArrowRight } from '@/components/ui/icons'
 
 export default function GoogleLinkedPage() {
   const router = useRouter()

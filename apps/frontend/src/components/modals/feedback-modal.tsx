@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Spinner } from '@/components/ui/spinner'
 import { api } from '@/lib/api'
 import { useToast } from '@/components/ui/toast'
-import { Star, CheckCircle2 } from 'lucide-react'
+import { Star, CheckCircle2 } from '@/components/ui/icons'
 import { cn } from '@/lib/utils'
 
 interface FeedbackModalProps {

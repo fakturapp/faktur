@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { cn } from '@/lib/utils'
-import { Copy, Check } from 'lucide-react'
+import { Copy, Check } from '@/components/ui/icons'
 
 interface IbanInputProps {
   value: string

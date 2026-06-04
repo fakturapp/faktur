@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { Card, CardContent } from '@/components/ui/card'
-import { Scale, ScrollText, Lock, Shield, Cookie, ChevronRight } from 'lucide-react'
+import { Scale, ScrollText, Lock, Shield, Cookie, ChevronRight } from '@/components/ui/icons'
 
 const legalPages = [
   {

@@ -37,7 +37,7 @@ import {
   History,
   FileMinus2,
   Link2,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 interface InvoiceDetail {
   id: string

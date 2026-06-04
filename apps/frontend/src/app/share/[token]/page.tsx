@@ -6,7 +6,7 @@ import { motion } from 'framer-motion'
 import { api } from '@/lib/api'
 import { Spinner } from '@/components/ui/spinner'
 import { Button } from '@/components/ui/button'
-import { ShieldAlert, LogIn } from 'lucide-react'
+import { ShieldAlert, LogIn } from '@/components/ui/icons'
 
 type DocumentType = 'invoice' | 'quote' | 'credit_note'
 

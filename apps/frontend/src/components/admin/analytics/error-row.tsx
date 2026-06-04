@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronRight, Check, AlertTriangle, Bug, Globe } from 'lucide-react'
+import { ChevronRight, Check, AlertTriangle, Bug, Globe } from '@/components/ui/icons'
 
 interface ErrorRowProps {
   id: string

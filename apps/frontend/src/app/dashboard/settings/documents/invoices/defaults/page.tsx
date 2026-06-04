@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, type Variants } from 'framer-motion'
-import { ClipboardList, Check } from 'lucide-react'
+import { ClipboardList, Check } from '@/components/ui/icons'
 import { InvoicePreview } from '@/components/settings/invoice-preview'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'

@@ -1,7 +1,7 @@
 'use client'
 
 import { Card, CardContent } from '@/components/ui/card'
-import { Lock } from 'lucide-react'
+import { Lock } from '@/components/ui/icons'
 
 export default function PrivacyPage() {
   return (

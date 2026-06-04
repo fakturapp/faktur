@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import * as pdfjsLib from 'pdfjs-dist'
 import type { PDFDocumentProxy, RenderTask } from 'pdfjs-dist'
-import { ChevronLeft, ChevronRight, FileWarning } from 'lucide-react'
+import { ChevronLeft, ChevronRight, FileWarning } from '@/components/ui/icons'
 import { Spinner } from '@/components/ui/spinner'
 import { api } from '@/lib/api'
 

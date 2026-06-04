@@ -31,7 +31,7 @@ import {
   Undo2,
   RefreshCw,
   ChevronRight,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 type StorageCategory = 'company_logo' | 'invoice_logo' | 'team_icon' | 'payment_link_pdf'
 

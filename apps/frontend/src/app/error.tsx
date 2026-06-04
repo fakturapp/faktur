@@ -1,6 +1,6 @@
 'use client'
 
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle } from '@/components/ui/icons'
 
 export default function Error({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (

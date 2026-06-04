@@ -6,7 +6,7 @@ import { motion } from 'framer-motion'
 import {
   ArrowLeft, Download, Save, Sparkles, FileText, Receipt, FileMinus2, RotateCcw,
   Reply, Forward, Star, MoreHorizontal, Wand2, Check,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import CodeMirror from '@uiw/react-codemirror'
 import { html as htmlLang } from '@codemirror/lang-html'
 import { sublime } from '@uiw/codemirror-theme-sublime'

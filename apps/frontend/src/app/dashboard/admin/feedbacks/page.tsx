@@ -9,7 +9,7 @@ import { useToast } from '@/components/ui/toast'
 import { Spinner } from '@/components/ui/spinner'
 import { Avatar } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
-import { Star } from 'lucide-react'
+import { Star } from '@/components/ui/icons'
 
 interface FeedbackItem {
   id: string

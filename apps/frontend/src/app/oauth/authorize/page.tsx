@@ -28,7 +28,7 @@ import {
   KeyRound,
   ShieldAlert,
   LogOut,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 const DarkVeil = dynamic(() => import('@/components/effects/DarkVeil'), { ssr: false })
 

@@ -18,7 +18,7 @@ import {
   CheckCircle2,
   FileEdit,
   CalendarDays,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import { CreditNoteDetailOverlay } from '@/components/credit-notes/credit-note-detail-overlay'
 import { useActiveEditors, ActiveEditorsBadge } from '@/components/collaboration/active-editors-badge'
 

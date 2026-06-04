@@ -11,7 +11,7 @@ import { api } from '@/lib/api'
 import {
   Link2, Copy, Check, Mail, X, UserPlus, Globe,
   ChevronDown, Shield, Eye, Pencil, Trash2, Users
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import { CheckboxRoot, CheckboxControl, CheckboxIndicator, CheckboxContent } from '@/components/ui/checkbox'
 
 

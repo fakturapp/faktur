@@ -9,7 +9,7 @@ import { api } from '@/lib/api'
 import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/toast'
 import { getPlan, formatPlanPrice, type PlanId } from '@/lib/plans'
-import { ChevronLeft, Check } from 'lucide-react'
+import { ChevronLeft, Check } from '@/components/ui/icons'
 
 interface CheckoutData {
   clientSecret: string

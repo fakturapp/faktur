@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/toast'
 import { api } from '@/lib/api'
-import { Info, Check } from 'lucide-react'
+import { Info, Check } from '@/components/ui/icons'
 
 interface FirstDocumentBannerProps {
   documentType: 'quote' | 'invoice'

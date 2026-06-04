@@ -15,7 +15,7 @@ import { HiddenUsername } from '@/components/auth/hidden-username'
 import {
   ChevronRight, ChevronLeft, Lock, Download, Shield,
   CheckCircle2, FileArchive, Landmark, ArrowRight, CreditCard,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 interface TeamInfo {
   id: string

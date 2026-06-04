@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, type RefObject } from 'react'
-import { Minus, Plus } from 'lucide-react'
+import { Minus, Plus } from '@/components/ui/icons'
 
 const STORAGE_KEY = 'faktur_doc_zoom'
 const MIN = 50

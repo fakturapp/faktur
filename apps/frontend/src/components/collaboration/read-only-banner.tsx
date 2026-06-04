@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Eye } from 'lucide-react'
+import { Eye } from '@/components/ui/icons'
 
 export function ReadOnlyBanner() {
   return (

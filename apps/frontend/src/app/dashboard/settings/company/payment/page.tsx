@@ -12,7 +12,7 @@ import {
   PenLine,
   Receipt,
   Trash2,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import { api } from '@/lib/api'
 import { useToast } from '@/components/ui/toast'
 import { useCompanySettings } from '@/lib/company-settings-context'

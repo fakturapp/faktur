@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Download, RefreshCw } from 'lucide-react'
+import { Download, RefreshCw } from '@/components/ui/icons'
 import {
   getFakturDesktopBridge,
   type FakturDesktopUpdateInfo,

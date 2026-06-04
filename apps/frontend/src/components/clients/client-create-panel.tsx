@@ -25,7 +25,7 @@ import {
   Phone,
   StickyNote,
   ChevronRight,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 interface ClientCreatePanelProps {
   open: boolean

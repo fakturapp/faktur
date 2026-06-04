@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft } from '@/components/ui/icons'
 
 export default function DownloadLayout({ children }: { children: React.ReactNode }) {
   return (

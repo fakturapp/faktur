@@ -7,7 +7,7 @@ import { PresenceBar } from '@/components/collaboration/presence-bar'
 import { LiveCursors } from '@/components/collaboration/live-cursors'
 import { ReadOnlyBanner } from '@/components/collaboration/read-only-banner'
 import { useCollaborationContext } from '@/components/collaboration/collaboration-provider'
-import { Share2, Wifi, WifiOff, FlaskConical } from 'lucide-react'
+import { Share2, Wifi, WifiOff, FlaskConical } from '@/components/ui/icons'
 
 
 type DocumentType = 'invoice' | 'quote' | 'credit_note'

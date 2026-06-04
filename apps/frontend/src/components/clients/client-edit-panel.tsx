@@ -25,7 +25,7 @@ import {
   Trash2,
   FileText,
   Receipt,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 interface Client {
   id: string

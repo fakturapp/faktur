@@ -27,7 +27,7 @@ import {
   FilePlus,
   Sparkles,
   RefreshCw,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 import { Spinner } from '@/components/ui/spinner'
 import { Dropdown, DropdownItem } from '@/components/ui/dropdown'
 import { InvoiceDetailOverlay } from '@/components/invoices/invoice-detail-overlay'

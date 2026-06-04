@@ -19,7 +19,7 @@ import { Spinner } from '@/components/ui/spinner'
 import {
   AlertTriangle, ArrowLeft, ArrowRight, Check, Users, UserCheck,
   KeyRound, Mail, Lock, Trash2, Shield, Crown, LogOut, Eye, EyeOff,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 const steps = [
   { label: 'Avertissement', icon: AlertTriangle },

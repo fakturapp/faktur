@@ -34,7 +34,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ShieldAlert,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 const INVOICES_PER_PAGE = 6
 

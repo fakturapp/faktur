@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useTutorial } from '@/lib/tutorial-context'
 import { TUTORIAL_LEVELS } from '@/components/tutorial/tutorial-steps'
 import { cn } from '@/lib/utils'
-import { GraduationCap, X, Search, Check, ChevronRight, Lock } from 'lucide-react'
+import { GraduationCap, X, Search, Check, ChevronRight, Lock } from '@/components/ui/icons'
 
 export function TutorialBanner() {
   const { active, level, step, totalStepsInLevel, currentLevel, quitTutorial, goToLevel } = useTutorial()

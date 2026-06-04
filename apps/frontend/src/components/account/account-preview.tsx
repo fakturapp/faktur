@@ -11,7 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import {
   Camera, Shield, Calendar, Globe, KeyRound, ShieldCheck,
   Fingerprint, Link2,
-} from 'lucide-react'
+} from '@/components/ui/icons'
 
 interface Provider {
   provider: string

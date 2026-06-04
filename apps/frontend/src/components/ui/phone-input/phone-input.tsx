@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { cn } from '@/lib/utils'
-import { Check, ChevronsUpDown, Search } from 'lucide-react'
+import { Check, ChevronsUpDown, Search } from '@/components/ui/icons'
 
 const COUNTRIES = [
   { code: 'FR', dial: '33', flag: '🇫🇷', name: 'France', maxDigits: 9, format: [1, 2, 2, 2, 2] },

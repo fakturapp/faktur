@@ -16,7 +16,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/components/ui/toast'
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check } from '@/components/ui/icons'
 import { apiKeysClient, type ApiKeyShape, type ScopesCatalog } from '@/lib/api-keys-client'
 
 type Step = 'info' | 'permissions'

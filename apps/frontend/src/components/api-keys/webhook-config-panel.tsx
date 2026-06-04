@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Send, RefreshCw, Trash2, Check } from 'lucide-react'
+import { Send, RefreshCw, Trash2, Check } from '@/components/ui/icons'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'

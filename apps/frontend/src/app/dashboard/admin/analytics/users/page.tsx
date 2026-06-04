@@ -6,7 +6,7 @@ import { api } from '@/lib/api'
 import { Spinner } from '@/components/ui/spinner'
 import { motion } from 'framer-motion'
 import { DateRangePicker } from '@/components/admin/analytics/date-range-picker'
-import { Users } from 'lucide-react'
+import { Users } from '@/components/ui/icons'
 
 const CHART_COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4']
 
