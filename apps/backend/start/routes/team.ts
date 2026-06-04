@@ -48,7 +48,7 @@ router
     router.post('/icon', [UploadIcon, 'handle']).use(middleware.storageQuota())
     router.post('/switch', [TeamSwitch, 'handle'])
     router.post('/export', [TeamExport, 'handle'])
-    router.post('/import', [TeamImport, 'handle'])
+    router.post('/import', [TeamImport, 'handle']).use(middleware.storageQuota())
     router.get('/members', [TeamMembers, 'handle'])
     router.get('/search-users', [SearchUsers, 'handle'])
     router.post('/invite', [TeamInvite, 'handle'])
