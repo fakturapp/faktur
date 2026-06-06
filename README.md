@@ -1,3 +1,13 @@
+> [!CAUTION]
+> **Ce dépôt a migré et est désormais en lecture seule.**
+> Le code n'est plus maintenu ici : le monorepo a été réparti dans des dépôts dédiés. Rendez-vous sur les nouveaux dépôts ci-dessous.
+>
+> - Backend (API AdonisJS 7) : https://github.com/fakturapp/server
+> - Frontend (application Next.js 16) : https://github.com/fakturapp/Application
+> - Compte (authentification, OAuth, paramètres du compte) : https://github.com/fakturapp/account
+> - Plateforme (portail développeur) : https://github.com/fakturapp/platform
+> - Documentation : https://github.com/fakturapp/docs
+
 # Faktur
 
 <a href="https://fakturapp.cc"><img src="https://img.shields.io/badge/Site-fakturapp.cc-6366f1?style=flat-square" alt="Site" /></a>
